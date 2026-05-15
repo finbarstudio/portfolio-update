@@ -19,10 +19,7 @@ export default function ContactPage() {
     <div className="px-6 md:px-10">
       {/* Back nav */}
       <div className="py-5 border-b border-line">
-        <Link
-          href="/"
-          className="mono-label text-ink-soft hover:text-pink transition-colors"
-        >
+        <Link href="/" className="mono-label text-ink-soft hover:text-pink transition-colors">
           ← HOME
         </Link>
       </div>
@@ -30,48 +27,62 @@ export default function ContactPage() {
       {/* Heading */}
       <div className="pt-10 pb-8 border-b border-line">
         <p className="mono-label text-ink-soft mb-3">Contact</p>
-        <h1 className="font-mono font-bold text-[clamp(1.5rem,3vw,2rem)] tracking-[0.08em] uppercase text-ink max-w-xl leading-tight">
+        <h1
+          className="font-mono font-bold uppercase text-ink max-w-xl leading-tight"
+          style={{ fontSize: "var(--text-h1)", letterSpacing: "0.08em" }}
+        >
           Let&rsquo;s work together.
         </h1>
       </div>
 
-      {/* Primary contact */}
+      {/* Contact details — email, phone, location */}
       <div className="py-10 border-b border-line">
-        <p className="mono-label text-ink-soft mb-5">Email</p>
-        <a
-          href="mailto:finbar@finbar.studio"
-          className="block font-sans text-2xl font-medium text-ink hover:text-pink transition-colors mb-2"
-        >
-          finbar@finbar.studio
-        </a>
-        <p className="text-sm text-ink-soft font-sans">
-          Best way to reach me. Usually reply within one business day.{" "}
-          {/* PLACEHOLDER — adjust if preferred */}
-        </p>
-      </div>
+        <div className="mb-7">
+          <p className="mono-label text-ink-soft mb-2">Email</p>
+          <a
+            href="mailto:finbar@finbar.studio"
+            className="block font-sans font-medium text-ink hover:text-pink transition-colors link-wipe"
+            style={{ fontSize: "var(--text-h2)" }}
+          >
+            finbar@finbar.studio
+          </a>
+          <p className="text-ink-soft font-sans mt-1" style={{ fontSize: "var(--text-small)" }}>
+            Best way to reach me. Usually reply within one business day.{/* PLACEHOLDER — adjust */}
+          </p>
+        </div>
 
-      {/* Phone */}
-      <div className="py-8 border-b border-line">
-        <p className="mono-label text-ink-soft mb-3">Phone</p>
-        <a
-          href="tel:+61412796630"
-          className="font-mono text-sm text-ink hover:text-pink transition-colors"
-        >
-          +61 412 796 630
-        </a>
-      </div>
+        <div className="mb-7">
+          <p className="mono-label text-ink-soft mb-2">Phone</p>
+          <a
+            href="tel:+61412796630"
+            className="font-mono text-ink hover:text-pink transition-colors link-wipe"
+            style={{ fontSize: "var(--text-small)" }}
+          >
+            +61 412 796 630
+          </a>
+        </div>
 
-      {/* Location */}
-      <div className="py-8 border-b border-line">
-        <p className="mono-label text-ink-soft mb-3">Location</p>
-        <p className="font-mono text-sm text-ink">Brisbane, Australia</p>
-        <p className="text-xs text-ink-soft font-sans mt-1">
-          Remote-friendly — previously worked with clients across UK and Australia.
-        </p>
+        <div className="mb-7">
+          <p className="mono-label text-ink-soft mb-2">Location</p>
+          <p className="font-mono text-ink" style={{ fontSize: "var(--text-small)" }}>Brisbane, Australia</p>
+          <p className="text-ink-soft font-sans mt-0.5" style={{ fontSize: "var(--text-caption)" }}>
+            Remote-friendly — previously worked with clients across UK and Australia.
+          </p>
+        </div>
+
+        {/* OPEN FOR WORK — sits directly under contact details per spec §6 */}
+        <div className="pt-2">
+          <span className="status-badge mb-2 block">OPEN FOR WORK</span>
+          <p className="text-ink-soft font-sans max-w-md" style={{ fontSize: "var(--text-small)" }}>
+            {/* PLACEHOLDER — update with current availability */}
+            Available for full-time design roles and freelance projects.
+            Happy to discuss Brisbane-based or remote positions.
+          </p>
+        </div>
       </div>
 
       {/* Socials */}
-      <div className="py-8 border-b border-line">
+      <div className="py-8">
         <p className="mono-label text-ink-soft mb-4">Follow</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {socials.map((s) => (
@@ -80,25 +91,12 @@ export default function ContactPage() {
               href={s.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="mono-label text-ink hover:text-pink transition-colors"
+              className="mono-label text-ink hover:text-pink transition-colors link-wipe"
             >
               {s.label}
             </a>
           ))}
         </div>
-      </div>
-
-      {/* Availability note */}
-      <div className="py-8">
-        <span className="status-badge mb-3 block">OPEN FOR WORK</span>
-        <p className="text-sm text-ink-soft font-sans max-w-md">
-          {/*
-           * PLACEHOLDER — update with current availability.
-           * E.g. full-time roles, freelance, start date.
-           */}
-          Available for full-time design roles and freelance projects.
-          Happy to discuss Brisbane-based or remote positions.
-        </p>
       </div>
     </div>
   );

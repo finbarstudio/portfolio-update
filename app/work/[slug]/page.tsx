@@ -28,7 +28,7 @@ export async function generateMetadata({
   };
 }
 
-/* ─── Tag pill ────────────────────────────────────────────────*/
+/* ─── Tag pill ─────────────────────────────────────────────── */
 function Tag({
   label,
   variant = "default",
@@ -36,24 +36,47 @@ function Tag({
   label: string;
   variant?: "default" | "teal" | "pink";
 }) {
-  const cls = {
-    default: "tag tag-default",
-    teal: "tag tag-teal",
-    pink: "tag tag-pink",
-  }[variant];
+  const cls = { default: "tag tag-default", teal: "tag tag-teal", pink: "tag tag-pink" }[variant];
   return <span className={cls}>{label}</span>;
 }
 
-/* ─── Hero image ───────────────────────────────────────────── */
-function HeroImage({ project }: { project: Project }) {
+/* ─── Case study image — padded, max-height constrained ─────
+   All images on case study pages use this wrapper.
+   Padding comes from --image-pad; max-height caps at 72vh.
+   ─────────────────────────────────────────────────────────── */
+function CaseImage({
+  src,
+  alt,
+  priority = false,
+  sizes = "(max-width: 768px) 100vw, calc(100vw - 224px)",
+  aspectRatio = "16/9",
+  halfWidth = false,
+}: {
+  src: string;
+  alt: string;
+  priority?: boolean;
+  sizes?: string;
+  aspectRatio?: string;
+  halfWidth?: boolean;
+}) {
   return (
-    <div className="relative w-full overflow-hidden bg-line" style={{ aspectRatio: "16/9" }}>
+    <div
+      className="img-wrap"
+      style={{
+        aspectRatio,
+        marginTop: "var(--image-pad)",
+        marginBottom: "var(--image-pad)",
+        ...(halfWidth
+          ? { sizes: "(max-width: 768px) 100vw, calc((100vw - 224px) / 2)" }
+          : {}),
+      }}
+    >
       <Image
-        src={project.heroImage.src}
-        alt={project.heroImage.alt}
+        src={src}
+        alt={alt}
         fill
-        priority
-        sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
+        priority={priority}
+        sizes={halfWidth ? "(max-width: 768px) 100vw, calc((100vw - 224px) / 2)" : sizes}
         className="object-cover"
       />
     </div>
@@ -80,13 +103,12 @@ function SummaryBlock({ project }: { project: Project }) {
     { label: "PROBLEM", value: project.problem },
     { label: "OUTCOME", value: project.outcome },
   ];
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 border-b border-line">
       {items.map(({ label, value }) => (
         <div key={label}>
           <p className="mono-label text-ink-soft mb-2">{label}</p>
-          <p className="text-sm text-ink leading-relaxed">{value}</p>
+          <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{value}</p>
         </div>
       ))}
     </div>
@@ -110,26 +132,20 @@ function SkillsRow({ project }: { project: Project }) {
 /* ─── Visual body ──────────────────────────────────────────── */
 function VisualBody({ project }: { project: Project }) {
   return (
-    <div className="py-10 border-b border-line">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="py-4 border-b border-line">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
         {project.images.map((img, i) => (
           <figure
             key={i}
-            className={`${
-              i === 0 && project.images.length >= 3 ? "md:col-span-2" : ""
-            }`}
+            className={i === 0 && project.images.length >= 3 ? "md:col-span-2" : ""}
           >
-            <div className="relative w-full overflow-hidden bg-line" style={{ aspectRatio: "16/9" }}>
-              <Image
-                src={img.src}
-                alt={img.alt}
-                fill
-                sizes="(max-width: 768px) 100vw, calc((100vw - 224px) / 2)"
-                className="object-cover"
-              />
-            </div>
+            <CaseImage
+              src={img.src}
+              alt={img.alt}
+              halfWidth={!(i === 0 && project.images.length >= 3)}
+            />
             {img.caption && (
-              <figcaption className="mt-2 text-xs text-ink-soft font-sans leading-relaxed">
+              <figcaption className="text-ink-soft font-sans leading-relaxed" style={{ fontSize: "var(--text-caption)", marginTop: "-0.5rem", marginBottom: "var(--image-pad)" }}>
                 {img.caption}
               </figcaption>
             )}
@@ -143,7 +159,7 @@ function VisualBody({ project }: { project: Project }) {
 /* ─── Depth section (Featured only) ───────────────────────── */
 function DepthSections({ sections }: { sections: DepthSection[] }) {
   return (
-    <div className="py-10 border-b border-line">
+    <div className="py-8 border-b border-line">
       <p className="mono-label text-ink-soft mb-8 border-b border-line pb-3">
         PROCESS &amp; DETAIL
       </p>
@@ -151,33 +167,16 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
         {sections.map((section, i) => (
           <div key={i}>
             <h3 className="mono-heading text-ink mb-4">{section.heading}</h3>
-            <p className="text-sm text-ink leading-relaxed mb-6 max-w-2xl">
+            <p className="text-ink leading-relaxed mb-2 max-w-2xl" style={{ fontSize: "var(--text-small)" }}>
               {section.body}
             </p>
             {section.images.length > 0 && (
-              <div
-                className={`grid gap-5 ${
-                  section.images.length === 1
-                    ? "grid-cols-1"
-                    : "grid-cols-1 md:grid-cols-2"
-                }`}
-              >
+              <div className={`grid gap-x-6 ${section.images.length === 1 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}>
                 {section.images.map((img, j) => (
                   <figure key={j}>
-                    <div
-                      className="relative w-full overflow-hidden bg-line"
-                      style={{ aspectRatio: "16/9" }}
-                    >
-                      <Image
-                        src={img.src}
-                        alt={img.alt}
-                        fill
-                        sizes="(max-width: 768px) 100vw, calc((100vw - 224px) / 2)"
-                        className="object-cover"
-                      />
-                    </div>
+                    <CaseImage src={img.src} alt={img.alt} halfWidth={section.images.length > 1} />
                     {img.caption && (
-                      <figcaption className="mt-2 text-xs text-ink-soft font-sans leading-relaxed">
+                      <figcaption className="text-ink-soft font-sans leading-relaxed" style={{ fontSize: "var(--text-caption)", marginTop: "-0.5rem", marginBottom: "var(--image-pad)" }}>
                         {img.caption}
                       </figcaption>
                     )}
@@ -200,7 +199,8 @@ function FooterCTA() {
         <p className="mono-label text-ink-soft mb-1">Open for work</p>
         <a
           href="mailto:finbar@finbar.studio"
-          className="font-sans text-lg font-medium text-ink hover:text-pink transition-colors"
+          className="font-sans font-medium text-ink hover:text-pink transition-colors link-wipe"
+          style={{ fontSize: "var(--text-h3)" }}
         >
           finbar@finbar.studio
         </a>
@@ -224,42 +224,42 @@ export default async function CaseStudyPage({
   const { slug } = await params;
   const project = projects.find((p) => p.slug === slug);
 
-  if (!project || project.tier === "gallery") {
-    notFound();
-  }
+  if (!project || project.tier === "gallery") notFound();
 
   return (
     <article className="px-6 md:px-10">
       {/* Back link */}
       <div className="py-5 border-b border-line">
-        <Link
-          href="/#work"
-          className="mono-label text-ink-soft hover:text-pink transition-colors"
-        >
+        <Link href="/#work" className="mono-label text-ink-soft hover:text-pink transition-colors">
           ← WORK
         </Link>
       </div>
 
-      {/* Hero */}
-      <div className="pt-8 pb-5 border-b border-line">
-        <p className="mono-label text-ink-soft mb-3">{project.oneLiner}</p>
-        <h1 className="font-mono font-bold text-[clamp(1.25rem,3vw,2rem)] tracking-[0.06em] uppercase text-ink">
+      {/* Header: title first, description second — spec §9 */}
+      <div className="pt-8 pb-2">
+        <h1
+          className="font-mono font-bold uppercase text-ink mb-3"
+          style={{ fontSize: "var(--text-h1)", letterSpacing: "0.06em", lineHeight: 1.1 }}
+        >
           {project.name}
         </h1>
+        <p className="mono-label text-ink-soft pb-5 border-b border-line">
+          {project.oneLiner}
+        </p>
       </div>
 
-      <HeroImage project={project} />
+      {/* Hero image */}
+      <CaseImage src={project.heroImage.src} alt={project.heroImage.alt} priority />
+
       <MetaRow project={project} />
       <SummaryBlock project={project} />
       <SkillsRow project={project} />
       <VisualBody project={project} />
 
-      {/* Optional depth — Featured projects only */}
       {project.hasDepth && project.depth && project.depth.length > 0 && (
         <DepthSections sections={project.depth} />
       )}
 
-      {/* Live URL if present */}
       {project.liveUrl && (
         <div className="py-6 border-b border-line">
           <p className="mono-label text-ink-soft mb-2">LIVE SITE</p>
@@ -267,7 +267,8 @@ export default async function CaseStudyPage({
             href={project.liveUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-mono text-teal hover:text-pink transition-colors"
+            className="font-mono text-teal hover:text-pink transition-colors link-wipe"
+            style={{ fontSize: "var(--text-small)" }}
           >
             {project.liveUrl} ↗
           </a>

@@ -1,67 +1,112 @@
+/* ═══════════════════════════════════════════════════════════════
+   finbar✶studio — Global Styles
+
+   CONTROL PANEL: The :root block below is the single place to
+   restyle the entire site. Edit colours, type scale, and spacing
+   here — every component reads from these variables. Nothing is
+   hard-coded anywhere else.
+   ═══════════════════════════════════════════════════════════════ */
+
 @import "tailwindcss";
 
-/* ─── Design Tokens ─────────────────────────────────────────── */
+/* ─── CONTROL PANEL ─────────────────────────────────────────────
+   Edit freely. Changes here ripple across the whole site.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+
+  /* ── COLOUR ─────────────────────────────────────────────────── */
+  --bg:       #FAFAF8;   /* page background — warm off-white        */
+  --ink:      #141414;   /* primary text — near-black               */
+  --ink-soft: #6B6B6B;   /* secondary text, captions, meta          */
+  --line:     #E4E4E0;   /* hairline borders, grid lines            */
+  --pink:     #FF1F8F;   /* PRIMARY accent — magenta-pink           */
+  --teal:     #4DA8E0;   /* secondary highlight — sky blue          */
+
+  /* ── TYPE SCALE ─────────────────────────────────────────────── */
+  --text-display: clamp(2rem, 5.5vw, 3.75rem); /* hero display     */
+  --text-h1:      clamp(1.375rem, 3vw, 2rem);   /* case study title */
+  --text-h2:      clamp(1.125rem, 2vw, 1.5rem); /* section headings */
+  --text-h3:      1rem;                          /* sub-headings     */
+  --text-body:    0.9375rem;  /* 15px — prose                       */
+  --text-small:   0.875rem;   /* 14px — card summary, etc.          */
+  --text-caption: 0.75rem;    /* 12px — image captions              */
+  --text-label:   0.6875rem;  /* 11px — mono-caps labels, nav       */
+  --text-tag:     0.5625rem;  /* 9px  — tag pills                   */
+
+  /* ── SPACING ────────────────────────────────────────────────── */
+  --space-section: 4.5rem;   /* vertical gap between major sections */
+  --image-pad:     1.5rem;   /* breathing room above & below images */
+}
+
+/* ─── Tailwind bridge ────────────────────────────────────────────
+   Maps :root vars → Tailwind utility classes.
+   bg-bg, text-ink, text-pink, border-line, text-teal, etc.
+   ─────────────────────────────────────────────────────────────── */
 @theme {
-  --color-bg:       #FAFAF8;
-  --color-ink:      #141414;
-  --color-ink-soft: #6B6B6B;
-  --color-line:     #E4E4E0;
-  --color-pink:     #FF2D78;
-  --color-teal:     #5FC9C4;
+  --color-bg:       var(--bg);
+  --color-ink:      var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line:     var(--line);
+  --color-pink:     var(--pink);
+  --color-teal:     var(--teal);
 
   --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "Courier New", monospace;
 }
 
-/* ─── Keyframes ─────────────────────────────────────────────── */
+/* ─── Keyframes ──────────────────────────────────────────────── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* Hero text fades as work scrolls over it.
+   CSS scroll-driven animation — no JS.
+   Chrome 115+, Firefox 110+, Safari 17.2+.
+   Falls back gracefully in older browsers. */
+@keyframes hero-exit {
+  from { opacity: 1;   transform: translateY(0); }
+  to   { opacity: 0.08; transform: translateY(-12px); }
 }
 
-/* ─── Base ──────────────────────────────────────────────────── */
+/* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
-
   html { scroll-behavior: smooth; }
 
   body {
-    background-color: #FAFAF8;
-    color: #141414;
-    font-family: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Remove default focus outline — we'll add our own */
   :focus-visible {
-    outline: 2px solid #FF2D78;
+    outline: 2px solid var(--pink);
     outline-offset: 2px;
     border-radius: 2px;
   }
 }
 
-/* ─── Components ────────────────────────────────────────────── */
+/* ─── Components ─────────────────────────────────────────────── */
 @layer components {
-  /* Mono-caps label — the typographic signature of the site */
+
+  /* Mono-caps label — the typographic signature of finbar✶studio */
   .mono-label {
-    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-family: var(--font-mono);
     font-weight: 700;
-    font-size: 0.6875rem;   /* 11px */
+    font-size: var(--text-label);
     letter-spacing: 0.14em;
     text-transform: uppercase;
     line-height: 1.4;
   }
 
-  /* Larger mono treatment for headings */
   .mono-heading {
-    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-family: var(--font-mono);
     font-weight: 700;
-    font-size: 0.75rem;     /* 12px */
+    font-size: 0.75rem;        /* sits between label and h3 */
     letter-spacing: 0.16em;
     text-transform: uppercase;
     line-height: 1.4;
@@ -78,7 +123,7 @@
     left: 0;
     width: 100%;
     height: 1px;
-    background: #FF2D78;
+    background: var(--pink);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.22s ease;
@@ -92,24 +137,24 @@
 
   /* Sidebar nav link */
   .sidebar-link {
-    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-family: var(--font-mono);
     font-weight: 700;
-    font-size: 0.6875rem;
+    font-size: var(--text-label);
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #6B6B6B;
+    color: var(--ink-soft);
     transition: color 0.18s ease;
     display: block;
     padding: 0.25rem 0;
   }
-  .sidebar-link:hover  { color: #FF2D78; }
-  .sidebar-link.active { color: #FF2D78; }
+  .sidebar-link:hover  { color: var(--pink); }
+  .sidebar-link.active { color: var(--pink); }
 
   /* Tag pill */
   .tag {
-    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-family: var(--font-mono);
     font-weight: 700;
-    font-size: 0.5625rem;   /* 9px */
+    font-size: var(--text-tag);
     letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: 0.2em 0.6em;
@@ -117,21 +162,21 @@
     display: inline-block;
     line-height: 1.6;
   }
-  .tag-default { background: #E4E4E0; color: #6B6B6B; }
-  .tag-teal    { background: #5FC9C4; color: #141414; }
-  .tag-pink    { background: #FF2D78; color: #FAFAF8; }
+  .tag-default { background: var(--line); color: var(--ink-soft); }
+  .tag-teal    { background: var(--teal); color: var(--ink); }
+  .tag-pink    { background: var(--pink); color: var(--bg); }
 
-  /* Open-for-work badge */
+  /* Open-for-work status badge */
   .status-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.4em;
-    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-family: var(--font-mono);
     font-weight: 700;
-    font-size: 0.5625rem;
+    font-size: var(--text-tag);
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #5FC9C4;
+    color: var(--teal);
   }
   .status-badge::before {
     content: '';
@@ -139,7 +184,26 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #5FC9C4;
+    background: var(--teal);
     flex-shrink: 0;
+  }
+
+  /* Image wrapper — adds breathing room, caps height at 72vh.
+     Applied around every image on the site. */
+  .img-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--line);
+    max-height: 72vh;
+  }
+
+  /* Hero text — CSS scroll-driven fade as work slides over it */
+  @supports (animation-timeline: scroll()) {
+    .hero-scroll-fade {
+      animation: hero-exit linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0vh 55vh;
+    }
   }
 }

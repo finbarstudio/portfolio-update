@@ -30,14 +30,44 @@ function TagRow({ project }: { project: Project }) {
   );
 }
 
-/* ─── Featured card (full-width, large image) ─────────────── */
-export function FeaturedCard({
-  project,
-  index,
+/* ─── Image wrapper — applies --image-pad and caps height ────
+   Wraps every card image. Height is limited to 72vh so no
+   single image dominates the viewport.
+   ─────────────────────────────────────────────────────────── */
+function CardImage({
+  src,
+  alt,
+  priority = false,
+  sizes,
+  aspectRatio = "3/2",
 }: {
-  project: Project;
-  index: number;
+  src: string;
+  alt: string;
+  priority?: boolean;
+  sizes: string;
+  aspectRatio?: string;
 }) {
+  return (
+    <div style={{ marginBottom: "var(--image-pad)" }}>
+      <div
+        className="img-wrap"
+        style={{ aspectRatio }}
+      >
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Featured card (full-width) ─────────────────────────── */
+export function FeaturedCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
       className="card-animate col-span-12 group"
@@ -48,47 +78,34 @@ export function FeaturedCard({
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {/* Image */}
-        <div className="relative w-full overflow-hidden bg-line" style={{ aspectRatio: "16/9" }}>
-          <Image
-            src={project.heroImage.src}
-            alt={project.heroImage.alt}
-            fill
-            sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
-            priority={index === 0}
-          />
-        </div>
+        <CardImage
+          src={project.heroImage.src}
+          alt={project.heroImage.alt}
+          priority={index === 0}
+          sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
+          aspectRatio="16/9"
+        />
 
-        {/* Card info */}
-        <div className="pt-5 pb-8 border-b border-line">
+        <div className="pb-8 border-b border-line">
           <div className="flex items-start justify-between gap-4 mb-3">
-            <h2 className="mono-heading text-ink group-hover:text-pink transition-colors text-sm">
+            <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
               {project.name}
             </h2>
             <span className="mono-label text-ink-soft whitespace-nowrap mt-px">{project.date}</span>
           </div>
           <TagRow project={project} />
-          <p className="mt-3 text-sm text-ink-soft leading-relaxed max-w-2xl">
+          <p className="mt-3 text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>
             {project.oneLiner}
           </p>
-          <p className="mt-4 mono-label text-pink">
-            VIEW CASE STUDY →
-          </p>
+          <p className="mt-4 mono-label text-pink">VIEW CASE STUDY →</p>
         </div>
       </Link>
     </article>
   );
 }
 
-/* ─── Full card (half-width, medium image) ────────────────── */
-export function FullCard({
-  project,
-  index,
-}: {
-  project: Project;
-  index: number;
-}) {
+/* ─── Full / Gallery card (2-col) ────────────────────────── */
+export function FullCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
       className="card-animate col-span-12 sm:col-span-6 group"
@@ -99,65 +116,47 @@ export function FullCard({
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {/* Image */}
-        <div className="relative w-full overflow-hidden bg-line" style={{ aspectRatio: "3/2" }}>
-          <Image
-            src={project.heroImage.src}
-            alt={project.heroImage.alt}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, calc((100vw - 224px) / 2)"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-          />
-        </div>
+        <CardImage
+          src={project.heroImage.src}
+          alt={project.heroImage.alt}
+          sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
+        />
 
-        {/* Card info */}
-        <div className="pt-4 pb-6 border-b border-line">
+        <div className="pb-6 border-b border-line">
           <div className="flex items-start justify-between gap-3 mb-2.5">
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">
               {project.name}
             </h2>
-            <span className="mono-label text-ink-soft whitespace-nowrap mt-px text-[10px]">{project.date}</span>
+            <span className="mono-label text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
           </div>
           <TagRow project={project} />
-          <p className="mt-2.5 text-xs text-ink-soft leading-relaxed line-clamp-2">
+          <p className="mt-2.5 text-ink-soft leading-relaxed line-clamp-2" style={{ fontSize: "var(--text-caption)" }}>
             {project.oneLiner}
           </p>
-          <p className="mt-3 mono-label text-pink text-[10px]">VIEW →</p>
+          <p className="mt-3 mono-label text-pink">VIEW →</p>
         </div>
       </Link>
     </article>
   );
 }
 
-/* ─── Gallery card (no link, compact) ────────────────────── */
-export function GalleryCard({
-  project,
-  index,
-}: {
-  project: Project;
-  index: number;
-}) {
+/* ─── Gallery card (2-col, no link) ─────────────────────── */
+export function GalleryCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
-      className="card-animate col-span-12 sm:col-span-6 lg:col-span-4 group"
+      className="card-animate col-span-12 sm:col-span-6 group"
       style={{ animationDelay: `${index * 0.07}s` }}
     >
-      {/* Image */}
-      <div className="relative w-full overflow-hidden bg-line" style={{ aspectRatio: "3/2" }}>
-        <Image
-          src={project.heroImage.src}
-          alt={project.heroImage.alt}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, calc((100vw - 224px) / 3)"
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-        />
-      </div>
+      <CardImage
+        src={project.heroImage.src}
+        alt={project.heroImage.alt}
+        sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
+      />
 
-      {/* Card info */}
-      <div className="pt-3.5 pb-5 border-b border-line">
+      <div className="pb-5 border-b border-line">
         <div className="flex items-start justify-between gap-3 mb-2">
           <h2 className="mono-label text-ink">{project.name}</h2>
-          <span className="mono-label text-ink-soft whitespace-nowrap text-[9px]">{project.date}</span>
+          <span className="mono-label text-ink-soft whitespace-nowrap" style={{ fontSize: "0.5625rem" }}>{project.date}</span>
         </div>
         <TagRow project={project} />
         {project.liveUrl && (
@@ -165,7 +164,8 @@ export function GalleryCard({
             href={project.liveUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 mono-label text-teal text-[10px] hover:text-pink transition-colors"
+            className="mt-2 mono-label text-teal hover:text-pink transition-colors link-wipe inline-block"
+            style={{ fontSize: "0.625rem" }}
             aria-label={`Visit ${project.name} live site`}
           >
             LIVE SITE ↗
@@ -177,14 +177,8 @@ export function GalleryCard({
 }
 
 /* ─── Default export — picks the right variant ────────────── */
-export default function ProjectCard({
-  project,
-  index,
-}: {
-  project: Project;
-  index: number;
-}) {
+export default function ProjectCard({ project, index }: { project: Project; index: number }) {
   if (project.tier === "featured") return <FeaturedCard project={project} index={index} />;
-  if (project.tier === "full") return <FullCard project={project} index={index} />;
+  if (project.tier === "full")     return <FullCard project={project} index={index} />;
   return <GalleryCard project={project} index={index} />;
 }

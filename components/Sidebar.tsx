@@ -42,13 +42,13 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
       aria-label="Site navigation"
     >
       {/* Logo */}
-      <div className="px-6 pt-8 pb-6 border-b border-line">
+      <div className="px-6 pt-8 pb-7">
         <Logo />
       </div>
 
-      {/* Primary nav */}
-      <nav className="px-6 py-6 border-b border-line" aria-label="Primary">
-        <ul className="space-y-1" role="list">
+      {/* Primary nav — no dividers, whitespace separates groups */}
+      <nav className="px-6 pb-6" aria-label="Primary">
+        <ul className="space-y-0.5" role="list">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link
@@ -69,24 +69,24 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
       </nav>
 
       {/* Contact */}
-      <div className="px-6 py-6 border-b border-line">
+      <div className="px-6 pt-6 pb-6">
         <p className="mono-label text-ink-soft mb-3">Contact</p>
         <a
           href="mailto:finbar@finbar.studio"
-          className="block text-[10px] font-mono text-ink-soft hover:text-pink transition-colors mb-1 link-wipe"
+          className="block text-[10px] font-mono text-ink-soft hover:text-pink transition-colors mb-1.5 link-wipe"
         >
           finbar@finbar.studio
         </a>
         <a
           href="tel:+61412796630"
-          className="block text-[10px] font-mono text-ink-soft hover:text-pink transition-colors"
+          className="block text-[10px] font-mono text-ink-soft hover:text-pink transition-colors link-wipe"
         >
           +61 412 796 630
         </a>
       </div>
 
       {/* Socials */}
-      <div className="px-6 py-6 border-b border-line">
+      <div className="px-6 pb-6">
         <p className="mono-label text-ink-soft mb-3">Follow</p>
         <ul className="space-y-1" role="list">
           {socials.map((s) => (
@@ -105,7 +105,7 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
       </div>
 
       {/* Footer info */}
-      <div className="px-6 py-6 mt-auto">
+      <div className="px-6 pb-6 mt-auto">
         <p className="mono-label text-ink-soft">Brisbane, Australia</p>
         <p className="mono-label text-ink-soft mt-1">2026©</p>
       </div>
@@ -114,18 +114,14 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
 }
 
 /* ── Mobile top bar ───────────────────────────────────────── */
-function MobileTopBar({
-  onOpen,
-}: {
-  onOpen: () => void;
-}) {
+function MobileTopBar({ onOpen }: { onOpen: () => void }) {
   return (
     <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-bg border-b border-line flex items-center justify-between px-5 z-50">
       <Logo />
       <button
         onClick={onOpen}
         aria-label="Open navigation menu"
-        className="flex flex-col gap-[5px] p-2 -mr-2 focus-visible:outline-pink"
+        className="flex flex-col gap-[5px] p-2 -mr-2"
       >
         <span className="block w-5 h-[1.5px] bg-ink" />
         <span className="block w-5 h-[1.5px] bg-ink" />
@@ -150,13 +146,8 @@ function MobileMenu({
     return pathname.startsWith(href);
   };
 
-  // Lock body scroll when open
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
@@ -170,7 +161,6 @@ function MobileMenu({
       aria-modal="true"
       aria-label="Navigation menu"
     >
-      {/* Top bar in menu */}
       <div className="flex items-center justify-between px-5 h-14 border-b border-line">
         <Logo />
         <button
@@ -184,7 +174,6 @@ function MobileMenu({
         </button>
       </div>
 
-      {/* Menu body */}
       <nav className="flex-1 overflow-y-auto px-5 py-8" aria-label="Mobile primary">
         <ul className="space-y-2 mb-10" role="list">
           {navLinks.map((link) => (
@@ -205,12 +194,12 @@ function MobileMenu({
 
         <span className="status-badge mb-10 block">OPEN FOR WORK</span>
 
-        <div className="mb-6">
+        <div className="mb-8">
           <p className="mono-label text-ink-soft mb-3">Contact</p>
-          <a href="mailto:finbar@finbar.studio" className="block text-sm font-mono text-ink-soft hover:text-pink transition-colors mb-1">
+          <a href="mailto:finbar@finbar.studio" className="block text-sm font-mono text-ink-soft hover:text-pink transition-colors mb-1.5 link-wipe">
             finbar@finbar.studio
           </a>
-          <a href="tel:+61412796630" className="block text-sm font-mono text-ink-soft hover:text-pink transition-colors">
+          <a href="tel:+61412796630" className="block text-sm font-mono text-ink-soft hover:text-pink transition-colors link-wipe">
             +61 412 796 630
           </a>
         </div>
@@ -224,7 +213,7 @@ function MobileMenu({
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-mono text-ink-soft hover:text-pink transition-colors"
+                className="text-sm font-mono text-ink-soft hover:text-pink transition-colors link-wipe"
               >
                 {s.label}
               </a>
@@ -243,20 +232,13 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Close menu on route change
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   return (
     <>
       <DesktopSidebar pathname={pathname} />
       <MobileTopBar onOpen={() => setMenuOpen(true)} />
-      <MobileMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        pathname={pathname}
-      />
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} />
     </>
   );
 }

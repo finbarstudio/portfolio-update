@@ -10,84 +10,86 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ─── Hero ──────────────────────────────────────────────────── */
+/* ─── Hero ──────────────────────────────────────────────────────
+   Sticky: stays behind the work section as it scrolls over.
+   CSS scroll-driven animation fades text out as work covers it.
+   ─────────────────────────────────────────────────────────────── */
 function Hero() {
   return (
     <section
-      className="px-6 md:px-10 pt-12 pb-10 border-b border-line"
+      className="sticky top-0 z-0 bg-bg px-6 md:px-10 border-b border-line"
+      style={{ minHeight: "36vh", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingBottom: "2.5rem", paddingTop: "3rem" }}
       aria-labelledby="hero-heading"
     >
-      {/* Eyebrow */}
-      <p className="mono-label text-ink-soft mb-5">
-        Brisbane &mdash; Graphic Designer &amp; Designer/Developer
-      </p>
+      <div className="hero-scroll-fade">
+        {/* Eyebrow — small mono-caps */}
+        <p className="mono-label text-ink-soft mb-5">
+          Brisbane, AU
+        </p>
 
-      {/* Statement */}
-      {/*
-       * PLACEHOLDER — refine this headline.
-       * Replace with Finbar's preferred one-line statement.
-       */}
-      <h1
-        id="hero-heading"
-        className="font-sans text-[clamp(1.5rem,3.5vw,2.5rem)] font-medium leading-[1.15] text-ink max-w-2xl mb-6"
-      >
-        Four-plus years across brand identity, digital, web,
-        and publication design.
-      </h1>
+        {/* Pink rule */}
+        <div
+          className="mb-6 bg-pink"
+          style={{ width: "2rem", height: "2px" }}
+          aria-hidden="true"
+        />
 
-      {/* Status */}
-      <span className="status-badge">OPEN FOR WORK</span>
+        {/* Display text — the whole identity in one declaration */}
+        <h1
+          id="hero-heading"
+          className="font-mono font-bold uppercase text-ink leading-[1.05]"
+          style={{
+            fontSize: "var(--text-display)",
+            letterSpacing: "0.04em",
+            maxWidth: "18ch",
+          }}
+        >
+          Graphic{" "}
+          <span style={{ color: "var(--ink-soft)" }}>Designer</span>
+          <br />
+          <span className="text-pink">&amp;</span>{" "}
+          <span style={{ color: "var(--ink-soft)" }}>Designer/</span>
+          <br />
+          Developer
+        </h1>
+      </div>
     </section>
   );
 }
 
-/* ─── Work grid ─────────────────────────────────────────────── */
+/* ─── Work grid ─────────────────────────────────────────────────
+   Featured: full-width.
+   Everything else (full + gallery): unified 2-col grid.
+   ─────────────────────────────────────────────────────────────── */
 function WorkGrid() {
   const sorted = [...projects].sort((a, b) => a.rank - b.rank);
-
   const featured = sorted.filter((p) => p.tier === "featured");
-  const full = sorted.filter((p) => p.tier === "full");
-  const gallery = sorted.filter((p) => p.tier === "gallery");
+  const rest = sorted.filter((p) => p.tier !== "featured");
 
   let cardIndex = 0;
 
   return (
     <section
       id="work"
-      className="px-6 md:px-10 py-12"
+      className="relative z-10 bg-bg px-6 md:px-10"
+      style={{ paddingTop: "var(--space-section)", paddingBottom: "var(--space-section)" }}
       aria-labelledby="work-heading"
     >
-      <h2 id="work-heading" className="sr-only">
-        Selected Work
-      </h2>
+      <h2 id="work-heading" className="sr-only">Selected Work</h2>
 
-      {/* Featured */}
-      <div className="mb-16">
-        <SectionLabel>FEATURED WORK</SectionLabel>
-        <div className="grid grid-cols-12 gap-x-6 gap-y-14">
-          {featured.map((project) => {
-            const i = cardIndex++;
-            return <ProjectCard key={project.slug} project={project} index={i} />;
-          })}
-        </div>
+      {/* Featured — full-width, no section label, work begins immediately */}
+      <div className="grid grid-cols-12 gap-x-6 gap-y-14 mb-16">
+        {featured.map((project) => {
+          const i = cardIndex++;
+          return <ProjectCard key={project.slug} project={project} index={i} />;
+        })}
       </div>
 
-      {/* Full case studies */}
-      <div className="mb-16">
+      {/* All other projects — uniform 2-col grid */}
+      <div>
         <SectionLabel>SELECTED PROJECTS</SectionLabel>
         <div className="grid grid-cols-12 gap-x-6 gap-y-10">
-          {full.map((project) => {
-            const i = cardIndex++;
-            return <ProjectCard key={project.slug} project={project} index={i} />;
-          })}
-        </div>
-      </div>
-
-      {/* Gallery */}
-      <div>
-        <SectionLabel>MORE WORK</SectionLabel>
-        <div className="grid grid-cols-12 gap-x-6 gap-y-8">
-          {gallery.map((project) => {
+          {rest.map((project) => {
             const i = cardIndex++;
             return <ProjectCard key={project.slug} project={project} index={i} />;
           })}
@@ -102,18 +104,25 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <WorkGrid />
 
-      {/* Footer CTA */}
-      <footer className="px-6 md:px-10 py-12 border-t border-line">
-        <p className="mono-label text-ink-soft mb-3">Get in touch</p>
-        <a
-          href="mailto:finbar@finbar.studio"
-          className="font-sans text-2xl font-medium text-ink hover:text-pink transition-colors"
+      {/* Work + footer wrapped so they slide over the sticky hero */}
+      <div className="relative z-10 bg-bg">
+        <WorkGrid />
+
+        <footer
+          className="px-6 md:px-10 py-12 border-t border-line"
+          aria-label="Site footer"
         >
-          finbar@finbar.studio
-        </a>
-      </footer>
+          <p className="mono-label text-ink-soft mb-3">Get in touch</p>
+          <a
+            href="mailto:finbar@finbar.studio"
+            className="font-sans font-medium text-ink hover:text-pink transition-colors link-wipe"
+            style={{ fontSize: "var(--text-h2)" }}
+          >
+            finbar@finbar.studio
+          </a>
+        </footer>
+      </div>
     </>
   );
 }
