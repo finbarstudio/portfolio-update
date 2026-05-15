@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# finbar✶studio
 
-## Getting Started
+Personal portfolio for [finbar.studio](https://finbar.studio).
 
-First, run the development server:
+Built with **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS 4**.
+Deploy target: **Vercel** (static export friendly — no server-side data).
+
+---
+
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Editing content
 
-## Learn More
+**All project content lives in one file: `/content/projects.ts`**
 
-To learn more about Next.js, take a look at the following resources:
+You never need to touch a component to update copy, dates, tags, images, or add/remove projects. Just edit this file.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Update copy on an existing project
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open `/content/projects.ts`, find the project by name, and edit the fields:
 
-## Deploy on Vercel
+```ts
+{
+  name: "Salesmasters",
+  date: "2023–2024",          // ← change the date
+  oneLiner: "...",             // ← one-line summary shown on cards
+  role: "...",                 // ← case study meta
+  problem: "...",              // ← case study meta
+  outcome: "...",              // ← case study meta
+  // ...
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Replace placeholder images
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Every `src` field that starts with `https://placehold.co/` is a placeholder.
+Replace it with a real image URL or a path to a local file in `/public/`:
+
+```ts
+// Before:
+heroImage: {
+  src: "https://placehold.co/1600x900/...",
+  alt: "TMYR hero image",
+}
+
+// After (local file in /public/images/):
+heroImage: {
+  src: "/images/tmyr-hero.jpg",
+  alt: "The Moment You Realise — campaign still",
+}
+```
+
+If you use a new external domain for images, add it to `next.config.ts` under `images.remotePatterns`.
+
+### Find all placeholders
+
+Search for `// PLACEHOLDER` in `/content/projects.ts` to find every field that needs real content (dates, outcomes, metrics, images).
+
+### Add a new project
+
+Copy any existing project object, change the `slug` (URL-safe, kebab-case), set `rank` to where it should appear (lower = higher on the page), and set `tier`:
+- `"featured"` — full-width card, has a full case study page
+- `"full"` — half-width card, has a case study page
+- `"gallery"` — third-width card, no case study page
+
+### Add depth sections (Featured projects only)
+
+Featured projects (tier: `"featured"`) can have an optional Process/Detail section on their case study page. Set `hasDepth: true` and populate the `depth` array:
+
+```ts
+hasDepth: true,
+depth: [
+  {
+    heading: "Research & Writing",
+    body: "One or two paragraphs — keep it short, let images carry the story.",
+    images: [
+      { src: "/images/...", alt: "Alt text", caption: "Short caption." },
+    ],
+  },
+],
+```
+
+---
+
+## Deploying to Vercel
+
+1. Push this repo to GitHub.
+2. Import the repo in [vercel.com/new](https://vercel.com/new).
+3. Vercel detects Next.js automatically — no configuration needed.
+4. Set your custom domain to `finbar.studio` in the Vercel project settings.
+
+Every `git push` to `main` auto-deploys.
+
+---
+
+## File structure
+
+```
+app/
+  globals.css          Design tokens, Tailwind theme, base styles
+  layout.tsx           Root layout — fonts, sidebar, main wrapper
+  page.tsx             Home page (hero + work grid)
+  about/page.tsx       About page
+  contact/page.tsx     Contact page
+  work/[slug]/page.tsx Case study template (all featured + full projects)
+
+components/
+  Sidebar.tsx          Persistent left sidebar + mobile menu
+  ProjectCard.tsx      Card variants: FeaturedCard, FullCard, GalleryCard
+
+content/
+  projects.ts          ← THE ONE FILE TO EDIT
+```
+
+---
+
+## Tech
+
+| Dependency | Purpose |
+|---|---|
+| `next` 16 | Framework, App Router, next/font, next/image |
+| `react` 19 | UI |
+| `tailwindcss` 4 | Styling (CSS-first config via `@theme` in globals.css) |
+| `typescript` | Type safety |
+
+No state management library. No CMS. No animation library. No other runtime dependencies.

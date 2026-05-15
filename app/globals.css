@@ -1,26 +1,145 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─── Design Tokens ─────────────────────────────────────────── */
+@theme {
+  --color-bg:       #FAFAF8;
+  --color-ink:      #141414;
+  --color-ink-soft: #6B6B6B;
+  --color-line:     #E4E4E0;
+  --color-pink:     #FF2D78;
+  --color-teal:     #5FC9C4;
+
+  --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "Courier New", monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Keyframes ─────────────────────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Base ──────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: #FAFAF8;
+    color: #141414;
+    font-family: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Remove default focus outline — we'll add our own */
+  :focus-visible {
+    outline: 2px solid #FF2D78;
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Components ────────────────────────────────────────────── */
+@layer components {
+  /* Mono-caps label — the typographic signature of the site */
+  .mono-label {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 0.6875rem;   /* 11px */
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  /* Larger mono treatment for headings */
+  .mono-heading {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 0.75rem;     /* 12px */
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  /* Pink underline wipe on hover */
+  .link-wipe {
+    position: relative;
+  }
+  .link-wipe::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #FF2D78;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.22s ease;
+  }
+  .link-wipe:hover::after { transform: scaleX(1); }
+
+  /* Card entrance animation */
+  .card-animate {
+    animation: fade-up 0.55s ease-out both;
+  }
+
+  /* Sidebar nav link */
+  .sidebar-link {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6B6B6B;
+    transition: color 0.18s ease;
+    display: block;
+    padding: 0.25rem 0;
+  }
+  .sidebar-link:hover  { color: #FF2D78; }
+  .sidebar-link.active { color: #FF2D78; }
+
+  /* Tag pill */
+  .tag {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 0.5625rem;   /* 9px */
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.2em 0.6em;
+    border-radius: 2px;
+    display: inline-block;
+    line-height: 1.6;
+  }
+  .tag-default { background: #E4E4E0; color: #6B6B6B; }
+  .tag-teal    { background: #5FC9C4; color: #141414; }
+  .tag-pink    { background: #FF2D78; color: #FAFAF8; }
+
+  /* Open-for-work badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 0.5625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5FC9C4;
+  }
+  .status-badge::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #5FC9C4;
+    flex-shrink: 0;
+  }
 }
