@@ -32,7 +32,19 @@ function Hero() {
             maxWidth: "18ch",
           }}
         >
-          <EncryptedText text="DIGITAL DESIGNER" />
+          <EncryptedText text="Graphic" delay={0} />{" "}
+          <span style={{ color: "var(--ink-soft)" }}>
+            <EncryptedText text="Designer" delay={120} />
+          </span>
+          <br />
+          <span className="text-pink">
+            <EncryptedText text="&" delay={240} />
+          </span>{" "}
+          <span style={{ color: "var(--ink-soft)" }}>
+            <EncryptedText text="Designer/" delay={360} />
+          </span>
+          <br />
+          <EncryptedText text="Developer" delay={520} />
         </h1>
       </div>
     </section>
@@ -59,7 +71,7 @@ function WorkGrid() {
     >
       <h2 id="work-heading" className="sr-only">Selected Work</h2>
 
-      {/* Featured — full-width, no section label, work begins immediately */}
+      {/* Featured — full-width */}
       <div className="grid grid-cols-12 gap-x-6 gap-y-14 mb-16">
         {featured.map((project) => {
           const i = cardIndex++;
@@ -98,7 +110,7 @@ export default function HomePage() {
           <p className="mono-label text-ink-soft mb-3">Get in touch</p>
           <a
             href="mailto:finbar@finbar.studio"
-            className="font-sans font-medium text-ink hover:text-pink transition-colors link-wipe"
+            className="font-sans font-medium text-ink hover:text-pink transition-colors"
             style={{ fontSize: "var(--text-h2)" }}
           >
             finbar@finbar.studio
