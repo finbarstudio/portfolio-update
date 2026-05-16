@@ -22,9 +22,9 @@ function Hero() {
         minHeight: "36vh",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-end",
+        justifyContent: "flex-start",
+        paddingTop: "1.75rem",
         paddingBottom: "1.75rem",
-        paddingTop: "0.75rem",
       }}
       aria-labelledby="hero-heading"
     >
