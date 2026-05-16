@@ -1,29 +1,84 @@
 "use client";
 
-// Cobe WebGL globe — https://github.com/shuding/cobe
-// Transparent bg, pink land dots matching site accent, Brisbane marker + label
+// Globe — Three.js imperative renderer
+// Dots-only land masses (no sphere) → water is fully transparent
+// Pink dots match site accent. Brisbane marker + mono label overlay.
 
 import { useEffect, useRef, useMemo } from "react";
-import createGlobe from "cobe";
+import * as THREE from "three";
 
-// Brisbane: lat -27.47, lon 153.03 → phi for cobe
-// phi=0 faces ~-180° lon. Each radian = ~57.3°.
-// We want lon 153° facing forward → phi ≈ (180-153)*(π/180) then adjust
-// Empirically phi ≈ 5.6 shows the Pacific/Australia region on load.
-const BRISBANE_LAT = -27.4698;
-const BRISBANE_LON = 153.0251;
-const START_PHI = 5.6;
+const GLOBE_RADIUS = 2;
+const PINK = 0xff1f8f;
+const BRISBANE = { lat: -27.4698, lon: 153.0251 };
 
-// Site colours → cobe [r, g, b] (0–1 range)
-// Pink #FF1F8F  → [1, 0.122, 0.561]
-// Bg  #FAFAF8  → [0.98, 0.98, 0.973]
-const PINK: [number, number, number] = [1, 0.122, 0.561];
-const BG: [number, number, number] = [0.98, 0.98, 0.973];
+function latLonToVec3(lat: number, lon: number, r = GLOBE_RADIUS) {
+  const phi   = (90 - lat) * (Math.PI / 180);
+  const theta = (lon + 180) * (Math.PI / 180);
+  return new THREE.Vector3(
+    -(r * Math.sin(phi) * Math.cos(theta)),
+      r * Math.cos(phi),
+      r * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+// 32-row binary world map — 1 = land, 0 = ocean
+const WORLD_MAP = [
+  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "000000000000000000000000000000000000000000000000000000000000000111111000000000000000000000000000000000000000000000000000",
+  "000000000000000000000000000000000000000000000000000000000111111111111111000000000000000000000000000000000000000000000000",
+  "000000000000000000000000111000000000000000000000000000111111111111111111110000000000000000000000000000000000000000000000",
+  "000000000000001110000111111110000000000000000000001111111111111111111111111000000000000000000000000000000000000000000000",
+  "000000000001111111111111111110000000000000000011111111111111111111111111111110000000000000000000000000000000000000000000",
+  "000000000111111111111111111100000000000000011111111111111111111111111111111111100000000000000000000000000000000000000000",
+  "000000000011111111111111111000000000000011111111111111111111111111111111111111110000000000000000000000000000000000000000",
+  "000000000001111111111111100000000000001111111111111111111111111111111111111111111000000000000000000000000000000000000000",
+  "000000000000111111111110000000000001111111111111111111111111111111111111111111111100000000000000000000000000000000000000",
+  "000000000000011111110000000000000011111111111111111111111111111111111111111111111110000000000000000000000000000000000000",
+  "000000000000001111000000000000000011111111111111111111111111111111111111111111111110000000000000000000000000000000000000",
+  "000000000000001110000000000000000001111111111111111111111111111111111111111111111100000000000000000000000000000000000000",
+  "000000000000111110000000000000000001111111111111111111111111111111111111111111111000000000000000000000000000000000000000",
+  "000000000000111110000000000000000000111111111111111111111111111111111111111111110000000000000000000000000000000000000000",
+  "000000000011111100000000000000000000011111111111111111111111111111111111111111000000000000000000000000000000000000000000",
+  "000000000111111000000000000000000000001111111111111111111111111111111111111110000000000000000000000000000000000000000000",
+  "000000000111110000000000000000000000001111111111111111111111111111111111111000000000000000000000000000000000000000000000",
+  "000000000111100000000000000000000000000111111111111111111111111111111111110000000000000000000000000000000000000000000000",
+  "000000000111000000000000000000000000000011111111111111111111111111111110000000000000000000000000000000000000000000000011",
+  "000000001111000000000000000000000000000001111111111111111111111111111000000000000000000000000000000000011000000000000011",
+  "000000001110000000000000000000000000000000111111111111111111111111000000000000000000000000000000000000111100000000000111",
+  "000000001100000000000000000000000000000000111111111111111111111000000000000000000000000000000000000011111100000000001111",
+  "000000001000000000000000000000000000000000001111111111111111100000000000000000000000000000000000001111111110000000011111",
+  "000000011000000000000000000000000000000000001111111111111111000000000000000000000000000000000000011111111110000000111111",
+  "000000011000000000000000000000000000000000000111111111111100000000000000000000000000000000000000011111111110000001111111",
+  "000000011000000000000000000000000000000000000011111111110000000000000000000000000000000000000000001111111100000111111111",
+  "000000011000000000000000000000000000000000000001111111000000000000000000000000000000000000000000000111111000001111111111",
+  "000000011000000000000000000000000000000000000000111100000000000000000000000000000000000000000000000001110000001111111111",
+  "000000001000000000000000000000000000000000000000011000000000000000000000000000000000000000000000000000000000111111111111",
+  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111110",
+  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111100",
+];
+
+function buildLandGeometry() {
+  const h = WORLD_MAP.length;
+  const w = WORLD_MAP[0].length;
+  const pts: number[] = [];
+
+  for (let row = 0; row < h; row++) {
+    const lat = 90 - (row / h) * 180;
+    for (let col = 0; col < w; col++) {
+      if (WORLD_MAP[row][col] !== "1") continue;
+      const lon = (col / w) * 360 - 180;
+      const v = latLonToVec3(lat, lon);
+      pts.push(v.x, v.y, v.z);
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pts), 3));
+  return geo;
+}
 
 export default function JarvisGlobe() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const phiRef = useRef(START_PHI);
+  const mountRef = useRef<HTMLDivElement>(null);
 
   const staticTime = useMemo(() => {
     return new Intl.DateTimeFormat("en-AU", {
@@ -35,71 +90,76 @@ export default function JarvisGlobe() {
   }, []);
 
   useEffect(() => {
-    if (!canvasRef.current || !containerRef.current) return;
-    const dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio : 1, 2);
-    const w = containerRef.current.clientWidth;
-    const h = containerRef.current.clientHeight;
+    const container = mountRef.current;
+    if (!container) return;
 
-    const globe = createGlobe(canvasRef.current, {
-      devicePixelRatio: dpr,
-      width: w * dpr,
-      height: h * dpr,
-      phi: START_PHI,
-      theta: 0.28,
-      dark: 0,
-      diffuse: 1.1,
-      mapSamples: 16000,
-      mapBrightness: 8,
-      baseColor: PINK,
-      markerColor: PINK,
-      glowColor: BG,
-      scale: 1.08,
-      markers: [{ location: [BRISBANE_LAT, BRISBANE_LON], size: 0.065 }],
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+
+    /* ── Renderer — alpha:true = transparent clear ── */
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0); // fully transparent bg
+    container.appendChild(renderer.domElement);
+
+    /* ── Scene + camera ── */
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
+    camera.position.set(0, 0, 5.6);
+
+    /* ── Land dots (Points — no sphere, so water = transparent) ── */
+    const dotsMat = new THREE.PointsMaterial({
+      color: PINK,
+      size: 0.038,
+      transparent: true,
+      opacity: 0.92,
+      depthWrite: false,
     });
+    const globe = new THREE.Points(buildLandGeometry(), dotsMat);
+    scene.add(globe);
 
-    // Drive rotation via rAF
+    /* ── Brisbane marker ── */
+    const markerGeo = new THREE.SphereGeometry(0.045, 12, 12);
+    const markerMat = new THREE.MeshBasicMaterial({ color: PINK });
+    const marker    = new THREE.Mesh(markerGeo, markerMat);
+    marker.position.copy(latLonToVec3(BRISBANE.lat, BRISBANE.lon));
+    globe.add(marker); // child of globe → rotates with it
+
+    /* ── Animate ── */
     let rafId: number;
     const animate = () => {
-      phiRef.current += 0.004;
-      globe.update({ phi: phiRef.current });
+      globe.rotation.y += 0.004;
+      renderer.render(scene, camera);
       rafId = requestAnimationFrame(animate);
     };
     rafId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(rafId);
-      globe.destroy();
+      renderer.dispose();
+      container.removeChild(renderer.domElement);
     };
   }, []);
 
   return (
     <div
-      ref={containerRef}
+      ref={mountRef}
       style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}
     >
-      <canvas
-        ref={canvasRef}
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
-          background: "transparent",
-        }}
-      />
-
-      {/* Brisbane label — bottom-left, mono-label style */}
+      {/* Label overlay — bottom-left */}
       <div
         style={{
           position: "absolute",
-          bottom: "10px",
-          left: "10px",
+          bottom: 10,
+          left: 10,
           pointerEvents: "none",
           lineHeight: 1.35,
         }}
       >
         <p
           style={{
-            fontFamily: "var(--font-jetbrains-mono, monospace)",
+            fontFamily: "var(--font-jetbrains-mono, var(--font-archivo-narrow, sans-serif))",
             fontSize: "7px",
             fontWeight: 700,
             letterSpacing: "1.5px",
@@ -112,7 +172,7 @@ export default function JarvisGlobe() {
         </p>
         <p
           style={{
-            fontFamily: "var(--font-jetbrains-mono, monospace)",
+            fontFamily: "var(--font-jetbrains-mono, var(--font-archivo-narrow, sans-serif))",
             fontSize: "12px",
             fontWeight: 700,
             letterSpacing: "0.04em",

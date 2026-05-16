@@ -1,46 +1,78 @@
 /* ═══════════════════════════════════════════════════════════════
-   finbar✶studio — Global Styles
+   finbar✶studio — Global Styles & Master Design Control Panel
 
-   CONTROL PANEL: The :root block below is the single place to
-   restyle the entire site. Edit colours, type scale, and spacing
-   here — every component reads from these variables. Nothing is
-   hard-coded anywhere else.
+   ╔═══════════════════════════════════════════════════════════╗
+   ║  MASTER CSS — EDIT HERE TO RESTYLE THE ENTIRE SITE       ║
+   ║  Everything below reads from the :root variables.        ║
+   ║  Change a value once → updates everywhere automatically.  ║
+   ╚═══════════════════════════════════════════════════════════╝
    ═══════════════════════════════════════════════════════════════ */
 
 @import "tailwindcss";
 
-/* ─── CONTROL PANEL ─────────────────────────────────────────────
-   Edit freely. Changes here ripple across the whole site.
-   ─────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   ★  MASTER CONTROL PANEL
+   ───────────────────────────────────────────────────────────────
+   This is the ONLY file you need to edit to:
+     • Change brand colours
+     • Swap fonts
+     • Adjust the type scale
+     • Tweak layout spacing
+   ═══════════════════════════════════════════════════════════════ */
 :root {
 
-  /* ── COLOUR ─────────────────────────────────────────────────── */
-  --bg:       #FAFAF8;   /* page background — warm off-white        */
-  --ink:      #141414;   /* primary text — near-black               */
-  --ink-soft: #6B6B6B;   /* secondary text, captions, meta          */
-  --line:     #E4E4E0;   /* hairline borders, grid lines            */
-  --pink:     #FF1F8F;   /* PRIMARY accent — magenta-pink           */
-  --teal:     #4DA8E0;   /* secondary highlight — sky blue          */
+  /* ┌─────────────────────────────────────────────────────────┐
+     │  FONTS                                                  │
+     │  --font-primary  → body copy, headings, display text   │
+     │  --font-label    → uppercase caps labels, nav, tags     │
+     │  Both currently use Archivo Narrow (loaded in          │
+     │  layout.tsx via next/font/google).                     │
+     │  To swap: change the fallback or load a new font in    │
+     │  layout.tsx and update the var() reference here.       │
+     └─────────────────────────────────────────────────────────┘ */
+  --font-primary: var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
+  --font-label:   var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
 
-  /* ── TYPE SCALE ─────────────────────────────────────────────── */
-  --text-display: clamp(2rem, 5.5vw, 3.75rem); /* hero display     */
-  --text-h1:      clamp(1.375rem, 3vw, 2rem);   /* case study title */
-  --text-h2:      clamp(1.125rem, 2vw, 1.5rem); /* section headings */
-  --text-h3:      1rem;                          /* sub-headings     */
-  --text-body:    0.9375rem;  /* 15px — prose                       */
-  --text-small:   0.875rem;   /* 14px — card summary, etc.          */
-  --text-caption: 0.75rem;    /* 12px — image captions              */
-  --text-label:   0.6875rem;  /* 11px — mono-caps labels, nav       */
-  --text-tag:     0.5625rem;  /* 9px  — tag pills                   */
+  /* ┌─────────────────────────────────────────────────────────┐
+     │  BRAND COLOURS                                          │
+     │  Change any value → ripples to every component.        │
+     └─────────────────────────────────────────────────────────┘ */
+  --bg:         #FAFAF8;   /* page + sidebar background — warm off-white  */
+  --ink:        #141414;   /* primary text — near-black                   */
+  --ink-soft:   #6B6B6B;   /* secondary text, captions, meta              */
+  --line:       #E4E4E0;   /* hairline borders, grid lines                */
 
-  /* ── SPACING ────────────────────────────────────────────────── */
-  --space-section: 4.5rem;   /* vertical gap between major sections */
-  --image-pad:     1.5rem;   /* breathing room above & below images */
+  --pink:       #FF1F8F;   /* ★ PRIMARY accent — magenta-pink             */
+                           /*   Used for: active links, hover, tags,      */
+                           /*   hero accent, globe, contact email hover    */
+
+  --teal:       #4DA8E0;   /* SECONDARY — OPEN FOR WORK badge + dot       */
+                           /*   Also used for: teal tag pills              */
+
+  /* ┌─────────────────────────────────────────────────────────┐
+     │  TYPE SCALE                                             │
+     │  Fluid sizes using clamp(min, preferred, max).         │
+     └─────────────────────────────────────────────────────────┘ */
+  --text-display: clamp(2rem, 5.5vw, 3.75rem);  /* hero display text     */
+  --text-h1:      clamp(1.375rem, 3vw, 2rem);    /* case study page title */
+  --text-h2:      clamp(1.125rem, 2vw, 1.5rem);  /* section headings      */
+  --text-h3:      1rem;                           /* sub-headings          */
+  --text-body:    0.9375rem;   /* 15px — prose paragraphs                 */
+  --text-small:   0.875rem;    /* 14px — card summaries, metadata         */
+  --text-caption: 0.75rem;     /* 12px — image captions                   */
+  --text-label:   0.6875rem;   /* 11px — uppercase caps labels, nav       */
+  --text-tag:     0.5625rem;   /* 9px  — tag pills                        */
+
+  /* ┌─────────────────────────────────────────────────────────┐
+     │  LAYOUT SPACING                                         │
+     └─────────────────────────────────────────────────────────┘ */
+  --space-section: 4.5rem;   /* vertical gap between major page sections  */
+  --image-pad:     1.5rem;   /* breathing room above & below images       */
 }
 
 /* ─── Tailwind bridge ────────────────────────────────────────────
-   Maps :root vars → Tailwind utility classes.
-   bg-bg, text-ink, text-pink, border-line, text-teal, etc.
+   Maps :root → Tailwind utility classes.
+   Result: bg-bg, text-ink, text-pink, border-line, text-teal …
    ─────────────────────────────────────────────────────────────── */
 @theme {
   --color-bg:       var(--bg);
@@ -50,8 +82,8 @@
   --color-pink:     var(--pink);
   --color-teal:     var(--teal);
 
-  --font-sans: var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, "Courier New", monospace;
+  --font-sans: var(--font-primary);
+  --font-mono: var(--font-label);
 }
 
 /* ─── Keyframes ──────────────────────────────────────────────── */
@@ -65,12 +97,11 @@
   50%       { opacity: 0.35; transform: scale(0.7); }
 }
 
-/* Hero text fades as work scrolls over it.
-   CSS scroll-driven animation — no JS.
-   Chrome 115+, Firefox 110+, Safari 17.2+.
-   Falls back gracefully in older browsers. */
+/* Hero text fades as work section scrolls over it.
+   CSS scroll-driven animation — zero JS.
+   Chrome 115+, Firefox 110+, Safari 17.2+. Graceful fallback. */
 @keyframes hero-exit {
-  from { opacity: 1;   transform: translateY(0); }
+  from { opacity: 1;    transform: translateY(0); }
   to   { opacity: 0.08; transform: translateY(-12px); }
 }
 
@@ -82,7 +113,7 @@
   body {
     background-color: var(--bg);
     color: var(--ink);
-    font-family: var(--font-sans);
+    font-family: var(--font-primary);
     font-size: var(--text-body);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -98,9 +129,9 @@
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
 
-  /* Mono-caps label — the typographic signature of finbar✶studio */
+  /* Mono-caps label — uppercase tracking, used for nav, tags, meta */
   .mono-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-weight: 700;
     font-size: var(--text-label);
     letter-spacing: 0.14em;
@@ -109,16 +140,16 @@
   }
 
   .mono-heading {
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-weight: 700;
-    font-size: 0.75rem;        /* sits between label and h3 */
+    font-size: 0.75rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     line-height: 1.4;
   }
 
-  /* Hover highlight — colour fill only, no underline animation */
-  .link-wipe { /* class kept for compat, no animation */ }
+  /* Hover = colour fill only (no underline animation) */
+  .link-wipe { /* retained for class-name compat */ }
 
   /* Card entrance animation */
   .card-animate {
@@ -127,7 +158,7 @@
 
   /* Sidebar nav link */
   .sidebar-link {
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-weight: 700;
     font-size: var(--text-label);
     letter-spacing: 0.14em;
@@ -142,7 +173,7 @@
 
   /* Tag pill */
   .tag {
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-weight: 700;
     font-size: var(--text-tag);
     letter-spacing: 0.12em;
@@ -156,12 +187,12 @@
   .tag-teal    { background: var(--teal); color: var(--ink); }
   .tag-pink    { background: var(--pink); color: var(--bg); }
 
-  /* Open-for-work status badge */
+  /* OPEN FOR WORK badge — pulsing dot */
   .status-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.4em;
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-weight: 700;
     font-size: var(--text-tag);
     letter-spacing: 0.12em;
@@ -179,8 +210,7 @@
     animation: dot-pulse 2s ease-in-out infinite;
   }
 
-  /* Image wrapper — adds breathing room, caps height at 72vh.
-     Applied around every image on the site. */
+  /* Image wrapper — breathing room + 72vh max height */
   .img-wrap {
     position: relative;
     width: 100%;
@@ -189,7 +219,7 @@
     max-height: 72vh;
   }
 
-  /* Hero text — CSS scroll-driven fade as work slides over it */
+  /* Hero scroll-driven fade (CSS only, no JS) */
   @supports (animation-timeline: scroll()) {
     .hero-scroll-fade {
       animation: hero-exit linear both;

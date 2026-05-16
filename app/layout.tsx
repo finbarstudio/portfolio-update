@@ -1,19 +1,14 @@
 import type { Metadata } from "next";
-import { Archivo_Narrow, JetBrains_Mono } from "next/font/google";
+import { Archivo_Narrow } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 
+// Single font family — Archivo Narrow used for both body and mono/label text.
 const archivoNarrow = Archivo_Narrow({
   variable: "--font-archivo-narrow",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -38,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivoNarrow.variable} ${jetbrainsMono.variable}`}
+      className={archivoNarrow.variable}
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
         <div className="flex min-h-screen">
