@@ -6,11 +6,11 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
+import { SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./LayoutShell";
 
-// WebGL needs browser APIs — no SSR
 const JarvisGlobe = dynamic(() => import("./JarvisGlobe"), { ssr: false });
 
-/* ── Icons ────────────────────────────────────────────────────── */
+/* ── Brand icons ──────────────────────────────────────────────── */
 function ArenaIcon({ size = 14 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 150 90" fill="currentColor" aria-hidden="true">
@@ -27,10 +27,57 @@ function LinkedInIcon({ size = 14 }: { size?: number }) {
   );
 }
 
+/* ── Nav icons (used in collapsed mode) ───────────────────────── */
+function GridIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="5" height="5" rx="0.75" stroke="currentColor" strokeWidth="1.5"/>
+      <rect x="9.5" y="1.5" width="5" height="5" rx="0.75" stroke="currentColor" strokeWidth="1.5"/>
+      <rect x="1.5" y="9.5" width="5" height="5" rx="0.75" stroke="currentColor" strokeWidth="1.5"/>
+      <rect x="9.5" y="9.5" width="5" height="5" rx="0.75" stroke="currentColor" strokeWidth="1.5"/>
+    </svg>
+  );
+}
+
+function PersonIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M2.5 14c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+function EnvelopeIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="1.5" y="3.5" width="13" height="9" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M1.5 5.5l6.5 4 6.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function ChevronLeftIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function ChevronRightIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+/* ── Data ─────────────────────────────────────────────────────── */
 const navLinks = [
-  { label: "WORK", href: "/#work" },
-  { label: "ABOUT", href: "/about" },
-  { label: "CONTACT", href: "/contact" },
+  { label: "WORK",    href: "/#work",    icon: <GridIcon /> },
+  { label: "ABOUT",   href: "/about",    icon: <PersonIcon /> },
+  { label: "CONTACT", href: "/contact",  icon: <EnvelopeIcon /> },
 ];
 
 const socials = [
@@ -40,11 +87,19 @@ const socials = [
   { label: "Instagram", href: "https://instagram.com/finbar.studio",   icon: <SiInstagram size={13} aria-hidden="true" /> },
 ];
 
+/* ── Shared glass style ───────────────────────────────────────── */
+const glass = {
+  background: "rgba(250, 250, 248, 0.82)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+} as React.CSSProperties;
+
+/* ── Logo ─────────────────────────────────────────────────────── */
 function Logo() {
   return (
     <Link
       href="/"
-      className="block font-mono font-bold text-[11px] tracking-[0.14em] uppercase text-ink hover:text-pink transition-colors"
+      className="block font-sans font-bold text-[11px] tracking-[0.14em] uppercase text-ink hover:text-pink transition-colors"
       aria-label="finbar✶studio — back to home"
     >
       finbar<span className="text-pink" aria-hidden="true">✶</span>studio
@@ -53,7 +108,15 @@ function Logo() {
 }
 
 /* ── Desktop sidebar ──────────────────────────────────────────── */
-function DesktopSidebar({ pathname }: { pathname: string }) {
+function DesktopSidebar({
+  pathname,
+  collapsed,
+  onToggle,
+}: {
+  pathname: string;
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
   const isActive = (href: string) => {
     if (href === "/#work") return pathname === "/";
     return pathname.startsWith(href);
@@ -61,64 +124,61 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
 
   return (
     <aside
-      className="hidden md:flex fixed left-0 top-0 h-screen w-56 border-r border-line flex-col z-40 overflow-y-auto"
+      className="hidden md:flex fixed left-0 top-0 h-screen border-r border-line flex-col z-40 overflow-hidden"
       style={{
-        background: "rgba(250, 250, 248, 0.82)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
+        width: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W,
+        transition: "width 0.25s cubic-bezier(0.4,0,0.2,1)",
+        ...glass,
       }}
       aria-label="Site navigation"
     >
-      {/* Logo */}
-      <div className="px-6 pt-7 pb-6">
-        <Logo />
-      </div>
+      {collapsed ? (
+        /* ── COLLAPSED: icon tabs ─────────────────────────────── */
+        <div className="flex flex-col items-center h-full py-4">
+          {/* Toggle — expand */}
+          <button
+            onClick={onToggle}
+            title="Expand sidebar"
+            aria-label="Expand sidebar"
+            className="mb-4 text-ink-soft hover:text-pink transition-colors p-1"
+          >
+            <ChevronRightIcon />
+          </button>
 
-      {/* Nav links */}
-      <nav className="px-6 pb-5" aria-label="Primary">
-        <ul className="space-y-0.5" role="list">
-          {navLinks.map((link) => (
-            <li key={link.href}>
+          {/* Logo mark */}
+          <Link
+            href="/"
+            aria-label="Home"
+            className="mb-5 text-pink font-bold text-sm hover:opacity-70 transition-opacity"
+          >
+            ✶
+          </Link>
+
+          {/* Divider */}
+          <div className="w-5 h-px bg-line mb-4" />
+
+          {/* Nav icons */}
+          <nav aria-label="Primary" className="flex flex-col items-center gap-1 w-full">
+            {navLinks.map((link) => (
               <Link
+                key={link.href}
                 href={link.href}
-                className={`sidebar-link${isActive(link.href) ? " active" : ""}`}
+                title={link.label}
+                aria-label={link.label}
                 aria-current={isActive(link.href) ? "page" : undefined}
+                className="flex items-center justify-center w-full py-2.5 transition-colors"
+                style={{ color: isActive(link.href) ? "var(--pink)" : "var(--ink-soft)" }}
               >
-                {link.label}
+                {link.icon}
               </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+            ))}
+          </nav>
 
-      {/* Contact details — no section heading */}
-      <div className="px-6 pb-3">
-        <a
-          href="mailto:finbar@finbar.studio"
-          className="block text-[10px] font-mono text-ink-soft hover:text-pink transition-colors mb-1"
-        >
-          finbar@finbar.studio
-        </a>
-        <a
-          href="tel:+61412796630"
-          className="block text-[10px] font-mono text-ink-soft hover:text-pink transition-colors"
-        >
-          +61 412 796 630
-        </a>
-      </div>
+          {/* Spacer */}
+          <div className="flex-1" />
 
-      {/* Open for work — directly below contact */}
-      <div className="px-6 pb-6">
-        <span className="status-badge">OPEN FOR WORK</span>
-      </div>
-
-      {/* Globe + icons + copyright — bottom */}
-      <div className="px-3 pb-4 mt-auto">
-        <div style={{ width: "100%", height: "178px", overflow: "hidden" }}>
-          <JarvisGlobe />
-        </div>
-        <div className="flex items-center justify-between mt-3 px-1">
-          <div className="flex items-center gap-3">
+          {/* Social icons stacked */}
+          <div className="flex flex-col items-center gap-3 mb-4">
             {socials.map((s) => (
               <a
                 key={s.href}
@@ -126,15 +186,101 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
+                title={s.label}
                 className="text-ink-soft hover:text-pink transition-colors"
               >
                 {s.icon}
               </a>
             ))}
           </div>
-          <p className="mono-label text-ink-soft" style={{ fontSize: "9px" }}>2026©</p>
+
+          {/* Copyright */}
+          <p
+            className="font-sans font-bold uppercase text-ink-soft"
+            style={{ fontSize: "7px", letterSpacing: "0.06em", lineHeight: 1.4 }}
+          >
+            26©
+          </p>
         </div>
-      </div>
+      ) : (
+        /* ── EXPANDED: full sidebar ───────────────────────────── */
+        <>
+          {/* Logo + collapse toggle */}
+          <div className="flex items-center justify-between px-6 pt-7 pb-6">
+            <Logo />
+            <button
+              onClick={onToggle}
+              title="Collapse sidebar"
+              aria-label="Collapse sidebar"
+              className="text-ink-soft hover:text-pink transition-colors p-1 -mr-1 flex-shrink-0"
+            >
+              <ChevronLeftIcon />
+            </button>
+          </div>
+
+          {/* Nav links */}
+          <nav className="px-6 pb-5" aria-label="Primary">
+            <ul className="space-y-0.5" role="list">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`sidebar-link${isActive(link.href) ? " active" : ""}`}
+                    aria-current={isActive(link.href) ? "page" : undefined}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Contact — no heading */}
+          <div className="px-6 pb-3">
+            <a
+              href="mailto:finbar@finbar.studio"
+              className="block text-[10px] font-sans text-ink-soft hover:text-pink transition-colors mb-1"
+            >
+              finbar@finbar.studio
+            </a>
+            <a
+              href="tel:+61412796630"
+              className="block text-[10px] font-sans text-ink-soft hover:text-pink transition-colors"
+            >
+              +61 412 796 630
+            </a>
+          </div>
+
+          {/* Open for work */}
+          <div className="px-6 pb-6">
+            <span className="status-badge">OPEN FOR WORK</span>
+          </div>
+
+          {/* Globe + icons + copyright — bottom */}
+          <div className="px-3 pb-4 mt-auto">
+            <div style={{ width: "100%", height: "178px", overflow: "hidden" }}>
+              <JarvisGlobe />
+            </div>
+            <div className="flex items-center justify-between mt-3 px-1">
+              <div className="flex items-center gap-3">
+                {socials.map((s) => (
+                  <a
+                    key={s.href}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    className="text-ink-soft hover:text-pink transition-colors"
+                  >
+                    {s.icon}
+                  </a>
+                ))}
+              </div>
+              <p className="mono-label text-ink-soft" style={{ fontSize: "9px" }}>2026©</p>
+            </div>
+          </div>
+        </>
+      )}
     </aside>
   );
 }
@@ -144,11 +290,7 @@ function MobileTopBar({ onOpen }: { onOpen: () => void }) {
   return (
     <div
       className="md:hidden fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-5 z-50"
-      style={{
-        background: "rgba(250, 250, 248, 0.88)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-      }}
+      style={glass}
     >
       <Logo />
       <button
@@ -237,7 +379,6 @@ function MobileMenu({
           <a href="tel:+61412796630" className="block mono-label text-ink-soft hover:text-pink transition-colors mb-6">
             +61 412 796 630
           </a>
-
           <div className="flex items-center gap-5">
             {socials.map((s) => (
               <a
@@ -260,14 +401,20 @@ function MobileMenu({
 }
 
 /* ── Root ─────────────────────────────────────────────────────── */
-export default function Sidebar() {
+export default function Sidebar({
+  collapsed = false,
+  onToggle,
+}: {
+  collapsed?: boolean;
+  onToggle?: () => void;
+}) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   return (
     <>
-      <DesktopSidebar pathname={pathname} />
+      <DesktopSidebar pathname={pathname} collapsed={collapsed} onToggle={onToggle ?? (() => {})} />
       <MobileTopBar onOpen={() => setMenuOpen(true)} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} />
     </>

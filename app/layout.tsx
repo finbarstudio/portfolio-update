@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo_Narrow } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
+import LayoutShell from "@/components/LayoutShell";
 
 // Single font family — Archivo Narrow used for both body and mono/label text.
 const archivoNarrow = Archivo_Narrow({
@@ -36,18 +36,7 @@ export default function RootLayout({
       className={archivoNarrow.variable}
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
-        <div className="flex min-h-screen">
-          {/* Persistent sidebar — handles its own mobile state */}
-          <Sidebar />
-
-          {/* Main content: offset left on desktop, offset top on mobile */}
-          <main
-            className="flex-1 min-w-0 md:ml-56 pt-14 md:pt-0"
-            id="main-content"
-          >
-            {children}
-          </main>
-        </div>
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   );
