@@ -12,14 +12,15 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 /* ─── Hero ──────────────────────────────────────────────────────
-   Sticky: stays behind the work section as it scrolls over.
+   Terminal-prompt flavour: PS1 line above, encrypted heading,
+   skill-tags output below. Sticky so it sits behind the work grid.
    ─────────────────────────────────────────────────────────────── */
 function Hero() {
   return (
     <section
       className="sticky top-0 z-0 bg-bg px-6 md:px-10"
       style={{
-        minHeight: "36vh",
+        minHeight: "44vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
@@ -29,17 +30,34 @@ function Hero() {
       aria-labelledby="hero-heading"
     >
       <div className="hero-scroll-fade">
+        {/* PS1 prompt line */}
+        <p className="terminal-line mb-5 select-none">
+          <span className="ps1">finbar@studio</span>
+          <span> </span>
+          <span className="path">~/</span>
+          <span> $ </span>
+          <span className="cmd">whoami</span>
+        </p>
+
+        {/* Heading — output of the command */}
         <h1
           id="hero-heading"
-          className="font-sans font-bold uppercase text-ink leading-[1.05]"
+          className="font-sans font-bold uppercase text-ink leading-[1.02] cursor-blink"
           style={{
             fontSize: "var(--text-display)",
-            letterSpacing: "0.04em",
+            letterSpacing: "0.03em",
           }}
         >
           <EncryptedText text="Graphic" delay={0} />{" "}
           <EncryptedText text="Designer" delay={120} />
         </h1>
+
+        {/* cat about line */}
+        <p className="terminal-line mt-6 select-none">
+          <span className="ps1">›</span>
+          <span> </span>
+          <span className="cmd">brand · identity · editorial · web · motion</span>
+        </p>
       </div>
     </section>
   );
@@ -65,6 +83,16 @@ function WorkGrid() {
     >
       <h2 id="work-heading" className="sr-only">Selected Work</h2>
 
+      {/* Section header — directory listing flavour */}
+      <div className="flex items-baseline justify-between border-b border-ink pb-2 mb-10">
+        <p className="mono-label text-ink">
+          <span className="text-pink">▸</span> /work
+        </p>
+        <p className="mono-label text-ink-soft">
+          {sorted.length} ITEMS
+        </p>
+      </div>
+
       {/* Featured — full-width */}
       <div className="grid grid-cols-12 gap-x-6 gap-y-14 mb-16">
         {featured.map((project) => {
@@ -75,7 +103,7 @@ function WorkGrid() {
 
       {/* All other projects — uniform 2-col grid */}
       <div>
-        <SectionLabel>SELECTED PROJECTS</SectionLabel>
+        <SectionLabel>── SELECTED PROJECTS ──</SectionLabel>
         <div className="grid grid-cols-12 gap-x-6 gap-y-10">
           {rest.map((project) => {
             const i = cardIndex++;
@@ -98,10 +126,12 @@ export default function HomePage() {
         <WorkGrid />
 
         <footer
-          className="px-6 md:px-10 py-12"
+          className="px-6 md:px-10 py-12 border-t border-ink"
           aria-label="Site footer"
         >
-          <p className="mono-label text-ink-soft mb-3">Get in touch</p>
+          <p className="mono-label text-ink-soft mb-3">
+            <span className="text-pink">$</span> echo $CONTACT
+          </p>
           <a
             href="mailto:finbar@finbar.studio"
             className="font-sans font-medium text-ink hover:text-pink transition-colors"

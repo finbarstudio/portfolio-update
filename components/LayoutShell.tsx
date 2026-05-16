@@ -1,18 +1,19 @@
 "use client";
 
-// Holds the sidebar collapse state so both Sidebar and <main> can react to it.
-// Persists preference to localStorage.
+// OS shell: fixed MenuBar (top) + StatusBar (bottom), Sidebar between them,
+// main content offset by sidebar width and chrome heights.
 
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
+import MenuBar from "./MenuBar";
+import StatusBar from "./StatusBar";
 
-export const SIDEBAR_EXPANDED_W = 224; // px  (w-56)
-export const SIDEBAR_COLLAPSED_W = 48; // px  (w-12)
+export const SIDEBAR_EXPANDED_W = 224; // px
+export const SIDEBAR_COLLAPSED_W = 48; // px
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
 
-  // Hydrate from localStorage (runs only on client, so no SSR mismatch)
   useEffect(() => {
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved === "true") setCollapsed(true);
@@ -27,18 +28,23 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="flex min-h-screen">
+    <>
+      <MenuBar />
       <Sidebar collapsed={collapsed} onToggle={toggle} />
       <main
-        className="flex-1 min-w-0 pt-14 md:pt-0"
+        className="min-w-0"
         style={{
           marginLeft: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W,
+          paddingTop: "var(--menubar-h)",
+          paddingBottom: "var(--statusbar-h)",
+          minHeight: "100vh",
           transition: "margin-left 0.25s cubic-bezier(0.4,0,0.2,1)",
         }}
         id="main-content"
       >
         {children}
       </main>
-    </div>
+      <StatusBar />
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
+import OSWindow from "@/components/OSWindow";
 
 export const metadata: Metadata = {
   title: "Contact — finbar✶studio",
@@ -33,82 +34,86 @@ const socials = [
 
 export default function ContactPage() {
   return (
-    <div className="px-6 md:px-10">
-      {/* Display heading */}
-      <div className="pt-4 pb-12">
-        <p className="mono-label text-ink-soft mb-4">Contact</p>
-        <h1
-          className="font-sans font-bold uppercase text-ink leading-[1.0]"
-          style={{ fontSize: "var(--text-display)", letterSpacing: "0.02em" }}
-        >
-          Let&rsquo;s work<br />together.
-        </h1>
-      </div>
-
-      {/* Email — primary action */}
-      <div className="mb-10">
-        <p className="mono-label text-ink-soft mb-2">Email</p>
-        <a
-          href="mailto:finbar@finbar.studio"
-          className="block font-sans font-bold text-ink hover:text-pink transition-colors"
-          style={{ fontSize: "var(--text-h2)" }}
-        >
-          finbar@finbar.studio
-        </a>
-        <p className="text-ink-soft font-sans mt-1" style={{ fontSize: "var(--text-small)" }}>
-          Best way to reach me. Usually reply within one business day.
-        </p>
-      </div>
-
-      {/* Phone + Location side by side */}
-      <div className="flex gap-10 mb-10">
-        <div>
-          <p className="mono-label text-ink-soft mb-2">Phone</p>
-          <a
-            href="tel:+61412796630"
-            className="font-sans text-ink hover:text-pink transition-colors"
-            style={{ fontSize: "var(--text-small)" }}
+    <div className="px-6 md:px-10 py-8">
+      <OSWindow title="CONTACT.WDW" bodyClassName="px-6 md:px-10 py-10">
+        {/* Display heading */}
+        <div className="pb-10 border-b border-line mb-10">
+          <p className="mono-label text-ink-soft mb-3">
+            <span className="text-pink">»</span> ./contact --open
+          </p>
+          <h1
+            className="font-sans font-bold uppercase text-ink leading-[1.0]"
+            style={{ fontSize: "var(--text-display)", letterSpacing: "0.02em" }}
           >
-            +61 412 796 630
+            Let&rsquo;s work<br />together.
+          </h1>
+        </div>
+
+        {/* Email — primary action */}
+        <div className="mb-10 border-l-2 border-pink pl-4">
+          <p className="mono-label text-ink-soft mb-2">── EMAIL ──</p>
+          <a
+            href="mailto:finbar@finbar.studio"
+            className="block font-sans font-bold text-ink hover:text-pink transition-colors"
+            style={{ fontSize: "var(--text-h2)" }}
+          >
+            finbar@finbar.studio
           </a>
-        </div>
-        <div>
-          <p className="mono-label text-ink-soft mb-2">Location</p>
-          <p className="font-sans text-ink" style={{ fontSize: "var(--text-small)" }}>
-            Brisbane, AU
-          </p>
-          <p className="text-ink-soft font-sans" style={{ fontSize: "var(--text-caption)" }}>
-            Remote-friendly
+          <p className="text-ink-soft font-sans mt-1" style={{ fontSize: "var(--text-small)" }}>
+            Best way to reach me. Usually reply within one business day.
           </p>
         </div>
-      </div>
 
-      {/* Status */}
-      <div className="mb-12">
-        <span className="status-badge">OPEN FOR WORK</span>
-        <p className="text-ink-soft font-sans mt-2 max-w-xs" style={{ fontSize: "var(--text-small)" }}>
-          Available for full-time roles and freelance. Brisbane or remote.
-        </p>
-      </div>
-
-      {/* Socials */}
-      <div>
-        <p className="mono-label text-ink-soft mb-4">Follow</p>
-        <div className="flex flex-wrap gap-6">
-          {socials.map((s) => (
+        {/* Phone + Location side by side */}
+        <div className="flex gap-10 mb-10">
+          <div>
+            <p className="mono-label text-ink-soft mb-2">── PHONE ──</p>
             <a
-              key={s.href}
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-ink-soft hover:text-pink transition-colors"
+              href="tel:+61412796630"
+              className="font-sans text-ink hover:text-pink transition-colors tabular-nums"
+              style={{ fontSize: "var(--text-small)" }}
             >
-              {s.icon}
-              <span className="mono-label">{s.label}</span>
+              +61 412 796 630
             </a>
-          ))}
+          </div>
+          <div>
+            <p className="mono-label text-ink-soft mb-2">── LOCATION ──</p>
+            <p className="font-sans text-ink" style={{ fontSize: "var(--text-small)" }}>
+              Brisbane, AU
+            </p>
+            <p className="text-ink-soft font-sans" style={{ fontSize: "var(--text-caption)" }}>
+              Remote-friendly
+            </p>
+          </div>
         </div>
-      </div>
+
+        {/* Status */}
+        <div className="mb-12 p-4 border border-ink pixel-shadow-sm bg-bg max-w-md">
+          <span className="status-badge">OPEN FOR WORK</span>
+          <p className="text-ink-soft font-sans mt-2" style={{ fontSize: "var(--text-small)" }}>
+            Available for full-time roles and freelance. Brisbane or remote.
+          </p>
+        </div>
+
+        {/* Socials */}
+        <div>
+          <p className="mono-label text-ink-soft mb-4">── ELSEWHERE ──</p>
+          <div className="flex flex-wrap gap-6">
+            {socials.map((s) => (
+              <a
+                key={s.href}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-ink-soft hover:text-pink transition-colors"
+              >
+                {s.icon}
+                <span className="mono-label">{s.label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </OSWindow>
     </div>
   );
 }

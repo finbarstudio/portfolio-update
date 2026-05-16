@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import OSWindow from "@/components/OSWindow";
 import {
   projects,
   getCaseStudyProjects,
@@ -209,7 +210,7 @@ function FooterCTA() {
         href="/#work"
         className="mono-label text-ink-soft hover:text-pink transition-colors"
       >
-        ← BACK TO WORK
+        [ ← BACK TO /WORK ]
       </Link>
     </div>
   );
@@ -227,19 +228,22 @@ export default async function CaseStudyPage({
   if (!project || project.tier === "gallery") notFound();
 
   return (
-    <article className="px-6 md:px-10">
-      {/* Back link */}
-      <div className="py-5">
-        <Link href="/#work" className="mono-label text-ink-soft hover:text-pink transition-colors">
-          ← WORK
+    <article className="px-6 md:px-10 py-6">
+      {/* Breadcrumb / path */}
+      <div className="terminal-line mb-4">
+        <span className="ps1">»</span>{" "}
+        <Link href="/#work" className="text-ink-soft hover:text-pink transition-colors underline-offset-2 hover:underline">
+          /work
         </Link>
+        <span className="text-ink-soft"> / </span>
+        <span className="text-ink">{project.slug}</span>
       </div>
 
       {/* Header: title first, description second — spec §9 */}
-      <div className="pt-8 pb-2">
+      <div className="pt-2 pb-2">
         <h1
-          className="font-mono font-bold uppercase text-ink mb-3"
-          style={{ fontSize: "var(--text-h1)", letterSpacing: "0.06em", lineHeight: 1.1 }}
+          className="font-sans font-bold uppercase text-ink mb-3 cursor-blink"
+          style={{ fontSize: "var(--text-h1)", letterSpacing: "0.04em", lineHeight: 1.1 }}
         >
           {project.name}
         </h1>
@@ -248,8 +252,19 @@ export default async function CaseStudyPage({
         </p>
       </div>
 
-      {/* Hero image */}
-      <CaseImage src={project.heroImage.src} alt={project.heroImage.alt} priority />
+      {/* Hero image — framed as a window */}
+      <OSWindow title={`${project.name}.PROJ`} className="mb-8">
+        <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
+          <Image
+            src={project.heroImage.src}
+            alt={project.heroImage.alt}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
+            className="object-cover"
+          />
+        </div>
+      </OSWindow>
 
       <MetaRow project={project} />
       <SummaryBlock project={project} />

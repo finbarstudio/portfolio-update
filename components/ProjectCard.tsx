@@ -40,27 +40,40 @@ function CardImage({
   priority = false,
   sizes,
   aspectRatio = "3/2",
+  title,
 }: {
   src: string;
   alt: string;
   priority?: boolean;
   sizes: string;
   aspectRatio?: string;
+  title?: string;
 }) {
   return (
     <div style={{ marginBottom: "var(--image-pad)" }}>
       <div
-        className="img-wrap"
-        style={{ aspectRatio }}
+        className="os-window group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] transition-transform"
       >
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes={sizes}
-          priority={priority}
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
-        />
+        {title && (
+          <div className="os-titlebar">
+            <span className="os-titlebar-btn" aria-hidden="true" />
+            <span className="os-titlebar-title">{title}</span>
+            <span className="os-titlebar-btn" aria-hidden="true" />
+          </div>
+        )}
+        <div
+          className="img-wrap"
+          style={{ aspectRatio, maxHeight: "72vh" }}
+        >
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes={sizes}
+            priority={priority}
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+          />
+        </div>
       </div>
     </div>
   );
@@ -84,6 +97,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
           priority={index === 0}
           sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
           aspectRatio="16/9"
+          title={`${project.name}.PROJ`}
         />
 
         <div className="pb-8">
@@ -120,6 +134,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
           src={project.heroImage.src}
           alt={project.heroImage.alt}
           sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
+          title={`${project.name}`}
         />
 
         <div className="pb-6">
