@@ -2,13 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./LayoutShell";
-
-const JarvisGlobe = dynamic(() => import("./JarvisGlobe"), { ssr: false });
 
 /* ── Brand icons ──────────────────────────────────────────────── */
 function ArenaIcon({ size = 14 }: { size?: number }) {
@@ -104,6 +101,86 @@ function Logo() {
     >
       finbar<span className="text-pink" aria-hidden="true">✶</span>studio
     </Link>
+  );
+}
+
+/* ── World clocks ─────────────────────────────────────────────── */
+const CLOCKS = [
+  { code: "BNE", label: "BRISBANE", tz: "Australia/Brisbane" },
+  { code: "LON", label: "LONDON",   tz: "Europe/London"      },
+];
+
+function WorldClocks() {
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const fmtTime = (tz: string) =>
+    now
+      ? new Intl.DateTimeFormat("en", {
+          timeZone: tz, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+        }).format(now)
+      : "--:--:--";
+
+  const fmtOffset = (tz: string) => {
+    if (!now) return "";
+    const s = new Intl.DateTimeFormat("en", { timeZone: tz, timeZoneName: "shortOffset" })
+      .formatToParts(now)
+      .find((p) => p.type === "timeZoneName")?.value ?? "";
+    return s.replace("GMT", "UTC");
+  };
+
+  return (
+    <div
+      className="mx-6 mb-5 border border-line"
+      style={{ padding: "10px 12px 10px" }}
+    >
+      {/* Column headers */}
+      <div className="flex justify-between mb-2">
+        {CLOCKS.map((c) => (
+          <p
+            key={c.code}
+            className="font-sans font-bold uppercase text-ink-soft"
+            style={{ fontSize: "8px", letterSpacing: "0.14em" }}
+          >
+            {c.code}
+          </p>
+        ))}
+      </div>
+
+      {/* Times */}
+      <div className="flex justify-between items-baseline">
+        {CLOCKS.map((c) => (
+          <p
+            key={c.code}
+            className="font-sans font-bold text-ink tabular-nums"
+            style={{ fontSize: "15px", letterSpacing: "0.03em", fontVariantNumeric: "tabular-nums" }}
+          >
+            {fmtTime(c.tz)}
+          </p>
+        ))}
+      </div>
+
+      {/* City + offset */}
+      <div className="flex justify-between mt-1">
+        {CLOCKS.map((c) => (
+          <p
+            key={c.code}
+            className="font-sans uppercase text-ink-soft"
+            style={{ fontSize: "8px", letterSpacing: "0.08em" }}
+          >
+            {c.label}
+            <span className="text-pink" style={{ marginLeft: "3px" }}>
+              {fmtOffset(c.tz)}
+            </span>
+          </p>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -239,13 +316,15 @@ function DesktopSidebar({
           <div className="px-6 pb-3">
             <a
               href="mailto:finbar@finbar.studio"
-              className="block text-[10px] font-sans text-ink-soft hover:text-pink transition-colors mb-1"
+              className="block font-sans text-ink-soft hover:text-pink transition-colors mb-1"
+              style={{ fontSize: "13px" }}
             >
               finbar@finbar.studio
             </a>
             <a
               href="tel:+61412796630"
-              className="block text-[10px] font-sans text-ink-soft hover:text-pink transition-colors"
+              className="block font-sans text-ink-soft hover:text-pink transition-colors"
+              style={{ fontSize: "13px" }}
             >
               +61 412 796 630
             </a>
@@ -256,12 +335,10 @@ function DesktopSidebar({
             <span className="status-badge">OPEN FOR WORK</span>
           </div>
 
-          {/* Globe + icons + copyright — bottom */}
-          <div className="px-3 pb-4 mt-auto">
-            <div style={{ width: "100%", height: "178px", overflow: "hidden" }}>
-              <JarvisGlobe />
-            </div>
-            <div className="flex items-center justify-between mt-3 px-1">
+          {/* World clocks + icons + copyright — bottom */}
+          <div className="mt-auto pb-4">
+            <WorldClocks />
+            <div className="flex items-center justify-between px-6">
               <div className="flex items-center gap-3">
                 {socials.map((s) => (
                   <a
