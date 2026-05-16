@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About — finbar✶studio",
@@ -10,16 +9,6 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="px-6 md:px-10">
-      {/* Back nav */}
-      <div className="py-5">
-        <Link
-          href="/"
-          className="mono-label text-ink-soft hover:text-pink transition-colors"
-        >
-          ← HOME
-        </Link>
-      </div>
-
       {/* Display heading */}
       <div className="pt-4 pb-12">
         <p className="mono-label text-ink-soft mb-4">About</p>

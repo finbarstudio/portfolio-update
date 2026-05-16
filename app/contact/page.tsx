@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 
 export const metadata: Metadata = {
@@ -35,13 +34,6 @@ const socials = [
 export default function ContactPage() {
   return (
     <div className="px-6 md:px-10">
-      {/* Back nav */}
-      <div className="py-5">
-        <Link href="/" className="mono-label text-ink-soft hover:text-pink transition-colors">
-          ← HOME
-        </Link>
-      </div>
-
       {/* Display heading */}
       <div className="pt-4 pb-12">
         <p className="mono-label text-ink-soft mb-4">Contact</p>

@@ -1,6 +1,6 @@
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
-import EncryptedText from "@/components/EncryptedText";
+import StarDecor from "@/components/StarDecor";
 
 /* ─── Section label ────────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -13,39 +13,51 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 /* ─── Hero ──────────────────────────────────────────────────────
    Sticky: stays behind the work section as it scrolls over.
-   CSS scroll-driven animation fades text out as work covers it.
+   ✶ star drifts upward on scroll (parallax via StarDecor).
    ─────────────────────────────────────────────────────────────── */
+const SKILLS = [
+  "Brand Identity",
+  "Web Design",
+  "Framer Dev",
+  "Art Direction",
+  "Print",
+];
+
 function Hero() {
   return (
     <section
-      className="sticky top-0 z-0 bg-bg px-6 md:px-10"
-      style={{ minHeight: "36vh", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingBottom: "2.5rem", paddingTop: "1rem" }}
+      className="sticky top-0 z-0 bg-bg px-6 md:px-10 overflow-hidden"
+      style={{
+        minHeight: "36vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end",
+        paddingBottom: "1.75rem",
+        paddingTop: "1.75rem",
+      }}
       aria-labelledby="hero-heading"
     >
-      <div className="hero-scroll-fade">
+      {/* Parallax star — behind content */}
+      <StarDecor />
+
+      <div className="hero-scroll-fade relative z-10 flex items-end justify-between gap-6">
         <h1
           id="hero-heading"
           className="font-sans font-bold uppercase text-ink leading-[1.05]"
           style={{
             fontSize: "var(--text-display)",
             letterSpacing: "0.04em",
-            maxWidth: "18ch",
           }}
         >
-          <EncryptedText text="Graphic" delay={0} />{" "}
-          <span style={{ color: "var(--ink-soft)" }}>
-            <EncryptedText text="Designer" delay={120} />
-          </span>
-          <br />
-          <span className="text-pink">
-            <EncryptedText text="&" delay={240} />
-          </span>{" "}
-          <span style={{ color: "var(--ink-soft)" }}>
-            <EncryptedText text="Designer/" delay={360} />
-          </span>
-          <br />
-          <EncryptedText text="Developer" delay={520} />
+          Graphic<br />Designer
         </h1>
+
+        {/* Skill tags — stacked right */}
+        <div className="flex flex-col items-end gap-1.5 pb-0.5 flex-shrink-0">
+          {SKILLS.map((s) => (
+            <span key={s} className="tag tag-default">{s}</span>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -72,7 +72,7 @@ function ChevronRightIcon() {
 
 /* ── Data ─────────────────────────────────────────────────────── */
 const navLinks = [
-  { label: "WORK",    href: "/#work",    icon: <GridIcon /> },
+  { label: "WORK",    href: "/",         icon: <GridIcon /> },
   { label: "ABOUT",   href: "/about",    icon: <PersonIcon /> },
   { label: "CONTACT", href: "/contact",  icon: <EnvelopeIcon /> },
 ];
@@ -195,7 +195,7 @@ function DesktopSidebar({
   onToggle: () => void;
 }) {
   const isActive = (href: string) => {
-    if (href === "/#work") return pathname === "/";
+    if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };
 
@@ -394,7 +394,7 @@ function MobileMenu({
   pathname: string;
 }) {
   const isActive = (href: string) => {
-    if (href === "/#work") return pathname === "/";
+    if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };
 
