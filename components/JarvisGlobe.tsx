@@ -1,25 +1,24 @@
 "use client";
 
-// JARVIS Globe — adapted for sidebar use
-// Rotating dotted globe with Brisbane marker + live time
-// Dynamically imported (no SSR) via Sidebar.tsx
-
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
 
 const CONFIG = {
   globeRadius: 2,
-  dotCount: 3000,
+  gridWidth: 120,
+  gridHeight: 60,
   colors: {
-    dots: "var(--teal, #4DA8E0)",
-    glow: "var(--teal, #4DA8E0)",
-    labelBorder: "var(--teal, #4DA8E0)",
-    labelText: "#dffaff",
-    line: "var(--teal, #4DA8E0)",
+    background: "#ffffff",
+    dots: "#ff2a85",
+    marker: "#ff2a85",
+    line: "#cccccc",
+    labelText: "#111111",
   },
-  brisbane: { lat: -27.4698, lon: 153.0251 },
+  brisbane: {
+    lat: -27.4698,
+    lon: 153.0251,
+  },
 };
 
 function latLonToVector3(lat: number, lon: number, radius: number) {
@@ -32,147 +31,232 @@ function latLonToVector3(lat: number, lon: number, radius: number) {
   );
 }
 
-function GlobeDots() {
-  const meshRef = useRef<THREE.Points>(null);
+function ContinentalGlobe({
+  onBrisbanePositionUpdate,
+}: {
+  onBrisbanePositionUpdate: (pos: THREE.Vector3) => void;
+}) {
+  const globeGroupRef = useRef<THREE.Group>(null);
+  const rawBrisbanePos = useMemo(
+    () => latLonToVector3(CONFIG.brisbane.lat, CONFIG.brisbane.lon, CONFIG.globeRadius),
+    []
+  );
 
-  // Build geometry imperatively to avoid R3F bufferAttribute JSX issues
   const geometry = useMemo(() => {
+    const worldMap = [
+      "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "000000000000000000000000000000000000000000000000000000000000000111111000000000000000000000000000000000000000000000000000",
+      "000000000000000000000000000000000000000000000000000000000111111111111111000000000000000000000000000000000000000000000000",
+      "000000000000000000000000111000000000000000000000000000111111111111111111110000000000000000000000000000000000000000000000",
+      "000000000000001110000111111110000000000000000000001111111111111111111111111000000000000000000000000000000000000000000000",
+      "000000000001111111111111111110000000000000000011111111111111111111111111111110000000000000000000000000000000000000000000",
+      "000000000111111111111111111100000000000000011111111111111111111111111111111111100000000000000000000000000000000000000000",
+      "000000000011111111111111111000000000000011111111111111111111111111111111111111110000000000000000000000000000000000000000",
+      "000000000001111111111111100000000000001111111111111111111111111111111111111111111000000000000000000000000000000000000000",
+      "000000000000111111111110000000000001111111111111111111111111111111111111111111111100000000000000000000000000000000000000",
+      "000000000000011111110000000000000011111111111111111111111111111111111111111111111110000000000000000000000000000000000000",
+      "000000000000001111000000000000000011111111111111111111111111111111111111111111111110000000000000000000000000000000000000",
+      "000000000000001110000000000000000001111111111111111111111111111111111111111111111100000000000000000000000000000000000000",
+      "000000000000111110000000000000000001111111111111111111111111111111111111111111111000000000000000000000000000000000000000",
+      "000000000000111110000000000000000000111111111111111111111111111111111111111111110000000000000000000000000000000000000000",
+      "000000000011111100000000000000000000011111111111111111111111111111111111111111000000000000000000000000000000000000000000",
+      "000000000111111000000000000000000000001111111111111111111111111111111111111110000000000000000000000000000000000000000000",
+      "000000000111110000000000000000000000001111111111111111111111111111111111111000000000000000000000000000000000000000000000",
+      "000000000111100000000000000000000000000111111111111111111111111111111111110000000000000000000000000000000000000000000000",
+      "000000000111000000000000000000000000000011111111111111111111111111111110000000000000000000000000000000000000000000000011",
+      "000000001111000000000000000000000000000001111111111111111111111111111000000000000000000000000000000000011000000000000011",
+      "000000001110000000000000000000000000000000111111111111111111111111000000000000000000000000000000000000111100000000000111",
+      "000000001100000000000000000000000000000000111111111111111111111000000000000000000000000000000000000011111100000000001111",
+      "000000001000000000000000000000000000000000001111111111111111100000000000000000000000000000000000001111111110000000011111",
+      "000000011000000000000000000000000000000000001111111111111111000000000000000000000000000000000000011111111110000000111111",
+      "000000011000000000000000000000000000000000000111111111111100000000000000000000000000000000000000011111111110000001111111",
+      "000000011000000000000000000000000000000000000011111111110000000000000000000000000000000000000000001111111100000111111111",
+      "000000011000000000000000000000000000000000000001111111000000000000000000000000000000000000000000000111111000001111111111",
+      "000000011000000000000000000000000000000000000000111100000000000000000000000000000000000000000000000001110000001111111111",
+      "000000001000000000000000000000000000000000000000011000000000000000000000000000000000000000000000000000000000111111111111",
+      "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111110",
+      "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111100",
+    ];
+
+    const h = worldMap.length;
+    const w = worldMap[0].length;
     const pts: number[] = [];
-    for (let i = 0; i < CONFIG.dotCount; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = CONFIG.globeRadius;
-      pts.push(
-        r * Math.sin(phi) * Math.cos(theta),
-        r * Math.sin(phi) * Math.sin(theta),
-        r * Math.cos(phi)
-      );
+
+    for (let latIdx = 0; latIdx < h; latIdx++) {
+      const lat = 90 - (latIdx / h) * 180;
+      for (let lonIdx = 0; lonIdx < w; lonIdx++) {
+        if (worldMap[latIdx][lonIdx] === "1") {
+          const lon = (lonIdx / w) * 360 - 180;
+          const phi = (90 - lat) * (Math.PI / 180);
+          const theta = (lon + 180) * (Math.PI / 180);
+          const r = CONFIG.globeRadius;
+          pts.push(
+            -(r * Math.sin(phi) * Math.cos(theta)),
+            r * Math.cos(phi),
+            r * Math.sin(phi) * Math.sin(theta)
+          );
+        }
+      }
     }
+
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pts), 3));
     return geo;
   }, []);
 
   useFrame((_, delta) => {
-    if (meshRef.current) meshRef.current.rotation.y += delta * 0.18;
+    if (globeGroupRef.current) {
+      globeGroupRef.current.rotation.y += delta * 0.12;
+      const vector = rawBrisbanePos.clone();
+      vector.applyMatrix4(globeGroupRef.current.matrixWorld);
+      onBrisbanePositionUpdate(vector);
+    }
   });
 
   return (
-    <points ref={meshRef} geometry={geometry}>
-      <pointsMaterial
-        size={0.025}
-        color="#4DA8E0"
-        transparent
-        opacity={0.85}
-        depthWrite={false}
-      />
-    </points>
-  );
-}
-
-function BrisbaneMarker() {
-  const groupRef = useRef<THREE.Group>(null);
-  const [time, setTime] = useState("--:--:--");
-
-  useEffect(() => {
-    const fmt = new Intl.DateTimeFormat("en-AU", {
-      timeZone: "Australia/Brisbane",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
-    const tick = () => setTime(fmt.format(new Date()));
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const pos = useMemo(
-    () => latLonToVector3(CONFIG.brisbane.lat, CONFIG.brisbane.lon, CONFIG.globeRadius),
-    []
-  );
-
-  useFrame(() => {
-    if (groupRef.current) groupRef.current.lookAt(0, 0, 0);
-  });
-
-  return (
-    <group ref={groupRef} position={pos}>
-      {/* Marker dot */}
-      <mesh>
-        <sphereGeometry args={[0.045, 16, 16]} />
-        <meshBasicMaterial color="#4DA8E0" />
+    <group ref={globeGroupRef}>
+      <points geometry={geometry}>
+        <pointsMaterial
+          size={0.045}
+          color={CONFIG.colors.dots}
+          transparent
+          opacity={0.85}
+          depthWrite={true}
+        />
+      </points>
+      <mesh position={rawBrisbanePos}>
+        <sphereGeometry args={[0.04, 16, 16]} />
+        <meshBasicMaterial color={CONFIG.colors.marker} />
       </mesh>
-
-      {/* Connector line */}
-      <mesh position={[0.55, 0.1, 0]}>
-        <boxGeometry args={[1.1, 0.004, 0.004]} />
-        <meshBasicMaterial color="#4DA8E0" />
-      </mesh>
-
-      {/* HTML label — rendered as DOM node inside the canvas */}
-      <Html position={[1.15, 0.1, 0]} center>
-        <div
-          style={{
-            minWidth: "100px",
-            padding: "6px 10px",
-            border: "1px solid rgba(77,168,224,0.6)",
-            background: "rgba(1, 4, 9, 0.75)",
-            backdropFilter: "blur(8px)",
-            borderRadius: "6px",
-            color: "#dffaff",
-            fontFamily: "var(--font-jetbrains-mono, monospace)",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "8px",
-              letterSpacing: "1.5px",
-              opacity: 0.6,
-              marginBottom: "3px",
-              textTransform: "uppercase",
-            }}
-          >
-            Brisbane
-          </div>
-          <div
-            style={{
-              fontSize: "13px",
-              fontWeight: 700,
-              letterSpacing: "0.5px",
-            }}
-          >
-            {time}
-          </div>
-        </div>
-      </Html>
     </group>
   );
 }
 
 export default function JarvisGlobe() {
+  const [brisbane3DPos, setBrisbane3DPos] = useState<THREE.Vector3>(
+    new THREE.Vector3()
+  );
+  const [lineCoords, setLineCoords] = useState<{
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const staticTime = useMemo(() => {
+    return new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Brisbane",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date());
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const width = containerRef.current.clientWidth;
+    const height = containerRef.current.clientHeight;
+    const labelX = width * 0.75;
+    const labelY = height * 0.25;
+
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(0, 0, 6);
+    camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld();
+
+    const tempV = brisbane3DPos.clone();
+    tempV.project(camera);
+
+    const screenX = (tempV.x * 0.5 + 0.5) * width;
+    const screenY = (tempV.y * -0.5 + 0.5) * height;
+
+    if (tempV.z <= 1) {
+      setLineCoords({ x1: screenX, y1: screenY, x2: labelX, y2: labelY });
+    } else {
+      setLineCoords(null);
+    }
+  }, [brisbane3DPos]);
+
   return (
     <div
+      ref={containerRef}
       style={{
+        position: "relative",
         width: "100%",
         height: "100%",
-        background: "radial-gradient(circle at 50% 60%, #07111f 0%, #010409 75%)",
-        borderRadius: "8px",
+        background: CONFIG.colors.background,
         overflow: "hidden",
+        borderRadius: "8px",
       }}
     >
-      <Canvas camera={{ position: [0, 0, 6], fov: 42 }}>
-        <ambientLight intensity={0.4} />
-        <GlobeDots />
-        <BrisbaneMarker />
-        <OrbitControls
-          enableZoom={false}
-          autoRotate={false}
-          enablePan={false}
-        />
+      {/* SVG connector line */}
+      {lineCoords && (
+        <svg
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            pointerEvents: "none",
+            zIndex: 10,
+          }}
+        >
+          <line
+            x1={lineCoords.x1}
+            y1={lineCoords.y1}
+            x2={lineCoords.x2}
+            y2={lineCoords.y2}
+            stroke={CONFIG.colors.line}
+            strokeWidth="1.5"
+            strokeDasharray="4 3"
+          />
+          <circle cx={lineCoords.x2} cy={lineCoords.y2} r="3" fill={CONFIG.colors.marker} />
+        </svg>
+      )}
+
+      {/* Three.js canvas */}
+      <Canvas camera={{ position: [0, 0, 6], fov: 45 }}>
+        <ambientLight intensity={1.0} />
+        <ContinentalGlobe onBrisbanePositionUpdate={setBrisbane3DPos} />
       </Canvas>
+
+      {/* HUD label */}
+      <div
+        style={{
+          position: "absolute",
+          top: "25%",
+          left: "75%",
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+          zIndex: 20,
+          minWidth: "90px",
+          padding: "8px 12px",
+          borderLeft: `3px solid ${CONFIG.colors.marker}`,
+          background: "rgba(255,255,255,0.9)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+          borderRadius: "0 6px 6px 0",
+          color: CONFIG.colors.labelText,
+          fontFamily: "var(--font-jetbrains-mono, monospace)",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "8px",
+            fontWeight: 600,
+            letterSpacing: "1.5px",
+            color: "#888",
+            marginBottom: "2px",
+            textTransform: "uppercase",
+          }}
+        >
+          Brisbane
+        </div>
+        <div style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.5px" }}>
+          {staticTime}
+        </div>
+      </div>
     </div>
   );
 }
