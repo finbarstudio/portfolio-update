@@ -45,8 +45,8 @@ export default function JarvisGlobe() {
       width: w * dpr,
       height: h * dpr,
       phi: START_PHI,
-      theta: 0.28,          // slight southern tilt toward Australia
-      dark: 0,              // light mode
+      theta: 0.28,
+      dark: 0,
       diffuse: 1.1,
       mapSamples: 16000,
       mapBrightness: 8,
@@ -54,16 +54,22 @@ export default function JarvisGlobe() {
       markerColor: PINK,
       glowColor: BG,
       scale: 1.08,
-      markers: [
-        { location: [BRISBANE_LAT, BRISBANE_LON], size: 0.065 },
-      ],
-      onRender(state) {
-        phiRef.current += 0.004;
-        state.phi = phiRef.current;
-      },
+      markers: [{ location: [BRISBANE_LAT, BRISBANE_LON], size: 0.065 }],
     });
 
-    return () => globe.destroy();
+    // Drive rotation via rAF
+    let rafId: number;
+    const animate = () => {
+      phiRef.current += 0.004;
+      globe.update({ phi: phiRef.current });
+      rafId = requestAnimationFrame(animate);
+    };
+    rafId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      globe.destroy();
+    };
   }, []);
 
   return (
