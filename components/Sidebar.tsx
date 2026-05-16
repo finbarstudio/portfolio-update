@@ -208,16 +208,17 @@ function MobileMenu({
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-5 py-8" aria-label="Mobile primary">
-        <ul className="space-y-2 mb-8" role="list">
+      <nav className="flex-1 overflow-y-auto px-5 flex flex-col py-6" aria-label="Mobile primary">
+        <ul className="space-y-1 mb-auto" role="list">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
                 onClick={onClose}
-                className={`block font-mono font-bold text-2xl tracking-[0.08em] uppercase transition-colors ${
+                className={`block font-sans font-bold uppercase transition-colors leading-none py-2 ${
                   isActive(link.href) ? "text-pink" : "text-ink hover:text-pink"
                 }`}
+                style={{ fontSize: "clamp(2.5rem, 12vw, 3.5rem)", letterSpacing: "-0.01em" }}
                 aria-current={isActive(link.href) ? "page" : undefined}
               >
                 {link.label}
@@ -226,38 +227,33 @@ function MobileMenu({
           ))}
         </ul>
 
-        {/* Contact — no heading */}
-        <div className="mb-5">
-          <a href="mailto:finbar@finbar.studio" className="block text-sm font-mono text-ink-soft hover:text-pink transition-colors mb-1">
+        <div className="pt-10">
+          <div className="mb-4">
+            <span className="status-badge">OPEN FOR WORK</span>
+          </div>
+          <a href="mailto:finbar@finbar.studio" className="block mono-label text-ink-soft hover:text-pink transition-colors mb-1">
             finbar@finbar.studio
           </a>
-          <a href="tel:+61412796630" className="block text-sm font-mono text-ink-soft hover:text-pink transition-colors">
+          <a href="tel:+61412796630" className="block mono-label text-ink-soft hover:text-pink transition-colors mb-6">
             +61 412 796 630
           </a>
-        </div>
 
-        {/* Open for work */}
-        <div className="mb-8">
-          <span className="status-badge">OPEN FOR WORK</span>
+          <div className="flex items-center gap-5">
+            {socials.map((s) => (
+              <a
+                key={s.href}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.label}
+                className="text-ink-soft hover:text-pink transition-colors"
+              >
+                {React.cloneElement(s.icon as React.ReactElement, { size: 18 } as Record<string, unknown>)}
+              </a>
+            ))}
+          </div>
+          <p className="mono-label text-ink-soft mt-6" style={{ fontSize: "9px" }}>2026©</p>
         </div>
-
-        {/* Social icons — no heading */}
-        <div className="flex items-center gap-5 mb-8">
-          {socials.map((s) => (
-            <a
-              key={s.href}
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={s.label}
-              className="text-ink-soft hover:text-pink transition-colors"
-            >
-              {React.cloneElement(s.icon as React.ReactElement, { size: 18 } as Record<string, unknown>)}
-            </a>
-          ))}
-        </div>
-
-        <p className="mono-label text-ink-soft" style={{ fontSize: "9px" }}>2026©</p>
       </nav>
     </div>
   );

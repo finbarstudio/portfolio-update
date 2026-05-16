@@ -20,21 +20,21 @@ export default function AboutPage() {
         </Link>
       </div>
 
-      {/* Heading */}
-      <div className="pt-10 pb-8">
-        <p className="mono-label text-ink-soft mb-3">About</p>
-        <h1 className="font-mono font-bold text-[clamp(1.5rem,3vw,2rem)] tracking-[0.08em] uppercase text-ink">
-          Finbar Skitini
+      {/* Display heading */}
+      <div className="pt-4 pb-12">
+        <p className="mono-label text-ink-soft mb-4">About</p>
+        <h1
+          className="font-sans font-bold uppercase text-ink leading-[1.0]"
+          style={{ fontSize: "var(--text-display)", letterSpacing: "0.02em" }}
+        >
+          Finbar<br />Skitini
         </h1>
       </div>
 
       {/* Bio */}
-      <div className="py-10 max-w-2xl">
-        {/*
-         * PLACEHOLDER — refine bio copy.
-         * Written from spec; update with Finbar's preferred voice.
-         */}
-        <div className="space-y-5 text-[15px] leading-relaxed text-ink font-sans">
+      <div className="mb-14 max-w-2xl">
+        <p className="mono-label text-ink-soft mb-5">Background</p>
+        <div className="space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
           <p>
             I&rsquo;m a Brisbane-based graphic designer and Framer developer
             with four-plus years across brand identity, digital campaigns, web,
@@ -45,24 +45,20 @@ export default function AboutPage() {
             My work spans full brand systems from concept to delivery —
             logomarks, colour systems, typographic frameworks, and brand
             guidelines — through to motion campaigns, bespoke publications, and
-            custom-built websites in Framer. I care about things being visually
-            considered, technically tight, and genuinely usable.
+            custom-built websites in Framer.
           </p>
           <p>
-            Accessibility matters to me. I build for real people with real
-            constraints, not just for portfolio screenshots.
-          </p>
-          <p>
-            Outside of work: gym and music.{" "}
-            {/* PLACEHOLDER — expand if Finbar wants to add more personal detail */}
+            I care about things being visually considered, technically tight,
+            and genuinely usable. Accessibility matters — I build for real
+            people, not just portfolio screenshots.
           </p>
         </div>
       </div>
 
       {/* What I do */}
-      <div className="py-10">
-        <p className="mono-label text-ink-soft mb-6">WHAT I DO</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-8">
+      <div className="mb-14">
+        <p className="mono-label text-ink-soft mb-8">What I do</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-10">
           {[
             {
               heading: "Brand Identity",
@@ -96,10 +92,12 @@ export default function AboutPage() {
             },
           ].map(({ heading, items }) => (
             <div key={heading}>
-              <p className="mono-label text-ink mb-3">{heading}</p>
-              <ul className="space-y-1.5">
+              <p className="font-sans font-bold text-ink mb-4" style={{ fontSize: "var(--text-small)" }}>
+                {heading}
+              </p>
+              <ul className="space-y-2">
                 {items.map((item) => (
-                  <li key={item} className="text-sm text-ink-soft font-sans">
+                  <li key={item} className="font-sans text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
                     {item}
                   </li>
                 ))}
@@ -110,18 +108,18 @@ export default function AboutPage() {
       </div>
 
       {/* Contact CTA */}
-      <div className="py-10">
-        <p className="mono-label text-ink-soft mb-3">
+      <div className="pb-14">
+        <div className="mb-3">
           <span className="status-badge">OPEN FOR WORK</span>
-        </p>
-        <p className="text-sm text-ink-soft font-sans mb-4">
+        </div>
+        <p className="font-sans text-ink-soft mb-5" style={{ fontSize: "var(--text-small)" }}>
           Available for full-time design roles and freelance engagements.
-          Brisbane-based; remote-friendly.{" "}
-          {/* PLACEHOLDER — adjust availability note */}
+          Brisbane-based; remote-friendly.
         </p>
         <a
           href="mailto:finbar@finbar.studio"
-          className="inline-block font-sans text-xl font-medium text-ink hover:text-pink transition-colors"
+          className="font-sans font-bold text-ink hover:text-pink transition-colors"
+          style={{ fontSize: "var(--text-h2)" }}
         >
           finbar@finbar.studio
         </a>

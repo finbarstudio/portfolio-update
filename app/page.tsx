@@ -19,7 +19,7 @@ function Hero() {
   return (
     <section
       className="sticky top-0 z-0 bg-bg px-6 md:px-10"
-      style={{ minHeight: "36vh", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingBottom: "2.5rem", paddingTop: "3rem" }}
+      style={{ minHeight: "36vh", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingBottom: "2.5rem", paddingTop: "1rem" }}
       aria-labelledby="hero-heading"
     >
       <div className="hero-scroll-fade">

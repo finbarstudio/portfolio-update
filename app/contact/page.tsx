@@ -42,66 +42,65 @@ export default function ContactPage() {
         </Link>
       </div>
 
-      {/* Heading */}
-      <div className="pt-10 pb-8">
-        <p className="mono-label text-ink-soft mb-3">Contact</p>
+      {/* Display heading */}
+      <div className="pt-4 pb-12">
+        <p className="mono-label text-ink-soft mb-4">Contact</p>
         <h1
-          className="font-mono font-bold uppercase text-ink max-w-xl leading-tight"
-          style={{ fontSize: "var(--text-h1)", letterSpacing: "0.08em" }}
+          className="font-sans font-bold uppercase text-ink leading-[1.0]"
+          style={{ fontSize: "var(--text-display)", letterSpacing: "0.02em" }}
         >
-          Let&rsquo;s work together.
+          Let&rsquo;s work<br />together.
         </h1>
       </div>
 
-      {/* Contact details */}
-      <div className="py-10">
-        <div className="mb-7">
-          <p className="mono-label text-ink-soft mb-2">Email</p>
-          <a
-            href="mailto:finbar@finbar.studio"
-            className="block font-sans font-medium text-ink hover:text-pink transition-colors"
-            style={{ fontSize: "var(--text-h2)" }}
-          >
-            finbar@finbar.studio
-          </a>
-          <p className="text-ink-soft font-sans mt-1" style={{ fontSize: "var(--text-small)" }}>
-            Best way to reach me. Usually reply within one business day.
-          </p>
-        </div>
+      {/* Email — primary action */}
+      <div className="mb-10">
+        <p className="mono-label text-ink-soft mb-2">Email</p>
+        <a
+          href="mailto:finbar@finbar.studio"
+          className="block font-sans font-bold text-ink hover:text-pink transition-colors"
+          style={{ fontSize: "var(--text-h2)" }}
+        >
+          finbar@finbar.studio
+        </a>
+        <p className="text-ink-soft font-sans mt-1" style={{ fontSize: "var(--text-small)" }}>
+          Best way to reach me. Usually reply within one business day.
+        </p>
+      </div>
 
-        <div className="mb-7">
+      {/* Phone + Location side by side */}
+      <div className="flex gap-10 mb-10">
+        <div>
           <p className="mono-label text-ink-soft mb-2">Phone</p>
           <a
             href="tel:+61412796630"
-            className="font-mono text-ink hover:text-pink transition-colors"
+            className="font-sans text-ink hover:text-pink transition-colors"
             style={{ fontSize: "var(--text-small)" }}
           >
             +61 412 796 630
           </a>
         </div>
-
-        <div className="mb-7">
-          <p className="mono-label text-ink-soft mb-2">Location</p>
-          <p className="font-mono text-ink" style={{ fontSize: "var(--text-small)" }}>Brisbane, Australia</p>
-          <p className="text-ink-soft font-sans mt-0.5" style={{ fontSize: "var(--text-caption)" }}>
-            Remote-friendly — previously worked with clients across UK and Australia.
-          </p>
-        </div>
-
-        {/* Open for work — directly below contact details */}
         <div>
-          <div className="mb-2">
-            <span className="status-badge">OPEN FOR WORK</span>
-          </div>
-          <p className="text-ink-soft font-sans max-w-md" style={{ fontSize: "var(--text-small)" }}>
-            Available for full-time design roles and freelance projects.
-            Happy to discuss Brisbane-based or remote positions.
+          <p className="mono-label text-ink-soft mb-2">Location</p>
+          <p className="font-sans text-ink" style={{ fontSize: "var(--text-small)" }}>
+            Brisbane, AU
+          </p>
+          <p className="text-ink-soft font-sans" style={{ fontSize: "var(--text-caption)" }}>
+            Remote-friendly
           </p>
         </div>
       </div>
 
-      {/* Socials — icon + label pairs */}
-      <div className="py-8">
+      {/* Status */}
+      <div className="mb-12">
+        <span className="status-badge">OPEN FOR WORK</span>
+        <p className="text-ink-soft font-sans mt-2 max-w-xs" style={{ fontSize: "var(--text-small)" }}>
+          Available for full-time roles and freelance. Brisbane or remote.
+        </p>
+      </div>
+
+      {/* Socials */}
+      <div>
         <p className="mono-label text-ink-soft mb-4">Follow</p>
         <div className="flex flex-wrap gap-6">
           {socials.map((s) => (
