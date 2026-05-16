@@ -22,11 +22,6 @@ function Hero() {
       aria-labelledby="hero-heading"
     >
       <div className="hero-scroll-fade">
-        {/* Eyebrow — small mono-caps */}
-        <p className="mono-label text-ink-soft mb-5">
-          Brisbane, AU
-        </p>
-
         {/* Pink rule */}
         <div
           className="mb-6 bg-pink"

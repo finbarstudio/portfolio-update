@@ -1,8 +1,30 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { Globe } from "lucide-react";
+import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
+
+// Three.js needs browser APIs — no SSR
+const JarvisGlobe = dynamic(() => import("./JarvisGlobe"), { ssr: false });
+
+// LinkedIn icon — not available in Simple Icons (removed by LinkedIn)
+function LinkedInIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  );
+}
 
 const navLinks = [
   { label: "WORK", href: "/#work" },
@@ -11,10 +33,26 @@ const navLinks = [
 ];
 
 const socials = [
-  { label: "Are.na", href: "https://are.na/finbar-studio" },
-  { label: "X", href: "https://x.com/finbarstudio" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/finbarskitini" },
-  { label: "Instagram", href: "https://instagram.com/finbar.studio" },
+  {
+    label: "Are.na",
+    href: "https://are.na/finbar-studio",
+    icon: <Globe size={14} aria-hidden="true" />,
+  },
+  {
+    label: "X",
+    href: "https://x.com/finbarstudio",
+    icon: <SiX size={13} aria-hidden="true" />,
+  },
+  {
+    label: "LinkedIn",
+    href: "https://linkedin.com/in/finbarskitini",
+    icon: <LinkedInIcon size={14} />,
+  },
+  {
+    label: "Instagram",
+    href: "https://instagram.com/finbar.studio",
+    icon: <SiInstagram size={14} aria-hidden="true" />,
+  },
 ];
 
 function Logo() {
@@ -38,7 +76,12 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
 
   return (
     <aside
-      className="hidden md:flex fixed left-0 top-0 h-screen w-56 border-r border-line bg-bg flex-col z-40 overflow-y-auto"
+      className="hidden md:flex fixed left-0 top-0 h-screen w-56 border-r border-line flex-col z-40 overflow-y-auto"
+      style={{
+        background: "rgba(250, 250, 248, 0.82)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
       aria-label="Site navigation"
     >
       {/* Logo */}
@@ -46,7 +89,7 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
         <Logo />
       </div>
 
-      {/* Primary nav — no dividers, whitespace separates groups */}
+      {/* Primary nav */}
       <nav className="px-6 pb-6" aria-label="Primary">
         <ul className="space-y-0.5" role="list">
           {navLinks.map((link) => (
@@ -61,15 +104,13 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
             </li>
           ))}
         </ul>
-
-        {/* Open for work */}
         <div className="mt-5">
           <span className="status-badge">OPEN FOR WORK</span>
         </div>
       </nav>
 
       {/* Contact */}
-      <div className="px-6 pt-6 pb-6">
+      <div className="px-6 pb-6">
         <p className="mono-label text-ink-soft mb-3">Contact</p>
         <a
           href="mailto:finbar@finbar.studio"
@@ -85,29 +126,31 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
         </a>
       </div>
 
-      {/* Socials */}
+      {/* Socials — icon row */}
       <div className="px-6 pb-6">
         <p className="mono-label text-ink-soft mb-3">Follow</p>
-        <ul className="space-y-1" role="list">
+        <div className="flex items-center gap-3">
           {socials.map((s) => (
-            <li key={s.href}>
-              <a
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-mono text-ink-soft hover:text-pink transition-colors link-wipe"
-              >
-                {s.label}
-              </a>
-            </li>
+            <a
+              key={s.href}
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={s.label}
+              className="text-ink-soft hover:text-pink transition-colors"
+            >
+              {s.icon}
+            </a>
           ))}
-        </ul>
+        </div>
       </div>
 
-      {/* Footer info */}
-      <div className="px-6 pb-6 mt-auto">
-        <p className="mono-label text-ink-soft">Brisbane, Australia</p>
-        <p className="mono-label text-ink-soft mt-1">2026©</p>
+      {/* Globe — replaces the Brisbane text footer */}
+      <div className="px-3 pb-3 mt-auto">
+        <div style={{ width: "100%", height: "190px", borderRadius: "8px", overflow: "hidden" }}>
+          <JarvisGlobe />
+        </div>
+        <p className="mono-label text-ink-soft mt-3 px-3">2026©</p>
       </div>
     </aside>
   );
@@ -116,7 +159,14 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
 /* ── Mobile top bar ───────────────────────────────────────── */
 function MobileTopBar({ onOpen }: { onOpen: () => void }) {
   return (
-    <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-bg border-b border-line flex items-center justify-between px-5 z-50">
+    <div
+      className="md:hidden fixed top-0 left-0 right-0 h-14 border-b border-line flex items-center justify-between px-5 z-50"
+      style={{
+        background: "rgba(250, 250, 248, 0.88)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
+    >
       <Logo />
       <button
         onClick={onOpen}
@@ -153,9 +203,10 @@ function MobileMenu({
 
   return (
     <div
-      className={`md:hidden fixed inset-0 bg-bg z-50 flex flex-col transition-opacity duration-200 ${
+      className={`md:hidden fixed inset-0 z-50 flex flex-col transition-opacity duration-200 ${
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
+      style={{ background: "rgba(250, 250, 248, 0.96)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
       aria-hidden={!open}
       role="dialog"
       aria-modal="true"
@@ -206,22 +257,23 @@ function MobileMenu({
 
         <div className="mb-10">
           <p className="mono-label text-ink-soft mb-3">Follow</p>
-          <div className="flex gap-4 flex-wrap">
+          <div className="flex items-center gap-5">
             {socials.map((s) => (
               <a
                 key={s.href}
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-mono text-ink-soft hover:text-pink transition-colors link-wipe"
+                aria-label={s.label}
+                className="text-ink-soft hover:text-pink transition-colors"
               >
-                {s.label}
+                {React.cloneElement(s.icon as React.ReactElement, { size: 18 } as Record<string, unknown>)}
               </a>
             ))}
           </div>
         </div>
 
-        <p className="mono-label text-ink-soft">Brisbane, Australia · 2026©</p>
+        <p className="mono-label text-ink-soft">2026©</p>
       </nav>
     </div>
   );
@@ -231,7 +283,6 @@ function MobileMenu({
 export default function Sidebar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   return (
