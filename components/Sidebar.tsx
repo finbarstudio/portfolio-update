@@ -1,6 +1,6 @@
 "use client";
 
-// "Finder" sidebar — folder-tree navigation with expandable work folder
+// Navigator sidebar — folder-tree navigation with expandable work folder
 // listing all 14 projects as files. Below the tree: dual world clocks,
 // open-for-work status, contact email, social icons.
 
@@ -133,7 +133,7 @@ function SidebarHeader({ onToggle }: { onToggle: () => void }) {
   return (
     <div className="os-titlebar" style={{ borderTop: "1px solid var(--ink)" }}>
       <span className="os-titlebar-btn" aria-hidden="true" />
-      <span className="os-titlebar-title">FINDER</span>
+      <span className="os-titlebar-title">NAVIGATOR</span>
       <button
         onClick={onToggle}
         aria-label="Collapse sidebar"
@@ -371,6 +371,14 @@ function DesktopSidebar({
               style={{ fontSize: "12px", letterSpacing: "0.02em" }}
             >
               finbar@finbar.studio
+            </a>
+
+            <a
+              href="tel:+61412796630"
+              className="block font-sans text-ink-soft hover:text-pink transition-colors tabular-nums"
+              style={{ fontSize: "11px", letterSpacing: "0.02em" }}
+            >
+              +61 412 796 630
             </a>
 
             <div className="flex items-center justify-between pt-1">

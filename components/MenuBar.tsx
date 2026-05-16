@@ -1,12 +1,17 @@
 "use client";
 
-// Top-of-screen "Apple-menu" style bar.
-// Always visible — gives the OS frame. Live local clock on the right.
+// Top-of-screen OS-style menu bar.
+// Brand links home. Nav items link to real pages. Live Brisbane clock on right.
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
-const MENU_ITEMS = ["File", "Edit", "View", "Window", "Help"];
+const NAV_ITEMS = [
+  { label: "Work",    href: "/" },
+  { label: "About",  href: "/about" },
+  { label: "Contact",href: "/contact" },
+];
 
 function LiveClock() {
   const [now, setNow] = useState<Date | null>(null);
@@ -32,6 +37,8 @@ function LiveClock() {
 }
 
 export default function MenuBar() {
+  const pathname = usePathname();
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 border-b border-ink bg-bg flex items-center px-3"
@@ -43,7 +50,7 @@ export default function MenuBar() {
       }}
       role="banner"
     >
-      {/* Brand */}
+      {/* Brand — always links home */}
       <Link
         href="/"
         className="flex items-center gap-1.5 font-bold uppercase tracking-[0.08em] hover:text-pink transition-colors"
@@ -53,18 +60,27 @@ export default function MenuBar() {
         <span>finbar.studio</span>
       </Link>
 
-      {/* Menu items — non-functional, just chrome */}
-      <nav className="hidden sm:flex items-center gap-0 ml-5" aria-label="Menu">
-        {MENU_ITEMS.map((m) => (
-          <button
-            key={m}
-            type="button"
-            className="px-2 py-0.5 text-ink hover:bg-ink hover:text-bg transition-colors"
-            tabIndex={-1}
-          >
-            {m}
-          </button>
-        ))}
+      {/* Nav items — functional links */}
+      <nav className="hidden sm:flex items-center gap-0 ml-5" aria-label="Primary">
+        {NAV_ITEMS.map((item) => {
+          const isActive = item.href === "/"
+            ? pathname === "/"
+            : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="px-2 py-0.5 transition-colors"
+              style={{
+                color: isActive ? "var(--bg)" : "var(--ink)",
+                background: isActive ? "var(--ink)" : "transparent",
+              }}
+              aria-current={isActive ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Right cluster */}
