@@ -52,10 +52,10 @@ function CardImage({
   return (
     <div style={{ marginBottom: "var(--image-pad)" }}>
       <div
-        className="os-window group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] transition-transform"
+        className="os-window md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform"
       >
         {title && (
-          <div className="os-titlebar">
+          <div className="os-titlebar hidden md:flex">
             <span className="os-titlebar-btn" aria-hidden="true" />
             <span className="os-titlebar-title">{title}</span>
             <span className="os-titlebar-btn" aria-hidden="true" />

@@ -1,7 +1,8 @@
 "use client";
 
 // Top-of-screen OS-style menu bar.
-// Brand links home. Nav items link to real pages. Live Brisbane clock on right.
+// Brand links home. Nav items link to real pages on desktop.
+// Mobile: brand + hamburger (opens MobileMenu via prop).
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -9,8 +10,8 @@ import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { label: "Work",    href: "/" },
-  { label: "About",  href: "/about" },
-  { label: "Contact",href: "/contact" },
+  { label: "About",   href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 function LiveClock() {
@@ -36,7 +37,11 @@ function LiveClock() {
   );
 }
 
-export default function MenuBar() {
+export default function MenuBar({
+  onMobileMenuOpen,
+}: {
+  onMobileMenuOpen?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
@@ -60,8 +65,8 @@ export default function MenuBar() {
         <span>finbar.studio</span>
       </Link>
 
-      {/* Nav items — functional links */}
-      <nav className="hidden sm:flex items-center gap-0 ml-5" aria-label="Primary">
+      {/* Nav items — functional links, desktop only */}
+      <nav className="hidden md:flex items-center gap-0 ml-5" aria-label="Primary">
         {NAV_ITEMS.map((item) => {
           const isActive = item.href === "/"
             ? pathname === "/"
@@ -85,12 +90,23 @@ export default function MenuBar() {
 
       {/* Right cluster */}
       <div className="ml-auto flex items-center gap-3 text-ink">
-        <span className="hidden md:inline-flex items-center gap-1.5">
+        <span className="hidden lg:inline-flex items-center gap-1.5">
           <span className="status-dot" />
           <span className="text-teal font-bold tracking-[0.1em]">ONLINE</span>
         </span>
         <span className="text-ink-soft hidden sm:inline">BNE</span>
         <LiveClock />
+
+        {/* Mobile hamburger */}
+        <button
+          type="button"
+          onClick={onMobileMenuOpen}
+          aria-label="Open navigation menu"
+          className="md:hidden flex items-center justify-center border border-ink"
+          style={{ width: 18, height: 18, marginLeft: 2 }}
+        >
+          <span className="text-[10px] leading-none font-bold">≡</span>
+        </button>
       </div>
     </header>
   );

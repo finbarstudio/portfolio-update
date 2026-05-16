@@ -438,4 +438,25 @@
     flex-shrink: 0;
     animation: dot-pulse 2s ease-in-out infinite;
   }
+
+  /* ───────────────────────────────────────────────────────────────
+     Mobile overrides — collapse heavy OS chrome below `md` (768px).
+     Titlebars are hidden in markup (`hidden md:flex`); here we strip
+     borders + drop-shadows from windows so content reads cleanly.
+     Chrome bars themselves (MenuBar, StatusBar, sidebar Navigator
+     header, Mobile menu Navigation.WDW header) live on different
+     classes and are unaffected.
+     ─────────────────────────────────────────────────────────────── */
+  @media (max-width: 767px) {
+    .os-window {
+      border: none;
+      box-shadow: none;
+      animation: none;
+    }
+    /* Slightly tighter section gap on mobile */
+    :root {
+      --space-section: 3rem;
+      --image-pad: 1rem;
+    }
+  }
 }

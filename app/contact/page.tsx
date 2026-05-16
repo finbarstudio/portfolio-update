@@ -34,8 +34,8 @@ const socials = [
 
 export default function ContactPage() {
   return (
-    <div className="px-6 md:px-10 py-8">
-      <OSWindow title="CONTACT.WDW" bodyClassName="px-6 md:px-10 py-10">
+    <div className="px-5 md:px-10 py-6 md:py-8">
+      <OSWindow title="CONTACT.WDW" bodyClassName="px-0 md:px-10 py-6 md:py-10">
         {/* Display heading */}
         <div className="pb-10 border-b border-line mb-10">
           <p className="mono-label text-ink-soft mb-3">
@@ -65,7 +65,7 @@ export default function ContactPage() {
         </div>
 
         {/* Phone + Location side by side */}
-        <div className="flex gap-10 mb-10">
+        <div className="flex flex-wrap gap-6 md:gap-10 mb-10">
           <div>
             <p className="mono-label text-ink-soft mb-2">── PHONE ──</p>
             <a

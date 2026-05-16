@@ -228,7 +228,7 @@ export default async function CaseStudyPage({
   if (!project || project.tier === "gallery") notFound();
 
   return (
-    <article className="px-6 md:px-10 py-6">
+    <article className="px-5 md:px-10 py-4 md:py-6">
       {/* Breadcrumb / path */}
       <div className="terminal-line mb-4">
         <span className="ps1">»</span>{" "}

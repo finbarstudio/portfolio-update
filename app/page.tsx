@@ -18,14 +18,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function Hero() {
   return (
     <section
-      className="sticky top-0 z-0 bg-bg px-6 md:px-10"
+      className="sticky top-0 z-0 bg-bg px-5 md:px-10 pt-5 md:pt-7 pb-6 md:pb-7"
       style={{
-        minHeight: "44vh",
+        minHeight: "38vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
-        paddingTop: "1.75rem",
-        paddingBottom: "1.75rem",
       }}
       aria-labelledby="hero-heading"
     >
@@ -77,7 +75,7 @@ function WorkGrid() {
   return (
     <section
       id="work"
-      className="relative z-10 bg-bg px-6 md:px-10"
+      className="relative z-10 bg-bg px-5 md:px-10"
       style={{ paddingTop: "var(--space-section)", paddingBottom: "var(--space-section)" }}
       aria-labelledby="work-heading"
     >
@@ -126,7 +124,7 @@ export default function HomePage() {
         <WorkGrid />
 
         <footer
-          className="px-6 md:px-10 py-12 border-t border-ink"
+          className="px-5 md:px-10 py-10 md:py-12 border-t border-ink"
           aria-label="Site footer"
         >
           <p className="mono-label text-ink-soft mb-3">

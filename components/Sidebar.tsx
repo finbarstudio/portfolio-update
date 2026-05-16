@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
 import { SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./LayoutShell";
+// MobileTopBar removed — hamburger lives in MenuBar; this file exports MobileMenu only.
 
 /* ── Brand icons ──────────────────────────────────────────────── */
 function ArenaIcon({ size = 13 }: { size?: number }) {
@@ -410,32 +411,6 @@ function DesktopSidebar({
   );
 }
 
-/* ── Mobile top bar ───────────────────────────────────────────── */
-function MobileTopBar({ onOpen }: { onOpen: () => void }) {
-  return (
-    <div
-      className="md:hidden fixed left-0 right-0 flex items-center justify-between px-3 z-40 bg-bg border-b border-ink"
-      style={{ top: "var(--menubar-h)", height: "32px" }}
-    >
-      <Link
-        href="/"
-        className="flex items-center gap-1.5 font-bold uppercase text-[11px] tracking-[0.08em] hover:text-pink transition-colors"
-      >
-        <span className="pixel-star">✶</span>
-        finbar.studio
-      </Link>
-      <button
-        onClick={onOpen}
-        aria-label="Open navigation menu"
-        className="os-titlebar-btn flex items-center justify-center"
-        title="Open menu"
-      >
-        <span className="text-[8px]">≡</span>
-      </button>
-    </div>
-  );
-}
-
 /* ── Mobile full-screen menu ──────────────────────────────────── */
 function MobileMenu({
   open,
@@ -535,13 +510,15 @@ function MobileMenu({
 export default function Sidebar({
   collapsed = false,
   onToggle,
+  mobileMenuOpen = false,
+  onMobileMenuClose,
 }: {
   collapsed?: boolean;
   onToggle?: () => void;
+  mobileMenuOpen?: boolean;
+  onMobileMenuClose?: () => void;
 }) {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   return (
     <>
@@ -550,8 +527,11 @@ export default function Sidebar({
         collapsed={collapsed}
         onToggle={onToggle ?? (() => {})}
       />
-      <MobileTopBar onOpen={() => setMenuOpen(true)} />
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} />
+      <MobileMenu
+        open={mobileMenuOpen}
+        onClose={onMobileMenuClose ?? (() => {})}
+        pathname={pathname}
+      />
     </>
   );
 }
