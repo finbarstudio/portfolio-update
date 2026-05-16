@@ -86,7 +86,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
           aspectRatio="16/9"
         />
 
-        <div className="pb-8 border-b border-line">
+        <div className="pb-8">
           <div className="flex items-start justify-between gap-4 mb-3">
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
               {project.name}
@@ -122,7 +122,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
           sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
         />
 
-        <div className="pb-6 border-b border-line">
+        <div className="pb-6">
           <div className="flex items-start justify-between gap-3 mb-2.5">
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">
               {project.name}
@@ -153,7 +153,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
         sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
       />
 
-      <div className="pb-5 border-b border-line">
+      <div className="pb-5">
         <div className="flex items-start justify-between gap-3 mb-2">
           <h2 className="mono-label text-ink">{project.name}</h2>
           <span className="mono-label text-ink-soft whitespace-nowrap" style={{ fontSize: "0.5625rem" }}>{project.date}</span>

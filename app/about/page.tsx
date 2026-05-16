@@ -11,7 +11,7 @@ export default function AboutPage() {
   return (
     <div className="px-6 md:px-10">
       {/* Back nav */}
-      <div className="py-5 border-b border-line">
+      <div className="py-5">
         <Link
           href="/"
           className="mono-label text-ink-soft hover:text-pink transition-colors"
@@ -21,7 +21,7 @@ export default function AboutPage() {
       </div>
 
       {/* Heading */}
-      <div className="pt-10 pb-8 border-b border-line">
+      <div className="pt-10 pb-8">
         <p className="mono-label text-ink-soft mb-3">About</p>
         <h1 className="font-mono font-bold text-[clamp(1.5rem,3vw,2rem)] tracking-[0.08em] uppercase text-ink">
           Finbar Skitini
@@ -29,7 +29,7 @@ export default function AboutPage() {
       </div>
 
       {/* Bio */}
-      <div className="py-10 border-b border-line max-w-2xl">
+      <div className="py-10 max-w-2xl">
         {/*
          * PLACEHOLDER — refine bio copy.
          * Written from spec; update with Finbar's preferred voice.
@@ -60,7 +60,7 @@ export default function AboutPage() {
       </div>
 
       {/* What I do */}
-      <div className="py-10 border-b border-line">
+      <div className="py-10">
         <p className="mono-label text-ink-soft mb-6">WHAT I DO</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-8">
           {[

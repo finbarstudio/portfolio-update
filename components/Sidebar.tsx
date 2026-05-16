@@ -143,7 +143,7 @@ function DesktopSidebar({ pathname }: { pathname: string }) {
 function MobileTopBar({ onOpen }: { onOpen: () => void }) {
   return (
     <div
-      className="md:hidden fixed top-0 left-0 right-0 h-14 border-b border-line flex items-center justify-between px-5 z-50"
+      className="md:hidden fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-5 z-50"
       style={{
         background: "rgba(250, 250, 248, 0.88)",
         backdropFilter: "blur(20px)",
@@ -195,7 +195,7 @@ function MobileMenu({
       aria-modal="true"
       aria-label="Navigation menu"
     >
-      <div className="flex items-center justify-between px-5 h-14 border-b border-line">
+      <div className="flex items-center justify-between px-5 h-14">
         <Logo />
         <button
           onClick={onClose}

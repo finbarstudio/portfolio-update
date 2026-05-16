@@ -36,14 +36,14 @@ export default function ContactPage() {
   return (
     <div className="px-6 md:px-10">
       {/* Back nav */}
-      <div className="py-5 border-b border-line">
+      <div className="py-5">
         <Link href="/" className="mono-label text-ink-soft hover:text-pink transition-colors">
           ← HOME
         </Link>
       </div>
 
       {/* Heading */}
-      <div className="pt-10 pb-8 border-b border-line">
+      <div className="pt-10 pb-8">
         <p className="mono-label text-ink-soft mb-3">Contact</p>
         <h1
           className="font-mono font-bold uppercase text-ink max-w-xl leading-tight"
@@ -54,7 +54,7 @@ export default function ContactPage() {
       </div>
 
       {/* Contact details */}
-      <div className="py-10 border-b border-line">
+      <div className="py-10">
         <div className="mb-7">
           <p className="mono-label text-ink-soft mb-2">Email</p>
           <a

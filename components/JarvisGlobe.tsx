@@ -159,7 +159,7 @@ export default function JarvisGlobe() {
       >
         <p
           style={{
-            fontFamily: "var(--font-jetbrains-mono, var(--font-archivo-narrow, sans-serif))",
+            fontFamily: "var(--font-archivo-narrow, sans-serif)",
             fontSize: "7px",
             fontWeight: 700,
             letterSpacing: "1.5px",
@@ -172,7 +172,7 @@ export default function JarvisGlobe() {
         </p>
         <p
           style={{
-            fontFamily: "var(--font-jetbrains-mono, var(--font-archivo-narrow, sans-serif))",
+            fontFamily: "var(--font-archivo-narrow, sans-serif)",
             fontSize: "12px",
             fontWeight: 700,
             letterSpacing: "0.04em",

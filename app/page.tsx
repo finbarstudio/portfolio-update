@@ -1,10 +1,11 @@
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
+import EncryptedText from "@/components/EncryptedText";
 
 /* ─── Section label ────────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mono-label text-ink-soft border-b border-line pb-3 mb-8">
+    <p className="mono-label text-ink-soft pb-3 mb-8">
       {children}
     </p>
   );
@@ -17,35 +18,21 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function Hero() {
   return (
     <section
-      className="sticky top-0 z-0 bg-bg px-6 md:px-10 border-b border-line"
+      className="sticky top-0 z-0 bg-bg px-6 md:px-10"
       style={{ minHeight: "36vh", display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingBottom: "2.5rem", paddingTop: "3rem" }}
       aria-labelledby="hero-heading"
     >
       <div className="hero-scroll-fade">
-        {/* Pink rule */}
-        <div
-          className="mb-6 bg-pink"
-          style={{ width: "2rem", height: "2px" }}
-          aria-hidden="true"
-        />
-
-        {/* Display text — the whole identity in one declaration */}
         <h1
           id="hero-heading"
-          className="font-mono font-bold uppercase text-ink leading-[1.05]"
+          className="font-sans font-bold uppercase text-ink leading-[1.05]"
           style={{
             fontSize: "var(--text-display)",
             letterSpacing: "0.04em",
             maxWidth: "18ch",
           }}
         >
-          Graphic{" "}
-          <span style={{ color: "var(--ink-soft)" }}>Designer</span>
-          <br />
-          <span className="text-pink">&amp;</span>{" "}
-          <span style={{ color: "var(--ink-soft)" }}>Designer/</span>
-          <br />
-          Developer
+          <EncryptedText text="DIGITAL DESIGNER" />
         </h1>
       </div>
     </section>
@@ -105,7 +92,7 @@ export default function HomePage() {
         <WorkGrid />
 
         <footer
-          className="px-6 md:px-10 py-12 border-t border-line"
+          className="px-6 md:px-10 py-12"
           aria-label="Site footer"
         >
           <p className="mono-label text-ink-soft mb-3">Get in touch</p>

@@ -86,7 +86,7 @@ function CaseImage({
 /* ─── Meta row ─────────────────────────────────────────────── */
 function MetaRow({ project }: { project: Project }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 py-5 border-b border-line">
+    <div className="flex flex-wrap items-center gap-2 py-5">
       {project.categories.map((cat) => (
         <Tag key={cat} label={cat} />
       ))}
@@ -104,7 +104,7 @@ function SummaryBlock({ project }: { project: Project }) {
     { label: "OUTCOME", value: project.outcome },
   ];
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 border-b border-line">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8">
       {items.map(({ label, value }) => (
         <div key={label}>
           <p className="mono-label text-ink-soft mb-2">{label}</p>
@@ -118,7 +118,7 @@ function SummaryBlock({ project }: { project: Project }) {
 /* ─── Skills row ───────────────────────────────────────────── */
 function SkillsRow({ project }: { project: Project }) {
   return (
-    <div className="py-6 border-b border-line">
+    <div className="py-6">
       <p className="mono-label text-ink-soft mb-3">SKILLS</p>
       <div className="flex flex-wrap gap-2">
         {project.skills.map((skill) => (
@@ -132,7 +132,7 @@ function SkillsRow({ project }: { project: Project }) {
 /* ─── Visual body ──────────────────────────────────────────── */
 function VisualBody({ project }: { project: Project }) {
   return (
-    <div className="py-4 border-b border-line">
+    <div className="py-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
         {project.images.map((img, i) => (
           <figure
@@ -159,8 +159,8 @@ function VisualBody({ project }: { project: Project }) {
 /* ─── Depth section (Featured only) ───────────────────────── */
 function DepthSections({ sections }: { sections: DepthSection[] }) {
   return (
-    <div className="py-8 border-b border-line">
-      <p className="mono-label text-ink-soft mb-8 border-b border-line pb-3">
+    <div className="py-8">
+      <p className="mono-label text-ink-soft mb-8 pb-3">
         PROCESS &amp; DETAIL
       </p>
       <div className="space-y-16">
@@ -229,7 +229,7 @@ export default async function CaseStudyPage({
   return (
     <article className="px-6 md:px-10">
       {/* Back link */}
-      <div className="py-5 border-b border-line">
+      <div className="py-5">
         <Link href="/#work" className="mono-label text-ink-soft hover:text-pink transition-colors">
           ← WORK
         </Link>
@@ -243,7 +243,7 @@ export default async function CaseStudyPage({
         >
           {project.name}
         </h1>
-        <p className="mono-label text-ink-soft pb-5 border-b border-line">
+        <p className="mono-label text-ink-soft pb-5">
           {project.oneLiner}
         </p>
       </div>
@@ -261,7 +261,7 @@ export default async function CaseStudyPage({
       )}
 
       {project.liveUrl && (
-        <div className="py-6 border-b border-line">
+        <div className="py-6">
           <p className="mono-label text-ink-soft mb-2">LIVE SITE</p>
           <a
             href={project.liveUrl}
