@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Project } from "@/content/projects";
+import ClientImage from "@/components/ClientImage";
+import Hero3D from "@/components/Hero3D";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -65,7 +66,7 @@ function CardImage({
           className="img-wrap"
           style={{ aspectRatio, maxHeight: "72vh" }}
         >
-          <Image
+          <ClientImage
             src={src}
             alt={alt}
             fill
@@ -91,14 +92,27 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        <CardImage
-          src={project.heroImage.src}
-          alt={project.heroImage.alt}
-          priority={index === 0}
-          sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
-          aspectRatio="16/9"
-          title={`${project.name}.PROJ`}
-        />
+        {project.hero3d ? (
+          <div style={{ marginBottom: "var(--image-pad)" }}>
+            <div className="os-window md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform">
+              <div className="os-titlebar hidden md:flex">
+                <span className="os-titlebar-btn" aria-hidden="true" />
+                <span className="os-titlebar-title">{project.name}.PROJ</span>
+                <span className="os-titlebar-btn" aria-hidden="true" />
+              </div>
+              <Hero3D src={project.hero3d} interactive={false} />
+            </div>
+          </div>
+        ) : (
+          <CardImage
+            src={project.heroImage.src}
+            alt={project.heroImage.alt}
+            priority={index === 0}
+            sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
+            aspectRatio="16/9"
+            title={`${project.name}.PROJ`}
+          />
+        )}
 
         <div className="pb-8">
           <div className="flex items-start justify-between gap-4 mb-3">
@@ -108,10 +122,12 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
             <span className="mono-label text-ink-soft whitespace-nowrap mt-px">{project.date}</span>
           </div>
           <TagRow project={project} />
-          <p className="mt-3 text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>
-            {project.oneLiner}
-          </p>
-          <p className="mt-4 mono-label text-pink">VIEW CASE STUDY →</p>
+          <div className="flex items-end justify-between gap-4 mt-3">
+            <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>
+              {project.oneLiner}
+            </p>
+            <span className="mono-label text-pink shrink-0 group-hover:translate-x-1 transition-transform">→</span>
+          </div>
         </div>
       </Link>
     </article>
@@ -145,10 +161,12 @@ export function FullCard({ project, index }: { project: Project; index: number }
             <span className="mono-label text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
           </div>
           <TagRow project={project} />
-          <p className="mt-2.5 text-ink-soft leading-relaxed line-clamp-2" style={{ fontSize: "var(--text-caption)" }}>
-            {project.oneLiner}
-          </p>
-          <p className="mt-3 mono-label text-pink">VIEW →</p>
+          <div className="flex items-end justify-between gap-3 mt-2.5">
+            <p className="text-ink-soft leading-relaxed line-clamp-2" style={{ fontSize: "var(--text-caption)" }}>
+              {project.oneLiner}
+            </p>
+            <span className="mono-label text-pink shrink-0 group-hover:translate-x-0.5 transition-transform" style={{ fontSize: "0.625rem" }}>→</span>
+          </div>
         </div>
       </Link>
     </article>

@@ -14,6 +14,10 @@ const NAV_ITEMS = [
   { label: "Contact", href: "/contact" },
 ];
 
+// Brisbane coords for Open-Meteo (free, no API key)
+const BNE_LAT  = -27.47;
+const BNE_LNG  = 153.02;
+
 function LiveClock() {
   const [now, setNow] = useState<Date | null>(null);
 
@@ -34,6 +38,29 @@ function LiveClock() {
         hour12: false,
       }).format(now)}
     </span>
+  );
+}
+
+function WeatherDisplay() {
+  const [temp, setTemp] = useState<number | null>(null);
+
+  useEffect(() => {
+    const url =
+      `https://api.open-meteo.com/v1/forecast?latitude=${BNE_LAT}&longitude=${BNE_LNG}` +
+      `&current=temperature_2m&timezone=Australia%2FBrisbane`;
+
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        const t = d?.current?.temperature_2m;
+        if (typeof t === "number") setTemp(Math.round(t));
+      })
+      .catch(() => {/* silently fail */});
+  }, []);
+
+  if (temp === null) return null;
+  return (
+    <span className="text-ink-soft hidden sm:inline tabular-nums">{temp}°</span>
   );
 }
 
@@ -58,11 +85,10 @@ export default function MenuBar({
       {/* Brand — always links home */}
       <Link
         href="/"
-        className="flex items-center gap-1.5 font-bold uppercase tracking-[0.08em] hover:text-pink transition-colors"
+        className="font-bold uppercase tracking-[0.08em] hover:text-pink transition-colors"
         aria-label="finbar.studio — home"
       >
-        <span className="pixel-star text-[14px]">✶</span>
-        <span>finbar.studio</span>
+        finbar<span className="pixel-star text-[13px]">✶</span>studio
       </Link>
 
       {/* Nav items — functional links, desktop only */}
@@ -95,6 +121,7 @@ export default function MenuBar({
           <span className="text-teal font-bold tracking-[0.1em]">ONLINE</span>
         </span>
         <span className="text-ink-soft hidden sm:inline">BNE</span>
+        <WeatherDisplay />
         <LiveClock />
 
         {/* Mobile hamburger */}

@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import OSWindow from "@/components/OSWindow";
+import Hero3D from "@/components/Hero3D";
+import ClientImage from "@/components/ClientImage";
 import {
   projects,
   getCaseStudyProjects,
@@ -41,10 +42,7 @@ function Tag({
   return <span className={cls}>{label}</span>;
 }
 
-/* ─── Case study image — padded, max-height constrained ─────
-   All images on case study pages use this wrapper.
-   Padding comes from --image-pad; max-height caps at 72vh.
-   ─────────────────────────────────────────────────────────── */
+/* ─── Case study image — padded, max-height constrained ─────── */
 function CaseImage({
   src,
   alt,
@@ -67,12 +65,9 @@ function CaseImage({
         aspectRatio,
         marginTop: "var(--image-pad)",
         marginBottom: "var(--image-pad)",
-        ...(halfWidth
-          ? { sizes: "(max-width: 768px) 100vw, calc((100vw - 224px) / 2)" }
-          : {}),
       }}
     >
-      <Image
+      <ClientImage
         src={src}
         alt={alt}
         fill
@@ -206,8 +201,9 @@ function FooterCTA() {
           finbar@finbar.studio
         </a>
       </div>
+      {/* Use "/" not "/#work" so returning home starts at the top */}
       <Link
-        href="/#work"
+        href="/"
         className="mono-label text-ink-soft hover:text-pink transition-colors"
       >
         [ ← BACK TO /WORK ]
@@ -232,14 +228,14 @@ export default async function CaseStudyPage({
       {/* Breadcrumb / path */}
       <div className="terminal-line mb-4">
         <span className="ps1">»</span>{" "}
-        <Link href="/#work" className="text-ink-soft hover:text-pink transition-colors underline-offset-2 hover:underline">
+        <Link href="/" className="text-ink-soft hover:text-pink transition-colors underline-offset-2 hover:underline">
           /work
         </Link>
         <span className="text-ink-soft"> / </span>
         <span className="text-ink">{project.slug}</span>
       </div>
 
-      {/* Header: title first, description second — spec §9 */}
+      {/* Header */}
       <div className="pt-2 pb-2">
         <h1
           className="font-sans font-bold uppercase text-ink mb-3 cursor-blink"
@@ -252,18 +248,22 @@ export default async function CaseStudyPage({
         </p>
       </div>
 
-      {/* Hero image — framed as a window */}
+      {/* Hero — 3D viewer or static image */}
       <OSWindow title={`${project.name}.PROJ`} className="mb-8">
-        <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
-          <Image
-            src={project.heroImage.src}
-            alt={project.heroImage.alt}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
-            className="object-cover"
-          />
-        </div>
+        {project.hero3d ? (
+          <Hero3D src={project.hero3d} />
+        ) : (
+          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
+            <ClientImage
+              src={project.heroImage.src}
+              alt={project.heroImage.alt}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
+              className="object-cover"
+            />
+          </div>
+        )}
       </OSWindow>
 
       <MetaRow project={project} />
@@ -275,18 +275,37 @@ export default async function CaseStudyPage({
         <DepthSections sections={project.depth} />
       )}
 
-      {project.liveUrl && (
-        <div className="py-6">
-          <p className="mono-label text-ink-soft mb-2">LIVE SITE</p>
-          <a
-            href={project.liveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-teal hover:text-pink transition-colors link-wipe"
-            style={{ fontSize: "var(--text-small)" }}
-          >
-            {project.liveUrl} ↗
-          </a>
+      {/* Links row — live site and/or company site */}
+      {(project.liveUrl || project.companyUrl) && (
+        <div className="flex flex-wrap gap-10 py-6">
+          {project.liveUrl && (
+            <div>
+              <p className="mono-label text-ink-soft mb-2">LIVE SITE</p>
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-teal hover:text-pink transition-colors"
+                style={{ fontSize: "var(--text-small)" }}
+              >
+                {project.liveUrl} ↗
+              </a>
+            </div>
+          )}
+          {project.companyUrl && project.companyUrl !== project.liveUrl && (
+            <div>
+              <p className="mono-label text-ink-soft mb-2">COMPANY</p>
+              <a
+                href={project.companyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-teal hover:text-pink transition-colors"
+                style={{ fontSize: "var(--text-small)" }}
+              >
+                {project.companyUrl} ↗
+              </a>
+            </div>
+          )}
         </div>
       )}
 

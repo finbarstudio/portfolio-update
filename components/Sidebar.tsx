@@ -5,6 +5,7 @@
 // open-for-work status, contact email, social icons.
 
 import React, { useEffect, useMemo, useState } from "react";
+// Note: useEffect/useState still used by DesktopSidebar (workOpen) and MobileMenu (body overflow)
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
@@ -80,61 +81,10 @@ const socials = [
   { label: "Instagram", href: "https://instagram.com/finbar.studio",   icon: <SiInstagram size={12} aria-hidden="true" /> },
 ];
 
-/* ── World clocks (kept — retro flavour) ──────────────────────── */
-const CLOCKS = [
-  { code: "BNE", tz: "Australia/Brisbane" },
-  { code: "LON", tz: "Europe/London"      },
-];
-
-function WorldClocks() {
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    setNow(new Date());
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const fmt = (tz: string) =>
-    now
-      ? new Intl.DateTimeFormat("en", {
-          timeZone: tz, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-        }).format(now)
-      : "--:--:--";
-
-  return (
-    <div className="mx-3 mb-3 border border-ink pixel-shadow-sm bg-bg">
-      <div className="os-titlebar" style={{ height: "16px" }}>
-        <span className="os-titlebar-title" style={{ fontSize: "8px", padding: "0 6px" }}>
-          CLOCK.WDGT
-        </span>
-      </div>
-      <div className="p-2.5 grid grid-cols-2 gap-2">
-        {CLOCKS.map((c) => (
-          <div key={c.code}>
-            <p
-              className="font-bold uppercase text-ink-soft"
-              style={{ fontSize: "8px", letterSpacing: "0.14em", lineHeight: 1 }}
-            >
-              {c.code}
-            </p>
-            <p
-              className="font-bold text-ink tabular-nums mt-1"
-              style={{ fontSize: "14px", letterSpacing: "0.02em", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}
-            >
-              {fmt(c.tz)}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ── Logo (brand mark, top of sidebar) ────────────────────────── */
+/* ── Collapse button row (no pinstripe titlebar) ──────────────── */
 function SidebarHeader({ onToggle }: { onToggle: () => void }) {
   return (
-    <div className="os-titlebar" style={{ borderTop: "1px solid var(--ink)" }}>
-      <span className="os-titlebar-btn" aria-hidden="true" />
-      <span className="os-titlebar-title">NAVIGATOR</span>
+    <div className="flex justify-end px-2 py-1.5 border-b border-line">
       <button
         onClick={onToggle}
         aria-label="Collapse sidebar"
@@ -266,15 +216,17 @@ function DesktopSidebar({
 
           {/* Tree */}
           <div className="flex-1 overflow-y-auto py-2">
-            {/* Root */}
-            <div
+            {/* Root — links home */}
+            <Link
+              href="/"
               className="tree-item"
-              style={{ cursor: "default", color: "var(--ink)", fontWeight: 700 }}
+              style={{ color: "var(--ink)", fontWeight: 700 }}
+              aria-label="Home"
             >
               <span className="tree-caret">▾</span>
               <span className="icon-folder" style={{ color: "var(--pink)" }} />
               <span>finbar.studio/</span>
-            </div>
+            </Link>
 
             {/* work/ folder — expandable */}
             <button
@@ -343,7 +295,7 @@ function DesktopSidebar({
             >
               <TreeGuide last={false} />
               <span className="icon-file" />
-              <span>about.md</span>
+              <span>about</span>
             </Link>
 
             {/* contact.md */}
@@ -355,12 +307,9 @@ function DesktopSidebar({
             >
               <TreeGuide last={true} />
               <span className="icon-file" />
-              <span>contact.md</span>
+              <span>contact</span>
             </Link>
           </div>
-
-          {/* World clocks */}
-          <WorldClocks />
 
           {/* Status / contact / socials */}
           <div className="px-3 pb-3 space-y-2 border-t border-ink pt-3">

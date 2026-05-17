@@ -49,6 +49,8 @@ export interface Project {
   hasDepth: boolean;     // whether an optional depth/process section exists (Featured only)
   depth?: DepthSection[];
   liveUrl?: string;
+  hero3d?: string;    // path to a self-contained HTML 3D viewer (used instead of heroImage on case study)
+  companyUrl?: string; // client's website — shown as "COMPANY" link on case study
 }
 
 /* ─────────────────────────────────────────────────────────── */
@@ -57,12 +59,13 @@ export interface Project {
 
 export const projects: Project[] = [
 
-  /* ── 1 ── TMYR — The Moment You Realise ── Featured ────── */
+  /* ── 2 ── TMYR — The Moment You Realise ── Featured ────── */
   {
     slug: "tmyr",
     name: "The Moment You Realise",
     tier: "featured",
-    rank: 1,
+    rank: 2,
+    companyUrl: "https://sharetobuy.com",
     date: "2022–2023",
     categories: ["Social Campaign", "Motion Graphics", "Digital"],
     skills: [
@@ -153,12 +156,13 @@ export const projects: Project[] = [
     ],
   },
 
-  /* ── 2 ── Salesmasters ── Featured ─────────────────────── */
+  /* ── 3 ── Salesmasters ── Featured ─────────────────────── */
   {
     slug: "salesmasters",
     name: "Salesmasters",
     tier: "featured",
-    rank: 2,
+    rank: 3,
+    companyUrl: "https://salesmasters.com.au",
     date: "2023–2024",
     categories: ["Publication Design", "Infographic Design", "Print"],
     skills: [
@@ -272,12 +276,12 @@ export const projects: Project[] = [
     ],
   },
 
-  /* ── 3 ── KinAya ── Featured ────────────────────────────── */
+  /* ── 1 ── KinAya ── Featured ────────────────────────────── */
   {
     slug: "kinaya",
     name: "KinAya",
     tier: "featured",
-    rank: 3,
+    rank: 1,
     date: "2024",
     categories: ["Brand Identity", "Web Design", "Framer", "NDIS"],
     skills: [
@@ -295,6 +299,7 @@ export const projects: Project[] = [
       "KinAya was rebranding entirely — new name, new identity. They needed a trustworthy and human brand that felt considered and professional, not flashy, plus a website that could be handed over for ongoing CMS management.",
     outcome:
       "Cohesive brand and site delivered as one unified vision. Smooth CMS handover. Positive client testimonial from Aryan Sareen.",
+    hero3d: "/models/kinaya/viewer.html",
     heroImage: {
       src: "/images/kinaya/kinaya-hero.jpg",
       alt: "kinaya-hero",
@@ -396,6 +401,7 @@ export const projects: Project[] = [
       },
     ],
     liveUrl: "https://kinaya.com.au",
+    companyUrl: "https://kinaya.com.au",
   },
 
   /* ── 4 ── Joe Devine ── Full ────────────────────────────── */
