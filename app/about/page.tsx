@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ClientImage from "@/components/ClientImage";
 
 export const metadata: Metadata = {
   title: "About — finbar✶studio",
@@ -23,8 +24,18 @@ export default function AboutPage() {
           </h1>
         </div>
 
-        {/* Bio */}
-        <div className="mb-14 max-w-2xl">
+        {/* Headshot + Bio */}
+        <div className="mb-14 flex flex-col md:flex-row gap-10 items-start">
+          <div className="shrink-0" style={{ width: 160, height: 160, position: "relative", borderRadius: 4, overflow: "hidden" }}>
+            <ClientImage
+              src="/images/headshot.webp"
+              alt="Finbar Skitini — graphic designer and Framer developer"
+              fill
+              sizes="160px"
+              className="object-cover"
+            />
+          </div>
+        <div className="max-w-2xl">
           <p className="mono-label text-ink-soft mb-5">── Background ──</p>
           <div className="space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
             <p>
@@ -45,6 +56,7 @@ export default function AboutPage() {
               people, not just portfolio screenshots.
             </p>
           </div>
+        </div>
         </div>
 
         {/* What I do */}

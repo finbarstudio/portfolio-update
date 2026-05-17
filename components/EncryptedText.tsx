@@ -23,9 +23,9 @@ export default function EncryptedText({
   speed = 35,
   delay = 0,
 }: Props) {
-  const [output, setOutput] = useState<string[]>(() =>
-    text.split("").map((c) => (/[a-zA-Z0-9]/.test(c) ? GLYPHS[0] : c))
-  );
+  // Start with the real text so SSR and initial hydration match,
+  // then let the effect scramble + resolve it.
+  const [output, setOutput] = useState<string[]>(() => text.split(""));
   const frameRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const delayRef = useRef<ReturnType<typeof setTimeout> | null>(null);

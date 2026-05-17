@@ -2,10 +2,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import SplineScene from "@/components/SplineScene";
 import ClientImage from "@/components/ClientImage";
+import VideoPlayer from "@/components/VideoPlayer";
+import PDFSlideshow from "@/components/PDFSlideshow";
 import {
   projects,
   type Project,
   type DepthSection,
+  type ProjectImage,
 } from "@/content/projects";
 
 /* ─── Static params ────────────────────────────────────────── */
@@ -77,6 +80,21 @@ function CaseImage({
   );
 }
 
+/* ─── Case study media — image or looping video ─────────────── */
+function CaseMedia({ img, halfWidth = false }: { img: ProjectImage; halfWidth?: boolean }) {
+  if (img.video) {
+    return (
+      <div
+        className="img-wrap"
+        style={{ aspectRatio: "1/1", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)" }}
+      >
+        <VideoPlayer src={img.video} poster={img.src} />
+      </div>
+    );
+  }
+  return <CaseImage src={img.src} alt={img.alt} halfWidth={halfWidth} />;
+}
+
 /* ─── Meta row ─────────────────────────────────────────────── */
 function MetaRow({ project }: { project: Project }) {
   return (
@@ -125,6 +143,7 @@ function SkillsRow({ project }: { project: Project }) {
 
 /* ─── Visual body ──────────────────────────────────────────── */
 function VisualBody({ project }: { project: Project }) {
+  if (project.images.length === 0) return null;
   return (
     <div className="py-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
@@ -133,11 +152,7 @@ function VisualBody({ project }: { project: Project }) {
             key={i}
             className={i === 0 && project.images.length >= 3 ? "md:col-span-2" : ""}
           >
-            <CaseImage
-              src={img.src}
-              alt={img.alt}
-              halfWidth={!(i === 0 && project.images.length >= 3)}
-            />
+            <CaseMedia img={img} halfWidth={!(i === 0 && project.images.length >= 3)} />
             {img.caption && (
               <figcaption className="text-ink-soft font-sans leading-relaxed" style={{ fontSize: "var(--text-caption)", marginTop: "-0.5rem", marginBottom: "var(--image-pad)" }}>
                 {img.caption}
@@ -168,7 +183,7 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
               <div className={`grid gap-x-6 ${section.images.length === 1 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}>
                 {section.images.map((img, j) => (
                   <figure key={j}>
-                    <CaseImage src={img.src} alt={img.alt} halfWidth={section.images.length > 1} />
+                    <CaseMedia img={img} halfWidth={section.images.length > 1} />
                     {img.caption && (
                       <figcaption className="text-ink-soft font-sans leading-relaxed" style={{ fontSize: "var(--text-caption)", marginTop: "-0.5rem", marginBottom: "var(--image-pad)" }}>
                         {img.caption}
@@ -258,10 +273,14 @@ export default async function CaseStudyPage({
         </p>
       </div>
 
-      {/* Hero — Spline or static image */}
+      {/* Hero — Spline, looping video, or static image */}
       <div className="mb-8">
         {project.heroSpline ? (
           <SplineScene scene={project.heroSpline} />
+        ) : project.heroVideo ? (
+          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
+            <VideoPlayer src={project.heroVideo} poster={project.heroImage.src} />
+          </div>
         ) : (
           <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
             <ClientImage
@@ -283,6 +302,13 @@ export default async function CaseStudyPage({
 
       {project.hasDepth && project.depth && project.depth.length > 0 && (
         <DepthSections sections={project.depth} />
+      )}
+
+      {project.pdfSlideshow && (
+        <PDFSlideshow
+          title={project.pdfSlideshow.title}
+          pages={project.pdfSlideshow.pages}
+        />
       )}
 
       {/* Links row — live site and/or company site */}
