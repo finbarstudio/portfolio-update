@@ -15,21 +15,33 @@ export default function PDFSlideshow({
   const [current, setCurrent] = useState(0);
   const total = pages.length;
 
+  function goTo(index: number) {
+    if (index === current) return;
+    setCurrent(index);
+  }
+
   return (
     <div className="py-8">
+      {/* Header row */}
       <div className="flex items-center justify-between mb-4">
-        <p className="mono-label text-ink-soft">{title}</p>
+        <div className="flex items-center gap-3">
+          <p className="mono-label text-ink-soft">{title}</p>
+          <span className="mono-label text-ink-soft" style={{ fontSize: "0.5625rem", opacity: 0.6 }}>
+            PDF · {total} pages
+          </span>
+        </div>
         <p className="mono-label text-ink-soft tabular-nums">
           {current + 1} / {total}
         </p>
       </div>
 
-      {/* Page image */}
+      {/* Page image — A4 ratio, white background, contain */}
       <div
         className="img-wrap border border-line"
-        style={{ aspectRatio: "1/1.414", maxHeight: "80vh" }} /* A4 ratio */
+        style={{ aspectRatio: "1/1.414", maxHeight: "80vh", background: "white" }}
       >
         <ClientImage
+          key={current}
           src={pages[current]}
           alt={`${title} — page ${current + 1}`}
           fill
@@ -42,7 +54,7 @@ export default function PDFSlideshow({
       {total > 1 && (
         <div className="flex items-center gap-3 mt-4">
           <button
-            onClick={() => setCurrent((c) => Math.max(0, c - 1))}
+            onClick={() => goTo(Math.max(0, current - 1))}
             disabled={current === 0}
             className="mono-label text-ink-soft hover:text-pink transition-colors disabled:opacity-30"
             aria-label="Previous page"
@@ -50,11 +62,11 @@ export default function PDFSlideshow({
             ← PREV
           </button>
 
-          <div className="flex gap-1 flex-1 justify-center">
+          <div className="flex gap-1 flex-1 justify-center flex-wrap">
             {pages.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setCurrent(i)}
+                onClick={() => goTo(i)}
                 aria-label={`Go to page ${i + 1}`}
                 style={{
                   width: 6,
@@ -65,13 +77,14 @@ export default function PDFSlideshow({
                   cursor: "pointer",
                   padding: 0,
                   transition: "background 0.15s",
+                  flexShrink: 0,
                 }}
               />
             ))}
           </div>
 
           <button
-            onClick={() => setCurrent((c) => Math.min(total - 1, c + 1))}
+            onClick={() => goTo(Math.min(total - 1, current + 1))}
             disabled={current === total - 1}
             className="mono-label text-ink-soft hover:text-pink transition-colors disabled:opacity-30"
             aria-label="Next page"

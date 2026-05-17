@@ -53,7 +53,7 @@ function CardImage({
   return (
     <div
       className="img-wrap md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform"
-      style={{ aspectRatio, maxHeight: "72vh", marginBottom: "var(--image-pad)" }}
+      style={{ aspectRatio, maxHeight: "72vh", marginBottom: "var(--image-pad)", background: "white" }}
     >
       <ClientImage
         src={src}
@@ -61,7 +61,7 @@ function CardImage({
         fill
         sizes={sizes}
         priority={priority}
-        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+        className="object-contain"
       />
     </div>
   );

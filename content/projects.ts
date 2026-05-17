@@ -151,29 +151,29 @@ export const projects: Project[] = [
       src: "/images/tmyr/hero-poster.webp",
       alt: "The Moment You Realise campaign — Share to Buy social video series hero frame",
     },
-    heroVideo: "/images/tmyr/Looping%20Reels%20Hero.webm",
+    heroVideo: "/images/tmyr/Looping Reels Hero.webm",
     images: [
       {
         src: "/images/tmyr/post-anthony.webp",
-        video: "/images/tmyr/1080x1080%20IG%20Posts/Anthony.webm",
+        video: "/images/tmyr/1080x1080 IG Posts/Anthony.webm",
         caption: "Anthony — 1:1 format social post, light/fade motion style.",
         alt: "TMYR campaign — Anthony story, 1080x1080 Instagram post with Share to Buy branding and motion overlay",
       },
       {
         src: "/images/tmyr/post-freya.webp",
-        video: "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
+        video: "/images/tmyr/1080x1080 IG Posts/Freya.webm",
         caption: "Freya — 1:1 format social post, light/fade motion style.",
         alt: "TMYR campaign — Freya story, 1080x1080 Instagram post showing shared ownership journey",
       },
       {
         src: "/images/tmyr/post-katie.webp",
-        video: "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
+        video: "/images/tmyr/1080x1080 IG Posts/Katie.webm",
         caption: "Katie — 1:1 format social post, bold/typewriter motion style.",
         alt: "TMYR campaign — Katie story, 1080x1080 Instagram post with kinetic text treatment",
       },
       {
         src: "/images/tmyr/post-lauren.webp",
-        video: "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
+        video: "/images/tmyr/1080x1080 IG Posts/Lauren.webm",
         caption: "Lauren — 1:1 format social post, bold/typewriter motion style.",
         alt: "TMYR campaign — Lauren story, 1080x1080 Instagram post with bold typography animation",
       },
@@ -186,13 +186,13 @@ export const projects: Project[] = [
         images: [
           {
             src: "/images/tmyr/post-anthony.webp",
-            video: "/images/tmyr/1080x1080%20IG%20Posts/Anthony.webm",
+            video: "/images/tmyr/1080x1080 IG Posts/Anthony.webm",
             caption: "Light/fade style — soft dissolves and gentle typography entrances.",
             alt: "TMYR light/fade motion style — Anthony story with soft animated text overlays",
           },
           {
             src: "/images/tmyr/post-katie.webp",
-            video: "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
+            video: "/images/tmyr/1080x1080 IG Posts/Katie.webm",
             caption: "Bold/typewriter style — punchy kinetic text for stronger stops.",
             alt: "TMYR bold/typewriter motion style — Katie story with kinetic text animation",
           },
@@ -204,13 +204,13 @@ export const projects: Project[] = [
         images: [
           {
             src: "/images/tmyr/post-freya.webp",
-            video: "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
+            video: "/images/tmyr/1080x1080 IG Posts/Freya.webm",
             caption: "Freya — 1:1 square post, one of five format deliverables per story.",
             alt: "TMYR Freya story 1:1 format — one delivery format from the five-format matrix",
           },
           {
             src: "/images/tmyr/post-lauren.webp",
-            video: "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
+            video: "/images/tmyr/1080x1080 IG Posts/Lauren.webm",
             caption: "Lauren — consistent brand treatment across all story variants.",
             alt: "TMYR Lauren story — consistent Share to Buy brand treatment across all campaign variants",
           },

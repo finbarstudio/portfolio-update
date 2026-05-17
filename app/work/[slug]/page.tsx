@@ -66,6 +66,7 @@ function CaseImage({
         aspectRatio,
         marginTop: "var(--image-pad)",
         marginBottom: "var(--image-pad)",
+        background: "white",
       }}
     >
       <ClientImage
@@ -74,7 +75,7 @@ function CaseImage({
         fill
         priority={priority}
         sizes={halfWidth ? "(max-width: 768px) 100vw, calc((100vw - 224px) / 2)" : sizes}
-        className="object-cover"
+        className="object-contain"
       />
     </div>
   );
@@ -86,7 +87,7 @@ function CaseMedia({ img, halfWidth = false }: { img: ProjectImage; halfWidth?: 
     return (
       <div
         className="img-wrap"
-        style={{ aspectRatio: "1/1", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)" }}
+        style={{ aspectRatio: "1/1", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)", background: "white" }}
       >
         <VideoPlayer src={img.video} poster={img.src} />
       </div>
@@ -278,18 +279,18 @@ export default async function CaseStudyPage({
         {project.heroSpline ? (
           <SplineScene scene={project.heroSpline} />
         ) : project.heroVideo ? (
-          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
+          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>
             <VideoPlayer src={project.heroVideo} poster={project.heroImage.src} />
           </div>
         ) : (
-          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
+          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>
             <ClientImage
               src={project.heroImage.src}
               alt={project.heroImage.alt}
               fill
               priority
               sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
-              className="object-cover"
+              className="object-contain"
             />
           </div>
         )}

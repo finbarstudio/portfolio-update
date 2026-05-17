@@ -22,7 +22,7 @@ export default function VideoPlayer({
       muted
       playsInline
       className={className}
-      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", ...style }}
+      style={{ width: "100%", height: "100%", objectFit: "contain", background: "white", display: "block", ...style }}
     />
   );
 }

@@ -37,7 +37,7 @@
      │  BRAND COLOURS                                          │
      │  Change any value → ripples to every component.        │
      └─────────────────────────────────────────────────────────┘ */
-  --bg:         #FAFAF8;   /* page + sidebar background — warm off-white  */
+  --bg:         #ffffff;   /* page + sidebar background — pure white       */
   --ink:        #141414;   /* primary text — near-black                   */
   --ink-soft:   #6B6B6B;   /* secondary text, captions, meta              */
   --line:       #E4E4E0;   /* hairline borders, grid lines                */
