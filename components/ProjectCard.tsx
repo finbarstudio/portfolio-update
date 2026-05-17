@@ -23,12 +23,15 @@ function Tag({
 
 /* ─── Shared tag row ─────────────────────────────────────── */
 function TagRow({ project }: { project: Project }) {
+  const hasNDIS = project.categories.includes("NDIS");
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-wrap items-center gap-1.5">
       {project.categories.map((cat) => (
         <Tag key={cat} label={cat} />
       ))}
       {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {hasNDIS && <img src="/images/ndis-logo.png" alt="NDIS" style={{ height: 16, width: "auto", objectFit: "contain", opacity: 0.8 }} />}
     </div>
   );
 }

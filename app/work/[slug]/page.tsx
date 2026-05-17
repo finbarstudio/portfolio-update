@@ -5,14 +5,13 @@ import SplineScene from "@/components/SplineScene";
 import ClientImage from "@/components/ClientImage";
 import {
   projects,
-  getCaseStudyProjects,
   type Project,
   type DepthSection,
 } from "@/content/projects";
 
 /* ─── Static params ────────────────────────────────────────── */
 export async function generateStaticParams() {
-  return getCaseStudyProjects().map((p) => ({ slug: p.slug }));
+  return projects.map((p) => ({ slug: p.slug }));
 }
 
 /* ─── Metadata ─────────────────────────────────────────────── */
@@ -221,7 +220,7 @@ export default async function CaseStudyPage({
   const { slug } = await params;
   const project = projects.find((p) => p.slug === slug);
 
-  if (!project || project.tier === "gallery") notFound();
+  if (!project) notFound();
 
   return (
     <article className="px-5 md:px-10 py-4 md:py-6">

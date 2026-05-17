@@ -81,21 +81,6 @@ const socials = [
   { label: "Instagram", href: "https://instagram.com/finbar.studio",   icon: <SiInstagram size={12} aria-hidden="true" /> },
 ];
 
-/* ── Collapse button row (no pinstripe titlebar) ──────────────── */
-function SidebarHeader({ onToggle }: { onToggle: () => void }) {
-  return (
-    <div className="flex justify-end px-2 py-1.5 border-b border-line">
-      <button
-        onClick={onToggle}
-        aria-label="Collapse sidebar"
-        title="Collapse sidebar"
-        className="os-titlebar-btn flex items-center justify-center"
-      >
-        <ChevronLeftIcon />
-      </button>
-    </div>
-  );
-}
 
 /* ── Tree-line guide column ───────────────────────────────────── */
 function TreeGuide({ last = false, vertical = true }: { last?: boolean; vertical?: boolean }) {
@@ -212,21 +197,28 @@ function DesktopSidebar({
       ) : (
         /* ── EXPANDED ──────────────────────────────────────────── */
         <>
-          <SidebarHeader onToggle={onToggle} />
-
           {/* Tree */}
           <div className="flex-1 overflow-y-auto py-2">
-            {/* Root — links home */}
-            <Link
-              href="/"
-              className="tree-item"
-              style={{ color: "var(--ink)", fontWeight: 700 }}
-              aria-label="Home"
-            >
-              <span className="tree-caret">▾</span>
-              <span className="icon-folder" style={{ color: "var(--pink)" }} />
-              <span>finbar.studio/</span>
-            </Link>
+            {/* Root — links home, collapse button inline on right */}
+            <div className="tree-item" style={{ color: "var(--ink)", fontWeight: 700 }}>
+              <Link
+                href="/"
+                className="flex items-center gap-1 flex-1 min-w-0"
+                aria-label="Home"
+              >
+                <span className="tree-caret">▾</span>
+                <span className="icon-folder" style={{ color: "var(--pink)" }} />
+                <span>finbar.studio/</span>
+              </Link>
+              <button
+                onClick={onToggle}
+                aria-label="Collapse sidebar"
+                title="Collapse sidebar"
+                className="os-titlebar-btn flex items-center justify-center ml-auto shrink-0"
+              >
+                <ChevronLeftIcon />
+              </button>
+            </div>
 
             {/* work/ folder — expandable */}
             <button
@@ -252,22 +244,6 @@ function DesktopSidebar({
                   const isLast   = idx === sortedProjects.length - 1;
                   const isActive = pathname === `/work/${p.slug}`;
                   const isGallery = p.tier === "gallery";
-
-                  if (isGallery) {
-                    // Gallery items have no case study — render as disabled item
-                    return (
-                      <div
-                        key={p.slug}
-                        className="tree-item"
-                        style={{ paddingLeft: "32px", cursor: "default", opacity: 0.55 }}
-                        title="Gallery item — no case study"
-                      >
-                        <TreeGuide last={isLast} />
-                        <span className="icon-file" />
-                        <span className="truncate flex-1">{p.name.toLowerCase()}</span>
-                      </div>
-                    );
-                  }
 
                   return (
                     <Link

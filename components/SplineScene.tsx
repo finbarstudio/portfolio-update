@@ -1,6 +1,10 @@
 "use client";
 
-import Spline from "@splinetool/react-spline/next";
+import dynamic from "next/dynamic";
+
+// Use the regular (non-Next) Spline with ssr:false — the /next variant only
+// accepts CDN URLs and silently fails on local /public/*.splinecode paths.
+const Spline = dynamic(() => import("@splinetool/react-spline"), { ssr: false });
 
 // Renders a Spline scene filling a 16/9 container.
 // Used as the hero on case study pages and featured home-page cards.

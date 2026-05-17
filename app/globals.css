@@ -318,7 +318,7 @@
     color: var(--ink-soft);
     line-height: 1;
   }
-  /* Traffic-light circles — decorative only */
+  /* Traffic-light circles */
   .os-titlebar-btn {
     width: 12px;
     height: 12px;
@@ -327,6 +327,9 @@
     background: var(--line);
     flex-shrink: 0;
     cursor: default;
+  }
+  /* Decorative spans: non-interactive */
+  span.os-titlebar-btn {
     pointer-events: none;
     user-select: none;
   }
