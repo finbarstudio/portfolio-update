@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import OSWindow from "@/components/OSWindow";
 import SplineScene from "@/components/SplineScene";
 import ClientImage from "@/components/ClientImage";
 import {
@@ -260,7 +259,7 @@ export default async function CaseStudyPage({
       </div>
 
       {/* Hero — Spline or static image */}
-      <OSWindow title={`${project.name}.PROJ`} className="mb-8">
+      <div className="mb-8">
         {project.heroSpline ? (
           <SplineScene scene={project.heroSpline} />
         ) : (
@@ -275,7 +274,7 @@ export default async function CaseStudyPage({
             />
           </div>
         )}
-      </OSWindow>
+      </div>
 
       <MetaRow project={project} />
       <SummaryBlock project={project} />

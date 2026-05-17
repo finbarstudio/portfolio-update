@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import OSWindow from "@/components/OSWindow";
 
 export const metadata: Metadata = {
   title: "About — finbar✶studio",
@@ -10,7 +9,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="px-5 md:px-10 py-6 md:py-8">
-      <OSWindow title="ABOUT.TXT — finbar.studio" bodyClassName="px-0 md:px-10 py-6 md:py-10">
+      <div className="px-0 md:px-10 py-6 md:py-10">
         {/* Display heading */}
         <div className="pb-10 border-b border-line mb-10">
           <p className="mono-label text-ink-soft mb-3">
@@ -118,7 +117,7 @@ export default function AboutPage() {
             finbar@finbar.studio
           </a>
         </div>
-      </OSWindow>
+      </div>
     </div>
   );
 }

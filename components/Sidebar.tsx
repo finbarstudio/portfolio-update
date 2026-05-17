@@ -200,7 +200,7 @@ function DesktopSidebar({
           {/* Tree */}
           <div className="flex-1 overflow-y-auto py-2">
             {/* Root — links home, collapse button inline on right */}
-            <div className="tree-item" style={{ color: "var(--ink)", fontWeight: 700 }}>
+            <div className="tree-item tree-item-root">
               <Link
                 href="/"
                 className="flex items-center gap-1 flex-1 min-w-0"

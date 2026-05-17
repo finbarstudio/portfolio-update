@@ -365,6 +365,9 @@
     background: var(--ink);
     color: var(--bg);
   }
+  /* Root item (finbar.studio/) — darker base than ink-soft, hover inherits from .tree-item:hover */
+  .tree-item-root { color: var(--ink); font-weight: 700; }
+
   .tree-item.active {
     color: var(--pink);
     font-weight: 700;

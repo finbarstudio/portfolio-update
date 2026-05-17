@@ -36,51 +36,33 @@ function TagRow({ project }: { project: Project }) {
   );
 }
 
-/* ─── Image wrapper — applies --image-pad and caps height ────
-   Wraps every card image. Height is limited to 72vh so no
-   single image dominates the viewport.
-   ─────────────────────────────────────────────────────────── */
+/* ─── Image wrapper ──────────────────────────────────────── */
 function CardImage({
   src,
   alt,
   priority = false,
   sizes,
   aspectRatio = "3/2",
-  title,
 }: {
   src: string;
   alt: string;
   priority?: boolean;
   sizes: string;
   aspectRatio?: string;
-  title?: string;
 }) {
   return (
-    <div style={{ marginBottom: "var(--image-pad)" }}>
-      <div
-        className="os-window md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform"
-      >
-        {title && (
-          <div className="os-titlebar hidden md:flex">
-            <span className="os-titlebar-btn" aria-hidden="true" />
-            <span className="os-titlebar-title">{title}</span>
-            <span className="os-titlebar-btn" aria-hidden="true" />
-          </div>
-        )}
-        <div
-          className="img-wrap"
-          style={{ aspectRatio, maxHeight: "72vh" }}
-        >
-          <ClientImage
-            src={src}
-            alt={alt}
-            fill
-            sizes={sizes}
-            priority={priority}
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
-          />
-        </div>
-      </div>
+    <div
+      className="img-wrap md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform"
+      style={{ aspectRatio, maxHeight: "72vh", marginBottom: "var(--image-pad)" }}
+    >
+      <ClientImage
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+      />
     </div>
   );
 }
@@ -99,17 +81,11 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         aria-label={`View case study: ${project.name}`}
       >
         {project.heroSpline ? (
-          <div style={{ marginBottom: "var(--image-pad)" }}>
-            <div className="os-window md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform">
-              <div className="os-titlebar hidden md:flex">
-                <span className="os-titlebar-btn" aria-hidden="true" />
-                <span className="os-titlebar-title">{project.name}.PROJ</span>
-                <span className="os-titlebar-btn" aria-hidden="true" />
-              </div>
-              <div style={{ pointerEvents: "none" }}>
-                <SplineScene scene={project.heroSpline} />
-              </div>
-            </div>
+          <div
+            className="md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform"
+            style={{ marginBottom: "var(--image-pad)", pointerEvents: "none" }}
+          >
+            <SplineScene scene={project.heroSpline} />
           </div>
         ) : (
           <CardImage
@@ -118,7 +94,6 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
             priority={index === 0}
             sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
             aspectRatio="16/9"
-            title={`${project.name}.PROJ`}
           />
         )}
 
@@ -159,7 +134,6 @@ export function FullCard({ project, index }: { project: Project; index: number }
           src={project.heroImage.src}
           alt={project.heroImage.alt}
           sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
-          title={project.name}
         />
 
         <div className="pb-6">

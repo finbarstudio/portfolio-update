@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
-import OSWindow from "@/components/OSWindow";
 
 export const metadata: Metadata = {
   title: "Contact — finbar✶studio",
@@ -35,7 +34,7 @@ const socials = [
 export default function ContactPage() {
   return (
     <div className="px-5 md:px-10 py-6 md:py-8">
-      <OSWindow title="CONTACT.WDW" bodyClassName="px-0 md:px-10 py-6 md:py-10">
+      <div className="px-0 md:px-10 py-6 md:py-10">
         {/* Display heading */}
         <div className="pb-10 border-b border-line mb-10">
           <p className="mono-label text-ink-soft mb-3">
@@ -113,7 +112,7 @@ export default function ContactPage() {
             ))}
           </div>
         </div>
-      </OSWindow>
+      </div>
     </div>
   );
 }
