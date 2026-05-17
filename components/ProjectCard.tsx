@@ -36,6 +36,22 @@ function TagRow({ project }: { project: Project }) {
   );
 }
 
+/* ─── Client logo (if present) ───────────────────────────── */
+function CardLogo({ project }: { project: Project }) {
+  if (!project.logo) return null;
+  return (
+    <div className="mb-2">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={project.logo}
+        alt=""
+        aria-hidden="true"
+        style={{ height: 18, width: "auto", objectFit: "contain", display: "block" }}
+      />
+    </div>
+  );
+}
+
 /* ─── Image wrapper ──────────────────────────────────────── */
 function CardImage({
   src,
@@ -52,7 +68,7 @@ function CardImage({
 }) {
   return (
     <div
-      className="img-wrap md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform"
+      className="img-wrap"
       style={{ aspectRatio, maxHeight: "72vh", marginBottom: "var(--image-pad)", background: "white" }}
     >
       <ClientImage
@@ -61,7 +77,7 @@ function CardImage({
         fill
         sizes={sizes}
         priority={priority}
-        className="object-contain"
+        className="object-cover"
       />
     </div>
   );
@@ -81,10 +97,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         aria-label={`View case study: ${project.name}`}
       >
         {project.heroSpline ? (
-          <div
-            className="md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform"
-            style={{ marginBottom: "var(--image-pad)", pointerEvents: "none" }}
-          >
+          <div style={{ marginBottom: "var(--image-pad)", pointerEvents: "none" }}>
             <SplineScene scene={project.heroSpline} />
           </div>
         ) : (
@@ -98,6 +111,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         )}
 
         <div className="pb-8">
+          <CardLogo project={project} />
           <div className="flex items-start justify-between gap-4 mb-3">
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
               {project.name}
@@ -118,7 +132,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
   );
 }
 
-/* ─── Full / Gallery card (2-col) ────────────────────────── */
+/* ─── Full card (half-width) ─────────────────────────────── */
 export function FullCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
@@ -137,6 +151,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
         />
 
         <div className="pb-6">
+          <CardLogo project={project} />
           <div className="flex items-start justify-between gap-3 mb-2.5">
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">
               {project.name}
@@ -157,39 +172,41 @@ export function FullCard({ project, index }: { project: Project; index: number }
   );
 }
 
-/* ─── Gallery card (2-col, no link) ─────────────────────── */
+/* ─── Gallery card (half-width, links to case study) ────── */
 export function GalleryCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
       className="card-animate col-span-12 sm:col-span-6 group relative"
       style={{ animationDelay: `${index * 0.07}s` }}
     >
-      <CardImage
-        src={project.heroImage.src}
-        alt={project.heroImage.alt}
-        sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
-      />
+      <Link
+        href={`/work/${project.slug}`}
+        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        aria-label={`View ${project.name}`}
+      >
+        <CardImage
+          src={project.heroImage.src}
+          alt={project.heroImage.alt}
+          sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
+        />
 
-      <div className="pb-5">
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <h2 className="mono-label text-ink">{project.name}</h2>
-          <span className="mono-label text-ink-soft whitespace-nowrap" style={{ fontSize: "0.5625rem" }}>{project.date}</span>
+        <div className="pb-5">
+          <CardLogo project={project} />
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <h2 className="mono-label text-ink group-hover:text-pink transition-colors">{project.name}</h2>
+            <span className="mono-label text-ink-soft whitespace-nowrap" style={{ fontSize: "0.5625rem" }}>{project.date}</span>
+          </div>
+          <TagRow project={project} />
+          <div className="mt-2 flex items-center justify-between gap-3">
+            {project.liveUrl && (
+              <span className="mono-label text-teal" style={{ fontSize: "0.625rem" }}>
+                LIVE ↗
+              </span>
+            )}
+            <span className="mono-label text-pink shrink-0 group-hover:translate-x-0.5 transition-transform ml-auto" style={{ fontSize: "0.625rem" }}>→</span>
+          </div>
         </div>
-        <TagRow project={project} />
-        {project.liveUrl && (
-          <a
-            href={project.liveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 mono-label text-teal hover:text-pink transition-colors inline-block"
-            style={{ fontSize: "0.625rem" }}
-            aria-label={`Visit ${project.name} live site`}
-          >
-            LIVE SITE ↗
-          </a>
-        )}
-      </div>
-
+      </Link>
     </article>
   );
 }

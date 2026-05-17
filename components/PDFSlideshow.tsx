@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ClientImage from "@/components/ClientImage";
 
 // PDF-to-image slideshow: renders each page as a WebP image with minimal
 // prev/next navigation. Pages are pre-converted by the build pipeline.
+// Adjacent pages are preloaded on mount and on page change so navigation
+// feels instant.
 export default function PDFSlideshow({
   pages,
   title,
@@ -19,6 +21,17 @@ export default function PDFSlideshow({
     if (index === current) return;
     setCurrent(index);
   }
+
+  // Preload adjacent pages whenever current changes
+  useEffect(() => {
+    const preload = (i: number) => {
+      if (i < 0 || i >= total) return;
+      const img = new window.Image();
+      img.src = pages[i];
+    };
+    preload(current - 1);
+    preload(current + 1);
+  }, [current, pages, total]);
 
   return (
     <div className="py-8">

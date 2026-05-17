@@ -246,7 +246,7 @@
     position: relative;
     width: 100%;
     overflow: hidden;
-    background-color: var(--line);
+    background-color: white;
     max-height: 72vh;
   }
 

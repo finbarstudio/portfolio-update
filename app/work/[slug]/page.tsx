@@ -4,6 +4,7 @@ import SplineScene from "@/components/SplineScene";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import PDFSlideshow from "@/components/PDFSlideshow";
+import EncryptedText from "@/components/EncryptedText";
 import {
   projects,
   type Project,
@@ -238,41 +239,52 @@ export default async function CaseStudyPage({
   if (!project) notFound();
 
   return (
-    <article className="px-5 md:px-10 py-4 md:py-6">
-      {/* Breadcrumb / path */}
-      <div className="terminal-line mb-4">
-        <span className="ps1">»</span>{" "}
-        <Link href="/" className="text-ink-soft hover:text-pink transition-colors underline-offset-2 hover:underline">
-          /work
-        </Link>
-        <span className="text-ink-soft"> / </span>
-        <span className="text-ink">{project.slug}</span>
-      </div>
+    <article className="px-5 md:px-10 pt-5 md:pt-7 pb-6">
+      {/* Terminal header — matches home / about / contact style */}
+      <p className="terminal-line mb-5 select-none">
+        <span className="ps1">finbar@studio</span>
+        <span> </span>
+        <span className="path">~/</span>
+        <span> $ </span>
+        <span className="cmd">{project.slug}</span>
+      </p>
 
-      {/* Header + live site link */}
-      <div className="pt-2 pb-2">
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <h1
-            className="font-sans font-bold uppercase text-ink cursor-blink"
-            style={{ fontSize: "var(--text-h1)", letterSpacing: "0.04em", lineHeight: 1.1 }}
-          >
-            {project.name}
-          </h1>
-          {project.liveUrl && (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mono-label text-teal hover:text-pink transition-colors shrink-0 mt-1"
-            >
-              LIVE ↗
-            </a>
-          )}
+      {/* Client logo (if available) */}
+      {project.logo && (
+        <div className="mb-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={project.logo}
+            alt=""
+            aria-hidden="true"
+            style={{ height: 28, width: "auto", objectFit: "contain", display: "block" }}
+          />
         </div>
-        <p className="mono-label text-ink-soft pb-5">
-          {project.oneLiner}
-        </p>
-      </div>
+      )}
+
+      <h1
+        className="font-sans font-bold uppercase text-ink leading-[1.02] cursor-blink"
+        style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
+      >
+        <EncryptedText text={project.name} />
+      </h1>
+
+      <p className="terminal-line mt-6 select-none">
+        <span className="ps1">›</span>
+        <span> </span>
+        <span className="cmd">{project.categories.join(" · ").toLowerCase()}</span>
+      </p>
+
+      {project.liveUrl && (
+        <a
+          href={project.liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mono-label text-teal hover:text-pink transition-colors mt-4 mb-2 inline-block"
+        >
+          LIVE ↗
+        </a>
+      )}
 
       {/* Hero — Spline, looping video, or static image */}
       <div className="mb-8">

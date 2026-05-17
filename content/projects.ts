@@ -51,6 +51,7 @@ export interface Project {
   images: ProjectImage[];
   hasDepth: boolean;
   depth?: DepthSection[];
+  logo?: string;          // Small client/brand logo — shown in card + case study header
   liveUrl?: string;
   heroSpline?: string;
   companyUrl?: string;
@@ -79,6 +80,7 @@ export const projects: Project[] = [
     role: "Sole designer and developer. Delivered brand identity (logomark, logotype, colour system, guidelines) and a complete Framer website with CMS, custom interactive components, and an accessibility text-resizer.",
     problem: "KinAya was rebranding entirely — new name, new identity. They needed a trustworthy and human brand that felt considered and professional, not flashy, plus a website that could be handed over for ongoing CMS management.",
     outcome: "Cohesive brand and site delivered as one unified vision. Smooth CMS handover. Positive client testimonial from Aryan Sareen.",
+    logo: "/images/kinaya/Final%20Logos/Logo%20Pink%20Grey.svg",
     heroSpline: "/models/kinaya/kinaya.splinecode",
     heroImage: { src: "/images/kinaya/desktop.webp", alt: "KinAya website desktop view — structured, accessible homepage layout" },
     images: [
@@ -147,33 +149,34 @@ export const projects: Project[] = [
       "Share to Buy needed an evergreen social campaign that emotionally connected with first-time buyers at the pivotal moment they realise shared ownership is achievable — across every major social format and channel.",
     outcome:
       "Campaign ran across 2022–2023 windows. December 2023 YoY: new registrants +19.7%, page views +1.5%, property enquiries +3.4%.",
+    logo: "/images/tmyr/STB%20Logo.svg",
     heroImage: {
       src: "/images/tmyr/hero-poster.webp",
       alt: "The Moment You Realise campaign — Share to Buy social video series hero frame",
     },
-    heroVideo: "/images/tmyr/Looping Reels Hero.webm",
+    heroVideo: "/images/tmyr/Looping%20Reels%20Hero.webm",
     images: [
       {
         src: "/images/tmyr/post-anthony.webp",
-        video: "/images/tmyr/1080x1080 IG Posts/Anthony.webm",
+        video: "/images/tmyr/1080x1080%20IG%20Posts/Anthony.webm",
         caption: "Anthony — 1:1 format social post, light/fade motion style.",
         alt: "TMYR campaign — Anthony story, 1080x1080 Instagram post with Share to Buy branding and motion overlay",
       },
       {
         src: "/images/tmyr/post-freya.webp",
-        video: "/images/tmyr/1080x1080 IG Posts/Freya.webm",
+        video: "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
         caption: "Freya — 1:1 format social post, light/fade motion style.",
         alt: "TMYR campaign — Freya story, 1080x1080 Instagram post showing shared ownership journey",
       },
       {
         src: "/images/tmyr/post-katie.webp",
-        video: "/images/tmyr/1080x1080 IG Posts/Katie.webm",
+        video: "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
         caption: "Katie — 1:1 format social post, bold/typewriter motion style.",
         alt: "TMYR campaign — Katie story, 1080x1080 Instagram post with kinetic text treatment",
       },
       {
         src: "/images/tmyr/post-lauren.webp",
-        video: "/images/tmyr/1080x1080 IG Posts/Lauren.webm",
+        video: "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
         caption: "Lauren — 1:1 format social post, bold/typewriter motion style.",
         alt: "TMYR campaign — Lauren story, 1080x1080 Instagram post with bold typography animation",
       },
@@ -192,7 +195,7 @@ export const projects: Project[] = [
           },
           {
             src: "/images/tmyr/post-katie.webp",
-            video: "/images/tmyr/1080x1080 IG Posts/Katie.webm",
+            video: "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
             caption: "Bold/typewriter style — punchy kinetic text for stronger stops.",
             alt: "TMYR bold/typewriter motion style — Katie story with kinetic text animation",
           },
@@ -204,13 +207,13 @@ export const projects: Project[] = [
         images: [
           {
             src: "/images/tmyr/post-freya.webp",
-            video: "/images/tmyr/1080x1080 IG Posts/Freya.webm",
+            video: "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
             caption: "Freya — 1:1 square post, one of five format deliverables per story.",
             alt: "TMYR Freya story 1:1 format — one delivery format from the five-format matrix",
           },
           {
             src: "/images/tmyr/post-lauren.webp",
-            video: "/images/tmyr/1080x1080 IG Posts/Lauren.webm",
+            video: "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
             caption: "Lauren — consistent brand treatment across all story variants.",
             alt: "TMYR Lauren story — consistent Share to Buy brand treatment across all campaign variants",
           },
@@ -243,6 +246,7 @@ export const projects: Project[] = [
       "Salesmasters needed unique, 40–50+ page playbooks for each client — text-heavy but engaging, fully brand-compliant, and ready for print. No template existed. Every playbook had to feel custom while maintaining consistency.",
     outcome:
       "15+ playbooks delivered across healthcare, manufacturing, technology, storage, and professional services. Repeat engagement over 1+ year is the signal.",
+    logo: "/images/salesmasters/Logo.png",
     heroImage: {
       src: "/images/salesmasters/hero.webp",
       alt: "Salesmasters Sales Process Playbook — double-page spread from the Bus4x4 edition showing full-bleed layout and typography",
@@ -605,6 +609,7 @@ export const projects: Project[] = [
       "Lows needed a brand that could work across every surface — from a football club sponsorship banner to a vehicle wrap to a website. The mark had to be instantly legible at all scales and production environments.",
     outcome:
       "Strong workload growth since launch. Bromley FC sponsorship partnership generated significant results.",
+    logo: "/images/lows-design-build/logo.webp",
     heroImage: {
       src: "/images/lows-design-build/hero.webp",
       alt: "Lows Design and Build brand identity — hero composite showing logo and brand applications",
@@ -661,6 +666,7 @@ export const projects: Project[] = [
       "Nimbus needed a brand that communicated artisanal quality and sustainability without being precious or cold. The identity had to feel distinctive on specialty retail shelves and scale to e-commerce, pop-up events, and future expansion.",
     outcome:
       "Cohesive visual identity delivered across all initial touchpoints.",
+    logo: "/images/nimbus-coffee/logo.webp",
     heroImage: {
       src: "/images/nimbus-coffee/hero.webp",
       alt: "Nimbus Coffee Co. packaging mockup — branded coffee bags showing the cloud-inspired mark and earthy palette",
@@ -705,6 +711,7 @@ export const projects: Project[] = [
     problem:
       "Momentum needed a brand and website that communicated their mission of empowerment and independence without feeling clinical or institutional.",
     outcome: "Live site: momentummentoring.co.",
+    logo: "/images/momentum-mentoring/Logo2.svg",
     heroSpline: "/models/momentum/momentum.splinecode",
     heroImage: {
       src: "/images/momentum-mentoring/hero.webp",
@@ -731,6 +738,7 @@ export const projects: Project[] = [
       "TasWater needed complex data visualised clearly within their strict brand guidelines — new visual systems that felt native to the existing brand.",
     outcome:
       "Client confirmed satisfaction. Leadership affirmed strong brand alignment.",
+    logo: "/images/taswater/logo.webp",
     heroImage: {
       src: "/images/taswater/hero.webp",
       alt: "TasWater infographic project — progression infographic showing Tasmania's water infrastructure milestones",
@@ -765,6 +773,7 @@ export const projects: Project[] = [
     problem:
       "The London Home Show needed event materials that worked across a wide range of print formats and digital channels — from outdoor flags to stage graphics to 10-year anniversary brochures.",
     outcome: "Campaign rollout delivered on time across all channels.",
+    logo: "/images/london-home-show/LHS%20Logo.svg",
     heroImage: {
       src: "/images/london-home-show/hero.webp",
       alt: "The London Home Show event — branding and signage across the exhibition venue",
