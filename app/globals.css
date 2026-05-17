@@ -76,8 +76,8 @@
   --menubar-h:    26px;      /* top global menubar height                 */
   --statusbar-h:  22px;      /* bottom status bar height                  */
   --titlebar-h:   22px;      /* window chrome title bar height            */
-  --win-shadow:   3px 3px 0 var(--ink);
-  --win-shadow-sm:2px 2px 0 var(--ink);
+  --win-shadow:    0 4px 20px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.07);
+  --win-shadow-sm: 0 2px 10px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
 }
 
 /* ─── Tailwind bridge ────────────────────────────────────────────
@@ -288,51 +288,48 @@
   .pixel-shadow    { box-shadow: var(--win-shadow); }
   .pixel-shadow-sm { box-shadow: var(--win-shadow-sm); }
 
-  /* Sharp-cornered framed window */
+  /* Window — Snow Leopard-inspired: rounded, soft shadow */
   .os-window {
-    border: 1px solid var(--ink);
+    border: 1px solid var(--line);
     background: var(--bg);
+    border-radius: 8px;
+    overflow: hidden;
     box-shadow: var(--win-shadow);
     animation: window-open 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 
-  /* Title bar of a window */
+  /* Title bar — subtle gradient, no pinstripe */
   .os-titlebar {
     height: var(--titlebar-h);
-    border-bottom: 1px solid var(--ink);
-    background-image: repeating-linear-gradient(
-      0deg,
-      var(--ink) 0,
-      var(--ink) 1px,
-      var(--bg)  1px,
-      var(--bg)  3px
-    );
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(to bottom, #f5f5f3 0%, #e6e6e2 100%);
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 0 6px;
+    padding: 0 8px;
   }
   .os-titlebar-title {
     margin: 0 auto;
-    background: var(--bg);
-    padding: 1px 8px;
     font-family: var(--font-label);
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--ink);
-    line-height: 1.4;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    line-height: 1;
   }
+  /* Traffic-light circles */
   .os-titlebar-btn {
-    width: 11px;
-    height: 11px;
-    border: 1px solid var(--ink);
-    background: var(--bg);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: var(--line);
     flex-shrink: 0;
     cursor: default;
+    transition: background 0.12s;
   }
-  .os-titlebar-btn:hover { background: var(--pink); }
+  .os-titlebar-btn:hover { background: var(--pink); border-color: var(--pink); }
 
   /* Terminal prompt — used in hero */
   .terminal-line {
@@ -451,6 +448,7 @@
     .os-window {
       border: none;
       box-shadow: none;
+      border-radius: 0;
       animation: none;
     }
     /* Slightly tighter section gap on mobile */

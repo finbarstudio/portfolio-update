@@ -1,7 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Project } from "@/content/projects";
 import ClientImage from "@/components/ClientImage";
-import Hero3D from "@/components/Hero3D";
+import SplineScene from "@/components/SplineScene";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -80,11 +82,31 @@ function CardImage({
   );
 }
 
+/* ─── Live-site icon — circle ↗ sibling of the card Link ────
+   Positioned absolute in the top-right corner of the os-window
+   titlebar area. Not nested inside Link so no anchor nesting.
+   ─────────────────────────────────────────────────────────── */
+function LiveIcon({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Visit ${label} live site`}
+      title="Live site ↗"
+      className="absolute z-10 flex items-center justify-center os-titlebar-btn hover:!bg-teal hidden md:flex"
+      style={{ top: 6, right: 6, cursor: "pointer" }}
+    >
+      <span style={{ fontSize: "8px", lineHeight: 1 }}>↗</span>
+    </a>
+  );
+}
+
 /* ─── Featured card (full-width) ─────────────────────────── */
 export function FeaturedCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
-      className="card-animate col-span-12 group"
+      className="card-animate col-span-12 group relative"
       style={{ animationDelay: `${index * 0.07}s` }}
     >
       <Link
@@ -92,7 +114,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {project.hero3d ? (
+        {project.heroSpline ? (
           <div style={{ marginBottom: "var(--image-pad)" }}>
             <div className="os-window md:group-hover:translate-x-[-1px] md:group-hover:translate-y-[-1px] transition-transform">
               <div className="os-titlebar hidden md:flex">
@@ -100,7 +122,9 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
                 <span className="os-titlebar-title">{project.name}.PROJ</span>
                 <span className="os-titlebar-btn" aria-hidden="true" />
               </div>
-              <Hero3D src={project.hero3d} interactive={false} />
+              <div style={{ pointerEvents: "none" }}>
+                <SplineScene scene={project.heroSpline} />
+              </div>
             </div>
           </div>
         ) : (
@@ -130,6 +154,8 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
           </div>
         </div>
       </Link>
+
+      {project.liveUrl && <LiveIcon href={project.liveUrl} label={project.name} />}
     </article>
   );
 }
@@ -138,7 +164,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
 export function FullCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
-      className="card-animate col-span-12 sm:col-span-6 group"
+      className="card-animate col-span-12 sm:col-span-6 group relative"
       style={{ animationDelay: `${index * 0.07}s` }}
     >
       <Link
@@ -150,7 +176,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
           src={project.heroImage.src}
           alt={project.heroImage.alt}
           sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
-          title={`${project.name}`}
+          title={project.name}
         />
 
         <div className="pb-6">
@@ -169,6 +195,8 @@ export function FullCard({ project, index }: { project: Project; index: number }
           </div>
         </div>
       </Link>
+
+      {project.liveUrl && <LiveIcon href={project.liveUrl} label={project.name} />}
     </article>
   );
 }
@@ -177,7 +205,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
 export function GalleryCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
-      className="card-animate col-span-12 sm:col-span-6 group"
+      className="card-animate col-span-12 sm:col-span-6 group relative"
       style={{ animationDelay: `${index * 0.07}s` }}
     >
       <CardImage
@@ -197,7 +225,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
             href={project.liveUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 mono-label text-teal hover:text-pink transition-colors link-wipe inline-block"
+            className="mt-2 mono-label text-teal hover:text-pink transition-colors inline-block"
             style={{ fontSize: "0.625rem" }}
             aria-label={`Visit ${project.name} live site`}
           >
@@ -205,6 +233,8 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
           </a>
         )}
       </div>
+
+      {project.liveUrl && <LiveIcon href={project.liveUrl} label={project.name} />}
     </article>
   );
 }

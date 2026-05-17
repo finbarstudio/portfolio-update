@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import OSWindow from "@/components/OSWindow";
-import Hero3D from "@/components/Hero3D";
+import SplineScene from "@/components/SplineScene";
 import ClientImage from "@/components/ClientImage";
 import {
   projects,
@@ -235,23 +235,35 @@ export default async function CaseStudyPage({
         <span className="text-ink">{project.slug}</span>
       </div>
 
-      {/* Header */}
+      {/* Header + live site link */}
       <div className="pt-2 pb-2">
-        <h1
-          className="font-sans font-bold uppercase text-ink mb-3 cursor-blink"
-          style={{ fontSize: "var(--text-h1)", letterSpacing: "0.04em", lineHeight: 1.1 }}
-        >
-          {project.name}
-        </h1>
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <h1
+            className="font-sans font-bold uppercase text-ink cursor-blink"
+            style={{ fontSize: "var(--text-h1)", letterSpacing: "0.04em", lineHeight: 1.1 }}
+          >
+            {project.name}
+          </h1>
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mono-label text-teal hover:text-pink transition-colors shrink-0 mt-1"
+            >
+              LIVE ↗
+            </a>
+          )}
+        </div>
         <p className="mono-label text-ink-soft pb-5">
           {project.oneLiner}
         </p>
       </div>
 
-      {/* Hero — 3D viewer or static image */}
+      {/* Hero — Spline or static image */}
       <OSWindow title={`${project.name}.PROJ`} className="mb-8">
-        {project.hero3d ? (
-          <Hero3D src={project.hero3d} />
+        {project.heroSpline ? (
+          <SplineScene scene={project.heroSpline} />
         ) : (
           <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
             <ClientImage

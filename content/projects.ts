@@ -49,7 +49,7 @@ export interface Project {
   hasDepth: boolean;     // whether an optional depth/process section exists (Featured only)
   depth?: DepthSection[];
   liveUrl?: string;
-  hero3d?: string;    // path to a self-contained HTML 3D viewer (used instead of heroImage on case study)
+  heroSpline?: string; // Spline scene URL — shown instead of heroImage on case study + featured card
   companyUrl?: string; // client's website — shown as "COMPANY" link on case study
 }
 
@@ -299,7 +299,7 @@ export const projects: Project[] = [
       "KinAya was rebranding entirely — new name, new identity. They needed a trustworthy and human brand that felt considered and professional, not flashy, plus a website that could be handed over for ongoing CMS management.",
     outcome:
       "Cohesive brand and site delivered as one unified vision. Smooth CMS handover. Positive client testimonial from Aryan Sareen.",
-    hero3d: "/models/kinaya/viewer.html",
+    heroSpline: "https://prod.spline.design/croQvPMLlcVMcrF7/scene.splinecode",
     heroImage: {
       src: "/images/kinaya/kinaya-hero.jpg",
       alt: "kinaya-hero",
