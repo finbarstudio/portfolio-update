@@ -318,7 +318,7 @@
     color: var(--ink-soft);
     line-height: 1;
   }
-  /* Traffic-light circles */
+  /* Traffic-light circles — decorative only */
   .os-titlebar-btn {
     width: 12px;
     height: 12px;
@@ -327,9 +327,9 @@
     background: var(--line);
     flex-shrink: 0;
     cursor: default;
-    transition: background 0.12s;
+    pointer-events: none;
+    user-select: none;
   }
-  .os-titlebar-btn:hover { background: var(--pink); border-color: var(--pink); }
 
   /* Terminal prompt — used in hero */
   .terminal-line {

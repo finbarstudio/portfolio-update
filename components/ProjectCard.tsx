@@ -82,25 +82,6 @@ function CardImage({
   );
 }
 
-/* ─── Live-site icon — circle ↗ sibling of the card Link ────
-   Positioned absolute in the top-right corner of the os-window
-   titlebar area. Not nested inside Link so no anchor nesting.
-   ─────────────────────────────────────────────────────────── */
-function LiveIcon({ href, label }: { href: string; label: string }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Visit ${label} live site`}
-      title="Live site ↗"
-      className="absolute z-10 flex items-center justify-center os-titlebar-btn hover:!bg-teal hidden md:flex"
-      style={{ top: 6, right: 6, cursor: "pointer" }}
-    >
-      <span style={{ fontSize: "8px", lineHeight: 1 }}>↗</span>
-    </a>
-  );
-}
 
 /* ─── Featured card (full-width) ─────────────────────────── */
 export function FeaturedCard({ project, index }: { project: Project; index: number }) {
@@ -155,7 +136,6 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         </div>
       </Link>
 
-      {project.liveUrl && <LiveIcon href={project.liveUrl} label={project.name} />}
     </article>
   );
 }
@@ -196,7 +176,6 @@ export function FullCard({ project, index }: { project: Project; index: number }
         </div>
       </Link>
 
-      {project.liveUrl && <LiveIcon href={project.liveUrl} label={project.name} />}
     </article>
   );
 }
@@ -234,7 +213,6 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
         )}
       </div>
 
-      {project.liveUrl && <LiveIcon href={project.liveUrl} label={project.name} />}
     </article>
   );
 }
