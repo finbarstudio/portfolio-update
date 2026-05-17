@@ -4,7 +4,16 @@ import dynamic from "next/dynamic";
 
 // Use the regular (non-Next) Spline with ssr:false — the /next variant only
 // accepts CDN URLs and silently fails on local /public/*.splinecode paths.
-const Spline = dynamic(() => import("@splinetool/react-spline"), { ssr: false });
+// Loading fallback matches the container bg so there's no flash on mount.
+const Spline = dynamic(
+  () => import("@splinetool/react-spline"),
+  {
+    ssr: false,
+    loading: () => (
+      <div style={{ position: "absolute", inset: 0, background: "var(--bg)" }} />
+    ),
+  }
+);
 
 // Renders a Spline scene filling a 16/9 container.
 // Used as the hero on case study pages and featured home-page cards.

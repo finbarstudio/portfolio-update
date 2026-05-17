@@ -464,3 +464,20 @@
     }
   }
 }
+
+/* ─── Reduced motion — Web Interface Guidelines compliance ───────
+   Respects user OS preference. All decorative animations are
+   disabled; functional transitions collapse to near-instant.
+   ─────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+  }
+
+  /* Hero scroll-driven fade: keep visible, don't animate */
+  .hero-scroll-fade { opacity: 1 !important; transform: none !important; }
+}
