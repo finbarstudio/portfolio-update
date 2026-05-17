@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import EncryptedText from "@/components/EncryptedText";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 
 export const metadata: Metadata = {
@@ -33,84 +34,91 @@ const socials = [
 
 export default function ContactPage() {
   return (
-    <div className="px-5 md:px-10 py-6 md:py-8">
-      <div className="px-0 md:px-10 py-6 md:py-10">
-        {/* Display heading */}
-        <div className="pb-10 border-b border-line mb-10">
-          <p className="mono-label text-ink-soft mb-3">
-            <span className="text-pink">»</span> ./contact --open
-          </p>
-          <h1
-            className="font-sans font-bold uppercase text-ink leading-[1.0]"
-            style={{ fontSize: "var(--text-display)", letterSpacing: "0.02em" }}
-          >
-            Let&rsquo;s work<br />together.
-          </h1>
-        </div>
+    <div className="px-5 md:px-10 pt-5 md:pt-7 pb-10">
+      {/* Terminal header */}
+      <p className="terminal-line mb-5 select-none">
+        <span className="ps1">finbar@studio</span>
+        <span> </span>
+        <span className="path">~/</span>
+        <span> $ </span>
+        <span className="cmd">./contact --open</span>
+      </p>
 
-        {/* Email — primary action */}
-        <div className="mb-10 border-l-2 border-pink pl-4">
-          <p className="mono-label text-ink-soft mb-2">── EMAIL ──</p>
-          <a
-            href="mailto:finbar@finbar.studio"
-            className="block font-sans font-bold text-ink hover:text-pink transition-colors"
-            style={{ fontSize: "var(--text-h2)" }}
-          >
-            finbar@finbar.studio
-          </a>
-          <p className="text-ink-soft font-sans mt-1" style={{ fontSize: "var(--text-small)" }}>
-            Best way to reach me. Usually reply within one business day.
-          </p>
-        </div>
+      <h1
+        className="font-sans font-bold uppercase text-ink leading-[1.02]"
+        style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
+      >
+        <EncryptedText text="Let's work together." />
+      </h1>
 
-        {/* Phone + Location side by side */}
-        <div className="flex flex-wrap gap-6 md:gap-10 mb-10">
-          <div>
-            <p className="mono-label text-ink-soft mb-2">── PHONE ──</p>
-            <a
-              href="tel:+61412796630"
-              className="font-sans text-ink hover:text-pink transition-colors tabular-nums"
-              style={{ fontSize: "var(--text-small)" }}
-            >
-              +61 412 796 630
-            </a>
-          </div>
-          <div>
-            <p className="mono-label text-ink-soft mb-2">── LOCATION ──</p>
-            <p className="font-sans text-ink" style={{ fontSize: "var(--text-small)" }}>
-              Brisbane, AU
-            </p>
-            <p className="text-ink-soft font-sans" style={{ fontSize: "var(--text-caption)" }}>
-              Remote-friendly
-            </p>
-          </div>
-        </div>
+      <p className="terminal-line mt-6 mb-12 select-none">
+        <span className="ps1">›</span>
+        <span> </span>
+        <span className="cmd">open for full-time roles and freelance — brisbane or remote</span>
+      </p>
 
-        {/* Status */}
-        <div className="mb-12 p-4 border border-ink pixel-shadow-sm bg-bg max-w-md">
-          <span className="status-badge">OPEN FOR WORK</span>
-          <p className="text-ink-soft font-sans mt-2" style={{ fontSize: "var(--text-small)" }}>
-            Available for full-time roles and freelance. Brisbane or remote.
-          </p>
-        </div>
+      {/* Email — primary action */}
+      <div className="mb-10 border-l-2 border-pink pl-4">
+        <p className="mono-label text-ink-soft mb-2">── EMAIL ──</p>
+        <a
+          href="mailto:finbar@finbar.studio"
+          className="block font-sans font-bold text-ink hover:text-pink transition-colors"
+          style={{ fontSize: "var(--text-h2)" }}
+        >
+          finbar@finbar.studio
+        </a>
+        <p className="text-ink-soft font-sans mt-1" style={{ fontSize: "var(--text-small)" }}>
+          Best way to reach me. Usually reply within one business day.
+        </p>
+      </div>
 
-        {/* Socials */}
+      {/* Phone + Location */}
+      <div className="flex flex-wrap gap-6 md:gap-10 mb-10">
         <div>
-          <p className="mono-label text-ink-soft mb-4">── ELSEWHERE ──</p>
-          <div className="flex flex-wrap gap-6">
-            {socials.map((s) => (
-              <a
-                key={s.href}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-ink-soft hover:text-pink transition-colors"
-              >
-                {s.icon}
-                <span className="mono-label">{s.label}</span>
-              </a>
-            ))}
-          </div>
+          <p className="mono-label text-ink-soft mb-2">── PHONE ──</p>
+          <a
+            href="tel:+61412796630"
+            className="font-sans text-ink hover:text-pink transition-colors tabular-nums"
+            style={{ fontSize: "var(--text-small)" }}
+          >
+            +61 412 796 630
+          </a>
+        </div>
+        <div>
+          <p className="mono-label text-ink-soft mb-2">── LOCATION ──</p>
+          <p className="font-sans text-ink" style={{ fontSize: "var(--text-small)" }}>
+            Brisbane, AU
+          </p>
+          <p className="text-ink-soft font-sans" style={{ fontSize: "var(--text-caption)" }}>
+            Remote-friendly
+          </p>
+        </div>
+      </div>
+
+      {/* Status */}
+      <div className="mb-12 p-4 border border-ink pixel-shadow-sm bg-bg max-w-md">
+        <span className="status-badge">OPEN FOR WORK</span>
+        <p className="text-ink-soft font-sans mt-2" style={{ fontSize: "var(--text-small)" }}>
+          Available for full-time roles and freelance. Brisbane or remote.
+        </p>
+      </div>
+
+      {/* Socials */}
+      <div>
+        <p className="mono-label text-ink-soft mb-4">── ELSEWHERE ──</p>
+        <div className="flex flex-wrap gap-6">
+          {socials.map((s) => (
+            <a
+              key={s.href}
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-ink-soft hover:text-pink transition-colors"
+            >
+              {s.icon}
+              <span className="mono-label">{s.label}</span>
+            </a>
+          ))}
         </div>
       </div>
     </div>

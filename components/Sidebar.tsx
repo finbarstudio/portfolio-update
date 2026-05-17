@@ -47,6 +47,13 @@ function ChevronRightIcon() {
 }
 
 /* ── Collapsed-mode glyphs ────────────────────────────────────── */
+function HomeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M2 7.5L8 2l6 5.5V14a.5.5 0 01-.5.5H10V10H6v4.5H2.5A.5.5 0 012 14V7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+    </svg>
+  );
+}
 function GridIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -149,9 +156,9 @@ function DesktopSidebar({
           <Link
             href="/"
             aria-label="Home"
-            className="pixel-star text-base mb-3 hover:opacity-70 transition-opacity"
+            className={`mb-1 transition-colors ${isHome ? "text-pink" : "text-ink-soft hover:text-pink"}`}
           >
-            ✶
+            <HomeIcon />
           </Link>
 
           <div className="w-5 h-px bg-line mb-2" />
@@ -168,8 +175,9 @@ function DesktopSidebar({
                 title={l.label}
                 aria-label={l.label}
                 aria-current={l.active ? "page" : undefined}
-                className="flex items-center justify-center w-full py-2 transition-colors"
-                style={{ color: l.active ? "var(--pink)" : "var(--ink-soft)" }}
+                className={`flex items-center justify-center w-full py-2 transition-colors ${
+                  l.active ? "text-pink" : "text-ink-soft hover:text-pink"
+                }`}
               >
                 {l.icon}
               </Link>

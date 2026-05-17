@@ -14,7 +14,7 @@ export const SIDEBAR_EXPANDED_W = 224; // px
 export const SIDEBAR_COLLAPSED_W = 48; // px
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
