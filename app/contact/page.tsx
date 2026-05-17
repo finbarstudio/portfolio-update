@@ -41,7 +41,7 @@ export default function ContactPage() {
         <span> </span>
         <span className="path">~/</span>
         <span> $ </span>
-        <span className="cmd">./contact --open</span>
+        <span className="cmd">contact</span>
       </p>
 
       <h1
@@ -57,25 +57,25 @@ export default function ContactPage() {
         <span className="cmd">open for full-time roles and freelance — brisbane or remote</span>
       </p>
 
-      {/* Email — primary action */}
-      <div className="mb-10 border-l-2 border-pink pl-4">
-        <p className="mono-label text-ink-soft mb-2">── EMAIL ──</p>
+      {/* Email */}
+      <div className="mb-14">
+        <p className="mono-label text-ink-soft mb-5">Email</p>
         <a
           href="mailto:finbar@finbar.studio"
-          className="block font-sans font-bold text-ink hover:text-pink transition-colors"
+          className="block font-sans font-bold text-ink hover:text-pink transition-colors mb-2"
           style={{ fontSize: "var(--text-h2)" }}
         >
           finbar@finbar.studio
         </a>
-        <p className="text-ink-soft font-sans mt-1" style={{ fontSize: "var(--text-small)" }}>
+        <p className="text-ink-soft font-sans" style={{ fontSize: "var(--text-small)" }}>
           Best way to reach me. Usually reply within one business day.
         </p>
       </div>
 
       {/* Phone + Location */}
-      <div className="flex flex-wrap gap-6 md:gap-10 mb-10">
+      <div className="mb-14 flex flex-wrap gap-14">
         <div>
-          <p className="mono-label text-ink-soft mb-2">── PHONE ──</p>
+          <p className="mono-label text-ink-soft mb-5">Phone</p>
           <a
             href="tel:+61412796630"
             className="font-sans text-ink hover:text-pink transition-colors tabular-nums"
@@ -85,7 +85,7 @@ export default function ContactPage() {
           </a>
         </div>
         <div>
-          <p className="mono-label text-ink-soft mb-2">── LOCATION ──</p>
+          <p className="mono-label text-ink-soft mb-5">Location</p>
           <p className="font-sans text-ink" style={{ fontSize: "var(--text-small)" }}>
             Brisbane, AU
           </p>
@@ -95,17 +95,9 @@ export default function ContactPage() {
         </div>
       </div>
 
-      {/* Status */}
-      <div className="mb-12 p-4 border border-ink pixel-shadow-sm bg-bg max-w-md">
-        <span className="status-badge">OPEN FOR WORK</span>
-        <p className="text-ink-soft font-sans mt-2" style={{ fontSize: "var(--text-small)" }}>
-          Available for full-time roles and freelance. Brisbane or remote.
-        </p>
-      </div>
-
       {/* Socials */}
-      <div>
-        <p className="mono-label text-ink-soft mb-4">── ELSEWHERE ──</p>
+      <div className="mb-14">
+        <p className="mono-label text-ink-soft mb-5">Elsewhere</p>
         <div className="flex flex-wrap gap-6">
           {socials.map((s) => (
             <a
@@ -120,6 +112,17 @@ export default function ContactPage() {
             </a>
           ))}
         </div>
+      </div>
+
+      {/* Status */}
+      <div className="pt-8 border-t border-line">
+        <div className="mb-3">
+          <span className="status-badge">OPEN FOR WORK</span>
+        </div>
+        <p className="font-sans text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
+          Available for full-time design roles and freelance engagements.
+          Brisbane-based; remote-friendly.
+        </p>
       </div>
     </div>
   );

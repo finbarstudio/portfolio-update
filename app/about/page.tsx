@@ -17,7 +17,7 @@ export default function AboutPage() {
         <span> </span>
         <span className="path">~/</span>
         <span> $ </span>
-        <span className="cmd">cat about.md</span>
+        <span className="cmd">about</span>
       </p>
 
       <h1
@@ -48,7 +48,7 @@ export default function AboutPage() {
           />
         </div>
         <div className="max-w-2xl">
-          <p className="mono-label text-ink-soft mb-5">── Background ──</p>
+          <p className="mono-label text-ink-soft mb-5">Background</p>
           <div className="space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
             <p>
               I&rsquo;m a Brisbane-based graphic designer and Framer developer
@@ -73,7 +73,7 @@ export default function AboutPage() {
 
       {/* Capabilities */}
       <div className="mb-14">
-        <p className="mono-label text-ink-soft mb-8">── Capabilities ──</p>
+        <p className="mono-label text-ink-soft mb-8">Capabilities</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-10">
           {[
             {

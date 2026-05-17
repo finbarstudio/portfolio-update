@@ -156,7 +156,7 @@ function DesktopSidebar({
           <Link
             href="/"
             aria-label="Home"
-            className={`mb-1 transition-colors ${isHome ? "text-pink" : "text-ink-soft hover:text-pink"}`}
+            className={`mb-3 transition-colors ${isHome ? "text-pink" : "text-ink-soft hover:text-pink"}`}
           >
             <HomeIcon />
           </Link>
