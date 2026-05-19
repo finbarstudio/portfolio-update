@@ -17,36 +17,33 @@ import dynamic from "next/dynamic";
 import * as THREE from "three";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, Environment } from "@react-three/drei";
+import { useGLTF, Environment, Center } from "@react-three/drei";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
-// Camera + framing. Distances tuned so the full monitor + stand always fits
-// (with breathing room) at both rest and hover, even on a 3/2 thumbnail card.
+// Camera + framing. The GLTF nests the screen-mockup and the frame at
+// different world positions, so the model is wrapped in drei's <Center>
+// to recenter the combined bounding box at origin. With the model centred,
+// the camera just lerps in/out along Z and the model rotation gives the
+// isometric tilt at rest, easing to a flat front-on view on hover.
 const CAMERA_FOV = 28;
-const CAMERA_DISTANCE_DEFAULT = 9.0;   // Pulled back at rest (isometric)
-const CAMERA_DISTANCE_HOVER = 7.2;     // Closer when hovered, still uncropped
+const CAMERA_DISTANCE_DEFAULT = 11.5;  // Pulled back at rest (isometric)
+const CAMERA_DISTANCE_HOVER = 9.0;     // Closer when hovered, still uncropped
 const LERP = 0.08;                     // Animation speed (per frame)
 
-// Model orientation. Studio Display GLTF exports with screen facing +Y (upward)
-// because the export uses Z-up. We rotate -90° around X so the screen faces +Z
-// (i.e. the camera at +Z sees the screen front-on).
-const MODEL_BASE_ROTATION: [number, number, number] = [-Math.PI / 2, 0, 0];
-
-// Isometric tilt (resting state).
-const ISO_ROTATION_Y = -0.55;          // ~ -31°  (left/right)
-const ISO_ROTATION_X = 0.18;           //   ~10°  (slight downward tilt)
+// Isometric tilt (resting state). Applied to the centred model; hover state
+// lerps these toward 0,0 to land on a flat, front-on, perfectly centred view.
+const ISO_ROTATION_Y = -0.45;          // ~ -26°  (left/right)
+const ISO_ROTATION_X = 0.12;           //   ~7°   (slight downward tilt)
 
 /* ── Inner: Display model + video texture ──────────────────── */
 
 type DisplayModelProps = {
   modelUrl: string;
   videoTexture: THREE.VideoTexture | null;
-  position?: [number, number, number];
-  rotation?: [number, number, number];
 };
 
-function DisplayModel({ modelUrl, videoTexture, position, rotation }: DisplayModelProps) {
+function DisplayModel({ modelUrl, videoTexture }: DisplayModelProps) {
   const { scene } = useGLTF(modelUrl) as unknown as { scene: THREE.Group };
 
   // Clone once so the same model can be mounted in multiple ModelDisplay
@@ -103,11 +100,7 @@ function DisplayModel({ modelUrl, videoTexture, position, rotation }: DisplayMod
     };
   }, [root, videoTexture]);
 
-  return (
-    <group position={position} rotation={rotation}>
-      <primitive object={root} />
-    </group>
-  );
+  return <primitive object={root} />;
 }
 
 /* ── Inner: rig that lerps rotation + camera distance on hover ── */
@@ -139,14 +132,9 @@ function Rig({
 
   return (
     <group ref={groupRef}>
-      <DisplayModel
-        modelUrl={modelUrl}
-        videoTexture={videoTexture}
-        rotation={MODEL_BASE_ROTATION}
-        // Recenter: the GLTF's frame sits at y≈0.6 in world (after root scale).
-        // Nudge down so the visual centre of the screen sits at origin.
-        position={[0, -0.45, 0]}
-      />
+      <Center>
+        <DisplayModel modelUrl={modelUrl} videoTexture={videoTexture} />
+      </Center>
     </group>
   );
 }
@@ -204,9 +192,7 @@ function ModelDisplayInner({
     tex.minFilter = THREE.LinearFilter;
     tex.magFilter = THREE.LinearFilter;
     tex.generateMipmaps = false;
-    // The screen mesh UVs are flipped on the Y axis vs. our video. Without
-    // this the demo plays upside-down.
-    tex.flipY = false;
+    // Keep the default flipY (true) — matches the MOCKUP UVs in this GLTF.
     return tex;
   }, [videoEl]);
 
