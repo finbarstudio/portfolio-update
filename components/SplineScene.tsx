@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-// Use the regular (non-Next) Spline with ssr:false — the /next variant only
+// Use the regular (non-Next) Spline with ssr:false, the /next variant only
 // accepts CDN URLs and silently fails on local /public/*.splinecode paths.
 // Loading fallback matches the container bg so there's no flash on mount.
 const Spline = dynamic(

@@ -3,9 +3,17 @@ import ClientImage from "@/components/ClientImage";
 import EncryptedText from "@/components/EncryptedText";
 
 export const metadata: Metadata = {
-  title: "About — finbar✶studio",
+  title: "About | finbar✶studio",
   description:
-    "Brisbane-based graphic designer and Framer developer. Originally from London, studied in London and Brighton, now open for design roles.",
+    "Finbar Skitini is a graphic designer and Framer developer in Brisbane. Originally from London, studied in London and Brighton. Open for design roles.",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About Finbar Skitini",
+    description:
+      "Graphic designer and Framer developer based in Brisbane. Open for full-time and freelance work.",
+    url: "/about",
+    type: "profile",
+  },
 };
 
 export default function AboutPage() {
@@ -30,7 +38,7 @@ export default function AboutPage() {
       <p className="terminal-line mt-6 mb-12 select-none">
         <span className="ps1">›</span>
         <span> </span>
-        <span className="cmd">graphic designer &amp; framer developer — brisbane, au</span>
+        <span className="cmd">graphic designer &amp; framer developer · brisbane, au</span>
       </p>
 
       {/* Headshot + Bio */}
@@ -41,7 +49,7 @@ export default function AboutPage() {
         >
           <ClientImage
             src="/images/headshot.webp"
-            alt="Finbar Skitini — graphic designer and Framer developer"
+            alt="Finbar Skitini, graphic designer and Framer developer"
             fill
             sizes="160px"
             className="object-contain"
@@ -51,21 +59,23 @@ export default function AboutPage() {
           <p className="mono-label text-ink-soft mb-5">Background</p>
           <div className="space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
             <p>
-              I&rsquo;m a Brisbane-based graphic designer and Framer developer
-              with four-plus years across brand identity, digital campaigns, web,
-              and publication design. Originally from London, I studied design in
-              London and Brighton before founding Finbar Studio.
+              I&rsquo;m a graphic designer and Framer developer based in
+              Brisbane. Over the last four years I&rsquo;ve worked across brand
+              identity, digital campaigns, websites and publications. Originally
+              from London. Studied design in London and Brighton, then moved to
+              Australia and started Finbar Studio.
             </p>
             <p>
-              My work spans full brand systems from concept to delivery —
-              logomarks, colour systems, typographic frameworks, and brand
-              guidelines — through to motion campaigns, bespoke publications, and
-              custom-built websites in Framer.
+              Most jobs start with the brand: logo, colour, type, guidelines.
+              From there I take it into whatever comes next, usually a motion
+              campaign, a printed publication, or a Framer website with a CMS
+              the client can run themselves.
             </p>
             <p>
-              I care about things being visually considered, technically tight,
-              and genuinely usable. Accessibility matters — I build for real
-              people, not just portfolio screenshots.
+              I like work that looks good, holds up technically, and actually
+              works for the people using it. Accessibility isn&rsquo;t something
+              I bolt on at the end. I&rsquo;d rather build for real users than
+              for a tidy portfolio screenshot.
             </p>
           </div>
         </div>
@@ -133,8 +143,8 @@ export default function AboutPage() {
           <span className="status-badge">OPEN FOR WORK</span>
         </div>
         <p className="font-sans text-ink-soft mb-5" style={{ fontSize: "var(--text-small)" }}>
-          Available for full-time design roles and freelance engagements.
-          Brisbane-based; remote-friendly.
+          Taking on full-time design roles and freelance projects. Based in
+          Brisbane, happy to work remotely.
         </p>
         <a
           href="mailto:finbar@finbar.studio"

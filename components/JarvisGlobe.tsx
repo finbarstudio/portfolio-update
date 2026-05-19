@@ -1,6 +1,6 @@
 "use client";
 
-// Globe — Three.js imperative renderer
+// Globe, Three.js imperative renderer
 // Dots-only land masses (no sphere) → water is fully transparent
 // Pink dots match site accent. Brisbane marker + mono label overlay.
 
@@ -21,7 +21,7 @@ function latLonToVec3(lat: number, lon: number, r = GLOBE_RADIUS) {
   );
 }
 
-// 32-row binary world map — 1 = land, 0 = ocean
+// 32-row binary world map, 1 = land, 0 = ocean
 const WORLD_MAP = [
   "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
   "000000000000000000000000000000000000000000000000000000000000000111111000000000000000000000000000000000000000000000000000",
@@ -96,7 +96,7 @@ export default function JarvisGlobe() {
     const w = container.clientWidth;
     const h = container.clientHeight;
 
-    /* ── Renderer — alpha:true = transparent clear ── */
+    /* ── Renderer, alpha:true = transparent clear ── */
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(w, h);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -108,7 +108,7 @@ export default function JarvisGlobe() {
     const camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
     camera.position.set(0, 0, 5.6);
 
-    /* ── Land dots (Points — no sphere, so water = transparent) ── */
+    /* ── Land dots (Points, no sphere, so water = transparent) ── */
     const dotsMat = new THREE.PointsMaterial({
       color: PINK,
       size: 0.038,
@@ -147,7 +147,7 @@ export default function JarvisGlobe() {
       ref={mountRef}
       style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}
     >
-      {/* Label overlay — bottom-left */}
+      {/* Label overlay, bottom-left */}
       <div
         style={{
           position: "absolute",

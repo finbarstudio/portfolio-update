@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 
-// Looping muted video — plays only while visible in the viewport.
+// Looping muted video, plays only while visible in the viewport.
 // Uses IntersectionObserver instead of autoPlay so off-screen videos
 // don't buffer memory. preload="metadata" fetches just enough for
 // the poster frame without pulling the full file.

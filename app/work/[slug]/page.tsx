@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Script from "next/script";
+import type { Metadata } from "next";
 import SplineScene from "@/components/SplineScene";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -12,23 +14,41 @@ import {
   type ProjectImage,
 } from "@/content/projects";
 
-/* ─── Static params ────────────────────────────────────────── */
+const SITE_URL = "https://finbar.studio";
+
+/* Static params */
 export async function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
 }
 
-/* ─── Metadata ─────────────────────────────────────────────── */
+/* Metadata */
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const project = projects.find((p) => p.slug === slug);
   if (!project) return {};
+  const url = `/work/${project.slug}`;
+  const ogImage = project.heroImage?.src;
   return {
-    title: `${project.name} — finbar✶studio`,
+    title: `${project.name} · ${project.categories.slice(0, 2).join(" · ")}`,
     description: project.oneLiner,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${project.name} | finbar✶studio`,
+      description: project.oneLiner,
+      url,
+      type: "article",
+      images: ogImage ? [{ url: ogImage, alt: project.heroImage.alt }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.name} | finbar✶studio`,
+      description: project.oneLiner,
+      images: ogImage ? [ogImage] : undefined,
+    },
   };
 }
 
@@ -44,7 +64,7 @@ function Tag({
   return <span className={cls}>{label}</span>;
 }
 
-/* ─── Case study image — padded, max-height constrained ─────── */
+/* ─── Case study image, padded, max-height constrained ─────── */
 function CaseImage({
   src,
   alt,
@@ -82,7 +102,7 @@ function CaseImage({
   );
 }
 
-/* ─── Case study media — image or looping video ─────────────── */
+/* ─── Case study media, image or looping video ─────────────── */
 function CaseMedia({ img, halfWidth = false }: { img: ProjectImage; halfWidth?: boolean }) {
   if (img.video) {
     return (
@@ -238,9 +258,34 @@ export default async function CaseStudyPage({
 
   if (!project) notFound();
 
+  const creativeWorkJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.name,
+    description: project.oneLiner,
+    dateCreated: project.date,
+    creator: {
+      "@type": "Person",
+      name: "Finbar Skitini",
+      url: SITE_URL,
+    },
+    keywords: [...project.categories, ...project.skills].join(", "),
+    url: `${SITE_URL}/work/${project.slug}`,
+    image: project.heroImage?.src
+      ? `${SITE_URL}${project.heroImage.src}`
+      : undefined,
+    inLanguage: "en-AU",
+  };
+
   return (
     <article className="px-5 md:px-10 pt-5 md:pt-7 pb-6">
-      {/* Terminal header — matches home / about / contact style */}
+      <Script
+        id={`ld-${project.slug}`}
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(creativeWorkJsonLd) }}
+      />
+      {/* Terminal header, matches home / about / contact style */}
       <p className="terminal-line mb-5 select-none">
         <span className="ps1">finbar@studio</span>
         <span> </span>
@@ -286,7 +331,7 @@ export default async function CaseStudyPage({
         </a>
       )}
 
-      {/* Hero — Spline, looping video, or static image */}
+      {/* Hero, Spline, looping video, or static image */}
       <div className="mb-8">
         {project.heroSpline ? (
           <SplineScene scene={project.heroSpline} />
@@ -324,7 +369,7 @@ export default async function CaseStudyPage({
         />
       )}
 
-      {/* Links row — live site and/or company site */}
+      {/* Links row, live site and/or company site */}
       {(project.liveUrl || project.companyUrl) && (
         <div className="flex flex-wrap gap-10 py-6">
           {project.liveUrl && (

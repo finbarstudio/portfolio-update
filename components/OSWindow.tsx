@@ -1,4 +1,4 @@
-// Mac-Classic style window chrome — pinstripe title bar, faux close/zoom
+// Mac-Classic style window chrome, pinstripe title bar, faux close/zoom
 // buttons, sharp 1px border + pixel offset shadow. Pure decoration.
 // On mobile (<md) the chrome collapses via globals.css media query so
 // content can use the full viewport width.

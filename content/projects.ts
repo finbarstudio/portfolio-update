@@ -1,21 +1,18 @@
 /**
- * ─────────────────────────────────────────────────────────────
- *  finbar✶studio — Project Content
- *  All copy, images, dates, tags, and case study content lives
- *  here. Edit this file to update anything on the site.
+ * finbar✶studio, Project Content
+ * All copy, images, dates, tags, and case study content lives here.
+ * Edit this file to update anything on the site.
  *
- *  IMAGE GUIDE
- *  ───────────────────────────────────────────────────────────
- *  All images live in /public/images/<slug>/
- *  Compressed WebP versions are in the same folder as the originals.
- *  Videos are WebM; poster frames are WebP.
+ * IMAGE GUIDE
+ * All images live in /public/images/<slug>/
+ * Compressed WebP versions are in the same folder as the originals.
+ * Videos are WebM; poster frames are WebP.
  *
- *  ProjectImage.video — set this to a .webm path to render a
- *  looping video in the case study gallery. src then acts as poster.
+ * ProjectImage.video: set this to a .webm path to render a looping video
+ * in the case study gallery. src then acts as poster.
  *
- *  Project.heroVideo — looping WebM for the case study hero.
- *  Project.pdfSlideshow — array of WebP page images from a PDF.
- * ─────────────────────────────────────────────────────────────
+ * Project.heroVideo: looping WebM for the case study hero.
+ * Project.pdfSlideshow: array of WebP page images from a PDF.
  */
 
 export type Tier = "featured" | "full" | "gallery";
@@ -24,7 +21,7 @@ export interface ProjectImage {
   src: string;        // WebP image path (also poster when video is set)
   caption?: string;
   alt: string;
-  video?: string;     // WebM path — if set, renders as looping video
+  video?: string;     // WebM path. If set, renders as a looping video.
 }
 
 export interface DepthSection {
@@ -51,7 +48,7 @@ export interface Project {
   images: ProjectImage[];
   hasDepth: boolean;
   depth?: DepthSection[];
-  logo?: string;          // Small client/brand logo — shown in card + case study header
+  logo?: string;          // Small client/brand logo. Shown in card + case study header.
   liveUrl?: string;
   heroSpline?: string;
   companyUrl?: string;
@@ -61,13 +58,11 @@ export interface Project {
   };
 }
 
-/* ─────────────────────────────────────────────────────────── */
-/*  PROJECTS — ranked, all tiers                              */
-/* ─────────────────────────────────────────────────────────── */
+/* PROJECTS, ranked, all tiers */
 
 export const projects: Project[] = [
 
-  /* ── 1 ── KinAya ── Featured ────────────────────────────── */
+  /* 1. KinAya. Featured */
   {
     slug: "kinaya",
     name: "KinAya",
@@ -76,49 +71,49 @@ export const projects: Project[] = [
     date: "2024",
     categories: ["Brand Identity", "Web Design", "Framer", "NDIS"],
     skills: ["Brand Identity", "Logo Design", "Framer Development", "CMS Setup", "Accessibility", "Web Design"],
-    oneLiner: "Full brand identity and six-page Framer website for an Adelaide NDIS support services provider rebranding under a new name.",
-    role: "Sole designer and developer. Delivered brand identity (logomark, logotype, colour system, guidelines) and a complete Framer website with CMS, custom interactive components, and an accessibility text-resizer.",
-    problem: "KinAya was rebranding entirely — new name, new identity. They needed a trustworthy and human brand that felt considered and professional, not flashy, plus a website that could be handed over for ongoing CMS management.",
-    outcome: "Cohesive brand and site delivered as one unified vision. Smooth CMS handover. Positive client testimonial from Aryan Sareen.",
+    oneLiner: "Full brand identity and a six-page Framer site for an Adelaide NDIS provider rebranding under a new name.",
+    role: "Sole designer and developer. Delivered the brand (logomark, logotype, colour, guidelines) and the Framer site itself, including CMS, custom interactive components, and a site-wide accessibility text-resizer.",
+    problem: "KinAya was rebranding from the ground up: new name, new identity. The brand had to feel trustworthy and human without slipping into something flashy. The site needed to be easy for the team to run themselves after launch.",
+    outcome: "Brand and site delivered as a single piece of work. CMS handover went smoothly. Positive testimonial from Aryan Sareen.",
     logo: "/images/kinaya/Final%20Logos/Logo%20Pink%20Grey.svg",
     heroSpline: "/models/kinaya/kinaya.splinecode",
-    heroImage: { src: "/images/kinaya/desktop.webp", alt: "KinAya website desktop view — structured, accessible homepage layout" },
+    heroImage: { src: "/images/kinaya/desktop.webp", alt: "KinAya website desktop view with structured, accessible homepage layout" },
     images: [
-      { src: "/images/kinaya/desktop.webp", caption: "Home page — structured, readable, accessible layout across all viewports.", alt: "KinAya Framer website homepage on desktop — clean navigation, hero section with NDIS branding" },
-      { src: "/images/kinaya/mobile.webp", caption: "Responsive mobile layout — full CMS control handed to the KinAya team post-launch.", alt: "KinAya website mobile view — responsive layout with navy and rose colour palette" },
-      { src: "/images/kinaya/logo-dev-1.webp", caption: "Early logomark explorations — testing forms, weight, and warmth.", alt: "KinAya logo development early stage — pencil and vector explorations of the mark" },
-      { src: "/images/kinaya/logo-dev-4.webp", caption: "Final refined logomark — the mark that balances warmth with professional trust.", alt: "KinAya final logomark — refined vector mark with logotype in brand typeface" },
+      { src: "/images/kinaya/desktop.webp", caption: "Home page: structured, readable, accessible layout across viewports.", alt: "KinAya Framer website homepage on desktop with clean navigation and NDIS branding" },
+      { src: "/images/kinaya/mobile.webp", caption: "Responsive mobile layout. Full CMS control was handed over to the KinAya team after launch.", alt: "KinAya website mobile view with responsive layout in the navy and rose palette" },
+      { src: "/images/kinaya/logo-dev-1.webp", caption: "Early logomark explorations: testing form, weight and warmth.", alt: "KinAya logo development early stage with pencil and vector explorations" },
+      { src: "/images/kinaya/logo-dev-4.webp", caption: "Final refined logomark. The version that balanced warmth with professional trust.", alt: "KinAya final logomark, refined vector mark with logotype in the brand typeface" },
     ],
     hasDepth: true,
     depth: [
       {
         heading: "Brand Identity Development",
-        body: "The KinAya identity needed to project warmth, trust, and professionalism for an NDIS audience. The logomark went through multiple rounds of refinement — from rough concept to refined vector. The logotype was set in a considered typeface that balances humanity with clarity.",
+        body: "The KinAya identity had to land somewhere between warm and trustworthy for an NDIS audience. The logomark went through several rounds of refinement from rough concept to final vector. The logotype was set in a typeface that balances human feel with clarity at small sizes.",
         images: [
-          { src: "/images/kinaya/logo-dev-1.webp", caption: "Early explorations — testing forms and visual weight.", alt: "KinAya logo development stage 1 — initial vector form explorations" },
-          { src: "/images/kinaya/logo-dev-2.webp", caption: "Mid-process refinement — narrowing to the core concept.", alt: "KinAya logo development stage 2 — refined mark candidates" },
-          { src: "/images/kinaya/logo-dev-3.webp", caption: "Near-final stage — geometry tightened, proportions locked.", alt: "KinAya logo development stage 3 — near-final mark with logotype" },
-          { src: "/images/kinaya/logo-dev-4.webp", caption: "Final mark — delivered with full brand guidelines.", alt: "KinAya final logomark in brand colours — navy and rose on white" },
+          { src: "/images/kinaya/logo-dev-1.webp", caption: "Early explorations: testing form and visual weight.", alt: "KinAya logo development stage 1, initial vector form explorations" },
+          { src: "/images/kinaya/logo-dev-2.webp", caption: "Mid-process refinement: narrowing to the core concept.", alt: "KinAya logo development stage 2, refined mark candidates" },
+          { src: "/images/kinaya/logo-dev-3.webp", caption: "Near-final stage. Geometry tightened, proportions locked.", alt: "KinAya logo development stage 3, near-final mark with logotype" },
+          { src: "/images/kinaya/logo-dev-4.webp", caption: "Final mark, delivered with full brand guidelines.", alt: "KinAya final logomark in brand colours navy and rose on white" },
         ],
       },
       {
         heading: "Accessibility Text-Resizer",
-        body: "A custom site-wide text-resizer was built in Framer — a component persistent across all pages that lets users increase the base text size in steps. For an NDIS provider whose users may have visual impairments, this was a non-negotiable feature. The resizer persists via localStorage so the user's preference is remembered across visits.",
+        body: "A custom site-wide text-resizer was built in Framer. It persists across every page and lets users step the base text size up or down. For an NDIS provider whose audience may include people with vision impairments, this wasn't optional. The preference is stored in localStorage so it sticks across visits.",
         images: [
           {
             src: "/images/kinaya/accessibility-poster.webp",
             video: "/images/kinaya/accessibility.webm",
-            caption: "The accessibility text-resizer in action — persistent across sessions, fully keyboard-accessible.",
-            alt: "KinAya accessibility text-resizer demonstration — custom Framer component incrementally scaling text site-wide",
+            caption: "The text-resizer in action: persistent across sessions and fully keyboard-accessible.",
+            alt: "KinAya accessibility text-resizer demonstration, custom Framer component scaling text site-wide",
           },
         ],
       },
       {
         heading: "Website & CMS",
-        body: "The six-page Framer site was built for handover from day one. CMS collections handle all repeating content — services, team profiles, and news posts — so the KinAya team can update content without touching code. SEO fundamentals were set from the outset: semantic HTML, per-page meta, Open Graph, and clean URLs.",
+        body: "The six-page Framer site was built for handover from day one. CMS collections handle the repeating content (services, team profiles, news posts), so the KinAya team can update without touching code. SEO basics were in place from launch: semantic HTML, per-page meta, Open Graph and clean URLs.",
         images: [
-          { src: "/images/kinaya/desktop.webp", caption: "Desktop layout — clean hierarchy, strong CTA structure.", alt: "KinAya desktop homepage full view — hero, services, and CTA sections" },
-          { src: "/images/kinaya/mobile.webp", caption: "Mobile — fully responsive, same content hierarchy on small screens.", alt: "KinAya mobile homepage — responsive layout adapting to small viewport" },
+          { src: "/images/kinaya/desktop.webp", caption: "Desktop layout with clean hierarchy and a clear CTA structure.", alt: "KinAya desktop homepage full view with hero, services and CTA sections" },
+          { src: "/images/kinaya/mobile.webp", caption: "Mobile: fully responsive, same content hierarchy on smaller screens.", alt: "KinAya mobile homepage, responsive layout adapting to small viewport" },
         ],
       },
     ],
@@ -126,7 +121,7 @@ export const projects: Project[] = [
     companyUrl: "https://kinaya.com.au",
   },
 
-  /* ── 2 ── TMYR — The Moment You Realise ── Featured ────── */
+  /* 2. TMYR (The Moment You Realise). Featured */
   {
     slug: "tmyr",
     name: "The Moment You Realise",
@@ -143,86 +138,86 @@ export const projects: Project[] = [
       "Static Asset Design",
     ],
     oneLiner:
-      "Evergreen social campaign for the UK's leading affordable-homeownership portal — capturing the emotional turning point when a buyer realises homeownership is within reach.",
-    role: "Solo motion designer and campaign producer. Sourced/selected stock footage, built and animated all motion graphic templates in After Effects, adapted Share to Buy brand elements, and delivered the complete asset library.",
+      "Evergreen social campaign for the UK's biggest affordable-homeownership portal. The films sit on the moment a first-time buyer realises they can actually afford it.",
+    role: "Solo motion designer and campaign producer. Sourced and selected stock footage, built and animated every motion graphic template in After Effects, adapted Share to Buy brand elements, and shipped the full asset library.",
     problem:
-      "Share to Buy needed an evergreen social campaign that emotionally connected with first-time buyers at the pivotal moment they realise shared ownership is achievable — across every major social format and channel.",
+      "Share to Buy needed an evergreen social campaign that hit a specific emotional beat: the second someone realises shared ownership is within reach. It had to work across every major social format and channel.",
     outcome:
-      "Campaign ran across 2022–2023 windows. December 2023 YoY: new registrants +19.7%, page views +1.5%, property enquiries +3.4%.",
+      "Campaign ran across 2022 and 2023 windows. December 2023 year on year: new registrants +19.7%, page views +1.5%, property enquiries +3.4%.",
     logo: "/images/tmyr/STB%20Logo.svg",
     heroImage: {
       src: "/images/tmyr/hero-poster.webp",
-      alt: "The Moment You Realise campaign — Share to Buy social video series hero frame",
+      alt: "The Moment You Realise campaign, Share to Buy social video series hero frame",
     },
     heroVideo: "/images/tmyr/Looping%20Reels%20Hero.webm",
     images: [
       {
         src: "/images/tmyr/post-anthony.webp",
         video: "/images/tmyr/1080x1080%20IG%20Posts/Anthony.webm",
-        caption: "Anthony — 1:1 format social post, light/fade motion style.",
-        alt: "TMYR campaign — Anthony story, 1080x1080 Instagram post with Share to Buy branding and motion overlay",
+        caption: "Anthony: 1:1 social post, light/fade motion style.",
+        alt: "TMYR campaign Anthony story, 1080x1080 Instagram post with Share to Buy branding",
       },
       {
         src: "/images/tmyr/post-freya.webp",
         video: "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
-        caption: "Freya — 1:1 format social post, light/fade motion style.",
-        alt: "TMYR campaign — Freya story, 1080x1080 Instagram post showing shared ownership journey",
+        caption: "Freya: 1:1 social post, light/fade motion style.",
+        alt: "TMYR campaign Freya story, 1080x1080 Instagram post showing shared ownership journey",
       },
       {
         src: "/images/tmyr/post-katie.webp",
         video: "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
-        caption: "Katie — 1:1 format social post, bold/typewriter motion style.",
-        alt: "TMYR campaign — Katie story, 1080x1080 Instagram post with kinetic text treatment",
+        caption: "Katie: 1:1 social post, bold/typewriter motion style.",
+        alt: "TMYR campaign Katie story, 1080x1080 Instagram post with kinetic text treatment",
       },
       {
         src: "/images/tmyr/post-lauren.webp",
         video: "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
-        caption: "Lauren — 1:1 format social post, bold/typewriter motion style.",
-        alt: "TMYR campaign — Lauren story, 1080x1080 Instagram post with bold typography animation",
+        caption: "Lauren: 1:1 social post, bold/typewriter motion style.",
+        alt: "TMYR campaign Lauren story, 1080x1080 Instagram post with bold typography animation",
       },
     ],
     hasDepth: true,
     depth: [
       {
         heading: "Two Motion Styles",
-        body: "The campaign runs in two distinct visual voices. The light/fade style uses soft dissolves and gentle type entrances — aspirational and calm. The bold/typewriter style uses punchy kinetic type and harder cuts — immediate, confident. Both share the same brand palette and can run simultaneously without visual conflict.",
+        body: "The campaign runs in two visual voices. The light/fade style uses soft dissolves and gentle type entrances. It feels aspirational and calm. The bold/typewriter style uses kinetic type and harder cuts: more immediate, more confident. Both share the same palette and run side by side without clashing.",
         images: [
           {
             src: "/images/tmyr/post-anthony.webp",
             video: "/images/tmyr/1080x1080 IG Posts/Anthony.webm",
-            caption: "Light/fade style — soft dissolves and gentle typography entrances.",
-            alt: "TMYR light/fade motion style — Anthony story with soft animated text overlays",
+            caption: "Light/fade style: soft dissolves and gentle type entrances.",
+            alt: "TMYR light/fade motion style, Anthony story with soft animated text overlays",
           },
           {
             src: "/images/tmyr/post-katie.webp",
             video: "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
-            caption: "Bold/typewriter style — punchy kinetic text for stronger stops.",
-            alt: "TMYR bold/typewriter motion style — Katie story with kinetic text animation",
+            caption: "Bold/typewriter style: punchy kinetic text for stronger stops.",
+            alt: "TMYR bold/typewriter motion style, Katie story with kinetic text animation",
           },
         ],
       },
       {
         heading: "Format Matrix & Production Scale",
-        body: "Every video was delivered across five formats (1:1, 9:16, 16:9, 4:5, and Stories/Reels) with both motion styles. An airtight file and naming system made client handover and future production scheduling frictionless. The modular After Effects templates meant each new story variant could be turned around in a fraction of the time.",
+        body: "Every video was delivered across five formats (1:1, 9:16, 16:9, 4:5 and Stories/Reels) in both motion styles. A tight file and naming system kept handover and future scheduling clean. The modular After Effects templates meant new story variants could be turned around in a fraction of the time.",
         images: [
           {
             src: "/images/tmyr/post-freya.webp",
             video: "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
-            caption: "Freya — 1:1 square post, one of five format deliverables per story.",
-            alt: "TMYR Freya story 1:1 format — one delivery format from the five-format matrix",
+            caption: "Freya: 1:1 square post, one of five formats per story.",
+            alt: "TMYR Freya story 1:1 format, one delivery format from the five-format matrix",
           },
           {
             src: "/images/tmyr/post-lauren.webp",
             video: "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
-            caption: "Lauren — consistent brand treatment across all story variants.",
-            alt: "TMYR Lauren story — consistent Share to Buy brand treatment across all campaign variants",
+            caption: "Lauren: consistent brand treatment across all story variants.",
+            alt: "TMYR Lauren story, consistent Share to Buy brand treatment across campaign variants",
           },
         ],
       },
     ],
   },
 
-  /* ── 3 ── Salesmasters ── Featured ─────────────────────── */
+  /* 3. Salesmasters. Featured */
   {
     slug: "salesmasters",
     name: "Salesmasters",
@@ -240,103 +235,103 @@ export const projects: Project[] = [
       "Print Production",
     ],
     oneLiner:
-      "Bespoke Sales Process Playbooks for a Brisbane sales consultancy — researched, written, designed, illustrated, and print-managed end-to-end.",
-    role: "Sole designer and writer. Researching each client's industry, writing all content (3,000–3,500 words per playbook), building InDesign documents from scratch, designing custom illustrations and infographics, managing print delivery.",
+      "Bespoke Sales Process Playbooks for a Brisbane sales consultancy. Researched, written, designed, illustrated and print-managed in-house.",
+    role: "Sole designer and writer. Researched each client's industry, wrote all content (3,000 to 3,500 words per playbook), built the InDesign documents from scratch, designed the illustrations and infographics, and managed print delivery.",
     problem:
-      "Salesmasters needed unique, 40–50+ page playbooks for each client — text-heavy but engaging, fully brand-compliant, and ready for print. No template existed. Every playbook had to feel custom while maintaining consistency.",
+      "Salesmasters needed unique 40 to 50-page playbooks for each client. Text-heavy but still readable, brand-compliant, and ready to print. There was no template to start from. Every playbook had to feel custom while still reading as part of the same set.",
     outcome:
-      "15+ playbooks delivered across healthcare, manufacturing, technology, storage, and professional services. Repeat engagement over 1+ year is the signal.",
+      "15+ playbooks delivered across healthcare, manufacturing, technology, storage and professional services. The clearest signal is the repeat work over more than a year.",
     logo: "/images/salesmasters/Logo.png",
     heroImage: {
       src: "/images/salesmasters/hero.webp",
-      alt: "Salesmasters Sales Process Playbook — double-page spread from the Bus4x4 edition showing full-bleed layout and typography",
+      alt: "Salesmasters Sales Process Playbook double-page spread from the Bus4x4 edition",
     },
     images: [
       {
         src: "/images/salesmasters/double-spread.webp",
-        caption: "Double-page spread — full-bleed imagery with Salesmasters brand layout and typographic hierarchy.",
-        alt: "Salesmasters playbook double-page spread — Bus4x4 edition, full-bleed photography with branded layout",
+        caption: "Double-page spread with full-bleed imagery, brand layout and typographic hierarchy.",
+        alt: "Salesmasters playbook double-page spread, Bus4x4 edition with full-bleed photography",
       },
       {
         src: "/images/salesmasters/sales-wheel-1.webp",
-        caption: "The Sales Wheel — custom circular diagram mapping the client's full sales process across every stage.",
-        alt: "Salesmasters Sales Wheel infographic — Active Medical edition, circular diagram mapping the sales cycle",
+        caption: "The Sales Wheel: a custom circular diagram mapping the client's sales process end to end.",
+        alt: "Salesmasters Sales Wheel infographic, Active Medical edition mapping the sales cycle",
       },
       {
         src: "/images/salesmasters/bant-diagram.webp",
-        caption: "BANT qualification framework — visualised as a purpose-built diagram for the playbook.",
-        alt: "Salesmasters BANT qualification diagram — custom infographic for the SiteWare Direct playbook",
+        caption: "BANT qualification framework, drawn as a purpose-built diagram for the playbook.",
+        alt: "Salesmasters BANT qualification diagram, custom infographic for the SiteWare Direct playbook",
       },
       {
         src: "/images/salesmasters/cover-alpha-lifecare.webp",
-        caption: "Cover design — Alpha Lifecare edition, each client gets a fully unique cover within the brand system.",
-        alt: "Salesmasters playbook cover — Alpha Lifecare edition with healthcare photography and branded title treatment",
+        caption: "Cover design for the Alpha Lifecare edition. Every client gets a unique cover that still reads as part of the series.",
+        alt: "Salesmasters playbook cover, Alpha Lifecare edition with healthcare photography",
       },
     ],
     hasDepth: true,
     depth: [
       {
         heading: "Custom Sales Wheels",
-        body: "The Sales Wheel is the centrepiece of every playbook — a custom circular diagram mapping each client's sales process across stages, touchpoints, and actions. Each wheel is drawn from scratch in Illustrator, adapted to the client's industry and specific sales methodology, then placed into InDesign for the final document.",
+        body: "The Sales Wheel sits at the centre of every playbook: a custom circular diagram mapping the client's sales process across stages, touchpoints and actions. Each wheel is drawn from scratch in Illustrator, adapted to the client's industry and sales methodology, then placed into InDesign for the final document.",
         images: [
           {
             src: "/images/salesmasters/sales-wheel-1.webp",
-            caption: "Active Medical Sales Wheel — mapped to the medical equipment sales cycle.",
-            alt: "Salesmasters Sales Wheel — Active Medical edition, circular infographic showing sales stages and touchpoints",
+            caption: "Active Medical Sales Wheel, built around the medical equipment sales cycle.",
+            alt: "Salesmasters Sales Wheel, Active Medical edition with sales stages and touchpoints",
           },
           {
             src: "/images/salesmasters/sales-wheel-2.webp",
-            caption: "Cutek Sales Wheel — adapted to the timber treatment and coatings industry.",
-            alt: "Salesmasters Sales Wheel — Cutek edition, customised for timber treatment product sales cycle",
+            caption: "Cutek Sales Wheel, adapted to the timber treatment and coatings industry.",
+            alt: "Salesmasters Sales Wheel, Cutek edition customised for timber treatment product sales cycle",
           },
         ],
       },
       {
         heading: "Technique Diagrams",
-        body: "Supporting the Sales Wheel, each playbook includes a set of technique diagrams — BANT qualification, STAR method, and client-specific process maps. All built in Illustrator to a consistent visual grammar, then placed into InDesign alongside the body copy.",
+        body: "Each playbook also includes supporting technique diagrams: BANT qualification, STAR method and client-specific process maps. All built in Illustrator to a shared visual grammar so they sit cleanly alongside the body copy in InDesign.",
         images: [
           {
             src: "/images/salesmasters/bant-diagram.webp",
-            caption: "BANT diagram — Budget, Authority, Need, Timing qualification framework visualised.",
-            alt: "BANT qualification framework diagram — custom infographic for Salesmasters playbook",
+            caption: "BANT diagram. Budget, Authority, Need, Timing as a visual framework.",
+            alt: "BANT qualification framework diagram, custom infographic for Salesmasters playbook",
           },
           {
             src: "/images/salesmasters/star-diagram.webp",
-            caption: "STAR method diagram — Situation, Task, Action, Result structured for sales storytelling.",
-            alt: "STAR method diagram — Salesmasters playbook infographic for structured sales technique",
+            caption: "STAR method diagram. Situation, Task, Action, Result for structured sales storytelling.",
+            alt: "STAR method diagram, Salesmasters playbook infographic for structured sales technique",
           },
           {
             src: "/images/salesmasters/technical-diagram.webp",
-            caption: "Bus4x4 6-Point Technical Diagram — bespoke process map for the client's product range.",
-            alt: "Bus4x4 6-point technical diagram — custom process infographic for the Bus4x4 playbook",
+            caption: "Bus4x4 6-Point Technical Diagram: a bespoke process map for the client's product range.",
+            alt: "Bus4x4 6-point technical diagram, custom process infographic for the Bus4x4 playbook",
           },
         ],
       },
       {
         heading: "Cover Design & Print Delivery",
-        body: "Each playbook's cover is a fully custom design — client logo prominently placed, bespoke title typography, brand-matched colour, imagery composited in Photoshop. Print files were prepared to spec (bleed, crop marks, CMYK) and managed through to delivery.",
+        body: "Each playbook cover is fully custom: prominent client logo, bespoke title typography, brand-matched colour and imagery composited in Photoshop. Print files were prepared to spec (bleed, crop marks, CMYK) and managed through to delivery.",
         images: [
           {
             src: "/images/salesmasters/cover-alpha-lifecare.webp",
-            caption: "Alpha Lifecare — healthcare imagery, brand-compliant layout.",
-            alt: "Salesmasters playbook cover — Alpha Lifecare edition with healthcare photography and brand title treatment",
+            caption: "Alpha Lifecare cover. Healthcare imagery, brand-compliant layout.",
+            alt: "Salesmasters playbook cover, Alpha Lifecare edition with healthcare photography",
           },
           {
             src: "/images/salesmasters/cover-playbook.webp",
-            caption: "Generic playbook cover — typographic-led treatment for broader applicability.",
-            alt: "Salesmasters generic playbook cover — typographic design for broad use",
+            caption: "Generic playbook cover. Typographic treatment for broader use.",
+            alt: "Salesmasters generic playbook cover, typographic design for broad use",
           },
           {
             src: "/images/salesmasters/cover-siteware.webp",
-            caption: "SiteWare Direct — tech/industrial palette and sharp typographic hierarchy.",
-            alt: "Salesmasters SiteWare Direct playbook cover — technology and industrial brand treatment",
+            caption: "SiteWare Direct cover. Tech/industrial palette with a sharper typographic hierarchy.",
+            alt: "Salesmasters SiteWare Direct playbook cover, technology and industrial brand treatment",
           },
         ],
       },
     ],
   },
 
-  /* ── 4 ── Joe Devine ── Full ────────────────────────────── */
+  /* 4. Joe Devine. Full */
   {
     slug: "joe-devine",
     name: "Joe Devine",
@@ -352,47 +347,47 @@ export const projects: Project[] = [
       "Social Media Assets",
     ],
     oneLiner:
-      "Visual identity across five instrumental singles for a London-based guitarist transitioning to solo work.",
-    role: "Art director and photographer. Created the cohesive visual identity for the five-single series: studio photography, custom artwork, colour treatments, and social/streaming assets.",
+      "Visual identity across five instrumental singles for a London-based guitarist moving from session work into solo releases.",
+    role: "Art director and photographer. Built the visual identity for the five-single series: studio photography, custom artwork, colour treatments, and social and streaming assets.",
     problem:
-      "Joe was transitioning from session work to solo releases and needed a visual identity that felt cohesive across five separate singles — each with its own colour and mood, but immediately recognisable as a series.",
+      "Joe was moving from session work into solo releases. He needed a look that read as one series across five separate singles. Each track wanted its own colour and mood while still being instantly recognisable as part of the set.",
     outcome:
-      "Client pleased with the series. The releases gained significant traction after launch.",
+      "Client happy with the series. The releases picked up real traction after launch.",
     heroImage: {
       src: "/images/joe-devine/hero.webp",
-      alt: "Joe Devine — all five single cover artworks displayed together, showing the cohesive visual series",
+      alt: "Joe Devine, all five single cover artworks shown together as a series",
     },
     images: [
       {
         src: "/images/joe-devine/cover-1.webp",
-        caption: "Single 1 — the series anchor, establishing the core photographic and typographic language.",
-        alt: "Joe Devine single cover artwork — first release, establishing the visual series identity",
+        caption: "Single 1: the anchor of the series, establishing the photographic and typographic language.",
+        alt: "Joe Devine single cover artwork, first release establishing the visual series identity",
       },
       {
         src: "/images/joe-devine/cover-2.webp",
-        caption: "Single 2 — warm colour treatment, same compositional logic as the series foundation.",
-        alt: "Joe Devine single cover artwork — second release with warm colour treatment",
+        caption: "Single 2: warm colour treatment, same compositional logic as single 1.",
+        alt: "Joe Devine single cover artwork, second release with warm colour treatment",
       },
       {
         src: "/images/joe-devine/cover-3.webp",
-        caption: "Single 3 — distinct palette, cohesive visual grammar maintained across the series.",
-        alt: "Joe Devine single cover artwork — third release with distinct colour palette",
+        caption: "Single 3: distinct palette, the series visual grammar held steady.",
+        alt: "Joe Devine single cover artwork, third release with distinct colour palette",
       },
       {
         src: "/images/joe-devine/cover-4.webp",
-        caption: "Single 4 — colour shift, same compositional and typographic framework throughout.",
-        alt: "Joe Devine single cover artwork — fourth release maintaining series typographic framework",
+        caption: "Single 4: a colour shift, same compositional and typographic framework.",
+        alt: "Joe Devine single cover artwork, fourth release maintaining series typographic framework",
       },
       {
         src: "/images/joe-devine/cover-5.webp",
-        caption: "Single 5 — series conclusion; all five covers read as a complete set.",
-        alt: "Joe Devine single cover artwork — fifth and final release completing the visual series",
+        caption: "Single 5: end of the series. All five covers read as a complete set together.",
+        alt: "Joe Devine single cover artwork, fifth and final release completing the visual series",
       },
     ],
     hasDepth: false,
   },
 
-  /* ── 5 ── Compass Capability ── Full ────────────────────── */
+  /* 5. Compass Capability. Full */
   {
     slug: "compass-capability",
     name: "Compass Capability",
@@ -407,41 +402,41 @@ export const projects: Project[] = [
       "Graphic Systems",
     ],
     oneLiner:
-      "Comprehensive brand identity from concept to implementation for a consulting firm empowering organisations through capability solutions.",
-    role: "Sole designer. Developed the full brand identity: logo with directional symbolism, typographic selection, logo variations, graphical asset systems, brand guidelines, and social assets.",
+      "Brand identity from concept through to rollout for a consulting firm working with industry on capability and workforce solutions.",
+    role: "Sole designer. Built the full identity: logo with directional symbolism, typography, logo variations, graphic asset systems, brand guidelines and social assets.",
     problem:
-      "Compass needed a visual identity that communicated their positioning — navigation, direction, and capability — across green industry, renewables, mining, transport, and manufacturing sectors. The brand had to feel considered and credible across all touchpoints.",
+      "Compass needed an identity that read as navigation, direction and capability across green industry, renewables, mining, transport and manufacturing. It had to feel credible at every touchpoint and not lean too hard on any one sector.",
     outcome:
-      "Cohesive visual language across all touchpoints delivered.",
+      "Consistent visual language delivered across the brand system.",
     heroImage: {
       src: "/images/compass-capability/hero.webp",
-      alt: "Compass Capability brand identity — logo mockup collage showing the mark applied across touchpoints",
+      alt: "Compass Capability brand identity, logo mockup collage across touchpoints",
     },
     images: [
       {
         src: "/images/compass-capability/graphic.webp",
-        caption: "Brand graphic system — the directional motif derived from the logomark, applied as a flexible graphic asset.",
-        alt: "Compass Capability brand graphic — directional compass motif used as a scalable brand asset",
+        caption: "Brand graphic system: the directional motif pulled from the logomark, used as a flexible asset.",
+        alt: "Compass Capability brand graphic, directional compass motif used as a scalable brand asset",
       },
       {
         src: "/images/compass-capability/pattern.webp",
-        caption: "Repeating pattern — derived from the logo geometry, used across brand touchpoints and digital backgrounds.",
-        alt: "Compass Capability repeating pattern — logo-derived geometric pattern for brand applications",
+        caption: "Repeating pattern built from the logo geometry. Used across brand touchpoints and digital backgrounds.",
+        alt: "Compass Capability repeating pattern, logo-derived geometric pattern for brand applications",
       },
       {
         src: "/images/compass-capability/mockup-billboard.webp",
-        caption: "Billboard mockup — brand identity applied at large-format outdoor scale.",
-        alt: "Compass Capability brand identity on billboard mockup — large format outdoor application",
+        caption: "Billboard mockup. Brand applied at large-format outdoor scale.",
+        alt: "Compass Capability brand identity on billboard mockup, large format outdoor application",
       },
       {
         src: "/images/compass-capability/mockup-business-card.webp",
-        caption: "Business card mockup — tight typography and logo mark at small print scale.",
-        alt: "Compass Capability business card mockup — logo and typography at small print scale",
+        caption: "Business card mockup: tight typography, logo mark at small print scale.",
+        alt: "Compass Capability business card mockup, logo and typography at small print scale",
       },
       {
         src: "/images/compass-capability/mockup-stationary.webp",
-        caption: "Stationery mockup — brand applied across letterhead and document templates.",
-        alt: "Compass Capability stationery mockup — letterhead and document templates with brand identity",
+        caption: "Stationery mockup: brand applied across letterhead and document templates.",
+        alt: "Compass Capability stationery mockup, letterhead and document templates with brand identity",
       },
     ],
     hasDepth: false,
@@ -456,7 +451,7 @@ export const projects: Project[] = [
     },
   },
 
-  /* ── 6 ── Norths Devils RLFC ── Full — CONCEPT ──────────── */
+  /* 6. Norths Devils RLFC. Full. CONCEPT */
   {
     slug: "norths-devils",
     name: "Norths Devils RLFC",
@@ -473,65 +468,65 @@ export const projects: Project[] = [
       "Sports Branding",
     ],
     oneLiner:
-      "Brand refresh and prototype website for a storied Queensland rugby league club — modernised mark, full responsive site, speculative work.",
-    role: "Sole designer and developer. Executed brand refresh (modernised primary mark retaining devil imagery) and built a prototype website from scratch mimicking professional NRL club sites.",
+      "Brand refresh and prototype website for a long-standing Queensland rugby league club. Modernised mark, full responsive site, speculative.",
+    role: "Sole designer and developer. Refreshed the brand (modernised primary mark, kept the devil) and built a prototype website from scratch modelled on professional NRL club sites.",
     problem:
-      "Norths Devils needed an identity that felt contemporary and dynamic while honouring the club's history. The existing mark lacked clarity at small sizes and digital applications. A companion website concept was developed to show the full vision.",
+      "Norths Devils needed an identity that felt current and dynamic without losing the club's history. The existing mark struggled at small sizes and in digital. The site concept was built alongside the brand to show how it would work in practice.",
     outcome:
-      "Speculative work — not accepted or implemented by the club. Produced as a self-initiated concept project.",
+      "Speculative work. Not adopted by the club. Built as a self-initiated concept.",
     heroImage: {
       src: "/images/norths-devils/desktop.webp",
-      alt: "Norths Devils RLFC prototype website — desktop view showing the full-screen hero and navigation",
+      alt: "Norths Devils RLFC prototype website desktop view with full-screen hero and navigation",
     },
     images: [
       {
         src: "/images/norths-devils/video-desktop-poster.webp",
         video: "/images/norths-devils/video-desktop.webm",
-        caption: "Website interaction — desktop scroll through the Norths Devils prototype site.",
-        alt: "Norths Devils prototype website desktop interaction — scroll through homepage, team, and club sections",
+        caption: "Desktop scroll through the Norths Devils prototype site.",
+        alt: "Norths Devils prototype website desktop interaction, scroll through homepage, team and club sections",
       },
       {
         src: "/images/norths-devils/video-mobile-poster.webp",
         video: "/images/norths-devils/video-mobile.webm",
-        caption: "Website interaction — mobile scroll demonstrating full responsive behaviour.",
-        alt: "Norths Devils prototype website mobile interaction — responsive scroll through the full site on iPhone",
+        caption: "Mobile scroll showing the full responsive behaviour.",
+        alt: "Norths Devils prototype website mobile interaction, responsive scroll through the full site on iPhone",
       },
       {
         src: "/images/norths-devils/logo-1.webp",
-        caption: "Refreshed primary mark — devil imagery retained, refined vector construction.",
-        alt: "Norths Devils RLFC refreshed logo — modernised devil mark with thickened edges for digital reproduction",
+        caption: "Refreshed primary mark. Devil imagery kept; vector construction tightened.",
+        alt: "Norths Devils RLFC refreshed logo, modernised devil mark with thickened edges for digital reproduction",
       },
       {
         src: "/images/norths-devils/logo-2.webp",
-        caption: "Before / after comparison — angular typography for aggression, rounded corners for vintage character.",
-        alt: "Norths Devils logo before and after comparison — original versus refreshed mark side by side",
+        caption: "Before and after comparison. Angular type for aggression, rounded corners for a vintage feel.",
+        alt: "Norths Devils logo before and after comparison, original versus refreshed mark side by side",
       },
       {
         src: "/images/norths-devils/iphone-1.webp",
-        caption: "iPhone mockup — responsive layout at mobile scale, club colours intact.",
-        alt: "Norths Devils prototype website on iPhone mockup — mobile responsive layout",
+        caption: "iPhone mockup: responsive layout at mobile scale, club colours intact.",
+        alt: "Norths Devils prototype website on iPhone mockup, mobile responsive layout",
       },
       {
         src: "/images/norths-devils/iphone-2.webp",
-        caption: "iPhone mockup — secondary page scroll showing team profile and news sections.",
-        alt: "Norths Devils prototype website iPhone mockup — team profile and news page layout",
+        caption: "iPhone mockup: secondary page scroll showing team profile and news sections.",
+        alt: "Norths Devils prototype website iPhone mockup, team profile and news page layout",
       },
       {
         src: "/images/norths-devils/mockup-wall.webp",
-        caption: "Concrete wall mockup — refreshed mark at large environmental scale.",
-        alt: "Norths Devils refreshed logo on concrete wall mockup — environmental scale brand application",
+        caption: "Concrete wall mockup. Refreshed mark at large environmental scale.",
+        alt: "Norths Devils refreshed logo on concrete wall mockup, environmental scale brand application",
       },
       {
         src: "/images/norths-devils/mockup-gallery.webp",
-        caption: "Gallery wall mockup — logo silhouettes and brand applications across surfaces.",
-        alt: "Norths Devils brand identity gallery wall mockup — logo silhouettes across multiple brand applications",
+        caption: "Gallery wall mockup: logo silhouettes and brand applications across surfaces.",
+        alt: "Norths Devils brand identity gallery wall mockup, logo silhouettes across multiple brand applications",
       },
     ],
     hasDepth: false,
     liveUrl: "https://northsdevilsrlfc.framer.website",
   },
 
-  /* ── 7 ── Copper Company ── Full ────────────────────────── */
+  /* 7. Copper Company. Full */
   {
     slug: "copper-company",
     name: "Copper Company",
@@ -547,47 +542,47 @@ export const projects: Project[] = [
       "Brand Guidelines",
     ],
     oneLiner:
-      "Complete brand identity system for a rum brand — concept to market launch, from monogram logo to packaging and brand guidelines.",
-    role: "Sole designer. Developed the full brand identity: distinctive monogram logo, repeating pattern system for packaging and brand applications, comprehensive guidelines, print-spec packaging, and social photography.",
+      "Brand identity for a rum brand. Concept through to launch: monogram logo, packaging and guidelines.",
+    role: "Sole designer. Built the full brand: monogram logo, repeating pattern for packaging and brand applications, guidelines, print-spec packaging and social photography.",
     problem:
-      "The Copper Company needed a brand built from the ground up — name, identity, and packaging all aligned. The mark needed to feel distinctive on shelf and translate into a pattern system that could wrap across packaging and brand touchpoints.",
+      "The Copper Company was being built from scratch: name, identity and packaging all needed to line up. The mark had to stand out on shelf and translate into a pattern that could wrap across packaging and brand touchpoints.",
     outcome:
-      "Client satisfied with final output and brand cohesion across all touchpoints.",
+      "Client happy with the final output and the brand reading consistently across every touchpoint.",
     heroImage: {
       src: "/images/copper-company/hero.webp",
-      alt: "Copper Company rum bottle — staged product photography showing the final label design and brand identity",
+      alt: "Copper Company rum bottle, staged product photography showing the final label design and brand identity",
     },
     images: [
       {
         src: "/images/copper-company/bottle-1.webp",
-        caption: "Bottle front — monogram label applied at full print spec, ready for production.",
-        alt: "Copper Company rum bottle front — monogram label at print specification on amber glass bottle",
+        caption: "Bottle front: monogram label at full print spec, ready for production.",
+        alt: "Copper Company rum bottle front, monogram label at print specification on amber glass bottle",
       },
       {
         src: "/images/copper-company/bottle-2.webp",
-        caption: "Bottle back — secondary label with tasting notes and brand pattern.",
-        alt: "Copper Company rum bottle back — secondary label with tasting notes and repeating monogram pattern",
+        caption: "Bottle back: secondary label with tasting notes and brand pattern.",
+        alt: "Copper Company rum bottle back, secondary label with tasting notes and repeating monogram pattern",
       },
       {
         src: "/images/copper-company/label-flat.webp",
-        caption: "Label flat net — the full label design in print-ready format with bleed and crop marks.",
-        alt: "Copper Company label flat net — print-ready label design showing full bleed and artwork at flat view",
+        caption: "Label flat net: the full label design as print-ready artwork with bleed and crop marks.",
+        alt: "Copper Company label flat net, print-ready label design showing full bleed and artwork at flat view",
       },
       {
         src: "/images/copper-company/insta-1.webp",
-        caption: "Social content — brand-consistent product photography for Instagram.",
-        alt: "Copper Company Instagram post 1 — brand-consistent social photography for rum product launch",
+        caption: "Social content: brand-consistent product photography for Instagram.",
+        alt: "Copper Company Instagram post 1, brand-consistent social photography for rum product launch",
       },
       {
         src: "/images/copper-company/insta-2.webp",
-        caption: "Social content — lifestyle photography with brand colour treatment.",
-        alt: "Copper Company Instagram post 2 — lifestyle photography with brand copper and dark colour treatment",
+        caption: "Social content: lifestyle photography with the brand colour treatment.",
+        alt: "Copper Company Instagram post 2, lifestyle photography with brand copper and dark colour treatment",
       },
     ],
     hasDepth: false,
   },
 
-  /* ── 8 ── Lows Design and Build ── Full ─────────────────── */
+  /* 8. Lows Design and Build. Full */
   {
     slug: "lows-design-build",
     name: "Lows Design and Build",
@@ -603,48 +598,48 @@ export const projects: Project[] = [
       "Brand Applications",
     ],
     oneLiner:
-      "Full branding suite for a London family-run design-and-build company — logo to vehicle wrap, including a Bromley FC sponsorship activation.",
-    role: "Sole designer. Refined client sketches into a scalable geometric mark, selected brand typeface, managed colour for digital and print. Applications: Bromley FC sponsorship banners, site hoarding, social icons, website, and vehicle wrap.",
+      "Full branding for a London family-run design-and-build company. Logo through to vehicle wrap, including a Bromley FC sponsorship activation.",
+    role: "Sole designer. Refined the client's sketches into a scalable geometric mark, selected the brand typeface, set colour for digital and print. Applied across Bromley FC sponsorship banners, site hoarding, social icons, the website and a vehicle wrap.",
     problem:
-      "Lows needed a brand that could work across every surface — from a football club sponsorship banner to a vehicle wrap to a website. The mark had to be instantly legible at all scales and production environments.",
+      "Lows needed a brand that could hold up anywhere: a football club sponsorship banner, a vehicle wrap, a website. The mark had to be readable at every scale and in every production environment.",
     outcome:
-      "Strong workload growth since launch. Bromley FC sponsorship partnership generated significant results.",
+      "Strong growth in workload since launch. The Bromley FC sponsorship pulled real results.",
     logo: "/images/lows-design-build/logo.webp",
     heroImage: {
       src: "/images/lows-design-build/hero.webp",
-      alt: "Lows Design and Build brand identity — hero composite showing logo and brand applications",
+      alt: "Lows Design and Build brand identity, hero composite showing logo and brand applications",
     },
     images: [
       {
         src: "/images/lows-design-build/logo.webp",
-        caption: "Geometric scalable mark — refined from client sketches, built on established logo construction principles.",
-        alt: "Lows Design and Build logo — geometric scalable mark refined from client concept sketches",
+        caption: "Scalable geometric mark, refined from the client's sketches and built on standard logo construction principles.",
+        alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
       },
       {
         src: "/images/lows-design-build/bromley-fc.webp",
-        caption: "Bromley FC sponsorship — the Lows mark in a Premier League-affiliated club's kit and branding.",
-        alt: "Lows Design and Build Bromley FC sponsorship — brand mark on football club materials and kit",
+        caption: "Bromley FC sponsorship: the Lows mark in a Premier League-affiliated club's kit and branding.",
+        alt: "Lows Design and Build Bromley FC sponsorship, brand mark on football club materials and kit",
       },
       {
         src: "/images/lows-design-build/bromley-led-2.webp",
-        caption: "Bromley FC LED pitch-side banner — brand at full stadium visibility scale.",
-        alt: "Lows Design and Build Bromley FC LED pitch-side advertising banner — brand at stadium scale",
+        caption: "Bromley FC LED pitch-side banner. Brand at full stadium visibility.",
+        alt: "Lows Design and Build Bromley FC LED pitch-side advertising banner, brand at stadium scale",
       },
       {
         src: "/images/lows-design-build/hoarding.webp",
-        caption: "Site hoarding — brand applied to construction site fencing at street-facing scale.",
-        alt: "Lows Design and Build site hoarding — brand identity on construction site fence at street scale",
+        caption: "Site hoarding: brand applied to construction site fencing at street scale.",
+        alt: "Lows Design and Build site hoarding, brand identity on construction site fence at street scale",
       },
       {
         src: "/images/lows-design-build/website.webp",
-        caption: "Website — clean, brand-consistent design built for conversion and referral traffic.",
-        alt: "Lows Design and Build website — branded homepage design for the construction and design company",
+        caption: "Website: clean, brand-consistent design built for conversion and referral traffic.",
+        alt: "Lows Design and Build website, branded homepage design for the construction and design company",
       },
     ],
     hasDepth: false,
   },
 
-  /* ── 9 ── Nimbus Coffee Co. ── Full ─────────────────────── */
+  /* 9. Nimbus Coffee Co. Full */
   {
     slug: "nimbus-coffee",
     name: "Nimbus Coffee Co.",
@@ -660,43 +655,43 @@ export const projects: Project[] = [
       "Brand Systems",
     ],
     oneLiner:
-      "Cohesive visual identity system for a premier artisan roastery — earthy palette, cloud-inspired mark, modular for future print/web/experiential expansion.",
-    role: "Sole designer. Developed core logo, typographic hierarchy, palette, and brand system. Applied across business cards, packaging, merchandise, and digital assets.",
+      "Visual identity system for an artisan roastery. Earthy palette, cloud-inspired mark, built to extend into print, web and experiential.",
+    role: "Sole designer. Built the core logo, typography, palette and brand system. Applied across business cards, packaging, merchandise and digital.",
     problem:
-      "Nimbus needed a brand that communicated artisanal quality and sustainability without being precious or cold. The identity had to feel distinctive on specialty retail shelves and scale to e-commerce, pop-up events, and future expansion.",
+      "Nimbus wanted to feel artisanal and considered without coming across precious or cold. The identity had to hold its own on specialty retail shelves and scale into e-commerce, pop-ups and whatever came next.",
     outcome:
-      "Cohesive visual identity delivered across all initial touchpoints.",
+      "Brand system delivered across the initial set of touchpoints.",
     logo: "/images/nimbus-coffee/logo.webp",
     heroImage: {
       src: "/images/nimbus-coffee/hero.webp",
-      alt: "Nimbus Coffee Co. packaging mockup — branded coffee bags showing the cloud-inspired mark and earthy palette",
+      alt: "Nimbus Coffee Co. packaging mockup, branded coffee bags showing the cloud-inspired mark and earthy palette",
     },
     images: [
       {
         src: "/images/nimbus-coffee/mockup-2.webp",
-        caption: "Packaging system — modular label design, scalable across bag sizes and blend types.",
-        alt: "Nimbus Coffee Co. packaging system mockup — modular label design on multiple coffee bag sizes",
+        caption: "Packaging system: modular label design, scalable across bag sizes and blend types.",
+        alt: "Nimbus Coffee Co. packaging system mockup, modular label design on multiple coffee bag sizes",
       },
       {
         src: "/images/nimbus-coffee/logo.webp",
-        caption: "Core logo — cloud formation-inspired mark, earthy palette reflecting natural roasting terrains.",
-        alt: "Nimbus Coffee Co. logo — cloud formation mark with logotype in earthy brand palette",
+        caption: "Core logo: a cloud-formation-inspired mark with an earthy palette that nods to roasting terrain.",
+        alt: "Nimbus Coffee Co. logo, cloud formation mark with logotype in earthy brand palette",
       },
       {
         src: "/images/nimbus-coffee/creative-1.webp",
-        caption: "Brand creative — identity applied across digital touchpoints and social assets.",
-        alt: "Nimbus Coffee Co. brand creative — logo and brand identity applied to digital social asset",
+        caption: "Brand creative: identity applied across digital touchpoints and social.",
+        alt: "Nimbus Coffee Co. brand creative, logo and brand identity applied to digital social asset",
       },
       {
         src: "/images/nimbus-coffee/creative-2.webp",
-        caption: "Brand creative — secondary touchpoint application showing typographic hierarchy.",
-        alt: "Nimbus Coffee Co. brand creative 2 — secondary digital asset with typographic brand system",
+        caption: "Brand creative: secondary touchpoint showing typographic hierarchy in use.",
+        alt: "Nimbus Coffee Co. brand creative 2, secondary digital asset with typographic brand system",
       },
     ],
     hasDepth: false,
   },
 
-  /* ── 10 ── Momentum Mentoring ── Gallery ────────────────── */
+  /* 10. Momentum Mentoring. Gallery */
   {
     slug: "momentum-mentoring",
     name: "Momentum Mentoring",
@@ -706,23 +701,23 @@ export const projects: Project[] = [
     categories: ["Brand Identity", "Web Design", "NDIS"],
     skills: ["Brand Identity", "Web Design", "Framer Development"],
     oneLiner:
-      "Brand and website for an NDIS mentoring provider — built to reflect empowerment, independence, and personal growth.",
+      "Brand and website for an NDIS mentoring provider. Built around empowerment, independence and personal growth.",
     role: "Designer and developer.",
     problem:
-      "Momentum needed a brand and website that communicated their mission of empowerment and independence without feeling clinical or institutional.",
+      "Momentum needed a brand and site that read as empowering and independent without slipping into clinical or institutional territory.",
     outcome: "Live site: momentummentoring.co.",
     logo: "/images/momentum-mentoring/Logo2.svg",
     heroSpline: "/models/momentum/momentum.splinecode",
     heroImage: {
       src: "/images/momentum-mentoring/hero.webp",
-      alt: "Momentum Mentoring brand identity and website — NDIS mentoring provider",
+      alt: "Momentum Mentoring brand identity and website for an NDIS mentoring provider",
     },
     images: [],
     hasDepth: false,
     liveUrl: "https://momentummentoring.co",
   },
 
-  /* ── 11 ── TasWater ── Gallery ──────────────────────────── */
+  /* 11. TasWater. Gallery */
   {
     slug: "taswater",
     name: "TasWater",
@@ -732,33 +727,33 @@ export const projects: Project[] = [
     categories: ["Infographic Design", "Information Design"],
     skills: ["Infographic Design", "Information Design", "Brand-Compliant Design"],
     oneLiner:
-      "Two comprehensive infographic projects for Tasmania's statewide water and sewerage corporation — within brand, leadership-approved.",
-    role: "Infographic designer. Delivered two projects over one month within TasWater's established brand guidelines — new visual systems and refinement of existing materials.",
+      "Two infographic projects for Tasmania's statewide water and sewerage corporation. On-brand and leadership-approved.",
+    role: "Infographic designer. Delivered two projects in a month inside TasWater's existing brand guidelines: new visual systems plus refinement of existing materials.",
     problem:
-      "TasWater needed complex data visualised clearly within their strict brand guidelines — new visual systems that felt native to the existing brand.",
+      "TasWater needed complex data shown clearly while staying inside their strict brand guidelines. New visual systems had to feel native to what already existed.",
     outcome:
-      "Client confirmed satisfaction. Leadership affirmed strong brand alignment.",
+      "Client confirmed they were happy. Leadership signed off on the brand alignment.",
     logo: "/images/taswater/logo.webp",
     heroImage: {
       src: "/images/taswater/hero.webp",
-      alt: "TasWater infographic project — progression infographic showing Tasmania's water infrastructure milestones",
+      alt: "TasWater infographic project: progression infographic showing Tasmania's water infrastructure milestones",
     },
     images: [
       {
         src: "/images/taswater/map.webp",
-        caption: "Interactive map infographic — TasWater's service area and infrastructure overlaid on a branded map.",
-        alt: "TasWater interactive map infographic — service area and infrastructure locations across Tasmania",
+        caption: "Interactive map infographic. TasWater's service area and infrastructure on a branded map.",
+        alt: "TasWater interactive map infographic, service area and infrastructure locations across Tasmania",
       },
       {
         src: "/images/taswater/logo.webp",
-        caption: "TasWater — brand-compliant design within their established identity system.",
-        alt: "TasWater logo — the brand identity guiding all infographic design decisions",
+        caption: "TasWater. Brand-compliant design inside their existing identity system.",
+        alt: "TasWater logo, the brand identity guiding all infographic design decisions",
       },
     ],
     hasDepth: false,
   },
 
-  /* ── 12 ── The London Home Show ── Gallery ──────────────── */
+  /* 12. The London Home Show. Gallery */
   {
     slug: "london-home-show",
     name: "The London Home Show",
@@ -768,57 +763,57 @@ export const projects: Project[] = [
     categories: ["Event Design", "Print & Digital"],
     skills: ["Event Design", "Print Design", "Digital Campaign"],
     oneLiner:
-      "Event-led design across print and digital channels for the UK's first affordable homes exhibition — flags, banners, stage graphics, brochures, and booklets.",
+      "Event design across print and digital for the UK's first affordable homes exhibition. Flags, banners, stage graphics, brochures and booklets.",
     role: "Designer. Print and digital event materials across all show collateral.",
     problem:
-      "The London Home Show needed event materials that worked across a wide range of print formats and digital channels — from outdoor flags to stage graphics to 10-year anniversary brochures.",
-    outcome: "Campaign rollout delivered on time across all channels.",
+      "The London Home Show needed event materials that worked across a wide range of print formats and digital channels: outdoor flags, stage graphics, 10-year anniversary brochures.",
+    outcome: "Campaign rollout delivered on time across every channel.",
     logo: "/images/london-home-show/LHS%20Logo.svg",
     heroImage: {
       src: "/images/london-home-show/hero.webp",
-      alt: "The London Home Show event — branding and signage across the exhibition venue",
+      alt: "The London Home Show event, branding and signage across the exhibition venue",
     },
     images: [
       {
         src: "/images/london-home-show/flags.webp",
-        caption: "Exterior flags — branding at street scale, welcoming attendees to the venue.",
-        alt: "London Home Show exterior flags — branded event flags outside the exhibition venue",
+        caption: "Exterior flags: branding at street scale, welcoming attendees in.",
+        alt: "London Home Show exterior flags, branded event flags outside the exhibition venue",
       },
       {
         src: "/images/london-home-show/banner.webp",
-        caption: "Banner and wayfinding — interior directional signage and brand presence.",
-        alt: "London Home Show banner — interior branded signage for event wayfinding",
+        caption: "Banner and wayfinding: interior directional signage and brand presence.",
+        alt: "London Home Show banner, interior branded signage for event wayfinding",
       },
       {
         src: "/images/london-home-show/booklets.webp",
-        caption: "Event booklets — programme and exhibitor guides for attendees.",
-        alt: "London Home Show event booklets — attendee programme and exhibitor guide printed collateral",
+        caption: "Event booklets: programme and exhibitor guides for attendees.",
+        alt: "London Home Show event booklets, attendee programme and exhibitor guide printed collateral",
       },
       {
         src: "/images/london-home-show/brochure.webp",
-        caption: "Show brochure — primary take-home printed collateral for the exhibition.",
-        alt: "London Home Show brochure — primary printed collateral distributed at the exhibition",
+        caption: "Show brochure: the main take-home piece of printed collateral.",
+        alt: "London Home Show brochure, primary printed collateral distributed at the exhibition",
       },
       {
         src: "/images/london-home-show/podium.webp",
-        caption: "Speaker podium — branded stage environment for the exhibition's panel sessions.",
-        alt: "London Home Show speaker podium — branded stage and podium for exhibition panel sessions",
+        caption: "Speaker podium: branded stage environment for the panel sessions.",
+        alt: "London Home Show speaker podium, branded stage and podium for exhibition panel sessions",
       },
       {
         src: "/images/london-home-show/stage.webp",
-        caption: "Stage backdrop — full-width branded stage graphic for the main event space.",
-        alt: "London Home Show stage backdrop — full-width branded graphic for the main exhibition stage",
+        caption: "Stage backdrop: full-width branded graphic for the main event space.",
+        alt: "London Home Show stage backdrop, full-width branded graphic for the main exhibition stage",
       },
       {
         src: "/images/london-home-show/brochure-10yr.webp",
-        caption: "10-year anniversary brochure — a commemorative edition marking a decade of the show.",
-        alt: "London Home Show 10-year anniversary brochure — commemorative edition marking decade of the exhibition",
+        caption: "10-year anniversary brochure. A commemorative edition marking a decade of the show.",
+        alt: "London Home Show 10-year anniversary brochure, commemorative edition marking decade of the exhibition",
       },
     ],
     hasDepth: false,
   },
 
-  /* ── 13 ── Packer & Associates ── Gallery ───────────────── */
+  /* 13. Packer & Associates. Gallery */
   {
     slug: "packer-associates",
     name: "Packer & Associates",
@@ -833,14 +828,14 @@ export const projects: Project[] = [
       "Brand Applications",
     ],
     oneLiner:
-      "Design and communications across digital, print, and internal docs for a capability solutions company — main deliverable: the capability statement.",
-    role: "Designer. Range of design and communications projects across digital platforms, print collateral, internal documentation, and brand applications.",
+      "Design and communications work across digital, print and internal docs for a capability solutions company. Main deliverable: the capability statement.",
+    role: "Designer. Mixed brief across digital platforms, print collateral, internal docs and brand applications.",
     problem:
-      "Packer needed consistent, professional design across a range of touchpoints — with the capability statement as the flagship deliverable.",
-    outcome: "Consistent brand expression maintained across all touchpoints.",
+      "Packer needed consistent, professional design across a wide range of touchpoints. The capability statement was the flagship deliverable.",
+    outcome: "Brand expression held consistent across every touchpoint.",
     heroImage: {
       src: "/images/packer-associates/hero-poster.webp",
-      alt: "Packer & Associates website — brand identity and digital presence for the capability solutions company",
+      alt: "Packer & Associates website, brand identity and digital presence for the capability solutions company",
     },
     heroVideo: "/images/packer-associates/website-video.webm",
     images: [],
@@ -864,7 +859,7 @@ export const projects: Project[] = [
     },
   },
 
-  /* ── 14 ── Toombul Bulls ── Gallery — CONCEPT ───────────── */
+  /* 14. Toombul Bulls. Gallery. CONCEPT */
   {
     slug: "toombul-bulls",
     name: "Toombul Bulls",
@@ -875,27 +870,27 @@ export const projects: Project[] = [
     categories: ["Brand Refresh", "Sports Branding"],
     skills: ["Logo Design", "Brand Refresh", "Sports Branding"],
     oneLiner:
-      "Logo and brand applications for a rugby league club rebrand — speculative, not yet adopted.",
+      "Logo and brand applications for a rugby league club rebrand. Speculative, not yet adopted.",
     role: "Designer. Logo and brand applications.",
     problem:
-      "Toombul Bulls needed a refreshed identity that felt contemporary while honouring the club's heritage.",
+      "Toombul Bulls needed a refreshed identity that felt current while keeping the club's heritage in view.",
     outcome:
-      "Speculative work — not accepted or implemented by the club. Produced as a self-initiated concept project.",
+      "Speculative work. Not adopted by the club. Built as a self-initiated concept.",
     heroImage: {
       src: "/images/toombul-bulls/hero.webp",
-      alt: "Toombul Bulls brand refresh concept — logo and brand applications for Queensland rugby league club",
+      alt: "Toombul Bulls brand refresh concept, logo and brand applications for Queensland rugby league club",
     },
     images: [],
     hasDepth: false,
   },
 ];
 
-/* ─── Helper: get project by slug ─────────────────────────── */
+/* Helper: get project by slug */
 export function getProjectBySlug(slug: string): Project | undefined {
   return projects.find((p) => p.slug === slug);
 }
 
-/* ─── Helper: get all projects that have case study pages ──── */
+/* Helper: get all projects that have case study pages */
 export function getCaseStudyProjects(): Project[] {
   return projects.filter((p) => p.tier !== "gallery");
 }

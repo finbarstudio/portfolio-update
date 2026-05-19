@@ -1,6 +1,6 @@
 "use client";
 
-// Scramble/decrypt text effect — characters cycle through random glyphs
+// Scramble/decrypt text effect, characters cycle through random glyphs
 // before settling to the real value, left to right.
 // Drop-in replacement for the @aceternity/encrypted-text component pattern.
 

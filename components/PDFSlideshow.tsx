@@ -48,7 +48,7 @@ export default function PDFSlideshow({
         </p>
       </div>
 
-      {/* Page image — A4 ratio, white background, contain */}
+      {/* Page image, A4 ratio, white background, contain */}
       <div
         className="img-wrap border border-line"
         style={{ aspectRatio: "1/1.414", maxHeight: "80vh", background: "white" }}
@@ -56,7 +56,7 @@ export default function PDFSlideshow({
         <ClientImage
           key={current}
           src={pages[current]}
-          alt={`${title} — page ${current + 1}`}
+          alt={`${title}, page ${current + 1}`}
           fill
           sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
           className="object-contain"

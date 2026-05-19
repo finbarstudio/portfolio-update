@@ -1,6 +1,6 @@
 "use client";
 
-// Navigator sidebar — folder-tree navigation with expandable work folder
+// Navigator sidebar, folder-tree navigation with expandable work folder
 // listing all 14 projects as files. Below the tree: dual world clocks,
 // open-for-work status, contact email, social icons.
 
@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
 import { SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./LayoutShell";
-// MobileTopBar removed — hamburger lives in MenuBar; this file exports MobileMenu only.
+// MobileTopBar removed, hamburger lives in MenuBar; this file exports MobileMenu only.
 
 /* ── Brand icons ──────────────────────────────────────────────── */
 function ArenaIcon({ size = 13 }: { size?: number }) {
@@ -102,7 +102,7 @@ function TreeGuide({ last = false, vertical = true }: { last?: boolean; vertical
   );
 }
 
-/* ── Desktop sidebar — Finder ─────────────────────────────────── */
+/* ── Desktop sidebar, Finder ─────────────────────────────────── */
 function DesktopSidebar({
   pathname,
   collapsed,
@@ -207,7 +207,7 @@ function DesktopSidebar({
         <>
           {/* Tree */}
           <div className="flex-1 overflow-y-auto py-2">
-            {/* Root — links home, collapse button inline on right */}
+            {/* Root, links home, collapse button inline on right */}
             <div className="tree-item tree-item-root">
               <Link
                 href="/"
@@ -228,7 +228,7 @@ function DesktopSidebar({
               </button>
             </div>
 
-            {/* work/ folder — expandable */}
+            {/* work/ folder, expandable */}
             <button
               type="button"
               onClick={() => setWorkOpen((v) => !v)}

@@ -1,6 +1,6 @@
 "use client";
 
-// Bottom-of-screen status bar — shows READY indicator, current path,
+// Bottom-of-screen status bar, shows READY indicator, current path,
 // project count, and a live tick of memory/uptime numbers for flavour.
 
 import { usePathname } from "next/navigation";
@@ -37,7 +37,7 @@ export default function StatusBar() {
       }}
       role="contentinfo"
     >
-      {/* Left cluster — READY indicator + path */}
+      {/* Left cluster, READY indicator + path */}
       <div className="flex items-center gap-3">
         <span className="flex items-center gap-1.5 text-teal font-bold uppercase">
           <span className="status-dot" />
@@ -47,7 +47,7 @@ export default function StatusBar() {
         <span className="text-ink tracking-[0.04em]">{path}</span>
       </div>
 
-      {/* Right cluster — stats */}
+      {/* Right cluster, stats */}
       <div className="flex items-center gap-3 uppercase">
         <span className="hidden sm:inline">{TOTAL_PROJECTS} PROJECTS</span>
         <span className="hidden sm:inline">·</span>

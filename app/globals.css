@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
-   finbar✶studio — Global Styles & Master Design Control Panel
+   finbar✶studio, Global Styles & Master Design Control Panel
 
    ╔═══════════════════════════════════════════════════════════╗
-   ║  MASTER CSS — EDIT HERE TO RESTYLE THE ENTIRE SITE       ║
+   ║  MASTER CSS, EDIT HERE TO RESTYLE THE ENTIRE SITE       ║
    ║  Everything below reads from the :root variables.        ║
    ║  Change a value once → updates everywhere automatically.  ║
    ╚═══════════════════════════════════════════════════════════╝
@@ -37,16 +37,16 @@
      │  BRAND COLOURS                                          │
      │  Change any value → ripples to every component.        │
      └─────────────────────────────────────────────────────────┘ */
-  --bg:         #ffffff;   /* page + sidebar background — pure white       */
-  --ink:        #141414;   /* primary text — near-black                   */
+  --bg:         #ffffff;   /* page + sidebar background, pure white       */
+  --ink:        #141414;   /* primary text, near-black                   */
   --ink-soft:   #6B6B6B;   /* secondary text, captions, meta              */
   --line:       #E4E4E0;   /* hairline borders, grid lines                */
 
-  --pink:       #FF1F8F;   /* ★ PRIMARY accent — magenta-pink             */
+  --pink:       #FF1F8F;   /* ★ PRIMARY accent, magenta-pink             */
                            /*   Used for: active links, hover, tags,      */
                            /*   hero accent, globe, contact email hover    */
 
-  --teal:       #4DA8E0;   /* SECONDARY — OPEN FOR WORK badge + dot       */
+  --teal:       #4DA8E0;   /* SECONDARY, OPEN FOR WORK badge + dot       */
                            /*   Also used for: teal tag pills              */
 
   /* ┌─────────────────────────────────────────────────────────┐
@@ -57,11 +57,11 @@
   --text-h1:      clamp(1.375rem, 3vw, 2rem);    /* case study page title */
   --text-h2:      clamp(1.125rem, 2vw, 1.5rem);  /* section headings      */
   --text-h3:      1rem;                           /* sub-headings          */
-  --text-body:    0.9375rem;   /* 15px — prose paragraphs                 */
-  --text-small:   0.875rem;    /* 14px — card summaries, metadata         */
-  --text-caption: 0.75rem;     /* 12px — image captions                   */
-  --text-label:   0.6875rem;   /* 11px — uppercase caps labels, nav       */
-  --text-tag:     0.5625rem;   /* 9px  — tag pills                        */
+  --text-body:    0.9375rem;   /* 15px, prose paragraphs                 */
+  --text-small:   0.875rem;    /* 14px, card summaries, metadata         */
+  --text-caption: 0.75rem;     /* 12px, image captions                   */
+  --text-label:   0.6875rem;   /* 11px, uppercase caps labels, nav       */
+  --text-tag:     0.5625rem;   /* 9px , tag pills                        */
 
   /* ┌─────────────────────────────────────────────────────────┐
      │  LAYOUT SPACING                                         │
@@ -108,7 +108,7 @@
 }
 
 /* Hero text fades as work section scrolls over it.
-   CSS scroll-driven animation — zero JS.
+   CSS scroll-driven animation, zero JS.
    Chrome 115+, Firefox 110+, Safari 17.2+. Graceful fallback. */
 @keyframes hero-exit {
   from { opacity: 1;    transform: translateY(0); }
@@ -160,7 +160,7 @@
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
 
-  /* Mono-caps label — uppercase tracking, used for nav, tags, meta */
+  /* Mono-caps label, uppercase tracking, used for nav, tags, meta */
   .mono-label {
     font-family: var(--font-label);
     font-weight: 700;
@@ -218,7 +218,7 @@
   .tag-teal    { background: var(--teal); color: var(--ink); }
   .tag-pink    { background: var(--pink); color: var(--bg); }
 
-  /* OPEN FOR WORK badge — pulsing dot */
+  /* OPEN FOR WORK badge, pulsing dot */
   .status-badge {
     display: inline-flex;
     align-items: center;
@@ -241,7 +241,7 @@
     animation: dot-pulse 2s ease-in-out infinite;
   }
 
-  /* Image wrapper — breathing room + 72vh max height */
+  /* Image wrapper, breathing room + 72vh max height */
   .img-wrap {
     position: relative;
     width: 100%;
@@ -260,10 +260,10 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
-     RETRO OS — chrome, windows, terminal, tree
+     RETRO OS, chrome, windows, terminal, tree
      ═══════════════════════════════════════════════════════════════ */
 
-  /* Blinking caret — append after any text */
+  /* Blinking caret, append after any text */
   .cursor-blink::after {
     content: "▌";
     display: inline-block;
@@ -288,7 +288,7 @@
   .pixel-shadow    { box-shadow: var(--win-shadow); }
   .pixel-shadow-sm { box-shadow: var(--win-shadow-sm); }
 
-  /* Window — Snow Leopard-inspired: rounded, soft shadow */
+  /* Window, Snow Leopard-inspired: rounded, soft shadow */
   .os-window {
     border: 1px solid var(--line);
     background: var(--bg);
@@ -298,7 +298,7 @@
     animation: window-open 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 
-  /* Title bar — subtle gradient, no pinstripe */
+  /* Title bar, subtle gradient, no pinstripe */
   .os-titlebar {
     height: var(--titlebar-h);
     border-bottom: 1px solid var(--line);
@@ -334,7 +334,7 @@
     user-select: none;
   }
 
-  /* Terminal prompt — used in hero */
+  /* Terminal prompt, used in hero */
   .terminal-line {
     font-family: var(--font-label);
     font-size: var(--text-label);
@@ -365,7 +365,7 @@
     background: var(--ink);
     color: var(--bg);
   }
-  /* Root item (finbar.studio/) — darker base than ink-soft, hover inherits from .tree-item:hover */
+  /* Root item (finbar.studio/), darker base than ink-soft, hover inherits from .tree-item:hover */
   .tree-item-root { color: var(--ink); font-weight: 700; }
 
   .tree-item.active {
@@ -424,7 +424,7 @@
     box-shadow: 0 2px 0 currentColor, 0 4px 0 currentColor;
   }
 
-  /* Pixel ✶ — sharper text-shadow stack to dial out font rendering */
+  /* Pixel ✶, sharper text-shadow stack to dial out font rendering */
   .pixel-star {
     font-weight: 700;
     line-height: 1;
@@ -443,7 +443,7 @@
   }
 
   /* ───────────────────────────────────────────────────────────────
-     Mobile overrides — collapse heavy OS chrome below `md` (768px).
+     Mobile overrides, collapse heavy OS chrome below `md` (768px).
      Titlebars are hidden in markup (`hidden md:flex`); here we strip
      borders + drop-shadows from windows so content reads cleanly.
      Chrome bars themselves (MenuBar, StatusBar, sidebar Navigator
@@ -465,7 +465,7 @@
   }
 }
 
-/* ─── Reduced motion — Web Interface Guidelines compliance ───────
+/* ─── Reduced motion, Web Interface Guidelines compliance ───────
    Respects user OS preference. All decorative animations are
    disabled; functional transitions collapse to near-instant.
    ─────────────────────────────────────────────────────────────── */

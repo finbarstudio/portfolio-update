@@ -211,7 +211,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
   );
 }
 
-/* ─── Default export — picks the right variant ────────────── */
+/* ─── Default export, picks the right variant ────────────── */
 export default function ProjectCard({ project, index }: { project: Project; index: number }) {
   if (project.tier === "featured") return <FeaturedCard project={project} index={index} />;
   if (project.tier === "full")     return <FullCard project={project} index={index} />;

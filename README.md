@@ -3,7 +3,7 @@
 Personal portfolio for [finbar.studio](https://finbar.studio).
 
 Built with **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS 4**.
-Deploy target: **Vercel** (static export friendly — no server-side data).
+Deploy target: **Vercel** (static export friendly, no server-side data).
 
 ---
 
@@ -55,7 +55,7 @@ heroImage: {
 // After (local file in /public/images/):
 heroImage: {
   src: "/images/tmyr-hero.jpg",
-  alt: "The Moment You Realise — campaign still",
+  alt: "The Moment You Realise, campaign still",
 }
 ```
 
@@ -68,9 +68,9 @@ Search for `// PLACEHOLDER` in `/content/projects.ts` to find every field that n
 ### Add a new project
 
 Copy any existing project object, change the `slug` (URL-safe, kebab-case), set `rank` to where it should appear (lower = higher on the page), and set `tier`:
-- `"featured"` — full-width card, has a full case study page
-- `"full"` — half-width card, has a case study page
-- `"gallery"` — third-width card, no case study page
+- `"featured"`, full-width card, has a full case study page
+- `"full"`, half-width card, has a case study page
+- `"gallery"`, third-width card, no case study page
 
 ### Add depth sections (Featured projects only)
 
@@ -81,7 +81,7 @@ hasDepth: true,
 depth: [
   {
     heading: "Research & Writing",
-    body: "One or two paragraphs — keep it short, let images carry the story.",
+    body: "One or two paragraphs, keep it short, let images carry the story.",
     images: [
       { src: "/images/...", alt: "Alt text", caption: "Short caption." },
     ],
@@ -95,7 +95,7 @@ depth: [
 
 1. Push this repo to GitHub.
 2. Import the repo in [vercel.com/new](https://vercel.com/new).
-3. Vercel detects Next.js automatically — no configuration needed.
+3. Vercel detects Next.js automatically, no configuration needed.
 4. Set your custom domain to `finbar.studio` in the Vercel project settings.
 
 Every `git push` to `main` auto-deploys.
@@ -107,7 +107,7 @@ Every `git push` to `main` auto-deploys.
 ```
 app/
   globals.css          Design tokens, Tailwind theme, base styles
-  layout.tsx           Root layout — fonts, sidebar, main wrapper
+  layout.tsx           Root layout, fonts, sidebar, main wrapper
   page.tsx             Home page (hero + work grid)
   about/page.tsx       About page
   contact/page.tsx     Contact page

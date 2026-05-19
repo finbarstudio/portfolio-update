@@ -3,9 +3,16 @@ import EncryptedText from "@/components/EncryptedText";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 
 export const metadata: Metadata = {
-  title: "Contact — finbar✶studio",
+  title: "Contact | finbar✶studio",
   description:
-    "Get in touch with Finbar — Brisbane-based graphic designer and Framer developer, open for work.",
+    "Get in touch with Finbar Skitini, graphic designer and Framer developer in Brisbane. Open for full-time roles and freelance.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact Finbar",
+    description: "Graphic designer and Framer developer based in Brisbane. Open for work.",
+    url: "/contact",
+    type: "website",
+  },
 };
 
 /* ── Inline icons (server-safe SVGs) ─────────────────────────── */
@@ -54,7 +61,7 @@ export default function ContactPage() {
       <p className="terminal-line mt-6 mb-12 select-none">
         <span className="ps1">›</span>
         <span> </span>
-        <span className="cmd">open for full-time roles and freelance — brisbane or remote</span>
+        <span className="cmd">open for full-time roles &amp; freelance · brisbane or remote</span>
       </p>
 
       {/* Email */}
@@ -120,8 +127,8 @@ export default function ContactPage() {
           <span className="status-badge">OPEN FOR WORK</span>
         </div>
         <p className="font-sans text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
-          Available for full-time design roles and freelance engagements.
-          Brisbane-based; remote-friendly.
+          Taking on full-time design roles and freelance work. Based in
+          Brisbane, happy to work remotely.
         </p>
       </div>
     </div>

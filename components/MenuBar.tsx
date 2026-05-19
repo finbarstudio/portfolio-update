@@ -82,16 +82,16 @@ export default function MenuBar({
       }}
       role="banner"
     >
-      {/* Brand — always links home */}
+      {/* Brand, always links home */}
       <Link
         href="/"
         className="font-bold uppercase tracking-[0.08em] hover:text-pink transition-colors"
-        aria-label="finbar.studio — home"
+        aria-label="finbar.studio, home"
       >
         finbar<span className="pixel-star text-[13px]">✶</span>studio
       </Link>
 
-      {/* Nav items — functional links, desktop only */}
+      {/* Nav items, functional links, desktop only */}
       <nav className="hidden md:flex items-center gap-0 ml-5" aria-label="Primary">
         {NAV_ITEMS.map((item) => {
           const isActive = item.href === "/"

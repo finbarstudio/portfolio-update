@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-// Large ✶ that drifts upward slightly as the page scrolls —
+// Large ✶ that drifts upward slightly as the page scrolls , 
 // parallax within the sticky hero section.
 export default function StarDecor() {
   const ref = useRef<HTMLDivElement>(null);

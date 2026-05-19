@@ -37,7 +37,7 @@ function Hero() {
           <span className="cmd">whoami</span>
         </p>
 
-        {/* Heading — output of the command */}
+        {/* Heading, output of the command */}
         <h1
           id="hero-heading"
           className="font-sans font-bold uppercase text-ink leading-[1.02] cursor-blink"
@@ -81,7 +81,7 @@ function WorkGrid() {
     >
       <h2 id="work-heading" className="sr-only">Selected Work</h2>
 
-      {/* Section header — directory listing flavour */}
+      {/* Section header, directory listing flavour */}
       <div className="flex items-baseline justify-between border-b border-ink pb-2 mb-10">
         <p className="mono-label text-ink">
           <span className="text-pink">▸</span> /work
@@ -91,7 +91,7 @@ function WorkGrid() {
         </p>
       </div>
 
-      {/* Featured — full-width */}
+      {/* Featured, full-width */}
       <div className="grid grid-cols-12 gap-x-6 gap-y-14 mb-16">
         {featured.map((project) => {
           const i = cardIndex++;
@@ -99,9 +99,9 @@ function WorkGrid() {
         })}
       </div>
 
-      {/* All other projects — uniform 2-col grid */}
+      {/* All other projects, uniform 2-col grid */}
       <div>
-        <SectionLabel>── SELECTED PROJECTS ──</SectionLabel>
+        <SectionLabel>SELECTED PROJECTS</SectionLabel>
         <div className="grid grid-cols-12 gap-x-6 gap-y-10">
           {rest.map((project) => {
             const i = cardIndex++;

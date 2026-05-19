@@ -3,7 +3,7 @@
 // Wraps next/image with an onError handler so broken/missing images
 // disappear cleanly instead of showing the browser's broken-image icon.
 // Progressive quality: renders WebP src immediately, then silently preloads
-// the matching .png — if it exists, swaps to it for lossless source quality.
+// the matching .png, if it exists, swaps to it for lossless source quality.
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -36,7 +36,7 @@ export default function ClientImage({ src, alt, fill, sizes, priority, className
     img.onload = () => {
       if (!cancelled) setActiveSrc(pngSrc);
     };
-    // onerror: PNG doesn't exist — silently stay on WebP
+    // onerror: PNG doesn't exist, silently stay on WebP
     img.src = pngSrc;
 
     return () => {
