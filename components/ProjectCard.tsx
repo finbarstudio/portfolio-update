@@ -60,17 +60,21 @@ function CardImage({
   priority = false,
   sizes,
   aspectRatio = "3/2",
+  fill = false,
 }: {
   src: string;
   alt: string;
   priority?: boolean;
   sizes: string;
   aspectRatio?: string;
+  fill?: boolean;
 }) {
   return (
     <div
       className="img-wrap"
-      style={{ aspectRatio, maxHeight: "72vh", marginBottom: "var(--image-pad)", background: "white" }}
+      style={fill
+        ? { height: "100%", marginBottom: "var(--image-pad)", background: "white" }
+        : { aspectRatio, maxHeight: "72vh", marginBottom: "var(--image-pad)", background: "white" }}
     >
       <ClientImage
         src={src}
@@ -89,36 +93,37 @@ function CardImage({
 export function FeaturedCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
-      className="card-animate col-span-12 group relative"
-      style={{ animationDelay: `${index * 0.07}s` }}
+      className="card-animate col-span-12 group"
+      style={{ animationDelay: `${index * 0.07}s`, height: "75vh", display: "flex", flexDirection: "column" }}
     >
       <Link
         href={`/work/${project.slug}`}
-        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        className="flex flex-col h-full focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {project.heroModel ? (
-          <div style={{ marginBottom: "var(--image-pad)" }}>
+        {/* Thumbnail — grows to fill remaining height */}
+        <div style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
+          {project.heroModel ? (
             <ModelDisplay
               model={project.heroModel.model}
               video={project.heroModel.video}
               poster={project.heroModel.poster}
-              aspectRatio="16/9"
+              fill
             />
-          </div>
-        ) : project.heroSpline ? (
-          <div style={{ marginBottom: "var(--image-pad)", pointerEvents: "none" }}>
-            <SplineScene scene={project.heroSpline} />
-          </div>
-        ) : (
-          <CardImage
-            src={project.heroImage.src}
-            alt={project.heroImage.alt}
-            priority={index === 0}
-            sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
-            aspectRatio="16/9"
-          />
-        )}
+          ) : project.heroSpline ? (
+            <div style={{ height: "100%", pointerEvents: "none" }}>
+              <SplineScene scene={project.heroSpline} style={{ aspectRatio: undefined, maxHeight: "none", height: "100%" }} />
+            </div>
+          ) : (
+            <CardImage
+              src={project.heroImage.src}
+              alt={project.heroImage.alt}
+              priority={index === 0}
+              sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
+              fill
+            />
+          )}
+        </div>
 
         <div className="pb-8">
           <CardLogo project={project} />

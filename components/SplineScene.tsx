@@ -17,7 +17,7 @@ const Spline = dynamic(
 
 // Renders a Spline scene filling a 16/9 container.
 // Used as the hero on case study pages and featured home-page cards.
-export default function SplineScene({ scene }: { scene: string }) {
+export default function SplineScene({ scene, style }: { scene: string; style?: React.CSSProperties }) {
   return (
     <div
       style={{
@@ -26,6 +26,7 @@ export default function SplineScene({ scene }: { scene: string }) {
         overflow: "hidden",
         position: "relative",
         background: "var(--bg)",
+        ...style,
       }}
     >
       <Spline

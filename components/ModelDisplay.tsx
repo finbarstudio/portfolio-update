@@ -165,6 +165,8 @@ type Props = {
   poster?: string;
   /** Override aspect ratio. Default 16/9 to match other thumbnails. */
   aspectRatio?: string;
+  /** Fill parent container height instead of using aspect ratio. */
+  fill?: boolean;
   className?: string;
   /** Disable hover animation (e.g. when used inside a parent that's already a link). */
   hoverable?: boolean;
@@ -175,6 +177,7 @@ function ModelDisplayInner({
   video,
   poster,
   aspectRatio = "16/9",
+  fill = false,
   className,
   hoverable = true,
 }: Props) {
@@ -245,7 +248,7 @@ function ModelDisplayInner({
       style={{
         position: "relative",
         width: "100%",
-        aspectRatio,
+        ...(fill ? { height: "100%" } : { aspectRatio }),
         background: "var(--color-bg, #FAFAF8)",
         overflow: "hidden",
         cursor: hoverable ? "pointer" : "default",
@@ -303,7 +306,7 @@ const ModelDisplay = dynamic(() => Promise.resolve(ModelDisplayInner), {
       style={{
         position: "relative",
         width: "100%",
-        aspectRatio: "16/9",
+        height: "100%",
         background: "var(--color-bg, #FAFAF8)",
       }}
     >
