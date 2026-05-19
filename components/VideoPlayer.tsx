@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import Loader from "./Loader";
 
 // Looping muted video, plays only while visible in the viewport.
 // Uses IntersectionObserver instead of autoPlay so off-screen videos
@@ -18,6 +19,7 @@ export default function VideoPlayer({
   style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const video = ref.current;
@@ -39,16 +41,20 @@ export default function VideoPlayer({
   }, []);
 
   return (
-    <video
-      ref={ref}
-      src={src}
-      poster={poster}
-      loop
-      muted
-      playsInline
-      preload="metadata"
-      className={className}
-      style={{ width: "100%", height: "100%", objectFit: "contain", background: "white", display: "block", ...style }}
-    />
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      {!ready && <Loader size={24} />}
+      <video
+        ref={ref}
+        src={src}
+        poster={poster}
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        onLoadedData={() => setReady(true)}
+        className={className}
+        style={{ width: "100%", height: "100%", objectFit: "contain", background: "white", display: "block", ...style }}
+      />
+    </div>
   );
 }

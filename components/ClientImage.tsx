@@ -7,6 +7,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import Loader from "./Loader";
 
 type Props = {
   src: string;
@@ -19,41 +20,29 @@ type Props = {
 
 export default function ClientImage({ src, alt, fill, sizes, priority, className }: Props) {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [activeSrc, setActiveSrc] = useState(src);
 
   useEffect(() => {
-    // Reset to the supplied src whenever it changes (e.g. PDF page flip)
     setActiveSrc(src);
     setFailed(false);
-
-    // Only try the PNG upgrade path for WebP sources
-    if (!src.endsWith(".webp")) return;
-
-    const pngSrc = src.replace(/\.webp$/, ".png");
-    const img = new window.Image();
-    let cancelled = false;
-
-    img.onload = () => {
-      if (!cancelled) setActiveSrc(pngSrc);
-    };
-    // onerror: PNG doesn't exist, silently stay on WebP
-    img.src = pngSrc;
-
-    return () => {
-      cancelled = true;
-    };
+    setLoaded(false);
   }, [src]);
 
   if (failed) return null;
   return (
-    <Image
-      src={activeSrc}
-      alt={alt}
-      fill={fill}
-      sizes={sizes}
-      priority={priority}
-      className={className}
-      onError={() => setFailed(true)}
-    />
+    <>
+      {!loaded && <Loader size={24} />}
+      <Image
+        src={activeSrc}
+        alt={alt}
+        fill={fill}
+        sizes={sizes}
+        priority={priority}
+        className={className}
+        onError={() => setFailed(true)}
+        onLoad={() => setLoaded(true)}
+      />
+    </>
   );
 }

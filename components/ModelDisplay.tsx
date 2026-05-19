@@ -18,6 +18,7 @@ import * as THREE from "three";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Environment, Center } from "@react-three/drei";
+import Loader from "./Loader";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
@@ -27,8 +28,14 @@ import { useGLTF, Environment, Center } from "@react-three/drei";
 // the camera just lerps in/out along Z and the model rotation gives the
 // isometric tilt at rest, easing to a flat front-on view on hover.
 const CAMERA_FOV = 28;
-const CAMERA_DISTANCE_DEFAULT = 11.5;  // Pulled back at rest (isometric)
-const CAMERA_DISTANCE_HOVER = 9.0;     // Closer when hovered, still uncropped
+// Rest = whole Mac + stand framed with margin (short containers don't crop).
+// Hover = camera moves in AND up so the screen face fills the frame and the
+// stand drops out of view — you can see the bevels.
+const CAMERA_DISTANCE_DEFAULT = 17;    // Rest, isometric, full Mac visible
+const CAMERA_DISTANCE_HOVER = 7.5;     // Hover, zoomed onto the screen
+const CAMERA_Y_DEFAULT = 0;            // Rest camera height
+const CAMERA_Y_HOVER = 0.9;            // Hover lifts camera to screen's vertical centre
+const LOOKAT_Y_HOVER = 0.9;            // ...and looks at the same point
 const LERP = 0.08;                     // Animation speed (per frame)
 
 // Isometric tilt (resting state). Applied to the centred model; hover state
@@ -117,7 +124,10 @@ function Rig({
   const groupRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
 
-  // Target values, recomputed each frame from hover state.
+  // Track the lookAt target separately so it can lerp too — at hover the
+  // camera looks up at the screen face rather than the bbox centre.
+  const lookAtY = useRef(0);
+
   useFrame(() => {
     if (!groupRef.current) return;
     const tx = hovered ? 0 : ISO_ROTATION_X;
@@ -126,8 +136,12 @@ function Rig({
     groupRef.current.rotation.y += (ty - groupRef.current.rotation.y) * LERP;
 
     const targetZ = hovered ? CAMERA_DISTANCE_HOVER : CAMERA_DISTANCE_DEFAULT;
+    const targetY = hovered ? CAMERA_Y_HOVER : CAMERA_Y_DEFAULT;
+    const targetLookY = hovered ? LOOKAT_Y_HOVER : 0;
     camera.position.z += (targetZ - camera.position.z) * LERP;
-    camera.lookAt(0, 0, 0);
+    camera.position.y += (targetY - camera.position.y) * LERP;
+    lookAtY.current += (targetLookY - lookAtY.current) * LERP;
+    camera.lookAt(0, lookAtY.current, 0);
   });
 
   return (
@@ -236,7 +250,7 @@ function ModelDisplayInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Poster fade-out until first frame is ready */}
+      {/* Poster + spinner until first frame is ready */}
       {poster && !ready && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -254,6 +268,7 @@ function ModelDisplayInner({
           }}
         />
       )}
+      {!ready && <Loader size={28} />}
 
       <Canvas
         camera={{
@@ -275,22 +290,6 @@ function ModelDisplayInner({
         </Suspense>
       </Canvas>
 
-      {/*
-        Soft edge fade. If the model ever overshoots the container during the
-        hover zoom, the edges blur into the page background instead of getting
-        clipped to a hard rectangle. Pointer-events:none so it doesn't swallow
-        clicks intended for the parent Link.
-      */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background:
-            "radial-gradient(ellipse at center, transparent 55%, var(--color-bg, #FAFAF8) 100%)",
-        }}
-      />
     </div>
   );
 }
@@ -306,7 +305,9 @@ const ModelDisplay = dynamic(() => Promise.resolve(ModelDisplayInner), {
         aspectRatio: "16/9",
         background: "var(--color-bg, #FAFAF8)",
       }}
-    />
+    >
+      <Loader size={28} />
+    </div>
   ),
 });
 

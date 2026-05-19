@@ -136,6 +136,11 @@
   to   { transform: translateX(-100%); }
 }
 
+/* Subtle preloader spinner. Thin ring with a pink arc that rotates. */
+@keyframes loader-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
