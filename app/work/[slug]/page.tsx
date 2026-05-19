@@ -3,6 +3,7 @@ import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
 import SplineScene from "@/components/SplineScene";
+import ModelDisplay from "@/components/ModelDisplay";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import PDFSlideshow from "@/components/PDFSlideshow";
@@ -331,9 +332,16 @@ export default async function CaseStudyPage({
         </a>
       )}
 
-      {/* Hero, Spline, looping video, or static image */}
+      {/* Hero, 3D model, Spline, looping video, or static image */}
       <div className="mb-8">
-        {project.heroSpline ? (
+        {project.heroModel ? (
+          <ModelDisplay
+            model={project.heroModel.model}
+            video={project.heroModel.video}
+            poster={project.heroModel.poster}
+            aspectRatio="16/9"
+          />
+        ) : project.heroSpline ? (
           <SplineScene scene={project.heroSpline} />
         ) : project.heroVideo ? (
           <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>

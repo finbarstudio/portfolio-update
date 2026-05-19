@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Project } from "@/content/projects";
 import ClientImage from "@/components/ClientImage";
 import SplineScene from "@/components/SplineScene";
+import ModelDisplay from "@/components/ModelDisplay";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -96,7 +97,16 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {project.heroSpline ? (
+        {project.heroModel ? (
+          <div style={{ marginBottom: "var(--image-pad)" }}>
+            <ModelDisplay
+              model={project.heroModel.model}
+              video={project.heroModel.video}
+              poster={project.heroModel.poster}
+              aspectRatio="16/9"
+            />
+          </div>
+        ) : project.heroSpline ? (
           <div style={{ marginBottom: "var(--image-pad)", pointerEvents: "none" }}>
             <SplineScene scene={project.heroSpline} />
           </div>
@@ -144,11 +154,22 @@ export function FullCard({ project, index }: { project: Project; index: number }
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        <CardImage
-          src={project.heroImage.src}
-          alt={project.heroImage.alt}
-          sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
-        />
+        {project.heroModel ? (
+          <div style={{ marginBottom: "var(--image-pad)" }}>
+            <ModelDisplay
+              model={project.heroModel.model}
+              video={project.heroModel.video}
+              poster={project.heroModel.poster}
+              aspectRatio="3/2"
+            />
+          </div>
+        ) : (
+          <CardImage
+            src={project.heroImage.src}
+            alt={project.heroImage.alt}
+            sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
+          />
+        )}
 
         <div className="pb-6">
           <CardLogo project={project} />
@@ -184,11 +205,22 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View ${project.name}`}
       >
-        <CardImage
-          src={project.heroImage.src}
-          alt={project.heroImage.alt}
-          sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
-        />
+        {project.heroModel ? (
+          <div style={{ marginBottom: "var(--image-pad)" }}>
+            <ModelDisplay
+              model={project.heroModel.model}
+              video={project.heroModel.video}
+              poster={project.heroModel.poster}
+              aspectRatio="3/2"
+            />
+          </div>
+        ) : (
+          <CardImage
+            src={project.heroImage.src}
+            alt={project.heroImage.alt}
+            sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
+          />
+        )}
 
         <div className="pb-5">
           <CardLogo project={project} />

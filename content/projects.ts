@@ -51,6 +51,11 @@ export interface Project {
   logo?: string;          // Small client/brand logo. Shown in card + case study header.
   liveUrl?: string;
   heroSpline?: string;
+  heroModel?: {           // Interactive 3D model with looping video on its screen
+    model: string;        // Path to .gltf (under /public)
+    video: string;        // Path to looping video shown on the screen
+    poster?: string;      // Poster shown until the canvas is ready
+  };
   companyUrl?: string;
   pdfSlideshow?: {        // PDF rendered as image pages
     title: string;
@@ -76,7 +81,11 @@ export const projects: Project[] = [
     problem: "KinAya was rebranding from the ground up: new name, new identity. The brand had to feel trustworthy and human without slipping into something flashy. The site needed to be easy for the team to run themselves after launch.",
     outcome: "Brand and site delivered as a single piece of work. CMS handover went smoothly. Positive testimonial from Aryan Sareen.",
     logo: "/images/kinaya/Final%20Logos/Logo%20Pink%20Grey.svg",
-    heroSpline: "/models/kinaya/kinaya.splinecode",
+    heroModel: {
+      model: "/models/studio-display/display.gltf",
+      video: "/images/kinaya/accessibility.webm",
+      poster: "/images/kinaya/accessibility-poster.webp",
+    },
     heroImage: { src: "/images/kinaya/desktop.webp", alt: "KinAya website desktop view with structured, accessible homepage layout" },
     images: [
       { src: "/images/kinaya/desktop.webp", caption: "Home page: structured, readable, accessible layout across viewports.", alt: "KinAya Framer website homepage on desktop with clean navigation and NDIS branding" },
@@ -707,7 +716,11 @@ export const projects: Project[] = [
       "Momentum needed a brand and site that read as empowering and independent without slipping into clinical or institutional territory.",
     outcome: "Live site: momentummentoring.co.",
     logo: "/images/momentum-mentoring/Logo2.svg",
-    heroSpline: "/models/momentum/momentum.splinecode",
+    heroModel: {
+      model: "/models/studio-display/display.gltf",
+      video: "/images/momentum-mentoring/screen.mp4",
+      poster: "/images/momentum-mentoring/hero.webp",
+    },
     heroImage: {
       src: "/images/momentum-mentoring/hero.webp",
       alt: "Momentum Mentoring brand identity and website for an NDIS mentoring provider",
