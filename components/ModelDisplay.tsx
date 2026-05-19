@@ -31,12 +31,13 @@ const CAMERA_FOV = 28;
 // Rest = whole Mac + stand framed with margin (short containers don't crop).
 // Hover = camera moves in AND up so the screen face fills the frame and the
 // stand drops out of view — you can see the bevels.
-const CAMERA_DISTANCE_DEFAULT = 17;    // Rest, isometric, full Mac visible
-const CAMERA_DISTANCE_HOVER = 7.5;     // Hover, zoomed onto the screen
+const CAMERA_DISTANCE_DEFAULT = 19;    // Rest, isometric, full Mac + stand visible
+const CAMERA_DISTANCE_HOVER = 11.5;    // Hover, zoomed onto the screen (bevels visible)
 const CAMERA_Y_DEFAULT = 0;            // Rest camera height
 const CAMERA_Y_HOVER = 0.9;            // Hover lifts camera to screen's vertical centre
 const LOOKAT_Y_HOVER = 0.9;            // ...and looks at the same point
-const LERP = 0.08;                     // Animation speed (per frame)
+const LERP_ROTATION = 0.06;            // Rotation easing (slightly snappier)
+const LERP_CAMERA = 0.03;              // Camera easing (slow, gentle glide)
 
 // Isometric tilt (resting state). Applied to the centred model; hover state
 // lerps these toward 0,0 to land on a flat, front-on, perfectly centred view.
@@ -132,15 +133,15 @@ function Rig({
     if (!groupRef.current) return;
     const tx = hovered ? 0 : ISO_ROTATION_X;
     const ty = hovered ? 0 : ISO_ROTATION_Y;
-    groupRef.current.rotation.x += (tx - groupRef.current.rotation.x) * LERP;
-    groupRef.current.rotation.y += (ty - groupRef.current.rotation.y) * LERP;
+    groupRef.current.rotation.x += (tx - groupRef.current.rotation.x) * LERP_ROTATION;
+    groupRef.current.rotation.y += (ty - groupRef.current.rotation.y) * LERP_ROTATION;
 
     const targetZ = hovered ? CAMERA_DISTANCE_HOVER : CAMERA_DISTANCE_DEFAULT;
     const targetY = hovered ? CAMERA_Y_HOVER : CAMERA_Y_DEFAULT;
     const targetLookY = hovered ? LOOKAT_Y_HOVER : 0;
-    camera.position.z += (targetZ - camera.position.z) * LERP;
-    camera.position.y += (targetY - camera.position.y) * LERP;
-    lookAtY.current += (targetLookY - lookAtY.current) * LERP;
+    camera.position.z += (targetZ - camera.position.z) * LERP_CAMERA;
+    camera.position.y += (targetY - camera.position.y) * LERP_CAMERA;
+    lookAtY.current += (targetLookY - lookAtY.current) * LERP_CAMERA;
     camera.lookAt(0, lookAtY.current, 0);
   });
 
@@ -272,7 +273,7 @@ function ModelDisplayInner({
 
       <Canvas
         camera={{
-          position: [0, 0, CAMERA_DISTANCE_DEFAULT],
+          position: [0, CAMERA_Y_DEFAULT, CAMERA_DISTANCE_DEFAULT],
           fov: CAMERA_FOV,
           near: 0.1,
           far: 50,
