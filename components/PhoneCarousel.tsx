@@ -42,28 +42,28 @@ type Slot = {
 };
 
 const REST_SLOTS: Slot[] = [
-  { x:  0.44, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 0: far off-right
-  { x:  0.30, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.62, opacity: 0.45 },// 1: entering right
-  { x:  0.19, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.95 },// 2: RIGHT
+  { x:  0.22, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 0: far off-right
+  { x:  0.15, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.62, opacity: 0.45 },// 1: entering right
+  { x:  0.095,y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.95 },// 2: RIGHT
   { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER
-  { x: -0.19, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.95 },// 4: LEFT
-  { x: -0.30, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.62, opacity: 0.45 },// 5: exiting left
-  { x: -0.44, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 6: far off-left
+  { x: -0.095,y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.95 },// 4: LEFT
+  { x: -0.15, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.62, opacity: 0.45 },// 5: exiting left
+  { x: -0.22, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 6: far off-left
 ];
 
 const HOVER_SLOTS: Slot[] = [
-  { x:  0.63, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
-  { x:  0.44, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
-  { x:  0.25, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
+  { x:  0.31, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x:  0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
+  { x:  0.125,y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
   { x:  0.00, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 1.0 },
-  { x: -0.25, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
-  { x: -0.44, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
-  { x: -0.63, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x: -0.125,y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
+  { x: -0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
+  { x: -0.31, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
 ];
 
 // Base scale applied to the loaded model before slot scaling. iPhone OBJ comes
 // in arbitrary units; this is tuned so the centre phone fills the frame nicely.
-const MODEL_BASE_SCALE = 0.75;
+const MODEL_BASE_SCALE = 1.125; // 1.5x previous
 
 // Ease the raw offset so each phone dwells briefly at every integer slot (incl.
 // the centre) before sliding to the next. Linear time -> stair-stepped progress.
@@ -88,11 +88,19 @@ type PhoneInstanceProps = {
 function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstanceProps) {
   // Deep clone so each instance has its own materials (needed for per-instance
   // opacity + per-instance video texture). Geometry is shared.
-  // Apply the screen-forward rotation directly on the clone so it's guaranteed
-  // to take effect regardless of how R3F reconciles the parent group rotation.
+  // Bake a Y=π rotation directly into the cloned geometry so the screen face
+  // (originally at -Z after obj2gltf's axis flip) ends up at +Z toward the
+  // camera. Doing this on the geometry guarantees it sticks regardless of how
+  // R3F reconciles transforms on the parent groups.
   const cloned = useMemo(() => {
     const c = sceneRoot.clone(true);
-    c.rotation.y = Math.PI; // flip so screen (+Z after rotation) faces the camera
+    const rot = new THREE.Matrix4().makeRotationY(Math.PI);
+    c.traverse((obj) => {
+      if (obj instanceof THREE.Mesh && obj.geometry) {
+        obj.geometry = obj.geometry.clone();
+        obj.geometry.applyMatrix4(rot);
+      }
+    });
     return c;
   }, [sceneRoot]);
 
@@ -126,19 +134,30 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       opacity: 0.85,
     });
 
+    const matched: Record<string, string> = {};
     cloned.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return;
       const name = (obj.name ?? "").toLowerCase();
-      if (name.includes("screen")) {
+      let pick: string;
+      if (name.includes("screen") || name.includes("display")) {
         obj.material = screenMat;
-      } else if (name.includes("glass") || name.includes("camera")) {
+        pick = "screen";
+      } else if (name.includes("camera_glass") || name.includes("flash_glass") || name.includes("lens")) {
         obj.material = glassMat;
-      } else if (name.includes("cylinder") || name.includes("sphere") || name.includes("flash") || name.includes("logo")) {
+        pick = "glass";
+      } else if (name.includes("cylinder") || name.includes("sphere") || name.includes("flash") || name.includes("logo") || name.includes("camera")) {
         obj.material = trimMat;
+        pick = "trim";
       } else {
         obj.material = bodyMat;
+        pick = "body";
       }
+      matched[obj.name || "<unnamed>"] = pick;
     });
+    // Logs once per instance so we can verify the screen mesh actually got the
+    // video texture. Open the console to inspect.
+    // eslint-disable-next-line no-console
+    console.log("[PhoneCarousel] mesh -> material:", matched);
 
     return () => {
       screenMat.dispose();
