@@ -25,42 +25,57 @@ import Loader from "./Loader";
 
 const NUM_PHONES = 7;
 const CENTER_SLOT = 3;                  // The visible "centre" slot index
-const CYCLE_SPEED = 0.22;               // Slots/sec — full loop = 7 / CYCLE_SPEED s
+const CYCLE_SPEED = 0.32;               // Slot-steps per second (raw; eased via DWELL).
+const DWELL_PORTION = 0.35;             // Fraction of each step spent paused at the integer slot.
 const STATE_LERP = 0.04;                // Hover state transition easing
-const CAMERA_DISTANCE = 6.4;            // Camera Z — pulled back enough to fit the 3-phone fan
+const CAMERA_DISTANCE = 1.6;            // Camera Z — ~4x zoom vs the previous framing.
 const CAMERA_FOV = 32;
+const FLANK_ROT = Math.PI / 12;         // ±15° — subtle Z-tilt on flanking phones.
 
 // Each slot = where a phone is when its slotFloat lands exactly on that index.
 // Phones interpolate continuously between adjacent slots, wrapping mod 7.
 // Slot 3 = visible centre. Slots 2/4 = flanks. 1/5 = transitional fade. 0/6 = hidden.
+// X/Y/Z values are tuned for CAMERA_DISTANCE = 1.6 (≈4x zoom).
 type Slot = {
   x: number; y: number; z: number;
   rotZ: number; scale: number; opacity: number;
 };
 
 const REST_SLOTS: Slot[] = [
-  { x:  3.5, y: -0.55, z: -0.6, rotZ: -Math.PI / 6, scale: 0.45, opacity: 0.0 }, // 0: far off-right
-  { x:  2.4, y: -0.32, z: -0.3, rotZ: -Math.PI / 6, scale: 0.62, opacity: 0.45 },// 1: entering right
-  { x:  1.5, y: -0.18, z: -0.1, rotZ: -Math.PI / 6, scale: 0.78, opacity: 0.95 },// 2: RIGHT
-  { x:  0.0, y:  0.0,  z:  0.0, rotZ:  0.0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER
-  { x: -1.5, y: -0.18, z: -0.1, rotZ:  Math.PI / 6, scale: 0.78, opacity: 0.95 },// 4: LEFT
-  { x: -2.4, y: -0.32, z: -0.3, rotZ:  Math.PI / 6, scale: 0.62, opacity: 0.45 },// 5: exiting left
-  { x: -3.5, y: -0.55, z: -0.6, rotZ:  Math.PI / 6, scale: 0.45, opacity: 0.0 }, // 6: far off-left
+  { x:  0.88, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 0: far off-right
+  { x:  0.60, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.62, opacity: 0.45 },// 1: entering right
+  { x:  0.38, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.95 },// 2: RIGHT
+  { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER
+  { x: -0.38, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.95 },// 4: LEFT
+  { x: -0.60, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.62, opacity: 0.45 },// 5: exiting left
+  { x: -0.88, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 6: far off-left
 ];
 
 const HOVER_SLOTS: Slot[] = [
-  { x:  5.0, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
-  { x:  3.5, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
-  { x:  2.0, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
-  { x:  0.0, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 1.0 },
-  { x: -2.0, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
-  { x: -3.5, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
-  { x: -5.0, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x:  1.25, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x:  0.88, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
+  { x:  0.50, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
+  { x:  0.00, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 1.0 },
+  { x: -0.50, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
+  { x: -0.88, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
+  { x: -1.25, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
 ];
 
 // Base scale applied to the loaded model before slot scaling. iPhone OBJ comes
 // in arbitrary units; this is tuned so the centre phone fills the frame nicely.
 const MODEL_BASE_SCALE = 0.75;
+
+// Ease the raw offset so each phone dwells briefly at every integer slot (incl.
+// the centre) before sliding to the next. Linear time -> stair-stepped progress.
+function easedOffset(raw: number): number {
+  const intPart = Math.floor(raw);
+  const frac = raw - intPart;
+  if (frac < DWELL_PORTION) return intPart; // pause at the integer slot
+  const t = (frac - DWELL_PORTION) / (1 - DWELL_PORTION);
+  // smoothstep transit to the next slot
+  const eased = t * t * (3 - 2 * t);
+  return intPart + eased;
+}
 
 /* ── Inner: single phone instance with its own materials + video ── */
 
@@ -201,7 +216,8 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
     const h = hoverProgressRef.current;
 
     offsetRef.current += delta * CYCLE_SPEED;
-    const offset = offsetRef.current;
+    // Dwell at each integer slot (incl. centre) before sliding to the next.
+    const offset = easedOffset(offsetRef.current);
 
     const lerp = THREE.MathUtils.lerp;
 
