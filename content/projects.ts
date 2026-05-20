@@ -56,6 +56,11 @@ export interface Project {
     video: string;        // Path to looping video shown on the screen
     poster?: string;      // Poster shown until the canvas is ready
   };
+  heroPhones?: {          // 7-phone carousel, each with its own looping video
+    model: string;        // Path to .glb (under /public)
+    videos: string[];     // Exactly 7 video URLs
+    poster?: string;
+  };
   companyUrl?: string;
   pdfSlideshow?: {        // PDF rendered as image pages
     title: string;
@@ -159,6 +164,19 @@ export const projects: Project[] = [
       alt: "The Moment You Realise campaign, Share to Buy social video series hero frame",
     },
     heroVideo: "/images/tmyr/Looping%20Reels%20Hero.webm",
+    heroPhones: {
+      model: "/models/iphone/iphone-15-pro-max.glb",
+      videos: [
+        "/images/tmyr/1080x1920%20IG%20Reels/Anthony.webm",
+        "/images/tmyr/1080x1920%20IG%20Reels/Freya.webm",
+        "/images/tmyr/1080x1920%20IG%20Reels/Katie.webm",
+        "/images/tmyr/1080x1920%20IG%20Reels/Kiran.webm",
+        "/images/tmyr/1080x1920%20IG%20Reels/Lauren.webm",
+        "/images/tmyr/1080x1920%20IG%20Reels/Molly.webm",
+        "/images/tmyr/1080x1920%20IG%20Reels/Olu.webm",
+      ],
+      poster: "/images/tmyr/hero-poster.jpg",
+    },
     images: [
       {
         src: "/images/tmyr/post-anthony.jpg",

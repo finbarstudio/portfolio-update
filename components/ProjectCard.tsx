@@ -5,6 +5,7 @@ import { Project } from "@/content/projects";
 import ClientImage from "@/components/ClientImage";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
+import PhoneCarousel from "@/components/PhoneCarousel";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -103,7 +104,14 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
       >
         {/* Thumbnail — grows to fill remaining height */}
         <div style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
-          {project.heroModel ? (
+          {project.heroPhones ? (
+            <PhoneCarousel
+              model={project.heroPhones.model}
+              videos={project.heroPhones.videos}
+              poster={project.heroPhones.poster}
+              fill
+            />
+          ) : project.heroModel ? (
             <ModelDisplay
               model={project.heroModel.model}
               video={project.heroModel.video}
