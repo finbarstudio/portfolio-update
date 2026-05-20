@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Backup of AV1-encoded reels before re-encode to VP9 (kept locally only)
+public/images/tmyr/1080x1920 IG Reels/_av1_originals/
