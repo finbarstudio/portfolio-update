@@ -42,28 +42,28 @@ type Slot = {
 };
 
 const REST_SLOTS: Slot[] = [
-  { x:  0.22, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 0: far off-right
-  { x:  0.15, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.62, opacity: 0.45 },// 1: entering right
-  { x:  0.095,y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.95 },// 2: RIGHT
+  { x:  0.40, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 0: far off-right
+  { x:  0.27, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.62, opacity: 0.45 },// 1: entering right
+  { x:  0.17, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.95 },// 2: RIGHT
   { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER
-  { x: -0.095,y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.95 },// 4: LEFT
-  { x: -0.15, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.62, opacity: 0.45 },// 5: exiting left
-  { x: -0.22, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 6: far off-left
+  { x: -0.17, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.95 },// 4: LEFT
+  { x: -0.27, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.62, opacity: 0.45 },// 5: exiting left
+  { x: -0.40, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 6: far off-left
 ];
 
 const HOVER_SLOTS: Slot[] = [
-  { x:  0.31, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
-  { x:  0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
-  { x:  0.125,y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
+  { x:  0.56, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x:  0.40, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
+  { x:  0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
   { x:  0.00, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 1.0 },
-  { x: -0.125,y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
-  { x: -0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
-  { x: -0.31, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x: -0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
+  { x: -0.40, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
+  { x: -0.56, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
 ];
 
 // Base scale applied to the loaded model before slot scaling. iPhone OBJ comes
 // in arbitrary units; this is tuned so the centre phone fills the frame nicely.
-const MODEL_BASE_SCALE = 1.125; // 1.5x previous
+const MODEL_BASE_SCALE = 0.85; // slight bump over 0.75
 
 // Ease the raw offset so each phone dwells briefly at every integer slot (incl.
 // the centre) before sliding to the next. Linear time -> stair-stepped progress.
@@ -88,29 +88,21 @@ type PhoneInstanceProps = {
 function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstanceProps) {
   // Deep clone so each instance has its own materials (needed for per-instance
   // opacity + per-instance video texture). Geometry is shared.
-  // Bake a Y=π rotation directly into the cloned geometry so the screen face
-  // (originally at -Z after obj2gltf's axis flip) ends up at +Z toward the
-  // camera. Doing this on the geometry guarantees it sticks regardless of how
-  // R3F reconciles transforms on the parent groups.
-  const cloned = useMemo(() => {
-    const c = sceneRoot.clone(true);
-    const rot = new THREE.Matrix4().makeRotationY(Math.PI);
-    c.traverse((obj) => {
-      if (obj instanceof THREE.Mesh && obj.geometry) {
-        obj.geometry = obj.geometry.clone();
-        obj.geometry.applyMatrix4(rot);
-      }
-    });
-    return c;
-  }, [sceneRoot]);
+  // The OBJ has screen at +Z and back at -Z; obj2gltf preserves that — so the
+  // model needs no rotation. The "looking at the back" effect was caused by a
+  // dark screen mat (video texture not yet decoded) being indistinguishable
+  // from a dark phone body, compounded by z-fighting between 7 overlapping
+  // transparent phones. Both fixed below.
+  const cloned = useMemo(() => sceneRoot.clone(true), [sceneRoot]);
 
   useEffect(() => {
     if (!videoTexture) return;
 
+    // Opaque materials prevent z-fighting between 7 overlapping phones.
+    // Visibility of off-stage phones is handled at the group level (phone.visible).
     const screenMat = new THREE.MeshBasicMaterial({
       map: videoTexture,
       toneMapped: false,
-      transparent: true,
     });
     const bodyMat = new THREE.MeshPhysicalMaterial({
       color: "#2a2a2c",
@@ -118,46 +110,31 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       metalness: 0.92,
       clearcoat: 0.35,
       clearcoatRoughness: 0.4,
-      transparent: true,
     });
     const trimMat = new THREE.MeshPhysicalMaterial({
       color: "#7a7a7d",
       roughness: 0.3,
       metalness: 0.95,
-      transparent: true,
     });
     const glassMat = new THREE.MeshPhysicalMaterial({
       color: "#101012",
       roughness: 0.2,
       metalness: 0.6,
-      transparent: true,
-      opacity: 0.85,
     });
 
-    const matched: Record<string, string> = {};
     cloned.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return;
       const name = (obj.name ?? "").toLowerCase();
-      let pick: string;
       if (name.includes("screen") || name.includes("display")) {
         obj.material = screenMat;
-        pick = "screen";
       } else if (name.includes("camera_glass") || name.includes("flash_glass") || name.includes("lens")) {
         obj.material = glassMat;
-        pick = "glass";
       } else if (name.includes("cylinder") || name.includes("sphere") || name.includes("flash") || name.includes("logo") || name.includes("camera")) {
         obj.material = trimMat;
-        pick = "trim";
       } else {
         obj.material = bodyMat;
-        pick = "body";
       }
-      matched[obj.name || "<unnamed>"] = pick;
     });
-    // Logs once per instance so we can verify the screen mesh actually got the
-    // video texture. Open the console to inspect.
-    // eslint-disable-next-line no-console
-    console.log("[PhoneCarousel] mesh -> material:", matched);
 
     return () => {
       screenMat.dispose();
@@ -215,11 +192,18 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
   }, [videoEls]);
 
   useEffect(() => {
-    videoEls.forEach((el) => {
-      el.load();
-      el.play().catch(() => {});
+    // Stagger video loads. Browsers cap concurrent requests per origin (~6),
+    // and Next dev can drop overlapping requests for large assets; fanning
+    // them out by 200ms each prevents 404s on later phones.
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    videoEls.forEach((el, i) => {
+      timers.push(setTimeout(() => {
+        el.load();
+        el.play().catch(() => {});
+      }, i * 200));
     });
     return () => {
+      timers.forEach((t) => clearTimeout(t));
       videoEls.forEach((el) => {
         el.pause();
         el.src = "";
@@ -275,21 +259,15 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
       phone.rotation.z = rotZ;
       phone.scale.setScalar(scale);
 
-      // Apply opacity to materials. (Materials were set to transparent in PhoneInstance.)
-      phone.traverse((obj) => {
-        if (!(obj instanceof THREE.Mesh)) return;
-        const mat = obj.material as THREE.Material | THREE.Material[];
-        if (Array.isArray(mat)) {
-          mat.forEach((m) => { if ("opacity" in m) (m as THREE.Material & { opacity: number }).opacity = opacity; });
-        } else if (mat && "opacity" in mat) {
-          (mat as THREE.Material & { opacity: number }).opacity = opacity;
-        }
-      });
+      // Cull off-stage phones entirely rather than fading transparent meshes —
+      // 7 overlapping transparent phones cause depth-sort z-fighting glitches.
+      const onStage = opacity > 0.4;
+      if (phone.visible !== onStage) phone.visible = onStage;
 
       // Pause off-stage videos so we don't hit browser concurrent-video limits.
       const vid = videoEls[i];
       if (vid) {
-        if (opacity < 0.12) {
+        if (!onStage) {
           if (!vid.paused) vid.pause();
         } else if (vid.paused) {
           vid.play().catch(() => {});
