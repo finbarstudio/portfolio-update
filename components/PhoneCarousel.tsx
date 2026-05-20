@@ -28,7 +28,7 @@ const CENTER_SLOT = 3;                  // The visible "centre" slot index
 const CYCLE_SPEED = 0.32;               // Slot-steps per second (raw; eased via DWELL).
 const DWELL_PORTION = 0.35;             // Fraction of each step spent paused at the integer slot.
 const STATE_LERP = 0.04;                // Hover state transition easing
-const CAMERA_DISTANCE = 1.6;            // Camera Z — ~4x zoom vs the previous framing.
+const CAMERA_DISTANCE = 0.55;           // Camera Z — additional ~3x zoom on top of previous.
 const CAMERA_FOV = 32;
 const FLANK_ROT = Math.PI / 12;         // ±15° — subtle Z-tilt on flanking phones.
 
@@ -145,7 +145,8 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
   return (
     <group ref={groupSetter}>
       <Center>
-        <group scale={MODEL_BASE_SCALE}>
+        {/* Rotate 180° on Y so the screen (not the camera array) faces the camera. */}
+        <group scale={MODEL_BASE_SCALE} rotation={[0, Math.PI, 0]}>
           <primitive object={cloned} />
         </group>
       </Center>
