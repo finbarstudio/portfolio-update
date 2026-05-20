@@ -28,7 +28,7 @@ const CENTER_SLOT = 3;                  // The visible "centre" slot index
 const CYCLE_SPEED = 0.32;               // Slot-steps per second (raw; eased via DWELL).
 const DWELL_PORTION = 0.35;             // Fraction of each step spent paused at the integer slot.
 const STATE_LERP = 0.04;                // Hover state transition easing
-const CAMERA_DISTANCE = 0.55;           // Camera Z — additional ~3x zoom on top of previous.
+const CAMERA_DISTANCE = 0.28;           // Camera Z — 2x more zoom.
 const CAMERA_FOV = 32;
 const FLANK_ROT = Math.PI / 12;         // ±15° — subtle Z-tilt on flanking phones.
 
@@ -42,23 +42,23 @@ type Slot = {
 };
 
 const REST_SLOTS: Slot[] = [
-  { x:  0.88, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 0: far off-right
-  { x:  0.60, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.62, opacity: 0.45 },// 1: entering right
-  { x:  0.38, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.95 },// 2: RIGHT
+  { x:  0.44, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 0: far off-right
+  { x:  0.30, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.62, opacity: 0.45 },// 1: entering right
+  { x:  0.19, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.95 },// 2: RIGHT
   { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER
-  { x: -0.38, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.95 },// 4: LEFT
-  { x: -0.60, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.62, opacity: 0.45 },// 5: exiting left
-  { x: -0.88, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 6: far off-left
+  { x: -0.19, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.95 },// 4: LEFT
+  { x: -0.30, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.62, opacity: 0.45 },// 5: exiting left
+  { x: -0.44, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 6: far off-left
 ];
 
 const HOVER_SLOTS: Slot[] = [
-  { x:  1.25, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
-  { x:  0.88, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
-  { x:  0.50, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
+  { x:  0.63, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x:  0.44, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
+  { x:  0.25, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
   { x:  0.00, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 1.0 },
-  { x: -0.50, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
-  { x: -0.88, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
-  { x: -1.25, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x: -0.25, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.75 },
+  { x: -0.44, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.3 },
+  { x: -0.63, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
 ];
 
 // Base scale applied to the loaded model before slot scaling. iPhone OBJ comes
@@ -88,7 +88,13 @@ type PhoneInstanceProps = {
 function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstanceProps) {
   // Deep clone so each instance has its own materials (needed for per-instance
   // opacity + per-instance video texture). Geometry is shared.
-  const cloned = useMemo(() => sceneRoot.clone(true), [sceneRoot]);
+  // Apply the screen-forward rotation directly on the clone so it's guaranteed
+  // to take effect regardless of how R3F reconciles the parent group rotation.
+  const cloned = useMemo(() => {
+    const c = sceneRoot.clone(true);
+    c.rotation.y = Math.PI; // flip so screen (+Z after rotation) faces the camera
+    return c;
+  }, [sceneRoot]);
 
   useEffect(() => {
     if (!videoTexture) return;
@@ -145,8 +151,7 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
   return (
     <group ref={groupSetter}>
       <Center>
-        {/* Rotate 180° on Y so the screen (not the camera array) faces the camera. */}
-        <group scale={MODEL_BASE_SCALE} rotation={[0, Math.PI, 0]}>
+        <group scale={MODEL_BASE_SCALE}>
           <primitive object={cloned} />
         </group>
       </Center>
