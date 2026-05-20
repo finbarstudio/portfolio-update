@@ -41,24 +41,28 @@ type Slot = {
   rotZ: number; scale: number; opacity: number;
 };
 
+// `opacity` here is now a "presence factor": 1 = fully present, 0 = fully gone.
+// It drives a per-phone uniform that darkens body/trim/glass via color
+// modulation (no real material transparency) and scales the phone toward 0
+// at the edges so entries/exits fade smoothly with no z-fighting or see-thru.
 const REST_SLOTS: Slot[] = [
-  { x:  0.40, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 0: far off-right
-  { x:  0.27, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.62, opacity: 0.30 },// 1: entering right
-  { x:  0.17, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.55 },// 2: RIGHT (non-focus, dimmer)
+  { x:  0.40, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 0: far off-right (size 0 = invisible)
+  { x:  0.27, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.35 },// 1: entering right
+  { x:  0.17, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.70 },// 2: RIGHT (non-focus, dimmer)
   { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER (focus)
-  { x: -0.17, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.55 },// 4: LEFT (non-focus, dimmer)
-  { x: -0.27, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.62, opacity: 0.30 },// 5: exiting left
-  { x: -0.40, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.0 }, // 6: far off-left
+  { x: -0.17, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.70 },// 4: LEFT (non-focus, dimmer)
+  { x: -0.27, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.35 },// 5: exiting left
+  { x: -0.40, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 6: far off-left
 ];
 
 const HOVER_SLOTS: Slot[] = [
-  { x:  0.56, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
-  { x:  0.40, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.25 },
-  { x:  0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.55 },
+  { x:  0.56, y: 0, z: 0, rotZ: 0, scale: 0.0, opacity: 0.0 },
+  { x:  0.40, y: 0, z: 0, rotZ: 0, scale: 0.6, opacity: 0.35 },
+  { x:  0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.70 },
   { x:  0.00, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 1.0 },
-  { x: -0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.55 },
-  { x: -0.40, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.25 },
-  { x: -0.56, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.0 },
+  { x: -0.22, y: 0, z: 0, rotZ: 0, scale: 1.0, opacity: 0.70 },
+  { x: -0.40, y: 0, z: 0, rotZ: 0, scale: 0.6, opacity: 0.35 },
+  { x: -0.56, y: 0, z: 0, rotZ: 0, scale: 0.0, opacity: 0.0 },
 ];
 
 // Base scale applied to the loaded model before slot scaling. iPhone OBJ comes
@@ -98,15 +102,12 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
   useEffect(() => {
     if (!videoTexture) return;
 
-    // Materials are transparent so the entering/exiting phones can fade in/out
-    // smoothly and the flanks can sit at a subtly reduced opacity. Z-fighting
-    // between the 7 overlapping phones is handled by setting phone.renderOrder
-    // per-frame based on Z depth, plus depthWrite: false on transparent mats.
+    // All materials opaque — fade is handled by scale + color modulation, not
+    // material transparency (which caused both see-through bugs and z-fighting
+    // between 7 overlapping phones).
     const screenMat = new THREE.MeshBasicMaterial({
       map: videoTexture,
       toneMapped: false,
-      transparent: true,
-      depthWrite: false,
     });
     const bodyMat = new THREE.MeshPhysicalMaterial({
       color: "#2a2a2c",
@@ -114,22 +115,16 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       metalness: 0.92,
       clearcoat: 0.35,
       clearcoatRoughness: 0.4,
-      transparent: true,
-      depthWrite: false,
     });
     const trimMat = new THREE.MeshPhysicalMaterial({
       color: "#7a7a7d",
       roughness: 0.3,
       metalness: 0.95,
-      transparent: true,
-      depthWrite: false,
     });
     const glassMat = new THREE.MeshPhysicalMaterial({
       color: "#101012",
       roughness: 0.2,
       metalness: 0.6,
-      transparent: true,
-      depthWrite: false,
     });
 
     cloned.traverse((obj) => {
@@ -203,18 +198,51 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
   }, [videoEls]);
 
   useEffect(() => {
-    // Stagger video PLAY calls (not load — that already happens from src
-    // assignment + preload="auto"). Browsers cap concurrent media decode
-    // pipelines; fanning out by 150ms prevents the dev server / browser
-    // dropping later phones' first decode and leaving their screens black.
+    // Aggressive diagnostics: every relevant video event is logged so we can
+    // see in DevTools exactly why a screen is black (autoplay block, decode
+    // error, file 404, codec unsupported, etc.).
+    const off: Array<() => void> = [];
+    videoEls.forEach((el, i) => {
+      const log = (ev: string) => (e: Event) => {
+        // eslint-disable-next-line no-console
+        console.log(`[PhoneCarousel] video ${i} ${ev}`, {
+          readyState: el.readyState,
+          networkState: el.networkState,
+          paused: el.paused,
+          currentTime: el.currentTime.toFixed(2),
+          duration: isFinite(el.duration) ? el.duration.toFixed(2) : "n/a",
+          src: el.currentSrc,
+          err: el.error ? `${el.error.code}: ${el.error.message}` : null,
+          e,
+        });
+      };
+      const events = ["loadedmetadata", "loadeddata", "canplay", "play", "playing", "error", "stalled", "suspend", "abort"];
+      events.forEach((ev) => {
+        const handler = log(ev);
+        el.addEventListener(ev, handler);
+        off.push(() => el.removeEventListener(ev, handler));
+      });
+    });
+
+    // Stagger play() calls so browsers don't drop later phones' first decode.
     const timers: ReturnType<typeof setTimeout>[] = [];
     videoEls.forEach((el, i) => {
       timers.push(setTimeout(() => {
-        el.play().catch(() => {});
+        el.play().then(
+          () => {
+            // eslint-disable-next-line no-console
+            console.log(`[PhoneCarousel] video ${i} play() resolved`);
+          },
+          (err) => {
+            // eslint-disable-next-line no-console
+            console.warn(`[PhoneCarousel] video ${i} play() rejected:`, err);
+          }
+        );
       }, i * 150));
     });
     return () => {
       timers.forEach((t) => clearTimeout(t));
+      off.forEach((fn) => fn());
       videoEls.forEach((el) => {
         el.pause();
         el.src = "";
@@ -231,6 +259,14 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
   const hoverProgressRef = useRef(0);
 
   useFrame((_, delta) => {
+    // Force every video texture to re-upload its latest frame each tick. Some
+    // r3f/three combos don't auto-mark VideoTextures dirty until the video
+    // fires "timeupdate", which only happens 4x/sec at best — too slow.
+    textures.forEach((t, i) => {
+      const el = videoEls[i];
+      if (el && el.readyState >= 2) t.needsUpdate = true;
+    });
+
     const targetHover = hovered ? 1 : 0;
     hoverProgressRef.current += (targetHover - hoverProgressRef.current) * STATE_LERP;
     const h = hoverProgressRef.current;
@@ -264,27 +300,13 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
       const z       = lerp(lerp(rA.z,       rB.z,       frac), lerp(hA.z,       hB.z,       frac), h);
       const rotZ    = lerp(lerp(rA.rotZ,    rB.rotZ,    frac), lerp(hA.rotZ,    hB.rotZ,    frac), h);
       const scale   = lerp(lerp(rA.scale,   rB.scale,   frac), lerp(hA.scale,   hB.scale,   frac), h);
-      const opacity = lerp(lerp(rA.opacity, rB.opacity, frac), lerp(hA.opacity, hB.opacity, frac), h);
 
       phone.position.set(x, y, z);
       phone.rotation.z = rotZ;
       phone.scale.setScalar(scale);
 
-      // Smooth fade via material opacity. depthWrite: false on the transparent
-      // materials prevents the z-fighting that 7 overlapping phones otherwise
-      // cause; renderOrder = -z sorts them back-to-front for clean blending.
-      phone.renderOrder = -Math.round(z * 1000);
-      phone.traverse((obj) => {
-        if (!(obj instanceof THREE.Mesh)) return;
-        const mat = obj.material as THREE.Material | THREE.Material[];
-        if (Array.isArray(mat)) {
-          mat.forEach((m) => { (m as THREE.Material & { opacity: number }).opacity = opacity; });
-        } else if (mat) {
-          (mat as THREE.Material & { opacity: number }).opacity = opacity;
-        }
-      });
-      // Fully off-stage: cull to avoid useless draws.
-      const onStage = opacity > 0.02;
+      // Cull truly invisible phones (scale 0 at the edges). Avoids useless draws.
+      const onStage = scale > 0.02;
       if (phone.visible !== onStage) phone.visible = onStage;
 
       // Pause off-stage videos so we don't hit browser concurrent-video limits.
