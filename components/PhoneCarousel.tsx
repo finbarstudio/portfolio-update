@@ -260,42 +260,13 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
       tex.minFilter = THREE.LinearFilter;
       tex.magFilter = THREE.LinearFilter;
       tex.generateMipmaps = false;
+      tex.flipY = false; // VP9 WebM frames are stored top-to-bottom; flipY=true (default) inverts them
       return tex;
     });
   }, [videoEls]);
 
   useEffect(() => {
-    // Aggressive diagnostics: every relevant video event is logged so we can
-    // see in DevTools exactly why a screen is black (autoplay block, decode
-    // error, file 404, codec unsupported, etc.).
-    const off: Array<() => void> = [];
-    videoEls.forEach((el, i) => {
-      const log = (ev: string) => (e: Event) => {
-        // eslint-disable-next-line no-console
-        console.log(`[PhoneCarousel] video ${i} ${ev}`, {
-          readyState: el.readyState,
-          networkState: el.networkState,
-          paused: el.paused,
-          currentTime: el.currentTime.toFixed(2),
-          duration: isFinite(el.duration) ? el.duration.toFixed(2) : "n/a",
-          src: el.currentSrc,
-          err: el.error ? `${el.error.code}: ${el.error.message}` : null,
-          e,
-        });
-      };
-      const events = ["loadedmetadata", "loadeddata", "canplay", "play", "playing", "error", "stalled", "suspend", "abort"];
-      events.forEach((ev) => {
-        const handler = log(ev);
-        el.addEventListener(ev, handler);
-        off.push(() => el.removeEventListener(ev, handler));
-      });
-    });
-
-    // No upfront play() — lazy lifecycle is driven from useFrame based on the
-    // onStage flag for each phone. That spreads loads/decoders over time and
-    // keeps active decoder count to whatever's visible (typically 3-5).
     return () => {
-      off.forEach((fn) => fn());
       videoEls.forEach((el) => {
         el.pause();
         el.src = "";
