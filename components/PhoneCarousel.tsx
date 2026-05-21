@@ -109,9 +109,17 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
     // All materials opaque — fade is handled by scale + color modulation, not
     // material transparency (which caused both see-through bugs and z-fighting
     // between 7 overlapping phones).
+    // DoubleSide: screen-Mesh_1's vertex winding/normals point away from the
+    // camera in this OBJ → without DoubleSide the front face never rasterises
+    // and you see through to screen-Mesh behind (dark, looks like a reflective
+    // gradient because of MeshPhysicalMaterial). Also bump renderOrder + skip
+    // depth test for the screen plane so it wins z-fighting against the
+    // co-planar surround mesh sitting at the same Z.
     const screenMat = new THREE.MeshBasicMaterial({
       map: videoTexture,
       toneMapped: false,
+      side: THREE.DoubleSide,
+      depthTest: false,
     });
     const bodyMat = new THREE.MeshPhysicalMaterial({
       color: "#2a2a2c",
@@ -174,6 +182,9 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       // The video plane: only prim[1] of screen-Mesh has full-range UVs.
       if (name === "screen-Mesh_1") {
         obj.material = screenMat;
+        // Force-on-top: combined with screenMat depthTest=false, this draws
+        // the video plane over the co-planar surround regardless of order.
+        obj.renderOrder = 10;
         return;
       }
       // Other screen prims become the dark surround (so prim[0]'s atlas-UV
@@ -185,9 +196,13 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
 
       if (lower.includes("camera_glass") || lower.includes("flash_glass") || lower.includes("lens")) {
         obj.material = glassMat;
-      } else if (lower.includes("cylinder") || lower.includes("sphere") || lower.includes("flash") || lower.includes("logo") || lower.includes("camera")) {
+      } else if (lower.includes("flash") || lower.includes("logo")) {
+        // Camera flash highlight + Apple logo — keep the lighter trim accent.
         obj.material = trimMat;
       } else {
+        // Cylinders (antenna bands) + spheres (camera bumps) + frame + back
+        // all get the body colour so antenna bands don't read as white stripes
+        // against the dark titanium frame.
         obj.material = bodyMat;
       }
     });
