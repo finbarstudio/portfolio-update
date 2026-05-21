@@ -28,7 +28,7 @@ const CENTER_SLOT = 3;                  // The visible "centre" slot index
 const CYCLE_SPEED = 0.32;               // Slot-steps per second (raw; eased via DWELL).
 const DWELL_PORTION = 0.35;             // Fraction of each step spent paused at the integer slot.
 const STATE_LERP = 0.04;                // Hover state transition easing
-const CAMERA_DISTANCE = 0.34;           // Camera Z — slight pull-back from 0.28.
+const CAMERA_DISTANCE = 0.42;           // Camera Z — further pull-back.
 const CAMERA_FOV = 32;
 const FLANK_ROT = Math.PI / 12;         // ±15° — subtle Z-tilt on flanking phones.
 const ONSTAGE_THRESHOLD = 0.5;          // Only phones above this scale get a video src + decoder.
@@ -131,28 +131,61 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       metalness: 0.6,
     });
 
+    // The iPhone 15 Pro Max OBJ has per-primitive sub-meshes with quirks we
+    // need to target individually (verified via scripts/probe-glb.mjs).
+    //
+    // screen-Mesh   (prim 0, 348 verts) — main display surface, but its UVs
+    //                                     atlas-map to only u[0.63-0.87]
+    //                                     v[0.25-0.50] of the texture. Using
+    //                                     this for video causes the "zoomed
+    //                                     way too far in" effect. Treat as
+    //                                     screen frame (dark).
+    // screen-Mesh_1 (prim 1,  96 verts) — inner display panel with full
+    //                                     UV[0,1] — THE plane the video
+    //                                     should actually map to.
+    // screen-Mesh_2 (prim 2,  36 verts) — tiny slider detail near the top.
+    //
+    // phone_case-Mesh   (prim 0, 1887 verts, "Material.001" glass) — the
+    //                                     glass shell that wraps the whole
+    //                                     phone front and was blocking the
+    //                                     screen. Hide this one only.
+    // phone_case-Mesh_1 (prim 1,  834 verts) — tiny bottom-edge detail.
+    // phone_case-Mesh_2 (prim 2, 33095 verts, "metal") — the metal frame /
+    //                                     bezel + back — KEEP visible for
+    //                                     bevel realism.
     cloned.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return;
-      const name = (obj.name ?? "").toLowerCase();
-      const parentName = (obj.parent?.name ?? "").toLowerCase();
-      const fullName = `${parentName} ${name}`;
+      const name = obj.name ?? "";
+      const lower = name.toLowerCase();
 
-      // CRITICAL: the iPhone 15 Pro Max OBJ ships with a `phone_case` mesh that
-      // is the protective shell wrapping the WHOLE phone front (Z=0.0029) — it
-      // sits 0.2mm in front of the actual screen (Z=0.0031), so when it gets
-      // the dark body material it blocks the video screen behind it. Symptom
-      // was the thin slither of video at the top where the case has a front-
-      // camera cutout. Hide it entirely.
-      if (fullName.includes("phone_case")) {
+      // Hide the glass shell front-face that was occluding the screen.
+      if (name === "phone_case-Mesh") {
+        obj.visible = false;
+        return;
+      }
+      // The bottom speaker-grille detail mesh ("scroo" = scrooo/screw misspelt
+      // in the OBJ). Without the phone_case glass overlaying it, the raw dots
+      // protrude unnaturally — hide them.
+      if (lower.startsWith("scroo")) {
         obj.visible = false;
         return;
       }
 
-      if (fullName.includes("screen") || fullName.includes("display")) {
+      // The video plane: only prim[1] of screen-Mesh has full-range UVs.
+      if (name === "screen-Mesh_1") {
         obj.material = screenMat;
-      } else if (name.includes("camera_glass") || name.includes("flash_glass") || name.includes("lens")) {
+        return;
+      }
+      // Other screen prims become the dark surround (so prim[0]'s atlas-UV
+      // sampling doesn't render a giant zoomed copy of the video).
+      if (name === "screen-Mesh" || name === "screen-Mesh_2") {
+        obj.material = bodyMat;
+        return;
+      }
+
+      if (lower.includes("camera_glass") || lower.includes("flash_glass") || lower.includes("lens")) {
         obj.material = glassMat;
-      } else if (name.includes("cylinder") || name.includes("sphere") || name.includes("flash") || name.includes("logo") || name.includes("camera")) {
+      } else if (lower.includes("cylinder") || lower.includes("sphere") || lower.includes("flash") || lower.includes("logo") || lower.includes("camera")) {
         obj.material = trimMat;
       } else {
         obj.material = bodyMat;
