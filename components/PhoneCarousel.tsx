@@ -96,16 +96,6 @@ type PhoneInstanceProps = {
 
 function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstanceProps) {
   const cloned = useMemo(() => sceneRoot.clone(true), [sceneRoot]);
-  const ringRef = useRef<THREE.Mesh | null>(null);
-
-  // Spin the loading ring until the video has its first frame.
-  useFrame((_, delta) => {
-    if (!ringRef.current) return;
-    const el = videoTexture?.image as HTMLVideoElement | undefined;
-    const ready = el ? el.readyState >= 2 : !videoTexture;
-    ringRef.current.visible = !ready;
-    if (!ready) ringRef.current.rotation.z -= delta * 2.8;
-  });
 
   useEffect(() => {
     if (!videoTexture) return;
@@ -145,9 +135,9 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
     // Antenna bands (cylinder meshes) need a distinct mid-grey so they read as
     // the titanium band colour rather than white highlights from the environment.
     const antennaMat = new THREE.MeshPhysicalMaterial({
-      color: "#606064",
-      roughness: 0.65,
-      metalness: 0.6,
+      color: "#3d3d40",
+      roughness: 0.5,
+      metalness: 0.85,
     });
 
     // The iPhone 15 Pro Max OBJ has per-primitive sub-meshes with quirks we
@@ -232,11 +222,6 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       <Center>
         <group scale={MODEL_BASE_SCALE}>
           <primitive object={cloned} />
-          {/* Loading ring — 270° arc that spins until video has its first frame */}
-          <mesh ref={ringRef} position={[0, 0, 0.006]} renderOrder={12}>
-            <ringGeometry args={[0.013, 0.019, 40, 1, 0, Math.PI * 1.5]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.75} depthTest={false} side={THREE.DoubleSide} />
-          </mesh>
         </group>
       </Center>
     </group>
