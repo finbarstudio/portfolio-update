@@ -31,7 +31,8 @@ const STATE_LERP = 0.04;                // Hover state transition easing
 const CAMERA_DISTANCE = 0.42;           // Camera Z — further pull-back.
 const CAMERA_FOV = 32;
 const FLANK_ROT = Math.PI / 12;         // ±15° — subtle Z-tilt on flanking phones.
-const ONSTAGE_THRESHOLD = 0.5;          // Only phones above this scale get a video src + decoder.
+const PRELOAD_THRESHOLD = 0.25;         // Phones above this scale get src+load (buffering starts early).
+const ONSTAGE_THRESHOLD = 0.5;          // Phones above this scale actually play (limits active decoders).
 
 // Each slot = where a phone is when its slotFloat lands exactly on that index.
 // Phones interpolate continuously between adjacent slots, wrapping mod 7.
@@ -94,14 +95,17 @@ type PhoneInstanceProps = {
 };
 
 function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstanceProps) {
-  // Deep clone so each instance has its own materials (needed for per-instance
-  // opacity + per-instance video texture). Geometry is shared.
-  // The OBJ has screen at +Z and back at -Z; obj2gltf preserves that — so the
-  // model needs no rotation. The "looking at the back" effect was caused by a
-  // dark screen mat (video texture not yet decoded) being indistinguishable
-  // from a dark phone body, compounded by z-fighting between 7 overlapping
-  // transparent phones. Both fixed below.
   const cloned = useMemo(() => sceneRoot.clone(true), [sceneRoot]);
+  const ringRef = useRef<THREE.Mesh | null>(null);
+
+  // Spin the loading ring until the video has its first frame.
+  useFrame((_, delta) => {
+    if (!ringRef.current) return;
+    const el = videoTexture?.image as HTMLVideoElement | undefined;
+    const ready = el ? el.readyState >= 2 : !videoTexture;
+    ringRef.current.visible = !ready;
+    if (!ready) ringRef.current.rotation.z -= delta * 2.8;
+  });
 
   useEffect(() => {
     if (!videoTexture) return;
@@ -136,6 +140,13 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
     const glassMat = new THREE.MeshPhysicalMaterial({
       color: "#101012",
       roughness: 0.2,
+      metalness: 0.6,
+    });
+    // Antenna bands (cylinder meshes) need a distinct mid-grey so they read as
+    // the titanium band colour rather than white highlights from the environment.
+    const antennaMat = new THREE.MeshPhysicalMaterial({
+      color: "#606064",
+      roughness: 0.65,
       metalness: 0.6,
     });
 
@@ -197,12 +208,12 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       if (lower.includes("camera_glass") || lower.includes("flash_glass") || lower.includes("lens")) {
         obj.material = glassMat;
       } else if (lower.includes("flash") || lower.includes("logo")) {
-        // Camera flash highlight + Apple logo — keep the lighter trim accent.
         obj.material = trimMat;
+      } else if (lower.includes("cylinder") || lower.includes("sphere")) {
+        // Antenna bands + camera-bump rings — mid-grey titanium, less specular
+        // than bodyMat so they don't blow out to white under the env lighting.
+        obj.material = antennaMat;
       } else {
-        // Cylinders (antenna bands) + spheres (camera bumps) + frame + back
-        // all get the body colour so antenna bands don't read as white stripes
-        // against the dark titanium frame.
         obj.material = bodyMat;
       }
     });
@@ -212,6 +223,7 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       bodyMat.dispose();
       trimMat.dispose();
       glassMat.dispose();
+      antennaMat.dispose();
     };
   }, [cloned, videoTexture]);
 
@@ -220,6 +232,11 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
       <Center>
         <group scale={MODEL_BASE_SCALE}>
           <primitive object={cloned} />
+          {/* Loading ring — 270° arc that spins until video has its first frame */}
+          <mesh ref={ringRef} position={[0, 0, 0.006]} renderOrder={12}>
+            <ringGeometry args={[0.013, 0.019, 40, 1, 0, Math.PI * 1.5]} />
+            <meshBasicMaterial color="#ffffff" transparent opacity={0.75} depthTest={false} side={THREE.DoubleSide} />
+          </mesh>
         </group>
       </Center>
     </group>
@@ -331,33 +348,29 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
       phone.rotation.z = rotZ;
       phone.scale.setScalar(scale);
 
-      // Cull truly invisible phones. Decoder-onstage uses a higher threshold
-      // so only ~3 phones hold a video src at once (under browser cap).
-      const visible = scale > 0.02;
-      const onStage = scale > ONSTAGE_THRESHOLD;
+      const visible   = scale > 0.02;
+      const preload   = scale > PRELOAD_THRESHOLD;   // start buffering (no decoder yet)
+      const onStage   = scale > ONSTAGE_THRESHOLD;   // actually play (decoder active)
       if (phone.visible !== visible) phone.visible = visible;
 
-      // Lazy video lifecycle. ONLY phones currently on-stage hold a src + an
-      // active decoder. This keeps us under the browser's concurrent-decoder
-      // cap (~4-6) regardless of NUM_PHONES, and is the root fix for the
-      // NotSupportedError storm we saw when all 7 mounted with src eagerly.
+      // Two-threshold lazy video lifecycle:
+      //   preload zone  — attach src + load() so the browser fetches/buffers the
+      //                   file in advance; no play() so no decoder slot consumed.
+      //   onstage zone  — call play() to activate the decoder and start rendering.
+      //   offstage      — pause + detach src to free the decoder.
       const vid = videoEls[i];
       const srcWanted = videos[i];
       if (vid) {
         if (onStage) {
-          // Attach src on first onstage transition (or after a previous detach).
-          if (vid.getAttribute("src") !== srcWanted) {
-            vid.src = srcWanted;
-            vid.load();
-          }
+          if (vid.getAttribute("src") !== srcWanted) { vid.src = srcWanted; vid.load(); }
           if (vid.paused) vid.play().catch(() => {});
-        } else {
-          // Off-stage: pause and release the decoder by detaching src.
+        } else if (preload) {
+          // Attach src so the browser buffers ahead, but don't play yet.
+          if (vid.getAttribute("src") !== srcWanted) { vid.src = srcWanted; vid.load(); }
           if (!vid.paused) vid.pause();
-          if (vid.getAttribute("src")) {
-            vid.removeAttribute("src");
-            vid.load();
-          }
+        } else {
+          if (!vid.paused) vid.pause();
+          if (vid.getAttribute("src")) { vid.removeAttribute("src"); vid.load(); }
         }
       }
     }
@@ -441,18 +454,6 @@ function PhoneCarouselInner({
         position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none",
         background: "linear-gradient(to right, var(--color-bg, #FAFAF8) 0%, transparent 5%, transparent 95%, var(--color-bg, #FAFAF8) 100%)",
       }} />
-      {poster && !ready && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={poster}
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: "absolute", inset: 0, width: "100%", height: "100%",
-            objectFit: "cover", transition: "opacity 0.3s ease",
-          }}
-        />
-      )}
       {!ready && <Loader size={28} />}
 
       <Canvas
