@@ -31,6 +31,7 @@ const STATE_LERP = 0.04;                // Hover state transition easing
 const CAMERA_DISTANCE = 0.28;           // Camera Z — 2x more zoom.
 const CAMERA_FOV = 32;
 const FLANK_ROT = Math.PI / 12;         // ±15° — subtle Z-tilt on flanking phones.
+const ONSTAGE_THRESHOLD = 0.5;          // Only phones above this scale get a video src + decoder.
 
 // Each slot = where a phone is when its slotFloat lands exactly on that index.
 // Phones interpolate continuously between adjacent slots, wrapping mod 7.
@@ -46,12 +47,15 @@ type Slot = {
 // modulation (no real material transparency) and scales the phone toward 0
 // at the edges so entries/exits fade smoothly with no z-fighting or see-thru.
 const REST_SLOTS: Slot[] = [
-  { x:  0.40, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 0: far off-right (size 0 = invisible)
-  { x:  0.27, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.45, opacity: 0.35 },// 1: entering right
-  { x:  0.17, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.70 },// 2: RIGHT (non-focus, dimmer)
-  { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER (focus)
-  { x: -0.17, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.70 },// 4: LEFT (non-focus, dimmer)
-  { x: -0.27, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.45, opacity: 0.35 },// 5: exiting left
+  // Only slots 2/3/4 hold a video src + active decoder (see ONSTAGE_THRESHOLD).
+  // Slots 1/5 keep a tiny scale for smooth scale-in/out at the edges without
+  // costing a decoder; slots 0/6 are fully invisible.
+  { x:  0.40, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 0: far off-right (invisible)
+  { x:  0.27, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.30, opacity: 0.0 },// 1: entering right (no decoder)
+  { x:  0.17, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.70 },// 2: RIGHT (live video)
+  { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER (live video)
+  { x: -0.17, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.70 },// 4: LEFT (live video)
+  { x: -0.27, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.30, opacity: 0.0 },// 5: exiting left (no decoder)
   { x: -0.40, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 6: far off-left
 ];
 
@@ -67,7 +71,7 @@ const HOVER_SLOTS: Slot[] = [
 
 // Base scale applied to the loaded model before slot scaling. iPhone OBJ comes
 // in arbitrary units; this is tuned so the centre phone fills the frame nicely.
-const MODEL_BASE_SCALE = 0.85; // slight bump over 0.75
+const MODEL_BASE_SCALE = 1.27; // 1.5x bump from 0.85
 
 // Ease the raw offset so each phone dwells briefly at every integer slot (incl.
 // the centre) before sliding to the next. Linear time -> stair-stepped progress.
@@ -168,20 +172,21 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
   const sceneRoot = gltf.scene;
 
   // 7 video elements + textures. Created once, lifetime tied to component.
+  // CRITICAL: src is *NOT* attached here. Browsers (esp. Chrome) cap active
+  // video decoders at ~4-6. Mounting 7 <video src=...> simultaneously causes
+  // 6 of them to fail with NotSupportedError. Instead we attach src lazily
+  // in useFrame only while a phone is on-stage, and detach when off-stage.
   const videoEls = useMemo(() => {
     if (typeof document === "undefined") return [] as HTMLVideoElement[];
-    return videos.map((src) => {
+    return videos.map(() => {
       const el = document.createElement("video");
-      // For same-origin local files we don't need crossOrigin; setting it
-      // after src can also block the texture from decoding correctly.
       el.muted = true;
       el.loop = true;
       el.playsInline = true;
-      el.autoplay = true;
-      el.preload = "auto";
+      el.preload = "none";
       el.setAttribute("playsinline", "");
       el.setAttribute("muted", "");
-      el.src = src;
+      // No src yet — set lazily in useFrame.
       return el;
     });
   }, [videos]);
@@ -224,24 +229,10 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
       });
     });
 
-    // Stagger play() calls so browsers don't drop later phones' first decode.
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    videoEls.forEach((el, i) => {
-      timers.push(setTimeout(() => {
-        el.play().then(
-          () => {
-            // eslint-disable-next-line no-console
-            console.log(`[PhoneCarousel] video ${i} play() resolved`);
-          },
-          (err) => {
-            // eslint-disable-next-line no-console
-            console.warn(`[PhoneCarousel] video ${i} play() rejected:`, err);
-          }
-        );
-      }, i * 150));
-    });
+    // No upfront play() — lazy lifecycle is driven from useFrame based on the
+    // onStage flag for each phone. That spreads loads/decoders over time and
+    // keeps active decoder count to whatever's visible (typically 3-5).
     return () => {
-      timers.forEach((t) => clearTimeout(t));
       off.forEach((fn) => fn());
       videoEls.forEach((el) => {
         el.pause();
@@ -305,17 +296,33 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
       phone.rotation.z = rotZ;
       phone.scale.setScalar(scale);
 
-      // Cull truly invisible phones (scale 0 at the edges). Avoids useless draws.
-      const onStage = scale > 0.02;
-      if (phone.visible !== onStage) phone.visible = onStage;
+      // Cull truly invisible phones. Decoder-onstage uses a higher threshold
+      // so only ~3 phones hold a video src at once (under browser cap).
+      const visible = scale > 0.02;
+      const onStage = scale > ONSTAGE_THRESHOLD;
+      if (phone.visible !== visible) phone.visible = visible;
 
-      // Pause off-stage videos so we don't hit browser concurrent-video limits.
+      // Lazy video lifecycle. ONLY phones currently on-stage hold a src + an
+      // active decoder. This keeps us under the browser's concurrent-decoder
+      // cap (~4-6) regardless of NUM_PHONES, and is the root fix for the
+      // NotSupportedError storm we saw when all 7 mounted with src eagerly.
       const vid = videoEls[i];
+      const srcWanted = videos[i];
       if (vid) {
-        if (!onStage) {
+        if (onStage) {
+          // Attach src on first onstage transition (or after a previous detach).
+          if (vid.getAttribute("src") !== srcWanted) {
+            vid.src = srcWanted;
+            vid.load();
+          }
+          if (vid.paused) vid.play().catch(() => {});
+        } else {
+          // Off-stage: pause and release the decoder by detaching src.
           if (!vid.paused) vid.pause();
-        } else if (vid.paused) {
-          vid.play().catch(() => {});
+          if (vid.getAttribute("src")) {
+            vid.removeAttribute("src");
+            vid.load();
+          }
         }
       }
     }
