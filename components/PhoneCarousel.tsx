@@ -260,7 +260,9 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
       tex.minFilter = THREE.LinearFilter;
       tex.magFilter = THREE.LinearFilter;
       tex.generateMipmaps = false;
-      tex.flipY = false; // VP9 WebM frames are stored top-to-bottom; flipY=true (default) inverts them
+      tex.flipY = false;    // VP9 frames are top-to-bottom; default flipY=true would invert vertically
+      tex.repeat.set(-1, 1); // mirror horizontally to correct left-right flip from the mesh UV winding
+      tex.offset.set(1, 0);
       return tex;
     });
   }, [videoEls]);
@@ -434,6 +436,11 @@ function PhoneCarouselInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
+      {/* Edge fade — masks phones entering/exiting on both sides */}
+      <div aria-hidden="true" style={{
+        position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none",
+        background: "linear-gradient(to right, var(--color-bg, #FAFAF8) 0%, transparent 5%, transparent 95%, var(--color-bg, #FAFAF8) 100%)",
+      }} />
       {poster && !ready && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
