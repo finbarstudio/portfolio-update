@@ -72,7 +72,7 @@ function CardImage({
 }) {
   return (
     <div
-      className="img-wrap"
+      className="img-wrap card-thumb"
       style={fill
         ? { height: "100%", marginBottom: "var(--image-pad)", background: "white" }
         : { aspectRatio, maxHeight: "72vh", marginBottom: "var(--image-pad)", background: "white" }}
@@ -103,7 +103,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         aria-label={`View case study: ${project.name}`}
       >
         {/* Thumbnail — grows to fill remaining height */}
-        <div style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
+        <div className="card-thumb" style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
           {project.heroPhones ? (
             <PhoneCarousel
               model={project.heroPhones.model}
@@ -168,7 +168,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
         aria-label={`View case study: ${project.name}`}
       >
         {project.heroModel ? (
-          <div style={{ marginBottom: "var(--image-pad)" }}>
+          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
             <ModelDisplay
               model={project.heroModel.model}
               video={project.heroModel.video}
@@ -219,7 +219,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
         aria-label={`View ${project.name}`}
       >
         {project.heroModel ? (
-          <div style={{ marginBottom: "var(--image-pad)" }}>
+          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
             <ModelDisplay
               model={project.heroModel.model}
               video={project.heroModel.video}

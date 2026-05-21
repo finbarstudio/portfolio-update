@@ -255,6 +255,18 @@
     max-height: 72vh;
   }
 
+  /* Card thumbnail hover ring — Apple G2-style rounded corners + pink outline.
+     Add .card-thumb to any thumbnail container. The .group on the <article>
+     triggers the ring on hover anywhere over the card. */
+  .card-thumb {
+    border-radius: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+  .group:hover .card-thumb {
+    box-shadow: 0 0 0 10px var(--pink);
+  }
+
   /* Hero scroll-driven fade (CSS only, no JS) */
   @supports (animation-timeline: scroll()) {
     .hero-scroll-fade {
