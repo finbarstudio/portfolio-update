@@ -28,7 +28,7 @@ const CENTER_SLOT = 3;                  // The visible "centre" slot index
 const CYCLE_SPEED = 0.32;               // Slot-steps per second (raw; eased via DWELL).
 const DWELL_PORTION = 0.35;             // Fraction of each step spent paused at the integer slot.
 const STATE_LERP = 0.04;                // Hover state transition easing
-const CAMERA_DISTANCE = 0.28;           // Camera Z — 2x more zoom.
+const CAMERA_DISTANCE = 0.34;           // Camera Z — slight pull-back from 0.28.
 const CAMERA_FOV = 32;
 const FLANK_ROT = Math.PI / 12;         // ±15° — subtle Z-tilt on flanking phones.
 const ONSTAGE_THRESHOLD = 0.5;          // Only phones above this scale get a video src + decoder.
@@ -134,7 +134,21 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
     cloned.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return;
       const name = (obj.name ?? "").toLowerCase();
-      if (name.includes("screen") || name.includes("display")) {
+      const parentName = (obj.parent?.name ?? "").toLowerCase();
+      const fullName = `${parentName} ${name}`;
+
+      // CRITICAL: the iPhone 15 Pro Max OBJ ships with a `phone_case` mesh that
+      // is the protective shell wrapping the WHOLE phone front (Z=0.0029) — it
+      // sits 0.2mm in front of the actual screen (Z=0.0031), so when it gets
+      // the dark body material it blocks the video screen behind it. Symptom
+      // was the thin slither of video at the top where the case has a front-
+      // camera cutout. Hide it entirely.
+      if (fullName.includes("phone_case")) {
+        obj.visible = false;
+        return;
+      }
+
+      if (fullName.includes("screen") || fullName.includes("display")) {
         obj.material = screenMat;
       } else if (name.includes("camera_glass") || name.includes("flash_glass") || name.includes("lens")) {
         obj.material = glassMat;
