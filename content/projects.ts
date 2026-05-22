@@ -61,6 +61,9 @@ export interface Project {
     videos: string[];     // Exactly 7 video URLs
     poster?: string;
   };
+  heroMagazine?: {        // 20-page 3D magazine that flips through itself
+    pages: string[];      // Page image URLs in flip order
+  };
   companyUrl?: string;
   pdfSlideshow?: {        // PDF rendered as image pages
     title: string;
@@ -269,6 +272,30 @@ export const projects: Project[] = [
     outcome:
       "15+ playbooks delivered across healthcare, manufacturing, technology, storage and professional services. The clearest signal is the repeat work over more than a year.",
     logo: "/images/salesmasters/Logo.png",
+    heroMagazine: {
+      pages: [
+        "/images/salesmasters/magazine pages/Bus4x4 .jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 2.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 3.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 4.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 5.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 6.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 7.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 8.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 9.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 10.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 11.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 12.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 13.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 14.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 15.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 16.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 17.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 18.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 19.jpg",
+        "/images/salesmasters/magazine pages/Bus4x4 20.jpg",
+      ],
+    },
     heroImage: {
       src: "/images/salesmasters/hero.png",
       alt: "Salesmasters Sales Process Playbook double-page spread from the Bus4x4 edition",

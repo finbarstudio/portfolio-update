@@ -6,6 +6,7 @@ import ClientImage from "@/components/ClientImage";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
 import PhoneCarousel from "@/components/PhoneCarousel";
+import MagazineCarousel from "@/components/MagazineCarousel";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -111,6 +112,8 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
               poster={project.heroPhones.poster}
               fill
             />
+          ) : project.heroMagazine ? (
+            <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (
             <ModelDisplay
               model={project.heroModel.model}
