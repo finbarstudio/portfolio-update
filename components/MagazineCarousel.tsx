@@ -6,10 +6,8 @@
  * navigation UI, audio, background plane and shadow material; left only the
  * page-fold animation with a slow auto-advance bounce loop.
  *
- * Each "page" is a thin BoxGeometry split into 30 vertical segments and
- * skinned to a bone chain. Bones twist along their length to give a natural
- * mid-flip curl, and the root bone rotates 180° to flip the page from right
- * to left of the spine.
+ * Hover state: book rotates to face the camera, sheets flatten (all bones
+ * unwind to zero) and spread into a horizontal right-to-left carousel.
  */
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -33,8 +31,19 @@ const INSIDE_CURVE_STRENGTH = 0.18;
 const OUTSIDE_CURVE_STRENGTH = 0.05;
 const TURNING_CURVE_STRENGTH = 0.09;
 
-const AUTO_FLIP_MS = 1700;     // ms between page turns
-const TURN_DURATION_MS = 400;  // animation window for curl on each turn
+const AUTO_FLIP_MS = 1700;
+const TURN_DURATION_MS = 400;
+
+// Book root rotation so the cover faces the camera. The template counters
+// this with <Float rotation-y={Math.PI}>; without it we point the book at us
+// directly (= -π/2 here).
+const BOOK_ROT_Y = -Math.PI / 2;
+const BOOK_ROT_X = -Math.PI / 18;     // slight pitch — gentle isometric feel
+
+const HOVER_STATE_LERP = 0.06;        // ease for state transitions
+const HOVER_SPEED = 0.42;             // cycles/sec for the horizontal carousel
+const HOVER_SPACING = 1.55;           // x distance between adjacent sheets
+const HOVER_VISIBLE_HALF = 2.5;       // ±N slots fully visible from centre
 
 /* ── Build geometry + skinning attributes once (module scope) ── */
 
@@ -73,10 +82,8 @@ pageGeometry.translate(PAGE_WIDTH / 2, 0, 0); // pivot at left edge (spine)
 }
 
 const whiteColor = new THREE.Color("white");
-const edgeColor = new THREE.Color("#f3f1ec"); // subtle warm paper edge
+const edgeColor = new THREE.Color("#f3f1ec");
 
-// 4 edge materials for the BoxGeometry side faces; front/back materials are
-// built per-page so each carries its own texture.
 const edgeMaterials = [
   new THREE.MeshStandardMaterial({ color: whiteColor }),
   new THREE.MeshStandardMaterial({ color: edgeColor }),
@@ -94,9 +101,21 @@ type SheetProps = {
   page: number;
   opened: boolean;
   bookClosed: boolean;
+  hoverProgressRef: React.MutableRefObject<number>;
+  hoverOffsetRef: React.MutableRefObject<number>;
 };
 
-function Sheet({ number, totalSheets, frontTex, backTex, page, opened, bookClosed }: SheetProps) {
+function Sheet({
+  number,
+  totalSheets,
+  frontTex,
+  backTex,
+  page,
+  opened,
+  bookClosed,
+  hoverProgressRef,
+  hoverOffsetRef,
+}: SheetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const skinnedRef = useRef<THREE.SkinnedMesh>(null);
   const turnedAt = useRef(0);
@@ -133,12 +152,9 @@ function Sheet({ number, totalSheets, frontTex, backTex, page, opened, bookClose
     return mesh;
   }, [frontTex, backTex]);
 
-  // Dispose per-page materials on unmount
   useEffect(() => {
     return () => {
       const mats = manualSkinnedMesh.material as THREE.Material[];
-      // Only dispose the per-sheet front/back materials; edgeMaterials are
-      // module-shared.
       mats[4]?.dispose();
       mats[5]?.dispose();
     };
@@ -155,12 +171,28 @@ function Sheet({ number, totalSheets, frontTex, backTex, page, opened, bookClose
     let turningTime = Math.min(TURN_DURATION_MS, +new Date() - turnedAt.current) / TURN_DURATION_MS;
     turningTime = Math.sin(turningTime * Math.PI);
 
-    let targetRotation = opened ? -Math.PI / 2 : Math.PI / 2;
+    let bookTargetRotation = opened ? -Math.PI / 2 : Math.PI / 2;
     if (!bookClosed) {
-      // Tiny per-sheet fan so stacked pages don't z-fight when fully open.
-      targetRotation += THREE.MathUtils.degToRad(number * 0.8);
+      bookTargetRotation += THREE.MathUtils.degToRad(number * 0.8);
     }
 
+    const h = hoverProgressRef.current;
+
+    // ── Carousel slot for this sheet ──────────────────────────
+    const N = totalSheets;
+    let slot = ((number - hoverOffsetRef.current) % N + N) % N;
+    if (slot > N / 2) slot -= N;                         // wrap to [-N/2, N/2)
+    const absS = Math.abs(slot);
+    let carouselScale = 0;
+    if (absS <= HOVER_VISIBLE_HALF + 1) {
+      const k = THREE.MathUtils.clamp(1 - absS / (HOVER_VISIBLE_HALF + 1), 0, 1);
+      carouselScale = 0.55 + k * 0.45;                   // [0.55..1]
+    }
+    // Page geometry pivots at its left edge, so subtract half-width to put the
+    // visible centre of each sheet at the slot x.
+    const carouselGroupX = -slot * HOVER_SPACING - PAGE_WIDTH / 2;
+
+    // ── Bones: blend book-fold rotations toward 0 by hover ────
     const bones = skinnedRef.current.skeleton.bones;
     for (let i = 0; i < bones.length; i++) {
       const target: THREE.Object3D = i === 0 ? groupRef.current : bones[i];
@@ -169,41 +201,49 @@ function Sheet({ number, totalSheets, frontTex, backTex, page, opened, bookClose
       const outsideCurveIntensity = i >= 8 ? Math.cos(i * 0.3 + 0.09) : 0;
       const turningIntensity = Math.sin(i * Math.PI * (1 / bones.length)) * turningTime;
 
-      let rotationAngle =
-        INSIDE_CURVE_STRENGTH * insideCurveIntensity * targetRotation -
-        OUTSIDE_CURVE_STRENGTH * outsideCurveIntensity * targetRotation +
-        TURNING_CURVE_STRENGTH * turningIntensity * targetRotation;
+      let bookRotY =
+        INSIDE_CURVE_STRENGTH * insideCurveIntensity * bookTargetRotation -
+        OUTSIDE_CURVE_STRENGTH * outsideCurveIntensity * bookTargetRotation +
+        TURNING_CURVE_STRENGTH * turningIntensity * bookTargetRotation;
 
-      let foldRotationAngle = THREE.MathUtils.degToRad(Math.sin(targetRotation) * 2);
+      let foldRotationAngle = THREE.MathUtils.degToRad(Math.sin(bookTargetRotation) * 2);
 
       if (bookClosed) {
         if (i === 0) {
-          rotationAngle = targetRotation;
+          bookRotY = bookTargetRotation;
           foldRotationAngle = 0;
         } else {
-          rotationAngle = 0;
+          bookRotY = 0;
           foldRotationAngle = 0;
         }
       }
-
-      // Damped lerp toward target — equivalent to maath's easing.dampAngle for
-      // these small bounded angles.
-      const lambdaY = EASING_FACTOR * 10;
-      target.rotation.y = THREE.MathUtils.damp(target.rotation.y, rotationAngle, lambdaY, delta);
 
       const foldIntensity =
         i > 8
           ? Math.sin(i * Math.PI * (1 / bones.length) - 0.5) * turningTime
           : 0;
+      const bookRotX = foldRotationAngle * foldIntensity;
 
-      const lambdaX = EASING_FACTOR_FOLD * 10;
+      // Blend toward 0 by hover progress — flatten the page.
+      const blendedY = THREE.MathUtils.lerp(bookRotY, 0, h);
+      const blendedX = THREE.MathUtils.lerp(bookRotX, 0, h);
+
+      target.rotation.y = THREE.MathUtils.damp(
+        target.rotation.y, blendedY, EASING_FACTOR * 10, delta
+      );
       target.rotation.x = THREE.MathUtils.damp(
-        target.rotation.x,
-        foldRotationAngle * foldIntensity,
-        lambdaX,
-        delta
+        target.rotation.x, blendedX, EASING_FACTOR_FOLD * 10, delta
       );
     }
+
+    // ── Group transform: book stacks at x=0, hover spreads into slots ──
+    const targetX = THREE.MathUtils.lerp(0, carouselGroupX, h);
+    const targetScale = THREE.MathUtils.lerp(1, carouselScale, h);
+    groupRef.current.position.x = THREE.MathUtils.damp(
+      groupRef.current.position.x, targetX, 6, delta
+    );
+    const s = THREE.MathUtils.damp(groupRef.current.scale.x, targetScale, 6, delta);
+    groupRef.current.scale.setScalar(Math.max(s, 0.0001));
   });
 
   return (
@@ -215,15 +255,12 @@ function Sheet({ number, totalSheets, frontTex, backTex, page, opened, bookClose
       />
     </group>
   );
-  // touch totalSheets so it's part of the closure for future use
-  void totalSheets;
 }
 
-/* ── Magazine: assembles sheets, drives the auto-advance ───── */
+/* ── Magazine: assembles sheets, drives the auto-advance + hover ── */
 
-function Magazine({ pages }: { pages: string[] }) {
-  // Treat consecutive pairs as front/back of one sheet.
-  // 20 image pages -> 10 sheets.
+function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
+  // 20 image pages -> 10 sheets, each with front/back faces.
   const sheets = useMemo(() => {
     const out: { front: string; back: string }[] = [];
     for (let i = 0; i < pages.length; i += 2) {
@@ -249,8 +286,6 @@ function Magazine({ pages }: { pages: string[] }) {
     });
   }, [textures]);
 
-  // Auto-advance state. page goes 0..sheets.length inclusive (both ends =
-  // fully closed). Bounce back and forth.
   const [page, setPage] = useState(0);
   const [delayedPage, setDelayedPage] = useState(0);
   const directionRef = useRef(1);
@@ -260,22 +295,14 @@ function Magazine({ pages }: { pages: string[] }) {
     const id = setInterval(() => {
       setPage((p) => {
         let next = p + directionRef.current;
-        if (next >= sheets.length) {
-          next = sheets.length;
-          directionRef.current = -1;
-        } else if (next <= 0) {
-          next = 0;
-          directionRef.current = 1;
-        }
+        if (next >= sheets.length) { next = sheets.length; directionRef.current = -1; }
+        else if (next <= 0) { next = 0; directionRef.current = 1; }
         return next;
       });
     }, AUTO_FLIP_MS);
     return () => clearInterval(id);
   }, [sheets.length]);
 
-  // Smooth catch-up so multi-page jumps animate one flip at a time (matches
-  // the template). With auto-advance of 1 step per interval, this is mostly
-  // a 1:1 follower, but keep the pattern for safety.
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const tick = () => {
@@ -289,8 +316,33 @@ function Magazine({ pages }: { pages: string[] }) {
     return () => { if (timeout) clearTimeout(timeout); };
   }, [page]);
 
+  // ── Hover state refs (driven each frame, shared with each Sheet) ──
+  const groupRef = useRef<THREE.Group>(null);
+  const hoverProgressRef = useRef(0);
+  const hoverOffsetRef = useRef(0);
+
+  useFrame((_, delta) => {
+    const target = hovered ? 1 : 0;
+    hoverProgressRef.current += (target - hoverProgressRef.current) * HOVER_STATE_LERP;
+
+    // Always advance the carousel offset so an entered hover state is mid-flow.
+    hoverOffsetRef.current = (hoverOffsetRef.current + delta * HOVER_SPEED) % Math.max(sheets.length, 1);
+
+    if (groupRef.current) {
+      const h = hoverProgressRef.current;
+      const targetRotY = THREE.MathUtils.lerp(BOOK_ROT_Y, 0, h);
+      const targetRotX = THREE.MathUtils.lerp(BOOK_ROT_X, 0, h);
+      groupRef.current.rotation.y = THREE.MathUtils.damp(
+        groupRef.current.rotation.y, targetRotY, 6, delta
+      );
+      groupRef.current.rotation.x = THREE.MathUtils.damp(
+        groupRef.current.rotation.x, targetRotX, 6, delta
+      );
+    }
+  });
+
   return (
-    <group rotation-y={Math.PI / 2}>
+    <group ref={groupRef} rotation={[BOOK_ROT_X, BOOK_ROT_Y, 0]}>
       {sheets.map((s, i) => (
         <Sheet
           key={i}
@@ -301,6 +353,8 @@ function Magazine({ pages }: { pages: string[] }) {
           page={delayedPage}
           opened={delayedPage > i}
           bookClosed={delayedPage === 0 || delayedPage === sheets.length}
+          hoverProgressRef={hoverProgressRef}
+          hoverOffsetRef={hoverOffsetRef}
         />
       ))}
     </group>
@@ -314,10 +368,19 @@ type Props = {
   aspectRatio?: string;
   fill?: boolean;
   className?: string;
+  hoverable?: boolean;
 };
 
-function MagazineCarouselInner({ pages, aspectRatio = "3/2", fill = false, className }: Props) {
+function MagazineCarouselInner({
+  pages,
+  aspectRatio = "3/2",
+  fill = false,
+  className,
+  hoverable = true,
+}: Props) {
   const [ready, setReady] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 700);
     return () => clearTimeout(t);
@@ -326,28 +389,39 @@ function MagazineCarouselInner({ pages, aspectRatio = "3/2", fill = false, class
   return (
     <div
       className={className}
+      onPointerEnter={() => hoverable && setHovered(true)}
+      onPointerLeave={() => hoverable && setHovered(false)}
+      onFocus={() => hoverable && setHovered(true)}
+      onBlur={() => hoverable && setHovered(false)}
       style={{
         position: "relative",
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
         background: "var(--color-bg, #FAFAF8)",
         overflow: "hidden",
+        cursor: hoverable ? "pointer" : "default",
       }}
     >
+      {/* Edge fade — masks pages entering/exiting on both sides in hover mode */}
+      <div aria-hidden="true" style={{
+        position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none",
+        background:
+          "linear-gradient(to right, var(--color-bg, #FAFAF8) 0%, transparent 6%, transparent 94%, var(--color-bg, #FAFAF8) 100%)",
+      }} />
       {!ready && <Loader size={28} />}
 
       <Canvas
         shadows={false}
-        camera={{ position: [-0.5, 1, 4], fov: 45, near: 0.1, far: 50 }}
+        camera={{ position: [0, 0.4, 4.2], fov: 42, near: 0.1, far: 50 }}
         dpr={[1, 1.75]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
         <ambientLight intensity={0.85} />
-        <directionalLight position={[2, 5, 2]} intensity={1.4} />
+        <directionalLight position={[3, 5, 4]} intensity={1.3} />
         <directionalLight position={[-3, 2, -2]} intensity={0.4} />
         <Suspense fallback={null}>
-          <Magazine pages={pages} />
+          <Magazine pages={pages} hovered={hovered} />
         </Suspense>
       </Canvas>
     </div>
