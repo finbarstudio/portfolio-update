@@ -1,14 +1,15 @@
 "use client";
 
 /**
- * MagazineCarousel — a 20-page magazine viewed at an isometric angle.
+ * MagazineCarousel — bone-skinned 3D magazine that auto-flips through its
+ * pages. Adapted from github.com/shreejai/book-slider-3d, stripped of
+ * navigation UI, audio, background plane and shadow material; left only the
+ * page-fold animation with a slow auto-advance bounce loop.
  *
- * Rest state: pages stacked on the right of a central spine. Every few seconds
- * the top page flips left around the spine, revealing the next page beneath.
- * Continuous loop across all 20 pages.
- *
- * Hover state: pages explode out into a horizontal right-to-left carousel,
- * mirroring PhoneCarousel's hover treatment.
+ * Each "page" is a thin BoxGeometry split into 30 vertical segments and
+ * skinned to a bone chain. Bones twist along their length to give a natural
+ * mid-flip curl, and the root bone rotates 180° to flip the page from right
+ * to left of the spine.
  */
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -20,105 +21,222 @@ import Loader from "./Loader";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
-const PAGE_W = 0.46;
-const PAGE_H = 0.66;
-const STACK_OFFSET = 0.0009;        // z separation between pages within a stack
-const FLIP_SECONDS = 3.6;            // seconds per page flip in rest state
-const STATE_LERP = 0.045;            // hover transition easing
-const HOVER_SPEED = 0.42;            // cycles/sec in hover carousel
-const HOVER_SPACING = 0.30;
-const HOVER_VISIBLE_HALF = 3;        // ±3 page slots visible from centre
-const CAM_Z = 1.4;
-const CAM_FOV = 32;
-const TILT_X = -Math.PI / 13;        // pitch down — isometric feel
-const TILT_Y = Math.PI / 12;         // yaw — isometric feel
+const PAGE_WIDTH = 1.28;
+const PAGE_HEIGHT = 1.71;
+const PAGE_DEPTH = 0.003;
+const PAGE_SEGMENTS = 30;
+const SEGMENT_WIDTH = PAGE_WIDTH / PAGE_SEGMENTS;
 
-/* ── Easing ────────────────────────────────────────────────── */
+const EASING_FACTOR = 0.5;
+const EASING_FACTOR_FOLD = 0.3;
+const INSIDE_CURVE_STRENGTH = 0.18;
+const OUTSIDE_CURVE_STRENGTH = 0.05;
+const TURNING_CURVE_STRENGTH = 0.09;
 
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
+const AUTO_FLIP_MS = 1700;     // ms between page turns
+const TURN_DURATION_MS = 400;  // animation window for curl on each turn
 
-/* ── Per-page rest transform ───────────────────────────────── */
-// phase ∈ [0, numPages). 0 = page just started flipping.
-function restPageTransform(phase: number, numPages: number) {
-  // 1. Actively flipping (0 → -π over 1 unit of phase)
-  if (phase < 1) {
-    const t = easeInOutCubic(phase);
-    return { rotY: -Math.PI * t, scale: 1, z: 0 };
+/* ── Build geometry + skinning attributes once (module scope) ── */
+
+const pageGeometry = new THREE.BoxGeometry(
+  PAGE_WIDTH,
+  PAGE_HEIGHT,
+  PAGE_DEPTH,
+  PAGE_SEGMENTS,
+  2
+);
+pageGeometry.translate(PAGE_WIDTH / 2, 0, 0); // pivot at left edge (spine)
+
+{
+  const position = pageGeometry.attributes.position;
+  const vertex = new THREE.Vector3();
+  const skinIndexes: number[] = [];
+  const skinWeights: number[] = [];
+
+  for (let i = 0; i < position.count; i++) {
+    vertex.fromBufferAttribute(position, i);
+    const x = vertex.x;
+    const skinIndex = Math.max(0, Math.floor(x / SEGMENT_WIDTH));
+    const skinWeight = (x % SEGMENT_WIDTH) / SEGMENT_WIDTH;
+    skinIndexes.push(skinIndex, skinIndex + 1, 0, 0);
+    skinWeights.push(1 - skinWeight, skinWeight, 0, 0);
   }
-  // 2. Recently flipped — visible on the left stack
-  if (phase < 5) {
-    return { rotY: -Math.PI, scale: 1, z: (phase - 1) * STACK_OFFSET * 0.6 };
-  }
-  // 3. Hidden mid-cycle — not in the visible window; rotation transitions
-  //    invisibly back from -π to 0 over the deep portion of the cycle.
-  if (phase < numPages - 5) {
-    const t = (phase - 5) / (numPages - 10); // 0..1
-    return { rotY: -Math.PI * (1 - t), scale: 0, z: 0 };
-  }
-  // 4. Right stack waiting — pages near "about to flip" are stacked at front.
-  const slotsFromTop = numPages - phase; // 5..0
-  return { rotY: 0, scale: 1, z: -slotsFromTop * STACK_OFFSET };
-}
 
-/* ── Per-page hover transform ──────────────────────────────── */
-// slotFloat ∈ [0, numPages). 0 = centre, increasing values drift left.
-function hoverPageTransform(slotFloat: number, numPages: number) {
-  // Bring slot into a centred frame where 0 = centre.
-  let s = slotFloat;
-  if (s > numPages / 2) s -= numPages; // wrap to [-numPages/2, numPages/2)
-
-  const absS = Math.abs(s);
-  // Smooth scale fall-off past ±visible half
-  let scale = 0;
-  let opacity = 0;
-  if (absS <= HOVER_VISIBLE_HALF + 1) {
-    const k = THREE.MathUtils.clamp(1 - absS / (HOVER_VISIBLE_HALF + 1), 0, 1);
-    scale = 0.45 + k * 0.55;
-    opacity = k;
-  }
-  const x = -s * HOVER_SPACING - PAGE_W / 2; // shift left so centre page sits on x=0
-  return { x, scale, opacity };
-}
-
-/* ── Page mesh ─────────────────────────────────────────────── */
-
-type PageProps = {
-  texture: THREE.Texture;
-  geometry: THREE.BufferGeometry;
-  groupSetter: (g: THREE.Group | null) => void;
-  matSetter: (m: THREE.MeshBasicMaterial | null) => void;
-};
-
-function Page({ texture, geometry, groupSetter, matSetter }: PageProps) {
-  const material = useMemo(() => {
-    const m = new THREE.MeshBasicMaterial({
-      map: texture,
-      side: THREE.DoubleSide,
-      toneMapped: false,
-      transparent: true,
-      opacity: 1,
-    });
-    return m;
-  }, [texture]);
-
-  useEffect(() => () => { material.dispose(); }, [material]);
-  useEffect(() => { matSetter(material); return () => matSetter(null); }, [material, matSetter]);
-
-  return (
-    <group ref={groupSetter}>
-      <mesh geometry={geometry} material={material} />
-    </group>
+  pageGeometry.setAttribute(
+    "skinIndex",
+    new THREE.Uint16BufferAttribute(skinIndexes, 4)
+  );
+  pageGeometry.setAttribute(
+    "skinWeight",
+    new THREE.Float32BufferAttribute(skinWeights, 4)
   );
 }
 
-/* ── Magazine ──────────────────────────────────────────────── */
+const whiteColor = new THREE.Color("white");
+const edgeColor = new THREE.Color("#f3f1ec"); // subtle warm paper edge
 
-function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
-  const numPages = pages.length;
-  const encodedPages = useMemo(() => pages.map(encodeURI), [pages]);
-  const textures = useLoader(THREE.TextureLoader, encodedPages) as THREE.Texture[];
+// 4 edge materials for the BoxGeometry side faces; front/back materials are
+// built per-page so each carries its own texture.
+const edgeMaterials = [
+  new THREE.MeshStandardMaterial({ color: whiteColor }),
+  new THREE.MeshStandardMaterial({ color: edgeColor }),
+  new THREE.MeshStandardMaterial({ color: whiteColor }),
+  new THREE.MeshStandardMaterial({ color: whiteColor }),
+];
+
+/* ── Single sheet ──────────────────────────────────────────── */
+
+type SheetProps = {
+  number: number;
+  totalSheets: number;
+  frontTex: THREE.Texture;
+  backTex: THREE.Texture;
+  page: number;
+  opened: boolean;
+  bookClosed: boolean;
+};
+
+function Sheet({ number, totalSheets, frontTex, backTex, page, opened, bookClosed }: SheetProps) {
+  const groupRef = useRef<THREE.Group>(null);
+  const skinnedRef = useRef<THREE.SkinnedMesh>(null);
+  const turnedAt = useRef(0);
+  const lastOpened = useRef(opened);
+
+  const manualSkinnedMesh = useMemo(() => {
+    const bones: THREE.Bone[] = [];
+    for (let i = 0; i <= PAGE_SEGMENTS; i++) {
+      const bone = new THREE.Bone();
+      bones.push(bone);
+      bone.position.x = i === 0 ? 0 : SEGMENT_WIDTH;
+      if (i > 0) bones[i - 1].add(bone);
+    }
+    const skeleton = new THREE.Skeleton(bones);
+
+    const materials: THREE.Material[] = [
+      ...edgeMaterials,
+      new THREE.MeshStandardMaterial({
+        color: whiteColor,
+        map: frontTex,
+        roughness: 0.55,
+      }),
+      new THREE.MeshStandardMaterial({
+        color: whiteColor,
+        map: backTex,
+        roughness: 0.55,
+      }),
+    ];
+
+    const mesh = new THREE.SkinnedMesh(pageGeometry, materials);
+    mesh.frustumCulled = false;
+    mesh.add(skeleton.bones[0]);
+    mesh.bind(skeleton);
+    return mesh;
+  }, [frontTex, backTex]);
+
+  // Dispose per-page materials on unmount
+  useEffect(() => {
+    return () => {
+      const mats = manualSkinnedMesh.material as THREE.Material[];
+      // Only dispose the per-sheet front/back materials; edgeMaterials are
+      // module-shared.
+      mats[4]?.dispose();
+      mats[5]?.dispose();
+    };
+  }, [manualSkinnedMesh]);
+
+  useFrame((_, delta) => {
+    if (!skinnedRef.current || !groupRef.current) return;
+
+    if (lastOpened.current !== opened) {
+      turnedAt.current = +new Date();
+      lastOpened.current = opened;
+    }
+
+    let turningTime = Math.min(TURN_DURATION_MS, +new Date() - turnedAt.current) / TURN_DURATION_MS;
+    turningTime = Math.sin(turningTime * Math.PI);
+
+    let targetRotation = opened ? -Math.PI / 2 : Math.PI / 2;
+    if (!bookClosed) {
+      // Tiny per-sheet fan so stacked pages don't z-fight when fully open.
+      targetRotation += THREE.MathUtils.degToRad(number * 0.8);
+    }
+
+    const bones = skinnedRef.current.skeleton.bones;
+    for (let i = 0; i < bones.length; i++) {
+      const target: THREE.Object3D = i === 0 ? groupRef.current : bones[i];
+
+      const insideCurveIntensity = i < 8 ? Math.sin(i * 0.2 + 0.25) : 0;
+      const outsideCurveIntensity = i >= 8 ? Math.cos(i * 0.3 + 0.09) : 0;
+      const turningIntensity = Math.sin(i * Math.PI * (1 / bones.length)) * turningTime;
+
+      let rotationAngle =
+        INSIDE_CURVE_STRENGTH * insideCurveIntensity * targetRotation -
+        OUTSIDE_CURVE_STRENGTH * outsideCurveIntensity * targetRotation +
+        TURNING_CURVE_STRENGTH * turningIntensity * targetRotation;
+
+      let foldRotationAngle = THREE.MathUtils.degToRad(Math.sin(targetRotation) * 2);
+
+      if (bookClosed) {
+        if (i === 0) {
+          rotationAngle = targetRotation;
+          foldRotationAngle = 0;
+        } else {
+          rotationAngle = 0;
+          foldRotationAngle = 0;
+        }
+      }
+
+      // Damped lerp toward target — equivalent to maath's easing.dampAngle for
+      // these small bounded angles.
+      const lambdaY = EASING_FACTOR * 10;
+      target.rotation.y = THREE.MathUtils.damp(target.rotation.y, rotationAngle, lambdaY, delta);
+
+      const foldIntensity =
+        i > 8
+          ? Math.sin(i * Math.PI * (1 / bones.length) - 0.5) * turningTime
+          : 0;
+
+      const lambdaX = EASING_FACTOR_FOLD * 10;
+      target.rotation.x = THREE.MathUtils.damp(
+        target.rotation.x,
+        foldRotationAngle * foldIntensity,
+        lambdaX,
+        delta
+      );
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      <primitive
+        object={manualSkinnedMesh}
+        ref={skinnedRef}
+        position-z={-number * PAGE_DEPTH + page * PAGE_DEPTH}
+      />
+    </group>
+  );
+  // touch totalSheets so it's part of the closure for future use
+  void totalSheets;
+}
+
+/* ── Magazine: assembles sheets, drives the auto-advance ───── */
+
+function Magazine({ pages }: { pages: string[] }) {
+  // Treat consecutive pairs as front/back of one sheet.
+  // 20 image pages -> 10 sheets.
+  const sheets = useMemo(() => {
+    const out: { front: string; back: string }[] = [];
+    for (let i = 0; i < pages.length; i += 2) {
+      out.push({ front: pages[i], back: pages[i + 1] ?? pages[i] });
+    }
+    return out;
+  }, [pages]);
+
+  const allTexPaths = useMemo(
+    () => sheets.flatMap((s) => [s.front, s.back]).map(encodeURI),
+    [sheets]
+  );
+  const textures = useLoader(THREE.TextureLoader, allTexPaths) as THREE.Texture[];
 
   useEffect(() => {
     textures.forEach((t) => {
@@ -131,85 +249,58 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
     });
   }, [textures]);
 
-  // PlaneGeometry pivoted so the left edge sits at x=0 (the spine axis).
-  const pageGeometry = useMemo(() => {
-    const g = new THREE.PlaneGeometry(PAGE_W, PAGE_H, 1, 1);
-    g.translate(PAGE_W / 2, 0, 0);
-    return g;
-  }, []);
+  // Auto-advance state. page goes 0..sheets.length inclusive (both ends =
+  // fully closed). Bounce back and forth.
+  const [page, setPage] = useState(0);
+  const [delayedPage, setDelayedPage] = useState(0);
+  const directionRef = useRef(1);
 
-  useEffect(() => () => { pageGeometry.dispose(); }, [pageGeometry]);
+  useEffect(() => {
+    if (sheets.length === 0) return;
+    const id = setInterval(() => {
+      setPage((p) => {
+        let next = p + directionRef.current;
+        if (next >= sheets.length) {
+          next = sheets.length;
+          directionRef.current = -1;
+        } else if (next <= 0) {
+          next = 0;
+          directionRef.current = 1;
+        }
+        return next;
+      });
+    }, AUTO_FLIP_MS);
+    return () => clearInterval(id);
+  }, [sheets.length]);
 
-  const pageRefs = useRef<(THREE.Group | null)[]>(new Array(numPages).fill(null));
-  const matRefs = useRef<(THREE.MeshBasicMaterial | null)[]>(new Array(numPages).fill(null));
-  const restProgress = useRef(0);
-  const hoverOffset = useRef(0);
-  const hoverProgress = useRef(0);
-
-  useFrame((_, delta) => {
-    const target = hovered ? 1 : 0;
-    hoverProgress.current += (target - hoverProgress.current) * STATE_LERP;
-    const h = hoverProgress.current;
-
-    restProgress.current = (restProgress.current + delta / FLIP_SECONDS) % numPages;
-    hoverOffset.current = (hoverOffset.current + delta * HOVER_SPEED) % numPages;
-
-    const lerp = THREE.MathUtils.lerp;
-
-    for (let i = 0; i < numPages; i++) {
-      const g = pageRefs.current[i];
-      const m = matRefs.current[i];
-      if (!g) continue;
-
-      // Rest phase: time since page i started its flip.
-      const phase = (restProgress.current - i + numPages) % numPages;
-      const r = restPageTransform(phase, numPages);
-
-      // Hover: page i's position in the horizontal slot stream.
-      const slotFloat = (i - hoverOffset.current + numPages) % numPages;
-      const hov = hoverPageTransform(slotFloat, numPages);
-
-      const x = lerp(0, hov.x, h);
-      const y = 0;
-      const z = lerp(r.z, 0, h);
-      const rotY = lerp(r.rotY, 0, h);
-      const scale = lerp(r.scale, hov.scale, h);
-      g.position.set(x, y, z);
-      g.rotation.y = rotY;
-      g.scale.setScalar(scale);
-
-      const restOpacity = r.scale > 0.02 ? 1 : 0;
-      const opacity = lerp(restOpacity, hov.opacity, h);
-      if (m) {
-        m.opacity = opacity;
-        m.depthWrite = opacity > 0.95;
-      }
-
-      g.visible = scale > 0.01 && opacity > 0.01;
-    }
-  });
+  // Smooth catch-up so multi-page jumps animate one flip at a time (matches
+  // the template). With auto-advance of 1 step per interval, this is mostly
+  // a 1:1 follower, but keep the pattern for safety.
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const tick = () => {
+      setDelayedPage((d) => {
+        if (page === d) return d;
+        timeout = setTimeout(tick, Math.abs(page - d) > 2 ? 50 : 150);
+        return d + (page > d ? 1 : -1);
+      });
+    };
+    tick();
+    return () => { if (timeout) clearTimeout(timeout); };
+  }, [page]);
 
   return (
-    <group rotation={[TILT_X, TILT_Y, 0]} position={[0, 0.02, 0]}>
-      {/* Subtle ground shadow disc — anchors the magazine visually */}
-      <mesh position={[0, -PAGE_H / 2 - 0.005, -0.04]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[PAGE_W * 0.9, 32]} />
-        <meshBasicMaterial color="#000" transparent opacity={0.06} />
-      </mesh>
-
-      {/* Spine — thin dark strip running along the binding axis */}
-      <mesh position={[0, 0, 0.001]}>
-        <boxGeometry args={[0.012, PAGE_H, 0.022]} />
-        <meshStandardMaterial color="#1a1a1c" roughness={0.55} metalness={0.2} />
-      </mesh>
-
-      {textures.map((tex, i) => (
-        <Page
+    <group rotation-y={Math.PI / 2}>
+      {sheets.map((s, i) => (
+        <Sheet
           key={i}
-          texture={tex}
-          geometry={pageGeometry}
-          groupSetter={(g) => { pageRefs.current[i] = g; }}
-          matSetter={(m) => { matRefs.current[i] = m; }}
+          number={i}
+          totalSheets={sheets.length}
+          frontTex={textures[i * 2]}
+          backTex={textures[i * 2 + 1]}
+          page={delayedPage}
+          opened={delayedPage > i}
+          bookClosed={delayedPage === 0 || delayedPage === sheets.length}
         />
       ))}
     </group>
@@ -223,19 +314,10 @@ type Props = {
   aspectRatio?: string;
   fill?: boolean;
   className?: string;
-  hoverable?: boolean;
 };
 
-function MagazineCarouselInner({
-  pages,
-  aspectRatio = "3/2",
-  fill = false,
-  className,
-  hoverable = true,
-}: Props) {
-  const [hovered, setHovered] = useState(false);
+function MagazineCarouselInner({ pages, aspectRatio = "3/2", fill = false, className }: Props) {
   const [ready, setReady] = useState(false);
-
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 700);
     return () => clearTimeout(t);
@@ -244,37 +326,28 @@ function MagazineCarouselInner({
   return (
     <div
       className={className}
-      onPointerEnter={() => hoverable && setHovered(true)}
-      onPointerLeave={() => hoverable && setHovered(false)}
-      onFocus={() => hoverable && setHovered(true)}
-      onBlur={() => hoverable && setHovered(false)}
       style={{
         position: "relative",
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
         background: "var(--color-bg, #FAFAF8)",
         overflow: "hidden",
-        cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Edge fade — masks pages entering/exiting on both sides */}
-      <div aria-hidden="true" style={{
-        position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none",
-        background:
-          "linear-gradient(to right, var(--color-bg, #FAFAF8) 0%, transparent 5%, transparent 95%, var(--color-bg, #FAFAF8) 100%)",
-      }} />
       {!ready && <Loader size={28} />}
 
       <Canvas
-        camera={{ position: [0, 0, CAM_Z], fov: CAM_FOV, near: 0.1, far: 50 }}
+        shadows={false}
+        camera={{ position: [-0.5, 1, 4], fov: 45, near: 0.1, far: 50 }}
         dpr={[1, 1.75]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
         <ambientLight intensity={0.85} />
-        <directionalLight position={[3, 4, 5]} intensity={0.6} />
+        <directionalLight position={[2, 5, 2]} intensity={1.4} />
+        <directionalLight position={[-3, 2, -2]} intensity={0.4} />
         <Suspense fallback={null}>
-          <Magazine pages={pages} hovered={hovered} />
+          <Magazine pages={pages} />
         </Suspense>
       </Canvas>
     </div>
