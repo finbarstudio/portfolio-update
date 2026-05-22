@@ -14,25 +14,36 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import * as THREE from "three";
 
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import Loader from "./Loader";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
 const PAGE_WIDTH = 1.28;
 const PAGE_HEIGHT = 1.71;
-const PAGE_DEPTH = 0.003;
+const PAGE_DEPTH = 0.006;             // ↑ thicker stack avoids z-fight between sheets
 const PAGE_SEGMENTS = 30;
 const SEGMENT_WIDTH = PAGE_WIDTH / PAGE_SEGMENTS;
 
-const EASING_FACTOR = 0.5;
-const EASING_FACTOR_FOLD = 0.3;
+const EASING_FACTOR = 0.22;           // ↓ slower damp so the flip is less aggressive
+const EASING_FACTOR_FOLD = 0.16;
 const INSIDE_CURVE_STRENGTH = 0.18;
 const OUTSIDE_CURVE_STRENGTH = 0.05;
 const TURNING_CURVE_STRENGTH = 0.09;
 
-const AUTO_FLIP_MS = 1700;
-const TURN_DURATION_MS = 400;
+const AUTO_FLIP_MS = 2800;            // ↑ longer pause between turns
+const TURN_DURATION_MS = 1100;        // ↑ curl visible for longer
+
+// Lift the actively-flipping sheet forward in z during its turn so the
+// curled body doesn't clip into the stacks on either side of the spine.
+const FLIP_Z_LIFT = 0.08;
+
+// Camera zoom: closer in book mode, pulled back in hover so the carousel
+// row has room to breathe.
+const CAM_Z_BOOK = 2.2;
+const CAM_Z_HOVER = 4.1;
+const CAM_Y_BOOK = 0.25;
+const CAM_Y_HOVER = 0.05;
 
 // Book root rotation so the cover faces the camera. The template counters
 // this with <Float rotation-y={Math.PI}>; without it we point the book at us
@@ -244,15 +255,21 @@ function Sheet({
     );
     const s = THREE.MathUtils.damp(groupRef.current.scale.x, targetScale, 6, delta);
     groupRef.current.scale.setScalar(Math.max(s, 0.0001));
+
+    // ── Mesh z: stack offset + a mid-turn forward lift to avoid clipping ──
+    const baseZ = -number * PAGE_DEPTH + page * PAGE_DEPTH;
+    const lift = turningTime * FLIP_Z_LIFT * (1 - h);
+    skinnedRef.current.position.z = THREE.MathUtils.damp(
+      skinnedRef.current.position.z, baseZ + lift, 8, delta
+    );
   });
 
+  // Mesh z is driven imperatively (below in useFrame) so we can add a
+  // turn-time forward lift to the flipping sheet. Don't set position-z via
+  // JSX or it'll fight the per-frame update.
   return (
     <group ref={groupRef}>
-      <primitive
-        object={manualSkinnedMesh}
-        ref={skinnedRef}
-        position-z={-number * PAGE_DEPTH + page * PAGE_DEPTH}
-      />
+      <primitive object={manualSkinnedMesh} ref={skinnedRef} />
     </group>
   );
 }
@@ -320,6 +337,7 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const hoverProgressRef = useRef(0);
   const hoverOffsetRef = useRef(0);
+  const camera = useThree((s) => s.camera);
 
   useFrame((_, delta) => {
     const target = hovered ? 1 : 0;
@@ -328,8 +346,9 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
     // Always advance the carousel offset so an entered hover state is mid-flow.
     hoverOffsetRef.current = (hoverOffsetRef.current + delta * HOVER_SPEED) % Math.max(sheets.length, 1);
 
+    const h = hoverProgressRef.current;
+
     if (groupRef.current) {
-      const h = hoverProgressRef.current;
       const targetRotY = THREE.MathUtils.lerp(BOOK_ROT_Y, 0, h);
       const targetRotX = THREE.MathUtils.lerp(BOOK_ROT_X, 0, h);
       groupRef.current.rotation.y = THREE.MathUtils.damp(
@@ -339,6 +358,12 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
         groupRef.current.rotation.x, targetRotX, 6, delta
       );
     }
+
+    // Lerp camera so book mode is zoomed in and hover mode pulls back for the carousel.
+    const targetCamZ = THREE.MathUtils.lerp(CAM_Z_BOOK, CAM_Z_HOVER, h);
+    const targetCamY = THREE.MathUtils.lerp(CAM_Y_BOOK, CAM_Y_HOVER, h);
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, targetCamZ, 4, delta);
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, targetCamY, 4, delta);
   });
 
   return (
@@ -412,14 +437,16 @@ function MagazineCarouselInner({
 
       <Canvas
         shadows={false}
-        camera={{ position: [0, 0.4, 4.2], fov: 42, near: 0.1, far: 50 }}
+        camera={{ position: [0, CAM_Y_BOOK, CAM_Z_BOOK], fov: 42, near: 0.1, far: 50 }}
         dpr={[1, 1.75]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
-        <ambientLight intensity={0.85} />
-        <directionalLight position={[3, 5, 4]} intensity={1.3} />
-        <directionalLight position={[-3, 2, -2]} intensity={0.4} />
+        <ambientLight intensity={1.25} />
+        <hemisphereLight args={["#ffffff", "#e8e6df", 0.55]} />
+        <directionalLight position={[3, 5, 4]} intensity={2.0} />
+        <directionalLight position={[-3, 2, -2]} intensity={0.75} />
+        <directionalLight position={[0, 4, -3]} intensity={0.55} />
         <Suspense fallback={null}>
           <Magazine pages={pages} hovered={hovered} />
         </Suspense>
