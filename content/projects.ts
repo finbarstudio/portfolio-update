@@ -75,12 +75,12 @@ export interface Project {
 
 export const projects: Project[] = [
 
-  /* 1. KinAya. Featured */
+  /* 2. KinAya. Featured */
   {
     slug: "kinaya",
     name: "KinAya",
     tier: "featured",
-    rank: 1,
+    rank: 2,
     date: "2024",
     categories: ["Brand Identity", "Web Design", "Framer", "NDIS"],
     skills: ["Brand Identity", "Logo Design", "Framer Development", "CMS Setup", "Accessibility", "Web Design"],
@@ -138,12 +138,12 @@ export const projects: Project[] = [
     companyUrl: "https://kinaya.com.au",
   },
 
-  /* 2. TMYR (The Moment You Realise). Featured */
+  /* 1. TMYR (The Moment You Realise). Featured */
   {
     slug: "tmyr",
     name: "The Moment You Realise",
     tier: "featured",
-    rank: 2,
+    rank: 1,
     companyUrl: "https://sharetobuy.com",
     date: "2022–2023",
     categories: ["Social Campaign", "Motion Graphics", "Digital"],
@@ -247,12 +247,12 @@ export const projects: Project[] = [
     ],
   },
 
-  /* 3. Salesmasters. Featured */
+  /* 4. Salesmasters. Featured */
   {
     slug: "salesmasters",
     name: "Salesmasters",
     tier: "featured",
-    rank: 3,
+    rank: 4,
     companyUrl: "https://salesmasters.com.au",
     date: "2023–2024",
     categories: ["Publication Design", "Infographic Design", "Print"],
@@ -385,12 +385,12 @@ export const projects: Project[] = [
     ],
   },
 
-  /* 4. Joe Devine. Full */
+  /* 3. Joe Devine. Full */
   {
     slug: "joe-devine",
     name: "Joe Devine",
     tier: "full",
-    rank: 4,
+    rank: 3,
     date: "2023",
     categories: ["Art Direction", "Cover Artwork", "Photography"],
     skills: [
