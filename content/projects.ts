@@ -92,7 +92,6 @@ export const projects: Project[] = [
     heroModel: {
       model: "/models/studio-display/display.gltf",
       video: "/images/kinaya/accessibility.webm",
-      poster: "/images/kinaya/accessibility-poster.jpg",
     },
     heroImage: { src: "/images/kinaya/desktop.png", alt: "KinAya website desktop view with structured, accessible homepage layout" },
     images: [
@@ -893,8 +892,7 @@ export const projects: Project[] = [
     outcome: "Brand expression held consistent across every touchpoint.",
     heroModel: {
       model: "/models/studio-display/display.gltf",
-      video: "/images/packer-associates/3D%20Model%20Video.mp4",
-      poster: "/images/packer-associates/hero-poster.jpg",
+      video: "/images/packer-associates/3D%20Model%20Video.webm",
     },
     heroImage: {
       src: "/images/packer-associates/hero-poster.jpg",
