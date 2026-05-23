@@ -48,16 +48,21 @@ const TURN_DURATION_MS = 1500;        // ↑ curl visible for longer, slower swi
 const FLIP_Z_LIFT = 0.22;
 const FLIP_Y_ARC  = 0.45;
 
-// Camera zoom: in book mode pull back slightly, in carousel mode bring closer so
-// text on the laid-out pages is large enough to read.
-const CAM_Z_BOOK = 2.7;
-const CAM_Z_CAROUSEL = 2.5;           // tighter than before for legible text
-const CAM_Y_BOOK = 0.25;
-const CAM_Y_CAROUSEL = -0.05;         // carousel sits mid-frame
+// Camera zoom: in book mode pull back further so the wider page fan has room
+// to breathe; in carousel mode bring closer so text reads.
+const CAM_Z_BOOK = 3.6;               // was 2.7 — too tight, page tips left frame
+const CAM_Z_CAROUSEL = 2.5;
+const CAM_Y_BOOK = 0.20;
+const CAM_Y_CAROUSEL = -0.05;
 
 // Book root rotation so the cover faces the camera.
 const BOOK_ROT_Y = -Math.PI / 2;
 const BOOK_ROT_X = -Math.PI / 18;
+
+// Per-sheet fan-out angle (degrees) added to each page's rest rotation in book
+// mode. Wider fan = visible separation between adjacent pages and, crucially,
+// a clear V of empty air through which the flipping page can swing.
+const BOOK_FAN_DEG = 3.5;             // was 0.8 — too tight, pages stacked flat
 
 const HOVER_STATE_LERP = 0.06;
 const CAROUSEL_SPEED = 0.30;          // slot units / sec
@@ -204,7 +209,11 @@ function Sheet({
 
     let bookTargetRotation = opened ? -Math.PI / 2 : Math.PI / 2;
     if (!bookClosed) {
-      bookTargetRotation += THREE.MathUtils.degToRad(number * 0.8);
+      // Fan each side toward upright so the two stacks form a V with a clear
+      // wedge of air above the spine for the flipping sheet to swing through.
+      // Deeper sheets (higher `number`) tilt more toward 0.
+      const fan = THREE.MathUtils.degToRad(number * BOOK_FAN_DEG);
+      bookTargetRotation += opened ? fan : -fan;
     }
 
     const h = hoverProgressRef.current;
