@@ -19,7 +19,7 @@ import Loader from "./Loader";
 const PAGE_WIDTH = 1.28;
 const PAGE_HEIGHT = 1.71;
 
-const CAM_Y = -0.05;
+const CAM_Y = 0;
 const CAM_Z = 2.5;
 
 const CAROUSEL_SPEED = 0.30;          // slot units / sec
@@ -117,7 +117,7 @@ function Carousel({ pages }: { pages: string[] }) {
   });
 
   return (
-    <group position={[0, -0.18, 0]}>
+    <group position={[0, 0, 0]}>
       {pages.map((_, i) => (
         <Page
           key={i}

@@ -247,11 +247,11 @@ export const projects: Project[] = [
     ],
   },
 
-  /* 4. Salesmasters. Featured */
+  /* 4. Salesmasters. Full */
   {
     slug: "salesmasters",
     name: "Salesmasters",
-    tier: "featured",
+    tier: "full",
     rank: 4,
     companyUrl: "https://salesmasters.com.au",
     date: "2023–2024",
@@ -385,11 +385,11 @@ export const projects: Project[] = [
     ],
   },
 
-  /* 3. Joe Devine. Full */
+  /* 3. Joe Devine. Featured */
   {
     slug: "joe-devine",
     name: "Joe Devine",
-    tier: "full",
+    tier: "featured",
     rank: 3,
     date: "2023",
     categories: ["Art Direction", "Cover Artwork", "Photography"],
