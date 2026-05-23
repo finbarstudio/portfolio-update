@@ -1,39 +1,88 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 
-type Props = {
-  images: string[];
-  /** ms between crossfades. Default 2800. */
-  interval?: number;
-  aspectRatio?: string;
-  sizes?: string;
-};
+/* ── Tunables ──────────────────────────────────────────── */
+const CARD_W = 0.28;    // card width as fraction of container
+const GAP    = 0.05;    // gap between cards (fraction of container)
+const S_MIN  = 0.78;    // scale at far edges
+const S_MAX  = 1.06;    // scale at center
+const TILT   = 0.03;    // rotateY degrees per px from center (3D depth)
+const SPEED  = 0.032;   // scroll px per ms
+
+type Props = { images: string[]; aspectRatio?: string; sizes?: string };
 
 /**
- * HeroSlideshow — lightweight CSS crossfade carousel for cover images.
- * No WebGL. All images preloaded; each fades in over 0.6 s.
+ * HeroSlideshow — continuous right-to-left cover carousel.
+ * All images visible at once; center card scales up with smoothstep easing.
+ * Subtle perspective tilt + white gradient masks on edges.
  */
-export default function HeroSlideshow({
-  images,
-  interval = 2800,
-  aspectRatio = "3/2",
-  sizes = "(max-width: 640px) 100vw, calc((100vw - 224px) / 2)",
-}: Props) {
-  const [current, setCurrent] = useState(0);
+export default function HeroSlideshow({ images, aspectRatio = "3/2", sizes }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const offsetRef    = useRef(0);
+  const lastTRef     = useRef<number | null>(null);
+  const rafRef       = useRef<number>(0);
+
+  // Triple the images so there are always cards filling the viewport during loop
+  const tiles = [...images, ...images, ...images];
 
   useEffect(() => {
-    if (images.length <= 1) return;
-    const t = setInterval(
-      () => setCurrent((i) => (i + 1) % images.length),
-      interval,
-    );
-    return () => clearInterval(t);
-  }, [images.length, interval]);
+    const el = containerRef.current;
+    if (!el) return;
+    const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-c]"));
+
+    let inited = false;
+
+    const tick = (now: number) => {
+      const cw     = el.offsetWidth;
+      const cardW  = cw * CARD_W;
+      const stride = cardW + cw * GAP;
+      const loopW  = stride * images.length;
+
+      // On first valid frame, centre the middle card of the first set
+      if (!inited && cw > 0) {
+        const k = Math.floor(images.length / 2);
+        offsetRef.current = k * stride - cw / 2 + cardW / 2;
+        inited = true;
+      }
+
+      const dt = lastTRef.current !== null ? now - lastTRef.current : 0;
+      lastTRef.current = now;
+
+      offsetRef.current += SPEED * dt;
+      // Seamless loop: when we've scrolled 2 full sets, step back one set
+      if (offsetRef.current >= loopW * 2) offsetRef.current -= loopW;
+
+      const cx = cw / 2;
+
+      cards.forEach((card, i) => {
+        const x  = i * stride - offsetRef.current;   // card left edge
+        const cX = x + cardW / 2;                     // card centre x
+        const d  = Math.abs(cX - cx);
+        const n  = Math.max(0, 1 - d / (cw * 0.52)); // normalised proximity
+        const e  = n * n * (3 - 2 * n);               // smoothstep
+        const sc = S_MIN + e * (S_MAX - S_MIN);
+        const ry = (cX - cx) * TILT;                  // perspective tilt
+
+        card.style.transform = `translateX(${x}px) translateY(-50%) perspective(1200px) rotateY(${-ry}deg) scale(${sc})`;
+        card.style.zIndex    = String(Math.round(e * 10));
+        card.style.opacity   = String(0.5 + e * 0.5);
+      });
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      lastTRef.current = null;
+    };
+  }, [images.length]);
 
   return (
     <div
+      ref={containerRef}
       style={{
         position: "relative",
         width: "100%",
@@ -42,36 +91,41 @@ export default function HeroSlideshow({
         background: "var(--color-bg, #FAFAF8)",
       }}
     >
-      {/* Sliding strip — translates left one slot per advance */}
+      {tiles.map((src, i) => (
+        <div
+          key={`${i}-${src}`}
+          data-c=""
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: 0,
+            width: `${CARD_W * 100}%`,
+            aspectRatio: "3/4",
+            transformOrigin: "center center",
+            willChange: "transform, opacity",
+          }}
+        >
+          <Image
+            src={src}
+            alt=""
+            fill
+            style={{ objectFit: "contain" }}
+            sizes={sizes ?? "(max-width: 640px) 100vw, 30vw"}
+          />
+        </div>
+      ))}
+
+      {/* White gradient masks — 5% solid, fading to 22% */}
       <div
         style={{
-          display: "flex",
-          width: `${images.length * 100}%`,
-          height: "100%",
-          transform: `translateX(-${(current * 100) / images.length}%)`,
-          transition: "transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 20,
+          background:
+            "linear-gradient(to right, var(--color-bg,#FAFAF8) 5%, transparent 22%, transparent 78%, var(--color-bg,#FAFAF8) 95%)",
         }}
-      >
-        {images.map((src) => (
-          <div
-            key={src}
-            style={{
-              width: `${100 / images.length}%`,
-              flexShrink: 0,
-              position: "relative",
-              height: "100%",
-            }}
-          >
-            <Image
-              src={src}
-              alt=""
-              fill
-              style={{ objectFit: "contain" }}
-              sizes={sizes}
-            />
-          </div>
-        ))}
-      </div>
+      />
     </div>
   );
 }
