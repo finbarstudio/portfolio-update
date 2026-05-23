@@ -29,18 +29,24 @@ const SEGMENT_WIDTH = PAGE_WIDTH / PAGE_SEGMENTS;
 
 const EASING_FACTOR = 0.16;           // ↓ slower damp so the flip is less aggressive
 const EASING_FACTOR_FOLD = 0.12;
-// Bone curl intensities: previous values stacked to ~100° cumulative tip rotation
-// at peak which made the page self-intersect mid-flip. Halved for a gentler curl.
-const INSIDE_CURVE_STRENGTH = 0.09;
-const OUTSIDE_CURVE_STRENGTH = 0.025;
-const TURNING_CURVE_STRENGTH = 0.045;
+// Bone curl intensities: kept low so the cumulative tip rotation across the
+// 31-bone chain stays well under 60°. Higher values cause the leading edge to
+// curl far enough that it bends back into the unflipped stack.
+const INSIDE_CURVE_STRENGTH = 0.055;
+const OUTSIDE_CURVE_STRENGTH = 0.018;
+const TURNING_CURVE_STRENGTH = 0.030;
 
 const AUTO_FLIP_MS = 3400;            // ↑ longer pause between turns
 const TURN_DURATION_MS = 1500;        // ↑ curl visible for longer, slower swing
 
-// Lift the actively-flipping sheet forward in z during its turn so the
-// curled body doesn't clip into the stacks on either side of the spine.
-const FLIP_Z_LIFT = 0.32;             // ↑ big enough to clear the curl extent
+// Lift the actively-flipping sheet during its turn so the curled body
+// doesn't intersect the remaining unflipped stack.
+//   FLIP_Z_LIFT — local z (page normal), effective at flip start/end when
+//                 the page is flat and parallel to the stack.
+//   FLIP_Y_ARC  — world up, effective at mid-flip when the page is vertical
+//                 (z is sideways). Page arcs OVER the rest of the book.
+const FLIP_Z_LIFT = 0.22;
+const FLIP_Y_ARC  = 0.45;
 
 // Camera zoom: in book mode pull back slightly, in carousel mode bring closer so
 // text on the laid-out pages is large enough to read.
@@ -271,7 +277,16 @@ function Sheet({
     const s = THREE.MathUtils.damp(groupRef.current.scale.x, targetScale, 6, delta);
     groupRef.current.scale.setScalar(Math.max(s, 0.0001));
 
-    // ── Mesh z: stack offset + mid-turn lift clears the curl from neighbours ──
+    // ── Y arc: lift the flipping sheet UP so it passes over the remaining
+    //           stack instead of sweeping through it at the 90° midpoint.
+    //           Magazine root rotates around y, so y stays "up" through the
+    //           swing — this lift is effective for the entire flip arc.
+    const yArc = turningTime * FLIP_Y_ARC * (1 - h);
+    groupRef.current.position.y = THREE.MathUtils.damp(
+      groupRef.current.position.y, yArc, 8, delta
+    );
+
+    // ── Mesh z: stack offset + flat-state lift to clear z-fight with neighbours ──
     const baseZ = -number * PAGE_DEPTH + page * PAGE_DEPTH;
     const lift = turningTime * FLIP_Z_LIFT * (1 - h);
     skinnedRef.current.position.z = THREE.MathUtils.damp(
