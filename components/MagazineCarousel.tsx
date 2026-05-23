@@ -1,13 +1,15 @@
 "use client";
 
 /**
- * MagazineCarousel — bone-skinned 3D magazine that auto-flips through its
- * pages. Adapted from github.com/shreejai/book-slider-3d, stripped of
- * navigation UI, audio, background plane and shadow material; left only the
- * page-fold animation with a slow auto-advance bounce loop.
+ * MagazineCarousel — bone-skinned 3D magazine.
  *
- * Hover state: book rotates to face the camera, sheets flatten (all bones
- * unwind to zero) and spread into a horizontal right-to-left carousel.
+ * Default (resting) state: pages laid out flat in a horizontal right-to-left
+ * carousel, dwelling at each integer slot for legibility.
+ *
+ * Hover state: pages fold into a bone-skinned 3D book and auto-flip through
+ * its pages with a real curl. Adapted from
+ * github.com/shreejai/book-slider-3d, stripped of nav buttons, audio,
+ * background plane and shadow material.
  */
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -25,42 +27,46 @@ const PAGE_DEPTH = 0.006;             // ↑ thicker stack avoids z-fight betwee
 const PAGE_SEGMENTS = 30;
 const SEGMENT_WIDTH = PAGE_WIDTH / PAGE_SEGMENTS;
 
-const EASING_FACTOR = 0.22;           // ↓ slower damp so the flip is less aggressive
-const EASING_FACTOR_FOLD = 0.16;
-const INSIDE_CURVE_STRENGTH = 0.18;
-const OUTSIDE_CURVE_STRENGTH = 0.05;
-const TURNING_CURVE_STRENGTH = 0.09;
+const EASING_FACTOR = 0.16;           // ↓ slower damp so the flip is less aggressive
+const EASING_FACTOR_FOLD = 0.12;
+// Bone curl intensities: previous values stacked to ~100° cumulative tip rotation
+// at peak which made the page self-intersect mid-flip. Halved for a gentler curl.
+const INSIDE_CURVE_STRENGTH = 0.09;
+const OUTSIDE_CURVE_STRENGTH = 0.025;
+const TURNING_CURVE_STRENGTH = 0.045;
 
-const AUTO_FLIP_MS = 2800;            // ↑ longer pause between turns
-const TURN_DURATION_MS = 1100;        // ↑ curl visible for longer
+const AUTO_FLIP_MS = 3400;            // ↑ longer pause between turns
+const TURN_DURATION_MS = 1500;        // ↑ curl visible for longer, slower swing
 
 // Lift the actively-flipping sheet forward in z during its turn so the
 // curled body doesn't clip into the stacks on either side of the spine.
-const FLIP_Z_LIFT = 0.28;             // ↑ big enough to clear the curl extent
+const FLIP_Z_LIFT = 0.32;             // ↑ big enough to clear the curl extent
 
-// Camera zoom: closer in book mode, pulled back in hover so the carousel
-// row has room to breathe.
-const CAM_Z_BOOK = 2.7;               // slightly pulled back from 2.2
-const CAM_Z_HOVER = 3.4;             // tighter hover — was too far out
+// Camera zoom: in book mode pull back slightly, in carousel mode bring closer so
+// text on the laid-out pages is large enough to read.
+const CAM_Z_BOOK = 2.7;
+const CAM_Z_CAROUSEL = 2.5;           // tighter than before for legible text
 const CAM_Y_BOOK = 0.25;
-const CAM_Y_HOVER = -0.05;           // lower so carousel sits mid-frame
+const CAM_Y_CAROUSEL = -0.05;         // carousel sits mid-frame
 
 // Book root rotation so the cover faces the camera.
 const BOOK_ROT_Y = -Math.PI / 2;
 const BOOK_ROT_X = -Math.PI / 18;
 
 const HOVER_STATE_LERP = 0.06;
-const HOVER_SPEED = 0.30;             // ↓ slower → less motion smear on text
-const HOVER_DWELL_PORTION = 0.40;     // fraction of each step pages hold still
-const HOVER_SPACING = 1.55;
-const HOVER_VISIBLE_HALF = 2.5;
+const CAROUSEL_SPEED = 0.30;          // slot units / sec
+const CAROUSEL_DWELL_PORTION = 0.40;  // fraction of each step pages hold still
+const CAROUSEL_SPACING = 1.55;
+const CAROUSEL_VISIBLE_HALF = 2.5;
+const CAROUSEL_SCALE_BASE = 0.70;     // base scale of far pages — bigger = more readable
+const CAROUSEL_SCALE_RANGE = 0.30;    // additional scale at centre slot
 
 /* ── Carousel easing: dwell at each integer slot for legibility ─ */
 function easedCarouselOffset(raw: number): number {
   const intPart = Math.floor(raw);
   const frac = raw - intPart;
-  if (frac < HOVER_DWELL_PORTION) return intPart;       // pause at slot
-  const t = (frac - HOVER_DWELL_PORTION) / (1 - HOVER_DWELL_PORTION);
+  if (frac < CAROUSEL_DWELL_PORTION) return intPart;    // pause at slot
+  const t = (frac - CAROUSEL_DWELL_PORTION) / (1 - CAROUSEL_DWELL_PORTION);
   return intPart + t * t * (3 - 2 * t);                 // smoothstep to next
 }
 
@@ -155,12 +161,12 @@ function Sheet({
       new THREE.MeshStandardMaterial({
         color: whiteColor,
         map: frontTex,
-        roughness: 0.55,
+        roughness: 0.85,
       }),
       new THREE.MeshStandardMaterial({
         color: whiteColor,
         map: backTex,
-        roughness: 0.55,
+        roughness: 0.85,
       }),
     ];
 
@@ -204,13 +210,13 @@ function Sheet({
     if (slot > N / 2) slot -= N;                         // wrap to [-N/2, N/2)
     const absS = Math.abs(slot);
     let carouselScale = 0;
-    if (absS <= HOVER_VISIBLE_HALF + 1) {
-      const k = THREE.MathUtils.clamp(1 - absS / (HOVER_VISIBLE_HALF + 1), 0, 1);
-      carouselScale = 0.55 + k * 0.45;                   // [0.55..1]
+    if (absS <= CAROUSEL_VISIBLE_HALF + 1) {
+      const k = THREE.MathUtils.clamp(1 - absS / (CAROUSEL_VISIBLE_HALF + 1), 0, 1);
+      carouselScale = CAROUSEL_SCALE_BASE + k * CAROUSEL_SCALE_RANGE;
     }
     // Page geometry pivots at its left edge, so subtract half-width to put the
     // visible centre of each sheet at the slot x.
-    const carouselGroupX = -slot * HOVER_SPACING - PAGE_WIDTH / 2;
+    const carouselGroupX = -slot * CAROUSEL_SPACING - PAGE_WIDTH / 2;
 
     // ── Bones: blend book-fold rotations toward 0 by hover ────
     const bones = skinnedRef.current.skeleton.bones;
@@ -307,9 +313,12 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
   useEffect(() => {
     textures.forEach((t) => {
       t.colorSpace = THREE.SRGBColorSpace;
-      t.minFilter = THREE.LinearFilter;
+      // Mipmaps + trilinear are essential when the textured page is scaled down
+      // in the carousel. Without them the GPU point-samples a single hi-res
+      // mip, producing aliased text that shimmers as it drifts.
+      t.minFilter = THREE.LinearMipmapLinearFilter;
       t.magFilter = THREE.LinearFilter;
-      t.generateMipmaps = false;
+      t.generateMipmaps = true;
       t.anisotropy = 16;
       t.needsUpdate = true;
     });
@@ -345,18 +354,20 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
     return () => { if (timeout) clearTimeout(timeout); };
   }, [page]);
 
-  // ── Hover state refs (driven each frame, shared with each Sheet) ──
+  // ── State refs (driven each frame, shared with each Sheet) ──
+  // hoverProgressRef: 1 = carousel (resting / default), 0 = book (on hover).
   const groupRef = useRef<THREE.Group>(null);
-  const hoverProgressRef = useRef(0);
+  const hoverProgressRef = useRef(1);   // start at carousel so first paint is correct
   const hoverOffsetRef = useRef(0);
   const camera = useThree((s) => s.camera);
 
   useFrame((_, delta) => {
-    const target = hovered ? 1 : 0;
+    // Default is carousel (1), hover collapses into book (0).
+    const target = hovered ? 0 : 1;
     hoverProgressRef.current += (target - hoverProgressRef.current) * HOVER_STATE_LERP;
 
-    // Always advance the carousel offset so an entered hover state is mid-flow.
-    hoverOffsetRef.current = (hoverOffsetRef.current + delta * HOVER_SPEED) % Math.max(sheets.length, 1);
+    // Always advance the carousel offset so the resting state stays in motion.
+    hoverOffsetRef.current = (hoverOffsetRef.current + delta * CAROUSEL_SPEED) % Math.max(sheets.length, 1);
 
     const h = hoverProgressRef.current;
 
@@ -376,15 +387,17 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
       );
     }
 
-    // Lerp camera so book mode is zoomed in and hover mode pulls back for the carousel.
-    const targetCamZ = THREE.MathUtils.lerp(CAM_Z_BOOK, CAM_Z_HOVER, h);
-    const targetCamY = THREE.MathUtils.lerp(CAM_Y_BOOK, CAM_Y_HOVER, h);
+    // Lerp camera between book (h=0) and carousel (h=1) framings.
+    const targetCamZ = THREE.MathUtils.lerp(CAM_Z_BOOK, CAM_Z_CAROUSEL, h);
+    const targetCamY = THREE.MathUtils.lerp(CAM_Y_BOOK, CAM_Y_CAROUSEL, h);
     camera.position.z = THREE.MathUtils.damp(camera.position.z, targetCamZ, 4, delta);
     camera.position.y = THREE.MathUtils.damp(camera.position.y, targetCamY, 4, delta);
   });
 
   return (
-    <group ref={groupRef} rotation={[BOOK_ROT_X, BOOK_ROT_Y, 0]}>
+    // Initial transform matches the resting carousel state (h=1) so first paint
+    // doesn't flash through a book→carousel transition.
+    <group ref={groupRef} position={[0, -0.18, 0]} rotation={[0, 0, 0]}>
       {sheets.map((s, i) => (
         <Sheet
           key={i}
@@ -454,7 +467,7 @@ function MagazineCarouselInner({
 
       <Canvas
         shadows={false}
-        camera={{ position: [0, CAM_Y_BOOK, CAM_Z_BOOK], fov: 42, near: 0.1, far: 50 }}
+        camera={{ position: [0, CAM_Y_CAROUSEL, CAM_Z_CAROUSEL], fov: 42, near: 0.1, far: 50 }}
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
