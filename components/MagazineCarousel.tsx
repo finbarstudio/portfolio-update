@@ -36,25 +36,33 @@ const TURN_DURATION_MS = 1100;        // ↑ curl visible for longer
 
 // Lift the actively-flipping sheet forward in z during its turn so the
 // curled body doesn't clip into the stacks on either side of the spine.
-const FLIP_Z_LIFT = 0.08;
+const FLIP_Z_LIFT = 0.28;             // ↑ big enough to clear the curl extent
 
 // Camera zoom: closer in book mode, pulled back in hover so the carousel
 // row has room to breathe.
-const CAM_Z_BOOK = 2.2;
-const CAM_Z_HOVER = 4.1;
+const CAM_Z_BOOK = 2.7;               // slightly pulled back from 2.2
+const CAM_Z_HOVER = 3.4;             // tighter hover — was too far out
 const CAM_Y_BOOK = 0.25;
-const CAM_Y_HOVER = 0.05;
+const CAM_Y_HOVER = -0.05;           // lower so carousel sits mid-frame
 
-// Book root rotation so the cover faces the camera. The template counters
-// this with <Float rotation-y={Math.PI}>; without it we point the book at us
-// directly (= -π/2 here).
+// Book root rotation so the cover faces the camera.
 const BOOK_ROT_Y = -Math.PI / 2;
-const BOOK_ROT_X = -Math.PI / 18;     // slight pitch — gentle isometric feel
+const BOOK_ROT_X = -Math.PI / 18;
 
-const HOVER_STATE_LERP = 0.06;        // ease for state transitions
-const HOVER_SPEED = 0.42;             // cycles/sec for the horizontal carousel
-const HOVER_SPACING = 1.55;           // x distance between adjacent sheets
-const HOVER_VISIBLE_HALF = 2.5;       // ±N slots fully visible from centre
+const HOVER_STATE_LERP = 0.06;
+const HOVER_SPEED = 0.30;             // ↓ slower → less motion smear on text
+const HOVER_DWELL_PORTION = 0.40;     // fraction of each step pages hold still
+const HOVER_SPACING = 1.55;
+const HOVER_VISIBLE_HALF = 2.5;
+
+/* ── Carousel easing: dwell at each integer slot for legibility ─ */
+function easedCarouselOffset(raw: number): number {
+  const intPart = Math.floor(raw);
+  const frac = raw - intPart;
+  if (frac < HOVER_DWELL_PORTION) return intPart;       // pause at slot
+  const t = (frac - HOVER_DWELL_PORTION) / (1 - HOVER_DWELL_PORTION);
+  return intPart + t * t * (3 - 2 * t);                 // smoothstep to next
+}
 
 /* ── Build geometry + skinning attributes once (module scope) ── */
 
@@ -191,7 +199,8 @@ function Sheet({
 
     // ── Carousel slot for this sheet ──────────────────────────
     const N = totalSheets;
-    let slot = ((number - hoverOffsetRef.current) % N + N) % N;
+    const easedOffset = easedCarouselOffset(hoverOffsetRef.current);
+    let slot = ((number - easedOffset) % N + N) % N;
     if (slot > N / 2) slot -= N;                         // wrap to [-N/2, N/2)
     const absS = Math.abs(slot);
     let carouselScale = 0;
@@ -256,12 +265,15 @@ function Sheet({
     const s = THREE.MathUtils.damp(groupRef.current.scale.x, targetScale, 6, delta);
     groupRef.current.scale.setScalar(Math.max(s, 0.0001));
 
-    // ── Mesh z: stack offset + a mid-turn forward lift to avoid clipping ──
+    // ── Mesh z: stack offset + mid-turn lift clears the curl from neighbours ──
     const baseZ = -number * PAGE_DEPTH + page * PAGE_DEPTH;
     const lift = turningTime * FLIP_Z_LIFT * (1 - h);
     skinnedRef.current.position.z = THREE.MathUtils.damp(
       skinnedRef.current.position.z, baseZ + lift, 8, delta
     );
+    // Belt-and-suspenders: raise render order while actively flipping so the
+    // page draws on top of any z-fighting that slip through despite the lift.
+    skinnedRef.current.renderOrder = turningTime > 0.02 ? 10 : 0;
   });
 
   // Mesh z is driven imperatively (below in useFrame) so we can add a
@@ -298,7 +310,7 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
       t.minFilter = THREE.LinearFilter;
       t.magFilter = THREE.LinearFilter;
       t.generateMipmaps = false;
-      t.anisotropy = 4;
+      t.anisotropy = 16;
       t.needsUpdate = true;
     });
   }, [textures]);
@@ -356,6 +368,11 @@ function Magazine({ pages, hovered }: { pages: string[]; hovered: boolean }) {
       );
       groupRef.current.rotation.x = THREE.MathUtils.damp(
         groupRef.current.rotation.x, targetRotX, 6, delta
+      );
+      // Shift carousel down so it sits in the vertical centre of the frame.
+      const targetGroupY = THREE.MathUtils.lerp(0, -0.18, h);
+      groupRef.current.position.y = THREE.MathUtils.damp(
+        groupRef.current.position.y, targetGroupY, 4, delta
       );
     }
 
@@ -438,7 +455,7 @@ function MagazineCarouselInner({
       <Canvas
         shadows={false}
         camera={{ position: [0, CAM_Y_BOOK, CAM_Z_BOOK], fov: 42, near: 0.1, far: 50 }}
-        dpr={[1, 1.75]}
+        dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
