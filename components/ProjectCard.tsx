@@ -170,7 +170,11 @@ export function FullCard({ project, index }: { project: Project; index: number }
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {project.heroModel ? (
+        {project.heroMagazine ? (
+          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
+            <MagazineCarousel pages={project.heroMagazine.pages} aspectRatio="3/2" />
+          </div>
+        ) : project.heroModel ? (
           <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
             <ModelDisplay
               model={project.heroModel.model}
