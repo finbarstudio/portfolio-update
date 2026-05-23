@@ -42,25 +42,36 @@ export default function HeroSlideshow({
         background: "var(--color-bg, #FAFAF8)",
       }}
     >
-      {images.map((src, i) => (
-        <div
-          key={src}
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: i === current ? 1 : 0,
-            transition: "opacity 0.6s ease",
-          }}
-        >
-          <Image
-            src={src}
-            alt=""
-            fill
-            style={{ objectFit: "contain" }}
-            sizes={sizes}
-          />
-        </div>
-      ))}
+      {/* Sliding strip — translates left one slot per advance */}
+      <div
+        style={{
+          display: "flex",
+          width: `${images.length * 100}%`,
+          height: "100%",
+          transform: `translateX(-${(current * 100) / images.length}%)`,
+          transition: "transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        {images.map((src) => (
+          <div
+            key={src}
+            style={{
+              width: `${100 / images.length}%`,
+              flexShrink: 0,
+              position: "relative",
+              height: "100%",
+            }}
+          >
+            <Image
+              src={src}
+              alt=""
+              fill
+              style={{ objectFit: "contain" }}
+              sizes={sizes}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
