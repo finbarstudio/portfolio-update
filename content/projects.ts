@@ -871,12 +871,12 @@ export const projects: Project[] = [
     hasDepth: false,
   },
 
-  /* 13. Packer & Associates. Gallery */
+  /* Packer & Associates. First of the Selected Projects grid. */
   {
     slug: "packer-associates",
     name: "Packer & Associates",
     tier: "gallery",
-    rank: 13,
+    rank: 2.5,
     date: "2023",
     categories: ["Publication Design", "Print Collateral"],
     skills: [
@@ -891,6 +891,11 @@ export const projects: Project[] = [
     problem:
       "Packer needed consistent, professional design across a wide range of touchpoints. The capability statement was the flagship deliverable.",
     outcome: "Brand expression held consistent across every touchpoint.",
+    heroModel: {
+      model: "/models/studio-display/display.gltf",
+      video: "/images/packer-associates/3D%20Model%20Video.mp4",
+      poster: "/images/packer-associates/hero-poster.jpg",
+    },
     heroImage: {
       src: "/images/packer-associates/hero-poster.jpg",
       alt: "Packer & Associates website, brand identity and digital presence for the capability solutions company",
