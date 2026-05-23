@@ -39,14 +39,20 @@ const TURNING_CURVE_STRENGTH = 0.030;
 const AUTO_FLIP_MS = 3400;            // ↑ longer pause between turns
 const TURN_DURATION_MS = 1500;        // ↑ curl visible for longer, slower swing
 
-// Lift the actively-flipping sheet during its turn so the curled body
-// doesn't intersect the remaining unflipped stack.
-//   FLIP_Z_LIFT — local z (page normal), effective at flip start/end when
-//                 the page is flat and parallel to the stack.
-//   FLIP_Y_ARC  — world up, effective at mid-flip when the page is vertical
-//                 (z is sideways). Page arcs OVER the rest of the book.
-const FLIP_Z_LIFT = 0.22;
-const FLIP_Y_ARC  = 0.45;
+// Lift the flipping sheet in WORLD UP during its turn so it arcs cleanly
+// over the rest of the book. Set on groupRef.position.y, which lives in the
+// Magazine outer group's local +y — invariant under that group's rotation
+// around y, so the lift direction is stable through the entire flip.
+//
+// (We previously also lifted skinnedMesh.position.z, but that's inside the
+//  rotating bone[0] frame: at the end of the flip local +z points world -x,
+//  so the "lift" pushed the page LEFT into the opened stack and damping
+//  made it linger there. That's the "page floats behind the stack, then
+//  clips back to centre" symptom. Removed.)
+//
+// Needs to exceed half the page height so the page clears the y-extent of
+// the side stacks at all rotations, not just at midflip.
+const FLIP_Y_ARC = 1.10;
 
 // Camera zoom: in book mode pull back further so the wider page fan has room
 // to breathe; in carousel mode bring closer so text reads.
@@ -286,24 +292,23 @@ function Sheet({
     const s = THREE.MathUtils.damp(groupRef.current.scale.x, targetScale, 6, delta);
     groupRef.current.scale.setScalar(Math.max(s, 0.0001));
 
-    // ── Y arc: lift the flipping sheet UP so it passes over the remaining
-    //           stack instead of sweeping through it at the 90° midpoint.
-    //           Magazine root rotates around y, so y stays "up" through the
-    //           swing — this lift is effective for the entire flip arc.
-    const yArc = turningTime * FLIP_Y_ARC * (1 - h);
-    groupRef.current.position.y = THREE.MathUtils.damp(
-      groupRef.current.position.y, yArc, 8, delta
-    );
+    // ── Y arc: lift the flipping sheet straight UP in the Magazine frame so
+    //           it arcs cleanly over the side stacks. Applied DIRECTLY (no
+    //           damp) — a damped y-arc lingers past the end of the swing,
+    //           which is what made the page hang above the destination
+    //           stack before settling down through it.
+    groupRef.current.position.y = turningTime * FLIP_Y_ARC * (1 - h);
 
-    // ── Mesh z: stack offset + flat-state lift to clear z-fight with neighbours ──
+    // ── Mesh z: stack offset only. No flip-time z lift — that vector lives
+    //           in the rotating bone[0] frame and at flip end it points into
+    //           the destination stack, pushing the page behind it.
     const baseZ = -number * PAGE_DEPTH + page * PAGE_DEPTH;
-    const lift = turningTime * FLIP_Z_LIFT * (1 - h);
     skinnedRef.current.position.z = THREE.MathUtils.damp(
-      skinnedRef.current.position.z, baseZ + lift, 8, delta
+      skinnedRef.current.position.z, baseZ, 12, delta
     );
-    // Belt-and-suspenders: raise render order while actively flipping so the
-    // page draws on top of any z-fighting that slip through despite the lift.
-    skinnedRef.current.renderOrder = turningTime > 0.02 ? 10 : 0;
+    // Keep render order high a little past the swing so the page stays on
+    // top while the skin/bone damping finishes settling.
+    skinnedRef.current.renderOrder = turningTime > 0.001 ? 10 : 0;
   });
 
   // Mesh z is driven imperatively (below in useFrame) so we can add a
