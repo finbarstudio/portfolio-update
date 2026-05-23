@@ -64,6 +64,7 @@ export interface Project {
   heroMagazine?: {        // 20-page 3D magazine that flips through itself
     pages: string[];      // Page image URLs in flip order
   };
+  heroSlideshow?: string[];   // Auto-advancing crossfade cover carousel (no WebGL)
   companyUrl?: string;
   pdfSlideshow?: {        // PDF rendered as image pages
     title: string;
@@ -271,14 +272,12 @@ export const projects: Project[] = [
     outcome:
       "15+ playbooks delivered across healthcare, manufacturing, technology, storage and professional services. The clearest signal is the repeat work over more than a year.",
     logo: "/images/salesmasters/Logo.png",
-    heroMagazine: {
-      pages: [
-        "/images/salesmasters/cover-alpha-lifecare.jpg",
-        "/images/salesmasters/cover-siteware.png",
-        "/images/salesmasters/cover-playbook.jpg",
-        "/images/salesmasters/Cover Pages/Bus4x4 .jpg",
-      ],
-    },
+    heroSlideshow: [
+      "/images/salesmasters/cover-alpha-lifecare.jpg",
+      "/images/salesmasters/cover-siteware.png",
+      "/images/salesmasters/cover-playbook.jpg",
+      "/images/salesmasters/Cover Pages/Bus4x4 .jpg",
+    ],
     heroImage: {
       src: "/images/salesmasters/hero.png",
       alt: "Salesmasters Sales Process Playbook double-page spread from the Bus4x4 edition",

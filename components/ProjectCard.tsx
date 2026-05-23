@@ -7,6 +7,7 @@ import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
 import PhoneCarousel from "@/components/PhoneCarousel";
 import MagazineCarousel from "@/components/MagazineCarousel";
+import HeroSlideshow from "@/components/HeroSlideshow";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -170,7 +171,11 @@ export function FullCard({ project, index }: { project: Project; index: number }
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {project.heroMagazine ? (
+        {project.heroSlideshow ? (
+          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
+            <HeroSlideshow images={project.heroSlideshow} />
+          </div>
+        ) : project.heroMagazine ? (
           <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
             <MagazineCarousel pages={project.heroMagazine.pages} aspectRatio="3/2" />
           </div>
@@ -225,7 +230,11 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View ${project.name}`}
       >
-        {project.heroModel ? (
+        {project.heroSlideshow ? (
+          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
+            <HeroSlideshow images={project.heroSlideshow} />
+          </div>
+        ) : project.heroModel ? (
           <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
             <ModelDisplay
               model={project.heroModel.model}
