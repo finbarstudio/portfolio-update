@@ -13,6 +13,7 @@ import {
   type Project,
   type DepthSection,
   type ProjectImage,
+  type MediaRow as MediaRowType,
 } from "@/content/projects";
 
 const SITE_URL = "https://finbar.studio";
@@ -160,6 +161,54 @@ function SkillsRow({ project }: { project: Project }) {
           <Tag key={skill} label={skill} />
         ))}
       </div>
+    </div>
+  );
+}
+
+/* ─── Media rows (one or more rows of equal-width items with a shared caption) ── */
+function MediaRows({ rows }: { rows: MediaRowType[] }) {
+  return (
+    <div className="py-4 space-y-10">
+      {rows.map((row, ri) => {
+        const items = row.videos ?? row.images ?? [];
+        if (items.length === 0) return null;
+        return (
+          <div key={ri}>
+            <div
+              className="flex md:grid gap-2 md:gap-3 overflow-x-auto md:overflow-visible -mx-5 md:mx-0 px-5 md:px-0 snap-x snap-mandatory md:snap-none"
+              style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
+            >
+              {items.map((src, i) => (
+                <div
+                  key={i}
+                  className="shrink-0 w-[38vw] sm:w-[28vw] md:w-auto snap-start"
+                  style={{ aspectRatio: row.ratio, background: "white", overflow: "hidden" }}
+                >
+                  {row.videos ? (
+                    <VideoPlayer src={src} />
+                  ) : (
+                    <ClientImage
+                      src={src}
+                      alt={row.alt ?? ""}
+                      fill
+                      sizes="(max-width: 768px) 38vw, 14vw"
+                      className="object-cover"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+            {row.caption && (
+              <p
+                className="text-ink-soft font-sans leading-relaxed mt-4"
+                style={{ fontSize: "var(--text-caption)" }}
+              >
+                {row.caption}
+              </p>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -364,10 +413,16 @@ export default async function CaseStudyPage({
       <MetaRow project={project} />
       <SummaryBlock project={project} />
       <SkillsRow project={project} />
-      <VisualBody project={project} />
 
-      {project.hasDepth && project.depth && project.depth.length > 0 && (
-        <DepthSections sections={project.depth} />
+      {project.mediaRows && project.mediaRows.length > 0 ? (
+        <MediaRows rows={project.mediaRows} />
+      ) : (
+        <>
+          <VisualBody project={project} />
+          {project.hasDepth && project.depth && project.depth.length > 0 && (
+            <DepthSections sections={project.depth} />
+          )}
+        </>
       )}
 
       {project.pdfSlideshow && (

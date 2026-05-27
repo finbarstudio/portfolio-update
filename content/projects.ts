@@ -30,6 +30,17 @@ export interface DepthSection {
   images: ProjectImage[];
 }
 
+// One horizontal row of media (images or videos) sharing a single caption.
+// Used when a project needs a clean lineup of variants rather than the
+// default 2-up gallery + depth-sections layout.
+export interface MediaRow {
+  ratio: string;            // CSS aspect-ratio, e.g. "1/1", "9/16"
+  videos?: string[];        // WebM paths (if set, used in preference to images)
+  images?: string[];        // Static image paths
+  caption?: string;
+  alt?: string;             // Shared alt for accessibility
+}
+
 export interface Project {
   slug: string;
   name: string;
@@ -48,6 +59,8 @@ export interface Project {
   images: ProjectImage[];
   hasDepth: boolean;
   depth?: DepthSection[];
+  mediaRows?: MediaRow[];  // When set, replaces images + depth body on case study page
+
   logo?: string;          // Small client/brand logo. Shown in card + case study header.
   liveUrl?: string;
   heroSpline?: string;
@@ -148,11 +161,9 @@ export const projects: Project[] = [
     date: "2022–2023",
     categories: ["Social Campaign", "Motion Graphics", "Digital"],
     skills: [
-      "Motion Graphics",
       "After Effects",
-      "Video Editing",
-      "Campaign Production",
-      "Static Asset Design",
+      "DaVinci Resolve",
+      "SmarterQueue",
     ],
     oneLiner:
       "Evergreen social campaign for the UK's biggest affordable-homeownership portal. The films sit on the moment a first-time buyer realises they can actually afford it.",
@@ -180,69 +191,36 @@ export const projects: Project[] = [
       ],
       poster: "/images/tmyr/hero-poster.jpg",
     },
-    images: [
+    images: [],
+    hasDepth: false,
+    mediaRows: [
       {
-        src: "/images/tmyr/post-anthony.jpg",
-        video: "/images/tmyr/1080x1080%20IG%20Posts/Anthony.webm",
-        caption: "Anthony: 1:1 social post, light/fade motion style.",
-        alt: "TMYR campaign Anthony story, 1080x1080 Instagram post with Share to Buy branding",
-      },
-      {
-        src: "/images/tmyr/post-freya.jpg",
-        video: "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
-        caption: "Freya: 1:1 social post, light/fade motion style.",
-        alt: "TMYR campaign Freya story, 1080x1080 Instagram post showing shared ownership journey",
-      },
-      {
-        src: "/images/tmyr/post-katie.jpg",
-        video: "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
-        caption: "Katie: 1:1 social post, bold/typewriter motion style.",
-        alt: "TMYR campaign Katie story, 1080x1080 Instagram post with kinetic text treatment",
-      },
-      {
-        src: "/images/tmyr/post-lauren.jpg",
-        video: "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
-        caption: "Lauren: 1:1 social post, bold/typewriter motion style.",
-        alt: "TMYR campaign Lauren story, 1080x1080 Instagram post with bold typography animation",
-      },
-    ],
-    hasDepth: true,
-    depth: [
-      {
-        heading: "Two Motion Styles",
-        body: "The campaign runs in two visual voices. The light/fade style uses soft dissolves and gentle type entrances. It feels aspirational and calm. The bold/typewriter style uses kinetic type and harder cuts: more immediate, more confident. Both share the same palette and run side by side without clashing.",
-        images: [
-          {
-            src: "/images/tmyr/post-anthony.jpg",
-            video: "/images/tmyr/1080x1080 IG Posts/Anthony.webm",
-            caption: "Light/fade style: soft dissolves and gentle type entrances.",
-            alt: "TMYR light/fade motion style, Anthony story with soft animated text overlays",
-          },
-          {
-            src: "/images/tmyr/post-katie.jpg",
-            video: "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
-            caption: "Bold/typewriter style: punchy kinetic text for stronger stops.",
-            alt: "TMYR bold/typewriter motion style, Katie story with kinetic text animation",
-          },
+        ratio: "1/1",
+        videos: [
+          "/images/tmyr/1080x1080%20IG%20Posts/Anthony.webm",
+          "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
+          "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
+          "/images/tmyr/1080x1080%20IG%20Posts/Kiran.webm",
+          "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
+          "/images/tmyr/1080x1080%20IG%20Posts/Molly.webm",
+          "/images/tmyr/1080x1080%20IG%20Posts/Olu.webm",
         ],
+        caption: "1080×1080 IG posts. Seven story variants, same brand language, two motion treatments (light/fade and bold/typewriter).",
+        alt: "TMYR campaign, 1080x1080 Instagram post variants for Share to Buy",
       },
       {
-        heading: "Format Matrix & Production Scale",
-        body: "Every video was delivered across five formats (1:1, 9:16, 16:9, 4:5 and Stories/Reels) in both motion styles. A tight file and naming system kept handover and future scheduling clean. The modular After Effects templates meant new story variants could be turned around in a fraction of the time.",
-        images: [
-          {
-            src: "/images/tmyr/post-freya.jpg",
-            video: "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
-            caption: "Freya: 1:1 square post, one of five formats per story.",
-            alt: "TMYR Freya story 1:1 format, one delivery format from the five-format matrix",
-          },
-          {
-            src: "/images/tmyr/post-lauren.jpg",
-            video: "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
-            caption: "Lauren: consistent brand treatment across all story variants.",
-            alt: "TMYR Lauren story, consistent Share to Buy brand treatment across campaign variants",
-          },
+        ratio: "9/16",
+        videos: [
+          "/images/tmyr/1080x1920%20IG%20Reels/Anthony.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Freya.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Katie.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Kiran.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Lauren.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Molly.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Olu.webm",
         ],
+        caption: "1080×1920 IG reels & stories. Same seven stories recut for vertical, scheduled across the 2022–2023 campaign windows.",
+        alt: "TMYR campaign, 1080x1920 Instagram reel variants for Share to Buy",
       },
     ],
   },
