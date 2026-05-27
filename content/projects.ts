@@ -204,7 +204,6 @@ export const projects: Project[] = [
           "/images/tmyr/1080x1080%20IG%20Posts/Molly.webm",
           "/images/tmyr/1080x1080%20IG%20Posts/Olu.webm",
         ],
-        caption: "1080×1080 IG posts. Seven story variants, same brand language, two motion treatments (light/fade and bold/typewriter).",
         alt: "TMYR campaign, 1080x1080 Instagram post variants for Share to Buy",
       },
       {
@@ -218,7 +217,6 @@ export const projects: Project[] = [
           "/images/tmyr/1080x1920%20IG%20Reels/Molly.webm",
           "/images/tmyr/1080x1920%20IG%20Reels/Olu.webm",
         ],
-        caption: "1080×1920 IG reels & stories. Same seven stories recut for vertical, scheduled across the 2022–2023 campaign windows.",
         alt: "TMYR campaign, 1080x1920 Instagram reel variants for Share to Buy",
       },
     ],

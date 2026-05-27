@@ -165,23 +165,45 @@ function SkillsRow({ project }: { project: Project }) {
   );
 }
 
-/* ─── Media rows (one or more rows of equal-width items with a shared caption) ── */
+/* ─── Media rows ──────────────────────────────────────────────
+   Swiss/modular grid: every tile in every row uses the same column
+   width (repeat(N, 1fr)), so a 1:1 post and a 9:16 reel are exactly
+   the same width — the reel just runs taller. Hairline top rule +
+   numbered row label (/01) + format meta in the right margin keep
+   the modular feel.
+   On mobile we snap-scroll with the same fixed tile width across
+   both rows so widths still match.
+   ───────────────────────────────────────────────────────────── */
 function MediaRows({ rows }: { rows: MediaRowType[] }) {
   return (
-    <div className="py-4 space-y-10">
+    <div className="py-2 space-y-6 md:space-y-8">
       {rows.map((row, ri) => {
         const items = row.videos ?? row.images ?? [];
         if (items.length === 0) return null;
+        const idx = String(ri + 1).padStart(2, "0");
+        const fmt = row.ratio.replace("/", ":");
         return (
           <div key={ri}>
+            {/* Swiss-style row meta: index left, format right, hairline rule */}
+            <div className="flex items-baseline justify-between border-t border-ink pt-2 mb-3">
+              <span className="mono-label text-ink tabular-nums">
+                <span className="text-ink-soft">/</span>{idx}
+              </span>
+              <span className="mono-label text-ink-soft tabular-nums">
+                {fmt} · {String(items.length).padStart(2, "0")} VARIANTS
+              </span>
+            </div>
+
+            {/* Mobile: horizontal snap-scroll, fixed tile width matched across rows.
+                Desktop: strict N-column grid, identical tile widths. */}
             <div
-              className="flex md:grid gap-2 md:gap-3 overflow-x-auto md:overflow-visible -mx-5 md:mx-0 px-5 md:px-0 snap-x snap-mandatory md:snap-none"
+              className="flex md:grid gap-1.5 md:gap-2 overflow-x-auto md:overflow-visible -mx-5 md:mx-0 px-5 md:px-0 snap-x snap-mandatory md:snap-none"
               style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
             >
               {items.map((src, i) => (
                 <div
                   key={i}
-                  className="shrink-0 w-[38vw] sm:w-[28vw] md:w-auto snap-start"
+                  className="shrink-0 w-[28vw] sm:w-[20vw] md:w-full snap-start"
                   style={{ aspectRatio: row.ratio, background: "white", overflow: "hidden" }}
                 >
                   {row.videos ? (
@@ -191,21 +213,13 @@ function MediaRows({ rows }: { rows: MediaRowType[] }) {
                       src={src}
                       alt={row.alt ?? ""}
                       fill
-                      sizes="(max-width: 768px) 38vw, 14vw"
+                      sizes="(max-width: 768px) 28vw, 14vw"
                       className="object-cover"
                     />
                   )}
                 </div>
               ))}
             </div>
-            {row.caption && (
-              <p
-                className="text-ink-soft font-sans leading-relaxed mt-4"
-                style={{ fontSize: "var(--text-caption)" }}
-              >
-                {row.caption}
-              </p>
-            )}
           </div>
         );
       })}
