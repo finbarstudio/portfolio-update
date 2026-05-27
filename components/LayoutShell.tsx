@@ -48,12 +48,11 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         onMobileMenuClose={() => setMobileMenuOpen(false)}
       />
       <main
-        className="min-w-0 ml-0 md:ml-[var(--sidebar-w)]"
+        className="min-w-0 ml-0 md:ml-[var(--sidebar-w)] pb-0 md:pb-[var(--statusbar-h)]"
         style={
           {
             "--sidebar-w": `${sidebarW}px`,
             paddingTop: "var(--menubar-h)",
-            paddingBottom: "var(--statusbar-h)",
             minHeight: "100vh",
             transition: "margin-left 0.25s cubic-bezier(0.4,0,0.2,1)",
           } as React.CSSProperties

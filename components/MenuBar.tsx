@@ -73,10 +73,9 @@ export default function MenuBar({
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 border-b border-ink bg-bg flex items-center px-3"
+      className="fixed top-0 left-0 right-0 z-50 border-b border-ink bg-bg flex items-center px-3 text-[12px] md:text-[11px]"
       style={{
         height: "var(--menubar-h)",
-        fontSize: "11px",
         letterSpacing: "0.04em",
         lineHeight: 1,
       }}
@@ -124,15 +123,17 @@ export default function MenuBar({
         <WeatherDisplay />
         <LiveClock />
 
-        {/* Mobile hamburger */}
+        {/* Mobile hamburger — real tap target */}
         <button
           type="button"
           onClick={onMobileMenuOpen}
           aria-label="Open navigation menu"
-          className="md:hidden flex items-center justify-center border border-ink"
-          style={{ width: 18, height: 18, marginLeft: 2 }}
+          className="md:hidden flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2"
+          style={{ width: 40, height: 40 }}
         >
-          <span className="text-[10px] leading-none font-bold">≡</span>
+          <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+            <path d="M1 1.5h20M1 8h20M1 14.5h20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+          </svg>
         </button>
       </div>
     </header>

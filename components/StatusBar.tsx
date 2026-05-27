@@ -28,7 +28,7 @@ export default function StatusBar() {
 
   return (
     <footer
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-ink bg-bg flex items-center justify-between px-3 text-ink-soft"
+      className="hidden md:flex fixed bottom-0 left-0 right-0 z-50 border-t border-ink bg-bg items-center justify-between px-3 text-ink-soft"
       style={{
         height: "var(--statusbar-h)",
         fontSize: "10px",

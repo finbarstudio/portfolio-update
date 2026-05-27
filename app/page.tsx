@@ -2,15 +2,6 @@ import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import EncryptedText from "@/components/EncryptedText";
 
-/* ─── Section label ────────────────────────────────────────── */
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mono-label text-ink-soft pb-3 mb-8">
-      {children}
-    </p>
-  );
-}
-
 /* ─── Hero ──────────────────────────────────────────────────────
    Terminal-prompt flavour: PS1 line above, encrypted heading,
    skill-tags output below. Sticky so it sits behind the work grid.
@@ -100,14 +91,11 @@ function WorkGrid() {
       </div>
 
       {/* All other projects, uniform 2-col grid */}
-      <div>
-        <SectionLabel>SELECTED PROJECTS</SectionLabel>
-        <div className="grid grid-cols-12 gap-x-6 gap-y-10">
-          {rest.map((project) => {
-            const i = cardIndex++;
-            return <ProjectCard key={project.slug} project={project} index={i} />;
-          })}
-        </div>
+      <div className="grid grid-cols-12 gap-x-6 gap-y-10">
+        {rest.map((project) => {
+          const i = cardIndex++;
+          return <ProjectCard key={project.slug} project={project} index={i} />;
+        })}
       </div>
     </section>
   );

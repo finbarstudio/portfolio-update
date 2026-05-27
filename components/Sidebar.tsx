@@ -360,16 +360,16 @@ function MobileMenu({
   }, [open]);
 
   const navLinks = [
-    { label: "WORK",    href: "/" },
-    { label: "ABOUT",   href: "/about" },
-    { label: "CONTACT", href: "/contact" },
+    { label: "Work",    href: "/" },
+    { label: "About",   href: "/about" },
+    { label: "Contact", href: "/contact" },
   ];
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <div
-      className={`md:hidden fixed inset-0 z-50 flex flex-col bg-bg transition-opacity duration-200 ${
+      className={`md:hidden fixed inset-0 z-[60] flex flex-col bg-bg transition-opacity duration-150 ${
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       aria-hidden={!open}
@@ -377,49 +377,69 @@ function MobileMenu({
       aria-modal="true"
       aria-label="Navigation menu"
     >
-      <div className="os-titlebar">
-        <span className="os-titlebar-btn" aria-hidden="true" />
-        <span className="os-titlebar-title">NAVIGATION.WDW</span>
+      {/* Header mirrors MenuBar — brand left, close (X) right */}
+      <div
+        className="flex items-center justify-between px-3 border-b border-ink"
+        style={{ height: "var(--menubar-h)" }}
+      >
+        <span
+          className="font-bold uppercase tracking-[0.08em] text-[12px]"
+          aria-hidden="true"
+        >
+          finbar<span className="pixel-star text-[14px]">✶</span>studio
+        </span>
         <button
+          type="button"
           onClick={onClose}
           aria-label="Close navigation menu"
-          className="os-titlebar-btn flex items-center justify-center"
-          title="Close"
+          className="flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2"
+          style={{ width: 40, height: 40 }}
         >
-          <span className="text-[8px]">×</span>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M2 2l14 14M16 2L2 16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+          </svg>
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-5 py-8 flex flex-col" aria-label="Mobile primary">
-        <ul className="space-y-1 mb-auto" role="list">
+      <nav className="flex-1 overflow-y-auto px-5 pt-8 pb-8 flex flex-col" aria-label="Mobile primary">
+        <ul className="space-y-0 mb-auto divide-y divide-line" role="list">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
                 onClick={onClose}
-                className={`block font-sans font-bold uppercase transition-colors leading-none py-2 ${
+                className={`flex items-center justify-between font-sans font-semibold py-4 transition-colors ${
                   isActive(link.href) ? "text-pink" : "text-ink hover:text-pink"
                 }`}
-                style={{ fontSize: "clamp(2.5rem, 12vw, 3.5rem)", letterSpacing: "-0.01em" }}
+                style={{ fontSize: "1.75rem", letterSpacing: "-0.01em", lineHeight: 1.1 }}
                 aria-current={isActive(link.href) ? "page" : undefined}
               >
-                {link.label}
+                <span>{link.label}</span>
+                <span className="mono-label text-ink-soft" aria-hidden="true">→</span>
               </Link>
             </li>
           ))}
         </ul>
 
-        <div className="pt-10">
+        <div className="pt-10 border-t border-line mt-10">
           <div className="mb-4">
             <span className="status-badge">OPEN FOR WORK</span>
           </div>
-          <a href="mailto:finbar@finbar.studio" className="block font-sans text-ink hover:text-pink transition-colors mb-1" style={{ fontSize: "13px" }}>
+          <a
+            href="mailto:finbar@finbar.studio"
+            className="block font-sans text-ink hover:text-pink transition-colors mb-1"
+            style={{ fontSize: "14px" }}
+          >
             finbar@finbar.studio
           </a>
-          <a href="tel:+61412796630" className="block font-sans text-ink-soft hover:text-pink transition-colors mb-6" style={{ fontSize: "13px" }}>
+          <a
+            href="tel:+61412796630"
+            className="block font-sans text-ink-soft hover:text-pink transition-colors mb-6 tabular-nums"
+            style={{ fontSize: "13px" }}
+          >
             +61 412 796 630
           </a>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-6">
             {socials.map((s) => (
               <a
                 key={s.href}
@@ -429,7 +449,7 @@ function MobileMenu({
                 aria-label={s.label}
                 className="text-ink-soft hover:text-pink transition-colors"
               >
-                {React.cloneElement(s.icon as React.ReactElement, { size: 18 } as Record<string, unknown>)}
+                {React.cloneElement(s.icon as React.ReactElement, { size: 20 } as Record<string, unknown>)}
               </a>
             ))}
           </div>
