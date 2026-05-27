@@ -177,7 +177,6 @@ export const projects: Project[] = [
       src: "/images/tmyr/hero-poster.jpg",
       alt: "The Moment You Realise campaign, Share to Buy social video series hero frame",
     },
-    heroVideo: "/images/tmyr/Looping%20Reels%20Hero.webm",
     heroPhones: {
       model: "/models/iphone/iphone-15-pro-max.glb",
       videos: [

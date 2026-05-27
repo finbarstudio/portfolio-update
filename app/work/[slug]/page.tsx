@@ -381,9 +381,11 @@ export default async function CaseStudyPage({
         </a>
       )}
 
-      {/* Hero, 3D model, Spline, looping video, or static image */}
+      {/* Hero — mediaRows take priority, else 3D model / Spline / looping video / static image */}
       <div className="mb-8">
-        {project.heroModel ? (
+        {project.mediaRows && project.mediaRows.length > 0 ? (
+          <MediaRows rows={project.mediaRows} />
+        ) : project.heroModel ? (
           <ModelDisplay
             model={project.heroModel.model}
             video={project.heroModel.video}
@@ -414,9 +416,8 @@ export default async function CaseStudyPage({
       <SummaryBlock project={project} />
       <SkillsRow project={project} />
 
-      {project.mediaRows && project.mediaRows.length > 0 ? (
-        <MediaRows rows={project.mediaRows} />
-      ) : (
+      {/* When mediaRows is acting as hero, nothing else below the text. */}
+      {!(project.mediaRows && project.mediaRows.length > 0) && (
         <>
           <VisualBody project={project} />
           {project.hasDepth && project.depth && project.depth.length > 0 && (
