@@ -392,12 +392,12 @@
     overflow: hidden;
     background: var(--surface-raised);
     box-shadow: var(--elev-1);
-    transition: box-shadow var(--dur-slow) var(--ease),
-                transform   var(--dur-slow) var(--ease);
+    transition: box-shadow var(--dur-slow) var(--ease);
   }
+  /* No transform on hover — translating the container makes WebGL mockups
+     (phone / Mac) visibly jump. Separation comes from elevation + the ring. */
   .group:hover .card-thumb {
     box-shadow: var(--elev-2), 0 0 0 6px var(--pink);
-    transform: translateY(-4px);
   }
 
   /* Hero scroll-driven fade (CSS only, no JS) */

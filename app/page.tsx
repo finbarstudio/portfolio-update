@@ -45,8 +45,8 @@ export default function HomePage() {
       {/* Minimal masthead — capabilities only, work leads below */}
       <header className="px-5 md:px-10 pt-8 md:pt-12 pb-10 md:pb-14">
         <h1
-          className="font-sans font-medium text-ink"
-          style={{ fontSize: "var(--text-h2)", letterSpacing: "0.01em", lineHeight: "var(--leading-snug)" }}
+          className="font-sans font-bold uppercase text-ink"
+          style={{ fontSize: "var(--text-h2)", letterSpacing: "0.06em", lineHeight: "var(--leading-snug)" }}
         >
           Graphic design, brand identity, editorial, web &amp; motion.
         </h1>

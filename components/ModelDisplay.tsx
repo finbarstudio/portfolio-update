@@ -32,7 +32,7 @@ const CAMERA_FOV = 28;
 // Hover = camera moves in AND up so the screen face fills the frame and the
 // stand drops out of view — you can see the bevels.
 const CAMERA_DISTANCE_DEFAULT = 19;    // Rest, isometric, full Mac + stand visible
-const CAMERA_DISTANCE_HOVER = 11.5;    // Hover, zoomed onto the screen (bevels visible)
+const CAMERA_DISTANCE_HOVER = 12.08;   // Hover, zoomed onto the screen (bevels visible). 5% less zoom than 11.5
 const CAMERA_Y_DEFAULT = 0;            // Rest camera height
 const CAMERA_Y_HOVER = 0.9;            // Hover lifts camera to screen's vertical centre
 const LOOKAT_Y_HOVER = 0.9;            // ...and looks at the same point
