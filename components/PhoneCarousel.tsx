@@ -434,8 +434,8 @@ function PhoneCarouselInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Pink starburst backdrop, behind the phones */}
-      <div className="starburst" aria-hidden="true" />
+      {/* Pink starburst backdrop, behind the phones — only on hover */}
+      <div className="starburst" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
       {/* Edge fade — masks phones entering/exiting on both sides */}
       <div aria-hidden="true" style={{

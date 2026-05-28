@@ -262,8 +262,8 @@ function ModelDisplayInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Pink starburst backdrop, behind the 3D piece */}
-      <div className="starburst" aria-hidden="true" />
+      {/* Pink starburst backdrop, behind the 3D piece — only on hover */}
+      <div className="starburst" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
       {/* Poster + spinner until first frame is ready */}
       {poster && !ready && (

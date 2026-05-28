@@ -333,6 +333,10 @@
     );
     -webkit-mask-image: radial-gradient(closest-side, #000 0%, #000 42%, transparent 86%);
             mask-image: radial-gradient(closest-side, #000 0%, #000 42%, transparent 86%);
+    /* Steady slow rotation only — no opacity pulse. Hidden until hover;
+       the hosting component toggles opacity via the `hovered` state. */
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease);
     animation: starburst-spin 80s linear infinite;
   }
 
@@ -368,8 +372,10 @@
       display: grid;
       grid-template-rows: 0fr;
       opacity: 0;
-      transition: grid-template-rows var(--dur) var(--ease),
-                  opacity var(--dur-fast) var(--ease);
+      /* Slow grow so a featured card's thumbnail eases down (steals space)
+         gradually enough for the WebGL mockup to refit smoothly. */
+      transition: grid-template-rows 480ms var(--ease),
+                  opacity var(--dur) var(--ease);
     }
     .hover-reveal > * { overflow: hidden; min-height: 0; }
     .group:hover .hover-reveal,
