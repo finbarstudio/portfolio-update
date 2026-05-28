@@ -119,19 +119,6 @@ function CaseMedia({ img, halfWidth = false }: { img: ProjectImage; halfWidth?: 
   return <CaseImage src={img.src} alt={img.alt} halfWidth={halfWidth} />;
 }
 
-/* ─── Meta row ─────────────────────────────────────────────── */
-function MetaRow({ project }: { project: Project }) {
-  return (
-    <div className="flex flex-wrap items-center gap-2 py-5">
-      {project.categories.map((cat) => (
-        <Tag key={cat} label={cat} />
-      ))}
-      <Tag label={project.date} variant="teal" />
-      {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
-    </div>
-  );
-}
-
 /* ─── Summary block ────────────────────────────────────────── */
 function SummaryBlock({ project }: { project: Project }) {
   const items = [
@@ -147,20 +134,6 @@ function SummaryBlock({ project }: { project: Project }) {
           <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{value}</p>
         </div>
       ))}
-    </div>
-  );
-}
-
-/* ─── Skills row ───────────────────────────────────────────── */
-function SkillsRow({ project }: { project: Project }) {
-  return (
-    <div className="py-6">
-      <p className="mono-label text-ink-soft mb-3">SKILLS</p>
-      <div className="flex flex-wrap gap-2">
-        {project.skills.map((skill) => (
-          <Tag key={skill} label={skill} />
-        ))}
-      </div>
     </div>
   );
 }
@@ -265,28 +238,80 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
   );
 }
 
-/* ─── Footer CTA ───────────────────────────────────────────── */
-function FooterCTA() {
+/* ─── Footer: Skills | Company | Open for work + clean back link ─── */
+function FooterMeta({ project }: { project: Project }) {
   return (
-    <div className="py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-      <div>
-        <p className="mono-label text-ink-soft mb-1">Open for work</p>
-        <a
-          href="mailto:finbar@finbar.studio"
-          className="font-sans font-medium text-ink hover:text-pink transition-colors link-wipe"
-          style={{ fontSize: "var(--text-h3)" }}
-        >
-          finbar@finbar.studio
-        </a>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8">
+        {/* Col 1: Skills */}
+        <div>
+          <p className="mono-label text-ink-soft mb-3">SKILLS</p>
+          <div className="flex flex-wrap gap-2">
+            {project.skills.map((skill) => (
+              <Tag key={skill} label={skill} />
+            ))}
+          </div>
+        </div>
+
+        {/* Col 2: Company (+ optional live link) */}
+        <div>
+          <p className="mono-label text-ink-soft mb-3">
+            {project.liveUrl && project.companyUrl ? "LINKS" : project.liveUrl ? "LIVE SITE" : "COMPANY"}
+          </p>
+          <div className="space-y-1.5">
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block font-mono text-teal hover:text-pink transition-colors break-all"
+                style={{ fontSize: "var(--text-small)" }}
+              >
+                {project.liveUrl.replace(/^https?:\/\//, "")} ↗
+              </a>
+            )}
+            {project.companyUrl && project.companyUrl !== project.liveUrl && (
+              <a
+                href={project.companyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block font-mono text-teal hover:text-pink transition-colors break-all"
+                style={{ fontSize: "var(--text-small)" }}
+              >
+                {project.companyUrl.replace(/^https?:\/\//, "")} ↗
+              </a>
+            )}
+            {!project.liveUrl && !project.companyUrl && (
+              <span className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>—</span>
+            )}
+          </div>
+        </div>
+
+        {/* Col 3: Open for work */}
+        <div>
+          <p className="mono-label text-ink-soft mb-3">OPEN FOR WORK</p>
+          <a
+            href="mailto:finbar@finbar.studio"
+            className="font-sans font-medium text-ink hover:text-pink transition-colors link-wipe"
+            style={{ fontSize: "var(--text-h3)" }}
+          >
+            finbar@finbar.studio
+          </a>
+        </div>
       </div>
-      {/* Use "/" not "/#work" so returning home starts at the top */}
-      <Link
-        href="/"
-        className="mono-label text-ink-soft hover:text-pink transition-colors"
-      >
-        [ ← BACK TO /WORK ]
-      </Link>
-    </div>
+
+      {/* Clean back link — pink arrow + black Archivo, uppercase, tracked */}
+      <div className="pt-6 pb-10">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-3 font-sans font-bold uppercase text-ink hover:text-pink transition-colors group"
+          style={{ fontSize: "0.875rem", letterSpacing: "0.16em" }}
+        >
+          <span className="text-pink transition-transform group-hover:-translate-x-1">←</span>
+          <span>Back to Work</span>
+        </Link>
+      </div>
+    </>
   );
 }
 
@@ -343,25 +368,16 @@ export default async function CaseStudyPage({
             </div>
           )}
           <h1
-            className="font-sans font-bold uppercase text-ink leading-[1.02] cursor-blink"
+            className="font-sans font-bold uppercase text-ink leading-[1.02]"
             style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
           >
             <EncryptedText text={project.name} />
           </h1>
         </div>
 
-        {/* 2-row, masonry-style tag grid; bottom-aligned to the H1 baseline */}
-        <div
-          className="gap-x-2 gap-y-1.5 justify-end items-end"
-          style={{
-            display: "grid",
-            gridTemplateRows: "repeat(2, auto)",
-            gridAutoFlow: "column dense",
-            gridAutoColumns: "max-content",
-            justifyContent: "end",
-            alignContent: "end",
-          }}
-        >
+        {/* Tags — right-aligned, brick-wrap. Equal gap horizontally and vertically;
+            each tag keeps its own intrinsic padding so the LEFT edge stays ragged. */}
+        <div className="flex flex-wrap justify-end items-end gap-2 max-w-[70%] sm:max-w-[55%] md:max-w-[45%]">
           {project.categories.map((cat) => (
             <Tag key={cat} label={cat} />
           ))}
@@ -369,17 +385,6 @@ export default async function CaseStudyPage({
           {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
         </div>
       </header>
-
-      {project.liveUrl && (
-        <a
-          href={project.liveUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mono-label text-teal hover:text-pink transition-colors mt-4 mb-2 inline-block"
-        >
-          LIVE ↗
-        </a>
-      )}
 
       {/* Hero — mediaRows take priority, else 3D model / Spline / looping video / static image */}
       <div className="mb-8">
@@ -413,7 +418,6 @@ export default async function CaseStudyPage({
       </div>
 
       <SummaryBlock project={project} />
-      <SkillsRow project={project} />
 
       {/* When mediaRows is acting as hero, nothing else below the text. */}
       {!(project.mediaRows && project.mediaRows.length > 0) && (
@@ -432,41 +436,7 @@ export default async function CaseStudyPage({
         />
       )}
 
-      {/* Links row, live site and/or company site */}
-      {(project.liveUrl || project.companyUrl) && (
-        <div className="flex flex-wrap gap-10 py-6">
-          {project.liveUrl && (
-            <div>
-              <p className="mono-label text-ink-soft mb-2">LIVE SITE</p>
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-teal hover:text-pink transition-colors"
-                style={{ fontSize: "var(--text-small)" }}
-              >
-                {project.liveUrl} ↗
-              </a>
-            </div>
-          )}
-          {project.companyUrl && project.companyUrl !== project.liveUrl && (
-            <div>
-              <p className="mono-label text-ink-soft mb-2">COMPANY</p>
-              <a
-                href={project.companyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-teal hover:text-pink transition-colors"
-                style={{ fontSize: "var(--text-small)" }}
-              >
-                {project.companyUrl} ↗
-              </a>
-            </div>
-          )}
-        </div>
-      )}
-
-      <FooterCTA />
+      <FooterMeta project={project} />
     </article>
   );
 }
