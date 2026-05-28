@@ -18,16 +18,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="px-5 md:px-10 pt-5 md:pt-7 pb-10">
-      {/* Terminal header */}
-      <p className="terminal-line mb-5 select-none">
-        <span className="ps1">finbar@studio</span>
-        <span> </span>
-        <span className="path">~/</span>
-        <span> $ </span>
-        <span className="cmd">about</span>
-      </p>
-
+    <div className="px-5 md:px-10 pt-8 md:pt-12 pb-10">
       <h1
         className="font-sans font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
@@ -35,10 +26,8 @@ export default function AboutPage() {
         <EncryptedText text="Finbar Skitini." />
       </h1>
 
-      <p className="terminal-line mt-6 mb-12 select-none">
-        <span className="ps1">›</span>
-        <span> </span>
-        <span className="cmd">graphic designer &amp; framer developer · brisbane, au</span>
+      <p className="mono-label text-ink-soft mt-6 mb-12">
+        graphic designer &amp; framer developer · brisbane, au
       </p>
 
       {/* Headshot + Bio */}

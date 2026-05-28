@@ -190,7 +190,6 @@ function ModelDisplayInner({
     if (typeof document === "undefined") return null;
     const el = document.createElement("video");
     el.src = video;
-    el.crossOrigin = "anonymous";
     el.loop = true;
     el.muted = true;
     el.playsInline = true;
@@ -200,6 +199,11 @@ function ModelDisplayInner({
     // for inline autoplay to work without user interaction.
     el.setAttribute("playsinline", "");
     el.setAttribute("muted", "");
+    // Keep the element off-screen but NOT display:none — several browsers
+    // (Safari, iOS) won't decode frames for a WebGL texture unless the
+    // <video> is actually attached to the DOM and renderable.
+    el.style.cssText =
+      "position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none;";
     return el;
   }, [video]);
 
@@ -221,14 +225,18 @@ function ModelDisplayInner({
       videoEl.play().catch(() => {});
     };
     videoEl.addEventListener("loadeddata", onLoaded);
-    // Kick off load.
+    // Attach to the DOM so the browser decodes frames for the texture.
+    document.body.appendChild(videoEl);
+    // Kick off load + try to play immediately (muted autoplay is allowed).
     videoEl.load();
+    videoEl.play().catch(() => {});
     return () => {
       videoEl.removeEventListener("loadeddata", onLoaded);
       videoEl.pause();
       videoEl.src = "";
       videoEl.removeAttribute("src");
       videoEl.load();
+      if (videoEl.parentNode) videoEl.parentNode.removeChild(videoEl);
     };
   }, [videoEl]);
 

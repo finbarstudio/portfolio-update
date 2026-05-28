@@ -3,13 +3,13 @@ import ProjectCard from "@/components/ProjectCard";
 import EncryptedText from "@/components/EncryptedText";
 
 /* ─── Hero ──────────────────────────────────────────────────────
-   Terminal-prompt flavour: PS1 line above, encrypted heading,
-   skill-tags output below. Sticky so it sits behind the work grid.
+   Display heading + discipline subtitle. Sticky so it sits behind
+   the work grid and fades as the work scrolls over it.
    ─────────────────────────────────────────────────────────────── */
 function Hero() {
   return (
     <section
-      className="sticky top-0 z-0 bg-bg px-5 md:px-10 pt-5 md:pt-7 pb-6 md:pb-7"
+      className="sticky top-0 z-0 bg-bg px-5 md:px-10 pt-8 md:pt-12 pb-8 md:pb-10"
       style={{
         minHeight: "38vh",
         display: "flex",
@@ -19,19 +19,9 @@ function Hero() {
       aria-labelledby="hero-heading"
     >
       <div className="hero-scroll-fade">
-        {/* PS1 prompt line */}
-        <p className="terminal-line mb-5 select-none">
-          <span className="ps1">finbar@studio</span>
-          <span> </span>
-          <span className="path">~/</span>
-          <span> $ </span>
-          <span className="cmd">whoami</span>
-        </p>
-
-        {/* Heading, output of the command */}
         <h1
           id="hero-heading"
-          className="font-sans font-bold uppercase text-ink leading-[1.02] cursor-blink"
+          className="font-sans font-bold uppercase text-ink leading-[1.02]"
           style={{
             fontSize: "var(--text-display)",
             letterSpacing: "0.03em",
@@ -41,11 +31,8 @@ function Hero() {
           <EncryptedText text="Designer" delay={120} />
         </h1>
 
-        {/* cat about line */}
-        <p className="terminal-line mt-6 select-none">
-          <span className="ps1">›</span>
-          <span> </span>
-          <span className="cmd">brand · identity · editorial · web · motion</span>
+        <p className="mono-label text-ink-soft mt-6">
+          brand · identity · editorial · web · motion
         </p>
       </div>
     </section>
@@ -115,9 +102,7 @@ export default function HomePage() {
           className="px-5 md:px-10 py-12 md:py-16 border-t border-line"
           aria-label="Site footer"
         >
-          <p className="mono-label text-ink-soft mb-3">
-            <span className="text-pink">$</span> echo $CONTACT
-          </p>
+          <p className="mono-label text-ink-soft mb-3">Get in touch</p>
           <a
             href="mailto:finbar@finbar.studio"
             className="font-sans font-medium text-ink hover:text-pink transition-colors"

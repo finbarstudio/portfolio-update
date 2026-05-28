@@ -41,16 +41,7 @@ const socials = [
 
 export default function ContactPage() {
   return (
-    <div className="px-5 md:px-10 pt-5 md:pt-7 pb-10">
-      {/* Terminal header */}
-      <p className="terminal-line mb-5 select-none">
-        <span className="ps1">finbar@studio</span>
-        <span> </span>
-        <span className="path">~/</span>
-        <span> $ </span>
-        <span className="cmd">contact</span>
-      </p>
-
+    <div className="px-5 md:px-10 pt-8 md:pt-12 pb-10">
       <h1
         className="font-sans font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
@@ -58,10 +49,8 @@ export default function ContactPage() {
         <EncryptedText text="Let's work together." />
       </h1>
 
-      <p className="terminal-line mt-6 mb-12 select-none">
-        <span className="ps1">›</span>
-        <span> </span>
-        <span className="cmd">open for full-time roles &amp; freelance · brisbane or remote</span>
+      <p className="mono-label text-ink-soft mt-6 mb-12">
+        open for full-time roles &amp; freelance · brisbane or remote
       </p>
 
       {/* Email */}

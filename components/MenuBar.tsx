@@ -142,10 +142,6 @@ export default function MenuBar({
 
       {/* Right cluster */}
       <div className="ml-auto flex items-center gap-3 text-ink">
-        <span className="hidden lg:inline-flex items-center gap-1.5">
-          <span className="status-dot" />
-          <span className="text-teal font-bold tracking-[0.1em]">ONLINE</span>
-        </span>
         <WeatherDisplay />
 
         {/* Mobile hamburger — real tap target */}
