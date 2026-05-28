@@ -127,9 +127,9 @@ function SummaryBlock({ project }: { project: Project }) {
     { label: "OUTCOME", value: project.outcome },
   ];
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 py-8 text-center md:text-left">
       {items.map(({ label, value }) => (
-        <div key={label}>
+        <div key={label} className="max-w-prose mx-auto md:mx-0">
           <p className="mono-label text-ink-soft mb-2">{label}</p>
           <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{value}</p>
         </div>
@@ -140,28 +140,34 @@ function SummaryBlock({ project }: { project: Project }) {
 
 /* ─── Media rows ──────────────────────────────────────────────
    All tiles from every row live in a single CSS grid with one set of
-   column definitions (repeat(N, 1fr)). That guarantees pixel-perfect
-   alignment — every column has the exact same width in row 1 and
-   row 2, and the gap between rows matches the gap between columns.
-   Pure white-space grid, no labels, no rules.
-   ───────────────────────────────────────────────────────────── */
-function MediaRows({ rows }: { rows: MediaRowType[] }) {
-  const maxCount = Math.max(...rows.map((r) => (r.videos ?? r.images ?? []).length));
-  if (maxCount === 0) return null;
+   column definitions (repeat(N, 1fr)). Same column count for both rows
+   guarantees pixel-perfect alignment — col N in row 1 sits exactly above
+   col N in row 2, and the gap between rows matches the gap between cols.
 
+   Mobile shows a smaller, larger-scale sample (2 of each row) so the work
+   reads at a usable size; desktop shows the full set.
+   ───────────────────────────────────────────────────────────── */
+function MediaGrid({
+  rows,
+  count,
+  className,
+  sizes,
+}: {
+  rows: MediaRowType[];
+  count: number;
+  className: string;
+  sizes: string;
+}) {
   return (
     <div
-      className="grid gap-2 md:gap-3 py-2"
+      className={className}
       style={{
-        // Equal-width columns and rows sized to content (auto). Each tile gets
-        // an explicit gridColumn / gridRow so a tile in row 1 col N is exactly
-        // above a tile in row 2 col N — no auto-flow surprises.
-        gridTemplateColumns: `repeat(${maxCount}, minmax(0, 1fr))`,
+        gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${rows.length}, auto)`,
       }}
     >
       {rows.flatMap((row, ri) => {
-        const items = row.videos ?? row.images ?? [];
+        const items = (row.videos ?? row.images ?? []).slice(0, count);
         return items.map((src, i) => (
           <div
             key={`${ri}-${i}`}
@@ -176,17 +182,26 @@ function MediaRows({ rows }: { rows: MediaRowType[] }) {
             {row.videos ? (
               <VideoPlayer src={src} />
             ) : (
-              <ClientImage
-                src={src}
-                alt={row.alt ?? ""}
-                fill
-                sizes="14vw"
-                className="object-cover"
-              />
+              <ClientImage src={src} alt={row.alt ?? ""} fill sizes={sizes} className="object-cover" />
             )}
           </div>
         ));
       })}
+    </div>
+  );
+}
+
+function MediaRows({ rows }: { rows: MediaRowType[] }) {
+  const maxCount = Math.max(...rows.map((r) => (r.videos ?? r.images ?? []).length));
+  if (maxCount === 0) return null;
+  const mobileCount = Math.min(2, maxCount);
+
+  return (
+    <div className="py-2">
+      {/* Mobile: a couple of each, large */}
+      <MediaGrid rows={rows} count={mobileCount} className="grid gap-2.5 md:hidden" sizes="50vw" />
+      {/* Desktop: the full set */}
+      <MediaGrid rows={rows} count={maxCount} className="hidden md:grid gap-3" sizes="14vw" />
     </div>
   );
 }
@@ -254,11 +269,11 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
 function FooterMeta({ project }: { project: Project }) {
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 py-8 border-t border-line text-center md:text-left">
         {/* Col 1: Skills */}
         <div>
           <p className="mono-label text-ink-soft mb-3">SKILLS</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-center md:justify-start gap-2">
             {project.skills.map((skill) => (
               <Tag key={skill} label={skill} />
             ))}
@@ -276,7 +291,7 @@ function FooterMeta({ project }: { project: Project }) {
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block font-mono text-teal hover:text-pink transition-colors break-all"
+                className="block font-mono text-teal hover:text-pink transition-colors break-words"
                 style={{ fontSize: "var(--text-small)" }}
               >
                 {project.liveUrl.replace(/^https?:\/\//, "")} ↗
@@ -287,7 +302,7 @@ function FooterMeta({ project }: { project: Project }) {
                 href={project.companyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block font-mono text-teal hover:text-pink transition-colors break-all"
+                className="block font-mono text-teal hover:text-pink transition-colors break-words"
                 style={{ fontSize: "var(--text-small)" }}
               >
                 {project.companyUrl.replace(/^https?:\/\//, "")} ↗
@@ -304,7 +319,7 @@ function FooterMeta({ project }: { project: Project }) {
           <p className="mono-label text-ink-soft mb-3">OPEN FOR WORK</p>
           <a
             href="mailto:finbar@finbar.studio"
-            className="font-sans font-medium text-ink hover:text-pink transition-colors link-wipe"
+            className="font-sans font-medium text-ink hover:text-pink transition-colors link-wipe break-words"
             style={{ fontSize: "var(--text-h3)" }}
           >
             finbar@finbar.studio
@@ -312,8 +327,8 @@ function FooterMeta({ project }: { project: Project }) {
         </div>
       </div>
 
-      {/* Clean back link — black Archivo, uppercase, tracked */}
-      <div className="pt-6 pb-10">
+      {/* Clean back link — black Archivo, uppercase, tracked. Centred on mobile. */}
+      <div className="pt-8 pb-10 text-center md:text-left">
         <Link
           href="/"
           className="inline-block font-sans font-bold uppercase text-ink hover:text-pink transition-colors"
@@ -364,11 +379,11 @@ export default async function CaseStudyPage({
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(creativeWorkJsonLd) }}
       />
-      {/* Header — logo + title left, tags 2-row masonry grid right, all bottom-aligned */}
-      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 mb-6">
+      {/* Header — mobile: stacked + centred. Desktop: logo+title left, tags right, bottom-aligned. */}
+      <header className="flex flex-col items-center text-center gap-5 mb-8 md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left md:gap-x-6 md:gap-y-4 md:mb-6">
         <div className="min-w-0 max-w-full">
           {project.logo && (
-            <div className="mb-4">
+            <div className="mb-4 flex justify-center md:block">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={project.logo}
@@ -386,9 +401,9 @@ export default async function CaseStudyPage({
           </h1>
         </div>
 
-        {/* Tags — right-aligned, brick-wrap. Equal gap horizontally and vertically;
-            each tag keeps its own intrinsic padding so the LEFT edge stays ragged. */}
-        <div className="flex flex-wrap justify-end items-end gap-2 max-w-[70%] sm:max-w-[55%] md:max-w-[45%]">
+        {/* Tags — mobile: centred wrap. Desktop: right-aligned brick-wrap, ragged left.
+            Equal gap both axes; each tag keeps its own intrinsic text padding. */}
+        <div className="flex flex-wrap justify-center md:justify-end items-end gap-2 max-w-full md:max-w-[45%]">
           {project.categories.map((cat) => (
             <Tag key={cat} label={cat} />
           ))}
