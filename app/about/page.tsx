@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import ClientImage from "@/components/ClientImage";
-import EncryptedText from "@/components/EncryptedText";
 
 export const metadata: Metadata = {
   title: "About | finbar✶studio",
@@ -23,7 +22,7 @@ export default function AboutPage() {
         className="font-sans font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
       >
-        <EncryptedText text="Finbar Skitini." />
+        Finbar Skitini.
       </h1>
 
       <p className="mono-label text-ink-soft mt-6 mb-12">
@@ -45,7 +44,6 @@ export default function AboutPage() {
           />
         </div>
         <div className="max-w-2xl">
-          <p className="mono-label text-ink-soft mb-5">Background</p>
           <div className="space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
             <p>
               I&rsquo;m a graphic designer and Framer developer based in
@@ -115,9 +113,8 @@ export default function AboutPage() {
               </p>
               <ul className="space-y-2">
                 {items.map((item) => (
-                  <li key={item} className="font-sans text-ink-soft flex gap-2" style={{ fontSize: "var(--text-small)" }}>
-                    <span className="text-pink">›</span>
-                    <span>{item}</span>
+                  <li key={item} className="font-sans text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
+                    {item}
                   </li>
                 ))}
               </ul>

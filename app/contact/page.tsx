@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import EncryptedText from "@/components/EncryptedText";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 
 export const metadata: Metadata = {
@@ -46,7 +45,7 @@ export default function ContactPage() {
         className="font-sans font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
       >
-        <EncryptedText text="Let's work together." />
+        Let&rsquo;s work together.
       </h1>
 
       <p className="mono-label text-ink-soft mt-6 mb-12">

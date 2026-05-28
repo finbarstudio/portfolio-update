@@ -233,9 +233,6 @@ function VisualBody({ project }: { project: Project }) {
 function DepthSections({ sections }: { sections: DepthSection[] }) {
   return (
     <div className="py-8">
-      <p className="mono-label text-ink-soft mb-8 pb-3">
-        PROCESS &amp; DETAIL
-      </p>
       <div className="space-y-16">
         {sections.map((section, i) => (
           <div key={i}>
