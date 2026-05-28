@@ -208,15 +208,17 @@ export const projects: Project[] = [
       },
       {
         // Reel source videos are 540×1162 (not 9:16) — match exactly so they fill the column.
+        // Filenames don't match the actual reel subject — re-ordered so each reel slot
+        // (col 1..7) lines up with the same person/story in the posts row above.
         ratio: "540/1162",
         videos: [
           "/images/tmyr/1080x1920%20IG%20Reels/Anthony.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Freya.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Katie.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Kiran.webm",
           "/images/tmyr/1080x1920%20IG%20Reels/Lauren.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Freya.webm",
           "/images/tmyr/1080x1920%20IG%20Reels/Molly.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Katie.webm",
           "/images/tmyr/1080x1920%20IG%20Reels/Olu.webm",
+          "/images/tmyr/1080x1920%20IG%20Reels/Kiran.webm",
         ],
         alt: "TMYR campaign, 1080x1920 Instagram reel variants for Share to Buy",
       },

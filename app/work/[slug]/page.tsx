@@ -312,15 +312,14 @@ function FooterMeta({ project }: { project: Project }) {
         </div>
       </div>
 
-      {/* Clean back link — pink arrow + black Archivo, uppercase, tracked */}
+      {/* Clean back link — black Archivo, uppercase, tracked */}
       <div className="pt-6 pb-10">
         <Link
           href="/"
-          className="inline-flex items-center gap-3 font-sans font-bold uppercase text-ink hover:text-pink transition-colors group"
+          className="inline-block font-sans font-bold uppercase text-ink hover:text-pink transition-colors"
           style={{ fontSize: "0.875rem", letterSpacing: "0.16em" }}
         >
-          <span className="text-pink transition-transform group-hover:-translate-x-1">←</span>
-          <span>Back to Work</span>
+          Back to Work
         </Link>
       </div>
     </>

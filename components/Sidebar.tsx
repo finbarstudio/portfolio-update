@@ -134,7 +134,7 @@ function DesktopSidebar({
       className="hidden md:flex fixed left-0 border-r border-ink flex-col z-40 bg-bg"
       style={{
         top: "var(--menubar-h)",
-        bottom: "var(--statusbar-h)",
+        bottom: 0,
         width: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W,
         transition: "width 0.25s cubic-bezier(0.4,0,0.2,1)",
         overflow: "hidden",

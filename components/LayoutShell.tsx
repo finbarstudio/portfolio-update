@@ -8,7 +8,6 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import MenuBar from "./MenuBar";
-import StatusBar from "./StatusBar";
 
 export const SIDEBAR_EXPANDED_W = 224; // px
 export const SIDEBAR_COLLAPSED_W = 48; // px
@@ -48,7 +47,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         onMobileMenuClose={() => setMobileMenuOpen(false)}
       />
       <main
-        className="min-w-0 ml-0 md:ml-[var(--sidebar-w)] pb-0 md:pb-[var(--statusbar-h)]"
+        className="min-w-0 ml-0 md:ml-[var(--sidebar-w)]"
         style={
           {
             "--sidebar-w": `${sidebarW}px`,
@@ -61,7 +60,6 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       >
         {children}
       </main>
-      <StatusBar />
     </>
   );
 }
