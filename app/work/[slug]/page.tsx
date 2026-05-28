@@ -152,14 +152,26 @@ function MediaRows({ rows }: { rows: MediaRowType[] }) {
   return (
     <div
       className="grid gap-2 md:gap-3 py-2"
-      style={{ gridTemplateColumns: `repeat(${maxCount}, minmax(0, 1fr))` }}
+      style={{
+        // Equal-width columns and rows sized to content (auto). Each tile gets
+        // an explicit gridColumn / gridRow so a tile in row 1 col N is exactly
+        // above a tile in row 2 col N — no auto-flow surprises.
+        gridTemplateColumns: `repeat(${maxCount}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${rows.length}, auto)`,
+      }}
     >
       {rows.flatMap((row, ri) => {
         const items = row.videos ?? row.images ?? [];
         return items.map((src, i) => (
           <div
             key={`${ri}-${i}`}
-            style={{ aspectRatio: row.ratio, background: "white", overflow: "hidden" }}
+            style={{
+              aspectRatio: row.ratio,
+              background: "white",
+              overflow: "hidden",
+              gridColumn: i + 1,
+              gridRow: ri + 1,
+            }}
           >
             {row.videos ? (
               <VideoPlayer src={src} />
