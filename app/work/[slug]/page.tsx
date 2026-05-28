@@ -328,40 +328,47 @@ export default async function CaseStudyPage({
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(creativeWorkJsonLd) }}
       />
-      {/* Terminal header, matches home / about / contact style */}
-      <p className="terminal-line mb-5 select-none">
-        <span className="ps1">finbar@studio</span>
-        <span> </span>
-        <span className="path">~/</span>
-        <span> $ </span>
-        <span className="cmd">{project.slug}</span>
-      </p>
-
-      {/* Client logo (if available) */}
-      {project.logo && (
-        <div className="mb-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={project.logo}
-            alt=""
-            aria-hidden="true"
-            style={{ height: 28, width: "auto", objectFit: "contain", display: "block" }}
-          />
+      {/* Header — logo + title left, tags 2-row masonry grid right, all bottom-aligned */}
+      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 mb-6">
+        <div className="min-w-0 max-w-full">
+          {project.logo && (
+            <div className="mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={project.logo}
+                alt=""
+                aria-hidden="true"
+                style={{ height: 28, width: "auto", objectFit: "contain", display: "block" }}
+              />
+            </div>
+          )}
+          <h1
+            className="font-sans font-bold uppercase text-ink leading-[1.02] cursor-blink"
+            style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
+          >
+            <EncryptedText text={project.name} />
+          </h1>
         </div>
-      )}
 
-      <h1
-        className="font-sans font-bold uppercase text-ink leading-[1.02] cursor-blink"
-        style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
-      >
-        <EncryptedText text={project.name} />
-      </h1>
-
-      <p className="terminal-line mt-6 select-none">
-        <span className="ps1">›</span>
-        <span> </span>
-        <span className="cmd">{project.categories.join(" · ").toLowerCase()}</span>
-      </p>
+        {/* 2-row, masonry-style tag grid; bottom-aligned to the H1 baseline */}
+        <div
+          className="gap-x-2 gap-y-1.5 justify-end items-end"
+          style={{
+            display: "grid",
+            gridTemplateRows: "repeat(2, auto)",
+            gridAutoFlow: "column dense",
+            gridAutoColumns: "max-content",
+            justifyContent: "end",
+            alignContent: "end",
+          }}
+        >
+          {project.categories.map((cat) => (
+            <Tag key={cat} label={cat} />
+          ))}
+          <Tag label={project.date} variant="teal" />
+          {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
+        </div>
+      </header>
 
       {project.liveUrl && (
         <a
@@ -405,7 +412,6 @@ export default async function CaseStudyPage({
         )}
       </div>
 
-      <MetaRow project={project} />
       <SummaryBlock project={project} />
       <SkillsRow project={project} />
 

@@ -207,7 +207,8 @@ export const projects: Project[] = [
         alt: "TMYR campaign, 1080x1080 Instagram post variants for Share to Buy",
       },
       {
-        ratio: "9/16",
+        // Reel source videos are 540×1162 (not 9:16) — match exactly so they fill the column.
+        ratio: "540/1162",
         videos: [
           "/images/tmyr/1080x1920%20IG%20Reels/Anthony.webm",
           "/images/tmyr/1080x1920%20IG%20Reels/Freya.webm",
