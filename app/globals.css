@@ -205,6 +205,11 @@
   to   { transform: translateX(100%); }
 }
 
+/* Slow rotation for the mockup starburst backdrop. */
+@keyframes starburst-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
@@ -312,6 +317,23 @@
     background: var(--teal);
     flex-shrink: 0;
     animation: dot-pulse 2s ease-in-out infinite;
+  }
+
+  /* Mockup starburst — a many-pointed pink sunburst radiating from centre,
+     behind the 3D piece, rotating very slowly. Subtle; fades out toward edges. */
+  .starburst {
+    position: absolute;
+    inset: -30%;
+    z-index: 0;
+    pointer-events: none;
+    background: repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      color-mix(in srgb, var(--pink) 9%, transparent) 0deg 2.6deg,
+      transparent 2.6deg 9deg
+    );
+    -webkit-mask-image: radial-gradient(closest-side, #000 0%, #000 42%, transparent 86%);
+            mask-image: radial-gradient(closest-side, #000 0%, #000 42%, transparent 86%);
+    animation: starburst-spin 80s linear infinite;
   }
 
   /* Skeleton loader — fills its (aspect-ratio'd) parent so the placeholder

@@ -262,6 +262,9 @@ function ModelDisplayInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
+      {/* Pink starburst backdrop, behind the 3D piece */}
+      <div className="starburst" aria-hidden="true" />
+
       {/* Poster + spinner until first frame is ready */}
       {poster && !ready && (
         // eslint-disable-next-line @next/next/no-img-element
