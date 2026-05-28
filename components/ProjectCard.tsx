@@ -97,15 +97,16 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
   return (
     <article
       className="card-animate col-span-12 group"
-      style={{ animationDelay: `${index * 0.07}s`, height: "75vh", display: "flex", flexDirection: "column" }}
+      style={{ animationDelay: `${index * 0.07}s` }}
     >
       <Link
         href={`/work/${project.slug}`}
-        className="flex flex-col h-full focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {/* Thumbnail — grows to fill remaining height */}
-        <div className="card-thumb" style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
+        {/* Thumbnail — fixed viewport height so revealing text below never
+            resizes it (which would make the WebGL mockups jump). */}
+        <div className="card-thumb" style={{ height: "72vh", marginBottom: "var(--image-pad)", position: "relative" }}>
           {project.heroPhones ? (
             <PhoneCarousel
               model={project.heroPhones.model}
