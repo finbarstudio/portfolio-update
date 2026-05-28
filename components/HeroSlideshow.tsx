@@ -11,14 +11,14 @@ const S_MAX  = 1.06;    // scale at center
 const TILT   = 0.03;    // rotateY degrees per px from center (3D depth)
 const SPEED  = 0.032;   // scroll px per ms
 
-type Props = { images: string[]; aspectRatio?: string; sizes?: string };
+type Props = { images: string[]; aspectRatio?: string; fill?: boolean; sizes?: string };
 
 /**
  * HeroSlideshow — continuous right-to-left cover carousel.
  * All images visible at once; center card scales up with smoothstep easing.
  * Subtle perspective tilt + white gradient masks on edges.
  */
-export default function HeroSlideshow({ images, aspectRatio = "3/2", sizes }: Props) {
+export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = false, sizes }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const offsetRef    = useRef(0);
   const lastTRef     = useRef<number | null>(null);
@@ -86,7 +86,7 @@ export default function HeroSlideshow({ images, aspectRatio = "3/2", sizes }: Pr
       style={{
         position: "relative",
         width: "100%",
-        aspectRatio,
+        ...(fill ? { height: "100%" } : { aspectRatio }),
         overflow: "hidden",
         background: "var(--color-bg, #FAFAF8)",
       }}

@@ -293,9 +293,6 @@ function ModelDisplayInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Pink starburst backdrop, behind the 3D piece — only on hover */}
-      <div className="starburst" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
-
       {/* Poster + spinner until first frame is ready */}
       {poster && !ready && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -336,6 +333,12 @@ function ModelDisplayInner({
           <Rig hovered={hovered} modelUrl={model} videoTexture={videoTexture} />
         </Suspense>
       </Canvas>
+
+      {/* Pink starburst — rendered above the canvas so it doesn't pulse
+          through the mac model's narrow transparent canvas gaps. At 9% pink
+          opacity the rays are barely perceptible over the model; the radial
+          mask keeps the effect centred and fading toward the edges. */}
+      <div className="starburst" aria-hidden="true" style={{ opacity: hovered ? 1 : 0, zIndex: 2 }} />
 
     </div>
   );

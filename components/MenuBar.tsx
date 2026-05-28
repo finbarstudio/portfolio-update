@@ -6,13 +6,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-
-const NAV_ITEMS = [
-  { label: "Work",    href: "/" },
-  { label: "About",   href: "/about" },
-  { label: "Contact", href: "/contact" },
-];
 
 // Brisbane coords for Open-Meteo (free, no API key)
 const BNE_LAT  = -27.47;
@@ -96,8 +89,6 @@ export default function MenuBar({
 }: {
   onMobileMenuOpen?: () => void;
 }) {
-  const pathname = usePathname();
-
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 border-b border-ink bg-bg flex items-center px-3 text-[12px] md:text-[11px]"
@@ -117,28 +108,14 @@ export default function MenuBar({
         finbar<span className="pixel-star text-[13px]">✶</span>studio
       </Link>
 
-      {/* Nav items, functional links, desktop only */}
-      <nav className="hidden md:flex items-center gap-0 ml-5" aria-label="Primary">
-        {NAV_ITEMS.map((item) => {
-          const isActive = item.href === "/"
-            ? pathname === "/"
-            : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="px-3 py-1.5 transition-colors"
-              style={{
-                color: isActive ? "var(--bg)" : "var(--ink)",
-                background: isActive ? "var(--ink)" : "transparent",
-              }}
-              aria-current={isActive ? "page" : undefined}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Capabilities line — hidden on mobile to keep bar uncluttered */}
+      <span
+        className="hidden md:block ml-5 text-ink-soft"
+        style={{ letterSpacing: "0.04em" }}
+        aria-label="Services"
+      >
+        Graphic design, brand identity, editorial, web &amp; motion.
+      </span>
 
       {/* Right cluster */}
       <div className="ml-auto flex items-center gap-3 text-ink">

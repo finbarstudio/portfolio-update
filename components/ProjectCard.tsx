@@ -167,37 +167,36 @@ export function FullCard({ project, index }: { project: Project; index: number }
   return (
     <article
       className="card-animate col-span-12 sm:col-span-6 group relative"
-      style={{ animationDelay: `${index * 0.07}s` }}
+      style={{ animationDelay: `${index * 0.07}s`, height: "60vh", display: "flex", flexDirection: "column" }}
     >
       <Link
         href={`/work/${project.slug}`}
-        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        className="flex flex-col h-full focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {project.heroSlideshow ? (
-          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
-            <HeroSlideshow images={project.heroSlideshow} />
-          </div>
-        ) : project.heroMagazine ? (
-          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
-            <MagazineCarousel pages={project.heroMagazine.pages} aspectRatio="3/2" />
-          </div>
-        ) : project.heroModel ? (
-          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
+        {/* Thumbnail — flex:1 so revealed text steals from it, not extends card */}
+        <div className="card-thumb" style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
+          {project.heroSlideshow ? (
+            <HeroSlideshow images={project.heroSlideshow} fill />
+          ) : project.heroMagazine ? (
+            <MagazineCarousel pages={project.heroMagazine.pages} fill />
+          ) : project.heroModel ? (
             <ModelDisplay
               model={project.heroModel.model}
               video={project.heroModel.video}
               poster={project.heroModel.poster}
-              aspectRatio="3/2"
+              fill
             />
-          </div>
-        ) : (
-          <CardImage
-            src={project.heroImage.src}
-            alt={project.heroImage.alt}
-            sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
-          />
-        )}
+          ) : (
+            <ClientImage
+              src={project.heroImage.src}
+              alt={project.heroImage.alt}
+              fill
+              sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
+              className="object-cover"
+            />
+          )}
+        </div>
 
         <div className="pb-6">
           <CardLogo project={project} />
@@ -227,33 +226,34 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
   return (
     <article
       className="card-animate col-span-12 sm:col-span-6 group relative"
-      style={{ animationDelay: `${index * 0.07}s` }}
+      style={{ animationDelay: `${index * 0.07}s`, height: "52vh", display: "flex", flexDirection: "column" }}
     >
       <Link
         href={`/work/${project.slug}`}
-        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        className="flex flex-col h-full focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View ${project.name}`}
       >
-        {project.heroSlideshow ? (
-          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
-            <HeroSlideshow images={project.heroSlideshow} />
-          </div>
-        ) : project.heroModel ? (
-          <div className="card-thumb" style={{ marginBottom: "var(--image-pad)" }}>
+        {/* Thumbnail — flex:1 so revealed text steals from it */}
+        <div className="card-thumb" style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
+          {project.heroSlideshow ? (
+            <HeroSlideshow images={project.heroSlideshow} fill />
+          ) : project.heroModel ? (
             <ModelDisplay
               model={project.heroModel.model}
               video={project.heroModel.video}
               poster={project.heroModel.poster}
-              aspectRatio="3/2"
+              fill
             />
-          </div>
-        ) : (
-          <CardImage
-            src={project.heroImage.src}
-            alt={project.heroImage.alt}
-            sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
-          />
-        )}
+          ) : (
+            <ClientImage
+              src={project.heroImage.src}
+              alt={project.heroImage.alt}
+              fill
+              sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
+              className="object-cover"
+            />
+          )}
+        </div>
 
         <div className="pb-5">
           <CardLogo project={project} />
