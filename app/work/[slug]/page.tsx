@@ -166,62 +166,41 @@ function SkillsRow({ project }: { project: Project }) {
 }
 
 /* ─── Media rows ──────────────────────────────────────────────
-   Swiss/modular grid: every tile in every row uses the same column
-   width (repeat(N, 1fr)), so a 1:1 post and a 9:16 reel are exactly
-   the same width — the reel just runs taller. Hairline top rule +
-   numbered row label (/01) + format meta in the right margin keep
-   the modular feel.
-   On mobile we snap-scroll with the same fixed tile width across
-   both rows so widths still match.
+   All tiles from every row live in a single CSS grid with one set of
+   column definitions (repeat(N, 1fr)). That guarantees pixel-perfect
+   alignment — every column has the exact same width in row 1 and
+   row 2, and the gap between rows matches the gap between columns.
+   Pure white-space grid, no labels, no rules.
    ───────────────────────────────────────────────────────────── */
 function MediaRows({ rows }: { rows: MediaRowType[] }) {
-  return (
-    <div className="py-2 space-y-6 md:space-y-8">
-      {rows.map((row, ri) => {
-        const items = row.videos ?? row.images ?? [];
-        if (items.length === 0) return null;
-        const idx = String(ri + 1).padStart(2, "0");
-        const fmt = row.ratio.replace("/", ":");
-        return (
-          <div key={ri}>
-            {/* Swiss-style row meta: index left, format right, hairline rule */}
-            <div className="flex items-baseline justify-between border-t border-ink pt-2 mb-3">
-              <span className="mono-label text-ink tabular-nums">
-                <span className="text-ink-soft">/</span>{idx}
-              </span>
-              <span className="mono-label text-ink-soft tabular-nums">
-                {fmt} · {String(items.length).padStart(2, "0")} VARIANTS
-              </span>
-            </div>
+  const maxCount = Math.max(...rows.map((r) => (r.videos ?? r.images ?? []).length));
+  if (maxCount === 0) return null;
 
-            {/* Mobile: horizontal snap-scroll, fixed tile width matched across rows.
-                Desktop: strict N-column grid, identical tile widths. */}
-            <div
-              className="flex md:grid gap-1.5 md:gap-2 overflow-x-auto md:overflow-visible -mx-5 md:mx-0 px-5 md:px-0 snap-x snap-mandatory md:snap-none"
-              style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
-            >
-              {items.map((src, i) => (
-                <div
-                  key={i}
-                  className="shrink-0 w-[28vw] sm:w-[20vw] md:w-full snap-start"
-                  style={{ aspectRatio: row.ratio, background: "white", overflow: "hidden" }}
-                >
-                  {row.videos ? (
-                    <VideoPlayer src={src} />
-                  ) : (
-                    <ClientImage
-                      src={src}
-                      alt={row.alt ?? ""}
-                      fill
-                      sizes="(max-width: 768px) 28vw, 14vw"
-                      className="object-cover"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
+  return (
+    <div
+      className="grid gap-2 md:gap-3 py-2"
+      style={{ gridTemplateColumns: `repeat(${maxCount}, minmax(0, 1fr))` }}
+    >
+      {rows.flatMap((row, ri) => {
+        const items = row.videos ?? row.images ?? [];
+        return items.map((src, i) => (
+          <div
+            key={`${ri}-${i}`}
+            style={{ aspectRatio: row.ratio, background: "white", overflow: "hidden" }}
+          >
+            {row.videos ? (
+              <VideoPlayer src={src} />
+            ) : (
+              <ClientImage
+                src={src}
+                alt={row.alt ?? ""}
+                fill
+                sizes="14vw"
+                className="object-cover"
+              />
+            )}
           </div>
-        );
+        ));
       })}
     </div>
   );
