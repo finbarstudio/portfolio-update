@@ -7,7 +7,6 @@ import ModelDisplay from "@/components/ModelDisplay";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import PDFSlideshow from "@/components/PDFSlideshow";
-import EncryptedText from "@/components/EncryptedText";
 import {
   projects,
   type Project,
@@ -397,7 +396,7 @@ export default async function CaseStudyPage({
             className="font-sans font-bold uppercase text-ink leading-[1.02]"
             style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
           >
-            <EncryptedText text={project.name} />
+            {project.name}
           </h1>
         </div>
 
