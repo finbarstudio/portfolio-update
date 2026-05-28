@@ -37,10 +37,10 @@
      │  BRAND COLOURS                                          │
      │  Change any value → ripples to every component.        │
      └─────────────────────────────────────────────────────────┘ */
-  --bg:         #ffffff;   /* page + sidebar background, pure white       */
+  --bg:         #FAFAF8;   /* page + sidebar ground, soft off-white       */
   --ink:        #141414;   /* primary text, near-black                   */
   --ink-soft:   #6B6B6B;   /* secondary text, captions, meta              */
-  --line:       #E4E4E0;   /* hairline borders, grid lines                */
+  --line:       #E8E8E4;   /* hairline borders, grid lines (softened)     */
 
   --pink:       #FF1F8F;   /* ★ PRIMARY accent, magenta-pink             */
                            /*   Used for: active links, hover, tags,      */
@@ -50,24 +50,68 @@
                            /*   Also used for: teal tag pills              */
 
   /* ┌─────────────────────────────────────────────────────────┐
-     │  TYPE SCALE                                             │
-     │  Fluid sizes using clamp(min, preferred, max).         │
+     │  SURFACE + ELEVATION TOKENS                            │
+     │  Separation comes from surface shifts + soft elevation, │
+     │  NOT from solid intersecting lines. The page sits on a  │
+     │  soft off-white; cards/media sit on pure white, raised. │
      └─────────────────────────────────────────────────────────┘ */
-  --text-display: clamp(2rem, 5.5vw, 3.75rem);  /* hero display text     */
-  --text-h1:      clamp(1.375rem, 3vw, 2rem);    /* case study page title */
-  --text-h2:      clamp(1.125rem, 2vw, 1.5rem);  /* section headings      */
-  --text-h3:      1rem;                           /* sub-headings          */
+  --surface:        #FAFAF8;  /* page + chrome ground (soft off-white)    */
+  --surface-raised: #ffffff;  /* cards, media tiles, panels (pure white)  */
+  --surface-sunken: #F2F2EF;  /* grouped / inset regions                  */
+
+  --elev-1: 0 1px 2px rgba(20,20,20,0.03), 0 2px 8px rgba(20,20,20,0.04);
+  --elev-2: 0 2px 6px rgba(20,20,20,0.05), 0 10px 28px rgba(20,20,20,0.07);
+  --elev-3: 0 6px 16px rgba(20,20,20,0.07), 0 22px 48px rgba(20,20,20,0.10);
+
+  /* ┌─────────────────────────────────────────────────────────┐
+     │  MOTION TOKENS                                         │
+     │  One easing curve + one base duration drive every       │
+     │  interactive change, for a unified premium feel.        │
+     └─────────────────────────────────────────────────────────┘ */
+  --ease:      cubic-bezier(0.22, 0.61, 0.36, 1);  /* the curve, used everywhere */
+  --dur-fast:  140ms;   /* small state flips: colour, opacity            */
+  --dur:       240ms;   /* default: most transitions                     */
+  --dur-slow:  420ms;   /* larger moves: card lift, sidebar expand        */
+
+  /* ┌─────────────────────────────────────────────────────────┐
+     │  TYPE SCALE — geometric (~1.25 major third) for heads  │
+     │  + proportional line-height tokens.                     │
+     └─────────────────────────────────────────────────────────┘ */
+  --text-display: clamp(2.25rem, 5.5vw, 4rem);    /* hero display text     */
+  --text-h1:      clamp(1.5rem, 3vw, 2.25rem);    /* case study page title */
+  --text-h2:      clamp(1.25rem, 2vw, 1.5rem);    /* section headings      */
+  --text-h3:      1.125rem;                        /* sub-headings          */
   --text-body:    0.9375rem;   /* 15px, prose paragraphs                 */
   --text-small:   0.875rem;    /* 14px, card summaries, metadata         */
   --text-caption: 0.75rem;     /* 12px, image captions                   */
   --text-label:   0.6875rem;   /* 11px, uppercase caps labels, nav       */
   --text-tag:     0.5625rem;   /* 9px , tag pills                        */
 
+  --leading-tight:  1.04;   /* large display / headings (no fragmentation) */
+  --leading-snug:   1.25;   /* sub-headings                                */
+  --leading-normal: 1.6;    /* body copy                                   */
+
   /* ┌─────────────────────────────────────────────────────────┐
-     │  LAYOUT SPACING                                         │
+     │  SPACING SCALE — strict base-8 (with base-4 halves).   │
+     │  Drive ALL padding / margin / gap from these tokens.    │
      └─────────────────────────────────────────────────────────┘ */
-  --space-section: 4.5rem;   /* vertical gap between major page sections  */
-  --image-pad:     1.5rem;   /* breathing room above & below images       */
+  --space-1:  0.25rem;   /*  4 */
+  --space-2:  0.5rem;    /*  8 */
+  --space-3:  0.75rem;   /* 12 */
+  --space-4:  1rem;      /* 16 */
+  --space-5:  1.5rem;    /* 24 */
+  --space-6:  2rem;      /* 32 */
+  --space-7:  3rem;      /* 48 */
+  --space-8:  4rem;      /* 64 */
+  --space-9:  6rem;      /* 96 */
+  --space-10: 8rem;      /* 128 */
+
+  /* Semantic layout spacing (derived from the scale) — more generous now */
+  --space-section: var(--space-9);   /* 96px, gap between major sections   */
+  --image-pad:     var(--space-6);   /* 32px, breathing room around media  */
+
+  /* Minimum interactive hit zone (touch + cursor) */
+  --hit: 44px;
 
   /* ┌─────────────────────────────────────────────────────────┐
      │  RETRO OS CHROME                                        │
@@ -75,6 +119,9 @@
      └─────────────────────────────────────────────────────────┘ */
   --menubar-h:    26px;      /* top global menubar height (desktop)       */
   --statusbar-h:  22px;      /* bottom status bar height                  */
+  --titlebar-h:   22px;      /* window chrome title bar height            */
+  --win-shadow:    var(--elev-2);
+  --win-shadow-sm: var(--elev-1);
 }
 
 /* Slightly taller menubar on mobile so the hamburger is a real tap target */
@@ -82,9 +129,6 @@
   :root {
     --menubar-h: 40px;
   }
-  --titlebar-h:   22px;      /* window chrome title bar height            */
-  --win-shadow:    0 4px 20px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.07);
-  --win-shadow-sm: 0 2px 10px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
 }
 
 /* ─── Tailwind bridge ────────────────────────────────────────────
@@ -92,12 +136,15 @@
    Result: bg-bg, text-ink, text-pink, border-line, text-teal …
    ─────────────────────────────────────────────────────────────── */
 @theme {
-  --color-bg:       var(--bg);
-  --color-ink:      var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-line:     var(--line);
-  --color-pink:     var(--pink);
-  --color-teal:     var(--teal);
+  --color-bg:             var(--bg);
+  --color-ink:            var(--ink);
+  --color-ink-soft:       var(--ink-soft);
+  --color-line:           var(--line);
+  --color-pink:           var(--pink);
+  --color-teal:           var(--teal);
+  --color-surface:        var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
 
   --font-sans: var(--font-primary);
   --font-mono: var(--font-label);
@@ -158,9 +205,13 @@
     color: var(--ink);
     font-family: var(--font-primary);
     font-size: var(--text-body);
-    line-height: 1.6;
+    line-height: var(--leading-normal);
     -webkit-font-smoothing: antialiased;
   }
+
+  /* Large type stays tight so display/headings never fragment into loose lines */
+  h1, h2, .display { line-height: var(--leading-tight); }
+  h3 { line-height: var(--leading-snug); }
 
   :focus-visible {
     outline: 2px solid var(--pink);
@@ -196,7 +247,7 @@
 
   /* Card entrance animation */
   .card-animate {
-    animation: fade-up 0.55s ease-out both;
+    animation: fade-up var(--dur-slow) var(--ease) both;
   }
 
   /* Sidebar nav link */
@@ -207,7 +258,7 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ink-soft);
-    transition: color 0.18s ease;
+    transition: color var(--dur-fast) var(--ease);
     display: block;
     padding: 0.25rem 0;
   }
@@ -258,20 +309,25 @@
     position: relative;
     width: 100%;
     overflow: hidden;
-    background-color: white;
+    background-color: var(--surface-raised);
     max-height: 72vh;
   }
 
-  /* Card thumbnail hover ring — Apple G2-style rounded corners + pink outline.
-     Add .card-thumb to any thumbnail container. The .group on the <article>
-     triggers the ring on hover anywhere over the card. */
+  /* Card thumbnail — rounded media tile. Separation at REST comes from a soft
+     elevation over the off-white page (no borders). On hover it lifts and gains
+     the pink outline (kept — Finbar likes it). Add .card-thumb to any thumbnail
+     container; the .group on the <article> triggers hover anywhere on the card. */
   .card-thumb {
     border-radius: 16px;
     overflow: hidden;
-    transition: box-shadow 0.2s ease;
+    background: var(--surface-raised);
+    box-shadow: var(--elev-1);
+    transition: box-shadow var(--dur-slow) var(--ease),
+                transform   var(--dur-slow) var(--ease);
   }
   .group:hover .card-thumb {
-    box-shadow: 0 0 0 10px var(--pink);
+    box-shadow: var(--elev-2), 0 0 0 6px var(--pink);
+    transform: translateY(-4px);
   }
 
   /* Hero scroll-driven fade (CSS only, no JS) */
@@ -383,7 +439,7 @@
     cursor: pointer;
     border: 1px solid transparent;
     line-height: 1.4;
-    transition: background 0.08s, color 0.08s;
+    transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
   }
   .tree-item:hover {
     background: var(--ink);
@@ -481,10 +537,10 @@
       border-radius: 0;
       animation: none;
     }
-    /* Slightly tighter section gap on mobile */
+    /* Slightly tighter rhythm on mobile, still generous */
     :root {
-      --space-section: 3rem;
-      --image-pad: 1rem;
+      --space-section: var(--space-7);  /* 48px */
+      --image-pad: var(--space-5);       /* 24px */
     }
   }
 }

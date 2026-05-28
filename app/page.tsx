@@ -73,7 +73,7 @@ function WorkGrid() {
       <h2 id="work-heading" className="sr-only">Selected Work</h2>
 
       {/* Section header, directory listing flavour */}
-      <div className="flex items-baseline justify-between border-b border-ink pb-2 mb-10">
+      <div className="flex items-baseline justify-between border-b border-line pb-3 mb-12 md:mb-16">
         <p className="mono-label text-ink">
           <span className="text-pink">▸</span> /work
         </p>
@@ -83,7 +83,7 @@ function WorkGrid() {
       </div>
 
       {/* Featured, full-width */}
-      <div className="grid grid-cols-12 gap-x-6 gap-y-14 mb-16">
+      <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-24 mb-20 md:mb-24">
         {featured.map((project) => {
           const i = cardIndex++;
           return <ProjectCard key={project.slug} project={project} index={i} />;
@@ -91,7 +91,7 @@ function WorkGrid() {
       </div>
 
       {/* All other projects, uniform 2-col grid */}
-      <div className="grid grid-cols-12 gap-x-6 gap-y-10">
+      <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
         {rest.map((project) => {
           const i = cardIndex++;
           return <ProjectCard key={project.slug} project={project} index={i} />;
@@ -112,7 +112,7 @@ export default function HomePage() {
         <WorkGrid />
 
         <footer
-          className="px-5 md:px-10 py-10 md:py-12 border-t border-ink"
+          className="px-5 md:px-10 py-12 md:py-16 border-t border-line"
           aria-label="Site footer"
         >
           <p className="mono-label text-ink-soft mb-3">
