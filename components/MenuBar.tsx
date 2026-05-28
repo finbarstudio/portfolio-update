@@ -127,7 +127,7 @@ export default function MenuBar({
             <Link
               key={item.href}
               href={item.href}
-              className="px-2 py-0.5 transition-colors"
+              className="px-3 py-1.5 transition-colors"
               style={{
                 color: isActive ? "var(--bg)" : "var(--ink)",
                 background: isActive ? "var(--ink)" : "transparent",
@@ -149,8 +149,8 @@ export default function MenuBar({
           type="button"
           onClick={onMobileMenuOpen}
           aria-label="Open navigation menu"
-          className="md:hidden flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2"
-          style={{ width: 40, height: 40 }}
+          className="md:hidden flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2.5"
+          style={{ width: 44, height: 44 }}
         >
           <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
             <path d="M1 1.5h20M1 8h20M1 14.5h20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />

@@ -145,7 +145,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
             </h2>
             <span className="mono-label text-ink-soft whitespace-nowrap mt-px">{project.date}</span>
           </div>
-          <TagRow project={project} />
+          <div className="hover-reveal"><div><TagRow project={project} /></div></div>
           <div className="flex items-end justify-between gap-4 mt-3">
             <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>
               {project.oneLiner}
@@ -204,7 +204,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
             </h2>
             <span className="mono-label text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
           </div>
-          <TagRow project={project} />
+          <div className="hover-reveal"><div><TagRow project={project} /></div></div>
           <div className="flex items-end justify-between gap-3 mt-2.5">
             <p className="text-ink-soft leading-relaxed line-clamp-2" style={{ fontSize: "var(--text-caption)" }}>
               {project.oneLiner}
@@ -257,7 +257,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
             <h2 className="mono-label text-ink group-hover:text-pink transition-colors">{project.name}</h2>
             <span className="mono-label text-ink-soft whitespace-nowrap" style={{ fontSize: "0.5625rem" }}>{project.date}</span>
           </div>
-          <TagRow project={project} />
+          <div className="hover-reveal"><div><TagRow project={project} /></div></div>
           <div className="mt-2 flex items-center justify-between gap-3">
             {project.liveUrl && (
               <span className="mono-label text-teal" style={{ fontSize: "0.625rem" }}>

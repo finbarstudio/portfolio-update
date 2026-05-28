@@ -392,8 +392,8 @@ function MobileMenu({
           type="button"
           onClick={onClose}
           aria-label="Close navigation menu"
-          className="flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2"
-          style={{ width: 40, height: 40 }}
+          className="flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2.5"
+          style={{ width: 44, height: 44 }}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
             <path d="M2 2l14 14M16 2L2 16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />

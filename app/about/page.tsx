@@ -31,7 +31,7 @@ export default function AboutPage() {
       </p>
 
       {/* Headshot + Bio */}
-      <div className="mb-14 flex flex-col md:flex-row gap-10 items-start">
+      <div className="mb-16 md:mb-24 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
         <div
           className="shrink-0"
           style={{ width: 160, height: 160, position: "relative", borderRadius: 4, overflow: "hidden", background: "white" }}
@@ -71,9 +71,9 @@ export default function AboutPage() {
       </div>
 
       {/* Capabilities */}
-      <div className="mb-14">
+      <div className="mb-16 md:mb-24">
         <p className="mono-label text-ink-soft mb-8">Capabilities</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-12">
           {[
             {
               heading: "Brand Identity",
@@ -106,7 +106,7 @@ export default function AboutPage() {
               ],
             },
           ].map(({ heading, items }) => (
-            <div key={heading} className="border-l-2 border-ink pl-4">
+            <div key={heading} className="border-l border-line pl-5">
               <p
                 className="font-sans font-bold uppercase text-ink mb-4 tracking-wider"
                 style={{ fontSize: "var(--text-small)" }}

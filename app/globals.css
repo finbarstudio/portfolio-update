@@ -195,6 +195,16 @@
   to { transform: rotate(360deg); }
 }
 
+/* Skeleton loading: a soft pulse + a slow shimmer sweep across the tile. */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+@keyframes skeleton-sweep {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
 /* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
@@ -302,6 +312,66 @@
     background: var(--teal);
     flex-shrink: 0;
     animation: dot-pulse 2s ease-in-out infinite;
+  }
+
+  /* Skeleton loader — fills its (aspect-ratio'd) parent so the placeholder
+     matches the exact geometry of the incoming media. Soft pulse + shimmer. */
+  .skeleton {
+    position: absolute;
+    inset: 0;
+    background: var(--surface-sunken);
+    overflow: hidden;
+    animation: skeleton-pulse 1.6s var(--ease) infinite;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      transparent 100%
+    );
+    animation: skeleton-sweep 1.6s var(--ease) infinite;
+  }
+
+  /* Progressive disclosure — secondary card meta (tags) stays tucked away
+     until the user shows interest. Pointer devices only: collapse to 0fr and
+     reveal on hover/focus. Touch / no-hover devices always show it. */
+  .hover-reveal { }
+  @media (hover: hover) and (pointer: fine) {
+    .hover-reveal {
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition: grid-template-rows var(--dur) var(--ease),
+                  opacity var(--dur-fast) var(--ease);
+    }
+    .hover-reveal > * { overflow: hidden; min-height: 0; }
+    .group:hover .hover-reveal,
+    .group:focus-within .hover-reveal {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+  }
+
+  /* Generous invisible hit zone — centres a small visual control inside a
+     larger pointer/touch target without affecting surrounding layout. */
+  .hit {
+    position: relative;
+  }
+  .hit::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    min-width: var(--hit);
+    min-height: var(--hit);
+    transform: translate(-50%, -50%);
   }
 
   /* Image wrapper, breathing room + 72vh max height */

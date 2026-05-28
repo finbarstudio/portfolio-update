@@ -724,7 +724,6 @@ export const projects: Project[] = [
     heroModel: {
       model: "/models/studio-display/display.gltf",
       video: "/images/momentum-mentoring/screen.mp4",
-      poster: "/images/momentum-mentoring/hero.webp",
     },
     heroImage: {
       src: "/images/momentum-mentoring/hero.webp",

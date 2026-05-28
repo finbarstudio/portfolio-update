@@ -126,7 +126,7 @@ function SummaryBlock({ project }: { project: Project }) {
     { label: "OUTCOME", value: project.outcome },
   ];
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 py-8 text-center md:text-left">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 py-10 md:py-14 text-center md:text-left">
       {items.map(({ label, value }) => (
         <div key={label} className="max-w-prose mx-auto md:mx-0">
           <p className="mono-label text-ink-soft mb-2">{label}</p>
@@ -326,11 +326,12 @@ function FooterMeta({ project }: { project: Project }) {
         </div>
       </div>
 
-      {/* Clean back link — black Archivo, uppercase, tracked. Centred on mobile. */}
-      <div className="pt-8 pb-10 text-center md:text-left">
+      {/* Clean back link — black Archivo, uppercase, tracked. Centred on mobile.
+          Generous tap target via py. */}
+      <div className="pt-6 pb-8 text-center md:text-left">
         <Link
           href="/"
-          className="inline-block font-sans font-bold uppercase text-ink hover:text-pink transition-colors"
+          className="inline-flex items-center min-h-[44px] py-2 font-sans font-bold uppercase text-ink hover:text-pink transition-colors"
           style={{ fontSize: "0.875rem", letterSpacing: "0.16em" }}
         >
           Back to Work
@@ -371,7 +372,7 @@ export default async function CaseStudyPage({
   };
 
   return (
-    <article className="px-5 md:px-10 pt-5 md:pt-7 pb-6">
+    <article className="px-5 md:px-10 pt-8 md:pt-12 pb-8">
       <Script
         id={`ld-${project.slug}`}
         type="application/ld+json"

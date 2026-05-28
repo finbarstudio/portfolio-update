@@ -1,47 +1,24 @@
 "use client";
 
 /**
- * Loader — subtle, on-theme preloader.
+ * Loader — skeleton placeholder.
  *
- * Thin ring on --color-line with a single pink arc (--color-pink) that
- * rotates. Renders centred inside its parent. Use as a preloader behind
- * images and video while the asset is fetching.
+ * Fills its parent (which carries the aspect ratio of the incoming media),
+ * so the placeholder matches the exact geometry of the piece that's loading.
+ * Soft pulse + slow shimmer sweep. See `.skeleton` in globals.css.
+ *
+ * `size` is retained for call-site compatibility but no longer used.
  */
 
 type Props = {
-  /** Pixel size of the ring. Default 28. */
+  /** @deprecated retained for compatibility; skeleton fills the parent. */
   size?: number;
-  /** Hide the ring; just reserve the slot. */
+  /** Reserve the slot without showing the skeleton. */
   invisible?: boolean;
   className?: string;
 };
 
-export default function Loader({ size = 28, invisible = false, className }: Props) {
-  return (
-    <div
-      className={className}
-      aria-hidden="true"
-      style={{
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        pointerEvents: "none",
-        opacity: invisible ? 0 : 1,
-      }}
-    >
-      <span
-        style={{
-          width: size,
-          height: size,
-          borderRadius: "50%",
-          border: "1.5px solid var(--color-line)",
-          borderTopColor: "var(--color-pink)",
-          animation: "loader-spin 0.85s linear infinite",
-          display: "block",
-        }}
-      />
-    </div>
-  );
+export default function Loader({ invisible = false, className }: Props) {
+  if (invisible) return null;
+  return <div className={`skeleton ${className ?? ""}`} aria-hidden="true" />;
 }

@@ -54,7 +54,7 @@ export default function ContactPage() {
       </p>
 
       {/* Email */}
-      <div className="mb-14">
+      <div className="mb-16 md:mb-20">
         <p className="mono-label text-ink-soft mb-5">Email</p>
         <a
           href="mailto:finbar@finbar.studio"
@@ -69,7 +69,7 @@ export default function ContactPage() {
       </div>
 
       {/* Phone + Location */}
-      <div className="mb-14 flex flex-wrap gap-14">
+      <div className="mb-16 md:mb-20 flex flex-wrap gap-14">
         <div>
           <p className="mono-label text-ink-soft mb-5">Phone</p>
           <a
@@ -92,7 +92,7 @@ export default function ContactPage() {
       </div>
 
       {/* Socials */}
-      <div className="mb-14">
+      <div className="mb-16 md:mb-20">
         <p className="mono-label text-ink-soft mb-5">Elsewhere</p>
         <div className="flex flex-wrap gap-6">
           {socials.map((s) => (
@@ -101,7 +101,7 @@ export default function ContactPage() {
               href={s.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-ink-soft hover:text-pink transition-colors"
+              className="flex items-center gap-2 py-2 text-ink-soft hover:text-pink transition-colors"
             >
               {s.icon}
               <span className="mono-label">{s.label}</span>
