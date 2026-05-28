@@ -375,6 +375,35 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
   );
 }
 
+/* ── Real-time resize ──────────────────────────────────────────
+   Polls the container size each frame and resizes the renderer + camera
+   live, so the phones shrink/grow smoothly WITH the container instead of
+   snapping after r3f's ResizeObserver settles (which causes the hover jump). */
+function LiveResize() {
+  const gl = useThree((s) => s.gl);
+  const camera = useThree((s) => s.camera);
+  const setSize = useThree((s) => s.setSize);
+  const last = useRef({ w: 0, h: 0 });
+
+  useFrame(() => {
+    const parent = gl.domElement.parentElement;
+    if (!parent) return;
+    const w = parent.clientWidth;
+    const h = parent.clientHeight;
+    if (w < 1 || h < 1) return;
+    if (w !== last.current.w || h !== last.current.h) {
+      last.current = { w, h };
+      setSize(w, h);
+      const cam = camera as THREE.PerspectiveCamera;
+      if (cam.isPerspectiveCamera) {
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+    }
+  });
+  return null;
+}
+
 /* ── Outer component ───────────────────────────────────────── */
 
 type Props = {
@@ -455,6 +484,7 @@ function PhoneCarouselInner({
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
+        <LiveResize />
         <ambientLight intensity={0.65} />
         <directionalLight position={[4, 5, 5]} intensity={1.0} />
         <directionalLight position={[-3, 2, -3]} intensity={0.35} />

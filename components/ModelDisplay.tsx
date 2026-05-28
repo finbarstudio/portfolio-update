@@ -111,6 +111,37 @@ function DisplayModel({ modelUrl, videoTexture }: DisplayModelProps) {
   return <primitive object={root} />;
 }
 
+/* ── Real-time resize ──────────────────────────────────────────
+   r3f only resizes the render buffer + camera when its ResizeObserver
+   fires, which lands after a CSS size transition settles — so the model
+   appears to "snap" to the new size. This polls the container every frame
+   and resizes live, so the model shrinks/grows smoothly WITH the container
+   (e.g. when a featured card's thumbnail eases shorter on hover). */
+function LiveResize() {
+  const gl = useThree((s) => s.gl);
+  const camera = useThree((s) => s.camera);
+  const setSize = useThree((s) => s.setSize);
+  const last = useRef({ w: 0, h: 0 });
+
+  useFrame(() => {
+    const parent = gl.domElement.parentElement;
+    if (!parent) return;
+    const w = parent.clientWidth;
+    const h = parent.clientHeight;
+    if (w < 1 || h < 1) return;
+    if (w !== last.current.w || h !== last.current.h) {
+      last.current = { w, h };
+      setSize(w, h);
+      const cam = camera as THREE.PerspectiveCamera;
+      if (cam.isPerspectiveCamera) {
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+    }
+  });
+  return null;
+}
+
 /* ── Inner: rig that lerps rotation + camera distance on hover ── */
 
 function Rig({
@@ -296,6 +327,7 @@ function ModelDisplayInner({
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
+        <LiveResize />
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 8, 5]} intensity={1.1} />
         <directionalLight position={[-4, 3, -2]} intensity={0.4} />
