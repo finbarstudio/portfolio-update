@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { projects } from "@/content/projects";
 
-const SITE_URL = "https://finbar.studio";
+const SITE_URL = "https://www.finbar.studio";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const projectRoutes: MetadataRoute.Sitemap = projects
     .filter((p) => p.tier !== "gallery")
     .map((p) => ({
-      url: `${SITE_URL}/work/${p.slug}`,
+      url: `${SITE_URL}/case-studies/${p.slug}`,
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.7,

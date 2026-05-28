@@ -13,16 +13,16 @@ const archivoNarrow = Archivo_Narrow({
   display: "swap",
 });
 
-const SITE_URL = "https://finbar.studio";
+const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "finbar✶studio | Graphic Designer & Framer Developer in Brisbane",
-    template: "%s | finbar✶studio",
+    default: "Finbar Skitini | Brisbane Graphic Designer & Framer Developer",
+    template: "%s | Finbar Studio",
   },
   description:
-    "Finbar Skitini is a graphic designer and Framer developer based in Brisbane. Brand identity, web, publication and motion design. 4+ years of experience. Open for work.",
+    "Brisbane-based graphic designer and Framer developer. See selected web design and branding projects built for real clients across Australia.",
   applicationName: "finbar✶studio",
   authors: [{ name: "Finbar Skitini", url: SITE_URL }],
   creator: "Finbar Skitini",
@@ -41,9 +41,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "finbar✶studio | Graphic Designer & Framer Developer",
+    title: "Finbar Skitini | Brisbane Graphic Designer & Framer Developer",
     description:
-      "Brand identity, web, publication and motion design from Brisbane. Open for full-time and freelance.",
+      "Brisbane-based graphic designer and Framer developer. See selected web design and branding projects built for real clients across Australia.",
     url: SITE_URL,
     siteName: "finbar✶studio",
     locale: "en_AU",
@@ -51,9 +51,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "finbar✶studio | Graphic Designer & Framer Developer",
+    title: "Finbar Skitini | Brisbane Graphic Designer & Framer Developer",
     description:
-      "Brand identity, web, publication and motion design from Brisbane. Open for work.",
+      "Brisbane-based graphic designer and Framer developer. See selected web design and branding projects built for real clients across Australia.",
     creator: "@finbarstudio",
   },
   robots: {

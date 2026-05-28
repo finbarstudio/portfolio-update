@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Project } from "@/content/projects";
-import ClientImage from "@/components/ClientImage";
+import ParallaxImage from "@/components/ParallaxImage";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
 import PhoneCarousel from "@/components/PhoneCarousel";
@@ -56,41 +56,6 @@ function CardLogo({ project }: { project: Project }) {
   );
 }
 
-/* ─── Image wrapper ──────────────────────────────────────── */
-function CardImage({
-  src,
-  alt,
-  priority = false,
-  sizes,
-  aspectRatio = "3/2",
-  fill = false,
-}: {
-  src: string;
-  alt: string;
-  priority?: boolean;
-  sizes: string;
-  aspectRatio?: string;
-  fill?: boolean;
-}) {
-  return (
-    <div
-      className="img-wrap card-thumb"
-      style={fill
-        ? { height: "100%", marginBottom: "var(--image-pad)", background: "white" }
-        : { aspectRatio, maxHeight: "72vh", marginBottom: "var(--image-pad)", background: "white" }}
-    >
-      <ClientImage
-        src={src}
-        alt={alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        className="object-cover"
-      />
-    </div>
-  );
-}
-
 
 /* ─── Featured card (full-width) ─────────────────────────── */
 export function FeaturedCard({ project, index }: { project: Project; index: number }) {
@@ -100,7 +65,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
       style={{ animationDelay: `${index * 0.07}s`, height: "75vh", display: "flex", flexDirection: "column" }}
     >
       <Link
-        href={`/work/${project.slug}`}
+        href={`/case-studies/${project.slug}`}
         className="flex flex-col h-full focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
@@ -129,12 +94,11 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
               <SplineScene scene={project.heroSpline} style={{ aspectRatio: undefined, maxHeight: "none", height: "100%" }} />
             </div>
           ) : (
-            <CardImage
+            <ParallaxImage
               src={project.heroImage.src}
               alt={project.heroImage.alt}
               priority={index === 0}
               sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
-              fill
             />
           )}
         </div>
@@ -170,7 +134,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
       style={{ animationDelay: `${index * 0.07}s`, height: "60vh", display: "flex", flexDirection: "column" }}
     >
       <Link
-        href={`/work/${project.slug}`}
+        href={`/case-studies/${project.slug}`}
         className="flex flex-col h-full focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
@@ -188,10 +152,9 @@ export function FullCard({ project, index }: { project: Project; index: number }
               fill
             />
           ) : (
-            <ClientImage
+            <ParallaxImage
               src={project.heroImage.src}
               alt={project.heroImage.alt}
-              fill
               sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
               className="object-cover"
             />
@@ -229,7 +192,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
       style={{ animationDelay: `${index * 0.07}s`, height: "52vh", display: "flex", flexDirection: "column" }}
     >
       <Link
-        href={`/work/${project.slug}`}
+        href={`/case-studies/${project.slug}`}
         className="flex flex-col h-full focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View ${project.name}`}
       >
@@ -245,10 +208,9 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
               fill
             />
           ) : (
-            <ClientImage
+            <ParallaxImage
               src={project.heroImage.src}
               alt={project.heroImage.alt}
-              fill
               sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
               className="object-cover"
             />

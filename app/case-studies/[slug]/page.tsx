@@ -15,7 +15,7 @@ import {
   type MediaRow as MediaRowType,
 } from "@/content/projects";
 
-const SITE_URL = "https://finbar.studio";
+const SITE_URL = "https://www.finbar.studio";
 
 /* Static params */
 export async function generateStaticParams() {
@@ -31,23 +31,30 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = projects.find((p) => p.slug === slug);
   if (!project) return {};
-  const url = `/work/${project.slug}`;
+  const url = `/case-studies/${project.slug}`;
   const ogImage = project.heroImage?.src;
+  // Match the indexed title/description pattern: "Name — Descriptor | Finbar Studio".
+  // Per-project SEO copy (in projects.ts) preserves the exact text Google already
+  // ranks for the migrated slugs; everything else falls back to a clean default.
+  const seoTitle =
+    project.seo?.title ??
+    `${project.name} — ${project.categories.slice(0, 2).join(" & ")} | Finbar Studio`;
+  const seoDescription = project.seo?.description ?? project.oneLiner;
   return {
-    title: `${project.name} · ${project.categories.slice(0, 2).join(" · ")}`,
-    description: project.oneLiner,
+    title: { absolute: seoTitle },
+    description: seoDescription,
     alternates: { canonical: url },
     openGraph: {
-      title: `${project.name} | finbar✶studio`,
-      description: project.oneLiner,
+      title: seoTitle,
+      description: seoDescription,
       url,
       type: "article",
       images: ogImage ? [{ url: ogImage, alt: project.heroImage.alt }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${project.name} | finbar✶studio`,
-      description: project.oneLiner,
+      title: seoTitle,
+      description: seoDescription,
       images: ogImage ? [ogImage] : undefined,
     },
   };
@@ -361,7 +368,7 @@ export default async function CaseStudyPage({
       url: SITE_URL,
     },
     keywords: [...project.categories, ...project.skills].join(", "),
-    url: `${SITE_URL}/work/${project.slug}`,
+    url: `${SITE_URL}/case-studies/${project.slug}`,
     image: project.heroImage?.src
       ? `${SITE_URL}${project.heroImage.src}`
       : undefined,

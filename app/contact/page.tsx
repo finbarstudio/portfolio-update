@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 
 export const metadata: Metadata = {
-  title: "Contact | finbar✶studio",
+  title: "Contact",
   description:
     "Get in touch with Finbar Skitini, graphic designer and Framer developer in Brisbane. Open for full-time roles and freelance.",
   alternates: { canonical: "/contact" },

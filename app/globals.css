@@ -319,6 +319,11 @@
     animation: dot-pulse 2s ease-in-out infinite;
   }
 
+  /* Parallax thumbnail — disable the 3D tilt when reduced motion is preferred. */
+  @media (prefers-reduced-motion: reduce) {
+    .parallax-inner { transform: none !important; transition: none !important; }
+  }
+
   /* Mockup starburst — a many-pointed pink sunburst radiating from centre,
      behind the 3D piece, rotating very slowly. Subtle; fades out toward edges. */
   .starburst {

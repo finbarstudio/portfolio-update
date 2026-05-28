@@ -116,7 +116,7 @@ function DesktopSidebar({
 
   // Open work folder on initial load if user is viewing a work page
   useEffect(() => {
-    if (pathname.startsWith("/work/")) setWorkOpen(true);
+    if (pathname.startsWith("/case-studies/")) setWorkOpen(true);
   }, [pathname]);
 
   const sortedProjects = useMemo(
@@ -127,7 +127,7 @@ function DesktopSidebar({
   const isHome    = pathname === "/";
   const isAbout   = pathname.startsWith("/about");
   const isContact = pathname.startsWith("/contact");
-  const isWorkActive = isHome || pathname.startsWith("/work/");
+  const isWorkActive = isHome || pathname.startsWith("/case-studies/");
 
   return (
     <aside
@@ -250,13 +250,13 @@ function DesktopSidebar({
               <div className="overflow-hidden" style={{ animation: "tree-expand 0.22s ease-out both" }}>
                 {sortedProjects.map((p, idx) => {
                   const isLast   = idx === sortedProjects.length - 1;
-                  const isActive = pathname === `/work/${p.slug}`;
+                  const isActive = pathname === `/case-studies/${p.slug}`;
                   const isGallery = p.tier === "gallery";
 
                   return (
                     <Link
                       key={p.slug}
-                      href={`/work/${p.slug}`}
+                      href={`/case-studies/${p.slug}`}
                       className={`tree-item ${isActive ? "active" : ""}`}
                       style={{ paddingLeft: "32px" }}
                       aria-current={isActive ? "page" : undefined}

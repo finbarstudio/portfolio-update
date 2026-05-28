@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import ClientImage from "@/components/ClientImage";
 
 export const metadata: Metadata = {
-  title: "About | finbar✶studio",
+  title: { absolute: "About | Finbar Skitini | Brisbane Designer" },
   description:
-    "Finbar Skitini is a graphic designer and Framer developer in Brisbane. Originally from London, studied in London and Brighton. Open for design roles.",
+    "Hi I am Finbar, a Brisbane-based graphic designer originally from London. Websites and brands built with care, creativity, and a strong graphic design foundation.",
   alternates: { canonical: "/about" },
   openGraph: {
-    title: "About Finbar Skitini",
+    title: "About | Finbar Skitini | Brisbane Designer",
     description:
-      "Graphic designer and Framer developer based in Brisbane. Open for full-time and freelance work.",
+      "Hi I am Finbar, a Brisbane-based graphic designer originally from London. Websites and brands built with care, creativity, and a strong graphic design foundation.",
     url: "/about",
     type: "profile",
   },

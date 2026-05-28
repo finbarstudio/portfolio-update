@@ -47,6 +47,10 @@ export interface Project {
   tier: Tier;
   rank: number;
   isConcept?: boolean;
+  /** Per-page SEO overrides. Used to preserve the exact title/description that
+   *  the live site already ranks for on migrated slugs. Falls back to a
+   *  generated title + oneLiner when omitted. */
+  seo?: { title?: string; description?: string };
   date: string;
   categories: string[];
   skills: string[];
@@ -95,6 +99,11 @@ export const projects: Project[] = [
     name: "KinAya",
     tier: "featured",
     rank: 2,
+    seo: {
+      title: "KinAya — Brand Identity & Framer Website | Finbar Studio",
+      description:
+        "How I designed the KinAya brand identity and built their Framer website from the ground up — a complete startup rebrand for an Adelaide-based NDIS support services provider.",
+    },
     date: "2024",
     categories: ["Brand Identity", "Web Design", "Framer", "NDIS"],
     skills: ["Brand Identity", "Logo Design", "Framer Development", "CMS Setup", "Accessibility", "Web Design"],
@@ -157,6 +166,11 @@ export const projects: Project[] = [
     name: "The Moment You Realise",
     tier: "featured",
     rank: 1,
+    seo: {
+      title: "The Moment You Realise — Social Campaign Design | Finbar Studio",
+      description:
+        "An evergreen, modular social campaign for the UK's leading affordable homeownership platform — 30+ motion and static assets across every major format, built to run again and again.",
+    },
     companyUrl: "https://sharetobuy.com",
     date: "2022–2023",
     categories: ["Social Campaign", "Motion Graphics", "Digital"],
@@ -231,6 +245,11 @@ export const projects: Project[] = [
     name: "Salesmasters",
     tier: "full",
     rank: 4,
+    seo: {
+      title: "Salesmasters — Sales Playbook Design & Production | Finbar Studio",
+      description:
+        "How I designed and produced 15+ bespoke sales process playbooks for a national sales consultancy — end-to-end, from content writing to print-ready delivery.",
+    },
     companyUrl: "https://salesmasters.com.au",
     date: "2023–2024",
     categories: ["Publication Design", "Infographic Design", "Print"],
