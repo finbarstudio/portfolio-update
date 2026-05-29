@@ -581,7 +581,8 @@
     border-radius: 0 7px 7px 0;
     cursor: pointer;
     transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
-                width var(--dur-fast) var(--ease);
+                width var(--dur-fast) var(--ease),
+                left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .sidebar-tab:hover {
     color: var(--pink);

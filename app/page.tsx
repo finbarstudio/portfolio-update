@@ -15,7 +15,7 @@ function WorkGrid() {
   return (
     <section
       id="work"
-      className="bg-bg px-5 md:px-10"
+      className="bg-bg px-5 md:px-10 pt-8 md:pt-12"
       style={{ paddingBottom: "var(--space-section)" }}
       aria-label="Selected work"
     >

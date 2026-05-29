@@ -131,18 +131,18 @@ function DesktopSidebar({
 
   return (
     <>
-    {collapsed && (
-      /* Protruding expand handle — lives outside the clipped <aside> */
+      {/* Protruding toggle handle — lives outside the clipped <aside> so it can
+          stick out past the border. Sits in the same spot in both states,
+          sliding with the sidebar edge; chevron flips to match. */}
       <button
         onClick={onToggle}
-        title="Expand sidebar"
-        aria-label="Expand sidebar"
+        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         className="sidebar-tab hidden md:flex"
-        style={{ left: SIDEBAR_COLLAPSED_W }}
+        style={{ left: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W }}
       >
-        <ChevronRightIcon />
+        {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
       </button>
-    )}
     <aside
       className="hidden md:flex fixed left-0 border-r border-ink flex-col z-40 bg-bg"
       style={{
@@ -219,14 +219,6 @@ function DesktopSidebar({
                 <span className="icon-folder" style={{ color: "var(--pink)" }} />
                 <span>finbar.studio/</span>
               </Link>
-              <button
-                onClick={onToggle}
-                aria-label="Collapse sidebar"
-                title="Collapse sidebar"
-                className="os-titlebar-btn flex items-center justify-center ml-auto shrink-0"
-              >
-                <ChevronLeftIcon />
-              </button>
             </div>
 
             {/* work/ folder, expandable */}
