@@ -22,8 +22,9 @@ const CAMERA_FOV = 28;
 const CAMERA_Z = 11;
 const SPACING = 1.25;     // centre-to-centre spacing
 const PANEL = 1;          // cover edge length (square)
-const FOCUS_SCALE = 0.38; // extra scale for the hovered cover
-const FOCUS_Z = 1.3;      // how far forward the hovered cover comes
+const FOCUS_SCALE = 0.34; // extra scale for the hovered cover
+const FOCUS_Z = 0.5;      // slight forward nudge (kept small so edge covers
+                          // don't get magnified past the canvas edge)
 const RECEDE_SCALE = 0.12; // how much the others shrink
 const RECEDE_Z = 0.6;     // how far back the others go
 
@@ -53,15 +54,7 @@ function LiveResize() {
 }
 
 /* ── Row ───────────────────────────────────────────────────── */
-function Row({
-  images,
-  hovered,
-  onReady,
-}: {
-  images: string[];
-  hovered: boolean;
-  onReady: () => void;
-}) {
+function Row({ images, onReady }: { images: string[]; onReady: () => void }) {
   const textures = useTexture(images) as THREE.Texture[];
 
   useEffect(() => {
@@ -75,35 +68,27 @@ function Row({
 
   const fitRef = useRef<THREE.Group>(null);
   const panelRefs = useRef<(THREE.Group | null)[]>([]);
-  const lightRef = useRef<THREE.PointLight>(null);
   const overIndex = useRef<number | null>(null);
   const focusAmts = useRef<number[]>(images.map(() => 0));
   const focusGlobal = useRef(0);
-  const sheen = useRef(0);
 
   const n = images.length;
   const baseRowW = (n - 1) * SPACING + PANEL;
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     // Auto-fit the row to the container.
     const cam = state.camera as THREE.PerspectiveCamera;
     const visH = 2 * CAMERA_Z * Math.tan((cam.fov * Math.PI) / 360);
     const visW = visH * cam.aspect;
-    let s = (visW * 0.85) / baseRowW;
+    // Leave horizontal margin so the focused cover's zoom doesn't clip at the
+    // edges of the canvas.
+    let s = (visW * 0.78) / baseRowW;
     s = Math.min(s, (visH * 0.5) / PANEL);
     if (fitRef.current) fitRef.current.scale.setScalar(s);
 
-    // Moving sheen — a clearcoat highlight that only appears on card hover.
-    const t = state.clock.elapsedTime;
-    sheen.current += ((hovered ? 1 : 0) - sheen.current) * 0.07;
-    if (lightRef.current) {
-      lightRef.current.intensity = sheen.current * 3.2;
-      lightRef.current.position.set(Math.sin(t * 0.7) * 4, Math.cos(t * 0.5) * 1.6 + 1, 5);
-    }
-
-    // Focus interaction.
+    // Focus: hovered cover zooms in place + comes forward; others ease smaller
+    // and back. No horizontal movement toward the centre.
     focusGlobal.current += ((overIndex.current !== null ? 1 : 0) - focusGlobal.current) * 0.12;
-    const lerp = THREE.MathUtils.lerp;
     for (let i = 0; i < n; i++) {
       const g = panelRefs.current[i];
       if (!g) continue;
@@ -112,8 +97,6 @@ function Row({
       const f = fa[i];                                   // this cover is hovered
       const recede = Math.max(0, focusGlobal.current - f); // another is hovered
 
-      const restX = (i - (n - 1) / 2) * SPACING;
-      g.position.x = lerp(restX, 0, f);                  // hovered -> centre
       g.position.z = f * FOCUS_Z - recede * RECEDE_Z;    // hovered forward, others back
       g.scale.setScalar(1 + f * FOCUS_SCALE - recede * RECEDE_SCALE);
     }
@@ -121,7 +104,6 @@ function Row({
 
   return (
     <group ref={fitRef}>
-      <pointLight ref={lightRef} intensity={0} decay={0} color="#ffffff" />
       {images.map((img, i) => {
         const x = (i - (n - 1) / 2) * SPACING;
         return (
@@ -131,20 +113,8 @@ function Row({
               onPointerOut={() => { if (overIndex.current === i) overIndex.current = null; }}
             >
               <planeGeometry args={[PANEL, PANEL]} />
-              {/* Art shown unlit (emissive) for true colour; the clearcoat picks
-                  up the moving light as a subtle sheen only when hovered. */}
-              <meshPhysicalMaterial
-                color="#000000"
-                emissive="#ffffff"
-                emissiveMap={textures[i]}
-                emissiveIntensity={1}
-                toneMapped={false}
-                roughness={0.5}
-                metalness={0}
-                clearcoat={0.65}
-                clearcoatRoughness={0.22}
-                envMapIntensity={0}
-              />
+              {/* Unlit — true-colour art, no lighting/sheen. */}
+              <meshBasicMaterial map={textures[i]} toneMapped={false} />
             </mesh>
           </group>
         );
@@ -187,16 +157,7 @@ function AlbumRowInner({
       }}
     >
       {/* Light pink background, fades in on hover */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "color-mix(in srgb, var(--pink) 15%, #ffffff)",
-          opacity: hovered ? 1 : 0,
-          transition: "opacity var(--dur-slow, 420ms) var(--ease, ease)",
-        }}
-      />
+      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
       {!ready && <Loader size={28} />}
 
@@ -208,7 +169,7 @@ function AlbumRowInner({
       >
         <LiveResize />
         <Suspense fallback={null}>
-          <Row images={images} hovered={hovered} onReady={() => setReady(true)} />
+          <Row images={images} onReady={() => setReady(true)} />
         </Suspense>
       </Canvas>
     </div>

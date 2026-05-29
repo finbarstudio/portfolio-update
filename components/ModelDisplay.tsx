@@ -294,6 +294,9 @@ function ModelDisplayInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
+      {/* Soft pink wash on hover, behind the canvas */}
+      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
+
       {/* Poster + spinner until first frame is ready */}
       {poster && !ready && (
         // eslint-disable-next-line @next/next/no-img-element

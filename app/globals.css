@@ -520,6 +520,18 @@
   /* Collapsed-sidebar rail buttons — uniform square targets with a soft
      rounded hover/active pill, so every glyph (home, work, about, contact,
      socials) sits on the same rhythm. */
+  /* Soft pink wash behind a 3D mockup, faded in on hover (canvas is transparent
+     so it shows through). Shared by all mockups. */
+  .mockup-pink-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: color-mix(in srgb, var(--pink) 10%, #ffffff);
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease);
+  }
+
   .rail-btn {
     display: flex;
     align-items: center;
@@ -573,14 +585,15 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 12px 8px;
+    padding: 12px 8px 20px;
     overflow-y: auto;
     overflow-x: hidden;
   }
   .nav-row {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     width: 100%;
     height: 34px;
     padding: 0 7px;
@@ -589,21 +602,24 @@
     text-align: left;
     cursor: pointer;
     white-space: nowrap;
-    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
-                padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
   }
   .nav-row:hover { color: var(--pink); background: var(--surface-sunken); }
   .nav-row.active {
     color: var(--pink);
     background: color-mix(in srgb, var(--pink) 12%, transparent);
   }
+  /* Icon is absolutely centred over the whole row so it sits exactly in the
+     middle of the collapsed rail; hidden when expanded (labels carry the nav). */
   .nav-ico {
-    width: 22px;
-    height: 22px;
-    flex-shrink: 0;
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease);
   }
   .nav-label {
     flex: 1;
@@ -612,7 +628,8 @@
     font-weight: 500;
     letter-spacing: 0.01em;
     opacity: 1;
-    transition: opacity 0.4s var(--ease);
+    transform: translateX(0);
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
   }
   .nav-count {
     font-size: 10px;
@@ -627,10 +644,13 @@
     transition: transform var(--dur) var(--ease), opacity 0.3s var(--ease);
   }
 
-  /* Collapsed rail: fade out labels/extras. Row padding is kept constant so the
-     icon stays put (just shy of rail-centred) and the label slides/fades in
-     beside it on expand — no horizontal jump. */
-  .side-nav.is-collapsed .nav-label,
+  /* Collapsed rail: show the icon (centred over the row), hide labels/extras. */
+  .side-nav.is-collapsed .nav-ico { opacity: 1; }
+  .side-nav.is-collapsed .nav-label {
+    opacity: 0;
+    transform: translateX(-4px);
+    pointer-events: none;
+  }
   .side-nav.is-collapsed .nav-count,
   .side-nav.is-collapsed .nav-chevron { opacity: 0; pointer-events: none; }
 

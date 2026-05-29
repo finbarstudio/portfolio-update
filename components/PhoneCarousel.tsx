@@ -463,6 +463,9 @@ function PhoneCarouselInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
+      {/* Soft pink wash on hover, behind the canvas */}
+      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
+
       {/* Edge fade — masks phones entering/exiting on both sides */}
       <div aria-hidden="true" style={{
         position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none",
