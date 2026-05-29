@@ -323,12 +323,15 @@
      `.group:hover` that drives the border/elevation), so border + zoom are one
      hover, not two. The `.card-thumb` already clips the overflow. */
   .card-zoom-inner {
-    transition: transform var(--dur-slow) var(--ease);
+    /* Subtle, slow push-in. Smaller scale + longer ease than the 480ms text
+       reveal so it reads as a calm drift rather than fighting the simultaneous
+       thumbnail shrink. */
+    transition: transform 620ms var(--ease);
     will-change: transform;
   }
   .group:hover .card-zoom-inner,
   .group:focus-within .card-zoom-inner {
-    transform: scale(1.06);
+    transform: scale(1.035);
   }
   @media (prefers-reduced-motion: reduce) {
     .card-zoom-inner { transition: none; }
@@ -348,8 +351,12 @@
       color-mix(in srgb, var(--pink) 9%, transparent) 0deg 2.6deg,
       transparent 2.6deg 9deg
     );
-    -webkit-mask-image: radial-gradient(closest-side, #000 0%, #000 42%, transparent 86%);
-            mask-image: radial-gradient(closest-side, #000 0%, #000 42%, transparent 86%);
+    /* Aspect-independent ellipse so coverage is the same proportion of the box
+       regardless of its width/height (closest-side flipped between dimensions
+       as the thumbnail reshaped on hover, hence the inconsistent fill). Always
+       reaches full width, fading out past the container edges. */
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, #000 35%, transparent 95%);
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, #000 35%, transparent 95%);
     /* Steady slow rotation only — no opacity pulse. Hidden until hover;
        the hosting component toggles opacity via the `hovered` state. */
     opacity: 0;
