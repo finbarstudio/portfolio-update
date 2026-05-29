@@ -1,15 +1,11 @@
 "use client";
 
 /**
- * AlbumRow — a slow 3D carousel of album covers. The covers are thin slabs
- * arranged around a vertical-axis ring, each facing outward, so the ones at the
- * front show their cover and the ones turned to the back show their (dark) back.
- * The ring auto-rotates; there's no idle skew and no scene lighting — the art is
- * rendered unlit at true colour.
- *
- * Hovering an individual cover lifts it out to front-centre, flat-on and a touch
- * closer to the camera. Card-level hover (via useGroupHover) fades in a pink
- * background behind the ring.
+ * AlbumRow — five album covers in a flat row, facing the camera. At rest they're
+ * static and unlit (true colour). Hovering a cover brings it to front-centre and
+ * scales it up while the others ease slightly smaller and backwards. Card-level
+ * hover fades in a light pink background and a gentle moving sheen (a clearcoat
+ * highlight lit by a slowly-orbiting light) for a subtle shiny gradient motion.
  */
 
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -24,17 +20,14 @@ import { useGroupHover } from "./useGroupHover";
 /* ── Tunables ──────────────────────────────────────────────── */
 const CAMERA_FOV = 28;
 const CAMERA_Z = 11;
-const CAMERA_Y = 1.5;          // slight elevation so the rear covers' backs show
-const RING_R = 2.2;            // carousel radius
-const PANEL = 1;               // cover edge length (square)
-const THICK = 0.06;            // slab thickness
-const SPIN_SPEED = 0.28;       // ring rotation, rad/sec
-const PRESENT_Z = 3.2;         // z a hovered cover eases to (closer than the ring front)
-const PRESENT_TILT = -0.2;     // tilt to face the slightly-raised camera when presented
-const EDGE_COLOR = "#1b1b1b";
-const BACK_COLOR = "#262626";
+const SPACING = 1.25;     // centre-to-centre spacing
+const PANEL = 1;          // cover edge length (square)
+const FOCUS_SCALE = 0.38; // extra scale for the hovered cover
+const FOCUS_Z = 1.3;      // how far forward the hovered cover comes
+const RECEDE_SCALE = 0.12; // how much the others shrink
+const RECEDE_Z = 0.6;     // how far back the others go
 
-/* ── Real-time resize + keep camera aimed at the ring centre ── */
+/* ── Real-time resize ──────────────────────────────────────── */
 function LiveResize() {
   const gl = useThree((s) => s.gl);
   const camera = useThree((s) => s.camera);
@@ -46,22 +39,29 @@ function LiveResize() {
     const w = parent.clientWidth;
     const h = parent.clientHeight;
     if (w < 1 || h < 1) return;
-    const cam = camera as THREE.PerspectiveCamera;
     if (w !== last.current.w || h !== last.current.h) {
       last.current = { w, h };
       setSize(w, h);
+      const cam = camera as THREE.PerspectiveCamera;
       if (cam.isPerspectiveCamera) {
         cam.aspect = w / h;
         cam.updateProjectionMatrix();
       }
     }
-    cam.lookAt(0, 0, 0);
   });
   return null;
 }
 
-/* ── Carousel ──────────────────────────────────────────────── */
-function Carousel({ images, onReady }: { images: string[]; onReady: () => void }) {
+/* ── Row ───────────────────────────────────────────────────── */
+function Row({
+  images,
+  hovered,
+  onReady,
+}: {
+  images: string[];
+  hovered: boolean;
+  onReady: () => void;
+}) {
   const textures = useTexture(images) as THREE.Texture[];
 
   useEffect(() => {
@@ -74,65 +74,81 @@ function Carousel({ images, onReady }: { images: string[]; onReady: () => void }
   }, [textures, onReady]);
 
   const fitRef = useRef<THREE.Group>(null);
-  const slabRefs = useRef<(THREE.Group | null)[]>([]);
+  const panelRefs = useRef<(THREE.Group | null)[]>([]);
+  const lightRef = useRef<THREE.PointLight>(null);
   const overIndex = useRef<number | null>(null);
-  const overAmts = useRef<number[]>(images.map(() => 0));
-  const spin = useRef(0);
+  const focusAmts = useRef<number[]>(images.map(() => 0));
+  const focusGlobal = useRef(0);
+  const sheen = useRef(0);
 
   const n = images.length;
-  const baseWidth = 2 * RING_R + PANEL; // full horizontal extent of the ring
+  const baseRowW = (n - 1) * SPACING + PANEL;
 
   useFrame((state, delta) => {
-    // Auto-fit the ring to the container (width-driven for landscape, height-
-    // clamped for portrait) so nothing clips at the edges across card / hero / mobile.
+    // Auto-fit the row to the container.
     const cam = state.camera as THREE.PerspectiveCamera;
     const visH = 2 * CAMERA_Z * Math.tan((cam.fov * Math.PI) / 360);
     const visW = visH * cam.aspect;
-    let s = (visW * 0.85) / baseWidth;
+    let s = (visW * 0.85) / baseRowW;
     s = Math.min(s, (visH * 0.5) / PANEL);
     if (fitRef.current) fitRef.current.scale.setScalar(s);
 
-    spin.current += delta * SPIN_SPEED;
+    // Moving sheen — a clearcoat highlight that only appears on card hover.
+    const t = state.clock.elapsedTime;
+    sheen.current += ((hovered ? 1 : 0) - sheen.current) * 0.07;
+    if (lightRef.current) {
+      lightRef.current.intensity = sheen.current * 3.2;
+      lightRef.current.position.set(Math.sin(t * 0.7) * 4, Math.cos(t * 0.5) * 1.6 + 1, 5);
+    }
+
+    // Focus interaction.
+    focusGlobal.current += ((overIndex.current !== null ? 1 : 0) - focusGlobal.current) * 0.12;
     const lerp = THREE.MathUtils.lerp;
-
     for (let i = 0; i < n; i++) {
-      const g = slabRefs.current[i];
+      const g = panelRefs.current[i];
       if (!g) continue;
-      const a = (i * Math.PI * 2) / n + spin.current; // this slab's ring angle
+      const fa = focusAmts.current;
+      fa[i] += ((overIndex.current === i ? 1 : 0) - fa[i]) * 0.12;
+      const f = fa[i];                                   // this cover is hovered
+      const recede = Math.max(0, focusGlobal.current - f); // another is hovered
 
-      const oa = overAmts.current;
-      oa[i] += ((overIndex.current === i ? 1 : 0) - oa[i]) * 0.12;
-      const h = oa[i];
-
-      // Ring pose -> presented pose (front-centre, flat-on, closer).
-      const nearestFront = Math.round(a / (Math.PI * 2)) * (Math.PI * 2);
-      g.position.x = lerp(Math.sin(a) * RING_R, 0, h);
-      g.position.z = lerp(Math.cos(a) * RING_R, PRESENT_Z, h);
-      g.rotation.y = lerp(a, nearestFront, h);
-      g.rotation.x = lerp(0, PRESENT_TILT, h);
-      g.scale.setScalar(1 + h * 0.08);
+      const restX = (i - (n - 1) / 2) * SPACING;
+      g.position.x = lerp(restX, 0, f);                  // hovered -> centre
+      g.position.z = f * FOCUS_Z - recede * RECEDE_Z;    // hovered forward, others back
+      g.scale.setScalar(1 + f * FOCUS_SCALE - recede * RECEDE_SCALE);
     }
   });
 
   return (
     <group ref={fitRef}>
-      {images.map((img, i) => (
-        <group key={img} ref={(el) => { slabRefs.current[i] = el; }}>
-          <mesh
-            onPointerOver={(e) => { e.stopPropagation(); overIndex.current = i; }}
-            onPointerOut={() => { if (overIndex.current === i) overIndex.current = null; }}
-          >
-            <boxGeometry args={[PANEL, PANEL, THICK]} />
-            {/* Box face order: +x, -x, +y, -y, +z (front cover), -z (back) */}
-            <meshBasicMaterial attach="material-0" color={EDGE_COLOR} toneMapped={false} />
-            <meshBasicMaterial attach="material-1" color={EDGE_COLOR} toneMapped={false} />
-            <meshBasicMaterial attach="material-2" color={EDGE_COLOR} toneMapped={false} />
-            <meshBasicMaterial attach="material-3" color={EDGE_COLOR} toneMapped={false} />
-            <meshBasicMaterial attach="material-4" map={textures[i]} toneMapped={false} />
-            <meshBasicMaterial attach="material-5" color={BACK_COLOR} toneMapped={false} />
-          </mesh>
-        </group>
-      ))}
+      <pointLight ref={lightRef} intensity={0} decay={0} color="#ffffff" />
+      {images.map((img, i) => {
+        const x = (i - (n - 1) / 2) * SPACING;
+        return (
+          <group key={img} position={[x, 0, 0]} ref={(el) => { panelRefs.current[i] = el; }}>
+            <mesh
+              onPointerOver={(e) => { e.stopPropagation(); overIndex.current = i; }}
+              onPointerOut={() => { if (overIndex.current === i) overIndex.current = null; }}
+            >
+              <planeGeometry args={[PANEL, PANEL]} />
+              {/* Art shown unlit (emissive) for true colour; the clearcoat picks
+                  up the moving light as a subtle sheen only when hovered. */}
+              <meshPhysicalMaterial
+                color="#000000"
+                emissive="#ffffff"
+                emissiveMap={textures[i]}
+                emissiveIntensity={1}
+                toneMapped={false}
+                roughness={0.5}
+                metalness={0}
+                clearcoat={0.65}
+                clearcoatRoughness={0.22}
+                envMapIntensity={0}
+              />
+            </mesh>
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -170,13 +186,13 @@ function AlbumRowInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Pink background — fades in on card hover (canvas is transparent) */}
+      {/* Light pink background, fades in on hover */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           inset: 0,
-          background: "var(--pink)",
+          background: "color-mix(in srgb, var(--pink) 15%, #ffffff)",
           opacity: hovered ? 1 : 0,
           transition: "opacity var(--dur-slow, 420ms) var(--ease, ease)",
         }}
@@ -185,14 +201,14 @@ function AlbumRowInner({
       {!ready && <Loader size={28} />}
 
       <Canvas
-        camera={{ position: [0, CAMERA_Y, CAMERA_Z], fov: CAMERA_FOV, near: 0.1, far: 50 }}
+        camera={{ position: [0, 0, CAMERA_Z], fov: CAMERA_FOV, near: 0.1, far: 50 }}
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
         <LiveResize />
         <Suspense fallback={null}>
-          <Carousel images={images} onReady={() => setReady(true)} />
+          <Row images={images} hovered={hovered} onReady={() => setReady(true)} />
         </Suspense>
       </Canvas>
     </div>
