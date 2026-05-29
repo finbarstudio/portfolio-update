@@ -54,6 +54,16 @@ function HomeIcon() {
     </svg>
   );
 }
+function GridIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="9.5" y="1.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="1.5" y="9.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="9.5" y="9.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
 function PersonIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -181,78 +191,50 @@ function DesktopSidebar({
         top: "var(--menubar-h)",
         bottom: 0,
         width: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W,
-        transition: "width 0.25s cubic-bezier(0.4,0,0.2,1)",
+        transition: "width 0.5s cubic-bezier(0.4,0,0.2,1)",
         overflow: "hidden",
       }}
       aria-label="Site navigation"
     >
-      {collapsed ? (
-        /* ── COLLAPSED ─────────────────────────────────────────── */
-        <div className="flex flex-col items-center py-3 h-full">
-          <nav aria-label="Primary" className="flex flex-col items-center gap-1.5">
-            <Link
-              href="/"
-              title="Home"
-              aria-label="Home"
-              aria-current={isHome ? "page" : undefined}
-              className={`rail-btn ${isHome ? "active" : ""}`}
-            >
-              <HomeIcon />
-            </Link>
-            {[
-              { href: "/about",   label: "ABOUT",   icon: <PersonIcon />,   active: isAbout },
-              { href: "/contact", label: "CONTACT", icon: <EnvelopeIcon />, active: isContact },
-            ].map((l) => (
-              <Link
-                key={l.label}
-                href={l.href}
-                title={l.label}
-                aria-label={l.label}
-                aria-current={l.active ? "page" : undefined}
-                className={`rail-btn ${l.active ? "active" : ""}`}
-              >
-                {l.icon}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      ) : (
-        /* ── EXPANDED ──────────────────────────────────────────── */
-        <>
-          {/* Clean nav — minimal, matches the rest of the UI (no OS/Finder tree) */}
-          <nav className="flex-1 overflow-y-auto px-2 py-3 flex flex-col gap-0.5" aria-label="Primary">
-            <Link
-              href="/"
-              className={`nav-item reveal-x ${isHome ? "active" : ""}`}
-              style={{ animationDelay: "0.04s" }}
-              aria-current={isHome ? "page" : undefined}
-            >
-              Home
-            </Link>
+      {/* Persistent nav — one list for both states. The icons stay put and the
+          labels slide/fade in as the rail expands (no remove/replace swap). */}
+      <nav className={`side-nav ${collapsed ? "is-collapsed" : ""}`} aria-label="Primary">
+        <Link
+          href="/"
+          title="Home"
+          aria-label="Home"
+          aria-current={isHome ? "page" : undefined}
+          className={`nav-row ${isHome ? "active" : ""}`}
+        >
+          <span className="nav-ico"><HomeIcon /></span>
+          <span className="nav-label">Home</span>
+        </Link>
 
-            {/* Work — expandable project list */}
+        {/* Work — expanded-only block (collapses to nothing in the rail) with an
+            expandable project list inside. */}
+        <div className="nav-work" data-open={collapsed ? "false" : "true"}>
+          <div className="nav-work-inner">
             <button
               type="button"
               onClick={() => setWorkOpen((v) => !v)}
-              className={`nav-item reveal-x ${isWork ? "active" : ""}`}
-              style={{ animationDelay: "0.09s" }}
+              className={`nav-row ${isWork ? "active" : ""}`}
               aria-expanded={workOpen}
+              aria-label="Work"
             >
-              <span className="flex-1 text-left">Work</span>
-              <span className="text-ink-soft tabular-nums" style={{ fontSize: "10px" }}>
-                {sortedProjects.length}
-              </span>
+              <span className="nav-ico"><GridIcon /></span>
+              <span className="nav-label">Work</span>
+              <span className="nav-count tabular-nums">{sortedProjects.length}</span>
               <svg
                 className="nav-chevron"
                 style={{ transform: workOpen ? "rotate(90deg)" : "rotate(0deg)" }}
-                width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true"
+                viewBox="0 0 16 16" fill="none" aria-hidden="true"
               >
                 <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
 
-            {workOpen && (
-              <div className="overflow-hidden flex flex-col gap-0.5" style={{ animation: "tree-expand 0.22s ease-out both" }}>
+            <div className="nav-sublist" data-open={!collapsed && workOpen ? "true" : "false"}>
+              <div className="nav-sublist-inner">
                 {sortedProjects.map((p) => {
                   const isActive = pathname === `/case-studies/${p.slug}`;
                   return (
@@ -267,50 +249,54 @@ function DesktopSidebar({
                   );
                 })}
               </div>
-            )}
-
-            <Link
-              href="/about"
-              className={`nav-item reveal-x ${isAbout ? "active" : ""}`}
-              style={{ animationDelay: "0.14s" }}
-              aria-current={isAbout ? "page" : undefined}
-            >
-              About
-            </Link>
-
-            <Link
-              href="/contact"
-              className={`nav-item reveal-x ${isContact ? "active" : ""}`}
-              style={{ animationDelay: "0.19s" }}
-              aria-current={isContact ? "page" : undefined}
-            >
-              Contact
-            </Link>
-          </nav>
-
-          {/* Status / contact. Socials live in the persistent SocialDock below
-              (rendered once, outside the collapsed/expanded branches) so they
-              travel between layouts instead of swapping. pb reserves the dock row. */}
-          <div className="px-3 space-y-2 border-t border-line pt-3" style={{ paddingBottom: 44 }}>
-            <span className="status-badge reveal-y" style={{ animationDelay: "0.18s" }}>OPEN FOR WORK</span>
-
-            <a
-              href="mailto:finbar@finbar.studio"
-              className="block font-sans text-ink hover:text-pink transition-colors reveal-y"
-              style={{ fontSize: "12px", letterSpacing: "0.02em", animationDelay: "0.22s" }}
-            >
-              finbar@finbar.studio
-            </a>
-
-            <a
-              href="tel:+61412796630"
-              className="block font-sans text-ink-soft hover:text-pink transition-colors tabular-nums reveal-y"
-              style={{ fontSize: "11px", letterSpacing: "0.02em", animationDelay: "0.26s" }}
-            >
-              +61 412 796 630
-            </a>
+            </div>
           </div>
-        </>
+        </div>
+
+        <Link
+          href="/about"
+          title="About"
+          aria-label="About"
+          aria-current={isAbout ? "page" : undefined}
+          className={`nav-row ${isAbout ? "active" : ""}`}
+        >
+          <span className="nav-ico"><PersonIcon /></span>
+          <span className="nav-label">About</span>
+        </Link>
+
+        <Link
+          href="/contact"
+          title="Contact"
+          aria-label="Contact"
+          aria-current={isContact ? "page" : undefined}
+          className={`nav-row ${isContact ? "active" : ""}`}
+        >
+          <span className="nav-ico"><EnvelopeIcon /></span>
+          <span className="nav-label">Contact</span>
+        </Link>
+      </nav>
+
+      {/* Status / contact — expanded only. Socials are in the persistent dock. */}
+      {!collapsed && (
+        <div className="px-3 space-y-2 border-t border-line pt-3" style={{ paddingBottom: 44 }}>
+          <span className="status-badge reveal-y" style={{ animationDelay: "0.18s" }}>OPEN FOR WORK</span>
+
+          <a
+            href="mailto:finbar@finbar.studio"
+            className="block font-sans text-ink hover:text-pink transition-colors reveal-y"
+            style={{ fontSize: "12px", letterSpacing: "0.02em", animationDelay: "0.22s" }}
+          >
+            finbar@finbar.studio
+          </a>
+
+          <a
+            href="tel:+61412796630"
+            className="block font-sans text-ink-soft hover:text-pink transition-colors tabular-nums reveal-y"
+            style={{ fontSize: "11px", letterSpacing: "0.02em", animationDelay: "0.26s" }}
+          >
+            +61 412 796 630
+          </a>
+        </div>
       )}
     </aside>
 
