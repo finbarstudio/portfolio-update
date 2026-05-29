@@ -133,18 +133,19 @@ function Panels({
       if (!g) continue;
       const m = MOTION[i % MOTION.length];
 
-      // Per-album hover reaction: the cover under the cursor eases forward +
-      // up a touch, scales slightly, and steadies toward facing the camera.
+      // Per-album hover reaction: the hovered cover turns completely flat to
+      // the camera (rotation eased to 0) and moves closer.
       const oa = overAmts.current;
       oa[i] += ((overIndex.current === i ? 1 : 0) - oa[i]) * 0.14;
       const a = oa[i];
-      const sway = 1 - a * 0.55; // hovered cover settles square-on
 
-      g.rotation.y = m.baseX + Math.sin(t * m.freqY + m.phY) * m.ampY * boost * sway;
-      g.rotation.x = m.baseY + Math.cos(t * m.freqX + m.phX) * m.ampX * boost * sway;
-      g.position.z = a * 0.28;   // lift toward camera
-      g.position.y = a * 0.05;   // tiny rise
-      g.scale.setScalar(1 + a * 0.07);
+      const restY = m.baseX + Math.sin(t * m.freqY + m.phY) * m.ampY * boost;
+      const restX = m.baseY + Math.cos(t * m.freqX + m.phX) * m.ampX * boost;
+      g.rotation.y = restY * (1 - a); // -> 0 when hovered = dead-on flat
+      g.rotation.x = restX * (1 - a);
+      g.position.z = a * 0.55;        // come closer to the camera
+      g.position.y = a * 0.05;        // tiny rise
+      g.scale.setScalar(1 + a * 0.05);
     }
   });
 
