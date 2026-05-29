@@ -15,7 +15,7 @@ import dynamic from "next/dynamic";
 import * as THREE from "three";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, useTexture } from "@react-three/drei";
+import { useTexture } from "@react-three/drei";
 import Loader from "./Loader";
 import { useGroupHover } from "./useGroupHover";
 
@@ -103,8 +103,8 @@ function Panels({
     const ctx = c.getContext("2d");
     if (!ctx) return null;
     const g = ctx.createRadialGradient(S / 2, S / 2, S * 0.12, S / 2, S / 2, S * 0.5);
-    g.addColorStop(0, "rgba(0,0,0,0.42)");
-    g.addColorStop(0.62, "rgba(0,0,0,0.15)");
+    g.addColorStop(0, "rgba(0,0,0,0.22)");
+    g.addColorStop(0.6, "rgba(0,0,0,0.07)");
     g.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, S, S);
@@ -157,8 +157,8 @@ function Panels({
             {/* Static soft shadow (doesn't skew with the cover). raycast off so
                 its halo never steals pointer events from the covers. */}
             {shadowTex && (
-              <mesh position={[0.02, -0.05, -0.08]} raycast={() => null}>
-                <planeGeometry args={[PANEL * 1.5, PANEL * 1.5]} />
+              <mesh position={[0.015, -0.04, -0.08]} raycast={() => null}>
+                <planeGeometry args={[PANEL * 1.4, PANEL * 1.4]} />
                 <meshBasicMaterial map={shadowTex} transparent depthWrite={false} toneMapped={false} />
               </mesh>
             )}
@@ -169,13 +169,20 @@ function Panels({
                 onPointerOut={() => { if (overIndex.current === i) overIndex.current = null; }}
               >
                 <planeGeometry args={[PANEL, PANEL]} />
+                {/* Art shown unlit (emissive) so it reads at true colour — no
+                    diffuse over-exposure. The only "light" is a tight clearcoat
+                    glint from the direct lights that slides across as it tilts. */}
                 <meshPhysicalMaterial
-                  map={textures[i]}
-                  roughness={0.55}
+                  color="#000000"
+                  emissive="#ffffff"
+                  emissiveMap={textures[i]}
+                  emissiveIntensity={1}
+                  toneMapped={false}
+                  roughness={0.45}
                   metalness={0.0}
-                  clearcoat={0.5}
-                  clearcoatRoughness={0.16}
-                  envMapIntensity={0.18}
+                  clearcoat={0.6}
+                  clearcoatRoughness={0.22}
+                  envMapIntensity={0}
                 />
               </mesh>
             </group>
@@ -241,11 +248,11 @@ function AlbumRowInner({
         style={{ position: "absolute", inset: 0 }}
       >
         <LiveResize />
-        <ambientLight intensity={0.85} />
-        <directionalLight position={[-4, 4, 6]} intensity={0.55} />
-        <directionalLight position={[5, -2, 3]} intensity={0.18} />
+        {/* Direct lights only — they drive the clearcoat glint; the emissive art
+            is unaffected by them. No Environment map (that was the broad wash). */}
+        <directionalLight position={[-3, 2, 8]} intensity={1.6} />
+        <directionalLight position={[4, 3, 6]} intensity={0.8} />
         <Suspense fallback={null}>
-          <Environment preset="studio" />
           <Panels images={images} hovered={hovered} onReady={() => setReady(true)} />
         </Suspense>
       </Canvas>
