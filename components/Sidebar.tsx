@@ -130,6 +130,19 @@ function DesktopSidebar({
   const isWorkActive = isHome || pathname.startsWith("/case-studies/");
 
   return (
+    <>
+    {collapsed && (
+      /* Protruding expand handle — lives outside the clipped <aside> */
+      <button
+        onClick={onToggle}
+        title="Expand sidebar"
+        aria-label="Expand sidebar"
+        className="sidebar-tab hidden md:flex"
+        style={{ left: SIDEBAR_COLLAPSED_W }}
+      >
+        <ChevronRightIcon />
+      </button>
+    )}
     <aside
       className="hidden md:flex fixed left-0 border-r border-ink flex-col z-40 bg-bg"
       style={{
@@ -144,40 +157,28 @@ function DesktopSidebar({
       {collapsed ? (
         /* ── COLLAPSED ─────────────────────────────────────────── */
         <div className="flex flex-col items-center py-3 h-full">
-          <button
-            onClick={onToggle}
-            title="Expand sidebar"
-            aria-label="Expand sidebar"
-            className="os-titlebar-btn flex items-center justify-center mb-3"
-          >
-            <ChevronRightIcon />
-          </button>
-
-          <Link
-            href="/"
-            aria-label="Home"
-            className={`mb-3 transition-colors ${isHome ? "text-pink" : "text-ink-soft hover:text-pink"}`}
-          >
-            <HomeIcon />
-          </Link>
-
-          <div className="w-5 h-px bg-line mb-2" />
-
-          <nav aria-label="Primary" className="flex flex-col items-center gap-1 w-full">
+          <nav aria-label="Primary" className="flex flex-col items-center gap-1.5">
+            <Link
+              href="/"
+              title="Home"
+              aria-label="Home"
+              aria-current={isHome ? "page" : undefined}
+              className={`rail-btn ${isHome ? "active" : ""}`}
+            >
+              <HomeIcon />
+            </Link>
             {[
-              { href: "/",        label: "WORK",    icon: <GridIcon />,     active: isWorkActive },
+              { href: "/",        label: "WORK",    icon: <GridIcon />,     active: pathname.startsWith("/case-studies/") },
               { href: "/about",   label: "ABOUT",   icon: <PersonIcon />,   active: isAbout },
               { href: "/contact", label: "CONTACT", icon: <EnvelopeIcon />, active: isContact },
             ].map((l) => (
               <Link
-                key={l.href}
+                key={l.label}
                 href={l.href}
                 title={l.label}
                 aria-label={l.label}
                 aria-current={l.active ? "page" : undefined}
-                className={`flex items-center justify-center w-full py-2 transition-colors ${
-                  l.active ? "text-pink" : "text-ink-soft hover:text-pink"
-                }`}
+                className={`rail-btn ${l.active ? "active" : ""}`}
               >
                 {l.icon}
               </Link>
@@ -186,7 +187,7 @@ function DesktopSidebar({
 
           <div className="flex-1" />
 
-          <div className="flex flex-col items-center gap-3 mb-3">
+          <div className="flex flex-col items-center gap-1 mb-1">
             {socials.map((s) => (
               <a
                 key={s.href}
@@ -195,7 +196,7 @@ function DesktopSidebar({
                 rel="noopener noreferrer"
                 aria-label={s.label}
                 title={s.label}
-                className="text-ink-soft hover:text-pink transition-colors"
+                className="rail-btn"
               >
                 {s.icon}
               </a>
@@ -341,6 +342,7 @@ function DesktopSidebar({
         </>
       )}
     </aside>
+    </>
   );
 }
 

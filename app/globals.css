@@ -345,6 +345,18 @@
     animation: starburst-spin 80s linear infinite;
   }
 
+  /* Denser ray pack for the Mac display. The mac model fills most of its
+     canvas, so the sparse default rays flickered through the thin transparent
+     gaps as they rotated. Twice the ray count at 50% duty reads as a steady
+     glow with fine texture instead of a pulse. */
+  .starburst--mac {
+    background: repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      color-mix(in srgb, var(--pink) 10%, transparent) 0deg 2deg,
+      transparent 2deg 4deg
+    );
+  }
+
   /* Skeleton loader — fills its (aspect-ratio'd) parent so the placeholder
      matches the exact geometry of the incoming media. Soft pulse + shimmer. */
   .skeleton {
@@ -515,6 +527,54 @@
   span.os-titlebar-btn {
     pointer-events: none;
     user-select: none;
+  }
+
+  /* Collapsed-sidebar rail buttons — uniform square targets with a soft
+     rounded hover/active pill, so every glyph (home, work, about, contact,
+     socials) sits on the same rhythm. */
+  .rail-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: var(--ink-soft);
+    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  }
+  .rail-btn:hover { color: var(--pink); background: var(--surface-sunken); }
+  .rail-btn.active {
+    color: var(--pink);
+    background: color-mix(in srgb, var(--pink) 12%, transparent);
+  }
+
+  /* Expand handle — a little tab protruding from the right edge of the
+     collapsed sidebar. Rendered outside the (clipped) <aside> so it can stick
+     out past the border. */
+  .sidebar-tab {
+    position: fixed;
+    top: calc(var(--menubar-h) + (100dvh - var(--menubar-h)) / 2);
+    transform: translateY(-50%);
+    z-index: 41;
+    width: 15px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -1px;
+    color: var(--ink-soft);
+    background: var(--bg);
+    border: 1px solid var(--ink);
+    border-left: none;
+    border-radius: 0 7px 7px 0;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
+                width var(--dur-fast) var(--ease);
+  }
+  .sidebar-tab:hover {
+    color: var(--pink);
+    background: var(--surface-sunken);
+    width: 18px;
   }
 
   /* Terminal prompt, used in hero */
