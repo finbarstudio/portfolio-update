@@ -4,6 +4,7 @@ import Script from "next/script";
 import type { Metadata } from "next";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
+import AlbumRow from "@/components/AlbumRow";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import PDFSlideshow from "@/components/PDFSlideshow";
@@ -420,6 +421,10 @@ export default async function CaseStudyPage({
       <div className="mb-8">
         {project.mediaRows && project.mediaRows.length > 0 ? (
           <MediaRows rows={project.mediaRows} />
+        ) : project.heroAlbums ? (
+          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
+            <AlbumRow images={project.heroAlbums.images} fill hoverable={false} />
+          </div>
         ) : project.heroModel ? (
           <ModelDisplay
             model={project.heroModel.model}

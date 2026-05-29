@@ -81,6 +81,9 @@ export interface Project {
   heroMagazine?: {        // 20-page 3D magazine that flips through itself
     pages: string[];      // Page image URLs in flip order
   };
+  heroAlbums?: {          // Row of glossy album-cover panels that skew to catch light
+    images: string[];     // Square cover image URLs, rendered left-to-right
+  };
   heroSlideshow?: string[];   // Auto-advancing crossfade cover carousel (no WebGL)
   companyUrl?: string;
   pdfSlideshow?: {        // PDF rendered as image pages
@@ -389,6 +392,15 @@ export const projects: Project[] = [
     heroImage: {
       src: "/images/joe-devine/hero.png",
       alt: "Joe Devine, all five single cover artworks shown together as a series",
+    },
+    heroAlbums: {
+      images: [
+        "/images/joe-devine/albums/baby-steps.webp",
+        "/images/joe-devine/albums/giant-leap.webp",
+        "/images/joe-devine/albums/collage.webp",
+        "/images/joe-devine/albums/one-foot-forward.webp",
+        "/images/joe-devine/albums/too-far-gone.webp",
+      ],
     },
     images: [
       {

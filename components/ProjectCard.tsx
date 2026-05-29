@@ -8,6 +8,7 @@ import ModelDisplay from "@/components/ModelDisplay";
 import PhoneCarousel from "@/components/PhoneCarousel";
 import MagazineCarousel from "@/components/MagazineCarousel";
 import HeroSlideshow from "@/components/HeroSlideshow";
+import AlbumRow from "@/components/AlbumRow";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -63,6 +64,8 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
               poster={project.heroPhones.poster}
               fill
             />
+          ) : project.heroAlbums ? (
+            <AlbumRow images={project.heroAlbums.images} fill />
           ) : project.heroMagazine ? (
             <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (
