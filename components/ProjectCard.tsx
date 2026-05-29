@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Project } from "@/content/projects";
-import ParallaxImage from "@/components/ParallaxImage";
+import ZoomImage from "@/components/ZoomImage";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
 import PhoneCarousel from "@/components/PhoneCarousel";
@@ -94,7 +94,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
               <SplineScene scene={project.heroSpline} style={{ aspectRatio: undefined, maxHeight: "none", height: "100%" }} />
             </div>
           ) : (
-            <ParallaxImage
+            <ZoomImage
               src={project.heroImage.src}
               alt={project.heroImage.alt}
               priority={index === 0}
@@ -152,7 +152,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
               fill
             />
           ) : (
-            <ParallaxImage
+            <ZoomImage
               src={project.heroImage.src}
               alt={project.heroImage.alt}
               sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"
@@ -208,7 +208,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
               fill
             />
           ) : (
-            <ParallaxImage
+            <ZoomImage
               src={project.heroImage.src}
               alt={project.heroImage.alt}
               sizes="(max-width: 640px) 100vw, calc((100vw - 224px) / 2)"

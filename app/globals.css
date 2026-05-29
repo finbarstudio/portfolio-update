@@ -319,9 +319,21 @@
     animation: dot-pulse 2s ease-in-out infinite;
   }
 
-  /* Parallax thumbnail — disable the 3D tilt when reduced motion is preferred. */
+  /* Static thumbnail zoom — eases in on the CARD's hover state (the same
+     `.group:hover` that drives the border/elevation), so border + zoom are one
+     hover, not two. The `.card-thumb` already clips the overflow. */
+  .card-zoom-inner {
+    transition: transform var(--dur-slow) var(--ease);
+    will-change: transform;
+  }
+  .group:hover .card-zoom-inner,
+  .group:focus-within .card-zoom-inner {
+    transform: scale(1.06);
+  }
   @media (prefers-reduced-motion: reduce) {
-    .parallax-inner { transform: none !important; transition: none !important; }
+    .card-zoom-inner { transition: none; }
+    .group:hover .card-zoom-inner,
+    .group:focus-within .card-zoom-inner { transform: none; }
   }
 
   /* Mockup starburst — a many-pointed pink sunburst radiating from centre,
