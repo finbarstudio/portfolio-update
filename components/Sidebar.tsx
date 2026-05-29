@@ -78,6 +78,61 @@ const socials = [
   { label: "Instagram", href: "https://instagram.com/finbar.studio",   icon: <SiInstagram size={12} aria-hidden="true" /> },
 ];
 
+/* ── Persistent social dock ───────────────────────────────────────
+   One set of social icons, always mounted, positioned absolutely. Each icon
+   tweens (transform) between its collapsed slot (a vertical column centred in
+   the rail) and its expanded slot (a horizontal row in the footer). A small
+   per-icon stagger + soft overshoot make them visibly tumble into place rather
+   than disappear/reappear when the sidebar toggles. */
+function SocialDock({ collapsed }: { collapsed: boolean }) {
+  const BOX = 24;   // icon tap box
+  const GAP = 30;   // centre-to-centre spacing
+  const railCenterX = SIDEBAR_COLLAPSED_W / 2;
+
+  return (
+    <div
+      className="hidden md:block"
+      style={{
+        position: "fixed",
+        left: 0,
+        bottom: 0,
+        width: SIDEBAR_EXPANDED_W,
+        height: 170,
+        pointerEvents: "none",
+        zIndex: 41,
+      }}
+    >
+      {socials.map((s, i) => {
+        // x/y are offsets from the dock's bottom-left corner.
+        const x = collapsed ? railCenterX - BOX / 2 : 12 + i * GAP;
+        const y = collapsed ? 16 + i * GAP : 14; // px up from the bottom
+        return (
+          <a
+            key={s.href}
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={s.label}
+            title={s.label}
+            className="social-dock-item text-ink-soft hover:text-pink"
+            style={{
+              position: "absolute",
+              left: 0,
+              bottom: 0,
+              width: BOX,
+              height: BOX,
+              transform: `translate(${x}px, ${-y}px)`,
+              transitionDelay: `${i * 0.045}s`,
+              pointerEvents: "auto",
+            }}
+          >
+            {s.icon}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
 
 /* ── Desktop sidebar ──────────────────────────────────────────── */
 function DesktopSidebar({
@@ -160,24 +215,6 @@ function DesktopSidebar({
               </Link>
             ))}
           </nav>
-
-          <div className="flex-1" />
-
-          <div className="flex flex-col items-center gap-1 mb-1">
-            {socials.map((s) => (
-              <a
-                key={s.href}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={s.label}
-                title={s.label}
-                className="rail-btn"
-              >
-                {s.icon}
-              </a>
-            ))}
-          </div>
         </div>
       ) : (
         /* ── EXPANDED ──────────────────────────────────────────── */
@@ -251,8 +288,10 @@ function DesktopSidebar({
             </Link>
           </nav>
 
-          {/* Status / contact / socials */}
-          <div className="px-3 pb-3 space-y-2 border-t border-line pt-3">
+          {/* Status / contact. Socials live in the persistent SocialDock below
+              (rendered once, outside the collapsed/expanded branches) so they
+              travel between layouts instead of swapping. pb reserves the dock row. */}
+          <div className="px-3 space-y-2 border-t border-line pt-3" style={{ paddingBottom: 44 }}>
             <span className="status-badge reveal-y" style={{ animationDelay: "0.18s" }}>OPEN FOR WORK</span>
 
             <a
@@ -270,26 +309,15 @@ function DesktopSidebar({
             >
               +61 412 796 630
             </a>
-
-            <div className="flex items-center gap-3 pt-1">
-              {socials.map((s, i) => (
-                <a
-                  key={s.href}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className="text-ink-soft hover:text-pink transition-colors reveal-social"
-                  style={{ animationDelay: `${0.3 + i * 0.06}s` }}
-                >
-                  {s.icon}
-                </a>
-              ))}
-            </div>
           </div>
         </>
       )}
     </aside>
+
+    {/* Persistent social dock — one set of icons that slides between the
+        collapsed vertical rail and the expanded horizontal row. Rendered
+        outside the (overflow-hidden) aside so it can't be clipped mid-slide. */}
+    <SocialDock collapsed={collapsed} />
     </>
   );
 }
