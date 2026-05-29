@@ -20,6 +20,7 @@ import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Environment, Center } from "@react-three/drei";
 import Loader from "./Loader";
+import { useGroupHover } from "./useGroupHover";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
@@ -431,7 +432,9 @@ function PhoneCarouselInner({
   className,
   hoverable = true,
 }: Props) {
-  const [hovered, setHovered] = useState(false);
+  // Hover is driven by the parent card (.group) so the carousel shares the card's
+  // single hover state rather than its own separate canvas hover.
+  const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
   const [ready, setReady] = useState(false);
 
   // Once any video has played a frame, hide the loader/poster.
@@ -449,11 +452,8 @@ function PhoneCarouselInner({
 
   return (
     <div
+      ref={hoverRef}
       className={className}
-      onPointerEnter={() => hoverable && setHovered(true)}
-      onPointerLeave={() => hoverable && setHovered(false)}
-      onFocus={() => hoverable && setHovered(true)}
-      onBlur={() => hoverable && setHovered(false)}
       style={{
         position: "relative",
         width: "100%",

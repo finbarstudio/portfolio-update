@@ -19,6 +19,7 @@ import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Environment, Center } from "@react-three/drei";
 import Loader from "./Loader";
+import { useGroupHover } from "./useGroupHover";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
@@ -212,7 +213,10 @@ function ModelDisplayInner({
   className,
   hoverable = true,
 }: Props) {
-  const [hovered, setHovered] = useState(false);
+  // Hover is driven by the parent card (.group), so the 3D animation shares the
+  // exact same hover state as the card border — one hover, not a separate one
+  // over just the canvas.
+  const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
   const [ready, setReady] = useState(false);
 
   // Build a single <video> element + VideoTexture that lives for the
@@ -279,11 +283,8 @@ function ModelDisplayInner({
 
   return (
     <div
+      ref={hoverRef}
       className={className}
-      onPointerEnter={() => hoverable && setHovered(true)}
-      onPointerLeave={() => hoverable && setHovered(false)}
-      onFocus={() => hoverable && setHovered(true)}
-      onBlur={() => hoverable && setHovered(false)}
       style={{
         position: "relative",
         width: "100%",

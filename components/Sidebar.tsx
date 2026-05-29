@@ -54,16 +54,6 @@ function HomeIcon() {
     </svg>
   );
 }
-function GridIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <rect x="1.5" y="1.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5"/>
-      <rect x="9.5" y="1.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5"/>
-      <rect x="1.5" y="9.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5"/>
-      <rect x="9.5" y="9.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5"/>
-    </svg>
-  );
-}
 function PersonIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -89,20 +79,7 @@ const socials = [
 ];
 
 
-/* ── Tree-line guide column ───────────────────────────────────── */
-function TreeGuide({ last = false, vertical = true }: { last?: boolean; vertical?: boolean }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="text-ink-soft font-mono select-none"
-      style={{ fontSize: "10px", width: "10px", textAlign: "center", flexShrink: 0, opacity: 0.5 }}
-    >
-      {vertical ? (last ? "└" : "├") : " "}
-    </span>
-  );
-}
-
-/* ── Desktop sidebar, Finder ─────────────────────────────────── */
+/* ── Desktop sidebar ──────────────────────────────────────────── */
 function DesktopSidebar({
   pathname,
   collapsed,
@@ -127,7 +104,7 @@ function DesktopSidebar({
   const isHome    = pathname === "/";
   const isAbout   = pathname.startsWith("/about");
   const isContact = pathname.startsWith("/contact");
-  const isWorkActive = isHome || pathname.startsWith("/case-studies/");
+  const isWork    = pathname.startsWith("/case-studies/");
 
   return (
     <>
@@ -168,7 +145,6 @@ function DesktopSidebar({
               <HomeIcon />
             </Link>
             {[
-              { href: "/",        label: "WORK",    icon: <GridIcon />,     active: pathname.startsWith("/case-studies/") },
               { href: "/about",   label: "ABOUT",   icon: <PersonIcon />,   active: isAbout },
               { href: "/contact", label: "CONTACT", icon: <EnvelopeIcon />, active: isContact },
             ].map((l) => (
@@ -206,90 +182,73 @@ function DesktopSidebar({
       ) : (
         /* ── EXPANDED ──────────────────────────────────────────── */
         <>
-          {/* Tree */}
-          <div className="flex-1 overflow-y-auto py-2">
-            {/* Root, links home, collapse button inline on right */}
-            <div className="tree-item tree-item-root">
-              <Link
-                href="/"
-                className="flex items-center gap-1 flex-1 min-w-0"
-                aria-label="Home"
-              >
-                <span className="tree-caret">▾</span>
-                <span className="icon-folder" style={{ color: "var(--pink)" }} />
-                <span>finbar.studio/</span>
-              </Link>
-            </div>
+          {/* Clean nav — minimal, matches the rest of the UI (no OS/Finder tree) */}
+          <nav className="flex-1 overflow-y-auto px-2 py-3 flex flex-col gap-0.5" aria-label="Primary">
+            <Link
+              href="/"
+              className={`nav-item ${isHome ? "active" : ""}`}
+              aria-current={isHome ? "page" : undefined}
+            >
+              Home
+            </Link>
 
-            {/* work/ folder, expandable */}
+            {/* Work — expandable project list */}
             <button
               type="button"
               onClick={() => setWorkOpen((v) => !v)}
-              className={`tree-item w-full text-left ${isWorkActive ? "active" : ""}`}
+              className={`nav-item ${isWork ? "active" : ""}`}
               aria-expanded={workOpen}
-              style={{ paddingLeft: "16px" }}
             >
-              <TreeGuide last={false} />
-              <span className="tree-caret">{workOpen ? "▾" : "▸"}</span>
-              <span className="icon-folder" />
-              <span className="flex-1">work/</span>
-              <span className="text-ink-soft" style={{ fontSize: "9px" }}>
+              <span className="flex-1 text-left">Work</span>
+              <span className="text-ink-soft tabular-nums" style={{ fontSize: "10px" }}>
                 {sortedProjects.length}
               </span>
+              <svg
+                className="nav-chevron"
+                style={{ transform: workOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true"
+              >
+                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
 
-            {/* Project files */}
             {workOpen && (
-              <div className="overflow-hidden" style={{ animation: "tree-expand 0.22s ease-out both" }}>
-                {sortedProjects.map((p, idx) => {
-                  const isLast   = idx === sortedProjects.length - 1;
+              <div className="overflow-hidden flex flex-col gap-0.5" style={{ animation: "tree-expand 0.22s ease-out both" }}>
+                {sortedProjects.map((p) => {
                   const isActive = pathname === `/case-studies/${p.slug}`;
-                  const isGallery = p.tier === "gallery";
-
                   return (
                     <Link
                       key={p.slug}
                       href={`/case-studies/${p.slug}`}
-                      className={`tree-item ${isActive ? "active" : ""}`}
-                      style={{ paddingLeft: "32px" }}
+                      className={`nav-sub ${isActive ? "active" : ""}`}
                       aria-current={isActive ? "page" : undefined}
                     >
-                      <TreeGuide last={isLast} />
-                      <span className="icon-file" />
-                      <span className="truncate flex-1">{p.name.toLowerCase()}</span>
+                      {p.name}
                     </Link>
                   );
                 })}
               </div>
             )}
 
-            {/* about.md */}
             <Link
               href="/about"
-              className={`tree-item ${isAbout ? "active" : ""}`}
-              style={{ paddingLeft: "16px" }}
+              className={`nav-item ${isAbout ? "active" : ""}`}
               aria-current={isAbout ? "page" : undefined}
             >
-              <TreeGuide last={false} />
-              <span className="icon-file" />
-              <span>about</span>
+              About
             </Link>
 
-            {/* contact.md */}
             <Link
               href="/contact"
-              className={`tree-item ${isContact ? "active" : ""}`}
-              style={{ paddingLeft: "16px" }}
+              className={`nav-item ${isContact ? "active" : ""}`}
               aria-current={isContact ? "page" : undefined}
             >
-              <TreeGuide last={true} />
-              <span className="icon-file" />
-              <span>contact</span>
+              Contact
             </Link>
-          </div>
+          </nav>
 
           {/* Status / contact / socials */}
-          <div className="px-3 pb-3 space-y-2 border-t border-ink pt-3">
+          <div className="px-3 pb-3 space-y-2 border-t border-line pt-3">
             <span className="status-badge">OPEN FOR WORK</span>
 
             <a
@@ -308,27 +267,19 @@ function DesktopSidebar({
               +61 412 796 630
             </a>
 
-            <div className="flex items-center justify-between pt-1">
-              <div className="flex items-center gap-3">
-                {socials.map((s) => (
-                  <a
-                    key={s.href}
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={s.label}
-                    className="text-ink-soft hover:text-pink transition-colors"
-                  >
-                    {s.icon}
-                  </a>
-                ))}
-              </div>
-              <p
-                className="font-bold uppercase text-ink-soft"
-                style={{ fontSize: "9px", letterSpacing: "0.08em" }}
-              >
-                v1.0.26
-              </p>
+            <div className="flex items-center gap-3 pt-1">
+              {socials.map((s) => (
+                <a
+                  key={s.href}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="text-ink-soft hover:text-pink transition-colors"
+                >
+                  {s.icon}
+                </a>
+              ))}
             </div>
           </div>
         </>
