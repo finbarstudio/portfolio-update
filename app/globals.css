@@ -205,10 +205,6 @@
   to   { transform: translateX(100%); }
 }
 
-/* Slow rotation for the mockup starburst backdrop. */
-@keyframes starburst-spin {
-  to { transform: rotate(360deg); }
-}
 
 /* Sidebar expand — entrance for the revealed content. */
 @keyframes nav-reveal-x {
@@ -353,43 +349,6 @@
     .card-zoom-inner { transition: none; }
     .group:hover .card-zoom-inner,
     .group:focus-within .card-zoom-inner { transform: none; }
-  }
-
-  /* Mockup starburst — a many-pointed pink sunburst radiating from centre,
-     behind the 3D piece, rotating very slowly. Subtle; fades out toward edges. */
-  .starburst {
-    position: absolute;
-    inset: -30%;
-    z-index: 0;
-    pointer-events: none;
-    background: repeating-conic-gradient(
-      from 0deg at 50% 50%,
-      color-mix(in srgb, var(--pink) 9%, transparent) 0deg 2.6deg,
-      transparent 2.6deg 9deg
-    );
-    /* Aspect-independent ellipse so coverage is the same proportion of the box
-       regardless of its width/height (closest-side flipped between dimensions
-       as the thumbnail reshaped on hover, hence the inconsistent fill). Always
-       reaches full width, fading out past the container edges. */
-    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, #000 35%, transparent 95%);
-            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, #000 35%, transparent 95%);
-    /* Steady slow rotation only — no opacity pulse. Hidden until hover;
-       the hosting component toggles opacity via the `hovered` state. */
-    opacity: 0;
-    transition: opacity var(--dur-slow) var(--ease);
-    animation: starburst-spin 80s linear infinite;
-  }
-
-  /* Denser ray pack for the Mac display. The mac model fills most of its
-     canvas, so the sparse default rays flickered through the thin transparent
-     gaps as they rotated. Twice the ray count at 50% duty reads as a steady
-     glow with fine texture instead of a pulse. */
-  .starburst--mac {
-    background: repeating-conic-gradient(
-      from 0deg at 50% 50%,
-      color-mix(in srgb, var(--pink) 10%, transparent) 0deg 2deg,
-      transparent 2deg 4deg
-    );
   }
 
   /* Skeleton loader — fills its (aspect-ratio'd) parent so the placeholder

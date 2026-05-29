@@ -294,12 +294,6 @@ function ModelDisplayInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Pink starburst backdrop, BEHIND the canvas (same as the phone carousel).
-          Uses the denser `--mac` ray variant: with the mac model occluding most
-          of the canvas, sparse rotating rays flickered through the thin
-          transparent gaps; denser rays read as a steady glow instead. */}
-      <div className="starburst starburst--mac" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
-
       {/* Poster + spinner until first frame is ready */}
       {poster && !ready && (
         // eslint-disable-next-line @next/next/no-img-element

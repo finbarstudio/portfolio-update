@@ -7,7 +7,7 @@
  * motion is subtle and the panels stay mostly square-on to the camera.
  *
  * Hover (driven by the parent card via useGroupHover) eases the sway up a touch
- * and reveals the pink starburst behind, matching the other 3D mockups.
+ * and fades in a pink background behind the floating covers.
  */
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -88,6 +88,27 @@ function Panels({
   const n = images.length;
   const baseRowW = (n - 1) * SPACING + PANEL;
 
+  // Soft drop-shadow sprite (radial gradient drawn to a canvas). Gives each
+  // cover a shadow halo so light/white artwork still separates from the page
+  // background in the rest state.
+  const shadowTex = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const S = 128;
+    const c = document.createElement("canvas");
+    c.width = c.height = S;
+    const ctx = c.getContext("2d");
+    if (!ctx) return null;
+    const g = ctx.createRadialGradient(S / 2, S / 2, S * 0.12, S / 2, S / 2, S * 0.5);
+    g.addColorStop(0, "rgba(0,0,0,0.42)");
+    g.addColorStop(0.62, "rgba(0,0,0,0.15)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, S, S);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }, []);
+
   useFrame((state) => {
     // Auto-fit: scale the whole row to ~90% of the visible width, but never let a
     // panel exceed 60% of the visible height. Keeps 5-in-a-row sensible whether
@@ -117,22 +138,28 @@ function Panels({
       {images.map((img, i) => {
         const x = (i - (n - 1) / 2) * SPACING;
         return (
-          <group
-            key={img}
-            position={[x, 0, 0]}
-            ref={(el) => { panelRefs.current[i] = el; }}
-          >
-            <mesh>
-              <planeGeometry args={[PANEL, PANEL]} />
-              <meshPhysicalMaterial
-                map={textures[i]}
-                roughness={0.45}
-                metalness={0.0}
-                clearcoat={0.85}
-                clearcoatRoughness={0.25}
-                envMapIntensity={1.0}
-              />
-            </mesh>
+          <group key={img} position={[x, 0, 0]}>
+            {/* Static soft shadow (doesn't skew with the cover) */}
+            {shadowTex && (
+              <mesh position={[0.02, -0.05, -0.08]}>
+                <planeGeometry args={[PANEL * 1.5, PANEL * 1.5]} />
+                <meshBasicMaterial map={shadowTex} transparent depthWrite={false} toneMapped={false} />
+              </mesh>
+            )}
+            {/* The cover — skews around its own centre to catch the light */}
+            <group ref={(el) => { panelRefs.current[i] = el; }}>
+              <mesh>
+                <planeGeometry args={[PANEL, PANEL]} />
+                <meshPhysicalMaterial
+                  map={textures[i]}
+                  roughness={0.55}
+                  metalness={0.0}
+                  clearcoat={0.5}
+                  clearcoatRoughness={0.16}
+                  envMapIntensity={0.18}
+                />
+              </mesh>
+            </group>
           </group>
         );
       })}
@@ -173,8 +200,18 @@ function AlbumRowInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Pink starburst backdrop, behind the canvas — only on hover */}
-      <div className="starburst" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
+      {/* Pink background — fades in on hover (canvas is transparent so it shows
+          through behind the floating covers) */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "var(--pink)",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity var(--dur-slow, 420ms) var(--ease, ease)",
+        }}
+      />
 
       {!ready && <Loader size={28} />}
 
@@ -185,9 +222,9 @@ function AlbumRowInner({
         style={{ position: "absolute", inset: 0 }}
       >
         <LiveResize />
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[-4, 4, 6]} intensity={1.25} />
-        <directionalLight position={[5, -2, 3]} intensity={0.4} />
+        <ambientLight intensity={0.85} />
+        <directionalLight position={[-4, 4, 6]} intensity={0.55} />
+        <directionalLight position={[5, -2, 3]} intensity={0.18} />
         <Suspense fallback={null}>
           <Environment preset="studio" />
           <Panels images={images} hovered={hovered} onReady={() => setReady(true)} />

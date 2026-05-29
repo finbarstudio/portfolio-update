@@ -397,7 +397,7 @@ export const projects: Project[] = [
       images: [
         "/images/joe-devine/albums/baby-steps.webp",
         "/images/joe-devine/albums/giant-leap.webp",
-        "/images/joe-devine/albums/collage.webp",
+        "/images/joe-devine/albums/a-perfect-contrast.webp",
         "/images/joe-devine/albums/one-foot-forward.webp",
         "/images/joe-devine/albums/too-far-gone.webp",
       ],
