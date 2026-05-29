@@ -210,6 +210,22 @@
   to { transform: rotate(360deg); }
 }
 
+/* Sidebar expand — entrance for the revealed content. */
+@keyframes nav-reveal-x {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes nav-reveal-y {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Social icons unfold from the vertical rail into the horizontal row: each
+   drops in from above + scales up, staggered left-to-right. */
+@keyframes social-unfold {
+  from { opacity: 0; transform: translateY(-12px) scale(0.5); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
@@ -639,6 +655,14 @@
   }
   .nav-sub:hover { color: var(--pink); background: var(--surface-sunken); }
   .nav-sub.active { color: var(--pink); font-weight: 600; }
+
+  /* Entrance helpers for the expanded-sidebar content (delays set inline). */
+  .reveal-x { animation: nav-reveal-x 0.42s var(--ease) both; }
+  .reveal-y { animation: nav-reveal-y 0.42s var(--ease) both; }
+  .reveal-social { animation: social-unfold 0.45s var(--ease) both; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-x, .reveal-y, .reveal-social { animation: none; }
+  }
 
   /* Terminal prompt, used in hero */
   .terminal-line {

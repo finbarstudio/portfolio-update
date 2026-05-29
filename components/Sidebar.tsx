@@ -186,7 +186,8 @@ function DesktopSidebar({
           <nav className="flex-1 overflow-y-auto px-2 py-3 flex flex-col gap-0.5" aria-label="Primary">
             <Link
               href="/"
-              className={`nav-item ${isHome ? "active" : ""}`}
+              className={`nav-item reveal-x ${isHome ? "active" : ""}`}
+              style={{ animationDelay: "0.04s" }}
               aria-current={isHome ? "page" : undefined}
             >
               Home
@@ -196,7 +197,8 @@ function DesktopSidebar({
             <button
               type="button"
               onClick={() => setWorkOpen((v) => !v)}
-              className={`nav-item ${isWork ? "active" : ""}`}
+              className={`nav-item reveal-x ${isWork ? "active" : ""}`}
+              style={{ animationDelay: "0.09s" }}
               aria-expanded={workOpen}
             >
               <span className="flex-1 text-left">Work</span>
@@ -232,7 +234,8 @@ function DesktopSidebar({
 
             <Link
               href="/about"
-              className={`nav-item ${isAbout ? "active" : ""}`}
+              className={`nav-item reveal-x ${isAbout ? "active" : ""}`}
+              style={{ animationDelay: "0.14s" }}
               aria-current={isAbout ? "page" : undefined}
             >
               About
@@ -240,7 +243,8 @@ function DesktopSidebar({
 
             <Link
               href="/contact"
-              className={`nav-item ${isContact ? "active" : ""}`}
+              className={`nav-item reveal-x ${isContact ? "active" : ""}`}
+              style={{ animationDelay: "0.19s" }}
               aria-current={isContact ? "page" : undefined}
             >
               Contact
@@ -249,33 +253,34 @@ function DesktopSidebar({
 
           {/* Status / contact / socials */}
           <div className="px-3 pb-3 space-y-2 border-t border-line pt-3">
-            <span className="status-badge">OPEN FOR WORK</span>
+            <span className="status-badge reveal-y" style={{ animationDelay: "0.18s" }}>OPEN FOR WORK</span>
 
             <a
               href="mailto:finbar@finbar.studio"
-              className="block font-sans text-ink hover:text-pink transition-colors"
-              style={{ fontSize: "12px", letterSpacing: "0.02em" }}
+              className="block font-sans text-ink hover:text-pink transition-colors reveal-y"
+              style={{ fontSize: "12px", letterSpacing: "0.02em", animationDelay: "0.22s" }}
             >
               finbar@finbar.studio
             </a>
 
             <a
               href="tel:+61412796630"
-              className="block font-sans text-ink-soft hover:text-pink transition-colors tabular-nums"
-              style={{ fontSize: "11px", letterSpacing: "0.02em" }}
+              className="block font-sans text-ink-soft hover:text-pink transition-colors tabular-nums reveal-y"
+              style={{ fontSize: "11px", letterSpacing: "0.02em", animationDelay: "0.26s" }}
             >
               +61 412 796 630
             </a>
 
             <div className="flex items-center gap-3 pt-1">
-              {socials.map((s) => (
+              {socials.map((s, i) => (
                 <a
                   key={s.href}
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="text-ink-soft hover:text-pink transition-colors"
+                  className="text-ink-soft hover:text-pink transition-colors reveal-social"
+                  style={{ animationDelay: `${0.3 + i * 0.06}s` }}
                 >
                   {s.icon}
                 </a>
