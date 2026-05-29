@@ -40,23 +40,6 @@ function TagRow({ project }: { project: Project }) {
   );
 }
 
-/* ─── Client logo (if present) ───────────────────────────── */
-function CardLogo({ project }: { project: Project }) {
-  if (!project.logo) return null;
-  return (
-    <div className="mb-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={project.logo}
-        alt=""
-        aria-hidden="true"
-        style={{ height: 18, width: "auto", objectFit: "contain", display: "block" }}
-      />
-    </div>
-  );
-}
-
-
 /* ─── Featured card (full-width) ─────────────────────────── */
 export function FeaturedCard({ project, index }: { project: Project; index: number }) {
   return (
@@ -104,7 +87,6 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         </div>
 
         <div className="pb-8">
-          <CardLogo project={project} />
           <div className="flex items-start justify-between gap-4 mb-3">
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
               {project.name}
@@ -162,7 +144,6 @@ export function FullCard({ project, index }: { project: Project; index: number }
         </div>
 
         <div className="pb-6">
-          <CardLogo project={project} />
           <div className="flex items-start justify-between gap-3 mb-2.5">
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">
               {project.name}
@@ -189,7 +170,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
   return (
     <article
       className="card-animate col-span-12 sm:col-span-6 group relative"
-      style={{ animationDelay: `${index * 0.07}s`, height: "52vh", display: "flex", flexDirection: "column" }}
+      style={{ animationDelay: `${index * 0.07}s`, height: "60vh", display: "flex", flexDirection: "column" }}
     >
       <Link
         href={`/case-studies/${project.slug}`}
@@ -217,14 +198,13 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
           )}
         </div>
 
-        <div className="pb-5">
-          <CardLogo project={project} />
-          <div className="flex items-start justify-between gap-3 mb-2">
-            <h2 className="mono-label text-ink group-hover:text-pink transition-colors">{project.name}</h2>
-            <span className="mono-label text-ink-soft whitespace-nowrap" style={{ fontSize: "0.5625rem" }}>{project.date}</span>
+        <div className="pb-6">
+          <div className="flex items-start justify-between gap-3 mb-2.5">
+            <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">{project.name}</h2>
+            <span className="mono-label text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
           </div>
           <div className="hover-reveal">
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <TagRow project={project} />
               {project.liveUrl && (
                 <span className="mono-label text-teal block" style={{ fontSize: "0.625rem" }}>
