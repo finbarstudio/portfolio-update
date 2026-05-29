@@ -84,6 +84,10 @@ function Panels({
   const fitRef = useRef<THREE.Group>(null);
   const panelRefs = useRef<(THREE.Group | null)[]>([]);
   const hoverAmt = useRef(0);
+  // Per-album pointer hover: which index the cursor is over, and an eased
+  // per-album amount so the hovered cover gives a slight reaction.
+  const overIndex = useRef<number | null>(null);
+  const overAmts = useRef<number[]>(images.map(() => 0));
 
   const n = images.length;
   const baseRowW = (n - 1) * SPACING + PANEL;
@@ -128,8 +132,19 @@ function Panels({
       const g = panelRefs.current[i];
       if (!g) continue;
       const m = MOTION[i % MOTION.length];
-      g.rotation.y = m.baseX + Math.sin(t * m.freqY + m.phY) * m.ampY * boost;
-      g.rotation.x = m.baseY + Math.cos(t * m.freqX + m.phX) * m.ampX * boost;
+
+      // Per-album hover reaction: the cover under the cursor eases forward +
+      // up a touch, scales slightly, and steadies toward facing the camera.
+      const oa = overAmts.current;
+      oa[i] += ((overIndex.current === i ? 1 : 0) - oa[i]) * 0.14;
+      const a = oa[i];
+      const sway = 1 - a * 0.55; // hovered cover settles square-on
+
+      g.rotation.y = m.baseX + Math.sin(t * m.freqY + m.phY) * m.ampY * boost * sway;
+      g.rotation.x = m.baseY + Math.cos(t * m.freqX + m.phX) * m.ampX * boost * sway;
+      g.position.z = a * 0.28;   // lift toward camera
+      g.position.y = a * 0.05;   // tiny rise
+      g.scale.setScalar(1 + a * 0.07);
     }
   });
 
@@ -139,16 +154,20 @@ function Panels({
         const x = (i - (n - 1) / 2) * SPACING;
         return (
           <group key={img} position={[x, 0, 0]}>
-            {/* Static soft shadow (doesn't skew with the cover) */}
+            {/* Static soft shadow (doesn't skew with the cover). raycast off so
+                its halo never steals pointer events from the covers. */}
             {shadowTex && (
-              <mesh position={[0.02, -0.05, -0.08]}>
+              <mesh position={[0.02, -0.05, -0.08]} raycast={() => null}>
                 <planeGeometry args={[PANEL * 1.5, PANEL * 1.5]} />
                 <meshBasicMaterial map={shadowTex} transparent depthWrite={false} toneMapped={false} />
               </mesh>
             )}
             {/* The cover — skews around its own centre to catch the light */}
             <group ref={(el) => { panelRefs.current[i] = el; }}>
-              <mesh>
+              <mesh
+                onPointerOver={(e) => { e.stopPropagation(); overIndex.current = i; }}
+                onPointerOut={() => { if (overIndex.current === i) overIndex.current = null; }}
+              >
                 <planeGeometry args={[PANEL, PANEL]} />
                 <meshPhysicalMaterial
                   map={textures[i]}
