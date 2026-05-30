@@ -22,6 +22,7 @@ export interface ProjectImage {
   caption?: string;
   alt: string;
   video?: string;     // WebM path. If set, renders as a looping video.
+  aspectRatio?: string; // Override the default 16/9 frame (e.g. "1/1" for square covers).
 }
 
 export interface DepthSection {
@@ -404,29 +405,34 @@ export const projects: Project[] = [
     },
     images: [
       {
-        src: "/images/joe-devine/cover-1.png",
-        caption: "Single 1: the anchor of the series, establishing the photographic and typographic language.",
-        alt: "Joe Devine single cover artwork, first release establishing the visual series identity",
+        src: "/images/joe-devine/albums/baby-steps-large.webp",
+        caption: "Baby Steps",
+        alt: "Joe Devine — Baby Steps single cover artwork",
+        aspectRatio: "1/1",
       },
       {
-        src: "/images/joe-devine/cover-2.png",
-        caption: "Single 2: warm colour treatment, same compositional logic as single 1.",
-        alt: "Joe Devine single cover artwork, second release with warm colour treatment",
+        src: "/images/joe-devine/albums/giant-leap-large.webp",
+        caption: "Giant Leap",
+        alt: "Joe Devine — Giant Leap single cover artwork",
+        aspectRatio: "1/1",
       },
       {
-        src: "/images/joe-devine/cover-3.png",
-        caption: "Single 3: distinct palette, the series visual grammar held steady.",
-        alt: "Joe Devine single cover artwork, third release with distinct colour palette",
+        src: "/images/joe-devine/albums/a-perfect-contrast-large.webp",
+        caption: "A Perfect Contrast",
+        alt: "Joe Devine — A Perfect Contrast single cover artwork",
+        aspectRatio: "1/1",
       },
       {
-        src: "/images/joe-devine/cover-4.png",
-        caption: "Single 4: a colour shift, same compositional and typographic framework.",
-        alt: "Joe Devine single cover artwork, fourth release maintaining series typographic framework",
+        src: "/images/joe-devine/albums/one-foot-forward-large.webp",
+        caption: "One Foot Forward",
+        alt: "Joe Devine — One Foot Forward single cover artwork",
+        aspectRatio: "1/1",
       },
       {
-        src: "/images/joe-devine/cover-5.png",
-        caption: "Single 5: end of the series. All five covers read as a complete set together.",
-        alt: "Joe Devine single cover artwork, fifth and final release completing the visual series",
+        src: "/images/joe-devine/albums/too-far-gone-large.webp",
+        caption: "Too Far Gone",
+        alt: "Joe Devine — Too Far Gone single cover artwork",
+        aspectRatio: "1/1",
       },
     ],
     hasDepth: false,

@@ -123,7 +123,14 @@ function CaseMedia({ img, halfWidth = false }: { img: ProjectImage; halfWidth?: 
       </div>
     );
   }
-  return <CaseImage src={img.src} alt={img.alt} halfWidth={halfWidth} />;
+  return (
+    <CaseImage
+      src={img.src}
+      alt={img.alt}
+      halfWidth={halfWidth}
+      aspectRatio={img.aspectRatio ?? "16/9"}
+    />
+  );
 }
 
 /* ─── Summary block ────────────────────────────────────────── */
