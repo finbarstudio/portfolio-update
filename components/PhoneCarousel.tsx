@@ -466,21 +466,6 @@ function PhoneCarouselInner({
       {/* Soft pink wash on hover, behind the canvas */}
       <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
-      {/* Edge fade — masks phones entering/exiting on both sides. Two layers
-          crossfade so the edges match the bg (off-white) at rest and the light
-          pink wash on hover. */}
-      <div aria-hidden="true" style={{
-        position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none",
-        background: "linear-gradient(to right, var(--color-bg, #FAFAF8) 0%, transparent 5%, transparent 95%, var(--color-bg, #FAFAF8) 100%)",
-        opacity: hovered ? 0 : 1,
-        transition: "opacity var(--dur-slow) var(--ease)",
-      }} />
-      <div aria-hidden="true" style={{
-        position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none",
-        background: "linear-gradient(to right, #FFE9F4 0%, transparent 5%, transparent 95%, #FFE9F4 100%)",
-        opacity: hovered ? 1 : 0,
-        transition: "opacity var(--dur-slow) var(--ease)",
-      }} />
       {!ready && <Loader size={28} />}
 
       <Canvas

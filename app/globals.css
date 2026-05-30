@@ -644,7 +644,13 @@
     transition: transform var(--dur) var(--ease), opacity 0.3s var(--ease);
   }
 
-  /* Collapsed rail: show the icon (centred over the row), hide labels/extras. */
+  /* Collapsed rail: rows shrink to a centred square so the hover/active pill
+     wraps the icon tightly (instead of a full-width strip). Icon centred. */
+  .side-nav.is-collapsed { align-items: center; }
+  .side-nav.is-collapsed .nav-row {
+    width: 34px;
+    padding: 0;
+  }
   .side-nav.is-collapsed .nav-ico { opacity: 1; }
   .side-nav.is-collapsed .nav-label {
     opacity: 0;
