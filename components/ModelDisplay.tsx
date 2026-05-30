@@ -112,6 +112,25 @@ function DisplayModel({ modelUrl, videoTexture }: DisplayModelProps) {
   return <primitive object={root} />;
 }
 
+/* ── Scene-background fade ────────────────────────────────────
+   The Mac model's clearcoat reflections vary the canvas alpha around its edges
+   each frame, which made an HTML pink div behind the canvas appear to pulse as
+   the transparent area fluctuated. Painting the bg into `scene.background`
+   instead makes the canvas itself opaque — no transparent areas, no pulse. */
+function BgFade({ hovered }: { hovered: boolean }) {
+  const scene = useThree((s) => s.scene);
+  const bg = useMemo(() => new THREE.Color("#FAFAF8"), []);
+  const pink = useMemo(() => new THREE.Color("#FFE9F4"), []); // pink 10% in white
+  const cur = useMemo(() => new THREE.Color("#FAFAF8"), []);
+  const amt = useRef(0);
+  useFrame(() => {
+    amt.current += ((hovered ? 1 : 0) - amt.current) * 0.07;
+    cur.copy(bg).lerp(pink, amt.current);
+    scene.background = cur;
+  });
+  return null;
+}
+
 /* ── Real-time resize ──────────────────────────────────────────
    r3f only resizes the render buffer + camera when its ResizeObserver
    fires, which lands after a CSS size transition settles — so the model
@@ -294,9 +313,6 @@ function ModelDisplayInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Soft pink wash on hover, behind the canvas */}
-      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
-
       {/* Poster + spinner until first frame is ready */}
       {poster && !ready && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -329,6 +345,7 @@ function ModelDisplayInner({
         style={{ position: "absolute", inset: 0 }}
       >
         <LiveResize />
+        <BgFade hovered={hovered} />
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 8, 5]} intensity={1.1} />
         <directionalLight position={[-4, 3, -2]} intensity={0.4} />
