@@ -520,6 +520,104 @@
   /* Collapsed-sidebar rail buttons — uniform square targets with a soft
      rounded hover/active pill, so every glyph (home, work, about, contact,
      socials) sits on the same rhythm. */
+  /* Testimonial — front-and-central pull quote on a soft pink wash. */
+  .testimonial {
+    background: color-mix(in srgb, var(--pink) 8%, #ffffff);
+    padding: clamp(2.5rem, 7vw, 6rem) clamp(1.25rem, 4vw, 3rem);
+    margin: clamp(2rem, 5vw, 4rem) 0;
+  }
+  .testimonial-inner {
+    max-width: 62ch;
+    margin: 0 auto;
+    position: relative;
+  }
+  .testimonial-mark {
+    position: absolute;
+    top: clamp(-1.5rem, -2vw, -0.75rem);
+    left: clamp(-1rem, -2vw, -0.25rem);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(4rem, 8vw, 7rem);
+    line-height: 1;
+    color: var(--pink);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .testimonial-quote {
+    font-family: var(--font-primary);
+    font-size: clamp(1.15rem, 2.1vw, 1.7rem);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin: 0;
+  }
+  .testimonial-author {
+    display: block;
+    margin-top: clamp(1.25rem, 2vw, 1.75rem);
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-style: normal;
+  }
+
+  /* Deliverables — editorial header + multi-column bulleted grid. */
+  .delivered {
+    padding: clamp(2rem, 5vw, 4rem) 0;
+  }
+  .delivered-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: clamp(1.25rem, 3vw, 2rem);
+  }
+  .delivered-meta {
+    font-family: var(--font-label);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .delivered-title {
+    font-family: var(--font-primary);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 4vw, 2.75rem);
+    line-height: 1;
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .delivered-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    row-gap: clamp(0.5rem, 1vw, 0.85rem);
+  }
+  .delivered-list li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-family: var(--font-primary);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .delivered-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.65em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--pink);
+  }
+
   /* Kinaya showcase — bespoke case-study layout with editorial section headers
      and four distinct content sections. */
   .kinaya-showcase {

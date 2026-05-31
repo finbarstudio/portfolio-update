@@ -6,6 +6,8 @@ import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
 import AlbumShowcase from "@/components/AlbumShowcase";
 import KinayaShowcase from "@/components/KinayaShowcase";
+import Testimonial from "@/components/Testimonial";
+import WhatWasDelivered from "@/components/WhatWasDelivered";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import PDFSlideshow from "@/components/PDFSlideshow";
@@ -427,6 +429,11 @@ export default async function CaseStudyPage({
         </div>
       </header>
 
+      {/* Client testimonial — front and centre, right after the header. */}
+      {project.testimonial && (
+        <Testimonial quote={project.testimonial.quote} author={project.testimonial.author} />
+      )}
+
       {/* Hero + body. heroAlbums uses a bespoke editorial showcase (no mockup,
           no standard image grid). mediaRows handles its own layout. Otherwise
           the standard hero + visual body + depth chain. */}
@@ -487,6 +494,10 @@ export default async function CaseStudyPage({
           title={project.pdfSlideshow.title}
           pages={project.pdfSlideshow.pages}
         />
+      )}
+
+      {project.delivered && project.delivered.length > 0 && (
+        <WhatWasDelivered items={project.delivered} />
       )}
 
       <FooterMeta project={project} />

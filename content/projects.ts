@@ -91,6 +91,14 @@ export interface Project {
     title: string;
     pages: string[];
   };
+
+  /** Client testimonial pulled out as a front-and-centre quote on the case study. */
+  testimonial?: {
+    quote: string;
+    author: string;        // "Name, Company"
+  };
+  /** Flat list of deliverables — rendered as a clean bulleted grid near the meta. */
+  delivered?: string[];
 }
 
 /* PROJECTS, ranked, all tiers */
@@ -162,6 +170,33 @@ export const projects: Project[] = [
     ],
     liveUrl: "https://kinaya.com.au",
     companyUrl: "https://kinaya.com.au",
+    testimonial: {
+      quote:
+        "Finbar was great to work with from start to finish. He took the time to understand what KinAya needed, communicated clearly throughout, and delivered something that felt cohesive — the branding and website genuinely felt like one vision. The accessibility features he suggested, like the text resizer, showed he was thinking beyond just aesthetics. Handover was smooth and we felt confident managing the site ourselves after his walkthrough. Highly recommend.",
+      author: "Aryan Sareen, KinAya",
+    },
+    delivered: [
+      "Six-page Framer website",
+      "Logotype design and kerning",
+      "Auto-advancing hero slideshow",
+      "Shared nav and footer components",
+      "Logomark refinement and development",
+      "Full primary logo (logomark + logotype)",
+      "Custom hover-interactive services component",
+      "All logo deliverables in brand colours, black, and white",
+      "Brand colour system including extended tint and gradient direction",
+      "CMS connected to homes, services, and team sections with detail pages",
+      "FAQ accordion",
+      "Post-launch support",
+      "CMS handover session",
+      "Multiple contact forms",
+      "Mobile-optimised throughout",
+      "Domain connection via GoDaddy",
+      "Foundational SEO and technical setup",
+      "Midjourney image generation with custom style profile",
+      "Gradient map and grain post-processing on all images",
+      "Site-wide text resizer (custom AI-assisted component)",
+    ],
   },
 
   /* 1. TMYR (The Moment You Realise). Featured */
