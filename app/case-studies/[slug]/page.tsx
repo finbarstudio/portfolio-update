@@ -4,7 +4,7 @@ import Script from "next/script";
 import type { Metadata } from "next";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
-import AlbumRow from "@/components/AlbumRow";
+import AlbumShowcase from "@/components/AlbumShowcase";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import PDFSlideshow from "@/components/PDFSlideshow";
@@ -278,9 +278,12 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
 
 /* ─── Footer: Skills | Company | Open for work + clean back link ─── */
 function FooterMeta({ project }: { project: Project }) {
+  const showCompany = Boolean(project.liveUrl || project.companyUrl);
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 py-8 border-t border-line text-center md:text-left">
+      <div
+        className={`grid grid-cols-1 ${showCompany ? "md:grid-cols-3" : "md:grid-cols-2"} gap-10 md:gap-6 py-8 border-t border-line text-center md:text-left`}
+      >
         {/* Col 1: Skills */}
         <div>
           <p className="mono-label text-ink-soft mb-3">SKILLS</p>
@@ -291,39 +294,38 @@ function FooterMeta({ project }: { project: Project }) {
           </div>
         </div>
 
-        {/* Col 2: Company (+ optional live link) */}
-        <div>
-          <p className="mono-label text-ink-soft mb-3">
-            {project.liveUrl && project.companyUrl ? "LINKS" : project.liveUrl ? "LIVE SITE" : "COMPANY"}
-          </p>
-          <div className="space-y-1.5">
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block font-mono text-teal hover:text-pink transition-colors break-words"
-                style={{ fontSize: "var(--text-small)" }}
-              >
-                {project.liveUrl.replace(/^https?:\/\//, "")} ↗
-              </a>
-            )}
-            {project.companyUrl && project.companyUrl !== project.liveUrl && (
-              <a
-                href={project.companyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block font-mono text-teal hover:text-pink transition-colors break-words"
-                style={{ fontSize: "var(--text-small)" }}
-              >
-                {project.companyUrl.replace(/^https?:\/\//, "")} ↗
-              </a>
-            )}
-            {!project.liveUrl && !project.companyUrl && (
-              <span className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>—</span>
-            )}
+        {/* Col 2: Company (+ optional live link). Hidden entirely when no link exists. */}
+        {showCompany && (
+          <div>
+            <p className="mono-label text-ink-soft mb-3">
+              {project.liveUrl && project.companyUrl ? "LINKS" : project.liveUrl ? "LIVE SITE" : "COMPANY"}
+            </p>
+            <div className="space-y-1.5">
+              {project.liveUrl && (
+                <a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block font-mono text-teal hover:text-pink transition-colors break-words"
+                  style={{ fontSize: "var(--text-small)" }}
+                >
+                  {project.liveUrl.replace(/^https?:\/\//, "")} ↗
+                </a>
+              )}
+              {project.companyUrl && project.companyUrl !== project.liveUrl && (
+                <a
+                  href={project.companyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block font-mono text-teal hover:text-pink transition-colors break-words"
+                  style={{ fontSize: "var(--text-small)" }}
+                >
+                  {project.companyUrl.replace(/^https?:\/\//, "")} ↗
+                </a>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Col 3: Open for work */}
         <div>
@@ -424,46 +426,49 @@ export default async function CaseStudyPage({
         </div>
       </header>
 
-      {/* Hero — mediaRows take priority, else 3D model / Spline / looping video / static image */}
-      <div className="mb-8">
-        {project.mediaRows && project.mediaRows.length > 0 ? (
-          <MediaRows rows={project.mediaRows} />
-        ) : project.heroAlbums ? (
-          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
-            <AlbumRow images={project.heroAlbums.images} fill hoverable={false} />
-          </div>
-        ) : project.heroModel ? (
-          <ModelDisplay
-            model={project.heroModel.model}
-            video={project.heroModel.video}
-            poster={project.heroModel.poster}
-            aspectRatio="16/9"
-          />
-        ) : project.heroSpline ? (
-          <SplineScene scene={project.heroSpline} />
-        ) : project.heroVideo ? (
-          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>
-            <VideoPlayer src={project.heroVideo} poster={project.heroImage.src} />
-          </div>
-        ) : (
-          <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>
-            <ClientImage
-              src={project.heroImage.src}
-              alt={project.heroImage.alt}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
-              className="object-contain"
-            />
-          </div>
-        )}
-      </div>
-
-      <SummaryBlock project={project} />
-
-      {/* When mediaRows is acting as hero, nothing else below the text. */}
-      {!(project.mediaRows && project.mediaRows.length > 0) && (
+      {/* Hero + body. heroAlbums uses a bespoke editorial showcase (no mockup,
+          no standard image grid). mediaRows handles its own layout. Otherwise
+          the standard hero + visual body + depth chain. */}
+      {project.heroAlbums ? (
         <>
+          <AlbumShowcase images={project.images.map(({ src, alt }) => ({ src, alt }))} />
+          <SummaryBlock project={project} />
+        </>
+      ) : project.mediaRows && project.mediaRows.length > 0 ? (
+        <>
+          <div className="mb-8"><MediaRows rows={project.mediaRows} /></div>
+          <SummaryBlock project={project} />
+        </>
+      ) : (
+        <>
+          <div className="mb-8">
+            {project.heroModel ? (
+              <ModelDisplay
+                model={project.heroModel.model}
+                video={project.heroModel.video}
+                poster={project.heroModel.poster}
+                aspectRatio="16/9"
+              />
+            ) : project.heroSpline ? (
+              <SplineScene scene={project.heroSpline} />
+            ) : project.heroVideo ? (
+              <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>
+                <VideoPlayer src={project.heroVideo} poster={project.heroImage.src} />
+              </div>
+            ) : (
+              <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>
+                <ClientImage
+                  src={project.heroImage.src}
+                  alt={project.heroImage.alt}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
+                  className="object-contain"
+                />
+              </div>
+            )}
+          </div>
+          <SummaryBlock project={project} />
           <VisualBody project={project} />
           {project.hasDepth && project.depth && project.depth.length > 0 && (
             <DepthSections sections={project.depth} />
