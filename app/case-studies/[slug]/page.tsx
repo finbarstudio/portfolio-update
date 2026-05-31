@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
 import AlbumShowcase from "@/components/AlbumShowcase";
+import KinayaShowcase from "@/components/KinayaShowcase";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import PDFSlideshow from "@/components/PDFSlideshow";
@@ -429,7 +430,12 @@ export default async function CaseStudyPage({
       {/* Hero + body. heroAlbums uses a bespoke editorial showcase (no mockup,
           no standard image grid). mediaRows handles its own layout. Otherwise
           the standard hero + visual body + depth chain. */}
-      {project.heroAlbums ? (
+      {project.slug === "kinaya" ? (
+        <>
+          <SummaryBlock project={project} />
+          <KinayaShowcase />
+        </>
+      ) : project.heroAlbums ? (
         <>
           <AlbumShowcase images={project.images.map(({ src, alt }) => ({ src, alt }))} />
           <SummaryBlock project={project} />
