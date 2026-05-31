@@ -1,11 +1,10 @@
 "use client";
 
 /**
- * AlbumShowcase — an editorial display of square cover artwork. Each cover sits
- * on its own row at a different width and offset, so they read as a deliberate
- * composition rather than a uniform grid. No captions or text. Subtle hover
- * lift on each tile. Falls back to a single-column stack on mobile (and for any
- * count other than 5).
+ * AlbumShowcase — a slow horizontal marquee of the album covers. Covers scroll
+ * continuously, multiple in view at once, with edge-faded mask so they melt
+ * into the page. Pauses on hover; per-cover hover lift for detail. The list is
+ * doubled so the loop is seamless.
  */
 
 import ClientImage from "./ClientImage";
@@ -13,19 +12,24 @@ import ClientImage from "./ClientImage";
 type Img = { src: string; alt: string };
 
 export default function AlbumShowcase({ images }: { images: Img[] }) {
+  // Double the list so translateX(-50%) lands the second copy exactly where the
+  // first started — seamless infinite loop with pure CSS.
+  const loop = [...images, ...images];
   return (
-    <div className="album-showcase">
-      {images.map((img, i) => (
-        <div key={img.src} className={`album-tile album-tile-${i + 1}`}>
-          <ClientImage
-            src={img.src}
-            alt={img.alt}
-            fill
-            sizes="(max-width: 768px) 100vw, 70vw"
-            className="object-cover"
-          />
-        </div>
-      ))}
+    <div className="album-marquee" aria-label="Album cover showcase">
+      <div className="album-track">
+        {loop.map((img, i) => (
+          <div key={i} className="album-card" aria-hidden={i >= images.length}>
+            <ClientImage
+              src={img.src}
+              alt={img.alt}
+              fill
+              sizes="(max-width: 768px) 70vw, 42vh"
+              className="object-cover"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
