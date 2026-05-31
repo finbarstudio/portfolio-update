@@ -284,6 +284,9 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
 
   // One group ref per phone for cheap per-frame position/rotation/scale updates.
   const phoneGroups = useRef<(THREE.Group | null)[]>(new Array(NUM_PHONES).fill(null));
+  // Cached screen mesh per phone — used to fade the screen through black at the
+  // video loop boundary so the snap-back to frame 1 doesn't read as a jump.
+  const screenMeshes = useRef<(THREE.Mesh | null)[]>(new Array(NUM_PHONES).fill(null));
   const offsetRef = useRef(0);
   const hoverProgressRef = useRef(0);
 
@@ -358,6 +361,30 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
           if (!vid.paused) vid.pause();
           if (vid.getAttribute("src")) { vid.removeAttribute("src"); vid.load(); }
         }
+      }
+
+      // Crossfade-through-black at loop boundaries — hides the snap when the
+      // looping video restarts. Lazily caches the screen mesh per phone.
+      if (!screenMeshes.current[i] && phone) {
+        phone.traverse((obj) => {
+          if (obj instanceof THREE.Mesh && obj.name === "screen-Mesh_1") {
+            screenMeshes.current[i] = obj;
+          }
+        });
+      }
+      const screen = screenMeshes.current[i];
+      if (screen && vid && vid.readyState >= 2) {
+        const dur = vid.duration;
+        const ct = vid.currentTime;
+        const FADE = 0.22; // seconds of fade in/out at each loop boundary
+        let b = 1;
+        if (Number.isFinite(dur) && dur > 0) {
+          if (ct < FADE) b = ct / FADE;                // fade in from black
+          else if (ct > dur - FADE) b = (dur - ct) / FADE; // fade out to black
+        }
+        b = Math.max(0, Math.min(1, b));
+        const mat = screen.material as THREE.MeshBasicMaterial;
+        if (mat && mat.color) mat.color.setRGB(b, b, b);
       }
     }
   });

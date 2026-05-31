@@ -37,7 +37,6 @@ const LOGO_DEV = [
   "/images/kinaya/Logo%20Development/Asset%2030.png",
   "/images/kinaya/Logo%20Development/Asset%2031.png",
   "/images/kinaya/Logo%20Development/Asset%2032.png",
-  "/images/kinaya/Logo%20Development/Asset%2034.png",
   "/images/kinaya/Logo%20Development/Asset%2035.png",
   "/images/kinaya/Logo%20Development/Asset%2037.png",
   "/images/kinaya/Logo%20Development/Asset%2038.png",
@@ -65,7 +64,10 @@ export default function KinayaShowcase() {
       {/* 01 — Logo Development */}
       <section className="kinaya-section">
         <SectionHeader index={1} total={TOTAL} name="Logo Development" />
-        <div className="kinaya-logo-dev">
+        <div
+          className="kinaya-logo-dev"
+          style={{ gridTemplateColumns: `repeat(${LOGO_DEV.length}, 1fr)` }}
+        >
           {LOGO_DEV.map((src) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img key={src} src={src} alt="" aria-hidden="true" />
