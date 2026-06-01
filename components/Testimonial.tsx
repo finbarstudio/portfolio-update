@@ -10,9 +10,8 @@ export default function Testimonial({
   author: string;
 }) {
   return (
-    <section className="testimonial" aria-label="Client testimonial">
+    <section className="testimonial -mx-5 md:-mx-10" aria-label="Client testimonial">
       <div className="testimonial-inner">
-        <span className="testimonial-mark" aria-hidden="true">&ldquo;</span>
         <blockquote className="testimonial-quote">{quote}</blockquote>
         <cite className="testimonial-author">— {author}</cite>
       </div>

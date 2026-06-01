@@ -520,26 +520,32 @@
   /* Collapsed-sidebar rail buttons — uniform square targets with a soft
      rounded hover/active pill, so every glyph (home, work, about, contact,
      socials) sits on the same rhythm. */
-  /* Testimonial — left-aligned, integrated with the project info block. */
+  /* Testimonial — wider feature block that breaks out beyond the article
+     padding, sits above the other bottom info. Soft pink wash with a pink
+     accent rule on the left so it stands apart without shouting. */
   .testimonial {
-    padding: clamp(1.5rem, 3vw, 2.25rem) 0;
+    padding: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 4vw, 3rem);
+    margin-top: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+    background: color-mix(in srgb, var(--pink) 8%, #ffffff);
+    border-left: 3px solid var(--pink);
   }
   .testimonial-inner {
-    max-width: 64ch;
+    max-width: 78ch;
     text-align: left;
   }
-  .testimonial-mark { display: none; }
   .testimonial-quote {
     font-family: var(--font-primary);
-    font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
     color: var(--ink);
     margin: 0;
   }
   .testimonial-author {
     display: block;
-    margin-top: clamp(0.85rem, 1.5vw, 1.1rem);
+    margin-top: clamp(1rem, 2vw, 1.4rem);
     font-family: var(--font-label);
     font-size: 11px;
     font-weight: 700;

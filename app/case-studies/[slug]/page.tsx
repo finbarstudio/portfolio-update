@@ -488,17 +488,17 @@ export default async function CaseStudyPage({
         />
       )}
 
+      {/* Bottom info block — testimonial first (as a distinct, wider feature),
+          then the supporting info: deliverables and (for kinaya) project facts. */}
+      {project.testimonial && (
+        <Testimonial quote={project.testimonial.quote} author={project.testimonial.author} />
+      )}
+
       {project.delivered && project.delivered.length > 0 && (
         <WhatWasDelivered items={project.delivered} />
       )}
 
-      {/* For kinaya, role/problem/outcome live at the bottom alongside the
-          testimonial — surfacing the visuals first. */}
       {project.slug === "kinaya" && <SummaryBlock project={project} />}
-
-      {project.testimonial && (
-        <Testimonial quote={project.testimonial.quote} author={project.testimonial.author} />
-      )}
 
       <FooterMeta project={project} />
     </article>
