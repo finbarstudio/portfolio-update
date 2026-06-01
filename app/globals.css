@@ -520,26 +520,15 @@
   /* Collapsed-sidebar rail buttons — uniform square targets with a soft
      rounded hover/active pill, so every glyph (home, work, about, contact,
      socials) sits on the same rhythm. */
-  /* Testimonial — quietly integrated pull quote, centred. */
+  /* Testimonial — left-aligned, integrated with the project info block. */
   .testimonial {
-    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2rem);
-    margin: clamp(1.5rem, 3vw, 2.5rem) 0;
+    padding: clamp(1.5rem, 3vw, 2.25rem) 0;
   }
   .testimonial-inner {
-    max-width: 56ch;
-    margin: 0 auto;
-    text-align: center;
-    position: relative;
+    max-width: 64ch;
+    text-align: left;
   }
-  .testimonial-mark {
-    display: block;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(2rem, 3vw, 2.6rem);
-    line-height: 0.6;
-    color: var(--pink);
-    margin-bottom: 0.5rem;
-    pointer-events: none;
-  }
+  .testimonial-mark { display: none; }
   .testimonial-quote {
     font-family: var(--font-primary);
     font-size: clamp(0.95rem, 1.2vw, 1.05rem);
@@ -560,17 +549,18 @@
     font-style: normal;
   }
 
-  /* Deliverables — centred single column, plenty of breathing room. */
+  /* Deliverables — left-aligned 3-column block, sits with the rest of the
+     project info at the bottom of the case study. */
   .delivered {
-    padding: clamp(2.5rem, 6vw, 4.5rem) 0;
-    text-align: center;
+    padding: clamp(2rem, 4vw, 3rem) 0;
+    text-align: left;
   }
   .delivered-header {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.65rem;
-    margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
   }
   .delivered-meta {
     font-family: var(--font-label);
@@ -592,22 +582,24 @@
   .delivered-list {
     list-style: none;
     padding: 0;
-    margin: 0 auto;
-    max-width: 64ch;
-    column-count: 2;
+    margin: 0;
+    column-count: 3;
     column-gap: clamp(1.5rem, 3vw, 2.5rem);
     text-align: left;
   }
   .delivered-list li {
     break-inside: avoid;
     font-family: var(--font-primary);
-    font-size: var(--text-body);
+    font-size: var(--text-small);
     line-height: 1.45;
     color: var(--ink);
-    margin-bottom: clamp(0.55rem, 0.9vw, 0.85rem);
+    margin-bottom: clamp(0.55rem, 0.9vw, 0.8rem);
   }
-  @media (max-width: 640px) {
-    .delivered-list { column-count: 1; max-width: 36ch; }
+  @media (max-width: 900px) {
+    .delivered-list { column-count: 2; }
+  }
+  @media (max-width: 560px) {
+    .delivered-list { column-count: 1; }
   }
 
   /* Kinaya showcase — bespoke case-study layout with editorial section headers

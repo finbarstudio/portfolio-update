@@ -144,9 +144,9 @@ function SummaryBlock({ project }: { project: Project }) {
     { label: "OUTCOME", value: project.outcome },
   ];
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 py-10 md:py-14 text-center md:text-left">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 py-10 md:py-14 text-left">
       {items.map(({ label, value }) => (
-        <div key={label} className="max-w-prose mx-auto md:mx-0">
+        <div key={label} className="max-w-prose">
           <p className="mono-label text-ink-soft mb-2">{label}</p>
           <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{value}</p>
         </div>
