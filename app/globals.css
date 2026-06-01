@@ -593,16 +593,21 @@
     list-style: none;
     padding: 0;
     margin: 0 auto;
-    max-width: 36ch;
-    display: flex;
-    flex-direction: column;
-    gap: clamp(0.65rem, 1vw, 0.95rem);
+    max-width: 64ch;
+    column-count: 2;
+    column-gap: clamp(1.5rem, 3vw, 2.5rem);
+    text-align: left;
   }
   .delivered-list li {
+    break-inside: avoid;
     font-family: var(--font-primary);
     font-size: var(--text-body);
     line-height: 1.45;
     color: var(--ink);
+    margin-bottom: clamp(0.55rem, 0.9vw, 0.85rem);
+  }
+  @media (max-width: 640px) {
+    .delivered-list { column-count: 1; max-width: 36ch; }
   }
 
   /* Kinaya showcase — bespoke case-study layout with editorial section headers

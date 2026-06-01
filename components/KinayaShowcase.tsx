@@ -20,13 +20,10 @@ const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ),
 });
 
-/* ── Editorial section header ─────────────────────────────── */
-function SectionHeader({ index, total, name }: { index: number; total: number; name: string }) {
+/* ── Section header ──────────────────────────────────────── */
+function SectionHeader({ name }: { name: string }) {
   return (
     <header className="kinaya-section-header">
-      <span className="kinaya-section-index">
-        {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
-      </span>
       <h2 className="kinaya-section-name">{name}</h2>
     </header>
   );
@@ -56,14 +53,13 @@ const FINAL_ALTERNATES = [
   "/images/kinaya/Final%20Logos/Logo%20Lightest%20Pink.svg",
 ];
 
-const TOTAL = 4;
 
 export default function KinayaShowcase() {
   return (
     <div className="kinaya-showcase">
       {/* 01 — Logo Development */}
       <section className="kinaya-section">
-        <SectionHeader index={1} total={TOTAL} name="Logo Development" />
+        <SectionHeader name="Logo Development" />
         <div
           className="kinaya-logo-dev"
           style={{ gridTemplateColumns: `repeat(${LOGO_DEV.length}, 1fr)` }}
@@ -77,7 +73,7 @@ export default function KinayaShowcase() {
 
       {/* 02 — Colour Palette */}
       <section className="kinaya-section">
-        <SectionHeader index={2} total={TOTAL} name="Colour Palette" />
+        <SectionHeader name="Colour Palette" />
         <div className="kinaya-palette">
           {PALETTE.map((c) => (
             <div
@@ -93,7 +89,7 @@ export default function KinayaShowcase() {
 
       {/* 03 — Final Identity */}
       <section className="kinaya-section">
-        <SectionHeader index={3} total={TOTAL} name="Final Identity" />
+        <SectionHeader name="Final Identity" />
         <div className="kinaya-final">
           <div className="kinaya-final-main">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -110,7 +106,7 @@ export default function KinayaShowcase() {
 
       {/* 04 — Website */}
       <section className="kinaya-section">
-        <SectionHeader index={4} total={TOTAL} name="Website" />
+        <SectionHeader name="Website" />
         <div className="kinaya-website">
           <p className="kinaya-website-body">
             Six-page Framer site, built for handover. CMS collections drive the

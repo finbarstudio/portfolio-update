@@ -429,19 +429,11 @@ export default async function CaseStudyPage({
         </div>
       </header>
 
-      {/* Client testimonial — front and centre, right after the header. */}
-      {project.testimonial && (
-        <Testimonial quote={project.testimonial.quote} author={project.testimonial.author} />
-      )}
-
       {/* Hero + body. heroAlbums uses a bespoke editorial showcase (no mockup,
           no standard image grid). mediaRows handles its own layout. Otherwise
           the standard hero + visual body + depth chain. */}
       {project.slug === "kinaya" ? (
-        <>
-          <SummaryBlock project={project} />
-          <KinayaShowcase />
-        </>
+        <KinayaShowcase />
       ) : project.heroAlbums ? (
         <>
           <AlbumShowcase images={project.images.map(({ src, alt }) => ({ src, alt }))} />
@@ -498,6 +490,14 @@ export default async function CaseStudyPage({
 
       {project.delivered && project.delivered.length > 0 && (
         <WhatWasDelivered items={project.delivered} />
+      )}
+
+      {/* For kinaya, role/problem/outcome live at the bottom alongside the
+          testimonial — surfacing the visuals first. */}
+      {project.slug === "kinaya" && <SummaryBlock project={project} />}
+
+      {project.testimonial && (
+        <Testimonial quote={project.testimonial.quote} author={project.testimonial.author} />
       )}
 
       <FooterMeta project={project} />

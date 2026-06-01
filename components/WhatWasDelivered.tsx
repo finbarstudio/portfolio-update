@@ -8,9 +8,6 @@ export default function WhatWasDelivered({ items }: { items: string[] }) {
   return (
     <section className="delivered" aria-label="What was delivered">
       <header className="delivered-header">
-        <span className="delivered-meta">
-          DELIVERABLES &nbsp;/&nbsp; {String(items.length).padStart(2, "0")}
-        </span>
         <h2 className="delivered-title">What was delivered</h2>
       </header>
       <ul className="delivered-list">

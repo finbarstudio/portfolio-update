@@ -296,6 +296,15 @@ function DesktopSidebar({
           >
             +61 412 796 630
           </a>
+
+          <p
+            className="text-ink-soft reveal-y pt-1"
+            style={{ fontSize: "10px", letterSpacing: "0.06em", animationDelay: "0.3s" }}
+          >
+            Made with{" "}
+            <span style={{ color: "var(--pink)" }} aria-hidden="true">♥</span>
+            <span className="sr-only">love</span> by finbar &amp; claude
+          </p>
         </div>
       )}
     </aside>
