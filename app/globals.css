@@ -891,6 +891,10 @@
   }
   /* Icon is absolutely centred over the whole row so it sits exactly in the
      middle of the collapsed rail; hidden when expanded (labels carry the nav). */
+  /* Icons hidden in expanded (labels carry the meaning), visible in collapsed.
+     Each side fades out immediately and fades in delayed, so during the 0.5s
+     rail-width transition they never both flash at the same time in awkward
+     midway positions — kills the mid-transition icon flicker. */
   .nav-ico {
     position: absolute;
     inset: 0;
@@ -899,7 +903,7 @@
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.35s var(--ease);
+    transition: opacity 0.18s var(--ease) 0s;
   }
   .nav-label {
     flex: 1;
@@ -908,37 +912,41 @@
     font-weight: 500;
     letter-spacing: 0.01em;
     opacity: 1;
-    transform: translateX(0);
-    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+    transition: opacity 0.22s var(--ease) 0.32s;
   }
   .nav-count {
     font-size: 10px;
     color: var(--ink-soft);
-    transition: opacity 0.3s var(--ease);
+    transition: opacity 0.22s var(--ease) 0.32s;
   }
   .nav-chevron {
     width: 10px;
     height: 10px;
     color: var(--ink-soft);
     flex-shrink: 0;
-    transition: transform var(--dur) var(--ease), opacity 0.3s var(--ease);
+    transition: transform var(--dur) var(--ease),
+                opacity 0.22s var(--ease) 0.32s;
   }
 
-  /* Collapsed rail: rows shrink to a centred square so the hover/active pill
-     wraps the icon tightly (instead of a full-width strip). Icon centred. */
+  /* Collapsed rail: rows shrink to a centred square pill; icons fade IN (after
+     a delay so the rail is mostly closed first); labels fade OUT immediately. */
   .side-nav.is-collapsed { align-items: center; }
   .side-nav.is-collapsed .nav-row {
     width: 34px;
     padding: 0;
   }
-  .side-nav.is-collapsed .nav-ico { opacity: 1; }
-  .side-nav.is-collapsed .nav-label {
-    opacity: 0;
-    transform: translateX(-4px);
-    pointer-events: none;
+  .side-nav.is-collapsed .nav-ico {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.2s var(--ease) 0.32s;
   }
+  .side-nav.is-collapsed .nav-label,
   .side-nav.is-collapsed .nav-count,
-  .side-nav.is-collapsed .nav-chevron { opacity: 0; pointer-events: none; }
+  .side-nav.is-collapsed .nav-chevron {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s var(--ease) 0s;
+  }
 
   /* Work block — collapses to nothing in the rail, grows in on expand. */
   .nav-work {
