@@ -1,5 +1,37 @@
 import type { Metadata } from "next";
 import ClientImage from "@/components/ClientImage";
+import { projects } from "@/content/projects";
+
+/* ── Testimonials gathered from any project that has one ─────── */
+function AboutTestimonials() {
+  const quotes = projects
+    .filter((p) => p.testimonial)
+    .map((p) => ({ ...p.testimonial!, slug: p.slug }));
+  if (!quotes.length) return null;
+  return (
+    <section className="pt-10 pb-12 border-t border-line" aria-label="Client testimonials">
+      <p className="mono-label text-ink-soft mb-6">Kind words</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+        {quotes.map((q) => (
+          <figure key={q.slug} className="max-w-prose">
+            <blockquote
+              className="font-sans text-ink leading-relaxed"
+              style={{ fontSize: "var(--text-body)", lineHeight: 1.6 }}
+            >
+              &ldquo;{q.quote}&rdquo;
+            </blockquote>
+            <figcaption
+              className="mono-label text-ink-soft mt-4"
+              style={{ fontSize: "11px" }}
+            >
+              — {q.author}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export const metadata: Metadata = {
   title: { absolute: "About | Finbar Skitini | Brisbane Designer" },
@@ -122,6 +154,9 @@ export default function AboutPage() {
           ))}
         </div>
       </div>
+
+      {/* Testimonials — pulled from any project that has one */}
+      <AboutTestimonials />
 
       {/* Contact CTA */}
       <div className="pt-8 border-t border-line">

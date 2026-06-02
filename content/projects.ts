@@ -99,6 +99,16 @@ export interface Project {
   };
   /** Flat list of deliverables — rendered as a clean bulleted grid near the meta. */
   delivered?: string[];
+  /** Measurable outcomes (campaign metrics etc.) — rendered with big highlighted
+   *  numbers and small delta/label beneath. */
+  outcomes?: {
+    intro?: string;
+    subtitle?: string;
+    stats: { value: string; delta?: string; label: string }[];
+    source?: string;
+  };
+  /** Hide from the home grid + sitemap. Detail page still exists if linked. */
+  hidden?: boolean;
 }
 
 /* PROJECTS, ranked, all tiers */
@@ -276,6 +286,17 @@ export const projects: Project[] = [
         alt: "TMYR campaign, 1080x1920 Instagram reel variants for Share to Buy",
       },
     ],
+    outcomes: {
+      intro:
+        "The campaign ran across multiple windows in 2022 and 2023, timed to periods of lower organic search demand — when search interest in shared ownership dropped from peak, paid and social activity picked up the gap.",
+      subtitle: "December 2023 results, year on year",
+      stats: [
+        { value: "3,417", delta: "+19.7% YoY", label: "New registrants" },
+        { value: "1,391,921", delta: "+1.5% YoY", label: "Page views" },
+        { value: "+3.4%", delta: "Year on year", label: "Property enquiries" },
+      ],
+      source: "Similarweb",
+    },
   },
 
   /* 4. Salesmasters. Full */
@@ -487,11 +508,17 @@ export const projects: Project[] = [
       },
     ],
     hasDepth: false,
+    testimonial: {
+      quote:
+        "Finbar nailed the visual language from the first round. Each single ended up with its own colour and feel, but they still read as one set when you line them up. He listened to what each track was about and translated it into the artwork without me having to over-explain. The covers raised the bar for how the releases were received.",
+      author: "Joe Devine, Musician",
+    },
   },
 
   /* 5. Compass Capability. Full */
   {
     slug: "compass-capability",
+    hidden: true,
     name: "Compass Capability",
     tier: "full",
     rank: 5,
@@ -556,6 +583,7 @@ export const projects: Project[] = [
   /* 6. Norths Devils RLFC. Full. CONCEPT */
   {
     slug: "norths-devils",
+    hidden: true,
     name: "Norths Devils RLFC",
     tier: "full",
     rank: 6,
@@ -687,6 +715,7 @@ export const projects: Project[] = [
   /* 8. Lows Design and Build. Full */
   {
     slug: "lows-design-build",
+    hidden: true,
     name: "Lows Design and Build",
     tier: "full",
     rank: 8,
@@ -744,6 +773,7 @@ export const projects: Project[] = [
   /* 9. Nimbus Coffee Co. Full */
   {
     slug: "nimbus-coffee",
+    hidden: true,
     name: "Nimbus Coffee Co.",
     tier: "full",
     rank: 9,
@@ -971,6 +1001,7 @@ export const projects: Project[] = [
   /* 14. Toombul Bulls. Gallery. CONCEPT */
   {
     slug: "toombul-bulls",
+    hidden: true,
     name: "Toombul Bulls",
     tier: "gallery",
     rank: 14,

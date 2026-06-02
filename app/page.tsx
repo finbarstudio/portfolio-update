@@ -6,7 +6,7 @@ import ProjectCard from "@/components/ProjectCard";
    No directory header — the work leads.
    ─────────────────────────────────────────────────────────────── */
 function WorkGrid() {
-  const sorted = [...projects].sort((a, b) => a.rank - b.rank);
+  const sorted = [...projects].filter((p) => !p.hidden).sort((a, b) => a.rank - b.rank);
   const featured = sorted.filter((p) => p.tier === "featured");
   const rest = sorted.filter((p) => p.tier !== "featured");
 

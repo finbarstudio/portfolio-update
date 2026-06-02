@@ -608,6 +608,89 @@
     .delivered-list { column-count: 1; }
   }
 
+  /* Outcomes — measurable results. Big highlighted numbers, small delta + label
+     beneath, left-aligned to sit with the rest of the bottom info block. */
+  .outcomes {
+    padding: clamp(2rem, 4vw, 3rem) 0;
+    text-align: left;
+  }
+  .outcomes-header { margin-bottom: clamp(1rem, 2vw, 1.5rem); }
+  .outcomes-title {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: clamp(1.125rem, 2.4vw, 1.625rem);
+    line-height: 1.05;
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .outcomes-intro {
+    max-width: 64ch;
+    font-family: var(--font-primary);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+  }
+  .outcomes-subtitle {
+    font-family: var(--font-label);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+  .outcomes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    align-items: start;
+  }
+  @media (max-width: 700px) {
+    .outcomes-grid { grid-template-columns: 1fr; gap: 2rem; }
+  }
+  .outcomes-stat { min-width: 0; }
+  .outcomes-value {
+    font-family: var(--font-primary);
+    font-weight: 800;
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    /* prevent ungainly wrapping on the big numbers */
+    overflow-wrap: anywhere;
+  }
+  .outcomes-delta {
+    display: inline-block;
+    margin-top: clamp(0.55rem, 1vw, 0.75rem);
+    padding: 3px 7px;
+    background: color-mix(in srgb, var(--pink) 12%, transparent);
+    color: var(--pink);
+    font-family: var(--font-label);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 4px;
+  }
+  .outcomes-label {
+    margin-top: clamp(0.7rem, 1.2vw, 1rem);
+    font-family: var(--font-label);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .outcomes-source {
+    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+    font-family: var(--font-primary);
+    font-size: 11px;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
   /* Kinaya showcase — bespoke case-study layout with editorial section headers
      and four distinct content sections. */
   .kinaya-showcase {
@@ -766,9 +849,8 @@
     align-items: center;
     gap: clamp(1rem, 2vw, 2rem);
     width: max-content;
-    animation: album-scroll 48s linear infinite;
+    animation: album-scroll 26s linear infinite;
   }
-  .album-marquee:hover .album-track { animation-play-state: paused; }
 
   .album-card {
     flex: 0 0 auto;
@@ -869,83 +951,75 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
+  /* Nav row — always fills the rail content width so the active pill scales
+     in step with the rail (no early square-snap). Overflow hidden clips the
+     vertical track to a single slot at a time. */
   .nav-row {
-    position: relative;
     display: flex;
-    align-items: center;
-    gap: 6px;
+    align-items: stretch;
     width: 100%;
     height: 34px;
-    padding: 0 7px;
     border-radius: 8px;
+    overflow: hidden;
     color: var(--ink);
     text-align: left;
     cursor: pointer;
-    white-space: nowrap;
-    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+    transition: color var(--dur-fast) var(--ease),
+                background var(--dur-fast) var(--ease);
   }
   .nav-row:hover { color: var(--pink); background: var(--surface-sunken); }
   .nav-row.active {
     color: var(--pink);
     background: color-mix(in srgb, var(--pink) 12%, transparent);
   }
-  /* Icon is absolutely centred over the whole row so it sits exactly in the
-     middle of the collapsed rail; hidden when expanded (labels carry the nav). */
-  /* Icons hidden in expanded (labels carry the meaning), visible in collapsed.
-     Each side fades out immediately and fades in delayed, so during the 0.5s
-     rail-width transition they never both flash at the same time in awkward
-     midway positions — kills the mid-transition icon flicker. */
-  .nav-ico {
-    position: absolute;
-    inset: 0;
+
+  /* Slot-machine track: icon slot above, label slot below. Translating the
+     track up by one row height reveals the label — single slide motion shared
+     with the rail width. No fade/opacity, no double-animation glitch. */
+  .nav-track {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    transform: translateY(0);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+  .side-nav:not(.is-collapsed) .nav-track { transform: translateY(-34px); }
+
+  .nav-slot {
+    flex: 0 0 34px;
+    height: 34px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.18s var(--ease) 0s;
+    min-width: 0;
   }
-  .nav-label {
-    flex: 1;
+  .nav-slot-ico { justify-content: center; }
+  .nav-slot-ico > svg { flex-shrink: 0; }
+
+  .nav-slot-label {
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 8px;
     font-family: var(--font-primary);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.01em;
-    opacity: 1;
-    transition: opacity 0.22s var(--ease) 0.32s;
+    white-space: nowrap;
   }
+  .nav-slot-text { flex: 1; text-align: left; min-width: 0; }
+
   .nav-count {
     font-size: 10px;
     color: var(--ink-soft);
-    transition: opacity 0.22s var(--ease) 0.32s;
+    flex-shrink: 0;
   }
   .nav-chevron {
     width: 10px;
     height: 10px;
     color: var(--ink-soft);
     flex-shrink: 0;
-    transition: transform var(--dur) var(--ease),
-                opacity 0.22s var(--ease) 0.32s;
-  }
-
-  /* Collapsed rail: rows shrink to a centred square pill; icons fade IN (after
-     a delay so the rail is mostly closed first); labels fade OUT immediately. */
-  .side-nav.is-collapsed { align-items: center; }
-  .side-nav.is-collapsed .nav-row {
-    width: 34px;
-    padding: 0;
-  }
-  .side-nav.is-collapsed .nav-ico {
-    opacity: 1;
-    pointer-events: auto;
-    transition: opacity 0.2s var(--ease) 0.32s;
-  }
-  .side-nav.is-collapsed .nav-label,
-  .side-nav.is-collapsed .nav-count,
-  .side-nav.is-collapsed .nav-chevron {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.18s var(--ease) 0s;
+    transition: transform var(--dur) var(--ease);
   }
 
   /* Work block — collapses to nothing in the rail, grows in on expand. */

@@ -88,6 +88,45 @@ const socials = [
   { label: "Instagram", href: "https://instagram.com/finbar.studio",   icon: <SiInstagram size={12} aria-hidden="true" /> },
 ];
 
+/* ── Live copyright year ──────────────────────────────────────────
+   Tiny "© 26" centred at the bottom of the rail when collapsed; full
+   "© 2026 finbar studio" left-aligned when open. Year is set on the client
+   and re-checked hourly so it survives page sessions across new years. */
+function YearStamp({ collapsed }: { collapsed: boolean }) {
+  const [year, setYear] = useState<number | null>(null);
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+    const id = setInterval(() => setYear(new Date().getFullYear()), 60 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+  if (year === null) return null;
+  const text = collapsed ? `© ${String(year).slice(-2)}` : `© ${year} finbar studio`;
+  return (
+    <div
+      className="hidden md:block"
+      aria-label={`Copyright ${year} finbar studio`}
+      style={{
+        position: "fixed",
+        left: collapsed ? 0 : 12,
+        bottom: 4,
+        width: collapsed ? SIDEBAR_COLLAPSED_W : "auto",
+        textAlign: collapsed ? "center" : "left",
+        fontFamily: "var(--font-label)",
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase",
+        color: "var(--ink-soft)",
+        pointerEvents: "none",
+        zIndex: 40,
+        transition: "left 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+      }}
+    >
+      {text}
+    </div>
+  );
+}
+
 /* ── Persistent social dock ───────────────────────────────────────
    One set of social icons, always mounted, positioned absolutely. Each icon
    tweens (transform) between its collapsed slot (a vertical column centred in
@@ -113,9 +152,10 @@ function SocialDock({ collapsed }: { collapsed: boolean }) {
       }}
     >
       {socials.map((s, i) => {
-        // x/y are offsets from the dock's bottom-left corner.
+        // x/y are offsets from the dock's bottom-left corner. Lifted slightly
+        // above the very bottom so the small year stamp fits below the dock.
         const x = collapsed ? railCenterX - BOX / 2 : 12 + i * GAP;
-        const y = collapsed ? 16 + i * GAP : 14; // px up from the bottom
+        const y = collapsed ? 28 + i * GAP : 22; // px up from the bottom
         return (
           <a
             key={s.href}
@@ -162,7 +202,7 @@ function DesktopSidebar({
   }, [pathname]);
 
   const sortedProjects = useMemo(
-    () => [...projects].sort((a, b) => a.rank - b.rank),
+    () => [...projects].filter((p) => !p.hidden).sort((a, b) => a.rank - b.rank),
     []
   );
 
@@ -206,8 +246,10 @@ function DesktopSidebar({
           aria-current={isHome ? "page" : undefined}
           className={`nav-row ${isHome ? "active" : ""}`}
         >
-          <span className="nav-ico"><HomeIcon /></span>
-          <span className="nav-label">Home</span>
+          <span className="nav-track">
+            <span className="nav-slot nav-slot-ico"><HomeIcon /></span>
+            <span className="nav-slot nav-slot-label">Home</span>
+          </span>
         </Link>
 
         {/* Work — expanded-only block (collapses to nothing in the rail) with an
@@ -221,16 +263,20 @@ function DesktopSidebar({
               aria-expanded={workOpen}
               aria-label="Work"
             >
-              <span className="nav-ico"><GridIcon /></span>
-              <span className="nav-label">Work</span>
-              <span className="nav-count tabular-nums">{sortedProjects.length}</span>
-              <svg
-                className="nav-chevron"
-                style={{ transform: workOpen ? "rotate(90deg)" : "rotate(0deg)" }}
-                viewBox="0 0 16 16" fill="none" aria-hidden="true"
-              >
-                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <span className="nav-track">
+                <span className="nav-slot nav-slot-ico"><GridIcon /></span>
+                <span className="nav-slot nav-slot-label">
+                  <span className="nav-slot-text">Work</span>
+                  <span className="nav-count tabular-nums">{sortedProjects.length}</span>
+                  <svg
+                    className="nav-chevron"
+                    style={{ transform: workOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                    viewBox="0 0 16 16" fill="none" aria-hidden="true"
+                  >
+                    <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </span>
             </button>
 
             <div className="nav-sublist" data-open={!collapsed && workOpen ? "true" : "false"}>
@@ -260,8 +306,10 @@ function DesktopSidebar({
           aria-current={isAbout ? "page" : undefined}
           className={`nav-row ${isAbout ? "active" : ""}`}
         >
-          <span className="nav-ico"><PersonIcon /></span>
-          <span className="nav-label">About</span>
+          <span className="nav-track">
+            <span className="nav-slot nav-slot-ico"><PersonIcon /></span>
+            <span className="nav-slot nav-slot-label">About</span>
+          </span>
         </Link>
 
         <Link
@@ -271,14 +319,16 @@ function DesktopSidebar({
           aria-current={isContact ? "page" : undefined}
           className={`nav-row ${isContact ? "active" : ""}`}
         >
-          <span className="nav-ico"><EnvelopeIcon /></span>
-          <span className="nav-label">Contact</span>
+          <span className="nav-track">
+            <span className="nav-slot nav-slot-ico"><EnvelopeIcon /></span>
+            <span className="nav-slot nav-slot-label">Contact</span>
+          </span>
         </Link>
       </nav>
 
       {/* Status / contact — expanded only. Socials are in the persistent dock. */}
       {!collapsed && (
-        <div className="px-3 space-y-2 border-t border-line pt-3" style={{ paddingBottom: 44 }}>
+        <div className="px-3 space-y-2 border-t border-line pt-3" style={{ paddingBottom: 56 }}>
           <span className="status-badge reveal-y" style={{ animationDelay: "0.18s" }}>OPEN FOR WORK</span>
 
           <a
@@ -313,6 +363,7 @@ function DesktopSidebar({
         collapsed vertical rail and the expanded horizontal row. Rendered
         outside the (overflow-hidden) aside so it can't be clipped mid-slide. */}
     <SocialDock collapsed={collapsed} />
+    <YearStamp collapsed={collapsed} />
     </>
   );
 }

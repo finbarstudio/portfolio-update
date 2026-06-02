@@ -8,6 +8,7 @@ import AlbumShowcase from "@/components/AlbumShowcase";
 import KinayaShowcase from "@/components/KinayaShowcase";
 import Testimonial from "@/components/Testimonial";
 import WhatWasDelivered from "@/components/WhatWasDelivered";
+import Outcomes from "@/components/Outcomes";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import PDFSlideshow from "@/components/PDFSlideshow";
@@ -435,15 +436,9 @@ export default async function CaseStudyPage({
       {project.slug === "kinaya" ? (
         <KinayaShowcase />
       ) : project.heroAlbums ? (
-        <>
-          <AlbumShowcase images={project.images.map(({ src, alt }) => ({ src, alt }))} />
-          <SummaryBlock project={project} />
-        </>
+        <AlbumShowcase images={project.images.map(({ src, alt }) => ({ src, alt }))} />
       ) : project.mediaRows && project.mediaRows.length > 0 ? (
-        <>
-          <div className="mb-8"><MediaRows rows={project.mediaRows} /></div>
-          <SummaryBlock project={project} />
-        </>
+        <div className="mb-8"><MediaRows rows={project.mediaRows} /></div>
       ) : (
         <>
           <div className="mb-8">
@@ -473,7 +468,6 @@ export default async function CaseStudyPage({
               </div>
             )}
           </div>
-          <SummaryBlock project={project} />
           <VisualBody project={project} />
           {project.hasDepth && project.depth && project.depth.length > 0 && (
             <DepthSections sections={project.depth} />
@@ -488,17 +482,26 @@ export default async function CaseStudyPage({
         />
       )}
 
-      {/* Bottom info block — testimonial first (as a distinct, wider feature),
-          then the supporting info: deliverables and (for kinaya) project facts. */}
+      {/* Bottom info block — same layout for every case study:
+          testimonial (feature) -> outcomes / deliverables -> project facts. */}
       {project.testimonial && (
         <Testimonial quote={project.testimonial.quote} author={project.testimonial.author} />
+      )}
+
+      {project.outcomes && (
+        <Outcomes
+          intro={project.outcomes.intro}
+          subtitle={project.outcomes.subtitle}
+          stats={project.outcomes.stats}
+          source={project.outcomes.source}
+        />
       )}
 
       {project.delivered && project.delivered.length > 0 && (
         <WhatWasDelivered items={project.delivered} />
       )}
 
-      {project.slug === "kinaya" && <SummaryBlock project={project} />}
+      <SummaryBlock project={project} />
 
       <FooterMeta project={project} />
     </article>

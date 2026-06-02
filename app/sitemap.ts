@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Only projects with a real case study page get indexed (gallery tier has no page)
   const projectRoutes: MetadataRoute.Sitemap = projects
-    .filter((p) => p.tier !== "gallery")
+    .filter((p) => p.tier !== "gallery" && !p.hidden)
     .map((p) => ({
       url: `${SITE_URL}/case-studies/${p.slug}`,
       lastModified: now,
