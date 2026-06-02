@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { useGroupHover } from "./useGroupHover";
 
 /* ── Tunables ──────────────────────────────────────────── */
 const CARD_W = 0.28;    // card width as fraction of container
@@ -19,7 +20,7 @@ type Props = { images: string[]; aspectRatio?: string; fill?: boolean; sizes?: s
  * Subtle perspective tilt + white gradient masks on edges.
  */
 export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = false, sizes }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { ref: containerRef, hovered } = useGroupHover<HTMLDivElement>(true);
   const offsetRef    = useRef(0);
   const lastTRef     = useRef<number | null>(null);
   const rafRef       = useRef<number>(0);
@@ -91,6 +92,9 @@ export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = fals
         background: "var(--color-bg, #FAFAF8)",
       }}
     >
+      {/* Soft pink wash on hover, behind the cards */}
+      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
+
       {tiles.map((src, i) => (
         <div
           key={`${i}-${src}`}
@@ -115,17 +119,6 @@ export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = fals
         </div>
       ))}
 
-      {/* White gradient masks — 5% solid, fading to 22% */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 20,
-          background:
-            "linear-gradient(to right, var(--color-bg,#FAFAF8) 5%, transparent 22%, transparent 78%, var(--color-bg,#FAFAF8) 95%)",
-        }}
-      />
     </div>
   );
 }
