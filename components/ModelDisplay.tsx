@@ -90,7 +90,15 @@ function DisplayModel({ modelUrl, videoTexture }: DisplayModelProps) {
     root.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return;
       const name = obj.name ?? "";
-      if (name.toLowerCase().includes("mockup")) {
+      // Look up the source material name too — some models (e.g. the macbook glb)
+      // use generic mesh names (Object_0..N) and need the screen detected via its
+      // material (`Glass_-_Heavy_Color`).
+      const origMat = Array.isArray(obj.material) ? obj.material[0] : obj.material;
+      const matName = (origMat as { name?: string } | null)?.name ?? "";
+      const lcName = name.toLowerCase();
+      const lcMat = matName.toLowerCase();
+
+      if (lcName.includes("mockup") || lcMat.includes("glass")) {
         obj.material = screenMat;
       } else if (name === "Frame") {
         obj.material = frameMat;
@@ -99,6 +107,8 @@ function DisplayModel({ modelUrl, videoTexture }: DisplayModelProps) {
       } else if (name === "Monitor") {
         obj.material = monitorBackMat;
       }
+      // else: leave the gltf's own material (the macbook ships its own PBR
+      // aluminium / plastic / steel materials).
     });
 
     return () => {

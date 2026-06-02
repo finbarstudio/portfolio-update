@@ -969,7 +969,7 @@ export const projects: Project[] = [
       "Packer needed consistent, professional design across a wide range of touchpoints. The capability statement was the flagship deliverable.",
     outcome: "Brand expression held consistent across every touchpoint.",
     heroModel: {
-      model: "/models/studio-display/display.gltf",
+      model: "/models/macbook/macbook.glb",
       video: "/images/packer-associates/3D%20Model%20Video.webm",
     },
     heroImage: {
