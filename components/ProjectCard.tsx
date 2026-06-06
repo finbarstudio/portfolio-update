@@ -73,6 +73,8 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
               model={project.heroModel.model}
               video={project.heroModel.video}
               poster={project.heroModel.poster}
+              modelScale={project.heroModel.modelScale}
+              screenRotation={project.heroModel.screenRotation}
               fill
             />
           ) : project.heroSpline ? (
@@ -134,6 +136,8 @@ export function FullCard({ project, index }: { project: Project; index: number }
               model={project.heroModel.model}
               video={project.heroModel.video}
               poster={project.heroModel.poster}
+              modelScale={project.heroModel.modelScale}
+              screenRotation={project.heroModel.screenRotation}
               fill
             />
           ) : (
@@ -189,6 +193,8 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
               model={project.heroModel.model}
               video={project.heroModel.video}
               poster={project.heroModel.poster}
+              modelScale={project.heroModel.modelScale}
+              screenRotation={project.heroModel.screenRotation}
               fill
             />
           ) : (

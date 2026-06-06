@@ -178,10 +178,12 @@ function Rig({
   hovered,
   modelUrl,
   videoTexture,
+  scale = 1,
 }: {
   hovered: boolean;
   modelUrl: string;
   videoTexture: THREE.VideoTexture | null;
+  scale?: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
@@ -209,7 +211,9 @@ function Rig({
   return (
     <group ref={groupRef}>
       <Center>
-        <DisplayModel modelUrl={modelUrl} videoTexture={videoTexture} />
+        <group scale={scale}>
+          <DisplayModel modelUrl={modelUrl} videoTexture={videoTexture} />
+        </group>
       </Center>
     </group>
   );
@@ -231,6 +235,12 @@ type Props = {
   className?: string;
   /** Disable hover animation (e.g. when used inside a parent that's already a link). */
   hoverable?: boolean;
+  /** Uniform scale applied to the loaded model — different glb's ship at wildly
+   *  different units. Default 1. The macbook glb, for example, needs ~0.33. */
+  modelScale?: number;
+  /** Rotation (radians) applied to the screen's video texture about its centre.
+   *  Different glb's lay their screen UVs out at different orientations. */
+  screenRotation?: number;
 };
 
 function ModelDisplayInner({
@@ -241,6 +251,8 @@ function ModelDisplayInner({
   fill = false,
   className,
   hoverable = true,
+  modelScale = 1,
+  screenRotation = 0,
 }: Props) {
   // Hover is driven by the parent card (.group), so the 3D animation shares the
   // exact same hover state as the card border — one hover, not a separate one
@@ -279,8 +291,12 @@ function ModelDisplayInner({
     tex.magFilter = THREE.LinearFilter;
     tex.generateMipmaps = false;
     // Keep the default flipY (true) — matches the MOCKUP UVs in this GLTF.
+    // Rotation about the texture centre — let per-model configs orient the
+    // video correctly (e.g. macbook glb's Glass mesh UVs).
+    tex.center.set(0.5, 0.5);
+    tex.rotation = screenRotation;
     return tex;
-  }, [videoEl]);
+  }, [videoEl, screenRotation]);
 
   useEffect(() => {
     if (!videoEl) return;
@@ -361,7 +377,7 @@ function ModelDisplayInner({
         <directionalLight position={[-4, 3, -2]} intensity={0.4} />
         <Suspense fallback={null}>
           <Environment preset="city" />
-          <Rig hovered={hovered} modelUrl={model} videoTexture={videoTexture} />
+          <Rig hovered={hovered} modelUrl={model} videoTexture={videoTexture} scale={modelScale} />
         </Suspense>
       </Canvas>
 

@@ -447,6 +447,8 @@ export default async function CaseStudyPage({
                 model={project.heroModel.model}
                 video={project.heroModel.video}
                 poster={project.heroModel.poster}
+              modelScale={project.heroModel.modelScale}
+              screenRotation={project.heroModel.screenRotation}
                 aspectRatio="16/9"
               />
             ) : project.heroSpline ? (

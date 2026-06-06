@@ -73,6 +73,10 @@ export interface Project {
     model: string;        // Path to .gltf (under /public)
     video: string;        // Path to looping video shown on the screen
     poster?: string;      // Poster shown until the canvas is ready
+    modelScale?: number;  // Uniform scale of the loaded model (different glb's
+                          // ship in wildly different units).
+    screenRotation?: number; // Texture rotation about its centre (radians),
+                          // so different screen UV orientations look right.
   };
   heroPhones?: {          // 7-phone carousel, each with its own looping video
     model: string;        // Path to .glb (under /public)
@@ -971,6 +975,8 @@ export const projects: Project[] = [
     heroModel: {
       model: "/models/macbook/macbook.glb",
       video: "/images/packer-associates/3D%20Model%20Video.webm",
+      modelScale: 0.34,
+      screenRotation: Math.PI,
     },
     heroImage: {
       src: "/images/packer-associates/hero-poster.jpg",
