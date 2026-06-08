@@ -443,14 +443,7 @@ export default async function CaseStudyPage({
         <>
           <div className="mb-8">
             {project.heroModel ? (
-              <ModelDisplay
-                model={project.heroModel.model}
-                video={project.heroModel.video}
-                poster={project.heroModel.poster}
-              modelScale={project.heroModel.modelScale}
-              screenRotation={project.heroModel.screenRotation}
-                aspectRatio="16/9"
-              />
+              <ModelDisplay {...project.heroModel} aspectRatio="16/9" hoverable={false} />
             ) : project.heroSpline ? (
               <SplineScene scene={project.heroSpline} />
             ) : project.heroVideo ? (

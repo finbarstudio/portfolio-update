@@ -9,6 +9,7 @@ import PhoneCarousel from "@/components/PhoneCarousel";
 import MagazineCarousel from "@/components/MagazineCarousel";
 import HeroSlideshow from "@/components/HeroSlideshow";
 import AlbumRow from "@/components/AlbumRow";
+import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -172,7 +173,9 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
       >
         {/* Thumbnail — flex:1 so revealed text steals from it */}
         <div className="card-thumb" style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
-          {project.heroSlideshow ? (
+          {project.heroPdf ? (
+            <PdfSlideshowThumb pages={project.heroPdf} />
+          ) : project.heroSlideshow ? (
             <HeroSlideshow images={project.heroSlideshow} fill />
           ) : project.heroModel ? (
             <ModelDisplay {...project.heroModel} fill />

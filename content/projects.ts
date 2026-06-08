@@ -97,6 +97,8 @@ export interface Project {
     images: string[];     // Square cover image URLs, rendered left-to-right
   };
   heroSlideshow?: string[];   // Auto-advancing crossfade cover carousel (no WebGL)
+  heroPdf?: string[];         // Page images for a lightweight crossfade PDF thumbnail
+
   companyUrl?: string;
   pdfSlideshow?: {        // PDF rendered as image pages
     title: string;
@@ -979,21 +981,20 @@ export const projects: Project[] = [
     problem:
       "Packer needed consistent, professional design across a wide range of touchpoints. The capability statement was the flagship deliverable.",
     outcome: "Brand expression held consistent across every touchpoint.",
-    heroModel: {
-      model: "/models/macbook/macbook.glb",
-      video: "/images/packer-associates/3D%20Model%20Video.webm",
-      modelScale: 0.30,
-      screenRotation: Math.PI / 2,   // macbook screen UVs are 90° off
-      // 16:9 video into 90°-rotated screen UVs. Keep ry ≈ 2.84·rx to preserve
-      // aspect (no stretch); larger rx zooms the video out (smaller on screen).
-      screenRepeat: [0.62, 1.76],
-      camDist: 20,                   // rest: pull back (was slightly too zoomed)
-      camDistHover: 10.9,            // hover: ~10% more zoom than the display default
-      camY: 0.9,
-      camYHover: 1.9,
-      lookYHover: 1.9,
-      modelY: 1.1,                   // raise the model in frame
-    },
+    heroPdf: [
+      "/images/packer-associates/pdf-pages/page-0-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-1-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-2-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-3-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-4-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-5-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-6-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-7-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-8-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-9-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-10-thumb.webp",
+      "/images/packer-associates/pdf-pages/page-11-thumb.webp",
+    ],
     heroImage: {
       src: "/images/packer-associates/hero-poster.jpg",
       alt: "Packer & Associates website, brand identity and digital presence for the capability solutions company",
