@@ -778,25 +778,38 @@
     transition: color var(--dur-fast) var(--ease);
   }
   .packer-link:hover { color: var(--ink); }
-  .packer-pills {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
+  /* Social/blog graphics — slow horizontal marquee of landscape cards. */
+  .packer-marquee {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%);
   }
-  .packer-pills li {
-    font-family: var(--font-label);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink);
-    padding: 8px 14px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface-raised);
+  .packer-marquee-track {
+    display: flex;
+    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+    width: max-content;
+    animation: album-scroll 40s linear infinite;
+  }
+  .packer-marquee-card {
+    flex: 0 0 auto;
+    width: clamp(220px, 30vw, 360px);
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    border-radius: 12px;
+    background: white;
+    box-shadow: var(--elev-1);
+  }
+  .packer-marquee-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .packer-marquee-track { animation: none; }
+    .packer-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
   }
 
   /* Logo Development — full-width row of equal-width transparent PNGs */

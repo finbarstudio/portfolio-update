@@ -20,13 +20,23 @@ const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ),
 });
 
-// Live Packer & Associates site. Fill in when confirmed; the link only renders
-// when set.
-const SITE_URL = "";
+const SITE_URL = "https://packerandassociates.com.au/";
 
 const PDF_PAGES = Array.from({ length: 12 }, (_, i) =>
   `/images/packer-associates/pdf-pages/page-${i}.webp`
 );
+
+const SOCIAL = [
+  "ai-generated-content",
+  "free-elearn-course",
+  "graphic-design",
+  "mens-mental-health-week",
+  "stimula",
+  "benefits-of-training",
+  "blog-1",
+  "blog-2",
+  "blog-3",
+].map((n) => `/images/packer-associates/social/${n}.webp`);
 
 function SectionHeader({ index, name }: { index: number; name: string }) {
   return (
@@ -77,7 +87,7 @@ export default function PackerShowcase() {
           its services with clarity.
         </p>
         <div className="packer-pdf">
-          <PdfSlideshowThumb pages={PDF_PAGES} />
+          <PdfSlideshowThumb pages={PDF_PAGES} hover={false} />
         </div>
       </section>
 
@@ -89,13 +99,16 @@ export default function PackerShowcase() {
           posts that kept the brand active, consistent and visible to its audience
           throughout the engagement.
         </p>
-        <ul className="packer-pills" aria-label="Channels">
-          <li>Blog articles</li>
-          <li>LinkedIn posts</li>
-          <li>Social graphics</li>
-          <li>Editorial design</li>
-          <li>Brand consistency</li>
-        </ul>
+        <div className="packer-marquee" aria-label="Social and blog graphics">
+          <div className="packer-marquee-track">
+            {[...SOCIAL, ...SOCIAL].map((src, i) => (
+              <div key={i} className="packer-marquee-card" aria-hidden={i >= SOCIAL.length}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" loading="lazy" />
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
     </div>
   );

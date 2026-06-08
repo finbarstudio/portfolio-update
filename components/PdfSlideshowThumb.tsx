@@ -15,8 +15,8 @@ import { useGroupHover } from "./useGroupHover";
 
 const INTERVAL = 2600; // ms per page
 
-export default function PdfSlideshowThumb({ pages }: { pages: string[] }) {
-  const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(true);
+export default function PdfSlideshowThumb({ pages, hover = true }: { pages: string[]; hover?: boolean }) {
+  const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hover);
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
 
