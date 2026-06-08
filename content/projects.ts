@@ -77,7 +77,7 @@ export interface Project {
                           // ship in wildly different units).
     screenRotation?: number; // Texture rotation about its centre (radians),
                           // so different screen UV orientations look right.
-    screenInset?: number; // 0–0.2 dark bezel margin around the video.
+    screenRepeat?: [number, number]; // Source-UV repeat to fix screen aspect.
     camDist?: number;     // Rest camera distance.
     camDistHover?: number;// Hover camera distance (smaller = more zoom).
     camY?: number;        // Rest camera height.
@@ -984,13 +984,15 @@ export const projects: Project[] = [
       video: "/images/packer-associates/3D%20Model%20Video.webm",
       modelScale: 0.30,
       screenRotation: Math.PI / 2,   // macbook screen UVs are 90° off
-      screenInset: 0.04,             // dark bezel so the screen reads as glass
+      // 16:9 video into 90°-rotated landscape screen UVs → crop the long axis
+      // so it fills the screen without stretching (cover).
+      screenRepeat: [0.35, 1],
       camDist: 20,                   // rest: pull back (was slightly too zoomed)
       camDistHover: 10.9,            // hover: ~10% more zoom than the display default
-      camY: 0.4,
-      camYHover: 1.3,
-      lookYHover: 1.3,
-      modelY: 0.4,                   // raise the model in frame
+      camY: 0.9,
+      camYHover: 1.9,
+      lookYHover: 1.9,
+      modelY: 1.1,                   // raise the model in frame
     },
     heroImage: {
       src: "/images/packer-associates/hero-poster.jpg",

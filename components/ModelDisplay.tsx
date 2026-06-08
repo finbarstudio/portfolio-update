@@ -106,9 +106,17 @@ function DisplayModel({ modelUrl, videoTexture }: DisplayModelProps) {
         obj.material = standMat;
       } else if (name === "Monitor") {
         obj.material = monitorBackMat;
+      } else if (origMat instanceof THREE.MeshPhysicalMaterial) {
+        // Keep the glb's own material, but kill transmission/translucency. The
+        // macbook ships translucent-plastic + glass materials whose transmission
+        // forces an extra full-scene render pass every frame — the source of the
+        // lag. Zeroing it keeps the look but drops the expensive pass.
+        if (origMat.transmission > 0) {
+          origMat.transmission = 0;
+          origMat.transparent = false;
+          origMat.opacity = 1;
+        }
       }
-      // else: leave the gltf's own material (the macbook ships its own PBR
-      // aluminium / plastic / steel materials).
     });
 
     return () => {
@@ -254,8 +262,9 @@ type Props = {
   lookYHover?: number;
   /** Vertical offset of the centred model (raise/lower it in frame). */
   modelY?: number;
-  /** Inset the video on the screen to leave a dark bezel border (0–0.2). */
-  screenInset?: number;
+  /** Source-UV repeat [x, y] for the screen video. <1 crops/cover, >1 zooms out.
+   *  Used to fix aspect when the glb's screen UVs don't match the video. */
+  screenRepeat?: [number, number];
 };
 
 function ModelDisplayInner({
@@ -274,7 +283,7 @@ function ModelDisplayInner({
   camYHover = CAMERA_Y_HOVER,
   lookYHover = LOOKAT_Y_HOVER,
   modelY = 0,
-  screenInset = 0,
+  screenRepeat = [1, 1],
 }: Props) {
   // Hover is driven by the parent card (.group), so the 3D animation shares the
   // exact same hover state as the card border — one hover, not a separate one
@@ -317,18 +326,20 @@ function ModelDisplayInner({
     // video correctly (e.g. macbook glb's Glass mesh UVs).
     tex.center.set(0.5, 0.5);
     tex.rotation = screenRotation;
-    // Inset the video to leave a dark bezel: zoom the UVs out slightly so the
-    // mapped image sits within the glass with a margin. ClampToEdge keeps the
-    // (dark) edge pixels filling the border — reads as a thin black bevel.
-    if (screenInset > 0) {
-      const r = 1 + screenInset * 2;
-      tex.wrapS = THREE.ClampToEdgeWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.repeat.set(r, r);
-      tex.offset.set(-screenInset, -screenInset);
-    }
+    // Per-model UV transform. screenRepeat corrects aspect when the glb's screen
+    // UVs don't match the video (e.g. the macbook's screen UVs are 90° rotated,
+    // so a 16:9 video must be cropped on one axis to avoid stretching). repeat<1
+    // crops in (cover); >1 zooms out. ClampToEdge so cropping doesn't tile.
+    tex.wrapS = THREE.ClampToEdgeWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    const rx = screenRepeat[0];
+    const ry = screenRepeat[1];
+    tex.repeat.set(rx, ry);
+    // Keep the sampled region centred (so cropping takes from both edges).
+    tex.offset.set((1 - rx) / 2, (1 - ry) / 2);
     return tex;
-  }, [videoEl, screenRotation, screenInset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoEl, screenRotation, screenRepeat[0], screenRepeat[1]]);
 
   useEffect(() => {
     if (!videoEl) return;
@@ -398,7 +409,7 @@ function ModelDisplayInner({
           near: 0.1,
           far: 50,
         }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
