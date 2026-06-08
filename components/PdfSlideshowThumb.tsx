@@ -43,7 +43,7 @@ export default function PdfSlideshowThumb({ pages, hover = true }: { pages: stri
         width: "100%",
         height: "100%",
         overflow: "hidden",
-        background: "#ffffff",
+        background: "var(--surface-sunken, #F2F2EF)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
