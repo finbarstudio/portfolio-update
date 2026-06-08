@@ -995,6 +995,12 @@ export const projects: Project[] = [
       "/images/packer-associates/pdf-pages/page-10-thumb.webp",
       "/images/packer-associates/pdf-pages/page-11-thumb.webp",
     ],
+    // Detail-page hero: the studio-display mac (same as KinAya) playing the
+    // packer video. Home grid still uses heroPdf (checked first in the card).
+    heroModel: {
+      model: "/models/studio-display/display.gltf",
+      video: "/images/packer-associates/3D%20Model%20Video.webm",
+    },
     heroImage: {
       src: "/images/packer-associates/hero-poster.jpg",
       alt: "Packer & Associates website, brand identity and digital presence for the capability solutions company",
