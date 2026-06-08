@@ -778,6 +778,27 @@
     transition: color var(--dur-fast) var(--ease);
   }
   .packer-link:hover { color: var(--ink); }
+  /* PDF viewer nav arrows */
+  .pdf-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--surface-raised);
+    color: var(--ink);
+    box-shadow: var(--elev-1);
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
+                box-shadow var(--dur-fast) var(--ease);
+  }
+  .pdf-nav-btn:hover { color: var(--pink); box-shadow: var(--elev-2); }
+
   /* Social/blog graphics — slow horizontal marquee of landscape cards. */
   .packer-marquee {
     position: relative;

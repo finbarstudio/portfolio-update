@@ -1008,23 +1008,6 @@ export const projects: Project[] = [
     heroVideo: "/images/packer-associates/website-video.webm",
     images: [],
     hasDepth: false,
-    pdfSlideshow: {
-      title: "Capability Statement",
-      pages: [
-        "/images/packer-associates/pdf-pages/page-0.webp",
-        "/images/packer-associates/pdf-pages/page-1.webp",
-        "/images/packer-associates/pdf-pages/page-2.webp",
-        "/images/packer-associates/pdf-pages/page-3.webp",
-        "/images/packer-associates/pdf-pages/page-4.webp",
-        "/images/packer-associates/pdf-pages/page-5.webp",
-        "/images/packer-associates/pdf-pages/page-6.webp",
-        "/images/packer-associates/pdf-pages/page-7.webp",
-        "/images/packer-associates/pdf-pages/page-8.webp",
-        "/images/packer-associates/pdf-pages/page-9.webp",
-        "/images/packer-associates/pdf-pages/page-10.webp",
-        "/images/packer-associates/pdf-pages/page-11.webp",
-      ],
-    },
   },
 
   /* 14. Toombul Bulls. Gallery. CONCEPT */

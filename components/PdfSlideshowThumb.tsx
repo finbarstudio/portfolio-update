@@ -15,10 +15,21 @@ import { useGroupHover } from "./useGroupHover";
 
 const INTERVAL = 2600; // ms per page
 
-export default function PdfSlideshowThumb({ pages, hover = true }: { pages: string[]; hover?: boolean }) {
+export default function PdfSlideshowThumb({
+  pages,
+  hover = true,
+  nav = false,
+}: {
+  pages: string[];
+  hover?: boolean;
+  /** Show prev/next arrows + a page counter (for the detail-page viewer). */
+  nav?: boolean;
+}) {
   const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hover);
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
+  // Auto-advance pauses once the user takes manual control via the arrows.
+  const [manual, setManual] = useState(false);
 
   // Pause cycling when off-screen.
   useEffect(() => {
@@ -30,10 +41,15 @@ export default function PdfSlideshowThumb({ pages, hover = true }: { pages: stri
   }, [hoverRef]);
 
   useEffect(() => {
-    if (!inView || pages.length < 2) return;
+    if (!inView || manual || pages.length < 2) return;
     const id = setInterval(() => setActive((i) => (i + 1) % pages.length), INTERVAL);
     return () => clearInterval(id);
-  }, [inView, pages.length]);
+  }, [inView, manual, pages.length]);
+
+  const go = (dir: number) => {
+    setManual(true);
+    setActive((i) => (i + dir + pages.length) % pages.length);
+  };
 
   return (
     <div
@@ -76,33 +92,80 @@ export default function PdfSlideshowThumb({ pages, hover = true }: { pages: stri
         />
       ))}
 
-      {/* Page progress dots */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          bottom: 12,
-          left: 0,
-          right: 0,
-          display: "flex",
-          justifyContent: "center",
-          gap: 5,
-          zIndex: 2,
-        }}
-      >
-        {pages.map((_, i) => (
+      {/* Prev / next arrows + page counter (detail-page viewer) */}
+      {nav && pages.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            aria-label="Previous page"
+            className="pdf-nav-btn"
+            style={{ left: 12 }}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M10 4 6 8l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => go(1)}
+            aria-label="Next page"
+            className="pdf-nav-btn"
+            style={{ right: 12 }}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
           <span
-            key={i}
+            aria-hidden="true"
             style={{
-              width: i === active ? 14 : 5,
-              height: 5,
-              borderRadius: 3,
-              background: i === active ? "var(--pink)" : "rgba(20,20,20,0.18)",
-              transition: "width 0.4s var(--ease, ease), background 0.4s var(--ease, ease)",
+              position: "absolute",
+              bottom: 12,
+              right: 14,
+              zIndex: 3,
+              fontFamily: "var(--font-label)",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              color: "var(--ink-soft)",
+              fontVariantNumeric: "tabular-nums",
             }}
-          />
-        ))}
-      </div>
+          >
+            {active + 1} / {pages.length}
+          </span>
+        </>
+      )}
+
+      {/* Page progress dots (hidden when arrows/counter are shown) */}
+      {!nav && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            bottom: 12,
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+            gap: 5,
+            zIndex: 2,
+          }}
+        >
+          {pages.map((_, i) => (
+            <span
+              key={i}
+              style={{
+                width: i === active ? 14 : 5,
+                height: 5,
+                borderRadius: 3,
+                background: i === active ? "var(--pink)" : "rgba(20,20,20,0.18)",
+                transition: "width 0.4s var(--ease, ease), background 0.4s var(--ease, ease)",
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

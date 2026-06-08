@@ -84,7 +84,7 @@ export default function PackerShowcase() {
           its services with clarity.
         </p>
         <div className="packer-pdf">
-          <PdfSlideshowThumb pages={PDF_PAGES} hover={false} />
+          <PdfSlideshowThumb pages={PDF_PAGES} hover={false} nav />
         </div>
       </section>
 
