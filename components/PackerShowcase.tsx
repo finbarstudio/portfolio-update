@@ -33,9 +33,6 @@ const SOCIAL = [
   "mens-mental-health-week",
   "stimula",
   "benefits-of-training",
-  "blog-1",
-  "blog-2",
-  "blog-3",
 ].map((n) => `/images/packer-associates/social/${n}.webp`);
 
 function SectionHeader({ index, name }: { index: number; name: string }) {
