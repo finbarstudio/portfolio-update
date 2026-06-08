@@ -984,9 +984,9 @@ export const projects: Project[] = [
       video: "/images/packer-associates/3D%20Model%20Video.webm",
       modelScale: 0.30,
       screenRotation: Math.PI / 2,   // macbook screen UVs are 90° off
-      // 16:9 video into 90°-rotated landscape screen UVs → crop the long axis
-      // so it fills the screen without stretching (cover).
-      screenRepeat: [0.35, 1],
+      // 16:9 video into 90°-rotated screen UVs. Keep ry ≈ 2.84·rx to preserve
+      // aspect (no stretch); larger rx zooms the video out (smaller on screen).
+      screenRepeat: [0.62, 1.76],
       camDist: 20,                   // rest: pull back (was slightly too zoomed)
       camDistHover: 10.9,            // hover: ~10% more zoom than the display default
       camY: 0.9,

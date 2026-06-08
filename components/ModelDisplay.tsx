@@ -290,6 +290,10 @@ function ModelDisplayInner({
   // over just the canvas.
   const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
   const [ready, setReady] = useState(false);
+  // Only mount the WebGL canvas + decode the video while the card is on (or near)
+  // screen. A grid of always-rendering 3D canvases is the main source of lag;
+  // gating them to the viewport keeps just the visible ones live.
+  const [inView, setInView] = useState(false);
 
   // Build a single <video> element + VideoTexture that lives for the
   // lifetime of this component. Autoplay, muted, looping, inline.
@@ -341,8 +345,22 @@ function ModelDisplayInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoEl, screenRotation, screenRepeat[0], screenRepeat[1]]);
 
+  // Watch the container's viewport visibility (200px margin so it's ready just
+  // before it scrolls in).
   useEffect(() => {
-    if (!videoEl) return;
+    const el = hoverRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") { setInView(true); return; }
+    const io = new IntersectionObserver(
+      ([e]) => setInView(e.isIntersecting),
+      { rootMargin: "200px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hoverRef]);
+
+  // Only decode the screen video while in view — pause + detach when off screen.
+  useEffect(() => {
+    if (!videoEl || !inView) return;
     const onLoaded = () => {
       setReady(true);
       videoEl.play().catch(() => {});
@@ -350,18 +368,14 @@ function ModelDisplayInner({
     videoEl.addEventListener("loadeddata", onLoaded);
     // Attach to the DOM so the browser decodes frames for the texture.
     document.body.appendChild(videoEl);
-    // Kick off load + try to play immediately (muted autoplay is allowed).
     videoEl.load();
     videoEl.play().catch(() => {});
     return () => {
       videoEl.removeEventListener("loadeddata", onLoaded);
       videoEl.pause();
-      videoEl.src = "";
-      videoEl.removeAttribute("src");
-      videoEl.load();
       if (videoEl.parentNode) videoEl.parentNode.removeChild(videoEl);
     };
-  }, [videoEl]);
+  }, [videoEl, inView]);
 
   useEffect(() => {
     return () => {
@@ -402,34 +416,36 @@ function ModelDisplayInner({
       )}
       {!ready && <Loader size={28} />}
 
-      <Canvas
-        camera={{
-          position: [0, CAMERA_Y_DEFAULT, CAMERA_DISTANCE_DEFAULT],
-          fov: CAMERA_FOV,
-          near: 0.1,
-          far: 50,
-        }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: true, alpha: true }}
-        style={{ position: "absolute", inset: 0 }}
-      >
-        <LiveResize />
-        <BgFade hovered={hovered} />
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 8, 5]} intensity={1.1} />
-        <directionalLight position={[-4, 3, -2]} intensity={0.4} />
-        <Suspense fallback={null}>
-          <Environment preset="city" />
-          <Rig
-            hovered={hovered}
-            modelUrl={model}
-            videoTexture={videoTexture}
-            scale={modelScale}
-            modelY={modelY}
-            cam={{ dist: camDist, distHover: camDistHover, y: camY, yHover: camYHover, lookYHover }}
-          />
-        </Suspense>
-      </Canvas>
+      {inView && (
+        <Canvas
+          camera={{
+            position: [0, CAMERA_Y_DEFAULT, CAMERA_DISTANCE_DEFAULT],
+            fov: CAMERA_FOV,
+            near: 0.1,
+            far: 50,
+          }}
+          dpr={[1, 1.5]}
+          gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+          style={{ position: "absolute", inset: 0 }}
+        >
+          <LiveResize />
+          <BgFade hovered={hovered} />
+          <ambientLight intensity={0.6} />
+          <directionalLight position={[5, 8, 5]} intensity={1.1} />
+          <directionalLight position={[-4, 3, -2]} intensity={0.4} />
+          <Suspense fallback={null}>
+            <Environment preset="city" />
+            <Rig
+              hovered={hovered}
+              modelUrl={model}
+              videoTexture={videoTexture}
+              scale={modelScale}
+              modelY={modelY}
+              cam={{ dist: camDist, distHover: camDistHover, y: camY, yHover: camYHover, lookYHover }}
+            />
+          </Suspense>
+        </Canvas>
+      )}
 
     </div>
   );
