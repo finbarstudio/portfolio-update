@@ -111,10 +111,10 @@ export default function KinayaShowcase() {
           <p className="kinaya-website-body">
             Six-page Framer site, built for handover. CMS collections drive the
             repeating content (services, team, posts) so the KinAya team can
-            publish without touching code. Built accessibility-first — a custom
-            site-wide text resizer persists across sessions, alongside semantic
-            HTML, focus states, and contrast tuned to the brand palette. SEO
-            basics in place from launch: per-page metadata, Open Graph, clean
+            publish without touching code. Built accessibility-first, with a
+            custom site-wide text resizer that persists across sessions,
+            alongside semantic HTML, focus states, and contrast tuned to the
+            brand palette. SEO basics in place from launch: per-page metadata, Open Graph, clean
             URLs.
           </p>
           <a

@@ -195,7 +195,7 @@ export const projects: Project[] = [
     companyUrl: "https://kinaya.com.au",
     testimonial: {
       quote:
-        "Finbar was great to work with from start to finish. He took the time to understand what KinAya needed, communicated clearly throughout, and delivered something that felt cohesive — the branding and website genuinely felt like one vision. The accessibility features he suggested, like the text resizer, showed he was thinking beyond just aesthetics. Handover was smooth and we felt confident managing the site ourselves after his walkthrough. Highly recommend.",
+        "Finbar was great to work with from start to finish. He took the time to understand what KinAya needed, communicated clearly throughout, and delivered something that felt cohesive. The branding and website genuinely felt like one vision. The accessibility features he suggested, like the text resizer, showed he was thinking beyond just aesthetics. Handover was smooth and we felt confident managing the site ourselves after his walkthrough. Highly recommend.",
       author: "Aryan Sareen, KinAya",
     },
     delivered: [
@@ -301,7 +301,7 @@ export const projects: Project[] = [
     ],
     outcomes: {
       intro:
-        "The campaign ran across multiple windows in 2022 and 2023, timed to periods of lower organic search demand — when search interest in shared ownership dropped from peak, paid and social activity picked up the gap.",
+        "The campaign ran across multiple windows in 2022 and 2023, timed to periods of lower organic search demand. When search interest in shared ownership dropped from peak, paid and social activity picked up the gap.",
       subtitle: "December 2023 results, year on year",
       stats: [
         { value: "3,417", delta: "+19.7% YoY", label: "New registrants" },
@@ -439,15 +439,15 @@ export const projects: Project[] = [
       "Digital PDF optimisation",
       "Technique infographics per playbook",
       "Section opener design and composition",
-      "Brand setup — fonts, colours, assets",
+      "Brand setup: fonts, colours, assets",
       "Sales context research per engagement",
       "Playbook writing (3,000–3,500 words)",
-      "Photoshop — grading, compositing, finishing",
+      "Photoshop: grading, compositing, finishing",
       "15+ engagements across 12+ months",
       "Title page and back cover design",
       "Print preflight and production management",
       "Midjourney image generation and prompting",
-      "Sales technique integration — BANT, STAR",
+      "Sales technique integration: BANT, STAR",
       "InDesign document architecture and setup",
       "Custom Sales Wheel illustration per client",
     ],
@@ -492,31 +492,31 @@ export const projects: Project[] = [
       {
         src: "/images/joe-devine/albums/baby-steps-md.webp",
         caption: "Baby Steps",
-        alt: "Joe Devine — Baby Steps single cover artwork",
+        alt: "Joe Devine, Baby Steps single cover artwork",
         aspectRatio: "1/1",
       },
       {
         src: "/images/joe-devine/albums/giant-leap-md.webp",
         caption: "Giant Leap",
-        alt: "Joe Devine — Giant Leap single cover artwork",
+        alt: "Joe Devine, Giant Leap single cover artwork",
         aspectRatio: "1/1",
       },
       {
         src: "/images/joe-devine/albums/a-perfect-contrast-md.webp",
         caption: "A Perfect Contrast",
-        alt: "Joe Devine — A Perfect Contrast single cover artwork",
+        alt: "Joe Devine, A Perfect Contrast single cover artwork",
         aspectRatio: "1/1",
       },
       {
         src: "/images/joe-devine/albums/one-foot-forward-md.webp",
         caption: "One Foot Forward",
-        alt: "Joe Devine — One Foot Forward single cover artwork",
+        alt: "Joe Devine, One Foot Forward single cover artwork",
         aspectRatio: "1/1",
       },
       {
         src: "/images/joe-devine/albums/too-far-gone-md.webp",
         caption: "Too Far Gone",
-        alt: "Joe Devine — Too Far Gone single cover artwork",
+        alt: "Joe Devine, Too Far Gone single cover artwork",
         aspectRatio: "1/1",
       },
     ],
@@ -977,7 +977,7 @@ export const projects: Project[] = [
     ],
     oneLiner:
       "An ongoing design and communications contract across three workstreams: website management, the capability statement, and social/editorial content.",
-    role: "Designer and content lead across the contract — running the website, producing the capability statement, and creating ongoing social and editorial content.",
+    role: "Designer and content lead across the contract, running the website, producing the capability statement, and creating ongoing social and editorial content.",
     problem:
       "Packer & Associates needed a consistent design and communications presence maintained over time across three fronts: their website, their flagship capability statement, and their day-to-day social and editorial output.",
     outcome: "Brand expression held consistent across every touchpoint, sustained over the full engagement.",

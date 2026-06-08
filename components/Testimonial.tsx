@@ -13,7 +13,7 @@ export default function Testimonial({
     <section className="testimonial -mx-5 md:-mx-10" aria-label="Client testimonial">
       <div className="testimonial-inner">
         <blockquote className="testimonial-quote">{quote}</blockquote>
-        <cite className="testimonial-author">— {author}</cite>
+        <cite className="testimonial-author">{author}</cite>
       </div>
     </section>
   );

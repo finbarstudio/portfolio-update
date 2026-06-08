@@ -24,7 +24,7 @@ function AboutTestimonials() {
               className="mono-label text-ink-soft mt-4"
               style={{ fontSize: "11px" }}
             >
-              — {q.author}
+              {q.author}
             </figcaption>
           </figure>
         ))}
