@@ -32,7 +32,6 @@ const STATE_LERP = 0.04;                // Hover state transition easing
 const CAMERA_DISTANCE = 0.42;           // Camera Z — further pull-back.
 const CAMERA_FOV = 32;
 const FLANK_ROT = Math.PI / 12;         // ±15° — subtle Z-tilt on flanking phones.
-const PRELOAD_THRESHOLD = 0.25;         // Phones above this scale get src+load (buffering starts early).
 const ONSTAGE_THRESHOLD = 0.5;          // Phones above this scale actually play (limits active decoders).
 
 // Each slot = where a phone is when its slotFloat lands exactly on that index.
@@ -284,9 +283,6 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
 
   // One group ref per phone for cheap per-frame position/rotation/scale updates.
   const phoneGroups = useRef<(THREE.Group | null)[]>(new Array(NUM_PHONES).fill(null));
-  // Cached screen mesh per phone — used to fade the screen through black at the
-  // video loop boundary so the snap-back to frame 1 doesn't read as a jump.
-  const screenMeshes = useRef<(THREE.Mesh | null)[]>(new Array(NUM_PHONES).fill(null));
   const offsetRef = useRef(0);
   const hoverProgressRef = useRef(0);
 
@@ -335,56 +331,41 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
 
       phone.position.set(x, y, z);
       phone.rotation.z = rotZ;
-      phone.scale.setScalar(scale);
 
-      const visible   = scale > 0.02;
-      const preload   = scale > PRELOAD_THRESHOLD;   // start buffering (no decoder yet)
       const onStage   = scale > ONSTAGE_THRESHOLD;   // actually play (decoder active)
-      if (phone.visible !== visible) phone.visible = visible;
-
-      // Two-threshold lazy video lifecycle:
-      //   preload zone  — attach src + load() so the browser fetches/buffers the
-      //                   file in advance; no play() so no decoder slot consumed.
-      //   onstage zone  — call play() to activate the decoder and start rendering.
-      //   offstage      — pause + detach src to free the decoder.
       const vid = videoEls[i];
       const srcWanted = videos[i];
+      const hasFrame = !!vid && vid.readyState >= 2;  // has a decoded frame to show
+
+      // Only show a phone once its video actually has a frame — otherwise the
+      // screen renders pure black. A not-yet-decoded phone stays hidden (it
+      // scales but isn't drawn) and pops in cleanly the instant it's ready,
+      // instead of flicking black while it loads.
+      const visible = scale > 0.02 && hasFrame;
+      if (phone.visible !== visible) phone.visible = visible;
+      phone.scale.setScalar(scale);
+
+      // Video lifecycle. Keep the src attached for ANY phone that is even
+      // slightly on screen (scale > 0.02) so it always has frames ready — the
+      // previous logic detached src while the phone was still visible, which is
+      // what caused the black reload flicker. Only fully off-screen phones
+      // detach to free a decoder.
       if (vid) {
-        if (onStage) {
+        if (scale > 0.02) {
+          // Keep src attached for any on-screen phone so it always holds a
+          // decoded frame (no black). Play only centre-stage phones to stay
+          // within the browser's active-decoder budget; paused flanks keep
+          // showing their last decoded frame.
           if (vid.getAttribute("src") !== srcWanted) { vid.src = srcWanted; vid.load(); }
-          if (vid.paused) vid.play().catch(() => {});
-        } else if (preload) {
-          // Attach src so the browser buffers ahead, but don't play yet.
-          if (vid.getAttribute("src") !== srcWanted) { vid.src = srcWanted; vid.load(); }
-          if (!vid.paused) vid.pause();
+          if (onStage) {
+            if (vid.paused) vid.play().catch(() => {});
+          } else {
+            if (!vid.paused) vid.pause();
+          }
         } else {
           if (!vid.paused) vid.pause();
           if (vid.getAttribute("src")) { vid.removeAttribute("src"); vid.load(); }
         }
-      }
-
-      // Crossfade-through-black at loop boundaries — hides the snap when the
-      // looping video restarts. Lazily caches the screen mesh per phone.
-      if (!screenMeshes.current[i] && phone) {
-        phone.traverse((obj) => {
-          if (obj instanceof THREE.Mesh && obj.name === "screen-Mesh_1") {
-            screenMeshes.current[i] = obj;
-          }
-        });
-      }
-      const screen = screenMeshes.current[i];
-      if (screen && vid && vid.readyState >= 2) {
-        const dur = vid.duration;
-        const ct = vid.currentTime;
-        const FADE = 0.22; // seconds of fade in/out at each loop boundary
-        let b = 1;
-        if (Number.isFinite(dur) && dur > 0) {
-          if (ct < FADE) b = ct / FADE;                // fade in from black
-          else if (ct > dur - FADE) b = (dur - ct) / FADE; // fade out to black
-        }
-        b = Math.max(0, Math.min(1, b));
-        const mat = screen.material as THREE.MeshBasicMaterial;
-        if (mat && mat.color) mat.color.setRGB(b, b, b);
       }
     }
   });
