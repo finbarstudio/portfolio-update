@@ -77,6 +77,13 @@ export interface Project {
                           // ship in wildly different units).
     screenRotation?: number; // Texture rotation about its centre (radians),
                           // so different screen UV orientations look right.
+    screenInset?: number; // 0–0.2 dark bezel margin around the video.
+    camDist?: number;     // Rest camera distance.
+    camDistHover?: number;// Hover camera distance (smaller = more zoom).
+    camY?: number;        // Rest camera height.
+    camYHover?: number;   // Hover camera height.
+    lookYHover?: number;  // Hover lookAt height.
+    modelY?: number;      // Vertical offset of the model in frame.
   };
   heroPhones?: {          // 7-phone carousel, each with its own looping video
     model: string;        // Path to .glb (under /public)
@@ -975,8 +982,15 @@ export const projects: Project[] = [
     heroModel: {
       model: "/models/macbook/macbook.glb",
       video: "/images/packer-associates/3D%20Model%20Video.webm",
-      modelScale: 0.34,
-      screenRotation: Math.PI,
+      modelScale: 0.30,
+      screenRotation: Math.PI / 2,   // macbook screen UVs are 90° off
+      screenInset: 0.04,             // dark bezel so the screen reads as glass
+      camDist: 20,                   // rest: pull back (was slightly too zoomed)
+      camDistHover: 10.9,            // hover: ~10% more zoom than the display default
+      camY: 0.4,
+      camYHover: 1.3,
+      lookYHover: 1.3,
+      modelY: 0.4,                   // raise the model in frame
     },
     heroImage: {
       src: "/images/packer-associates/hero-poster.jpg",

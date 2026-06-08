@@ -69,14 +69,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
           ) : project.heroMagazine ? (
             <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (
-            <ModelDisplay
-              model={project.heroModel.model}
-              video={project.heroModel.video}
-              poster={project.heroModel.poster}
-              modelScale={project.heroModel.modelScale}
-              screenRotation={project.heroModel.screenRotation}
-              fill
-            />
+            <ModelDisplay {...project.heroModel} fill />
           ) : project.heroSpline ? (
             <div style={{ height: "100%", pointerEvents: "none" }}>
               <SplineScene scene={project.heroSpline} style={{ aspectRatio: undefined, maxHeight: "none", height: "100%" }} />
@@ -132,14 +125,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
           ) : project.heroMagazine ? (
             <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (
-            <ModelDisplay
-              model={project.heroModel.model}
-              video={project.heroModel.video}
-              poster={project.heroModel.poster}
-              modelScale={project.heroModel.modelScale}
-              screenRotation={project.heroModel.screenRotation}
-              fill
-            />
+            <ModelDisplay {...project.heroModel} fill />
           ) : (
             <ZoomImage
               src={project.heroImage.src}
@@ -189,14 +175,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
           {project.heroSlideshow ? (
             <HeroSlideshow images={project.heroSlideshow} fill />
           ) : project.heroModel ? (
-            <ModelDisplay
-              model={project.heroModel.model}
-              video={project.heroModel.video}
-              poster={project.heroModel.poster}
-              modelScale={project.heroModel.modelScale}
-              screenRotation={project.heroModel.screenRotation}
-              fill
-            />
+            <ModelDisplay {...project.heroModel} fill />
           ) : (
             <ZoomImage
               src={project.heroImage.src}

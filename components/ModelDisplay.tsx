@@ -179,11 +179,15 @@ function Rig({
   modelUrl,
   videoTexture,
   scale = 1,
+  cam,
+  modelY = 0,
 }: {
   hovered: boolean;
   modelUrl: string;
   videoTexture: THREE.VideoTexture | null;
   scale?: number;
+  cam: { dist: number; distHover: number; y: number; yHover: number; lookYHover: number };
+  modelY?: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
@@ -199,9 +203,9 @@ function Rig({
     groupRef.current.rotation.x += (tx - groupRef.current.rotation.x) * LERP_ROTATION;
     groupRef.current.rotation.y += (ty - groupRef.current.rotation.y) * LERP_ROTATION;
 
-    const targetZ = hovered ? CAMERA_DISTANCE_HOVER : CAMERA_DISTANCE_DEFAULT;
-    const targetY = hovered ? CAMERA_Y_HOVER : CAMERA_Y_DEFAULT;
-    const targetLookY = hovered ? LOOKAT_Y_HOVER : 0;
+    const targetZ = hovered ? cam.distHover : cam.dist;
+    const targetY = hovered ? cam.yHover : cam.y;
+    const targetLookY = hovered ? cam.lookYHover : 0;
     camera.position.z += (targetZ - camera.position.z) * LERP_CAMERA;
     camera.position.y += (targetY - camera.position.y) * LERP_CAMERA;
     lookAtY.current += (targetLookY - lookAtY.current) * LERP_CAMERA;
@@ -210,7 +214,7 @@ function Rig({
 
   return (
     <group ref={groupRef}>
-      <Center>
+      <Center position={[0, modelY, 0]}>
         <group scale={scale}>
           <DisplayModel modelUrl={modelUrl} videoTexture={videoTexture} />
         </group>
@@ -241,6 +245,17 @@ type Props = {
   /** Rotation (radians) applied to the screen's video texture about its centre.
    *  Different glb's lay their screen UVs out at different orientations. */
   screenRotation?: number;
+  /** Camera framing overrides (per-model, since glb's differ in scale/shape).
+   *  Defaults match the studio-display tuning. */
+  camDist?: number;
+  camDistHover?: number;
+  camY?: number;
+  camYHover?: number;
+  lookYHover?: number;
+  /** Vertical offset of the centred model (raise/lower it in frame). */
+  modelY?: number;
+  /** Inset the video on the screen to leave a dark bezel border (0–0.2). */
+  screenInset?: number;
 };
 
 function ModelDisplayInner({
@@ -253,6 +268,13 @@ function ModelDisplayInner({
   hoverable = true,
   modelScale = 1,
   screenRotation = 0,
+  camDist = CAMERA_DISTANCE_DEFAULT,
+  camDistHover = CAMERA_DISTANCE_HOVER,
+  camY = CAMERA_Y_DEFAULT,
+  camYHover = CAMERA_Y_HOVER,
+  lookYHover = LOOKAT_Y_HOVER,
+  modelY = 0,
+  screenInset = 0,
 }: Props) {
   // Hover is driven by the parent card (.group), so the 3D animation shares the
   // exact same hover state as the card border — one hover, not a separate one
@@ -295,8 +317,18 @@ function ModelDisplayInner({
     // video correctly (e.g. macbook glb's Glass mesh UVs).
     tex.center.set(0.5, 0.5);
     tex.rotation = screenRotation;
+    // Inset the video to leave a dark bezel: zoom the UVs out slightly so the
+    // mapped image sits within the glass with a margin. ClampToEdge keeps the
+    // (dark) edge pixels filling the border — reads as a thin black bevel.
+    if (screenInset > 0) {
+      const r = 1 + screenInset * 2;
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.repeat.set(r, r);
+      tex.offset.set(-screenInset, -screenInset);
+    }
     return tex;
-  }, [videoEl, screenRotation]);
+  }, [videoEl, screenRotation, screenInset]);
 
   useEffect(() => {
     if (!videoEl) return;
@@ -377,7 +409,14 @@ function ModelDisplayInner({
         <directionalLight position={[-4, 3, -2]} intensity={0.4} />
         <Suspense fallback={null}>
           <Environment preset="city" />
-          <Rig hovered={hovered} modelUrl={model} videoTexture={videoTexture} scale={modelScale} />
+          <Rig
+            hovered={hovered}
+            modelUrl={model}
+            videoTexture={videoTexture}
+            scale={modelScale}
+            modelY={modelY}
+            cam={{ dist: camDist, distHover: camDistHover, y: camY, yHover: camYHover, lookYHover }}
+          />
         </Suspense>
       </Canvas>
 
