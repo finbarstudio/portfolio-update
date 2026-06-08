@@ -43,7 +43,7 @@ export default function PdfSlideshowThumb({ pages }: { pages: string[] }) {
         width: "100%",
         height: "100%",
         overflow: "hidden",
-        background: "var(--surface-sunken, #F2F2EF)",
+        background: "#ffffff",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
