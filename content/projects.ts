@@ -976,11 +976,11 @@ export const projects: Project[] = [
       "Brand Applications",
     ],
     oneLiner:
-      "Design and communications work across digital, print and internal docs for a capability solutions company. Main deliverable: the capability statement.",
-    role: "Designer. Mixed brief across digital platforms, print collateral, internal docs and brand applications.",
+      "An ongoing design and communications contract across three workstreams: website management, the capability statement, and social/editorial content.",
+    role: "Designer and content lead across the contract — running the website, producing the capability statement, and creating ongoing social and editorial content.",
     problem:
-      "Packer needed consistent, professional design across a wide range of touchpoints. The capability statement was the flagship deliverable.",
-    outcome: "Brand expression held consistent across every touchpoint.",
+      "Packer & Associates needed a consistent design and communications presence maintained over time across three fronts: their website, their flagship capability statement, and their day-to-day social and editorial output.",
+    outcome: "Brand expression held consistent across every touchpoint, sustained over the full engagement.",
     heroPdf: [
       "/images/packer-associates/pdf-pages/page-0-thumb.webp",
       "/images/packer-associates/pdf-pages/page-1-thumb.webp",

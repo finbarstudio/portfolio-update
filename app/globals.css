@@ -725,6 +725,59 @@
     color: var(--ink);
   }
 
+  /* Packer showcase — numbered workstream sections. */
+  .packer-section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
+  }
+  .packer-section-index {
+    font-family: var(--font-label);
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--pink);
+    line-height: 1;
+  }
+  .packer-section-body {
+    max-width: 60ch;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: clamp(1.25rem, 3vw, 2rem);
+  }
+  .packer-website-visual {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 78vh;
+    background: white;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+  .packer-pdf { width: 100%; }
+  .packer-pills {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .packer-pills li {
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface-raised);
+  }
+
   /* Logo Development — full-width row of equal-width transparent PNGs */
   .kinaya-logo-dev {
     display: grid;
