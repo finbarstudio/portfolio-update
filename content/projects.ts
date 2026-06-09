@@ -132,8 +132,8 @@ export const projects: Project[] = [
   {
     slug: "kinaya",
     name: "KinAya",
-    tier: "featured",
-    rank: 2,
+    tier: "full",
+    rank: 5,
     seo: {
       title: "KinAya — Brand Identity & Framer Website | Finbar Studio",
       description:
@@ -317,7 +317,7 @@ export const projects: Project[] = [
     slug: "salesmasters",
     name: "Salesmasters",
     tier: "full",
-    rank: 4,
+    rank: 3,
     seo: {
       title: "Salesmasters — Sales Playbook Design & Production | Finbar Studio",
       description:
@@ -378,8 +378,8 @@ export const projects: Project[] = [
   {
     slug: "joe-devine",
     name: "Joe Devine",
-    tier: "featured",
-    rank: 3,
+    tier: "full",
+    rank: 4,
     date: "2023",
     categories: ["Art Direction", "Cover Artwork", "Photography"],
     skills: [
@@ -593,6 +593,7 @@ export const projects: Project[] = [
   /* 7. Copper Company. Full */
   {
     slug: "copper-company",
+    hidden: true,
     name: "Copper Company",
     tier: "full",
     rank: 7,
@@ -762,7 +763,7 @@ export const projects: Project[] = [
     slug: "momentum-mentoring",
     name: "Momentum Mentoring",
     tier: "gallery",
-    rank: 10,
+    rank: 6,
     date: "2024",
     categories: ["Brand Identity", "Web Design", "NDIS"],
     skills: ["Brand Identity", "Web Design", "Framer Development"],
@@ -789,6 +790,7 @@ export const projects: Project[] = [
   /* 11. TasWater. Gallery */
   {
     slug: "taswater",
+    hidden: true,
     name: "TasWater",
     tier: "gallery",
     rank: 11,
@@ -825,6 +827,7 @@ export const projects: Project[] = [
   /* 12. The London Home Show. Gallery */
   {
     slug: "london-home-show",
+    hidden: true,
     name: "The London Home Show",
     tier: "gallery",
     rank: 12,
@@ -887,7 +890,7 @@ export const projects: Project[] = [
     slug: "packer-associates",
     name: "Packer & Associates",
     tier: "gallery",
-    rank: 2.5,
+    rank: 2,
     date: "2023",
     categories: ["Publication Design", "Print Collateral"],
     skills: [
