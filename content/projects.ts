@@ -349,8 +349,8 @@ export const projects: Project[] = [
       "/images/salesmasters/covers/bus4x4.webp",
     ],
     heroImage: {
-      src: "/images/salesmasters/hero.webp",
-      alt: "Salesmasters Sales Process Playbook double-page spread from the Bus4x4 edition",
+      src: "/images/salesmasters/covers/bus4x4.webp",
+      alt: "Salesmasters Sales Process Playbook cover, Bus4x4 edition",
     },
     // Detail page uses the bespoke SalesmastersShowcase, so the generic
     // images/depth galleries aren't rendered.
