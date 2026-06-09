@@ -16,9 +16,10 @@ type Props = {
   sizes?: string;
   priority?: boolean;
   className?: string;
+  onReady?: () => void;
 };
 
-export default function ClientImage({ src, alt, fill, sizes, priority, className }: Props) {
+export default function ClientImage({ src, alt, fill, sizes, priority, className, onReady }: Props) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [activeSrc, setActiveSrc] = useState(src);
@@ -40,8 +41,8 @@ export default function ClientImage({ src, alt, fill, sizes, priority, className
         sizes={sizes}
         priority={priority}
         className={className}
-        onError={() => setFailed(true)}
-        onLoad={() => setLoaded(true)}
+        onError={() => { setFailed(true); onReady?.(); }}
+        onLoad={() => { setLoaded(true); onReady?.(); }}
       />
     </>
   );

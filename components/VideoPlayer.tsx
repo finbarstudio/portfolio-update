@@ -12,11 +12,15 @@ export default function VideoPlayer({
   poster,
   className = "",
   style,
+  onReady,
+  eager,
 }: {
   src: string;
   poster?: string;
   className?: string;
   style?: React.CSSProperties;
+  onReady?: () => void;
+  eager?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [ready, setReady] = useState(false);
@@ -50,8 +54,8 @@ export default function VideoPlayer({
         loop
         muted
         playsInline
-        preload="metadata"
-        onLoadedData={() => setReady(true)}
+        preload={eager ? "auto" : "metadata"}
+        onLoadedData={() => { setReady(true); onReady?.(); }}
         className={className}
         style={{ width: "100%", height: "100%", objectFit: "contain", background: "white", display: "block", ...style }}
       />
