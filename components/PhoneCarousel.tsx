@@ -230,34 +230,6 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
   );
 }
 
-/* ── Wireframe placeholder ─────────────────────────────────────
-   Three phone outlines arranged like the rest state, shown until all the real
-   phones have decoded a frame so the carousel reveals as one. */
-function PhoneWireframe() {
-  return (
-    <div className="phone-wire" aria-hidden="true">
-      <svg viewBox="0 0 300 170" preserveAspectRatio="xMidYMid meet" fill="none">
-        {/* left flank, tilted */}
-        <g transform="translate(70 95) rotate(15)" opacity="0.6">
-          <rect x="-26" y="-52" width="52" height="104" rx="9" stroke="currentColor" strokeWidth="2.2" />
-          <rect x="-20" y="-44" width="40" height="88" rx="4" stroke="currentColor" strokeWidth="1.2" opacity="0.6" />
-        </g>
-        {/* right flank, tilted */}
-        <g transform="translate(230 95) rotate(-15)" opacity="0.6">
-          <rect x="-26" y="-52" width="52" height="104" rx="9" stroke="currentColor" strokeWidth="2.2" />
-          <rect x="-20" y="-44" width="40" height="88" rx="4" stroke="currentColor" strokeWidth="1.2" opacity="0.6" />
-        </g>
-        {/* centre phone */}
-        <g transform="translate(150 85)">
-          <rect x="-32" y="-64" width="64" height="128" rx="11" stroke="currentColor" strokeWidth="2.6" />
-          <rect x="-25" y="-55" width="50" height="110" rx="5" stroke="currentColor" strokeWidth="1.4" opacity="0.6" />
-          <rect x="-7" y="-60" width="14" height="3" rx="1.5" fill="currentColor" opacity="0.6" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
 /* ── Inner: carousel that drives all 7 phones from one offset ── */
 
 function Carousel({ model, videos, hovered, inView, onReady }: { model: string; videos: string[]; hovered: boolean; inView: boolean; onReady: () => void }) {
@@ -523,8 +495,8 @@ function PhoneCarouselInner({
       {/* Soft pink wash on hover, behind the canvas */}
       <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
-      {/* Wireframe placeholder until every phone is ready (they pop in together). */}
-      {!ready && <PhoneWireframe />}
+      {/* Spinner until every phone is ready (they pop in together). */}
+      {!ready && <Loader size={28} />}
 
       {appReady && (
       <Canvas
