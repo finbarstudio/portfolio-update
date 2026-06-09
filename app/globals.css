@@ -962,51 +962,50 @@
     box-shadow: 0 6px 22px rgba(20, 20, 20, 0.16);
   }
 
-  /* Sales Wheels — signature graphic, 2-up. */
-  .sm-wheels {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: clamp(1rem, 3vw, 2.5rem);
-    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  /* Graphics grouped by client — one row each. */
+  .sm-company {
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
   }
-  @media (max-width: 640px) { .sm-wheels { grid-template-columns: 1fr; } }
-  .sm-figure {
-    margin: 0;
-    background: white;
-    border-radius: 12px;
-    box-shadow: var(--elev-1);
-    padding: clamp(1rem, 2.5vw, 2rem);
+  .sm-company-name {
+    font-family: var(--font-label);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .sm-company-caption {
+    max-width: 62ch;
+    margin-top: 0.4rem;
+    font-family: var(--font-primary);
+    font-size: var(--text-small);
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .sm-company-items {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
+    gap: clamp(0.6rem, 1.5vw, 1.1rem);
+    margin-top: clamp(1rem, 2vw, 1.5rem);
   }
-  .sm-figure img { width: 100%; height: auto; display: block; }
-  .sm-figure-square { aspect-ratio: 1 / 1; }
-  .sm-figure-square img { max-height: 100%; width: auto; object-fit: contain; }
-
-  /* Micrographics — small diagrams + icons in a 5-up grid. */
-  .sm-micro {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: clamp(0.6rem, 1.5vw, 1rem);
-  }
-  .sm-micro-item {
+  .sm-company-item {
     margin: 0;
-    aspect-ratio: 1 / 1;
+    height: clamp(96px, 13vw, 150px);
     background: white;
     border-radius: 10px;
     box-shadow: var(--elev-1);
-    padding: clamp(0.6rem, 1.5vw, 1.1rem);
+    padding: clamp(0.7rem, 1.6vw, 1.2rem);
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .sm-micro-item img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
-  @media (max-width: 900px) {
-    .sm-micro { grid-template-columns: repeat(4, 1fr); }
-  }
-  @media (max-width: 560px) {
-    .sm-micro { grid-template-columns: repeat(3, 1fr); }
+  .sm-company-item img {
+    height: 100%;
+    width: auto;
+    max-width: clamp(160px, 24vw, 320px);
+    object-fit: contain;
+    display: block;
   }
 
   /* Logo reels — two square looping videos. */

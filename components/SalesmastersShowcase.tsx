@@ -27,20 +27,50 @@ const LOGOS = [
   "connected-platforms.svg",
 ].map((n) => `/images/salesmasters/logos/${n}`);
 
-const WHEELS = [
-  { src: "/images/salesmasters/graphics/wheel-active-medical.webp", label: "Active Medical" },
-  { src: "/images/salesmasters/graphics/wheel-cutek.webp", label: "Cutek" },
-];
+const G = "/images/salesmasters/graphics";
 
-const DIAGRAMS = [
-  { src: "/images/salesmasters/graphics/bant.webp", label: "BANT qualification" },
-  { src: "/images/salesmasters/graphics/star.webp", label: "STAR method" },
-  { src: "/images/salesmasters/graphics/technical.webp", label: "Bus4x4 six-point walkround" },
+// Graphics grouped by client — one row each.
+const COMPANIES = [
+  {
+    name: "Site Ware Direct",
+    caption:
+      "BANT and STAR technique diagrams and a custom Sales Wheel, styled as fabric swatches — a nod to their industrial workwear manufacturing.",
+    items: [`${G}/site-ware-direct/bant.webp`, `${G}/site-ware-direct/star.webp`, `${G}/site-ware-direct/wheel.webp`],
+  },
+  {
+    name: "Cutek",
+    caption: "Sales Wheel and a custom audience icon set across their market segments.",
+    items: [
+      `${G}/cutek/wheel.webp`,
+      `${G}/cutek/architects.webp`,
+      `${G}/cutek/consumers.webp`,
+      `${G}/cutek/distributors.webp`,
+      `${G}/cutek/government.webp`,
+      `${G}/cutek/manufacturers.webp`,
+    ],
+  },
+  {
+    name: "Bus4x4",
+    caption: "The six-point walkround diagram, the source vehicle renders it was built from, and the custom tyre illustration.",
+    items: [
+      `${G}/bus4x4/technical.webp`,
+      `${G}/bus4x4/orig-rear.webp`,
+      `${G}/bus4x4/orig-cargo.webp`,
+      `${G}/bus4x4/orig-driver.webp`,
+      `${G}/bus4x4/orig-full-boot.webp`,
+      `${G}/bus4x4/orig-full-hood.webp`,
+      `${G}/bus4x4/wheel.webp`,
+    ],
+  },
+  {
+    name: "Active Medical",
+    caption: "Sales Wheel and a bespoke icon set.",
+    items: [
+      `${G}/active-medical/wheel.webp`,
+      ...["handshake", "star", "bolt", "graph", "simple", "target"].map((n) => `${G}/active-medical/icons/${n}.webp`),
+    ],
+  },
 ];
-
-const ICONS = ["handshake", "star", "bolt", "graph", "simple", "target"].map(
-  (n) => `/images/salesmasters/graphics/icons/${n}.webp`
-);
 
 const STATS = [
   { value: "15+", label: "Playbooks delivered" },
@@ -115,43 +145,31 @@ export default function SalesmastersShowcase() {
         <BookViewer pages={PLAYBOOK_PAGES} />
       </section>
 
-      {/* 03 — Infographics & technique diagrams */}
+      {/* 03 — Infographics & technique diagrams, grouped by client */}
       <section className="kinaya-section">
         <SectionHeader index={3} name="Graphics & Diagrams" />
         <p className="packer-section-body">
           To hold the reader&apos;s attention through dense material, I tied each
-          playbook together with custom graphics: a bespoke Sales Wheel mapping the
-          client&apos;s process, technique frameworks like BANT and STAR drawn as
-          purpose-built diagrams, and client-specific process maps, such as the
-          six-point walkround I illustrated for Bus4x4&apos;s van sales system.
-          Custom icon sets carry the visual language across each edition.
+          playbook together with custom graphics, all built to the client&apos;s
+          brand: bespoke Sales Wheels mapping their process, technique frameworks
+          like BANT and STAR drawn as purpose-built diagrams, client-specific
+          process maps, and custom icon sets.
         </p>
 
-        {/* Sales Wheels — the signature graphic, shown a touch larger */}
-        <div className="sm-wheels">
-          {WHEELS.map((w) => (
-            <figure key={w.src} className="sm-figure sm-figure-square">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={w.src} alt={`Sales Wheel, ${w.label}`} loading="lazy" />
-            </figure>
-          ))}
-        </div>
-
-        {/* Micrographics — diagrams + icons, small, 5-up grid */}
-        <div className="sm-micro" aria-label="Diagrams and icons">
-          {DIAGRAMS.map((d) => (
-            <figure key={d.src} className="sm-micro-item">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={d.src} alt={d.label} loading="lazy" />
-            </figure>
-          ))}
-          {ICONS.map((src) => (
-            <figure key={src} className="sm-micro-item">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" aria-hidden="true" loading="lazy" />
-            </figure>
-          ))}
-        </div>
+        {COMPANIES.map((co) => (
+          <div key={co.name} className="sm-company">
+            <p className="sm-company-name">{co.name}</p>
+            {co.caption && <p className="sm-company-caption">{co.caption}</p>}
+            <div className="sm-company-items">
+              {co.items.map((src) => (
+                <figure key={src} className="sm-company-item">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="" aria-hidden="true" loading="lazy" />
+                </figure>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
     </div>
   );
