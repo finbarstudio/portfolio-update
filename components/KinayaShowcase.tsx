@@ -49,10 +49,19 @@ const PALETTE = [
 
 const FINAL_GRADIENT = "/images/kinaya/Final%20Logos/Logo%20Gradient.svg";
 const FINAL_ALTERNATES = [
-  "/images/kinaya/Final%20Logos/Logo%20Pink.svg",
-  "/images/kinaya/Final%20Logos/Logo%20Grey.svg",
-  "/images/kinaya/Final%20Logos/Logo%20Lightest%20Pink.svg",
+  { src: "/images/kinaya/Final%20Logos/Logo%20Pink.svg" },
+  { src: "/images/kinaya/Final%20Logos/Logo%20Grey.svg" },
+  // Lightest pink is a dark-mode mark — show it on a dark card.
+  { src: "/images/kinaya/Final%20Logos/Logo%20Lightest%20Pink.svg", dark: true },
 ];
+
+function MoonIcon() {
+  return (
+    <svg className="kinaya-alt-moon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7Z" fill="currentColor" />
+    </svg>
+  );
+}
 
 
 export default function KinayaShowcase() {
@@ -98,9 +107,12 @@ export default function KinayaShowcase() {
             <img src={FINAL_GRADIENT} alt="KinAya logo, gradient" />
           </div>
           <div className="kinaya-final-alts">
-            {FINAL_ALTERNATES.map((src) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img key={src} src={src} alt="" aria-hidden="true" />
+            {FINAL_ALTERNATES.map((a) => (
+              <figure key={a.src} className={`kinaya-alt${a.dark ? " kinaya-alt-dark" : ""}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={a.src} alt="" aria-hidden="true" />
+                {a.dark && <MoonIcon />}
+              </figure>
             ))}
           </div>
         </div>

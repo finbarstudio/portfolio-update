@@ -797,8 +797,6 @@
     filter: drop-shadow(0 6px 18px rgba(20, 20, 20, 0.12));
   }
   .pdf-page[data-active="true"] { transform: scale(1); }
-  /* Zoom only when the cursor is over the page itself. */
-  .pdf-page[data-active="true"]:hover { transform: scale(1.05); }
 
   /* PDF viewer bottom controls — thin pill bars. */
   .pdf-controls {
@@ -1281,15 +1279,26 @@
     max-width: 900px;
     align-items: stretch;
   }
-  .kinaya-final-alts img {
-    width: 100%;
+  .kinaya-alt {
+    position: relative;
+    margin: 0;
     height: clamp(90px, 12vw, 150px);
-    object-fit: contain;
     background: white;
     border-radius: 14px;
     box-shadow: var(--elev-1);
     padding: clamp(1rem, 3vw, 2rem);
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .kinaya-alt img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+  /* Dark-mode mark on a dark card. */
+  .kinaya-alt-dark { background: #16181d; }
+  .kinaya-alt-moon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: rgba(255, 255, 255, 0.55);
   }
   @media (max-width: 640px) {
     .kinaya-final-alts { grid-template-columns: 1fr; gap: 1.5rem; }
