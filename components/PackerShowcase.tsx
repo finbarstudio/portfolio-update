@@ -11,10 +11,14 @@ import { useEffect, useRef, useState } from "react";
 import Loader from "./Loader";
 import PdfSlideshowThumb from "./PdfSlideshowThumb";
 
-/* A looping reel that only plays while it's in view. */
+/* A looping reel that plays while in view, with a play/pause button and a
+   stylised pink scrubber. */
 function Reel({ src, poster }: { src: string; poster: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [inView, setInView] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const userPaused = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -24,16 +28,65 @@ function Reel({ src, poster }: { src: string; poster: string }) {
     return () => io.disconnect();
   }, []);
 
+  // Play on enter (unless the user paused it), pause on leave.
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (inView) el.play().catch(() => {});
+    if (inView && !userPaused.current) el.play().catch(() => {});
     else el.pause();
   }, [inView]);
 
+  const toggle = () => {
+    const el = ref.current;
+    if (!el) return;
+    if (el.paused) { userPaused.current = false; el.play().catch(() => {}); }
+    else { userPaused.current = true; el.pause(); }
+  };
+
+  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el || !el.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    el.currentTime = ratio * el.duration;
+    setProgress(ratio);
+  };
+
   return (
     <div className="packer-reel">
-      <video ref={ref} src={src} poster={poster} muted loop playsInline preload="metadata" />
+      <video
+        ref={ref}
+        src={src}
+        poster={poster}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onClick={toggle}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onTimeUpdate={(e) => {
+          const v = e.currentTarget;
+          if (v.duration) setProgress(v.currentTime / v.duration);
+        }}
+      />
+      <div className="reel-controls">
+        <button type="button" onClick={toggle} aria-label={playing ? "Pause" : "Play"} className="reel-btn">
+          {playing ? (
+            <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true">
+              <rect x="2" y="1.5" width="2.6" height="9" rx="0.6" fill="currentColor" />
+              <rect x="7.4" y="1.5" width="2.6" height="9" rx="0.6" fill="currentColor" />
+            </svg>
+          ) : (
+            <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true">
+              <path d="M3 1.8 10 6 3 10.2V1.8Z" fill="currentColor" />
+            </svg>
+          )}
+        </button>
+        <div className="reel-track" onClick={seek} role="slider" aria-label="Seek" aria-valuenow={Math.round(progress * 100)} tabIndex={0}>
+          <div className="reel-fill" style={{ width: `${progress * 100}%` }} />
+        </div>
+      </div>
     </div>
   );
 }

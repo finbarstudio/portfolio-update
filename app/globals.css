@@ -855,6 +855,7 @@
     max-width: 760px;
   }
   .packer-reel {
+    position: relative;
     aspect-ratio: 1 / 1;
     overflow: hidden;
     border-radius: 14px;
@@ -866,6 +867,51 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    cursor: pointer;
+  }
+  /* Playback controls overlay — play/pause + pink scrubber. */
+  .reel-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: linear-gradient(to top, rgba(20, 20, 20, 0.38), transparent);
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+  }
+  .packer-reel:hover .reel-controls,
+  .reel-controls:focus-within { opacity: 1; }
+  .reel-btn {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--ink);
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .reel-btn:hover { color: var(--pink); }
+  .reel-track {
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .reel-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--pink);
   }
 
   /* Social/blog graphics — slow horizontal marquee of landscape cards. */
