@@ -21,6 +21,7 @@ import { useGLTF, Environment, Center } from "@react-three/drei";
 import Loader from "./Loader";
 import { useGroupHover } from "./useGroupHover";
 import { FrameDriver } from "./FrameDriver";
+import { useAppReady } from "./useAppReady";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
@@ -295,6 +296,8 @@ function ModelDisplayInner({
   // screen. A grid of always-rendering 3D canvases is the main source of lag;
   // gating them to the viewport keeps just the visible ones live.
   const [inView, setInView] = useState(false);
+  // Defer the first canvas init past initial load + stagger vs other mockups.
+  const appReady = useAppReady();
 
   // Build a single <video> element + VideoTexture that lives for the
   // lifetime of this component. Autoplay, muted, looping, inline.
@@ -417,7 +420,7 @@ function ModelDisplayInner({
       )}
       {!ready && <Loader size={28} />}
 
-      {inView && (
+      {inView && appReady && (
         <Canvas
           frameloop="demand"
           camera={{

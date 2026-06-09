@@ -17,6 +17,7 @@ import { useTexture } from "@react-three/drei";
 import Loader from "./Loader";
 import { useGroupHover } from "./useGroupHover";
 import { FrameDriver } from "./FrameDriver";
+import { useAppReady } from "./useAppReady";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 const CAMERA_FOV = 28;
@@ -143,6 +144,8 @@ function AlbumRowInner({
 }: Props) {
   const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
   const [ready, setReady] = useState(false);
+  // Defer the first canvas init past initial load + stagger vs other mockups.
+  const appReady = useAppReady();
   // The row is static at rest, so render on-demand: animate while hovered, plus
   // a short linger so the focus ease-out completes, then stop entirely (0 idle).
   // Starts true so the initial render + auto-fit runs, then settles to idle.
@@ -169,8 +172,9 @@ function AlbumRowInner({
       {/* Light pink background, fades in on hover */}
       <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
-      {!ready && <Loader size={28} />}
+      {(!ready || !appReady) && <Loader size={28} />}
 
+      {appReady && (
       <Canvas
         frameloop="demand"
         camera={{ position: [0, 0, CAMERA_Z], fov: CAMERA_FOV, near: 0.1, far: 50 }}
@@ -185,6 +189,7 @@ function AlbumRowInner({
           <Row images={images} onReady={() => setReady(true)} />
         </Suspense>
       </Canvas>
+      )}
     </div>
   );
 }

@@ -22,6 +22,7 @@ import { useGLTF, Environment, Center } from "@react-three/drei";
 import Loader from "./Loader";
 import { useGroupHover } from "./useGroupHover";
 import { FrameDriver } from "./FrameDriver";
+import { useAppReady } from "./useAppReady";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
@@ -454,6 +455,8 @@ function PhoneCarouselInner({
   const [ready, setReady] = useState(false);
   // Pause rendering + video decode entirely when the carousel is off screen.
   const [inView, setInView] = useState(false);
+  // Defer the first canvas init past initial load + stagger vs other mockups.
+  const appReady = useAppReady();
   useEffect(() => {
     const el = hoverRef.current;
     if (!el || typeof IntersectionObserver === "undefined") { setInView(true); return; }
@@ -491,8 +494,9 @@ function PhoneCarouselInner({
       {/* Soft pink wash on hover, behind the canvas */}
       <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
-      {!ready && <Loader size={28} />}
+      {(!ready || !appReady) && <Loader size={28} />}
 
+      {appReady && (
       <Canvas
         frameloop="demand"
         camera={{
@@ -516,6 +520,7 @@ function PhoneCarouselInner({
           <Carousel model={model} videos={videos} hovered={hovered} inView={inView} />
         </Suspense>
       </Canvas>
+      )}
     </div>
   );
 }
