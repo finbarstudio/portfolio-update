@@ -910,10 +910,14 @@
     width: auto;
     max-width: clamp(110px, 16vw, 180px);
     object-fit: contain;
-    filter: grayscale(1) opacity(0.55);
-    transition: filter var(--dur) var(--ease);
+    /* Uniform grey silhouette at rest (brightness 0 = flat, regardless of the
+       logo's own colour, so white-on-dark logos stay visible too); true colour
+       on hover. */
+    filter: brightness(0);
+    opacity: 0.5;
+    transition: filter var(--dur) var(--ease), opacity var(--dur) var(--ease);
   }
-  .sm-logo:hover img { filter: grayscale(0) opacity(1); }
+  .sm-logo:hover img { filter: none; opacity: 1; }
   @media (prefers-reduced-motion: reduce) {
     .sm-logo-track { animation: none; }
     .sm-logo-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
