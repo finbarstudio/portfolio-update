@@ -16,6 +16,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import Loader from "./Loader";
 import { useGroupHover } from "./useGroupHover";
+import { FrameDriver } from "./FrameDriver";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 const CAMERA_FOV = 28;
@@ -142,6 +143,15 @@ function AlbumRowInner({
 }: Props) {
   const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
   const [ready, setReady] = useState(false);
+  // The row is static at rest, so render on-demand: animate while hovered, plus
+  // a short linger so the focus ease-out completes, then stop entirely (0 idle).
+  // Starts true so the initial render + auto-fit runs, then settles to idle.
+  const [rendering, setRendering] = useState(true);
+  useEffect(() => {
+    if (hovered) { setRendering(true); return; }
+    const t = setTimeout(() => setRendering(false), 1200);
+    return () => clearTimeout(t);
+  }, [hovered]);
 
   return (
     <div
@@ -162,11 +172,14 @@ function AlbumRowInner({
       {!ready && <Loader size={28} />}
 
       <Canvas
+        frameloop="demand"
         camera={{ position: [0, 0, CAMERA_Z], fov: CAMERA_FOV, near: 0.1, far: 50 }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
+        {/* Static at rest → render only while hovered/easing (idle 0). */}
+        <FrameDriver active={rendering} idleFps={0} />
         <LiveResize />
         <Suspense fallback={null}>
           <Row images={images} onReady={() => setReady(true)} />

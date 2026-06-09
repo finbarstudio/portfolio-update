@@ -20,6 +20,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Environment, Center } from "@react-three/drei";
 import Loader from "./Loader";
 import { useGroupHover } from "./useGroupHover";
+import { FrameDriver } from "./FrameDriver";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
@@ -418,6 +419,7 @@ function ModelDisplayInner({
 
       {inView && (
         <Canvas
+          frameloop="demand"
           camera={{
             position: [0, CAMERA_Y_DEFAULT, CAMERA_DISTANCE_DEFAULT],
             fov: CAMERA_FOV,
@@ -428,6 +430,9 @@ function ModelDisplayInner({
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
           style={{ position: "absolute", inset: 0 }}
         >
+          {/* 30fps at rest (enough for the looping screen video), 60fps on hover
+              for the camera glide. */}
+          <FrameDriver active={hovered} idleFps={30} />
           <LiveResize />
           <BgFade hovered={hovered} />
           <ambientLight intensity={0.6} />

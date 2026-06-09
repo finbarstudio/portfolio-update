@@ -21,6 +21,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Environment, Center } from "@react-three/drei";
 import Loader from "./Loader";
 import { useGroupHover } from "./useGroupHover";
+import { FrameDriver } from "./FrameDriver";
 
 /* ── Tunables ──────────────────────────────────────────────── */
 
@@ -287,12 +288,12 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
   const hoverProgressRef = useRef(0);
 
   useFrame((_, delta) => {
-    // Force every video texture to re-upload its latest frame each tick. Some
-    // r3f/three combos don't auto-mark VideoTextures dirty until the video
-    // fires "timeupdate", which only happens 4x/sec at best — too slow.
+    // Re-upload only the textures whose video is actually PLAYING. Paused
+    // (off-stage) phones hold a static last frame already on the GPU, so
+    // marking them dirty just wastes a texture upload each tick.
     textures.forEach((t, i) => {
       const el = videoEls[i];
-      if (el && el.readyState >= 2) t.needsUpdate = true;
+      if (el && !el.paused && el.readyState >= 2) t.needsUpdate = true;
     });
 
     const targetHover = hovered ? 1 : 0;
@@ -477,16 +478,19 @@ function PhoneCarouselInner({
       {!ready && <Loader size={28} />}
 
       <Canvas
+        frameloop="demand"
         camera={{
           position: [0, 0, CAMERA_DISTANCE],
           fov: CAMERA_FOV,
           near: 0.1,
           far: 50,
         }}
-        dpr={[1, 1.75]}
+        dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
+        {/* 30fps at rest (the slow cycle + screen videos), 60fps on hover. */}
+        <FrameDriver active={hovered} idleFps={30} />
         <LiveResize />
         <ambientLight intensity={0.65} />
         <directionalLight position={[4, 5, 5]} intensity={1.0} />

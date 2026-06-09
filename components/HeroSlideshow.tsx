@@ -34,6 +34,7 @@ export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = fals
     const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-c]"));
 
     let inited = false;
+    let running = false;
 
     const tick = (now: number) => {
       const cw     = el.offsetWidth;
@@ -74,9 +75,30 @@ export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = fals
       rafRef.current = requestAnimationFrame(tick);
     };
 
-    rafRef.current = requestAnimationFrame(tick);
-    return () => {
+    // Only run the rAF loop while the slideshow is on screen — a continuous
+    // per-frame DOM-transform loop is wasted CPU when scrolled out of view.
+    const start = () => {
+      if (running) return;
+      running = true;
+      lastTRef.current = null;
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    const stop = () => {
+      running = false;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+
+    let io: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { rootMargin: "100px" });
+      io.observe(el);
+    } else {
+      start();
+    }
+
+    return () => {
+      stop();
+      io?.disconnect();
       lastTRef.current = null;
     };
   }, [images.length]);
