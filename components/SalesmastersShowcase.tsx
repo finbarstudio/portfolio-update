@@ -15,12 +15,17 @@ const PLAYBOOK_PAGES = Array.from({ length: 20 }, (_, i) =>
   `/images/salesmasters/opt/page-${i + 1}.webp`
 );
 
-const COVERS = [
-  "cover-bus4x4",
-  "cover-alpha",
-  "cover-siteware",
-  "cover-playbook",
-].map((n) => `/images/salesmasters/opt/${n}.webp`);
+const LOGOS = [
+  "active-medical.svg",
+  "bus4x4.svg",
+  "alpha-lifecare.svg",
+  "siteware-direct.svg",
+  "criterion.svg",
+  "cutek.webp",
+  "all-storage-systems.webp",
+  "prescience.webp",
+  "connected-platforms.webp",
+].map((n) => `/images/salesmasters/logos/opt/${n}`);
 
 const WHEELS = [
   { src: "/images/salesmasters/opt/wheel-active-medical.webp", label: "Active Medical" },
@@ -80,11 +85,11 @@ export default function SalesmastersShowcase() {
           salesmasters.com.au ↗
         </a>
 
-        {/* Bespoke covers, scrolling — client-branded credibility */}
-        <div className="sm-cover-marquee" aria-label="Bespoke playbook covers">
-          <div className="sm-cover-track">
-            {[...COVERS, ...COVERS, ...COVERS].map((src, i) => (
-              <div key={i} className="sm-cover" aria-hidden={i >= COVERS.length}>
+        {/* Client logos, scrolling — grey, colour on hover */}
+        <div className="sm-logo-marquee" aria-label="Client logos">
+          <div className="sm-logo-track">
+            {[...LOGOS, ...LOGOS].map((src, i) => (
+              <div key={i} className="sm-logo" aria-hidden={i >= LOGOS.length}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={src} alt="" loading="lazy" />
               </div>
