@@ -191,6 +191,7 @@ function Rig({
   scale = 1,
   cam,
   modelY = 0,
+  engageRef,
 }: {
   hovered: boolean;
   modelUrl: string;
@@ -198,9 +199,13 @@ function Rig({
   scale?: number;
   cam: { dist: number; distHover: number; y: number; yHover: number; lookYHover: number };
   modelY?: number;
+  // 0..1 "engagement" driven by scroll position (partial move toward the hover
+  // pose), so the model has subtle life as it scrolls through the viewport.
+  engageRef: React.MutableRefObject<number>;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
+  const lerp = THREE.MathUtils.lerp;
 
   // Track the lookAt target separately so it can lerp too — at hover the
   // camera looks up at the screen face rather than the bbox centre.
@@ -208,14 +213,16 @@ function Rig({
 
   useFrame(() => {
     if (!groupRef.current) return;
-    const tx = hovered ? 0 : ISO_ROTATION_X;
-    const ty = hovered ? 0 : ISO_ROTATION_Y;
+    // Hover fully engages; scroll adds a partial engage when not hovered.
+    const e = hovered ? 1 : engageRef.current;
+    const tx = lerp(ISO_ROTATION_X, 0, e);
+    const ty = lerp(ISO_ROTATION_Y, 0, e);
     groupRef.current.rotation.x += (tx - groupRef.current.rotation.x) * LERP_ROTATION;
     groupRef.current.rotation.y += (ty - groupRef.current.rotation.y) * LERP_ROTATION;
 
-    const targetZ = hovered ? cam.distHover : cam.dist;
-    const targetY = hovered ? cam.yHover : cam.y;
-    const targetLookY = hovered ? cam.lookYHover : 0;
+    const targetZ = lerp(cam.dist, cam.distHover, e);
+    const targetY = lerp(cam.y, cam.yHover, e);
+    const targetLookY = lerp(0, cam.lookYHover, e);
     camera.position.z += (targetZ - camera.position.z) * LERP_CAMERA;
     camera.position.y += (targetY - camera.position.y) * LERP_CAMERA;
     lookAtY.current += (targetLookY - lookAtY.current) * LERP_CAMERA;
@@ -298,6 +305,34 @@ function ModelDisplayInner({
   const [inView, setInView] = useState(false);
   // Defer the first canvas init past initial load + stagger vs other mockups.
   const appReady = useAppReady();
+
+  // Scroll engagement: how centred the model is in the viewport (0 at edges,
+  // up to SCROLL_ENGAGE at centre), giving a subtle move toward the hover pose
+  // as it scrolls past. Read each frame by the Rig.
+  const engageRef = useRef(0);
+  useEffect(() => {
+    const el = hoverRef.current;
+    if (!el || typeof window === "undefined") return;
+    const SCROLL_ENGAGE = 0.28;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      const centre = r.top + r.height / 2;
+      const d = Math.abs(centre - vh / 2) / (vh / 2);        // 0 centred → 1 at edge
+      engageRef.current = Math.max(0, 1 - d) * SCROLL_ENGAGE;
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [hoverRef]);
 
   // Build a single <video> element + VideoTexture that lives for the
   // lifetime of this component. Autoplay, muted, looping, inline.
@@ -450,6 +485,7 @@ function ModelDisplayInner({
               scale={modelScale}
               modelY={modelY}
               cam={{ dist: camDist, distHover: camDistHover, y: camY, yHover: camYHover, lookYHover }}
+              engageRef={engageRef}
             />
           </Suspense>
         </Canvas>

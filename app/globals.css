@@ -1374,10 +1374,13 @@
     box-shadow: var(--elev-1);
     transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
   }
-  .album-card:hover {
-    transform: scale(1.04);
-    box-shadow: var(--elev-2);
-    z-index: 2;
+  /* Hover-only: slight zoom as a cover comes into focus, smooth ease in/out. */
+  @media (hover: hover) {
+    .album-card:hover {
+      transform: scale(1.05);
+      box-shadow: var(--elev-2);
+      z-index: 2;
+    }
   }
 
   @keyframes album-scroll {
@@ -1391,6 +1394,42 @@
       overflow-x: auto;
       -webkit-mask-image: none;
               mask-image: none;
+    }
+  }
+
+  /* Touch: swipeable carousel with the centred cover snapped (the focus), and a
+     swipe hint. No tap-to-zoom. */
+  .album-swipe-hint { display: none; }
+  @media (hover: none) {
+    .album-marquee {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 2.5rem;
+    }
+    .album-track { animation: none; width: max-content; gap: 1rem; }
+    .album-card {
+      width: min(72vw, 360px);
+      scroll-snap-align: center;
+    }
+    .album-swipe-hint {
+      position: absolute;
+      bottom: 0.6rem;
+      left: 0;
+      right: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-family: var(--font-label);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      pointer-events: none;
+      animation: phone-wire-pulse 1.9s var(--ease) infinite;
     }
   }
 

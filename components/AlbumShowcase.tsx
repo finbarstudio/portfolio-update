@@ -30,6 +30,12 @@ export default function AlbumShowcase({ images }: { images: Img[] }) {
           </div>
         ))}
       </div>
+      {/* Touch-only swipe hint. */}
+      <div className="album-swipe-hint" aria-hidden="true">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10 4 6 8l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        <span>Swipe</span>
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import AlbumShowcase from "@/components/AlbumShowcase";
 import KinayaShowcase from "@/components/KinayaShowcase";
 import PackerShowcase from "@/components/PackerShowcase";
 import SalesmastersShowcase from "@/components/SalesmastersShowcase";
+import MomentumShowcase from "@/components/MomentumShowcase";
 import Testimonial from "@/components/Testimonial";
 import WhatWasDelivered from "@/components/WhatWasDelivered";
 import Outcomes from "@/components/Outcomes";
@@ -441,6 +442,8 @@ export default async function CaseStudyPage({
         <PackerShowcase />
       ) : project.slug === "salesmasters" ? (
         <SalesmastersShowcase />
+      ) : project.slug === "momentum-mentoring" ? (
+        <MomentumShowcase />
       ) : project.heroAlbums ? (
         <AlbumShowcase images={project.images.map(({ src, alt }) => ({ src, alt }))} />
       ) : project.mediaRows && project.mediaRows.length > 0 ? (
