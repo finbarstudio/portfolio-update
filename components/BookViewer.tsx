@@ -25,7 +25,7 @@ function preload(srcs: (string | null)[]): Promise<void> {
   ).then(() => undefined);
 }
 
-export default function BookViewer({ pages }: { pages: string[] }) {
+export default function BookViewer({ pages, markSpread }: { pages: string[]; markSpread?: number }) {
   // Build spreads: cover alone on the right, then facing pairs, last page alone.
   const spreads: [string | null, string | null][] = [[null, pages[0] ?? null]];
   for (let i = 1; i < pages.length; i += 2) {
@@ -106,12 +106,14 @@ export default function BookViewer({ pages }: { pages: string[] }) {
             <button
               key={i}
               type="button"
-              aria-label={`Spread ${i + 1}`}
+              aria-label={i === markSpread ? `Spread ${i + 1} (highlight)` : `Spread ${i + 1}`}
               aria-current={i === idx}
               onClick={() => setIdx(i)}
-              className="pdf-dot"
+              className={`pdf-dot${i === markSpread ? " pdf-dot-mark" : ""}`}
               data-active={i === idx}
-            />
+            >
+              {i === markSpread && <span className="pdf-dot-star" aria-hidden="true">★</span>}
+            </button>
           ))}
         </div>
         <button type="button" onClick={() => go(1)} aria-label="Next pages" className="pdf-arrow" disabled={idx === spreads.length - 1}>

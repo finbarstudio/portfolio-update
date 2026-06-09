@@ -33,7 +33,7 @@ const G = "/images/salesmasters/graphics";
 const CUTEK_ICONS = ["architects", "consumers", "distributors", "government"].map(
   (n) => `${G}/cutek/${n}.webp`
 );
-const AM_ICONS = ["handshake", "target", "graph", "star"].map(
+const AM_ICONS = ["handshake", "target", "graph", "star", "bolt", "simple"].map(
   (n) => `${G}/active-medical/icons/${n}.webp`
 );
 
@@ -63,9 +63,9 @@ function Company({ name, caption, children }: { name: string; caption?: string; 
   );
 }
 
-function Tile({ src, tall = false, wide = false }: { src: string; tall?: boolean; wide?: boolean }) {
+function Tile({ src, tall = false, wide = false, icon = false }: { src: string; tall?: boolean; wide?: boolean; icon?: boolean }) {
   return (
-    <figure className={`sm-tile${tall ? " sm-tile-tall" : ""}${wide ? " sm-tile-wide" : ""}`}>
+    <figure className={`sm-tile${tall ? " sm-tile-tall" : ""}${wide ? " sm-tile-wide" : ""}${icon ? " sm-tile-icon" : ""}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" aria-hidden="true" loading="lazy" />
     </figure>
@@ -127,7 +127,8 @@ export default function SalesmastersShowcase() {
           an interactive, distributable PDF and a print edition, with the print
           pre-production managed through to delivery.
         </p>
-        <BookViewer pages={PLAYBOOK_PAGES} />
+        {/* Highlight the pages 8–9 spread (cover=0, then 2-3,4-5,6-7,8-9 → index 4). */}
+        <BookViewer pages={PLAYBOOK_PAGES} markSpread={4} />
       </section>
 
       {/* 03 — Infographics & technique diagrams, grouped by client */}
@@ -141,15 +142,15 @@ export default function SalesmastersShowcase() {
           process maps, and custom icon sets.
         </p>
 
-        {/* Site Ware Direct — Sales Wheel (tall) + BANT/STAR stacked */}
+        {/* Site Ware Direct — wheel, BANT, STAR side by side, all 2-row tall */}
         <Company
           name="Site Ware Direct"
           caption="BANT and STAR technique diagrams and a custom Sales Wheel, styled as fabric swatches — a nod to their industrial workwear manufacturing."
         >
-          <Tile src={`${G}/site-ware-direct/wheel.webp`} tall />
-          <div className="sm-co-stack">
-            <Tile src={`${G}/site-ware-direct/bant.webp`} />
-            <Tile src={`${G}/site-ware-direct/star.webp`} />
+          <div className="sm-co-3up">
+            <Tile src={`${G}/site-ware-direct/wheel.webp`} tall />
+            <Tile src={`${G}/site-ware-direct/bant.webp`} tall />
+            <Tile src={`${G}/site-ware-direct/star.webp`} tall />
           </div>
         </Company>
 
@@ -157,21 +158,21 @@ export default function SalesmastersShowcase() {
         <Company name="Cutek" caption="Sales Wheel and a custom audience icon set across their market segments.">
           <Tile src={`${G}/cutek/wheel.webp`} tall />
           <div className="sm-co-2x2">
-            {CUTEK_ICONS.map((src) => <Tile key={src} src={src} />)}
+            {CUTEK_ICONS.map((src) => <Tile key={src} src={src} icon />)}
           </div>
         </Company>
 
-        {/* Bus4x4 — six-point walkround + tyre wheel, both tall */}
-        <Company name="Bus4x4" caption="The custom six-point walkround diagram and the bespoke tyre-wheel illustration.">
-          <Tile src={`${G}/bus4x4/technical.webp`} tall wide />
+        {/* Bus4x4 — tyre wheel first, then six-point walkround, both tall */}
+        <Company name="Bus4x4" caption="The bespoke tyre-wheel illustration and the custom six-point walkround diagram.">
           <Tile src={`${G}/bus4x4/wheel.webp`} tall />
+          <Tile src={`${G}/bus4x4/technical.webp`} tall wide />
         </Company>
 
-        {/* Active Medical — Sales Wheel (tall) + 2×2 icons */}
+        {/* Active Medical — Sales Wheel (tall) + 3×2 icon grid */}
         <Company name="Active Medical" caption="Sales Wheel and a bespoke icon set.">
           <Tile src={`${G}/active-medical/wheel.webp`} tall />
-          <div className="sm-co-2x2">
-            {AM_ICONS.map((src) => <Tile key={src} src={src} />)}
+          <div className="sm-co-3x2">
+            {AM_ICONS.map((src) => <Tile key={src} src={src} icon />)}
           </div>
         </Company>
       </section>

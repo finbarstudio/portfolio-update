@@ -830,6 +830,33 @@
   }
   .pdf-dot[data-active="true"] { background: var(--pink); }
 
+  /* Highlighted spread marker — a pulsing pink dot with a small star, so people
+     know there's a spread worth flipping to. */
+  .pdf-dot-mark {
+    position: relative;
+    background: var(--pink);
+    animation: pdf-mark-pulse 1.9s var(--ease) infinite;
+  }
+  .pdf-dot-star {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    transform: translateX(-50%);
+    font-size: 9px;
+    line-height: 1;
+    color: var(--pink);
+    pointer-events: none;
+    animation: pdf-mark-bob 1.9s var(--ease) infinite;
+  }
+  @keyframes pdf-mark-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pink) 55%, transparent); }
+    50%      { box-shadow: 0 0 0 5px color-mix(in srgb, var(--pink) 0%, transparent); }
+  }
+  @keyframes pdf-mark-bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-2px); }
+  }
+
   /* Interactive (detail) pills grow taller on viewer hover for easy clicking. */
   .has-nav .pdf-dot { cursor: pointer; }
   .pdf-thumb:hover .has-nav .pdf-dot { height: 0.55rem; }
@@ -1027,15 +1054,36 @@
   }
   .sm-co-stack .sm-tile { aspect-ratio: auto; width: clamp(220px, 30vw, 380px); }
 
-  /* 2×2 icon grid filling the two rows. */
-  .sm-co-2x2 {
+  /* 2×2 / 3×2 icon grids filling the two rows. */
+  .sm-co-2x2,
+  .sm-co-3x2 {
     display: grid;
-    grid-template-columns: var(--smrow) var(--smrow);
     grid-template-rows: var(--smrow) var(--smrow);
     gap: var(--smgap);
   }
-  .sm-co-2x2 .sm-tile { height: auto; }
+  .sm-co-2x2 { grid-template-columns: var(--smrow) var(--smrow); }
+  .sm-co-3x2 { grid-template-columns: var(--smrow) var(--smrow) var(--smrow); }
+  .sm-co-2x2 .sm-tile,
+  .sm-co-3x2 .sm-tile { height: auto; }
+  /* Icon tiles get more breathing room inside. */
+  .sm-tile-icon { padding: clamp(1.1rem, 2.6vw, 1.9rem); }
 
+  /* Three tall tiles side by side, sharing the row width (narrow to fit). */
+  .sm-co-3up {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--smgap);
+    width: 100%;
+  }
+  .sm-co-3up .sm-tile {
+    width: 100%;
+    height: calc(var(--smrow) * 2 + var(--smgap));
+    aspect-ratio: auto;
+  }
+
+  @media (max-width: 640px) {
+    .sm-co-3x2 { grid-template-columns: var(--smrow) var(--smrow); grid-template-rows: repeat(3, var(--smrow)); }
+  }
   @media (max-width: 560px) {
     .sm-co-stack .sm-tile { width: clamp(180px, 60vw, 320px); }
   }
