@@ -306,22 +306,22 @@ function ModelDisplayInner({
   // Defer the first canvas init past initial load + stagger vs other mockups.
   const appReady = useAppReady();
 
-  // Scroll engagement: how centred the model is in the viewport (0 at edges,
-  // up to SCROLL_ENGAGE at centre), giving a subtle move toward the hover pose
-  // as it scrolls past. Read each frame by the Rig.
+  // Scroll engagement: maps the model's progress through the viewport to a
+  // 0..ENGAGE value, so it's *locked to scroll position* — scrolling down eases
+  // it one way (toward the hover pose), scrolling back up reverses it.
   const engageRef = useRef(0);
   useEffect(() => {
     const el = hoverRef.current;
     if (!el || typeof window === "undefined") return;
-    const SCROLL_ENGAGE = 0.28;
+    const SCROLL_ENGAGE = 0.6;
     let raf = 0;
     const update = () => {
       raf = 0;
       const r = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
-      const centre = r.top + r.height / 2;
-      const d = Math.abs(centre - vh / 2) / (vh / 2);        // 0 centred → 1 at edge
-      engageRef.current = Math.max(0, 1 - d) * SCROLL_ENGAGE;
+      // 0 as it enters the bottom of the viewport → 1 as it leaves the top.
+      const progress = (vh - r.top) / (vh + r.height);
+      engageRef.current = Math.min(1, Math.max(0, progress)) * SCROLL_ENGAGE;
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();

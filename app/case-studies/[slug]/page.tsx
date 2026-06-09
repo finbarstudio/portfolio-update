@@ -9,6 +9,7 @@ import KinayaShowcase from "@/components/KinayaShowcase";
 import PackerShowcase from "@/components/PackerShowcase";
 import SalesmastersShowcase from "@/components/SalesmastersShowcase";
 import MomentumShowcase from "@/components/MomentumShowcase";
+import MediaRows from "@/components/MediaRows";
 import Testimonial from "@/components/Testimonial";
 import WhatWasDelivered from "@/components/WhatWasDelivered";
 import Outcomes from "@/components/Outcomes";
@@ -155,74 +156,6 @@ function SummaryBlock({ project }: { project: Project }) {
           <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{value}</p>
         </div>
       ))}
-    </div>
-  );
-}
-
-/* ─── Media rows ──────────────────────────────────────────────
-   All tiles from every row live in a single CSS grid with one set of
-   column definitions (repeat(N, 1fr)). Same column count for both rows
-   guarantees pixel-perfect alignment — col N in row 1 sits exactly above
-   col N in row 2, and the gap between rows matches the gap between cols.
-
-   Mobile shows a smaller, larger-scale sample (2 of each row) so the work
-   reads at a usable size; desktop shows the full set.
-   ───────────────────────────────────────────────────────────── */
-function MediaGrid({
-  rows,
-  count,
-  className,
-  sizes,
-}: {
-  rows: MediaRowType[];
-  count: number;
-  className: string;
-  sizes: string;
-}) {
-  return (
-    <div
-      className={className}
-      style={{
-        gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${rows.length}, auto)`,
-      }}
-    >
-      {rows.flatMap((row, ri) => {
-        const items = (row.videos ?? row.images ?? []).slice(0, count);
-        return items.map((src, i) => (
-          <div
-            key={`${ri}-${i}`}
-            style={{
-              aspectRatio: row.ratio,
-              background: "white",
-              overflow: "hidden",
-              gridColumn: i + 1,
-              gridRow: ri + 1,
-            }}
-          >
-            {row.videos ? (
-              <VideoPlayer src={src} />
-            ) : (
-              <ClientImage src={src} alt={row.alt ?? ""} fill sizes={sizes} className="object-cover" />
-            )}
-          </div>
-        ));
-      })}
-    </div>
-  );
-}
-
-function MediaRows({ rows }: { rows: MediaRowType[] }) {
-  const maxCount = Math.max(...rows.map((r) => (r.videos ?? r.images ?? []).length));
-  if (maxCount === 0) return null;
-  const mobileCount = Math.min(2, maxCount);
-
-  return (
-    <div className="py-2">
-      {/* Mobile: a couple of each, large */}
-      <MediaGrid rows={rows} count={mobileCount} className="grid gap-2.5 md:hidden" sizes="50vw" />
-      {/* Desktop: the full set */}
-      <MediaGrid rows={rows} count={maxCount} className="hidden md:grid gap-3" sizes="14vw" />
     </div>
   );
 }
