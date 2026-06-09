@@ -47,7 +47,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
   return (
     <article
       className="card-animate col-span-12 group"
-      style={{ animationDelay: `${index * 0.07}s`, height: "75vh", display: "flex", flexDirection: "column" }}
+      style={{ animationDelay: `${index * 0.03}s`, height: "75vh", display: "flex", flexDirection: "column" }}
     >
       <Link
         href={`/case-studies/${project.slug}`}
@@ -112,7 +112,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
   return (
     <article
       className="card-animate col-span-12 sm:col-span-6 group relative"
-      style={{ animationDelay: `${index * 0.07}s`, height: "60vh", display: "flex", flexDirection: "column" }}
+      style={{ animationDelay: `${index * 0.03}s`, height: "60vh", display: "flex", flexDirection: "column" }}
     >
       <Link
         href={`/case-studies/${project.slug}`}
@@ -164,7 +164,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
   return (
     <article
       className="card-animate col-span-12 sm:col-span-6 group relative"
-      style={{ animationDelay: `${index * 0.07}s`, height: "60vh", display: "flex", flexDirection: "column" }}
+      style={{ animationDelay: `${index * 0.03}s`, height: "60vh", display: "flex", flexDirection: "column" }}
     >
       <Link
         href={`/case-studies/${project.slug}`}

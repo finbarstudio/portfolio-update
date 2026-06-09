@@ -153,7 +153,7 @@
 
 /* ─── Keyframes ──────────────────────────────────────────────── */
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -269,7 +269,7 @@
 
   /* Card entrance animation */
   .card-animate {
-    animation: fade-up var(--dur-slow) var(--ease) both;
+    animation: fade-up var(--dur) var(--ease) both;
   }
 
   /* Sidebar nav link */
@@ -380,8 +380,8 @@
       opacity: 0;
       /* Slow grow so a featured card's thumbnail eases down (steals space)
          gradually enough for the WebGL mockup to refit smoothly. */
-      transition: grid-template-rows 480ms var(--ease),
-                  opacity var(--dur) var(--ease);
+      transition: grid-template-rows 320ms var(--ease),
+                  opacity var(--dur-fast) var(--ease);
     }
     .hover-reveal > * { overflow: hidden; min-height: 0; }
     .group:hover .hover-reveal,
@@ -426,7 +426,7 @@
     overflow: hidden;
     background: var(--thumb-bg);
     box-shadow: var(--elev-1);
-    transition: box-shadow var(--dur-slow) var(--ease);
+    transition: box-shadow var(--dur) var(--ease);
   }
   /* No transform on hover — translating the container makes WebGL mockups
      (phone / Mac) visibly jump. Separation comes from elevation + the ring. */
