@@ -760,8 +760,8 @@
   .packer-pdf {
     position: relative;
     width: 100%;
-    aspect-ratio: 3 / 2;
-    max-height: 70vh;
+    aspect-ratio: 16 / 9;
+    max-height: 58vh;
     overflow: hidden;
     border-radius: 16px;
   }
@@ -781,13 +781,12 @@
   .packer-link:hover { color: var(--ink); }
   /* PDF page image — contained, inset so rounded corners don't clip it; grows
      slightly when the viewer is hovered. */
-  /* Page sits in the upper area with a clear band at the bottom for controls. */
   .pdf-page {
     position: absolute;
-    top: 6%;
-    left: 6%;
-    right: 6%;
-    bottom: 15%;
+    inset: 8% 6%;
+    width: 88%;
+    height: 84%;
+    margin: auto;
     object-fit: contain;
     transform: scale(0.97);
     transition: opacity 0.8s var(--ease), transform 0.55s var(--ease);
@@ -795,64 +794,63 @@
   }
   .pdf-page[data-active="true"] { transform: scale(1); }
   /* Zoom only when the cursor is over the page itself. */
-  .pdf-page[data-active="true"]:hover { transform: scale(1.04); }
+  .pdf-page[data-active="true"]:hover { transform: scale(1.05); }
 
-  /* PDF viewer bottom controls — rounded bubbles for dots + arrows. */
+  /* PDF viewer bottom controls — thin horizontal bars. */
   .pdf-controls {
     position: absolute;
-    bottom: 14px;
+    bottom: 12px;
     left: 0;
     right: 0;
     z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 7px;
   }
   .pdf-dots {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
   }
-  /* Round bubble indicators. */
+  /* Thin horizontal bar indicators. */
   .pdf-dot {
-    width: 6px;
-    height: 6px;
+    width: 14px;
+    height: 4px;
     padding: 0;
     border: none;
-    border-radius: 50%;
+    border-radius: 2px;
     background: rgba(20, 20, 20, 0.22);
-    transition: width 0.3s var(--ease), height 0.3s var(--ease), background 0.2s var(--ease);
+    transition: height 0.25s var(--ease), background 0.2s var(--ease);
   }
   .pdf-dot[data-active="true"] { background: var(--pink); }
 
-  /* Interactive (detail) bubbles grow to ~double size when the viewer is hovered
-     so they're easy to click; the active one stays pink. */
+  /* Interactive (detail) bars: double height when the viewer is hovered so each
+     is an easy click target, staying rectangular. */
   .has-nav .pdf-dot { cursor: pointer; }
-  .pdf-thumb:hover .has-nav .pdf-dot { width: 12px; height: 12px; }
+  .pdf-thumb:hover .has-nav .pdf-dot { height: 8px; }
   .pdf-thumb:hover .has-nav button.pdf-dot:hover {
     background: color-mix(in srgb, var(--pink) 60%, transparent);
   }
 
-  /* Prev/next arrows in matching round bubbles, revealed on hover. */
+  /* Prev/next arrows in a matching bar-style bubble, revealed on hover. */
   .pdf-arrow {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 16px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
-    border-radius: 50%;
-    background: var(--surface-raised);
-    color: var(--ink);
-    box-shadow: var(--elev-1);
+    border-radius: 4px;
+    background: rgba(20, 20, 20, 0.12);
+    color: rgba(20, 20, 20, 0.6);
     cursor: pointer;
     opacity: 0;
     transition: opacity var(--dur) var(--ease), color var(--dur-fast) var(--ease),
-                box-shadow var(--dur-fast) var(--ease);
+                background var(--dur-fast) var(--ease);
   }
-  .pdf-arrow:hover { color: var(--pink); box-shadow: var(--elev-2); }
+  .pdf-arrow:hover { background: color-mix(in srgb, var(--pink) 18%, transparent); color: var(--pink); }
   .pdf-thumb:hover .pdf-arrow,
   .pdf-arrow:focus-visible { opacity: 1; }
 
