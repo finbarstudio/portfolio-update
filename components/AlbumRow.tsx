@@ -151,7 +151,7 @@ function AlbumRowInner({
         position: "relative",
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
-        background: "var(--color-bg, #FAFAF8)",
+        background: "var(--thumb-bg, #e0e0e0)",
         overflow: "hidden",
         cursor: hoverable ? "pointer" : "default",
       }}
@@ -180,7 +180,7 @@ function AlbumRowInner({
 const AlbumRow = dynamic(() => Promise.resolve(AlbumRowInner), {
   ssr: false,
   loading: () => (
-    <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--color-bg, #FAFAF8)" }}>
+    <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--thumb-bg, #e0e0e0)" }}>
       <Loader size={28} />
     </div>
   ),

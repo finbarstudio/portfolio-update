@@ -466,7 +466,7 @@ function PhoneCarouselInner({
         position: "relative",
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
-        background: "var(--color-bg, #FAFAF8)",
+        background: "var(--thumb-bg, #e0e0e0)",
         overflow: "hidden",
         cursor: hoverable ? "pointer" : "default",
       }}
@@ -509,7 +509,7 @@ const PhoneCarousel = dynamic(() => Promise.resolve(PhoneCarouselInner), {
         position: "relative",
         width: "100%",
         height: "100%",
-        background: "var(--color-bg, #FAFAF8)",
+        background: "var(--thumb-bg, #e0e0e0)",
       }}
     >
       <Loader size={28} />

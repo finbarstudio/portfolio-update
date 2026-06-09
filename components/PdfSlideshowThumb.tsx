@@ -64,7 +64,7 @@ export default function PdfSlideshowThumb({
         width: "100%",
         height: "100%",
         overflow: "hidden",
-        background: "var(--surface-sunken, #F2F2EF)",
+        background: "var(--thumb-bg, #e0e0e0)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

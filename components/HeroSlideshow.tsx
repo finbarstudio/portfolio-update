@@ -89,7 +89,7 @@ export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = fals
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
         overflow: "hidden",
-        background: "var(--color-bg, #FAFAF8)",
+        background: "var(--thumb-bg, #e0e0e0)",
       }}
     >
       {/* Soft pink wash on hover, behind the cards */}

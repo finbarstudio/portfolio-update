@@ -137,9 +137,9 @@ function DisplayModel({ modelUrl, videoTexture }: DisplayModelProps) {
    instead makes the canvas itself opaque — no transparent areas, no pulse. */
 function BgFade({ hovered }: { hovered: boolean }) {
   const scene = useThree((s) => s.scene);
-  const bg = useMemo(() => new THREE.Color("#FAFAF8"), []);
+  const bg = useMemo(() => new THREE.Color("#e0e0e0"), []);   // shared thumbnail grey
   const pink = useMemo(() => new THREE.Color("#FFE9F4"), []); // pink 10% in white
-  const cur = useMemo(() => new THREE.Color("#FAFAF8"), []);
+  const cur = useMemo(() => new THREE.Color("#e0e0e0"), []);
   const amt = useRef(0);
   useFrame(() => {
     amt.current += ((hovered ? 1 : 0) - amt.current) * 0.07;
@@ -391,7 +391,7 @@ function ModelDisplayInner({
         position: "relative",
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
-        background: "var(--color-bg, #FAFAF8)",
+        background: "var(--thumb-bg, #e0e0e0)",
         overflow: "hidden",
         cursor: hoverable ? "pointer" : "default",
       }}
@@ -460,7 +460,7 @@ const ModelDisplay = dynamic(() => Promise.resolve(ModelDisplayInner), {
         position: "relative",
         width: "100%",
         height: "100%",
-        background: "var(--color-bg, #FAFAF8)",
+        background: "var(--thumb-bg, #e0e0e0)",
       }}
     >
       <Loader size={28} />
