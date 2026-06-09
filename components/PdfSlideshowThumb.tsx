@@ -54,6 +54,11 @@ export default function PdfSlideshowThumb({
   return (
     <div
       ref={hoverRef}
+      className={`pdf-thumb ${nav ? "has-nav" : ""}`}
+      // While the pointer is over the viewer, pause the auto-advance so the user
+      // can read / navigate; resume it the moment the pointer leaves.
+      onMouseEnter={nav ? () => setManual(true) : undefined}
+      onMouseLeave={nav ? () => setManual(false) : undefined}
       style={{
         position: "relative",
         width: "100%",
@@ -75,18 +80,11 @@ export default function PdfSlideshowThumb({
           src={src}
           alt=""
           aria-hidden={i !== active}
+          data-active={i === active}
           loading={i === 0 ? "eager" : "lazy"}
+          className="pdf-page"
           style={{
-            position: "absolute",
-            inset: "8% 6%",            // inset so rounded corners don't clip the page
-            width: "88%",
-            height: "84%",
-            margin: "auto",
-            objectFit: "contain",
             opacity: i === active ? 1 : 0,
-            transform: i === active ? "scale(1)" : "scale(0.97)",
-            transition: "opacity 0.8s var(--ease, ease), transform 0.8s var(--ease, ease)",
-            filter: "drop-shadow(0 6px 18px rgba(20,20,20,0.12))",
             zIndex: i === active ? 1 : 0,
           }}
         />

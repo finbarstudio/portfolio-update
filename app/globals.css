@@ -778,6 +778,22 @@
     transition: color var(--dur-fast) var(--ease);
   }
   .packer-link:hover { color: var(--ink); }
+  /* PDF page image — contained, inset so rounded corners don't clip it; grows
+     slightly when the viewer is hovered. */
+  .pdf-page {
+    position: absolute;
+    inset: 8% 6%;
+    width: 88%;
+    height: 84%;
+    margin: auto;
+    object-fit: contain;
+    transform: scale(0.97);
+    transition: opacity 0.8s var(--ease), transform 0.55s var(--ease);
+    filter: drop-shadow(0 6px 18px rgba(20, 20, 20, 0.12));
+  }
+  .pdf-page[data-active="true"] { transform: scale(1); }
+  .pdf-thumb:hover .pdf-page[data-active="true"] { transform: scale(1.05); }
+
   /* PDF viewer bottom controls — dots + hover-revealed prev/next arrows. */
   .pdf-controls {
     position: absolute;
@@ -788,7 +804,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
   }
   .pdf-dots {
     display: flex;
@@ -802,30 +818,32 @@
     border: none;
     border-radius: 3px;
     background: rgba(20, 20, 20, 0.18);
-    transition: width 0.4s var(--ease), background 0.4s var(--ease);
+    transition: width 0.3s var(--ease), background 0.2s var(--ease);
   }
   button.pdf-dot { cursor: pointer; }
+  /* Hover preview — show which page you're about to select. */
+  button.pdf-dot:hover { width: 11px; background: color-mix(in srgb, var(--pink) 55%, transparent); }
   .pdf-dot[data-active="true"] { width: 14px; background: var(--pink); }
 
+  /* Arrows styled to match the dot bar: small, flat pills, no heavy circle. */
   .pdf-arrow {
-    width: 26px;
-    height: 26px;
+    width: 18px;
+    height: 14px;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 999px;
-    background: var(--surface-raised);
-    color: var(--ink);
-    box-shadow: var(--elev-1);
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: rgba(20, 20, 20, 0.4);
     cursor: pointer;
     opacity: 0;
-    transition: opacity var(--dur) var(--ease), color var(--dur-fast) var(--ease),
-                box-shadow var(--dur-fast) var(--ease);
+    transition: opacity var(--dur) var(--ease), color var(--dur-fast) var(--ease);
   }
-  .pdf-arrow:hover { color: var(--pink); box-shadow: var(--elev-2); }
+  .pdf-arrow:hover { color: var(--pink); }
   /* Arrows fade in when the viewer is hovered (and stay for keyboard focus). */
-  .card-thumb:hover .pdf-arrow,
-  .packer-pdf:hover .pdf-arrow,
+  .pdf-thumb:hover .pdf-arrow,
   .pdf-arrow:focus-visible { opacity: 1; }
 
   /* Logo reels — two square looping videos. */
