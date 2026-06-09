@@ -20,10 +20,11 @@ const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ),
 });
 
-/* ── Section header ──────────────────────────────────────── */
-function SectionHeader({ name }: { name: string }) {
+/* ── Numbered section header (Packer style) ──────────────── */
+function SectionHeader({ index, name }: { index: number; name: string }) {
   return (
-    <header className="kinaya-section-header">
+    <header className="packer-section-header">
+      <span className="packer-section-index">{String(index).padStart(2, "0")}</span>
       <h2 className="kinaya-section-name">{name}</h2>
     </header>
   );
@@ -57,9 +58,16 @@ const FINAL_ALTERNATES = [
 export default function KinayaShowcase() {
   return (
     <div className="kinaya-showcase">
-      {/* 01 — Logo Development */}
+      {/* 01 — Brand Identity */}
       <section className="kinaya-section">
-        <SectionHeader name="Logo Development" />
+        <SectionHeader index={1} name="Brand Identity" />
+        <p className="packer-section-body">
+          A full brand identity built from the ground up — logomark, logotype,
+          colour system and guidelines — balancing warmth with the trust an NDIS
+          audience needs.
+        </p>
+
+        <p className="kinaya-sub">Logo Development</p>
         <div
           className="kinaya-logo-dev"
           style={{ gridTemplateColumns: `repeat(${LOGO_DEV.length}, 1fr)` }}
@@ -69,11 +77,8 @@ export default function KinayaShowcase() {
             <img key={src} src={src} alt="" aria-hidden="true" />
           ))}
         </div>
-      </section>
 
-      {/* 02 — Colour Palette */}
-      <section className="kinaya-section">
-        <SectionHeader name="Colour Palette" />
+        <p className="kinaya-sub">Colour Palette</p>
         <div className="kinaya-palette">
           {PALETTE.map((c) => (
             <div
@@ -85,11 +90,8 @@ export default function KinayaShowcase() {
             </div>
           ))}
         </div>
-      </section>
 
-      {/* 03 — Final Identity */}
-      <section className="kinaya-section">
-        <SectionHeader name="Final Identity" />
+        <p className="kinaya-sub">Final Identity</p>
         <div className="kinaya-final">
           <div className="kinaya-final-main">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -104,35 +106,32 @@ export default function KinayaShowcase() {
         </div>
       </section>
 
-      {/* 04 — Website */}
+      {/* 02 — Website */}
       <section className="kinaya-section">
-        <SectionHeader name="Website" />
-        <div className="kinaya-website">
-          <p className="kinaya-website-body">
-            Six-page Framer site, built for handover. CMS collections drive the
-            repeating content (services, team, posts) so the KinAya team can
-            publish without touching code. Built accessibility-first, with a
-            custom site-wide text resizer that persists across sessions,
-            alongside semantic HTML, focus states, and contrast tuned to the
-            brand palette. SEO basics in place from launch: per-page metadata, Open Graph, clean
-            URLs.
-          </p>
-          <a
-            href="https://www.kinaya.com.au/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="kinaya-website-link"
-          >
-            kinaya.com.au ↗
-          </a>
-          <div className="kinaya-website-visual">
-            <ModelDisplay
-              model="/models/studio-display/display.gltf"
-              video="/images/kinaya/accessibility.webm"
-              fill
-              hoverable={false}
-            />
-          </div>
+        <SectionHeader index={2} name="Website" />
+        <p className="packer-section-body">
+          Six-page Framer site, built for handover. CMS collections drive the
+          repeating content (services, team, posts) so the KinAya team can
+          publish without touching code. Built accessibility-first, with a custom
+          site-wide text resizer that persists across sessions, alongside semantic
+          HTML, focus states, and contrast tuned to the brand palette. SEO basics
+          in place from launch: per-page metadata, Open Graph, clean URLs.
+        </p>
+        <a
+          href="https://www.kinaya.com.au/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="packer-link"
+        >
+          kinaya.com.au ↗
+        </a>
+        <div className="packer-website-visual">
+          <ModelDisplay
+            model="/models/studio-display/display.gltf"
+            video="/images/kinaya/accessibility.webm"
+            fill
+            hoverable={false}
+          />
         </div>
       </section>
     </div>
