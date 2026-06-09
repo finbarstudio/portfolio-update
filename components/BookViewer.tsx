@@ -69,10 +69,27 @@ export default function BookViewer({ pages, markSpread }: { pages: string[]; mar
     return () => el.removeEventListener("keydown", onKey);
   }, []);
 
+  // Touch swipe to flip spreads.
+  const touchX = useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => { touchX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) > 35) go(dx < 0 ? 1 : -1);
+  };
+
   const [left, right] = spreads[shown];
 
   return (
-    <div className="sm-book pdf-thumb" ref={rootRef} tabIndex={0} aria-label="Playbook">
+    <div
+      className="sm-book pdf-thumb"
+      ref={rootRef}
+      tabIndex={0}
+      aria-label="Playbook"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       <div className="sm-book-spread">
         <div className="sm-book-page sm-book-left">
           {left && (
@@ -101,19 +118,17 @@ export default function BookViewer({ pages, markSpread }: { pages: string[]; mar
             <path d="M10 4 6 8l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
+        {/* Dots are display-only indicators (navigate via swipe / arrows). */}
         <div className="pdf-dots">
           {spreads.map((_, i) => (
-            <button
+            <span
               key={i}
-              type="button"
-              aria-label={i === markSpread ? `Spread ${i + 1} (highlight)` : `Spread ${i + 1}`}
-              aria-current={i === idx}
-              onClick={() => setIdx(i)}
               className={`pdf-dot${i === markSpread ? " pdf-dot-mark" : ""}`}
               data-active={i === idx}
+              aria-hidden="true"
             >
               {i === markSpread && <span className="pdf-dot-star" aria-hidden="true">★</span>}
-            </button>
+            </span>
           ))}
         </div>
         <button type="button" onClick={() => go(1)} aria-label="Next pages" className="pdf-arrow" disabled={idx === spreads.length - 1}>

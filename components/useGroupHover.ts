@@ -17,6 +17,10 @@ export function useGroupHover<T extends HTMLElement>(enabled = true) {
 
   useEffect(() => {
     if (!enabled) return;
+    // Touch devices fire pointerenter on tap and never leave, which makes the
+    // hover state stick and glitch. Only track hover on real hover-capable
+    // (pointer:fine) devices.
+    if (typeof window !== "undefined" && window.matchMedia && !window.matchMedia("(hover: hover)").matches) return;
     const el = ref.current;
     if (!el) return;
     const target = (el.closest(".group") as HTMLElement | null) ?? el;

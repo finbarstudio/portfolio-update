@@ -336,9 +336,11 @@
     transition: transform 620ms var(--ease);
     will-change: transform;
   }
-  .group:hover .card-zoom-inner,
-  .group:focus-within .card-zoom-inner {
-    transform: scale(1.035);
+  @media (hover: hover) {
+    .group:hover .card-zoom-inner,
+    .group:focus-within .card-zoom-inner {
+      transform: scale(1.035);
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .card-zoom-inner { transition: none; }
@@ -429,8 +431,16 @@
     transition: box-shadow var(--dur) var(--ease);
   }
   /* No transform on hover — translating the container makes WebGL mockups
-     (phone / Mac) visibly jump. Separation comes from elevation + the ring. */
-  .group:hover .card-thumb {
+     (phone / Mac) visibly jump. Separation comes from elevation + the ring.
+     Hover only on hover-capable devices; on touch the pink outline shows on
+     tap (active/focus) instead, so there are no stuck hover glitches. */
+  @media (hover: hover) {
+    .group:hover .card-thumb {
+      box-shadow: var(--elev-2), 0 0 0 6px var(--pink);
+    }
+  }
+  .group:active .card-thumb,
+  .group:focus-within .card-thumb {
     box-shadow: var(--elev-2), 0 0 0 6px var(--pink);
   }
 
@@ -855,12 +865,7 @@
     50%      { transform: translateX(-50%) translateY(-2px); }
   }
 
-  /* Interactive (detail) pills grow taller on viewer hover for easy clicking. */
-  .has-nav .pdf-dot { cursor: pointer; }
-  .pdf-thumb:hover .has-nav .pdf-dot { height: 0.55rem; }
-  .pdf-thumb:hover .has-nav button.pdf-dot:hover {
-    background: color-mix(in srgb, var(--pink) 60%, transparent);
-  }
+  /* Dots are display-only indicators now (nav via swipe / arrows) — keep small. */
 
   /* Prev/next arrows in a matching pill, same height as the hovered bars. */
   .pdf-arrow {
@@ -887,29 +892,8 @@
   .pdf-arrow:disabled:hover { background: rgba(20, 20, 20, 0.14); color: rgba(20, 20, 20, 0.6); }
 
   /* ── Salesmasters showcase ─────────────────────────────────── */
-  .sm-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: clamp(1.5rem, 5vw, 4rem);
-    margin-bottom: clamp(1.25rem, 3vw, 2rem);
-  }
-  .sm-stat-value {
-    font-family: var(--font-primary);
-    font-weight: 800;
-    font-size: clamp(1.75rem, 4vw, 3rem);
-    line-height: 1;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-  }
-  .sm-stat-label {
-    margin-top: 0.5rem;
-    font-family: var(--font-label);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
+  /* Stats reuse the Outcomes styling (big number + pink tag + label). */
+  .sm-stats { margin-bottom: clamp(1.5rem, 3vw, 2rem); }
 
   /* Client logo marquee — grey at rest, full colour on hover. */
   .sm-logo-marquee {
@@ -950,6 +934,10 @@
   @media (prefers-reduced-motion: reduce) {
     .sm-logo-track { animation: none; }
     .sm-logo-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  }
+  @media (hover: none) {
+    .sm-logo-marquee { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .sm-logo-track { animation: none; }
   }
 
   /* Playbook book viewer — two facing pages per spread. */
@@ -1079,11 +1067,16 @@
     aspect-ratio: auto;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 700px) {
+    /* Shrink the row unit so the wheel + grids fit small screens and wrap
+       (wheel above, diagrams/icons below), centred. */
+    .sm-co-row { --smrow: clamp(74px, 20vw, 104px); justify-content: center; }
     .sm-co-3x2 { grid-template-columns: var(--smrow) var(--smrow); grid-template-rows: repeat(3, var(--smrow)); }
-  }
-  @media (max-width: 560px) {
-    .sm-co-stack .sm-tile { width: clamp(180px, 60vw, 320px); }
+    .sm-co-stack .sm-tile { width: clamp(180px, 64vw, 320px); }
+    /* SWD: wheel on its own row, BANT + STAR below it. */
+    .sm-co-3up { grid-template-columns: 1fr; }
+    .sm-co-3up .sm-tile:first-child { aspect-ratio: 1 / 1; height: auto; width: clamp(160px, 50vw, 240px); margin: 0 auto; }
+    .sm-co-3up .sm-tile { height: clamp(120px, 34vw, 200px); }
   }
 
   /* Logo reels — two square looping videos. */
@@ -1186,6 +1179,12 @@
   @media (prefers-reduced-motion: reduce) {
     .packer-marquee-track { animation: none; }
     .packer-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  }
+  /* Touch: stop the auto-scroll and let the user swipe through. */
+  @media (hover: none) {
+    .packer-marquee { overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
+    .packer-marquee-track { animation: none; }
+    .packer-marquee-card { scroll-snap-align: center; }
   }
 
   /* Logo Development — full-width row of equal-width transparent PNGs */

@@ -51,6 +51,16 @@ export default function PdfSlideshowThumb({
     setActive((i) => (i + dir + pages.length) % pages.length);
   };
 
+  // Touch swipe to change page (mobile primary nav).
+  const touchX = useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => { touchX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) > 35) go(dx < 0 ? 1 : -1);
+  };
+
   return (
     <div
       ref={hoverRef}
@@ -59,6 +69,8 @@ export default function PdfSlideshowThumb({
       // can read / navigate; resume it the moment the pointer leaves.
       onMouseEnter={nav ? () => setManual(true) : undefined}
       onMouseLeave={nav ? () => setManual(false) : undefined}
+      onTouchStart={nav ? onTouchStart : undefined}
+      onTouchEnd={nav ? onTouchEnd : undefined}
       style={{
         position: "relative",
         width: "100%",
@@ -101,22 +113,11 @@ export default function PdfSlideshowThumb({
           </button>
         )}
 
+        {/* Dots are display-only indicators (navigate via swipe / arrows). */}
         <div className="pdf-dots">
-          {pages.map((_, i) =>
-            nav ? (
-              <button
-                key={i}
-                type="button"
-                aria-label={`Go to page ${i + 1}`}
-                aria-current={i === active}
-                onClick={() => { setManual(true); setActive(i); }}
-                className="pdf-dot"
-                data-active={i === active}
-              />
-            ) : (
-              <span key={i} className="pdf-dot" data-active={i === active} aria-hidden="true" />
-            )
-          )}
+          {pages.map((_, i) => (
+            <span key={i} className="pdf-dot" data-active={i === active} aria-hidden="true" />
+          ))}
         </div>
 
         {nav && pages.length > 1 && (

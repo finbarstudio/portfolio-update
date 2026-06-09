@@ -38,9 +38,9 @@ const AM_ICONS = ["handshake", "target", "graph", "star", "bolt", "simple"].map(
 );
 
 const STATS = [
-  { value: "15+", label: "Playbooks delivered" },
-  { value: "12+", label: "Months of repeat work" },
-  { value: "~70", label: "Hours per edition" },
+  { value: "15+", tag: "Playbooks", label: "Across five industries" },
+  { value: "12+", tag: "Months", label: "Of repeat work" },
+  { value: "~70", tag: "Hours", label: "Per edition" },
 ];
 
 function SectionHeader({ index, name }: { index: number; name: string }) {
@@ -87,11 +87,12 @@ export default function SalesmastersShowcase() {
           than a year.
         </p>
 
-        <div className="sm-stats">
+        <div className="outcomes-grid sm-stats">
           {STATS.map((s) => (
-            <div key={s.label} className="sm-stat">
-              <div className="sm-stat-value">{s.value}</div>
-              <div className="sm-stat-label">{s.label}</div>
+            <div key={s.label} className="outcomes-stat">
+              <div className="outcomes-value">{s.value}</div>
+              <div className="outcomes-delta">{s.tag}</div>
+              <div className="outcomes-label">{s.label}</div>
             </div>
           ))}
         </div>

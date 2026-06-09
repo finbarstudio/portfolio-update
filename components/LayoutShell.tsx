@@ -53,6 +53,9 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
             "--sidebar-w": `${sidebarW}px`,
             paddingTop: "var(--menubar-h)",
             minHeight: "100vh",
+            // Clip any incidental horizontal overflow so the page never scrolls
+            // sideways (fixes asymmetric right padding / stray swipe on mobile).
+            overflowX: "clip",
             transition: "margin-left 0.5s cubic-bezier(0.4,0,0.2,1)",
           } as React.CSSProperties
         }
