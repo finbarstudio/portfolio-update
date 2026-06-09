@@ -7,8 +7,36 @@
  */
 
 import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import Loader from "./Loader";
 import PdfSlideshowThumb from "./PdfSlideshowThumb";
+
+/* A looping reel that only plays while it's in view. */
+function Reel({ src, poster }: { src: string; poster: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") { setInView(true); return; }
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { rootMargin: "100px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (inView) el.play().catch(() => {});
+    else el.pause();
+  }, [inView]);
+
+  return (
+    <div className="packer-reel">
+      <video ref={ref} src={src} poster={poster} muted loop playsInline preload="metadata" />
+    </div>
+  );
+}
 
 // ModelDisplay is r3f / WebGL → dynamic, SSR-disabled.
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
@@ -106,17 +134,7 @@ export default function PackerShowcase() {
         {/* Logo reels — square looping showreels */}
         <div className="packer-reels">
           {REELS.map((r) => (
-            <div key={r.src} className="packer-reel">
-              <video
-                src={r.src}
-                poster={r.poster}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-              />
-            </div>
+            <Reel key={r.src} src={r.src} poster={r.poster} />
           ))}
         </div>
 
