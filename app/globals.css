@@ -793,25 +793,28 @@
     filter: drop-shadow(0 6px 18px rgba(20, 20, 20, 0.12));
   }
   .pdf-page[data-active="true"] { transform: scale(1); }
-  .pdf-thumb:hover .pdf-page[data-active="true"] { transform: scale(1.05); }
+  /* Zoom only when the cursor is over the page itself (not the surrounding
+     container / controls). */
+  .pdf-page[data-active="true"]:hover { transform: scale(1.05); }
 
   /* PDF viewer bottom controls — dots + hover-revealed prev/next arrows. */
   .pdf-controls {
     position: absolute;
-    bottom: 12px;
+    bottom: 10px;
     left: 0;
     right: 0;
     z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
   }
   .pdf-dots {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 3px;
   }
+  /* Decorative (home thumbnail) dots: tiny, non-interactive. */
   .pdf-dot {
     width: 5px;
     height: 5px;
@@ -821,10 +824,23 @@
     background: rgba(20, 20, 20, 0.18);
     transition: width 0.3s var(--ease), background 0.2s var(--ease);
   }
-  button.pdf-dot { cursor: pointer; }
-  /* Hover preview — show which page you're about to select. */
-  button.pdf-dot:hover { width: 11px; background: color-mix(in srgb, var(--pink) 55%, transparent); }
   .pdf-dot[data-active="true"] { width: 14px; background: var(--pink); }
+
+  /* Interactive (detail viewer) dots: small visible bar with a large invisible
+     hit area (padding + background-clip) so they're easy to click. */
+  .has-nav .pdf-dot {
+    width: 13px;
+    height: 18px;
+    padding: 7px 4px;
+    background-clip: content-box;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .has-nav .pdf-dot[data-active="true"] { width: 22px; }
+  .has-nav button.pdf-dot:hover {
+    width: 22px;
+    background-color: color-mix(in srgb, var(--pink) 55%, transparent);
+  }
 
   /* Arrows styled to match the dot bar: small, flat pills, no heavy circle. */
   .pdf-arrow {
