@@ -7,6 +7,7 @@
  * bespoke infographics and technique diagrams.
  */
 
+import type { ReactNode } from "react";
 import BookViewer from "./BookViewer";
 
 const SITE_URL = "https://salesmasters.com.au";
@@ -29,48 +30,12 @@ const LOGOS = [
 
 const G = "/images/salesmasters/graphics";
 
-// Graphics grouped by client — one row each.
-const COMPANIES = [
-  {
-    name: "Site Ware Direct",
-    caption:
-      "BANT and STAR technique diagrams and a custom Sales Wheel, styled as fabric swatches — a nod to their industrial workwear manufacturing.",
-    items: [`${G}/site-ware-direct/bant.webp`, `${G}/site-ware-direct/star.webp`, `${G}/site-ware-direct/wheel.webp`],
-  },
-  {
-    name: "Cutek",
-    caption: "Sales Wheel and a custom audience icon set across their market segments.",
-    items: [
-      `${G}/cutek/wheel.webp`,
-      `${G}/cutek/architects.webp`,
-      `${G}/cutek/consumers.webp`,
-      `${G}/cutek/distributors.webp`,
-      `${G}/cutek/government.webp`,
-      `${G}/cutek/manufacturers.webp`,
-    ],
-  },
-  {
-    name: "Bus4x4",
-    caption: "The six-point walkround diagram, the source vehicle renders it was built from, and the custom tyre illustration.",
-    items: [
-      `${G}/bus4x4/technical.webp`,
-      `${G}/bus4x4/orig-rear.webp`,
-      `${G}/bus4x4/orig-cargo.webp`,
-      `${G}/bus4x4/orig-driver.webp`,
-      `${G}/bus4x4/orig-full-boot.webp`,
-      `${G}/bus4x4/orig-full-hood.webp`,
-      `${G}/bus4x4/wheel.webp`,
-    ],
-  },
-  {
-    name: "Active Medical",
-    caption: "Sales Wheel and a bespoke icon set.",
-    items: [
-      `${G}/active-medical/wheel.webp`,
-      ...["handshake", "star", "bolt", "graph", "simple", "target"].map((n) => `${G}/active-medical/icons/${n}.webp`),
-    ],
-  },
-];
+const CUTEK_ICONS = ["architects", "consumers", "distributors", "government"].map(
+  (n) => `${G}/cutek/${n}.webp`
+);
+const AM_ICONS = ["handshake", "target", "graph", "star"].map(
+  (n) => `${G}/active-medical/icons/${n}.webp`
+);
 
 const STATS = [
   { value: "15+", label: "Playbooks delivered" },
@@ -84,6 +49,26 @@ function SectionHeader({ index, name }: { index: number; name: string }) {
       <span className="packer-section-index">{String(index).padStart(2, "0")}</span>
       <h2 className="kinaya-section-name">{name}</h2>
     </header>
+  );
+}
+
+/* ── Graphics building blocks ──────────────────────────────── */
+function Company({ name, caption, children }: { name: string; caption?: string; children: ReactNode }) {
+  return (
+    <div className="sm-company">
+      <p className="sm-company-name">{name}</p>
+      {caption && <p className="sm-company-caption">{caption}</p>}
+      <div className="sm-co-row">{children}</div>
+    </div>
+  );
+}
+
+function Tile({ src, tall = false, wide = false }: { src: string; tall?: boolean; wide?: boolean }) {
+  return (
+    <figure className={`sm-tile${tall ? " sm-tile-tall" : ""}${wide ? " sm-tile-wide" : ""}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" aria-hidden="true" loading="lazy" />
+    </figure>
   );
 }
 
@@ -156,20 +141,39 @@ export default function SalesmastersShowcase() {
           process maps, and custom icon sets.
         </p>
 
-        {COMPANIES.map((co) => (
-          <div key={co.name} className="sm-company">
-            <p className="sm-company-name">{co.name}</p>
-            {co.caption && <p className="sm-company-caption">{co.caption}</p>}
-            <div className="sm-company-items">
-              {co.items.map((src) => (
-                <figure key={src} className="sm-company-item">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" aria-hidden="true" loading="lazy" />
-                </figure>
-              ))}
-            </div>
+        {/* Site Ware Direct — Sales Wheel (tall) + BANT/STAR stacked */}
+        <Company
+          name="Site Ware Direct"
+          caption="BANT and STAR technique diagrams and a custom Sales Wheel, styled as fabric swatches — a nod to their industrial workwear manufacturing."
+        >
+          <Tile src={`${G}/site-ware-direct/wheel.webp`} tall />
+          <div className="sm-co-stack">
+            <Tile src={`${G}/site-ware-direct/bant.webp`} />
+            <Tile src={`${G}/site-ware-direct/star.webp`} />
           </div>
-        ))}
+        </Company>
+
+        {/* Cutek — Sales Wheel (tall) + 2×2 audience icons */}
+        <Company name="Cutek" caption="Sales Wheel and a custom audience icon set across their market segments.">
+          <Tile src={`${G}/cutek/wheel.webp`} tall />
+          <div className="sm-co-2x2">
+            {CUTEK_ICONS.map((src) => <Tile key={src} src={src} />)}
+          </div>
+        </Company>
+
+        {/* Bus4x4 — six-point walkround + tyre wheel, both tall */}
+        <Company name="Bus4x4" caption="The custom six-point walkround diagram and the bespoke tyre-wheel illustration.">
+          <Tile src={`${G}/bus4x4/technical.webp`} tall wide />
+          <Tile src={`${G}/bus4x4/wheel.webp`} tall />
+        </Company>
+
+        {/* Active Medical — Sales Wheel (tall) + 2×2 icons */}
+        <Company name="Active Medical" caption="Sales Wheel and a bespoke icon set.">
+          <Tile src={`${G}/active-medical/wheel.webp`} tall />
+          <div className="sm-co-2x2">
+            {AM_ICONS.map((src) => <Tile key={src} src={src} />)}
+          </div>
+        </Company>
       </section>
     </div>
   );

@@ -961,6 +961,15 @@
     object-fit: contain;
     box-shadow: 0 6px 22px rgba(20, 20, 20, 0.16);
   }
+  .sm-book-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--thumb-bg, #e0e0e0);
+  }
 
   /* Graphics grouped by client — one row each. */
   .sm-company {
@@ -982,30 +991,53 @@
     line-height: 1.5;
     color: var(--ink-soft);
   }
-  .sm-company-items {
+  /* Two-row-tall company layouts. --smrow is one row; tall tiles span two. */
+  .sm-co-row {
+    --smrow: clamp(120px, 16vw, 190px);
+    --smgap: clamp(0.6rem, 1.5vw, 1.1rem);
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: clamp(0.6rem, 1.5vw, 1.1rem);
+    align-items: stretch;
+    gap: var(--smgap);
     margin-top: clamp(1rem, 2vw, 1.5rem);
   }
-  .sm-company-item {
+  .sm-tile {
     margin: 0;
-    height: clamp(96px, 13vw, 150px);
     background: white;
     border-radius: 10px;
     box-shadow: var(--elev-1);
-    padding: clamp(0.7rem, 1.6vw, 1.2rem);
+    padding: clamp(0.6rem, 1.4vw, 1.1rem);
     display: flex;
     align-items: center;
     justify-content: center;
+    height: var(--smrow);
+    aspect-ratio: 1 / 1;     /* small tiles are square */
   }
-  .sm-company-item img {
-    height: 100%;
-    width: auto;
-    max-width: clamp(160px, 24vw, 320px);
-    object-fit: contain;
-    display: block;
+  .sm-tile img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; }
+  /* Tall tile = full two-row height (square by default). */
+  .sm-tile-tall { height: calc(var(--smrow) * 2 + var(--smgap)); }
+  /* Wide tall tile (e.g. the technical diagram) keeps height but goes 16:9. */
+  .sm-tile-wide { aspect-ratio: 16 / 9; }
+
+  /* BANT/STAR stacked into the two rows. */
+  .sm-co-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--smgap);
+  }
+  .sm-co-stack .sm-tile { aspect-ratio: auto; width: clamp(220px, 30vw, 380px); }
+
+  /* 2×2 icon grid filling the two rows. */
+  .sm-co-2x2 {
+    display: grid;
+    grid-template-columns: var(--smrow) var(--smrow);
+    grid-template-rows: var(--smrow) var(--smrow);
+    gap: var(--smgap);
+  }
+  .sm-co-2x2 .sm-tile { height: auto; }
+
+  @media (max-width: 560px) {
+    .sm-co-stack .sm-tile { width: clamp(180px, 60vw, 320px); }
   }
 
   /* Logo reels — two square looping videos. */

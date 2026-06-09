@@ -8,6 +8,22 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import Loader from "./Loader";
+
+// Preload both pages of a spread; resolves once both are decoded.
+function preload(srcs: (string | null)[]): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
+  return Promise.all(
+    srcs.filter(Boolean).map(
+      (src) =>
+        new Promise<void>((res) => {
+          const im = new window.Image();
+          im.onload = im.onerror = () => res();
+          im.src = src as string;
+        })
+    )
+  ).then(() => undefined);
+}
 
 export default function BookViewer({ pages }: { pages: string[] }) {
   // Build spreads: cover alone on the right, then facing pairs, last page alone.
@@ -16,11 +32,31 @@ export default function BookViewer({ pages }: { pages: string[] }) {
     spreads.push([pages[i] ?? null, pages[i + 1] ?? null]);
   }
 
-  const [idx, setIdx] = useState(0);
+  const [idx, setIdx] = useState(0);       // requested spread
+  const [shown, setShown] = useState(0);   // spread currently displayed
+  const [loading, setLoading] = useState(true);
   const rootRef = useRef<HTMLDivElement>(null);
 
   const go = (d: number) =>
     setIdx((i) => Math.min(spreads.length - 1, Math.max(0, i + d)));
+
+  // Load the requested spread fully before showing it, so both facing pages
+  // appear together (never a half-loaded mismatch). Prefetch the neighbours so
+  // subsequent flips are instant.
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    preload(spreads[idx]).then(() => {
+      if (cancelled) return;
+      setShown(idx);
+      setLoading(false);
+      // warm the adjacent spreads in the background
+      if (spreads[idx + 1]) preload(spreads[idx + 1]);
+      if (spreads[idx - 1]) preload(spreads[idx - 1]);
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
 
   useEffect(() => {
     const el = rootRef.current;
@@ -33,7 +69,7 @@ export default function BookViewer({ pages }: { pages: string[] }) {
     return () => el.removeEventListener("keydown", onKey);
   }, []);
 
-  const [left, right] = spreads[idx];
+  const [left, right] = spreads[shown];
 
   return (
     <div className="sm-book pdf-thumb" ref={rootRef} tabIndex={0} aria-label="Playbook">
@@ -41,16 +77,23 @@ export default function BookViewer({ pages }: { pages: string[] }) {
         <div className="sm-book-page sm-book-left">
           {left && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={left} alt="" loading="lazy" />
+            <img src={left} alt="" />
           )}
         </div>
         <div className="sm-book-page sm-book-right">
           {right && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={right} alt="" loading="lazy" />
+            <img src={right} alt="" />
           )}
         </div>
       </div>
+
+      {/* Loading placeholder — covers the spread until both pages are ready. */}
+      {loading && (
+        <div className="sm-book-loading" aria-hidden="true">
+          <Loader size={28} />
+        </div>
+      )}
 
       <div className="pdf-controls has-nav">
         <button type="button" onClick={() => go(-1)} aria-label="Previous pages" className="pdf-arrow" disabled={idx === 0}>
