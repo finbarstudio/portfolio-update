@@ -1387,6 +1387,25 @@
     }
   }
 
+  /* Phone-carousel wireframe placeholder — three phone outlines, gently pulsing,
+     shown until the real phones are all ready. */
+  .phone-wire {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
+    pointer-events: none;
+    animation: phone-wire-pulse 1.8s var(--ease) infinite;
+  }
+  .phone-wire svg { width: min(78%, 460px); height: 70%; }
+  @keyframes phone-wire-pulse {
+    0%, 100% { opacity: 0.35; }
+    50%      { opacity: 0.6; }
+  }
+
   /* Soft pink wash behind a 3D mockup, faded in on hover (canvas is transparent
      so it shows through). Shared by all mockups. */
   .mockup-pink-bg {

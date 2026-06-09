@@ -230,9 +230,38 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
   );
 }
 
+/* ── Wireframe placeholder ─────────────────────────────────────
+   Three phone outlines arranged like the rest state, shown until all the real
+   phones have decoded a frame so the carousel reveals as one. */
+function PhoneWireframe() {
+  return (
+    <div className="phone-wire" aria-hidden="true">
+      <svg viewBox="0 0 300 170" preserveAspectRatio="xMidYMid meet" fill="none">
+        {/* left flank, tilted */}
+        <g transform="translate(70 95) rotate(15)" opacity="0.6">
+          <rect x="-26" y="-52" width="52" height="104" rx="9" stroke="currentColor" strokeWidth="2.2" />
+          <rect x="-20" y="-44" width="40" height="88" rx="4" stroke="currentColor" strokeWidth="1.2" opacity="0.6" />
+        </g>
+        {/* right flank, tilted */}
+        <g transform="translate(230 95) rotate(-15)" opacity="0.6">
+          <rect x="-26" y="-52" width="52" height="104" rx="9" stroke="currentColor" strokeWidth="2.2" />
+          <rect x="-20" y="-44" width="40" height="88" rx="4" stroke="currentColor" strokeWidth="1.2" opacity="0.6" />
+        </g>
+        {/* centre phone */}
+        <g transform="translate(150 85)">
+          <rect x="-32" y="-64" width="64" height="128" rx="11" stroke="currentColor" strokeWidth="2.6" />
+          <rect x="-25" y="-55" width="50" height="110" rx="5" stroke="currentColor" strokeWidth="1.4" opacity="0.6" />
+          <rect x="-7" y="-60" width="14" height="3" rx="1.5" fill="currentColor" opacity="0.6" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 /* ── Inner: carousel that drives all 7 phones from one offset ── */
 
-function Carousel({ model, videos, hovered, inView }: { model: string; videos: string[]; hovered: boolean; inView: boolean }) {
+function Carousel({ model, videos, hovered, inView, onReady }: { model: string; videos: string[]; hovered: boolean; inView: boolean; onReady: () => void }) {
+  const reportedReady = useRef(false);
   // useGLTF caches the load + returns the scene. Shared across instances.
   const gltf = useGLTF(model) as unknown as { scene: THREE.Group };
   const sceneRoot = gltf.scene;
@@ -314,6 +343,10 @@ function Carousel({ model, videos, hovered, inView }: { model: string; videos: s
 
     const lerp = THREE.MathUtils.lerp;
 
+    // Count phones that should be on screen but don't yet have a decoded frame,
+    // so we can hold the reveal until they're all ready (pop in together).
+    let pendingFrames = 0;
+
     for (let i = 0; i < NUM_PHONES; i++) {
       const phone = phoneGroups.current[i];
       if (!phone) continue;
@@ -353,6 +386,7 @@ function Carousel({ model, videos, hovered, inView }: { model: string; videos: s
       const visible = scale > 0.02 && hasFrame;
       if (phone.visible !== visible) phone.visible = visible;
       phone.scale.setScalar(scale);
+      if (scale > 0.02 && !hasFrame) pendingFrames++;
 
       // Video lifecycle. Keep the src attached for ANY phone that is even
       // slightly on screen (scale > 0.02) so it always has frames ready — the
@@ -376,6 +410,12 @@ function Carousel({ model, videos, hovered, inView }: { model: string; videos: s
           if (vid.getAttribute("src")) { vid.removeAttribute("src"); vid.load(); }
         }
       }
+    }
+
+    // Every on-screen phone has a frame → reveal them all together (once).
+    if (pendingFrames === 0 && !reportedReady.current) {
+      reportedReady.current = true;
+      onReady();
     }
   });
 
@@ -452,6 +492,8 @@ function PhoneCarouselInner({
   // Hover is driven by the parent card (.group) so the carousel shares the card's
   // single hover state rather than its own separate canvas hover.
   const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
+  // `ready` flips only once every on-screen phone has a decoded frame, so the
+  // whole carousel pops in together instead of phone-by-phone as they load.
   const [ready, setReady] = useState(false);
   // Pause rendering + video decode entirely when the carousel is off screen.
   const [inView, setInView] = useState(false);
@@ -464,19 +506,6 @@ function PhoneCarouselInner({
     io.observe(el);
     return () => io.disconnect();
   }, [hoverRef]);
-
-  // Once any video has played a frame, hide the loader/poster.
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    let cancelled = false;
-    const check = () => {
-      if (cancelled) return;
-      // Just mark ready after a short delay — Canvas + first paint will look ok by then.
-      setReady(true);
-    };
-    const t = setTimeout(check, 600);
-    return () => { cancelled = true; clearTimeout(t); };
-  }, []);
 
   return (
     <div
@@ -494,7 +523,8 @@ function PhoneCarouselInner({
       {/* Soft pink wash on hover, behind the canvas */}
       <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
-      {(!ready || !appReady) && <Loader size={28} />}
+      {/* Wireframe placeholder until every phone is ready (they pop in together). */}
+      {!ready && <PhoneWireframe />}
 
       {appReady && (
       <Canvas
@@ -507,7 +537,12 @@ function PhoneCarouselInner({
         }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
-        style={{ position: "absolute", inset: 0 }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          opacity: ready ? 1 : 0,
+          transition: "opacity 0.45s var(--ease, ease)",
+        }}
       >
         {/* 60fps on hover; 30fps when visible at rest; nothing when off screen. */}
         <FrameDriver active={hovered && inView} idleFps={inView ? 30 : 0} />
@@ -517,7 +552,7 @@ function PhoneCarouselInner({
         <directionalLight position={[-3, 2, -3]} intensity={0.35} />
         <Suspense fallback={null}>
           <Environment preset="city" />
-          <Carousel model={model} videos={videos} hovered={hovered} inView={inView} />
+          <Carousel model={model} videos={videos} hovered={hovered} inView={inView} onReady={() => setReady(true)} />
         </Suspense>
       </Canvas>
       )}
