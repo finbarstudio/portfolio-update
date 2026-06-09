@@ -133,37 +133,9 @@ function SectionHeader({ index, name }: { index: number; name: string }) {
 export default function PackerShowcase() {
   return (
     <div className="kinaya-showcase">
-      {/* 01 — Website */}
+      {/* 01 — Capability Statement */}
       <section className="kinaya-section">
-        <SectionHeader index={1} name="Website Management" />
-        <p className="packer-section-body">
-          I ran and maintained the Packer &amp; Associates website across the
-          contract: content updates, new pages, layout work and general upkeep,
-          keeping the site current and on brand as the business grew.
-        </p>
-        {SITE_URL && (
-          <a
-            href={SITE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="packer-link"
-          >
-            Visit the live site ↗
-          </a>
-        )}
-        <div className="packer-website-visual">
-          <ModelDisplay
-            model="/models/studio-display/display.gltf"
-            video="/images/packer-associates/3D%20Model%20Video.webm"
-            fill
-            hoverable={false}
-          />
-        </div>
-      </section>
-
-      {/* 02 — Capability Statement */}
-      <section className="kinaya-section">
-        <SectionHeader index={2} name="Capability Statement" />
+        <SectionHeader index={1} name="Capability Statement" />
         <p className="packer-section-body">
           The flagship deliverable. A twelve-page digital capability statement,
           written, designed and produced from scratch to present the company and
@@ -174,9 +146,9 @@ export default function PackerShowcase() {
         </div>
       </section>
 
-      {/* 03 — Social & Editorial */}
+      {/* 02 — Social & Editorial */}
       <section className="kinaya-section">
-        <SectionHeader index={3} name="Social & Editorial" />
+        <SectionHeader index={2} name="Social & Editorial" />
         <p className="packer-section-body">
           Ongoing content for the company blog and LinkedIn, plus animated logo
           reels for their clients. I wrote and designed posts and built motion
@@ -201,6 +173,34 @@ export default function PackerShowcase() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 03 — Website */}
+      <section className="kinaya-section">
+        <SectionHeader index={3} name="Website Management" />
+        <p className="packer-section-body">
+          I ran and maintained the Packer &amp; Associates website across the
+          contract: content updates, new pages, layout work and general upkeep,
+          keeping the site current and on brand as the business grew.
+        </p>
+        {SITE_URL && (
+          <a
+            href={SITE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="packer-link"
+          >
+            Visit the live site ↗
+          </a>
+        )}
+        <div className="packer-website-visual">
+          <ModelDisplay
+            model="/models/studio-display/display.gltf"
+            video="/images/packer-associates/3D%20Model%20Video.webm"
+            fill
+            hoverable={false}
+          />
         </div>
       </section>
     </div>
