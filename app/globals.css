@@ -778,14 +778,38 @@
     transition: color var(--dur-fast) var(--ease);
   }
   .packer-link:hover { color: var(--ink); }
-  /* PDF viewer nav arrows */
-  .pdf-nav-btn {
+  /* PDF viewer bottom controls — dots + hover-revealed prev/next arrows. */
+  .pdf-controls {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    bottom: 12px;
+    left: 0;
+    right: 0;
     z-index: 3;
-    width: 34px;
-    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .pdf-dots {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pdf-dot {
+    width: 5px;
+    height: 5px;
+    padding: 0;
+    border: none;
+    border-radius: 3px;
+    background: rgba(20, 20, 20, 0.18);
+    transition: width 0.4s var(--ease), background 0.4s var(--ease);
+  }
+  button.pdf-dot { cursor: pointer; }
+  .pdf-dot[data-active="true"] { width: 14px; background: var(--pink); }
+
+  .pdf-arrow {
+    width: 26px;
+    height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -794,10 +818,37 @@
     color: var(--ink);
     box-shadow: var(--elev-1);
     cursor: pointer;
-    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease), color var(--dur-fast) var(--ease),
                 box-shadow var(--dur-fast) var(--ease);
   }
-  .pdf-nav-btn:hover { color: var(--pink); box-shadow: var(--elev-2); }
+  .pdf-arrow:hover { color: var(--pink); box-shadow: var(--elev-2); }
+  /* Arrows fade in when the viewer is hovered (and stay for keyboard focus). */
+  .card-thumb:hover .pdf-arrow,
+  .packer-pdf:hover .pdf-arrow,
+  .pdf-arrow:focus-visible { opacity: 1; }
+
+  /* Logo reels — two square looping videos. */
+  .packer-reels {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+    max-width: 760px;
+  }
+  .packer-reel {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 14px;
+    background: white;
+    box-shadow: var(--elev-1);
+  }
+  .packer-reel video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 
   /* Social/blog graphics — slow horizontal marquee of landscape cards. */
   .packer-marquee {

@@ -27,13 +27,18 @@ const PDF_PAGES = Array.from({ length: 12 }, (_, i) =>
 );
 
 const SOCIAL = [
-  "ai-generated-content",
   "free-elearn-course",
   "graphic-design",
-  "mens-mental-health-week",
   "stimula",
-  "benefits-of-training",
+  "post-1",
+  "post-2",
+  "post-3",
 ].map((n) => `/images/packer-associates/social/${n}.webp`);
+
+const REELS = [
+  { src: "/images/packer-associates/reels/compass-reel.webm", poster: "/images/packer-associates/reels/compass-reel.webp" },
+  { src: "/images/packer-associates/reels/stimula-reel.webm", poster: "/images/packer-associates/reels/stimula-reel.webp" },
+];
 
 function SectionHeader({ index, name }: { index: number; name: string }) {
   return (
@@ -92,10 +97,30 @@ export default function PackerShowcase() {
       <section className="kinaya-section">
         <SectionHeader index={3} name="Social & Editorial" />
         <p className="packer-section-body">
-          Ongoing content for the company blog and LinkedIn. I wrote and designed
-          posts that kept the brand active, consistent and visible to its audience
-          throughout the engagement.
+          Ongoing content for the company blog and LinkedIn, plus animated logo
+          reels for their clients. I wrote and designed posts and built motion
+          pieces that kept the brand active, consistent and visible throughout the
+          engagement.
         </p>
+
+        {/* Logo reels — square looping showreels */}
+        <div className="packer-reels">
+          {REELS.map((r) => (
+            <div key={r.src} className="packer-reel">
+              <video
+                src={r.src}
+                poster={r.poster}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Social / blog graphics marquee */}
         <div className="packer-marquee" aria-label="Social and blog graphics">
           <div className="packer-marquee-track">
             {[...SOCIAL, ...SOCIAL].map((src, i) => (

@@ -92,80 +92,43 @@ export default function PdfSlideshowThumb({
         />
       ))}
 
-      {/* Prev / next arrows + page counter (detail-page viewer) */}
-      {nav && pages.length > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={() => go(-1)}
-            aria-label="Previous page"
-            className="pdf-nav-btn"
-            style={{ left: 12 }}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      {/* Bottom control bar — pink page dots, plus hover-revealed prev/next
+          arrows beside them when nav is enabled. Dots are clickable in nav mode. */}
+      <div className={`pdf-controls ${nav ? "has-nav" : ""}`}>
+        {nav && pages.length > 1 && (
+          <button type="button" onClick={() => go(-1)} aria-label="Previous page" className="pdf-arrow">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M10 4 6 8l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <button
-            type="button"
-            onClick={() => go(1)}
-            aria-label="Next page"
-            className="pdf-nav-btn"
-            style={{ right: 12 }}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        )}
+
+        <div className="pdf-dots">
+          {pages.map((_, i) =>
+            nav ? (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Go to page ${i + 1}`}
+                aria-current={i === active}
+                onClick={() => { setManual(true); setActive(i); }}
+                className="pdf-dot"
+                data-active={i === active}
+              />
+            ) : (
+              <span key={i} className="pdf-dot" data-active={i === active} aria-hidden="true" />
+            )
+          )}
+        </div>
+
+        {nav && pages.length > 1 && (
+          <button type="button" onClick={() => go(1)} aria-label="Next page" className="pdf-arrow">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <span
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              bottom: 12,
-              right: 14,
-              zIndex: 3,
-              fontFamily: "var(--font-label)",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              color: "var(--ink-soft)",
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {active + 1} / {pages.length}
-          </span>
-        </>
-      )}
-
-      {/* Page progress dots (hidden when arrows/counter are shown) */}
-      {!nav && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            bottom: 12,
-            left: 0,
-            right: 0,
-            display: "flex",
-            justifyContent: "center",
-            gap: 5,
-            zIndex: 2,
-          }}
-        >
-          {pages.map((_, i) => (
-            <span
-              key={i}
-              style={{
-                width: i === active ? 14 : 5,
-                height: 5,
-                borderRadius: 3,
-                background: i === active ? "var(--pink)" : "rgba(20,20,20,0.18)",
-                transition: "width 0.4s var(--ease, ease), background 0.4s var(--ease, ease)",
-              }}
-            />
-          ))}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
