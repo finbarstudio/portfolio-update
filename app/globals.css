@@ -902,7 +902,9 @@
     transition: opacity var(--dur) var(--ease);
   }
   .packer-reel:hover .reel-controls,
-  .reel-controls:focus-within { opacity: 1; }
+  /* keep visible for keyboard focus only — not after a mouse click on the
+     scrubber (which would otherwise leave the HUD stuck on once the mouse left) */
+  .packer-reel:has(:focus-visible) .reel-controls { opacity: 1; }
   .reel-btn {
     flex-shrink: 0;
     width: 26px;
