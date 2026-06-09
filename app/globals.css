@@ -855,6 +855,8 @@
   .pdf-arrow:hover { background: color-mix(in srgb, var(--pink) 20%, transparent); color: var(--pink); }
   .pdf-thumb:hover .pdf-arrow,
   .pdf-arrow:focus-visible { opacity: 1; }
+  .pdf-thumb:hover .pdf-arrow:disabled { opacity: 0.3; cursor: default; }
+  .pdf-arrow:disabled:hover { background: rgba(20, 20, 20, 0.14); color: rgba(20, 20, 20, 0.6); }
 
   /* ── Salesmasters showcase ─────────────────────────────────── */
   .sm-stats {
@@ -917,19 +919,42 @@
     .sm-logo-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
   }
 
-  /* Playbook viewer — portrait page container, centred. */
-  .sm-playbook {
+  /* Playbook book viewer — two facing pages per spread. */
+  .sm-book {
     position: relative;
     width: 100%;
-    max-width: 540px;
     margin: 0 auto;
-    aspect-ratio: 1240 / 1900;   /* page + bottom control band */
-    max-height: 78vh;
+    aspect-ratio: 2480 / 1900;   /* two A4 pages + bottom control band */
+    max-height: 74vh;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: 14px;
+    outline: none;
+  }
+  .sm-book-spread {
+    position: absolute;
+    inset: 4% 4% 14% 4%;
+    display: flex;
+    gap: 1.5%;
+    align-items: stretch;
+    justify-content: center;
+  }
+  .sm-book-page {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+  }
+  .sm-book-left { justify-content: flex-end; }
+  .sm-book-right { justify-content: flex-start; }
+  .sm-book-page img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    box-shadow: 0 6px 22px rgba(20, 20, 20, 0.16);
   }
 
-  /* Infographics. */
+  /* Sales Wheels — signature graphic, 2-up. */
   .sm-wheels {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -937,12 +962,6 @@
     margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
   }
   @media (max-width: 640px) { .sm-wheels { grid-template-columns: 1fr; } }
-  .sm-diagrams {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(1.25rem, 3vw, 2.5rem);
-    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
-  }
   .sm-figure {
     margin: 0;
     background: white;
@@ -956,13 +975,31 @@
   .sm-figure img { width: 100%; height: auto; display: block; }
   .sm-figure-square { aspect-ratio: 1 / 1; }
   .sm-figure-square img { max-height: 100%; width: auto; object-fit: contain; }
-  .sm-icons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: clamp(1.25rem, 3vw, 2.5rem);
-    align-items: center;
+
+  /* Micrographics — small diagrams + icons in a 5-up grid. */
+  .sm-micro {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: clamp(0.6rem, 1.5vw, 1rem);
   }
-  .sm-icons img { width: clamp(40px, 6vw, 64px); height: auto; }
+  .sm-micro-item {
+    margin: 0;
+    aspect-ratio: 1 / 1;
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--elev-1);
+    padding: clamp(0.6rem, 1.5vw, 1.1rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sm-micro-item img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+  @media (max-width: 900px) {
+    .sm-micro { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .sm-micro { grid-template-columns: repeat(3, 1fr); }
+  }
 
   /* Logo reels — two square looping videos. */
   .packer-reels {

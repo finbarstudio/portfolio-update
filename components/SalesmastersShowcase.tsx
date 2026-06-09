@@ -7,7 +7,7 @@
  * bespoke infographics and technique diagrams.
  */
 
-import PdfSlideshowThumb from "./PdfSlideshowThumb";
+import BookViewer from "./BookViewer";
 
 const SITE_URL = "https://salesmasters.com.au";
 
@@ -112,9 +112,7 @@ export default function SalesmastersShowcase() {
           an interactive, distributable PDF and a print edition, with the print
           pre-production managed through to delivery.
         </p>
-        <div className="sm-playbook">
-          <PdfSlideshowThumb pages={PLAYBOOK_PAGES} hover={false} nav />
-        </div>
+        <BookViewer pages={PLAYBOOK_PAGES} />
       </section>
 
       {/* 03 — Infographics & technique diagrams */}
@@ -129,6 +127,7 @@ export default function SalesmastersShowcase() {
           Custom icon sets carry the visual language across each edition.
         </p>
 
+        {/* Sales Wheels — the signature graphic, shown a touch larger */}
         <div className="sm-wheels">
           {WHEELS.map((w) => (
             <figure key={w.src} className="sm-figure sm-figure-square">
@@ -138,19 +137,19 @@ export default function SalesmastersShowcase() {
           ))}
         </div>
 
-        <div className="sm-diagrams">
+        {/* Micrographics — diagrams + icons, small, 5-up grid */}
+        <div className="sm-micro" aria-label="Diagrams and icons">
           {DIAGRAMS.map((d) => (
-            <figure key={d.src} className="sm-figure">
+            <figure key={d.src} className="sm-micro-item">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={d.src} alt={d.label} loading="lazy" />
             </figure>
           ))}
-        </div>
-
-        <div className="sm-icons" aria-label="Custom icon set">
           {ICONS.map((src) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} src={src} alt="" aria-hidden="true" loading="lazy" />
+            <figure key={src} className="sm-micro-item">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" aria-hidden="true" loading="lazy" />
+            </figure>
           ))}
         </div>
       </section>
