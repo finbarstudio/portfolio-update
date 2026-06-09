@@ -856,6 +856,102 @@
   .pdf-thumb:hover .pdf-arrow,
   .pdf-arrow:focus-visible { opacity: 1; }
 
+  /* ── Salesmasters showcase ─────────────────────────────────── */
+  .sm-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    margin-bottom: clamp(1.25rem, 3vw, 2rem);
+  }
+  .sm-stat-value {
+    font-family: var(--font-primary);
+    font-weight: 800;
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .sm-stat-label {
+    margin-top: 0.5rem;
+    font-family: var(--font-label);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* Cover marquee — portrait client-branded covers scrolling. */
+  .sm-cover-marquee {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .sm-cover-track {
+    display: flex;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    width: max-content;
+    animation: album-scroll 38s linear infinite;
+  }
+  .sm-cover {
+    flex: 0 0 auto;
+    width: clamp(150px, 18vw, 230px);
+    aspect-ratio: 1240 / 1754;
+    overflow: hidden;
+    border-radius: 8px;
+    background: white;
+    box-shadow: var(--elev-1);
+  }
+  .sm-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* Playbook viewer — portrait page container, centred. */
+  .sm-playbook {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    margin: 0 auto;
+    aspect-ratio: 1240 / 1900;   /* page + bottom control band */
+    max-height: 78vh;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  /* Infographics. */
+  .sm-wheels {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(1rem, 3vw, 2.5rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  @media (max-width: 640px) { .sm-wheels { grid-template-columns: 1fr; } }
+  .sm-diagrams {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .sm-figure {
+    margin: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--elev-1);
+    padding: clamp(1rem, 2.5vw, 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sm-figure img { width: 100%; height: auto; display: block; }
+  .sm-figure-square { aspect-ratio: 1 / 1; }
+  .sm-figure-square img { max-height: 100%; width: auto; object-fit: contain; }
+  .sm-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: center;
+  }
+  .sm-icons img { width: clamp(40px, 6vw, 64px); height: auto; }
+
   /* Logo reels — two square looping videos. */
   .packer-reels {
     display: grid;

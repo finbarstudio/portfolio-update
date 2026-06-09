@@ -7,6 +7,7 @@ import ModelDisplay from "@/components/ModelDisplay";
 import AlbumShowcase from "@/components/AlbumShowcase";
 import KinayaShowcase from "@/components/KinayaShowcase";
 import PackerShowcase from "@/components/PackerShowcase";
+import SalesmastersShowcase from "@/components/SalesmastersShowcase";
 import Testimonial from "@/components/Testimonial";
 import WhatWasDelivered from "@/components/WhatWasDelivered";
 import Outcomes from "@/components/Outcomes";
@@ -438,6 +439,8 @@ export default async function CaseStudyPage({
         <KinayaShowcase />
       ) : project.slug === "packer-associates" ? (
         <PackerShowcase />
+      ) : project.slug === "salesmasters" ? (
+        <SalesmastersShowcase />
       ) : project.heroAlbums ? (
         <AlbumShowcase images={project.images.map(({ src, alt }) => ({ src, alt }))} />
       ) : project.mediaRows && project.mediaRows.length > 0 ? (
