@@ -19,12 +19,12 @@ const LOGOS = [
   "active-medical.svg",
   "bus4x4.svg",
   "alpha-lifecare.svg",
-  "siteware-direct.svg",
+  "siteware-direct.webp",
   "criterion.svg",
   "cutek.webp",
   "all-storage-systems.webp",
   "prescience.webp",
-  "connected-platforms.webp",
+  "connected-platforms.svg",
 ].map((n) => `/images/salesmasters/logos/opt/${n}`);
 
 const WHEELS = [
