@@ -341,100 +341,21 @@ export const projects: Project[] = [
       "Salesmasters needed unique 40 to 50-page playbooks for each client. Text-heavy but still readable, brand-compliant, and ready to print. There was no template to start from. Every playbook had to feel custom while still reading as part of the same set.",
     outcome:
       "15+ playbooks delivered across healthcare, manufacturing, technology, storage and professional services. The clearest signal is the repeat work over more than a year.",
-    logo: "/images/salesmasters/Logo.png",
+    logo: "/images/salesmasters/logo.webp",
     heroSlideshow: [
-      "/images/salesmasters/cover-alpha-lifecare.jpg",
-      "/images/salesmasters/cover-siteware.png",
-      "/images/salesmasters/cover-playbook.jpg",
-      "/images/salesmasters/Cover Pages/Bus4x4 .jpg",
+      "/images/salesmasters/covers/alpha.webp",
+      "/images/salesmasters/covers/siteware.webp",
+      "/images/salesmasters/covers/playbook.webp",
+      "/images/salesmasters/covers/bus4x4.webp",
     ],
     heroImage: {
-      src: "/images/salesmasters/hero.png",
+      src: "/images/salesmasters/hero.webp",
       alt: "Salesmasters Sales Process Playbook double-page spread from the Bus4x4 edition",
     },
-    images: [
-      {
-        src: "/images/salesmasters/double-spread.png",
-        caption: "Double-page spread with full-bleed imagery, brand layout and typographic hierarchy.",
-        alt: "Salesmasters playbook double-page spread, Bus4x4 edition with full-bleed photography",
-      },
-      {
-        src: "/images/salesmasters/sales-wheel-1.png",
-        caption: "The Sales Wheel: a custom circular diagram mapping the client's sales process end to end.",
-        alt: "Salesmasters Sales Wheel infographic, Active Medical edition mapping the sales cycle",
-      },
-      {
-        src: "/images/salesmasters/bant-diagram.png",
-        caption: "BANT qualification framework, drawn as a purpose-built diagram for the playbook.",
-        alt: "Salesmasters BANT qualification diagram, custom infographic for the SiteWare Direct playbook",
-      },
-      {
-        src: "/images/salesmasters/cover-alpha-lifecare.jpg",
-        caption: "Cover design for the Alpha Lifecare edition. Every client gets a unique cover that still reads as part of the series.",
-        alt: "Salesmasters playbook cover, Alpha Lifecare edition with healthcare photography",
-      },
-    ],
-    hasDepth: true,
-    depth: [
-      {
-        heading: "Custom Sales Wheels",
-        body: "The Sales Wheel sits at the centre of every playbook: a custom circular diagram mapping the client's sales process across stages, touchpoints and actions. Each wheel is drawn from scratch in Illustrator, adapted to the client's industry and sales methodology, then placed into InDesign for the final document.",
-        images: [
-          {
-            src: "/images/salesmasters/sales-wheel-1.png",
-            caption: "Active Medical Sales Wheel, built around the medical equipment sales cycle.",
-            alt: "Salesmasters Sales Wheel, Active Medical edition with sales stages and touchpoints",
-          },
-          {
-            src: "/images/salesmasters/sales-wheel-2.png",
-            caption: "Cutek Sales Wheel, adapted to the timber treatment and coatings industry.",
-            alt: "Salesmasters Sales Wheel, Cutek edition customised for timber treatment product sales cycle",
-          },
-        ],
-      },
-      {
-        heading: "Technique Diagrams",
-        body: "Each playbook also includes supporting technique diagrams: BANT qualification, STAR method and client-specific process maps. All built in Illustrator to a shared visual grammar so they sit cleanly alongside the body copy in InDesign.",
-        images: [
-          {
-            src: "/images/salesmasters/bant-diagram.png",
-            caption: "BANT diagram. Budget, Authority, Need, Timing as a visual framework.",
-            alt: "BANT qualification framework diagram, custom infographic for Salesmasters playbook",
-          },
-          {
-            src: "/images/salesmasters/star-diagram.png",
-            caption: "STAR method diagram. Situation, Task, Action, Result for structured sales storytelling.",
-            alt: "STAR method diagram, Salesmasters playbook infographic for structured sales technique",
-          },
-          {
-            src: "/images/salesmasters/technical-diagram.png",
-            caption: "Bus4x4 6-Point Technical Diagram: a bespoke process map for the client's product range.",
-            alt: "Bus4x4 6-point technical diagram, custom process infographic for the Bus4x4 playbook",
-          },
-        ],
-      },
-      {
-        heading: "Cover Design & Print Delivery",
-        body: "Each playbook cover is fully custom: prominent client logo, bespoke title typography, brand-matched colour and imagery composited in Photoshop. Print files were prepared to spec (bleed, crop marks, CMYK) and managed through to delivery.",
-        images: [
-          {
-            src: "/images/salesmasters/cover-alpha-lifecare.jpg",
-            caption: "Alpha Lifecare cover. Healthcare imagery, brand-compliant layout.",
-            alt: "Salesmasters playbook cover, Alpha Lifecare edition with healthcare photography",
-          },
-          {
-            src: "/images/salesmasters/cover-playbook.jpg",
-            caption: "Generic playbook cover. Typographic treatment for broader use.",
-            alt: "Salesmasters generic playbook cover, typographic design for broad use",
-          },
-          {
-            src: "/images/salesmasters/cover-siteware.png",
-            caption: "SiteWare Direct cover. Tech/industrial palette with a sharper typographic hierarchy.",
-            alt: "Salesmasters SiteWare Direct playbook cover, technology and industrial brand treatment",
-          },
-        ],
-      },
-    ],
+    // Detail page uses the bespoke SalesmastersShowcase, so the generic
+    // images/depth galleries aren't rendered.
+    images: [],
+    hasDepth: false,
     delivered: [
       "Digital PDF optimisation",
       "Technique infographics per playbook",

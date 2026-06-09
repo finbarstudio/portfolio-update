@@ -12,7 +12,7 @@ import BookViewer from "./BookViewer";
 const SITE_URL = "https://salesmasters.com.au";
 
 const PLAYBOOK_PAGES = Array.from({ length: 20 }, (_, i) =>
-  `/images/salesmasters/opt/page-${i + 1}.webp`
+  `/images/salesmasters/playbook/page-${i + 1}.webp`
 );
 
 const LOGOS = [
@@ -25,21 +25,21 @@ const LOGOS = [
   "all-storage-systems.webp",
   "prescience.webp",
   "connected-platforms.svg",
-].map((n) => `/images/salesmasters/logos/opt/${n}`);
+].map((n) => `/images/salesmasters/logos/${n}`);
 
 const WHEELS = [
-  { src: "/images/salesmasters/opt/wheel-active-medical.webp", label: "Active Medical" },
-  { src: "/images/salesmasters/opt/wheel-cutek.webp", label: "Cutek" },
+  { src: "/images/salesmasters/graphics/wheel-active-medical.webp", label: "Active Medical" },
+  { src: "/images/salesmasters/graphics/wheel-cutek.webp", label: "Cutek" },
 ];
 
 const DIAGRAMS = [
-  { src: "/images/salesmasters/opt/bant.webp", label: "BANT qualification" },
-  { src: "/images/salesmasters/opt/star.webp", label: "STAR method" },
-  { src: "/images/salesmasters/opt/technical.webp", label: "Bus4x4 six-point walkround" },
+  { src: "/images/salesmasters/graphics/bant.webp", label: "BANT qualification" },
+  { src: "/images/salesmasters/graphics/star.webp", label: "STAR method" },
+  { src: "/images/salesmasters/graphics/technical.webp", label: "Bus4x4 six-point walkround" },
 ];
 
-const ICONS = ["handshake", "star_", "bolt", "graph", "simple", "target"].map(
-  (n) => `/images/salesmasters/opt/icon-${n}.webp`
+const ICONS = ["handshake", "star", "bolt", "graph", "simple", "target"].map(
+  (n) => `/images/salesmasters/graphics/icons/${n}.webp`
 );
 
 const STATS = [
