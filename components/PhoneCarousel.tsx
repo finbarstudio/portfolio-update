@@ -231,7 +231,7 @@ function PhoneInstance({ sceneRoot, videoTexture, groupSetter }: PhoneInstancePr
 
 /* ── Inner: carousel that drives all 7 phones from one offset ── */
 
-function Carousel({ model, videos, hovered }: { model: string; videos: string[]; hovered: boolean }) {
+function Carousel({ model, videos, hovered, inView }: { model: string; videos: string[]; hovered: boolean; inView: boolean }) {
   // useGLTF caches the load + returns the scene. Shared across instances.
   const gltf = useGLTF(model) as unknown as { scene: THREE.Group };
   const sceneRoot = gltf.scene;
@@ -281,6 +281,13 @@ function Carousel({ model, videos, hovered }: { model: string; videos: string[];
       textures.forEach((t) => t.dispose());
     };
   }, [videoEls, textures]);
+
+  // Off screen: the render loop is stopped, so pause every video to halt decode.
+  // Back on screen, the per-frame lifecycle resumes the on-stage ones.
+  useEffect(() => {
+    if (inView) return;
+    videoEls.forEach((el) => { if (!el.paused) el.pause(); });
+  }, [inView, videoEls]);
 
   // One group ref per phone for cheap per-frame position/rotation/scale updates.
   const phoneGroups = useRef<(THREE.Group | null)[]>(new Array(NUM_PHONES).fill(null));
@@ -445,6 +452,15 @@ function PhoneCarouselInner({
   // single hover state rather than its own separate canvas hover.
   const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
   const [ready, setReady] = useState(false);
+  // Pause rendering + video decode entirely when the carousel is off screen.
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = hoverRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") { setInView(true); return; }
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { rootMargin: "150px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hoverRef]);
 
   // Once any video has played a frame, hide the loader/poster.
   useEffect(() => {
@@ -489,15 +505,15 @@ function PhoneCarouselInner({
         gl={{ antialias: true, alpha: true }}
         style={{ position: "absolute", inset: 0 }}
       >
-        {/* 30fps at rest (the slow cycle + screen videos), 60fps on hover. */}
-        <FrameDriver active={hovered} idleFps={30} />
+        {/* 60fps on hover; 30fps when visible at rest; nothing when off screen. */}
+        <FrameDriver active={hovered && inView} idleFps={inView ? 30 : 0} />
         <LiveResize />
         <ambientLight intensity={0.65} />
         <directionalLight position={[4, 5, 5]} intensity={1.0} />
         <directionalLight position={[-3, 2, -3]} intensity={0.35} />
         <Suspense fallback={null}>
           <Environment preset="city" />
-          <Carousel model={model} videos={videos} hovered={hovered} />
+          <Carousel model={model} videos={videos} hovered={hovered} inView={inView} />
         </Suspense>
       </Canvas>
     </div>
