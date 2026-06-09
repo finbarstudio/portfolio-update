@@ -8,7 +8,7 @@ import ModelDisplay from "@/components/ModelDisplay";
 import PhoneCarousel from "@/components/PhoneCarousel";
 import MagazineCarousel from "@/components/MagazineCarousel";
 import HeroSlideshow from "@/components/HeroSlideshow";
-import AlbumRow from "@/components/AlbumRow";
+import AlbumThumb from "@/components/AlbumThumb";
 import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
@@ -66,7 +66,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
               fill
             />
           ) : project.heroAlbums ? (
-            <AlbumRow images={project.heroAlbums.images} fill />
+            <AlbumThumb images={project.heroAlbums.images} />
           ) : project.heroMagazine ? (
             <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (
@@ -126,7 +126,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
           ) : project.heroPhones ? (
             <PhoneCarousel model={project.heroPhones.model} videos={project.heroPhones.videos} poster={project.heroPhones.poster} fill />
           ) : project.heroAlbums ? (
-            <AlbumRow images={project.heroAlbums.images} fill />
+            <AlbumThumb images={project.heroAlbums.images} />
           ) : project.heroSlideshow ? (
             <HeroSlideshow images={project.heroSlideshow} fill />
           ) : project.heroMagazine ? (

@@ -1427,6 +1427,23 @@
   }
   .mockup-wire svg { width: min(82%, 480px); height: 76%; }
 
+  /* Joe Devine mobile thumbnail — static 2x2 cover grid. */
+  .album-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: clamp(6px, 2vw, 12px);
+    padding: clamp(10px, 4vw, 22px);
+    place-items: center;
+  }
+  .album-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
   /* Soft pink wash behind a 3D mockup, faded in on hover (canvas is transparent
      so it shows through). Shared by all mockups. */
   .mockup-pink-bg {
