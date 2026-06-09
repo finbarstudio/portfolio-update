@@ -978,10 +978,18 @@
     position: absolute;
     inset: 0;
     z-index: 4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: var(--thumb-bg, #e0e0e0);
+    color: var(--ink-soft);
+    animation: phone-wire-pulse 1.8s var(--ease) infinite;
+  }
+  .page-wire { max-width: 100%; max-height: 100%; width: auto; height: 100%; }
+  .sm-excerpt-note {
+    margin-top: clamp(0.75rem, 1.5vw, 1rem);
+    text-align: center;
+    font-family: var(--font-primary);
+    font-size: 12px;
+    font-style: italic;
+    color: var(--ink-soft);
   }
 
   /* Graphics grouped by client — one row each. */
@@ -1404,6 +1412,20 @@
     0%, 100% { opacity: 0.35; }
     50%      { opacity: 0.6; }
   }
+
+  /* Shared mockup wireframe placeholder (mac / album / page). */
+  .mockup-wire {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
+    pointer-events: none;
+    animation: phone-wire-pulse 1.8s var(--ease) infinite;
+  }
+  .mockup-wire svg { width: min(82%, 480px); height: 76%; }
 
   /* Soft pink wash behind a 3D mockup, faded in on hover (canvas is transparent
      so it shows through). Shared by all mockups. */

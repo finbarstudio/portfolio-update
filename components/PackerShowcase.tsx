@@ -8,7 +8,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import Loader from "./Loader";
+import { MacWireframe } from "./Wireframe";
 import PdfSlideshowThumb from "./PdfSlideshowThumb";
 
 /* A looping reel that plays while in view, with a play/pause button and a
@@ -95,8 +95,8 @@ function Reel({ src, poster }: { src: string; poster: string }) {
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ssr: false,
   loading: () => (
-    <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--color-bg)" }}>
-      <Loader size={28} />
+    <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--thumb-bg, #e0e0e0)" }}>
+      <MacWireframe />
     </div>
   ),
 });

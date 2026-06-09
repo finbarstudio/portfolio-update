@@ -18,7 +18,7 @@ import * as THREE from "three";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Environment, Center } from "@react-three/drei";
-import Loader from "./Loader";
+import { MacWireframe } from "./Wireframe";
 import { useGroupHover } from "./useGroupHover";
 import { FrameDriver } from "./FrameDriver";
 import { useAppReady } from "./useAppReady";
@@ -418,7 +418,7 @@ function ModelDisplayInner({
           }}
         />
       )}
-      {!ready && <Loader size={28} />}
+      {!ready && <MacWireframe />}
 
       {inView && appReady && (
         <Canvas
@@ -471,7 +471,7 @@ const ModelDisplay = dynamic(() => Promise.resolve(ModelDisplayInner), {
         background: "var(--thumb-bg, #e0e0e0)",
       }}
     >
-      <Loader size={28} />
+      <MacWireframe />
     </div>
   ),
 });

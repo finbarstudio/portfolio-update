@@ -130,6 +130,7 @@ export default function SalesmastersShowcase() {
         </p>
         {/* Highlight the pages 8–9 spread (cover=0, then 2-3,4-5,6-7,8-9 → index 4). */}
         <BookViewer pages={PLAYBOOK_PAGES} markSpread={4} />
+        <p className="sm-excerpt-note">A 20-page excerpt of a full-length sales playbook.</p>
       </section>
 
       {/* 03 — Infographics & technique diagrams, grouped by client */}

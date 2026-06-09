@@ -8,7 +8,23 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import Loader from "./Loader";
+
+// A4-portrait page wireframe (frame + a few text lines) used while loading.
+function PageWire() {
+  return (
+    <svg className="page-wire" viewBox="0 0 210 297" preserveAspectRatio="xMidYMid meet" fill="none" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="207" height="294" rx="6" stroke="currentColor" strokeWidth="2" />
+      <rect x="22" y="30" width="120" height="9" rx="2" fill="currentColor" opacity="0.5" />
+      <rect x="22" y="55" width="166" height="4" rx="2" fill="currentColor" opacity="0.28" />
+      <rect x="22" y="66" width="166" height="4" rx="2" fill="currentColor" opacity="0.28" />
+      <rect x="22" y="77" width="120" height="4" rx="2" fill="currentColor" opacity="0.28" />
+      <rect x="22" y="104" width="166" height="78" rx="4" fill="currentColor" opacity="0.16" />
+      <rect x="22" y="198" width="166" height="4" rx="2" fill="currentColor" opacity="0.28" />
+      <rect x="22" y="209" width="166" height="4" rx="2" fill="currentColor" opacity="0.28" />
+      <rect x="22" y="220" width="100" height="4" rx="2" fill="currentColor" opacity="0.28" />
+    </svg>
+  );
+}
 
 // Preload both pages of a spread; resolves once both are decoded.
 function preload(srcs: (string | null)[]): Promise<void> {
@@ -105,10 +121,14 @@ export default function BookViewer({ pages, markSpread }: { pages: string[]; mar
         </div>
       </div>
 
-      {/* Loading placeholder — covers the spread until both pages are ready. */}
+      {/* Wireframe placeholder — page outlines while a spread loads (less jarring
+          than a full grey reload). */}
       {loading && (
         <div className="sm-book-loading" aria-hidden="true">
-          <Loader size={28} />
+          <div className="sm-book-spread">
+            <div className="sm-book-page sm-book-left"><PageWire /></div>
+            <div className="sm-book-page sm-book-right"><PageWire /></div>
+          </div>
         </div>
       )}
 
