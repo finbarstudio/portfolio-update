@@ -1,5 +1,19 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
+
+const SITE_URL = "https://www.finbar.studio";
+
+const contactPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "@id": `${SITE_URL}/contact#webpage`,
+  url: `${SITE_URL}/contact`,
+  name: "Contact Finbar Skitini",
+  isPartOf: { "@id": `${SITE_URL}/#website` },
+  inLanguage: "en-AU",
+  mainEntity: { "@id": `${SITE_URL}/#person` },
+};
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -41,6 +55,12 @@ const socials = [
 export default function ContactPage() {
   return (
     <div className="px-5 md:px-10 pt-8 md:pt-12 pb-10">
+      <Script
+        id="ld-contact"
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageJsonLd) }}
+      />
       <h1
         className="font-sans font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}

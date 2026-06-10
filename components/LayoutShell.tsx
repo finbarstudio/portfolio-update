@@ -39,6 +39,11 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   return (
     <>
+      {/* Keyboard/screen-reader skip link — first focusable element, jumps past
+          the persistent chrome straight to the page content. */}
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
       <MenuBar onMobileMenuOpen={() => setMobileMenuOpen(true)} />
       <Sidebar
         collapsed={collapsed}
@@ -60,6 +65,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
           } as React.CSSProperties
         }
         id="main-content"
+        tabIndex={-1}
       >
         {children}
       </main>

@@ -240,6 +240,37 @@
     outline-offset: 2px;
     border-radius: 2px;
   }
+
+  /* Strip the focus ring from the <main> skip-link target — it receives focus
+     programmatically, not by tabbing, so a visible outline there is noise. */
+  #main-content:focus,
+  #main-content:focus-visible {
+    outline: none;
+  }
+}
+
+/* ─── Skip link ──────────────────────────────────────────────────
+   Visually hidden until focused, then pinned top-left over the chrome. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-archivo-narrow), sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  border-radius: 4px;
+  transform: translateY(-150%);
+  transition: transform 0.18s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--pink);
+  outline-offset: 2px;
 }
 
 /* ─── Components ─────────────────────────────────────────────── */

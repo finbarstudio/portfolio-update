@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo_Narrow } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -67,29 +67,79 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  icons: {
-    icon: "/favicon.ico",
+  // Icons are auto-detected from the file conventions in /app
+  // (favicon.ico, icon.tsx, apple-icon.tsx) — no manual list needed.
+  appleWebApp: {
+    capable: true,
+    title: "finbar✶studio",
+    statusBarStyle: "default",
   },
+  // The site uses explicit tel:/mailto: links, so stop iOS Safari from
+  // auto-detecting and restyling phone numbers and addresses in body copy.
+  formatDetection: { telephone: false, address: false, email: false },
   category: "Design",
 };
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "light",
+  themeColor: "#FAFAF8",
+};
+
+// Stable node id so other schema graphs can reference this one Person.
+const PERSON_ID = `${SITE_URL}/#person`;
 
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
+  "@id": PERSON_ID,
   name: "Finbar Skitini",
   alternateName: "Finbar Studio",
   url: SITE_URL,
+  image: `${SITE_URL}/images/headshot.webp`,
   jobTitle: "Graphic Designer & Framer Developer",
   description:
     "Brisbane-based graphic designer and Framer developer. Brand identity, web, publication and motion design.",
   email: "mailto:finbar@finbar.studio",
   telephone: "+61412796630",
+  knowsLanguage: ["en-AU", "en-GB"],
   address: {
     "@type": "PostalAddress",
     addressLocality: "Brisbane",
     addressRegion: "QLD",
     addressCountry: "AU",
   },
+  // Designer + developer occupations, for richer entity understanding.
+  hasOccupation: [
+    {
+      "@type": "Occupation",
+      name: "Graphic Designer",
+      occupationLocation: { "@type": "City", name: "Brisbane" },
+      skills:
+        "Brand identity, logo design, publication design, infographic design, motion graphics",
+    },
+    {
+      "@type": "Occupation",
+      name: "Framer Developer",
+      occupationLocation: { "@type": "City", name: "Brisbane" },
+      skills:
+        "Framer development, CMS setup, custom interactive components, web accessibility, SEO foundations",
+    },
+  ],
+  // Services offered — helps surface the practice as a hireable studio.
+  makesOffer: [
+    "Brand Identity",
+    "Logo Design",
+    "Framer Website Development",
+    "Publication Design",
+    "Motion Graphics",
+    "Web Accessibility",
+  ].map((name) => ({
+    "@type": "Offer",
+    itemOffered: { "@type": "Service", name },
+  })),
+  brand: { "@type": "Brand", name: "finbar✶studio" },
   nationality: { "@type": "Country", name: "United Kingdom" },
   alumniOf: [
     { "@type": "EducationalOrganization", name: "University of Brighton" },
@@ -114,10 +164,13 @@ const personJsonLd = {
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${SITE_URL}/#website`,
   name: "finbar✶studio",
+  alternateName: "Finbar Skitini Portfolio",
   url: SITE_URL,
   inLanguage: "en-AU",
-  publisher: { "@type": "Person", name: "Finbar Skitini" },
+  publisher: { "@id": PERSON_ID },
+  about: { "@id": PERSON_ID },
 };
 
 export default function RootLayout({

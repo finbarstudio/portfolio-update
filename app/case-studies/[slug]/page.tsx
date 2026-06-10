@@ -306,23 +306,38 @@ export default async function CaseStudyPage({
 
   if (!project) notFound();
 
+  const pageUrl = `${SITE_URL}/case-studies/${project.slug}`;
+
   const creativeWorkJsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
+    "@id": `${pageUrl}#work`,
     name: project.name,
+    headline: `${project.name} — ${project.categories.join(", ")}`,
     description: project.oneLiner,
     dateCreated: project.date,
-    creator: {
-      "@type": "Person",
-      name: "Finbar Skitini",
-      url: SITE_URL,
-    },
+    genre: project.categories,
+    creator: { "@id": `${SITE_URL}/#person` },
+    author: { "@id": `${SITE_URL}/#person` },
+    publisher: { "@id": `${SITE_URL}/#person` },
+    isPartOf: { "@id": `${SITE_URL}/#website` },
     keywords: [...project.categories, ...project.skills].join(", "),
-    url: `${SITE_URL}/case-studies/${project.slug}`,
+    url: pageUrl,
+    mainEntityOfPage: pageUrl,
     image: project.heroImage?.src
       ? `${SITE_URL}${project.heroImage.src}`
       : undefined,
     inLanguage: "en-AU",
+  };
+
+  // Breadcrumb trail so Google can render Home › Work › <Project> in results.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: project.name, item: pageUrl },
+    ],
   };
 
   return (
@@ -332,6 +347,12 @@ export default async function CaseStudyPage({
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(creativeWorkJsonLd) }}
+      />
+      <Script
+        id={`ld-breadcrumb-${project.slug}`}
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {/* Header — mobile: stacked + centred. Desktop: logo+title left, tags right, bottom-aligned. */}
       <header className="flex flex-col items-center text-center gap-5 mb-8 md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left md:gap-x-6 md:gap-y-4 md:mb-6">

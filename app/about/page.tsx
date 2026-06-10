@@ -1,6 +1,22 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import ClientImage from "@/components/ClientImage";
 import { projects } from "@/content/projects";
+
+const SITE_URL = "https://www.finbar.studio";
+
+// ProfilePage is the canonical schema for a personal/about page. It points at
+// the one Person node defined in the root layout rather than redefining it.
+const profilePageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": `${SITE_URL}/about#webpage`,
+  url: `${SITE_URL}/about`,
+  name: "About | Finbar Skitini | Brisbane Designer",
+  isPartOf: { "@id": `${SITE_URL}/#website` },
+  inLanguage: "en-AU",
+  mainEntity: { "@id": `${SITE_URL}/#person` },
+};
 
 /* ── Testimonials gathered from any project that has one ─────── */
 function AboutTestimonials() {
@@ -50,6 +66,12 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="px-5 md:px-10 pt-8 md:pt-12 pb-10">
+      <Script
+        id="ld-about"
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}
+      />
       <h1
         className="font-sans font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
