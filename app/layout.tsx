@@ -18,7 +18,7 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Finbar Skitini | Brisbane Graphic Designer & Framer Developer",
+    default: "Finbar Studio | Brisbane Graphic Designer & Framer Developer",
     template: "%s | Finbar Studio",
   },
   description:
