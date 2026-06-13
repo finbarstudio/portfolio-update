@@ -3,7 +3,6 @@ import { Archivo_Narrow } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import LayoutShell from "@/components/LayoutShell";
-import SmoothScroll from "@/components/SmoothScroll";
 
 // Single font family. Archivo Narrow used for both body and mono/label text.
 const archivoNarrow = Archivo_Narrow({
@@ -183,7 +182,6 @@ export default function RootLayout({
       className={archivoNarrow.variable}
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
-        <SmoothScroll />
         <LayoutShell>{children}</LayoutShell>
         <Script
           id="ld-person"

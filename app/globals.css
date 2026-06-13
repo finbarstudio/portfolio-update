@@ -337,14 +337,6 @@
 .sidebar-logo.is-collapsed svg { width: 22px; height: 22px; }
 .sidebar-logo.is-collapsed .logo-word { opacity: 0; width: 0; margin: 0; }
 
-/* ─── Lenis smooth scroll ────────────────────────────────────────
-   Lenis adds .lenis / .lenis-smooth to <html> when active. */
-html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
-.lenis.lenis-smooth iframe { pointer-events: none; }
-
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
 
@@ -384,6 +376,23 @@ html.lenis, html.lenis body { height: auto; }
     gap: var(--space-4);
     margin-bottom: var(--space-6);
   }
+
+  /* Hero masthead logo — rises into the sidebar on scroll (see HeroLogo). */
+  .hero-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.04em;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: clamp(1.6rem, 4.5vw, 2.75rem);
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: var(--space-5);
+    will-change: transform, opacity;
+  }
+  .hero-logo svg { width: 0.82em; height: 0.82em; flex: 0 0 auto; color: var(--pink); }
 
   /* Massive display type that drives the hero + section openers. */
   .home-display {

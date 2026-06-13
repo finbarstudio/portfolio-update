@@ -4,6 +4,7 @@ import Script from "next/script";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
+import HeroLogo from "@/components/HeroLogo";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -60,7 +61,8 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
 /* ─── Hero ──────────────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="px-5 md:px-10 pt-16 md:pt-32 pb-12 md:pb-16" aria-label="Introduction">
+    <section className="px-5 md:px-10 pt-6 md:pt-10 pb-12 md:pb-16" aria-label="Introduction">
+      <HeroLogo />
       <Reveal immediate as="p" className="mono-label text-ink-soft mb-6 md:mb-8">Brisbane graphic designer</Reveal>
 
       <Reveal immediate delay={0.08} as="h1" className="home-display text-ink max-w-[15ch]">
