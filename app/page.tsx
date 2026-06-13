@@ -3,6 +3,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
+import Reveal from "@/components/Reveal";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -60,13 +61,13 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
 function Hero() {
   return (
     <section className="px-5 md:px-10 pt-16 md:pt-32 pb-12 md:pb-16" aria-label="Introduction">
-      <p className="mono-label text-ink-soft mb-6 md:mb-8 home-enter">Brisbane graphic designer</p>
+      <Reveal immediate as="p" className="mono-label text-ink-soft mb-6 md:mb-8">Brisbane graphic designer</Reveal>
 
-      <h1 className="home-display text-ink max-w-[15ch] home-enter" style={{ animationDelay: "0.06s" }}>
+      <Reveal immediate delay={0.08} as="h1" className="home-display text-ink max-w-[15ch]">
         Brand identity, editorial, web &amp; motion.
-      </h1>
+      </Reveal>
 
-      <div className="mt-8 md:mt-10 grid md:grid-cols-12 gap-6 md:gap-8 items-end home-enter" style={{ animationDelay: "0.14s" }}>
+      <Reveal immediate delay={0.18} className="mt-8 md:mt-10 grid md:grid-cols-12 gap-6 md:gap-8 items-end">
         <p className="md:col-span-7 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
           I&rsquo;m Finbar. I design brand identities, publications and websites for businesses in
           Australia and the UK. My background is print and editorial, so type, grids and the small
@@ -89,7 +90,7 @@ function Hero() {
             <Link href="/about#contact" className="home-link">Start a project →</Link>
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -99,34 +100,33 @@ function SelectedWork() {
   const picks = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean) as typeof projects;
   let i = 0;
   return (
-    <section className="home-section px-5 md:px-10" aria-label="Selected work">
-      <div className="reveal-up">
-        <SectionHead title="Selected work" aside={<Link href="/work" className="home-link">Full archive →</Link>} />
-      </div>
+    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="Selected work">
+      <SectionHead title="Selected work" aside={<Link href="/work" className="home-link">Full archive →</Link>} />
       <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
         {picks.map((project) => (
           <ProjectCard key={project.slug} project={project} index={i++} />
         ))}
       </div>
-    </section>
+    </Reveal>
   );
 }
 
 /* ─── How I work ────────────────────────────────────────────── */
 function Approach() {
   return (
-    <section className="home-section px-5 md:px-10 reveal-up" aria-label="How I work">
+    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="How I work">
       <SectionHead title="How I work" />
       <div className="grid md:grid-cols-12 gap-8">
         <div className="md:col-span-7 max-w-2xl space-y-4 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
           <p>
-            Most projects start with the brand: the mark, the type, the rules. From there it goes
-            wherever it needs to, a website, a publication, a campaign.
+            I move between expressive work and strict work. One day it&rsquo;s album and cover art,
+            the next it&rsquo;s a publication, a long-form layout or an infographic with a lot of
+            information to make clear. I like having both ends of that range in my week.
           </p>
           <p>
-            My background is editorial and print, so I think in grids and hierarchy and care about
-            the small stuff, kerning, spacing, the way a page holds together. That carries into the
-            web work, where the detail tends to show the most.
+            What ties it together is the craft underneath: typography, colour, and how a layout
+            leads the eye. I think about that for how a thing looks, and just as often for how
+            readable and accessible it needs to be.
           </p>
           <p>
             I work creative first and move quickly, putting things in front of real content and
@@ -134,7 +134,7 @@ function Approach() {
           </p>
         </div>
       </div>
-    </section>
+    </Reveal>
   );
 }
 
@@ -150,7 +150,7 @@ const CAPABILITIES = [
 
 function Capabilities() {
   return (
-    <section className="home-section px-5 md:px-10 reveal-up" aria-label="What I do">
+    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="What I do">
       <SectionHead
         title="What I do"
         aside={<Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>}
@@ -160,22 +160,21 @@ function Capabilities() {
         freelance projects and permanent roles alike.
       </p>
       <div className="cap-grid">
-        {CAPABILITIES.map((c, i) => (
+        {CAPABILITIES.map((c) => (
           <div key={c.name} className="cap-item">
-            <span className="cap-index">{String(i + 1).padStart(2, "0")}</span>
             <h3 className="cap-name">{c.name}</h3>
             <p className="cap-desc">{c.desc}</p>
           </div>
         ))}
       </div>
-    </section>
+    </Reveal>
   );
 }
 
 /* ─── Contact ───────────────────────────────────────────────── */
 function Contact() {
   return (
-    <section className="home-section px-5 md:px-10 reveal-up" aria-label="Contact">
+    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="Contact">
       <SectionHead title="Get in touch" />
       <div className="grid md:grid-cols-12 gap-8 items-end">
         <div className="md:col-span-8">
@@ -201,7 +200,7 @@ function Contact() {
           </div>
         </div>
       </div>
-    </section>
+    </Reveal>
   );
 }
 

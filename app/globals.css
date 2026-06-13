@@ -334,7 +334,16 @@
   transition: opacity 0.3s var(--ease);
 }
 .sidebar-logo.is-collapsed { justify-content: center; padding: 0; }
-.sidebar-logo.is-collapsed .logo-word { opacity: 0; }
+.sidebar-logo.is-collapsed svg { width: 22px; height: 22px; }
+.sidebar-logo.is-collapsed .logo-word { opacity: 0; width: 0; margin: 0; }
+
+/* ─── Lenis smooth scroll ────────────────────────────────────────
+   Lenis adds .lenis / .lenis-smooth to <html> when active. */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
 
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
@@ -485,8 +494,7 @@
     border-bottom: 1px solid var(--line);
     transition: background var(--dur-fast) var(--ease);
   }
-  .cap-index { font-family: var(--font-label); font-weight: 700; font-size: var(--text-tag); letter-spacing: 0.14em; color: var(--ink-soft); }
-  .cap-name { margin-top: var(--space-3); font-family: var(--font-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; font-size: 1.35rem; line-height: 1.05; color: var(--ink); transition: color var(--dur-fast) var(--ease); }
+  .cap-name { font-family: var(--font-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; font-size: 1.35rem; line-height: 1.05; color: var(--ink); transition: color var(--dur-fast) var(--ease); }
   .cap-desc { margin-top: auto; padding-top: var(--space-4); color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; }
   @media (hover: hover) {
     .cap-item:hover { background: var(--surface-sunken); }
