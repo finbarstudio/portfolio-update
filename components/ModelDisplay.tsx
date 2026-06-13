@@ -52,14 +52,23 @@ const ISO_ROTATION_X = 0.12;           //   ~7°   (slight downward tilt)
 type DisplayModelProps = {
   modelUrl: string;
   videoTexture: THREE.VideoTexture | null;
+  onReady?: () => void;
 };
 
-function DisplayModel({ modelUrl, videoTexture }: DisplayModelProps) {
+function DisplayModel({ modelUrl, videoTexture, onReady }: DisplayModelProps) {
   const { scene } = useGLTF(modelUrl) as unknown as { scene: THREE.Group };
 
   // Clone once so the same model can be mounted in multiple ModelDisplay
   // instances on the same page without sharing materials/state.
   const root = useMemo(() => scene.clone(true), [scene]);
+
+  // useGLTF suspends, so by the time this mounts the model is fully loaded.
+  // Signal ready on the next frame so the renderer has painted it once before
+  // the parent reveals the canvas (model + video appear together, no flash).
+  useEffect(() => {
+    const id = requestAnimationFrame(() => onReady?.());
+    return () => cancelAnimationFrame(id);
+  }, [onReady]);
 
   // Walk the cloned scene, find the screen mesh, apply the video material.
   useEffect(() => {
@@ -192,6 +201,7 @@ function Rig({
   cam,
   modelY = 0,
   engageRef,
+  onModelReady,
 }: {
   hovered: boolean;
   modelUrl: string;
@@ -202,6 +212,7 @@ function Rig({
   // 0..1 "engagement" driven by scroll position (partial move toward the hover
   // pose), so the model has subtle life as it scrolls through the viewport.
   engageRef: React.MutableRefObject<number>;
+  onModelReady?: () => void;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
@@ -233,7 +244,7 @@ function Rig({
     <group ref={groupRef}>
       <Center position={[0, modelY, 0]}>
         <group scale={scale}>
-          <DisplayModel modelUrl={modelUrl} videoTexture={videoTexture} />
+          <DisplayModel modelUrl={modelUrl} videoTexture={videoTexture} onReady={onModelReady} />
         </group>
       </Center>
     </group>
@@ -298,7 +309,12 @@ function ModelDisplayInner({
   // exact same hover state as the card border — one hover, not a separate one
   // over just the canvas.
   const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
-  const [ready, setReady] = useState(false);
+  // The star loader stays until BOTH the model AND its screen video are loaded,
+  // then the canvas fades in and the star fades out together (no half-loaded
+  // mac with a black screen, no star lingering over a loaded model).
+  const [modelReady, setModelReady] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const ready = modelReady && videoReady;
   // Only mount the WebGL canvas + decode the video while the card is on (or near)
   // screen. A grid of always-rendering 3D canvases is the main source of lag;
   // gating them to the viewport keeps just the visible ones live.
@@ -401,7 +417,7 @@ function ModelDisplayInner({
   useEffect(() => {
     if (!videoEl || !inView) return;
     const onLoaded = () => {
-      setReady(true);
+      setVideoReady(true);
       videoEl.play().catch(() => {});
     };
     videoEl.addEventListener("loadeddata", onLoaded);
@@ -466,7 +482,12 @@ function ModelDisplayInner({
           }}
           dpr={[1, 1.5]}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-          style={{ position: "absolute", inset: 0 }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: ready ? 1 : 0,
+            transition: "opacity 0.45s var(--ease, ease)",
+          }}
         >
           {/* 30fps at rest (enough for the looping screen video), 60fps on hover
               for the camera glide. */}
@@ -486,6 +507,7 @@ function ModelDisplayInner({
               modelY={modelY}
               cam={{ dist: camDist, distHover: camDistHover, y: camY, yHover: camYHover, lookYHover }}
               engageRef={engageRef}
+              onModelReady={() => setModelReady(true)}
             />
           </Suspense>
         </Canvas>
