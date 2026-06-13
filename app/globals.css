@@ -910,6 +910,21 @@
   }
   .pdf-dot[data-active="true"] { background: var(--pink); }
 
+  /* Clickable bubble: transparent button wrapping the bar, with a real tap
+     target (the bar itself stays small). */
+  .pdf-dot-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem 0.2rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    line-height: 0;
+  }
+  .pdf-dot-btn:hover .pdf-dot { background: var(--pink); }
+  .pdf-dot-btn:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; border-radius: 4px; }
+
   /* Highlighted spread marker — a pulsing pink dot with a small star, so people
      know there's a spread worth flipping to. */
   .pdf-dot-mark {

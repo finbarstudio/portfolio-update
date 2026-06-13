@@ -106,7 +106,9 @@ export default function BookViewer({ pages, markSpread }: { pages: string[]; mar
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      <div className="sm-book-spread">
+      {/* Hidden while loading so the opaque wireframe is all that shows — no
+          glimpse of the previously-loaded spread underneath. */}
+      <div className="sm-book-spread" style={{ visibility: loading ? "hidden" : "visible" }}>
         <div className="sm-book-page sm-book-left">
           {left && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -138,17 +140,24 @@ export default function BookViewer({ pages, markSpread }: { pages: string[]; mar
             <path d="M10 4 6 8l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        {/* Dots are display-only indicators (navigate via swipe / arrows). */}
+        {/* Clickable bubbles — jump to any spread (also swipe / arrows). */}
         <div className="pdf-dots">
           {spreads.map((_, i) => (
-            <span
+            <button
               key={i}
-              className={`pdf-dot${i === markSpread ? " pdf-dot-mark" : ""}`}
-              data-active={i === idx}
-              aria-hidden="true"
+              type="button"
+              className="pdf-dot-btn"
+              onClick={() => setIdx(i)}
+              aria-label={`Go to spread ${i + 1} of ${spreads.length}`}
+              aria-current={i === idx ? "true" : undefined}
             >
-              {i === markSpread && <span className="pdf-dot-star" aria-hidden="true">★</span>}
-            </span>
+              <span
+                className={`pdf-dot${i === markSpread ? " pdf-dot-mark" : ""}`}
+                data-active={i === idx}
+              >
+                {i === markSpread && <span className="pdf-dot-star" aria-hidden="true">★</span>}
+              </span>
+            </button>
           ))}
         </div>
         <button type="button" onClick={() => go(1)} aria-label="Next pages" className="pdf-arrow" disabled={idx === spreads.length - 1}>
