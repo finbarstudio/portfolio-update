@@ -323,6 +323,7 @@
   transition: color var(--dur-fast) var(--ease);
 }
 .sidebar-logo:hover { color: var(--pink); }
+.sidebar-logo svg { width: 16px; height: 16px; flex: 0 0 auto; color: var(--pink); }
 .sidebar-logo .logo-word {
   margin-left: 8px;
   font-weight: 700;
@@ -462,6 +463,34 @@
         animation-range: entry 0% cover 18%;
       }
     }
+  }
+
+  /* Capabilities matrix — a bordered grid of discipline cells. Deliberately a
+     different texture from the prose/card sections (a print-style index grid).
+     Shared hairlines: container draws top+left, each cell draws bottom+right. */
+  .cap-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+  @media (min-width: 640px)  { .cap-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1024px) { .cap-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .cap-item {
+    display: flex;
+    flex-direction: column;
+    min-height: 168px;
+    padding: var(--space-5);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    transition: background var(--dur-fast) var(--ease);
+  }
+  .cap-index { font-family: var(--font-label); font-weight: 700; font-size: var(--text-tag); letter-spacing: 0.14em; color: var(--ink-soft); }
+  .cap-name { margin-top: var(--space-3); font-family: var(--font-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; font-size: 1.35rem; line-height: 1.05; color: var(--ink); transition: color var(--dur-fast) var(--ease); }
+  .cap-desc { margin-top: auto; padding-top: var(--space-4); color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; }
+  @media (hover: hover) {
+    .cap-item:hover { background: var(--surface-sunken); }
+    .cap-item:hover .cap-name { color: var(--pink); }
   }
 
   /* Hover = colour fill only (no underline animation) */

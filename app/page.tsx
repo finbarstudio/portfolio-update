@@ -138,45 +138,35 @@ function Approach() {
   );
 }
 
-/* ─── Two ways to work together ─────────────────────────────── */
-function SplitPathway() {
-  return (
-    <section className="home-section px-5 md:px-10 reveal-up" aria-label="Ways to work together">
-      <SectionHead title="Two ways to work together" />
-      <div className="home-split">
-        {/* For employers */}
-        <div>
-          <p className="mono-label text-ink-soft mb-4">For employers</p>
-          <p className="text-ink leading-relaxed mb-6" style={{ fontSize: "var(--text-small)" }}>
-            If you&rsquo;re hiring, I can own brand and editorial work and take it through to a
-            finished website. Creative first, with a real eye for detail. Open to permanent roles.
-          </p>
-          <ul className="home-list mb-7" style={{ fontSize: "var(--text-small)" }}>
-            <li className="text-ink">Brand identity &amp; logo design</li>
-            <li className="text-ink">Editorial &amp; publication design (InDesign)</li>
-            <li className="text-ink">Website &amp; UI design</li>
-            <li className="text-ink">Photoshop &amp; Illustrator</li>
-            <li className="text-ink">Motion &amp; social</li>
-          </ul>
-          <Link href="/about" className="home-link">More about me →</Link>
-        </div>
+/* ─── What I do (capabilities matrix) ───────────────────────── */
+const CAPABILITIES = [
+  { name: "Brand identity", desc: "Logomarks, colour and type, with guidelines to keep it consistent." },
+  { name: "Editorial & print", desc: "Publications and print-ready layouts, set in InDesign." },
+  { name: "Web & UI design", desc: "Brand-led websites and interfaces, built detail-first." },
+  { name: "Creative direction", desc: "Art direction and visual systems across a project." },
+  { name: "Motion graphics", desc: "Animated assets and short-form video, made in After Effects." },
+  { name: "Social campaigns", desc: "Static and motion sets sized for every channel." },
+];
 
-        {/* For clients */}
-        <div>
-          <p className="mono-label text-ink-soft mb-4">For clients</p>
-          <p className="text-ink leading-relaxed mb-6" style={{ fontSize: "var(--text-small)" }}>
-            If you run a business, I take on identity, editorial and web projects start to finish.
-            You work with me directly, not an account manager.
-          </p>
-          <ul className="home-list mb-7" style={{ fontSize: "var(--text-small)" }}>
-            <li className="text-ink">Brand identity &amp; logo design</li>
-            <li className="text-ink">Editorial &amp; print</li>
-            <li className="text-ink">Web design</li>
-            <li className="text-ink">Creative direction</li>
-            <li className="text-ink">Motion &amp; social campaigns</li>
-          </ul>
-          <Link href="/about#contact" className="home-link">Start a project →</Link>
-        </div>
+function Capabilities() {
+  return (
+    <section className="home-section px-5 md:px-10 reveal-up" aria-label="What I do">
+      <SectionHead
+        title="What I do"
+        aside={<Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>}
+      />
+      <p className="text-ink-soft leading-relaxed mb-8 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
+        One designer across the whole range, from the first sketch to the finished thing. Open to
+        freelance projects and permanent roles alike.
+      </p>
+      <div className="cap-grid">
+        {CAPABILITIES.map((c, i) => (
+          <div key={c.name} className="cap-item">
+            <span className="cap-index">{String(i + 1).padStart(2, "0")}</span>
+            <h3 className="cap-name">{c.name}</h3>
+            <p className="cap-desc">{c.desc}</p>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -222,7 +212,7 @@ export default function HomePage() {
       <Hero />
       <SelectedWork />
       <Approach />
-      <SplitPathway />
+      <Capabilities />
       <Contact />
     </>
   );
