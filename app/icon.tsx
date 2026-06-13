@@ -1,11 +1,13 @@
 import { ImageResponse } from "next/og";
+import { STAR_POINTS } from "@/components/brand-star";
 
 /**
- * Generated favicon — the brand star (✶) in pink on the site's off-white
+ * Generated favicon — the solid brand star (✶) in pink on the site's off-white
  * ground. Next.js emits this alongside the legacy favicon.ico for browsers
  * that prefer PNG. 32×32 keeps it crisp in tabs and bookmarks.
  *
- * Drawn as inline SVG: next/og's bundled font has no ✶ glyph.
+ * Drawn as an inline SVG polygon matching the filled ✶ in the wordmark
+ * (next/og's bundled font has no ✶ glyph).
  */
 
 export const size = { width: 32, height: 32 };
@@ -24,12 +26,8 @@ export default function Icon() {
           justifyContent: "center",
         }}
       >
-        <svg width={26} height={26} viewBox="0 0 100 100" fill="none">
-          <g stroke="#FF1F8F" strokeWidth={13} strokeLinecap="round">
-            <line x1="50" y1="9" x2="50" y2="91" />
-            <line x1="14.5" y1="29.5" x2="85.5" y2="70.5" />
-            <line x1="14.5" y1="70.5" x2="85.5" y2="29.5" />
-          </g>
+        <svg width={28} height={28} viewBox="0 0 100 100">
+          <polygon points={STAR_POINTS} fill="#FF1F8F" />
         </svg>
       </div>
     ),

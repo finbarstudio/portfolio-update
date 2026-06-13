@@ -402,6 +402,53 @@
     animation: skeleton-sweep 1.6s var(--ease) infinite;
   }
 
+  /* ── Star loader (LoaderThree) ──────────────────────────────────
+     The brand ✶ drawn as a glowing pink stroke that traces itself on a loop
+     while the whole mark slowly rotates. Centres itself in any positioned
+     parent (e.g. the .skeleton placeholder it sits inside). */
+  .star-loader {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .star-loader svg {
+    animation: star-spin 3.4s linear infinite;
+    transform-origin: 50% 50%;
+    overflow: visible;
+  }
+  .star-loader-track {
+    fill: none;
+    stroke: color-mix(in srgb, var(--pink) 16%, transparent);
+    stroke-width: 5.5;
+    stroke-linejoin: round;
+  }
+  .star-loader-draw {
+    fill: none;
+    stroke: var(--pink);
+    stroke-width: 5.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    animation: star-draw 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--pink) 60%, transparent));
+  }
+  @keyframes star-draw {
+    0%   { stroke-dashoffset: 1; }
+    45%  { stroke-dashoffset: 0; }
+    55%  { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -1; }
+  }
+  @keyframes star-spin {
+    to { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .star-loader svg { animation: none; }
+    .star-loader-draw { animation: none; stroke-dasharray: none; }
+  }
+
   /* Progressive disclosure — secondary card meta (tags) stays tucked away
      until the user shows interest. Pointer devices only: collapse to 0fr and
      reveal on hover/focus. Touch / no-hover devices always show it. */
