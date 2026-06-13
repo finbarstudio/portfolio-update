@@ -47,7 +47,7 @@ export async function generateMetadata({
   // ranks for the migrated slugs; everything else falls back to a clean default.
   const seoTitle =
     project.seo?.title ??
-    `${project.name} — ${project.categories.slice(0, 2).join(" & ")} | Finbar Studio`;
+    `${project.name}: ${project.categories.slice(0, 2).join(" & ")} | Finbar Studio`;
   const seoDescription = project.seo?.description ?? project.oneLiner;
   return {
     title: { absolute: seoTitle },
@@ -313,7 +313,7 @@ export default async function CaseStudyPage({
     "@type": "CreativeWork",
     "@id": `${pageUrl}#work`,
     name: project.name,
-    headline: `${project.name} — ${project.categories.join(", ")}`,
+    headline: `${project.name}: ${project.categories.join(", ")}`,
     description: project.oneLiner,
     dateCreated: project.date,
     genre: project.categories,

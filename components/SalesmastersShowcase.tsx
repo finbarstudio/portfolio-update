@@ -147,7 +147,7 @@ export default function SalesmastersShowcase() {
         {/* Site Ware Direct — wheel, BANT, STAR side by side, all 2-row tall */}
         <Company
           name="Site Ware Direct"
-          caption="BANT and STAR technique diagrams and a custom Sales Wheel, styled as fabric swatches — a nod to their industrial workwear manufacturing."
+          caption="BANT and STAR technique diagrams and a custom Sales Wheel, styled as fabric swatches, a nod to their industrial workwear manufacturing."
         >
           <div className="sm-co-3up">
             <Tile src={`${G}/site-ware-direct/wheel.webp`} tall />

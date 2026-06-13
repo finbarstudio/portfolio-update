@@ -29,7 +29,7 @@ export default function MomentumShowcase() {
         </header>
         <p className="packer-section-body">
           Brand identity and a Framer website for an NDIS mentoring provider, built
-          around empowerment, independence and personal growth — warm and human,
+          around empowerment, independence and personal growth. Warm and human,
           never clinical. Designed and developed end to end, ready for the team to
           run themselves.
         </p>

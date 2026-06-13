@@ -15,7 +15,7 @@ import { STAR_POINTS } from "@/components/brand-star";
  */
 
 export const alt =
-  "finbar✶studio — Brisbane graphic designer and Framer developer";
+  "finbar✶studio, Brisbane graphic designer. Brand identity, editorial, web and motion.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -80,9 +80,9 @@ export default function OpengraphImage() {
               maxWidth: 1000,
             }}
           >
-            <span>Graphic Designer</span>
-            <span style={{ color: PINK, padding: "0 20px" }}>&amp;</span>
-            <span>Framer Developer</span>
+            <span>Brisbane</span>
+            <span style={{ color: PINK, padding: "0 20px" }}>graphic</span>
+            <span>designer</span>
           </div>
           <div
             style={{
@@ -93,7 +93,7 @@ export default function OpengraphImage() {
               letterSpacing: "0.01em",
             }}
           >
-            Brand identity, web, publication and motion — Brisbane, AU
+            Brand identity, editorial, web &amp; motion
           </div>
         </div>
 

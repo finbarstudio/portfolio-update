@@ -135,9 +135,9 @@ export const projects: Project[] = [
     tier: "full",
     rank: 5,
     seo: {
-      title: "KinAya — Brand Identity & Framer Website | Finbar Studio",
+      title: "KinAya: Brand Identity & Framer Website | Finbar Studio",
       description:
-        "How I designed the KinAya brand identity and built their Framer website from the ground up — a complete startup rebrand for an Adelaide-based NDIS support services provider.",
+        "How I designed the KinAya brand identity and built their Framer website from the ground up. A complete startup rebrand for an Adelaide-based NDIS support services provider.",
     },
     date: "2024",
     categories: ["Brand Identity", "Web Design", "Framer", "NDIS"],
@@ -229,9 +229,9 @@ export const projects: Project[] = [
     tier: "featured",
     rank: 1,
     seo: {
-      title: "The Moment You Realise — Social Campaign Design | Finbar Studio",
+      title: "The Moment You Realise: Social Campaign Design | Finbar Studio",
       description:
-        "An evergreen, modular social campaign for the UK's leading affordable homeownership platform — 30+ motion and static assets across every major format, built to run again and again.",
+        "An evergreen, modular social campaign for the UK's leading affordable homeownership platform. 30+ motion and static assets across every major format, built to run again and again.",
     },
     companyUrl: "https://sharetobuy.com",
     date: "2022–2023",
@@ -319,9 +319,9 @@ export const projects: Project[] = [
     tier: "full",
     rank: 3,
     seo: {
-      title: "Salesmasters — Sales Playbook Design & Production | Finbar Studio",
+      title: "Salesmasters: Sales Playbook Design & Production | Finbar Studio",
       description:
-        "How I designed and produced 15+ bespoke sales process playbooks for a national sales consultancy — end-to-end, from content writing to print-ready delivery.",
+        "How I designed and produced 15+ bespoke sales process playbooks for a national sales consultancy, end to end, from content writing to print-ready delivery.",
     },
     companyUrl: "https://salesmasters.com.au",
     date: "2023–2024",

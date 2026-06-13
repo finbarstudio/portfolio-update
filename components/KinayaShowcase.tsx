@@ -71,8 +71,8 @@ export default function KinayaShowcase() {
       <section className="kinaya-section">
         <SectionHeader index={1} name="Brand Identity" />
         <p className="packer-section-body">
-          A full brand identity built from the ground up — logomark, logotype,
-          colour system and guidelines — balancing warmth with the trust an NDIS
+          A full brand identity built from the ground up: logomark, logotype,
+          colour system and guidelines, balancing warmth with the trust an NDIS
           audience needs.
         </p>
 

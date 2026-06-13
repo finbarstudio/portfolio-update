@@ -6,14 +6,14 @@ import ProjectCard from "@/components/ProjectCard";
 const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
-  title: "Work — Selected Projects",
+  title: "Work: Selected Projects",
   description:
-    "Selected branding, web design, publication and motion projects by Finbar Skitini, a Brisbane graphic designer and design-minded developer working with clients across Australia and the UK.",
+    "Selected branding, web design, publication and motion projects by Finbar Skitini, a Brisbane graphic designer working with clients across Australia and the UK.",
   alternates: { canonical: "/work" },
   openGraph: {
-    title: "Work — Selected Projects | Finbar Studio",
+    title: "Work: Selected Projects | Finbar Studio",
     description:
-      "Branding, web design, publication and motion projects from finbar✶studio — a Brisbane creative practice.",
+      "Branding, web design, publication and motion projects from finbar✶studio, a Brisbane creative practice.",
     url: "/work",
     type: "website",
   },
@@ -33,9 +33,9 @@ function WorkJsonLd() {
     "@type": "CollectionPage",
     "@id": `${SITE_URL}/work#webpage`,
     url: `${SITE_URL}/work`,
-    name: "Work — Selected Projects | Finbar Studio",
+    name: "Work: Selected Projects | Finbar Studio",
     description:
-      "Selected web design, brand identity, publication and motion projects by Finbar Skitini, a Brisbane graphic designer and design-minded developer.",
+      "Selected web design, brand identity, publication and motion projects by Finbar Skitini, a Brisbane graphic designer.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#person` },
     inLanguage: "en-AU",
@@ -108,7 +108,7 @@ function WorkGrid() {
 function WorkHeader() {
   return (
     <header className="px-5 md:px-10 pt-8 md:pt-12 pb-10 md:pb-14">
-      <p className="mono-label text-ink-soft mb-5">Archive — branding, web, publication &amp; motion</p>
+      <p className="mono-label text-ink-soft mb-5">Archive of branding, web, publication &amp; motion</p>
       <h1
         className="font-sans font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
@@ -116,7 +116,7 @@ function WorkHeader() {
         Selected work.
       </h1>
       <p className="text-ink-soft font-sans leading-relaxed mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
-        A working archive of projects for brands and businesses across Australia and the UK —
+        A working archive of projects for brands and businesses across Australia and the UK:
         visual identities, websites, publications and campaigns, designed and built end to end.
       </p>
     </header>
