@@ -5,6 +5,8 @@ import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HeroLogo from "@/components/HeroLogo";
+import { isShopifyConfigured } from "@/lib/shopify";
+import { STORE_PRODUCT } from "@/content/store";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -173,6 +175,30 @@ function Capabilities() {
   );
 }
 
+/* ─── Studio products ───────────────────────────────────────── */
+function Products() {
+  const comingSoon = !isShopifyConfigured();
+  return (
+    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="Studio products">
+      <SectionHead title="Studio products" aside={<Link href="/store" className="home-link">Visit store →</Link>} />
+      <div className="grid md:grid-cols-12 gap-8 items-end">
+        <div className="md:col-span-8">
+          <h3 className="home-display-sm text-ink">{STORE_PRODUCT.fallback.name}</h3>
+          <p className="text-ink-soft leading-relaxed mt-3 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
+            {STORE_PRODUCT.fallback.blurb}
+          </p>
+        </div>
+        <div className="md:col-span-4 md:text-right">
+          {comingSoon && <span className="tag tag-teal mb-3 inline-block">Coming soon</span>}
+          <div className="md:flex md:justify-end">
+            <Link href="/store" className="home-link">{comingSoon ? "Get notified →" : "View product →"}</Link>
+          </div>
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
 /* ─── Contact ───────────────────────────────────────────────── */
 function Contact() {
   return (
@@ -214,6 +240,7 @@ export default function HomePage() {
       <SelectedWork />
       <Approach />
       <Capabilities />
+      <Products />
       <Contact />
     </>
   );

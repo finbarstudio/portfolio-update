@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/`,        lastModified: now, changeFrequency: "monthly", priority: 1 },
     { url: `${SITE_URL}/work`,    lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/about`,   lastModified: now, changeFrequency: "yearly",  priority: 0.8 },
+    { url: `${SITE_URL}/store`,   lastModified: now, changeFrequency: "monthly", priority: 0.7 },
   ];
 
   // Only projects with a real case study page get indexed (gallery tier has no page)

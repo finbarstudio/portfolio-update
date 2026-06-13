@@ -504,6 +504,46 @@
     transition: background var(--dur-fast) var(--ease);
   }
   .cap-name { font-family: var(--font-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; font-size: 1.35rem; line-height: 1.05; color: var(--ink); transition: color var(--dur-fast) var(--ease); }
+
+  /* ── Store ──────────────────────────────────────────────────── */
+  .store-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: var(--thumb-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--elev-1);
+  }
+  .store-media-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: color-mix(in srgb, var(--pink) 30%, transparent);
+  }
+  .store-media-placeholder svg { width: 64px; height: 64px; }
+  .store-buy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--hit);
+    padding: 0 1.4rem;
+    background: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 8px;
+    font-family: var(--font-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: var(--text-label);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  }
+  .store-buy:hover { background: var(--pink); border-color: var(--pink); color: var(--bg); }
+  .store-buy-ghost { background: transparent; color: var(--ink); }
+  .store-buy-ghost:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
   .cap-desc { margin-top: auto; padding-top: var(--space-4); color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; }
   @media (hover: hover) {
     .cap-item:hover { background: var(--surface-sunken); }
