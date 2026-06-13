@@ -6,6 +6,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import BrandStar from "./BrandStar";
 
 // Brisbane coords for Open-Meteo (free, no API key)
 const BNE_LAT  = -27.47;
@@ -105,7 +106,7 @@ export default function MenuBar({
         className="font-bold uppercase tracking-[0.08em] hover:text-pink transition-colors"
         aria-label="finbar.studio, home"
       >
-        finbar<span className="pixel-star text-[13px]">✶</span>studio
+        finbar<BrandStar className="pixel-star" size="0.8em" />studio
       </Link>
 
       {/* Capabilities line — hidden on mobile to keep bar uncluttered */}

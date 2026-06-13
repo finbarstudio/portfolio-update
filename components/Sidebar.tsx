@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
 import { SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./LayoutShell";
+import BrandStar from "./BrandStar";
 // MobileTopBar removed, hamburger lives in MenuBar; this file exports MobileMenu only.
 
 /* ── Brand icons ──────────────────────────────────────────────── */
@@ -410,7 +411,7 @@ function MobileMenu({
           className="font-bold uppercase tracking-[0.08em] text-[12px]"
           aria-hidden="true"
         >
-          finbar<span className="pixel-star text-[14px]">✶</span>studio
+          finbar<BrandStar className="pixel-star" size="0.85em" />studio
         </span>
         <button
           type="button"

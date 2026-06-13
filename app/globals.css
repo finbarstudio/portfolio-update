@@ -415,8 +415,6 @@
     pointer-events: none;
   }
   .star-loader svg {
-    animation: star-spin 3.4s linear infinite;
-    transform-origin: 50% 50%;
     overflow: visible;
   }
   .star-loader-track {
@@ -441,11 +439,7 @@
     55%  { stroke-dashoffset: 0; }
     100% { stroke-dashoffset: -1; }
   }
-  @keyframes star-spin {
-    to { transform: rotate(360deg); }
-  }
   @media (prefers-reduced-motion: reduce) {
-    .star-loader svg { animation: none; }
     .star-loader-draw { animation: none; stroke-dasharray: none; }
   }
 

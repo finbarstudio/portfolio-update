@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { STAR_POINTS } from "@/components/brand-star";
 
 /**
- * Generated favicon — the solid brand star (✶) in pink on the site's off-white
+ * Generated favicon — the solid brand star (✶) in pink on a TRANSPARENT
  * ground. Next.js emits this alongside the legacy favicon.ico for browsers
  * that prefer PNG. 32×32 keeps it crisp in tabs and bookmarks.
  *
@@ -20,7 +20,7 @@ export default function Icon() {
         style={{
           width: "100%",
           height: "100%",
-          background: "#FAFAF8",
+          background: "transparent",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
