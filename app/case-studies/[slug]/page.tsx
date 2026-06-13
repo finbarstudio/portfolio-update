@@ -284,7 +284,7 @@ function FooterMeta({ project }: { project: Project }) {
           Generous tap target via py. */}
       <div className="pt-6 pb-8 text-center md:text-left">
         <Link
-          href="/"
+          href="/work"
           className="inline-flex items-center min-h-[44px] py-2 font-sans font-bold uppercase text-ink hover:text-pink transition-colors"
           style={{ fontSize: "0.875rem", letterSpacing: "0.16em" }}
         >

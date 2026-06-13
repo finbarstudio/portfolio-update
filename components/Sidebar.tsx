@@ -5,7 +5,7 @@
 // open-for-work status, contact email, social icons.
 
 import React, { useEffect, useMemo, useState } from "react";
-// Note: useEffect/useState still used by DesktopSidebar (workOpen) and MobileMenu (body overflow)
+// Note: useEffect/useState still used by MobileMenu (body overflow lock)
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
@@ -195,12 +195,6 @@ function DesktopSidebar({
   collapsed: boolean;
   onToggle: () => void;
 }) {
-  const [workOpen, setWorkOpen] = useState(true);
-
-  // Open work folder on initial load if user is viewing a work page
-  useEffect(() => {
-    if (pathname.startsWith("/case-studies/")) setWorkOpen(true);
-  }, [pathname]);
 
   const sortedProjects = useMemo(
     () => [...projects].filter((p) => !p.hidden).sort((a, b) => a.rank - b.rank),
@@ -210,7 +204,7 @@ function DesktopSidebar({
   const isHome    = pathname === "/";
   const isAbout   = pathname.startsWith("/about");
   const isContact = pathname.startsWith("/contact");
-  const isWork    = pathname.startsWith("/case-studies/");
+  const isWork    = pathname === "/work" || pathname.startsWith("/case-studies/");
 
   return (
     <>
@@ -253,34 +247,27 @@ function DesktopSidebar({
           </span>
         </Link>
 
-        {/* Work — expanded-only block (collapses to nothing in the rail) with an
-            expandable project list inside. */}
+        {/* Work — links to the /work archive; the project quick-list sits beneath
+            it (expanded-only; collapses to nothing in the rail). */}
+        <Link
+          href="/work"
+          title="Work"
+          aria-label="Work"
+          aria-current={isWork ? "page" : undefined}
+          className={`nav-row ${isWork ? "active" : ""}`}
+        >
+          <span className="nav-track">
+            <span className="nav-slot nav-slot-ico"><GridIcon /></span>
+            <span className="nav-slot nav-slot-label">
+              <span className="nav-slot-text">Work</span>
+              <span className="nav-count tabular-nums">{sortedProjects.length}</span>
+            </span>
+          </span>
+        </Link>
+
         <div className="nav-work" data-open={collapsed ? "false" : "true"}>
           <div className="nav-work-inner">
-            <button
-              type="button"
-              onClick={() => setWorkOpen((v) => !v)}
-              className={`nav-row ${isWork ? "active" : ""}`}
-              aria-expanded={workOpen}
-              aria-label="Work"
-            >
-              <span className="nav-track">
-                <span className="nav-slot nav-slot-ico"><GridIcon /></span>
-                <span className="nav-slot nav-slot-label">
-                  <span className="nav-slot-text">Work</span>
-                  <span className="nav-count tabular-nums">{sortedProjects.length}</span>
-                  <svg
-                    className="nav-chevron"
-                    style={{ transform: workOpen ? "rotate(90deg)" : "rotate(0deg)" }}
-                    viewBox="0 0 16 16" fill="none" aria-hidden="true"
-                  >
-                    <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </span>
-            </button>
-
-            <div className="nav-sublist" data-open={!collapsed && workOpen ? "true" : "false"}>
+            <div className="nav-sublist" data-open={!collapsed ? "true" : "false"}>
               <div className="nav-sublist-inner">
                 {sortedProjects.map((p) => {
                   const isActive = pathname === `/case-studies/${p.slug}`;
@@ -385,12 +372,17 @@ function MobileMenu({
   }, [open]);
 
   const navLinks = [
-    { label: "Work",    href: "/" },
+    { label: "Home",    href: "/" },
+    { label: "Work",    href: "/work" },
     { label: "About",   href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
   const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+    href === "/"
+      ? pathname === "/"
+      : href === "/work"
+        ? pathname.startsWith("/work") || pathname.startsWith("/case-studies/")
+        : pathname.startsWith(href);
 
   return (
     <div

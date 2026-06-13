@@ -295,6 +295,92 @@
     line-height: 1.4;
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     HOMEPAGE — editorial landing (Swiss grid, thin rules, huge type)
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* Section wrapper: a thin top rule + the section index label, print-editorial. */
+  .home-section {
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-9);
+  }
+  .home-section-index {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  /* Massive display type that drives the hero + section openers. */
+  .home-display {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 0.96;
+    font-size: clamp(2.6rem, 8.5vw, 6.5rem);
+  }
+  .home-display-sm {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+    line-height: 1.0;
+    font-size: clamp(1.85rem, 4.5vw, 3.25rem);
+  }
+
+  /* Availability status row — teal pulsing dot + line. */
+  .home-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* Split pathway: two equal columns separated by a hairline. */
+  .home-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+  }
+  @media (min-width: 768px) {
+    .home-split { grid-template-columns: 1fr 1fr; gap: 0; }
+    .home-split > * + * {
+      border-left: 1px solid var(--line);
+      padding-left: var(--space-7);
+    }
+    .home-split > *:first-child { padding-right: var(--space-7); }
+  }
+
+  /* A list of capabilities/links with a leading hairline per row. */
+  .home-list > * {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-top: 1px solid var(--line);
+    padding: var(--space-3) 0;
+  }
+
+  /* Big underlined editorial link. */
+  .home-link {
+    font-family: var(--font-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--text-label);
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 2px;
+    border-bottom: 1.5px solid var(--ink);
+    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), gap var(--dur) var(--ease);
+  }
+  @media (hover: hover) {
+    .home-link:hover { color: var(--pink); border-color: var(--pink); gap: 0.85rem; }
+  }
+
   /* Hover = colour fill only (no underline animation) */
   .link-wipe { /* retained for class-name compat */ }
 
