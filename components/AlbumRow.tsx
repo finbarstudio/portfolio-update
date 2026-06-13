@@ -14,7 +14,7 @@ import * as THREE from "three";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
-import { AlbumWireframe } from "./Wireframe";
+import Loader from "./Loader";
 import { useGroupHover } from "./useGroupHover";
 import { FrameDriver } from "./FrameDriver";
 import { useAppReady } from "./useAppReady";
@@ -172,7 +172,7 @@ function AlbumRowInner({
       {/* Light pink background, fades in on hover */}
       <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
-      {(!ready || !appReady) && <AlbumWireframe />}
+      {(!ready || !appReady) && <Loader />}
 
       {appReady && (
       <Canvas
@@ -199,7 +199,7 @@ const AlbumRow = dynamic(() => Promise.resolve(AlbumRowInner), {
   ssr: false,
   loading: () => (
     <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--thumb-bg, #e0e0e0)" }}>
-      <AlbumWireframe />
+      <Loader />
     </div>
   ),
 });

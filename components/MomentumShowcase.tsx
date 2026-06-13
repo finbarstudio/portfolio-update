@@ -7,13 +7,13 @@
  */
 
 import dynamic from "next/dynamic";
-import { MacWireframe } from "./Wireframe";
+import Loader from "./Loader";
 
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ssr: false,
   loading: () => (
     <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--thumb-bg, #e0e0e0)" }}>
-      <MacWireframe />
+      <Loader />
     </div>
   ),
 });

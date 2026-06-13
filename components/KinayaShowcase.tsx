@@ -8,14 +8,14 @@
  */
 
 import dynamic from "next/dynamic";
-import { MacWireframe } from "./Wireframe";
+import Loader from "./Loader";
 
 // ModelDisplay is r3f / WebGL → dynamic, SSR-disabled, identical to the home card.
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ssr: false,
   loading: () => (
     <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--thumb-bg, #e0e0e0)" }}>
-      <MacWireframe />
+      <Loader />
     </div>
   ),
 });
