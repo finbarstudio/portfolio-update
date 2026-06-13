@@ -250,8 +250,9 @@ function DesktopSidebar({
         aria-label="finbar.studio, home"
         title="finbar.studio, home"
       >
+        <span className="logo-word logo-pre">finbar</span>
         <BrandStar className="pixel-star" size={16} />
-        <span className="logo-word">finbar studio</span>
+        <span className="logo-word logo-post">studio</span>
       </Link>
 
       {/* Persistent nav — one list for both states. The icons stay put and the

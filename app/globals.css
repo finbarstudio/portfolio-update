@@ -315,6 +315,7 @@
 .sidebar-logo {
   display: flex;
   align-items: center;
+  gap: 2px;
   flex: 0 0 auto;
   height: 48px;
   padding: 0 14px;
@@ -325,17 +326,19 @@
 .sidebar-logo:hover { color: var(--pink); }
 .sidebar-logo svg { width: 16px; height: 16px; flex: 0 0 auto; color: var(--pink); }
 .sidebar-logo .logo-word {
-  margin-left: 8px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-size: 13px;
   white-space: nowrap;
-  transition: opacity 0.3s var(--ease);
+  overflow: hidden;
+  transition: opacity 0.3s var(--ease), max-width 0.4s var(--ease);
+  max-width: 8ch;
 }
-.sidebar-logo.is-collapsed { justify-content: center; padding: 0; }
+/* Collapsed: hide the wordmark either side and centre just the star. */
+.sidebar-logo.is-collapsed { justify-content: center; gap: 0; padding: 0; }
 .sidebar-logo.is-collapsed svg { width: 22px; height: 22px; }
-.sidebar-logo.is-collapsed .logo-word { opacity: 0; width: 0; margin: 0; }
+.sidebar-logo.is-collapsed .logo-word { opacity: 0; max-width: 0; }
 
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
@@ -393,6 +396,25 @@
     will-change: transform, opacity;
   }
   .hero-logo svg { width: 0.82em; height: 0.82em; flex: 0 0 auto; color: var(--pink); }
+
+  /* Kinetic hero headline (see HeroHeadline): masked word-reveal + parallax. */
+  .hh-word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    margin-right: 0.26em;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+    will-change: transform;
+  }
+  .hh-inner {
+    display: inline-block;
+    will-change: transform, opacity;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  @media (hover: hover) {
+    .hh-word:hover .hh-inner { color: var(--pink); }
+  }
 
   /* Massive display type that drives the hero + section openers. */
   .home-display {

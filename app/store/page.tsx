@@ -50,7 +50,7 @@ export default async function StorePage() {
     : null;
 
   return (
-    <div className="px-5 md:px-10 pt-8 md:pt-14 pb-10">
+    <div className="px-5 md:px-10 pt-8 md:pt-12 pb-10">
       {productJsonLd && (
         <Script
           id="ld-product"

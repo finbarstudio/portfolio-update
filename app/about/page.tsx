@@ -89,7 +89,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="px-5 md:px-10 pt-8 md:pt-14 pb-10">
+    <div className="px-5 md:px-10 pt-8 md:pt-12 pb-10">
       <Script
         id="ld-about"
         type="application/ld+json"

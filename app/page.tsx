@@ -5,6 +5,7 @@ import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HeroLogo from "@/components/HeroLogo";
+import HeroHeadline from "@/components/HeroHeadline";
 import { isShopifyConfigured } from "@/lib/shopify";
 import { STORE_PRODUCT } from "@/content/store";
 
@@ -63,13 +64,11 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
 /* ─── Hero ──────────────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="px-5 md:px-10 pt-6 md:pt-10 pb-12 md:pb-16" aria-label="Introduction">
+    <section className="px-5 md:px-10 pt-8 md:pt-12 pb-12 md:pb-16" aria-label="Introduction">
       <HeroLogo />
       <Reveal immediate as="p" className="mono-label text-ink-soft mb-6 md:mb-8">Brisbane graphic designer</Reveal>
 
-      <Reveal immediate delay={0.08} as="h1" className="home-display text-ink max-w-[15ch]">
-        Brand identity, editorial, web &amp; motion.
-      </Reveal>
+      <HeroHeadline text="Brand identity, editorial, web & motion." className="home-display text-ink max-w-[15ch]" />
 
       <Reveal immediate delay={0.18} className="mt-8 md:mt-10 grid md:grid-cols-12 gap-6 md:gap-8 items-end">
         <p className="md:col-span-7 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
