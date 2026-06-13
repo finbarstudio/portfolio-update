@@ -190,10 +190,12 @@ function DesktopSidebar({
   pathname,
   collapsed,
   onToggle,
+  onContactOpen,
 }: {
   pathname: string;
   collapsed: boolean;
   onToggle: () => void;
+  onContactOpen: () => void;
 }) {
 
   const sortedProjects = useMemo(
@@ -203,7 +205,6 @@ function DesktopSidebar({
 
   const isHome    = pathname === "/";
   const isAbout   = pathname.startsWith("/about");
-  const isContact = pathname.startsWith("/contact");
   const isWork    = pathname === "/work" || pathname.startsWith("/case-studies/");
 
   return (
@@ -231,6 +232,18 @@ function DesktopSidebar({
       }}
       aria-label="Site navigation"
     >
+      {/* Logo, pinned at the top of the rail (replaces the old top bar). Shows
+          just the star when collapsed, the full wordmark when expanded. */}
+      <Link
+        href="/"
+        className={`sidebar-logo ${collapsed ? "is-collapsed" : ""}`}
+        aria-label="finbar.studio, home"
+        title="finbar.studio, home"
+      >
+        <BrandStar className="pixel-star" size={16} />
+        <span className="logo-word">finbar studio</span>
+      </Link>
+
       {/* Persistent nav — one list for both states. The icons stay put and the
           labels slide/fade in as the rail expands (no remove/replace swap). */}
       <nav className={`side-nav ${collapsed ? "is-collapsed" : ""}`} aria-label="Primary">
@@ -300,18 +313,19 @@ function DesktopSidebar({
           </span>
         </Link>
 
-        <Link
-          href="/contact"
+        <button
+          type="button"
+          onClick={onContactOpen}
           title="Contact"
           aria-label="Contact"
-          aria-current={isContact ? "page" : undefined}
-          className={`nav-row ${isContact ? "active" : ""}`}
+          aria-haspopup="dialog"
+          className="nav-row"
         >
           <span className="nav-track">
             <span className="nav-slot nav-slot-ico"><EnvelopeIcon /></span>
             <span className="nav-slot nav-slot-label">Contact</span>
           </span>
-        </Link>
+        </button>
       </nav>
 
       {/* Status / contact — expanded only. Socials are in the persistent dock. */}
@@ -360,10 +374,12 @@ function DesktopSidebar({
 function MobileMenu({
   open,
   onClose,
+  onContactOpen,
   pathname,
 }: {
   open: boolean;
   onClose: () => void;
+  onContactOpen: () => void;
   pathname: string;
 }) {
   useEffect(() => {
@@ -372,10 +388,9 @@ function MobileMenu({
   }, [open]);
 
   const navLinks = [
-    { label: "Home",    href: "/" },
-    { label: "Work",    href: "/work" },
-    { label: "About",   href: "/about" },
-    { label: "Contact", href: "/contact" },
+    { label: "Home",  href: "/" },
+    { label: "Work",  href: "/work" },
+    { label: "About", href: "/about" },
   ];
   const isActive = (href: string) =>
     href === "/"
@@ -436,6 +451,18 @@ function MobileMenu({
               </Link>
             </li>
           ))}
+          <li>
+            <button
+              type="button"
+              onClick={() => { onClose(); onContactOpen(); }}
+              aria-haspopup="dialog"
+              className="w-full flex items-center justify-between font-sans font-semibold py-4 text-ink hover:text-pink transition-colors text-left"
+              style={{ fontSize: "1.75rem", letterSpacing: "-0.01em", lineHeight: 1.1 }}
+            >
+              <span>Contact</span>
+              <span className="mono-label text-ink-soft" aria-hidden="true">→</span>
+            </button>
+          </li>
         </ul>
 
         <div className="pt-10 border-t border-line mt-10">
@@ -482,13 +509,16 @@ export default function Sidebar({
   onToggle,
   mobileMenuOpen = false,
   onMobileMenuClose,
+  onContactOpen,
 }: {
   collapsed?: boolean;
   onToggle?: () => void;
   mobileMenuOpen?: boolean;
   onMobileMenuClose?: () => void;
+  onContactOpen?: () => void;
 }) {
   const pathname = usePathname();
+  const openContact = onContactOpen ?? (() => {});
 
   return (
     <>
@@ -496,10 +526,12 @@ export default function Sidebar({
         pathname={pathname}
         collapsed={collapsed}
         onToggle={onToggle ?? (() => {})}
+        onContactOpen={openContact}
       />
       <MobileMenu
         open={mobileMenuOpen}
         onClose={onMobileMenuClose ?? (() => {})}
+        onContactOpen={openContact}
         pathname={pathname}
       />
     </>

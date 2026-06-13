@@ -1,20 +1,53 @@
 "use client";
 
-// OS shell: fixed MenuBar (top) + StatusBar (bottom).
-// Desktop: persistent Sidebar between bars; mobile: full-screen MobileMenu
-// opened from the MenuBar hamburger (state held here so MenuBar can trigger).
+// App shell. Desktop: persistent left Sidebar with the logo pinned at its top
+// (no global top bar). Mobile: a slim top bar (logo + hamburger) opens the
+// full-screen MobileMenu. Contact opens a quick drawer rather than a page.
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import Sidebar from "./Sidebar";
-import MenuBar from "./MenuBar";
+import BrandStar from "./BrandStar";
+import ContactDrawer from "./ContactDrawer";
 
 export const SIDEBAR_EXPANDED_W = 224; // px
 export const SIDEBAR_COLLAPSED_W = 48; // px
 
+/* Slim mobile-only top bar (the desktop sidebar is hidden on mobile). */
+function MobileBar({ onMenu }: { onMenu: () => void }) {
+  return (
+    <header
+      className="md:hidden fixed top-0 left-0 right-0 z-50 border-b border-ink bg-bg flex items-center justify-between px-3"
+      style={{ height: "var(--menubar-h)" }}
+      role="banner"
+    >
+      <Link
+        href="/"
+        className="font-bold uppercase tracking-[0.08em] text-[13px] hover:text-pink transition-colors"
+        aria-label="finbar.studio, home"
+      >
+        finbar<BrandStar className="pixel-star" size="0.85em" />studio
+      </Link>
+      <button
+        type="button"
+        onClick={onMenu}
+        aria-label="Open navigation menu"
+        className="flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2.5"
+        style={{ width: 44, height: 44 }}
+      >
+        <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+          <path d="M1 1.5h20M1 8h20M1 14.5h20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+        </svg>
+      </button>
+    </header>
+  );
+}
+
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -22,9 +55,10 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     if (saved === "true") setCollapsed(true);
   }, []);
 
-  // Close mobile menu on route change
+  // Close transient UI on route change
   useEffect(() => {
     setMobileMenuOpen(false);
+    setContactOpen(false);
   }, [pathname]);
 
   const toggle = () => {
@@ -39,17 +73,16 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   return (
     <>
-      {/* Keyboard/screen-reader skip link — first focusable element, jumps past
-          the persistent chrome straight to the page content. */}
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-      <MenuBar onMobileMenuOpen={() => setMobileMenuOpen(true)} />
+      <MobileBar onMenu={() => setMobileMenuOpen(true)} />
       <Sidebar
         collapsed={collapsed}
         onToggle={toggle}
         mobileMenuOpen={mobileMenuOpen}
         onMobileMenuClose={() => setMobileMenuOpen(false)}
+        onContactOpen={() => setContactOpen(true)}
       />
       <main
         className="min-w-0 ml-0 md:ml-[var(--sidebar-w)]"
@@ -58,8 +91,6 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
             "--sidebar-w": `${sidebarW}px`,
             paddingTop: "var(--menubar-h)",
             minHeight: "100vh",
-            // Clip any incidental horizontal overflow so the page never scrolls
-            // sideways (fixes asymmetric right padding / stray swipe on mobile).
             overflowX: "clip",
             transition: "margin-left 0.5s cubic-bezier(0.4,0,0.2,1)",
           } as React.CSSProperties
@@ -69,6 +100,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       >
         {children}
       </main>
+      <ContactDrawer open={contactOpen} onClose={() => setContactOpen(false)} />
     </>
   );
 }

@@ -18,32 +18,32 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Finbar Studio | Brisbane Graphic Designer & Framer Developer",
+    default: "Finbar Studio | Brisbane Graphic Designer",
     template: "%s | Finbar Studio",
   },
   description:
-    "Brisbane-based graphic designer and Framer developer. See selected web design and branding projects built for real clients across Australia.",
+    "Brisbane graphic designer working in brand identity, editorial, web and motion. See selected projects for businesses across Australia and the UK.",
   applicationName: "finbar✶studio",
   authors: [{ name: "Finbar Skitini", url: SITE_URL }],
   creator: "Finbar Skitini",
   publisher: "Finbar Skitini",
   keywords: [
-    "Finbar Skitini",
-    "Finbar Studio",
+    "Brisbane graphic designer",
     "graphic designer Brisbane",
-    "Framer developer",
-    "brand identity designer",
-    "Brisbane web designer",
-    "publication design",
+    "brand identity designer Brisbane",
+    "logo designer Brisbane",
+    "freelance graphic designer Brisbane",
+    "web designer Brisbane",
+    "creative studio Brisbane",
+    "editorial design",
     "motion graphics",
-    "NDIS brand design",
-    "freelance designer Australia",
+    "Finbar Skitini",
   ],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Skitini | Brisbane Graphic Designer & Framer Developer",
+    title: "Finbar Studio | Brisbane Graphic Designer",
     description:
-      "Brisbane-based graphic designer and Framer developer. See selected web design and branding projects built for real clients across Australia.",
+      "Brisbane graphic designer working in brand identity, editorial, web and motion for businesses across Australia and the UK.",
     url: SITE_URL,
     siteName: "finbar✶studio",
     locale: "en_AU",
@@ -51,9 +51,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Finbar Skitini | Brisbane Graphic Designer & Framer Developer",
+    title: "Finbar Studio | Brisbane Graphic Designer",
     description:
-      "Brisbane-based graphic designer and Framer developer. See selected web design and branding projects built for real clients across Australia.",
+      "Brisbane graphic designer working in brand identity, editorial, web and motion.",
     creator: "@finbarstudio",
   },
   robots: {
@@ -98,9 +98,9 @@ const personJsonLd = {
   alternateName: "Finbar Studio",
   url: SITE_URL,
   image: `${SITE_URL}/images/headshot.webp`,
-  jobTitle: "Graphic Designer & Framer Developer",
+  jobTitle: "Graphic Designer",
   description:
-    "Brisbane-based graphic designer and Framer developer. Brand identity, web, publication and motion design.",
+    "Brisbane graphic designer working in brand identity, editorial, web and motion design.",
   email: "mailto:finbar@finbar.studio",
   telephone: "+61412796630",
   knowsLanguage: ["en-AU", "en-GB"],
@@ -110,31 +110,31 @@ const personJsonLd = {
     addressRegion: "QLD",
     addressCountry: "AU",
   },
-  // Designer + developer occupations, for richer entity understanding.
+  // Occupations, for richer entity understanding.
   hasOccupation: [
     {
       "@type": "Occupation",
       name: "Graphic Designer",
       occupationLocation: { "@type": "City", name: "Brisbane" },
       skills:
-        "Brand identity, logo design, publication design, infographic design, motion graphics",
+        "Brand identity, logo design, editorial and publication design, infographic design, motion graphics",
     },
     {
       "@type": "Occupation",
-      name: "Framer Developer",
+      name: "Web & UI Designer",
       occupationLocation: { "@type": "City", name: "Brisbane" },
       skills:
-        "Framer development, CMS setup, custom interactive components, web accessibility, SEO foundations",
+        "Website design, UI design, brand-led web design, creative direction",
     },
   ],
   // Services offered — helps surface the practice as a hireable studio.
   makesOffer: [
     "Brand Identity",
     "Logo Design",
-    "Framer Website Development",
-    "Publication Design",
+    "Editorial & Publication Design",
+    "Web & UI Design",
     "Motion Graphics",
-    "Web Accessibility",
+    "Creative Direction",
   ].map((name) => ({
     "@type": "Offer",
     itemOffered: { "@type": "Service", name },

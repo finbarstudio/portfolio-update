@@ -118,17 +118,18 @@
      │  RETRO OS CHROME                                        │
      │  Bars, windows, beveled shadows for the OS aesthetic    │
      └─────────────────────────────────────────────────────────┘ */
-  --menubar-h:    26px;      /* top global menubar height (desktop)       */
+  --menubar-h:    40px;      /* slim mobile top bar (logo + hamburger)    */
   --statusbar-h:  22px;      /* bottom status bar height                  */
   --titlebar-h:   22px;      /* window chrome title bar height            */
   --win-shadow:    var(--elev-2);
   --win-shadow-sm: var(--elev-1);
 }
 
-/* Slightly taller menubar on mobile so the hamburger is a real tap target */
-@media (max-width: 767.98px) {
+/* No global top bar on desktop — the logo lives at the top of the sidebar.
+   Only mobile keeps a slim bar, so the desktop offset collapses to 0. */
+@media (min-width: 768px) {
   :root {
-    --menubar-h: 40px;
+    --menubar-h: 0px;
   }
 }
 
@@ -272,6 +273,67 @@
   outline: 2px solid var(--pink);
   outline-offset: 2px;
 }
+
+/* ─── Contact drawer ─────────────────────────────────────────────
+   Slides in from the right (bottom sheet on mobile). */
+.contact-drawer-root { position: fixed; inset: 0; z-index: 80; pointer-events: none; }
+.contact-drawer-root.is-open { pointer-events: auto; }
+.contact-drawer-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(20, 20, 20, 0.35);
+  opacity: 0; transition: opacity var(--dur) var(--ease);
+}
+.contact-drawer-root.is-open .contact-drawer-backdrop { opacity: 1; }
+.contact-drawer-panel {
+  position: absolute; top: 0; right: 0; height: 100%;
+  width: min(420px, 92vw);
+  background: var(--surface-raised);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--elev-3);
+  padding: var(--space-6);
+  transform: translateX(100%);
+  transition: transform var(--dur-slow) var(--ease);
+  overflow-y: auto;
+  outline: none;
+}
+.contact-drawer-root.is-open .contact-drawer-panel { transform: translateX(0); }
+@media (max-width: 640px) {
+  .contact-drawer-panel {
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; height: auto; max-height: 88vh;
+    border-left: none; border-top: 1px solid var(--line);
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+  }
+  .contact-drawer-root.is-open .contact-drawer-panel { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-drawer-backdrop, .contact-drawer-panel { transition: none; }
+}
+
+/* Sidebar logo block, pinned at the top of the rail (the old top-bar logo). */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 48px;
+  padding: 0 14px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  transition: color var(--dur-fast) var(--ease);
+}
+.sidebar-logo:hover { color: var(--pink); }
+.sidebar-logo .logo-word {
+  margin-left: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: opacity 0.3s var(--ease);
+}
+.sidebar-logo.is-collapsed { justify-content: center; padding: 0; }
+.sidebar-logo.is-collapsed .logo-word { opacity: 0; }
 
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {

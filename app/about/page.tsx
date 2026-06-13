@@ -5,41 +5,65 @@ import { projects } from "@/content/projects";
 
 const SITE_URL = "https://www.finbar.studio";
 
-// ProfilePage is the canonical schema for a personal/about page. It points at
-// the one Person node defined in the root layout rather than redefining it.
-const profilePageJsonLd = {
+// Combined About + Contact page. ProfilePage with a contactPoint, pointing at
+// the one Person node defined in the root layout.
+const aboutJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfilePage",
   "@id": `${SITE_URL}/about#webpage`,
   url: `${SITE_URL}/about`,
-  name: "About | Finbar Skitini | Brisbane Designer",
+  name: "About & Contact | Finbar Skitini, Brisbane Graphic Designer",
   isPartOf: { "@id": `${SITE_URL}/#website` },
   inLanguage: "en-AU",
-  mainEntity: { "@id": `${SITE_URL}/#person` },
+  mainEntity: {
+    "@id": `${SITE_URL}/#person`,
+    contactPoint: {
+      "@type": "ContactPoint",
+      email: "finbar@finbar.studio",
+      telephone: "+61412796630",
+      contactType: "Enquiries",
+      areaServed: ["AU", "GB"],
+      availableLanguage: "English",
+    },
+  },
 };
 
-/* ── Testimonials gathered from any project that has one ─────── */
+const CAPABILITIES = [
+  {
+    heading: "Brand identity",
+    items: ["Logo & logomark", "Colour systems", "Typography", "Brand guidelines", "Asset systems"],
+  },
+  {
+    heading: "Editorial & print",
+    items: ["Publication design (InDesign)", "Infographics", "Layout & typesetting", "Print production", "Content writing"],
+  },
+  {
+    heading: "Web, motion & more",
+    items: ["Website & UI design", "Creative direction", "Motion graphics (After Effects)", "Photoshop & Illustrator", "AI-assisted workflow"],
+  },
+];
+
+const SOCIALS = [
+  { label: "Are.na", href: "https://are.na/finbar-studio" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/finbarskitini" },
+  { label: "Instagram", href: "https://instagram.com/finbar.studio" },
+  { label: "X", href: "https://x.com/finbarstudio" },
+];
+
+/* Testimonials gathered from any project that has one. */
 function AboutTestimonials() {
-  const quotes = projects
-    .filter((p) => p.testimonial)
-    .map((p) => ({ ...p.testimonial!, slug: p.slug }));
+  const quotes = projects.filter((p) => p.testimonial).map((p) => ({ ...p.testimonial!, slug: p.slug }));
   if (!quotes.length) return null;
   return (
-    <section className="pt-10 pb-12 border-t border-line" aria-label="Client testimonials">
+    <section className="home-section" aria-label="Client testimonials">
       <p className="mono-label text-ink-soft mb-6">Kind words</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
         {quotes.map((q) => (
           <figure key={q.slug} className="max-w-prose">
-            <blockquote
-              className="font-sans text-ink leading-relaxed"
-              style={{ fontSize: "var(--text-body)", lineHeight: 1.6 }}
-            >
+            <blockquote className="font-sans text-ink leading-relaxed" style={{ fontSize: "var(--text-body)", lineHeight: 1.6 }}>
               &ldquo;{q.quote}&rdquo;
             </blockquote>
-            <figcaption
-              className="mono-label text-ink-soft mt-4"
-              style={{ fontSize: "11px" }}
-            >
+            <figcaption className="mono-label text-ink-soft mt-4" style={{ fontSize: "11px" }}>
               {q.author}
             </figcaption>
           </figure>
@@ -50,14 +74,14 @@ function AboutTestimonials() {
 }
 
 export const metadata: Metadata = {
-  title: { absolute: "About | Finbar Skitini | Brisbane Designer" },
+  title: { absolute: "About & Contact | Finbar Skitini, Brisbane Graphic Designer" },
   description:
-    "Hi I am Finbar, a Brisbane-based graphic designer originally from London. Websites and brands built with care, creativity, and a strong graphic design foundation.",
+    "Finbar Skitini is a Brisbane graphic designer working in brand identity, editorial, web and motion. About the studio, plus how to get in touch.",
   alternates: { canonical: "/about" },
   openGraph: {
-    title: "About | Finbar Skitini | Brisbane Designer",
+    title: "About & Contact | Finbar Studio",
     description:
-      "Hi I am Finbar, a Brisbane-based graphic designer originally from London. Websites and brands built with care, creativity, and a strong graphic design foundation.",
+      "Brisbane graphic designer working in brand identity, editorial, web and motion. About the studio and how to get in touch.",
     url: "/about",
     type: "profile",
   },
@@ -65,13 +89,15 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="px-5 md:px-10 pt-8 md:pt-12 pb-10">
+    <div className="px-5 md:px-10 pt-12 md:pt-24 pb-10">
       <Script
         id="ld-about"
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
       />
+
+      <p className="mono-label text-ink-soft mb-6">Brisbane graphic designer</p>
       <h1
         className="font-sans font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
@@ -79,92 +105,49 @@ export default function AboutPage() {
         Finbar Skitini.
       </h1>
 
-      <p className="mono-label text-ink-soft mt-6 mb-12">
-        graphic designer &amp; framer developer · brisbane, au
-      </p>
-
-      {/* Headshot + Bio */}
-      <div className="mb-16 md:mb-24 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
+      {/* Headshot + bio */}
+      <div className="mt-10 md:mt-14 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
         <div
           className="shrink-0"
-          style={{ width: 160, height: 160, position: "relative", borderRadius: 4, overflow: "hidden", background: "white" }}
+          style={{ width: 160, height: 160, position: "relative", borderRadius: 6, overflow: "hidden", background: "var(--surface-sunken)" }}
         >
           <ClientImage
             src="/images/headshot.webp"
-            alt="Finbar Skitini, graphic designer and Framer developer"
+            alt="Finbar Skitini, Brisbane graphic designer"
             fill
+            priority
             sizes="160px"
-            className="object-contain"
+            className="object-cover"
           />
         </div>
-        <div className="max-w-2xl">
-          <div className="space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
-            <p>
-              I&rsquo;m a graphic designer and Framer developer based in
-              Brisbane. Over the last four years I&rsquo;ve worked across brand
-              identity, digital campaigns, websites and publications. Originally
-              from London. Studied design in London and Brighton, then moved to
-              Australia and started Finbar Studio.
-            </p>
-            <p>
-              Most jobs start with the brand: logo, colour, type, guidelines.
-              From there I take it into whatever comes next, usually a motion
-              campaign, a printed publication, or a Framer website with a CMS
-              the client can run themselves.
-            </p>
-            <p>
-              I like work that looks good, holds up technically, and actually
-              works for the people using it. Accessibility isn&rsquo;t something
-              I bolt on at the end. I&rsquo;d rather build for real users than
-              for a tidy portfolio screenshot.
-            </p>
-          </div>
+        <div className="max-w-2xl space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
+          <p>
+            I&rsquo;m Finbar, a graphic designer in Brisbane, originally from London. I studied
+            design in London and Brighton, then moved to Australia and started working as finbar
+            studio.
+          </p>
+          <p>
+            My background is brand and editorial. Most jobs start with the brand, the logo, colour
+            and type, then run into whatever&rsquo;s next: a publication, a website, a campaign. I
+            care about the details, the kerning, the spacing, the way a thing holds together, and I
+            bring that to screen work as much as print.
+          </p>
+          <p>
+            I also lean on modern tools, AI included, to handle the technical lift and move quickly.
+            That frees me up to spend my time on the creative work and get more done for each client.
+          </p>
         </div>
       </div>
 
       {/* Capabilities */}
-      <div className="mb-16 md:mb-24">
+      <section className="home-section mt-16 md:mt-24" aria-label="Capabilities">
         <p className="mono-label text-ink-soft mb-8">Capabilities</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-12">
-          {[
-            {
-              heading: "Brand Identity",
-              items: [
-                "Logo design & logomark",
-                "Colour systems",
-                "Typography selection",
-                "Brand guidelines",
-                "Graphic asset systems",
-              ],
-            },
-            {
-              heading: "Web & Digital",
-              items: [
-                "Framer development",
-                "CMS setup & handover",
-                "Custom interactive components",
-                "Accessibility implementation",
-                "SEO foundations",
-              ],
-            },
-            {
-              heading: "Publication & Campaign",
-              items: [
-                "Publication design (InDesign)",
-                "Infographic design",
-                "Content writing",
-                "Motion graphics (After Effects)",
-                "Print production",
-              ],
-            },
-          ].map(({ heading, items }) => (
+          {CAPABILITIES.map(({ heading, items }) => (
             <div key={heading} className="border-l border-line pl-5">
-              <p
-                className="font-sans font-bold uppercase text-ink mb-4 tracking-wider"
-                style={{ fontSize: "var(--text-small)" }}
-              >
+              <h2 className="font-sans font-bold uppercase text-ink mb-4 tracking-wider" style={{ fontSize: "var(--text-small)" }}>
                 {heading}
-              </p>
+              </h2>
               <ul className="space-y-2">
                 {items.map((item) => (
                   <li key={item} className="font-sans text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
@@ -175,28 +158,52 @@ export default function AboutPage() {
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Testimonials — pulled from any project that has one */}
       <AboutTestimonials />
 
-      {/* Contact CTA */}
-      <div className="pt-8 border-t border-line">
-        <div className="mb-3">
-          <span className="status-badge">OPEN FOR WORK</span>
-        </div>
-        <p className="font-sans text-ink-soft mb-5" style={{ fontSize: "var(--text-small)" }}>
-          Taking on full-time design roles and freelance projects. Based in
-          Brisbane, happy to work remotely.
+      {/* Contact — merged in from the old /contact page */}
+      <section className="home-section" id="contact" aria-label="Contact">
+        <h2 className="home-display-sm text-ink mb-2">Get in touch</h2>
+        <p className="text-ink-soft mb-6 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
+          Open to freelance projects and permanent design roles. Email is the fastest way to reach me.
         </p>
+
         <a
           href="mailto:finbar@finbar.studio"
-          className="font-sans font-bold text-ink hover:text-pink transition-colors"
-          style={{ fontSize: "var(--text-h2)" }}
+          className="home-display-sm text-ink hover:text-pink transition-colors break-words inline-block mb-8"
         >
           finbar@finbar.studio
         </a>
-      </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl">
+          <div>
+            <p className="mono-label text-ink-soft mb-2">Phone</p>
+            <a href="tel:+61412796630" className="text-ink hover:text-pink transition-colors tabular-nums" style={{ fontSize: "var(--text-small)" }}>
+              +61 412 796 630
+            </a>
+          </div>
+          <div>
+            <p className="mono-label text-ink-soft mb-2">Location</p>
+            <p className="text-ink" style={{ fontSize: "var(--text-small)" }}>Brisbane, QLD</p>
+            <p className="text-ink-soft" style={{ fontSize: "var(--text-caption)" }}>Remote-friendly</p>
+          </div>
+          <div>
+            <p className="mono-label text-ink-soft mb-2">Elsewhere</p>
+            <div className="flex flex-col gap-1.5">
+              {SOCIALS.map((s) => (
+                <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors" style={{ fontSize: "var(--text-small)" }}>
+                  {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <span className="status-badge">OPEN FOR WORK</span>
+        </div>
+      </section>
     </div>
   );
 }

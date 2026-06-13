@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Finbar Studio is the independent practice of Finbar Skitini, a Brisbane graphic designer working in brand identity, editorial, web and motion for businesses in Australia and the UK.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Studio | Brisbane Graphic Designer & Framer Developer",
+    title: "Finbar Studio | Brisbane Graphic Designer",
     description:
       "Independent design studio in Brisbane. Brand identity, editorial, web and motion. Available for select freelance projects and permanent roles.",
     url: SITE_URL,
@@ -59,7 +59,7 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
 /* ─── Hero ──────────────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="px-5 md:px-10 pt-10 md:pt-16 pb-12 md:pb-16" aria-label="Introduction">
+    <section className="px-5 md:px-10 pt-16 md:pt-32 pb-12 md:pb-16" aria-label="Introduction">
       <p className="mono-label text-ink-soft mb-6 md:mb-8 home-enter">Brisbane graphic designer</p>
 
       <h1 className="home-display text-ink max-w-[15ch] home-enter" style={{ animationDelay: "0.06s" }}>
@@ -86,7 +86,7 @@ function Hero() {
           </ul>
           <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6">
             <Link href="/work" className="home-link">View work →</Link>
-            <Link href="/contact" className="home-link">Start a project →</Link>
+            <Link href="/about#contact" className="home-link">Start a project →</Link>
           </div>
         </div>
       </div>
@@ -175,7 +175,7 @@ function SplitPathway() {
             <li className="text-ink">Creative direction</li>
             <li className="text-ink">Motion &amp; social campaigns</li>
           </ul>
-          <Link href="/contact" className="home-link">Start a project →</Link>
+          <Link href="/about#contact" className="home-link">Start a project →</Link>
         </div>
       </div>
     </section>
@@ -207,7 +207,7 @@ function Contact() {
           <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2">
             <Link href="/about" className="mono-label text-ink-soft hover:text-pink transition-colors">About</Link>
             <Link href="/work" className="mono-label text-ink-soft hover:text-pink transition-colors">Work</Link>
-            <Link href="/contact" className="mono-label text-ink-soft hover:text-pink transition-colors">Contact</Link>
+            <Link href="/about#contact" className="mono-label text-ink-soft hover:text-pink transition-colors">Contact</Link>
           </div>
         </div>
       </div>
