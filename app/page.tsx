@@ -4,7 +4,6 @@ import Script from "next/script";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
-import HeroLogo from "@/components/HeroLogo";
 import HeroHeadline from "@/components/HeroHeadline";
 import HeroStar from "@/components/HeroStar";
 import { isShopifyConfigured } from "@/lib/shopify";
@@ -68,18 +67,17 @@ function Hero() {
     <section className="relative overflow-hidden px-5 md:px-10 pt-8 md:pt-12 pb-12 md:pb-16" aria-label="Introduction">
       <HeroStar />
       <div className="relative z-10">
-      <HeroLogo />
-      <Reveal immediate as="p" className="mono-label text-ink-soft mb-6 md:mb-8">Brisbane graphic designer</Reveal>
+      <Reveal immediate as="p" className="mono-label text-ink-soft mb-6 md:mb-8 hero-legible inline-block">Brisbane graphic designer</Reveal>
 
       <HeroHeadline text="Brand identity, editorial, web & motion." className="home-display text-ink max-w-[15ch]" />
 
       <Reveal immediate delay={0.18} className="mt-8 md:mt-10 grid md:grid-cols-12 gap-6 md:gap-8 items-end">
-        <p className="md:col-span-7 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
+        <p className="md:col-span-7 text-ink leading-relaxed hero-legible" style={{ fontSize: "var(--text-body)" }}>
           I&rsquo;m Finbar. I design brand identities, publications and websites for businesses in
           Australia and the UK. My background is print and editorial, so type, grids and the small
           details are where I&rsquo;m strongest, and I bring the same eye to everything on screen.
         </p>
-        <div className="md:col-span-5 md:col-start-9">
+        <div className="md:col-span-5 md:col-start-9 hero-legible">
           <p className="mono-label text-ink-soft mb-3">Available for</p>
           <ul className="home-list">
             <li>

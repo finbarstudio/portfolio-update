@@ -380,23 +380,6 @@
     margin-bottom: var(--space-6);
   }
 
-  /* Hero masthead logo — rises into the sidebar on scroll (see HeroLogo). */
-  .hero-logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.04em;
-    font-family: var(--font-primary);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-size: clamp(1.6rem, 4.5vw, 2.75rem);
-    line-height: 1;
-    color: var(--ink);
-    margin-bottom: var(--space-5);
-    will-change: transform, opacity;
-  }
-  .hero-logo svg { width: 0.82em; height: 0.82em; flex: 0 0 auto; color: var(--pink); }
-
   /* Big hero backdrop star (see HeroStar): glowing self-tracing outline, cropped
      off the bottom by the section, rotating + parallaxing on scroll. */
   .hero-star {
@@ -408,9 +391,17 @@
     transform: translateX(-50%);
     z-index: 0;
     pointer-events: none;
-    will-change: transform;
   }
+  .hero-star-move { width: 100%; height: 100%; will-change: transform, opacity; }
   .hero-star-svg { width: 100%; height: 100%; overflow: visible; }
+
+  /* Keep small text legible over the star: sit it on the page ground so the
+     star reads behind the big display type and in the margins, not the copy. */
+  .hero-legible {
+    background: var(--bg);
+    border-radius: 8px;
+    box-shadow: 0 0 0 6px var(--bg);
+  }
   .hero-star-track {
     fill: none;
     stroke: color-mix(in srgb, var(--pink) 9%, transparent);
