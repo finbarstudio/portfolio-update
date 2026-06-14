@@ -402,30 +402,32 @@
      star reads behind the big display type and in the margins, not the copy. */
   .hero-star-track {
     fill: none;
-    stroke: color-mix(in srgb, var(--pink) 9%, transparent);
-    stroke-width: 0.9;
+    stroke: color-mix(in srgb, var(--ink) 12%, transparent);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;   /* true 1px regardless of size */
     stroke-linejoin: round;
   }
   .hero-star-draw {
     fill: none;
     stroke: var(--pink);
-    stroke-width: 1.5;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;   /* true 1px sticker outline */
     stroke-linejoin: round;
     stroke-linecap: round;
-    opacity: 0.9;
+    opacity: 0.95;
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-star-draw { animation: none; stroke-dasharray: none; opacity: 0.4; }
   }
 
-  /* Kinetic 3D hero headline (see HeroHeadline). */
-  .hh-3d { transform-style: preserve-3d; }
+  /* Kinetic hero headline — each word clips + springs up (see HeroHeadline). */
   .hh-word {
     display: inline-block;
+    overflow: hidden;
     vertical-align: top;
-    margin-right: 0.26em;
-    transform-style: preserve-3d;
-    will-change: transform;
+    margin-right: 0.22em;
+    padding-bottom: 0.16em;       /* room for serif descenders inside the mask */
+    margin-bottom: -0.16em;
   }
   .hh-inner {
     display: inline-block;
@@ -433,7 +435,30 @@
     transition: color var(--dur-fast) var(--ease);
   }
   @media (hover: hover) {
-    .hh-word:hover .hh-inner { color: var(--pink); }
+    .hh-word:hover .hh-inner { color: var(--pink) !important; }
+  }
+
+  /* 1px-outline sticker pill — the retro flyer / fruit-packaging label look. */
+  .sticker-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    padding: 0.42em 0.95em;
+    font-family: var(--font-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: var(--text-label);
+    line-height: 1;
+    color: var(--ink);
+    background: var(--bg);
+    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  }
+  .sticker-pill.is-pink { border-color: var(--pink); color: var(--pink); }
+  @media (hover: hover) {
+    a.sticker-pill:hover, button.sticker-pill:hover { color: var(--pink); border-color: var(--pink); }
   }
 
   /* Massive display type that drives the hero + section openers. */

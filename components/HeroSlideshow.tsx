@@ -69,7 +69,8 @@ export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = fals
 
         card.style.transform = `translateX(${x}px) translateY(-50%) perspective(1200px) rotateY(${-ry}deg) scale(${sc})`;
         card.style.zIndex    = String(Math.round(e * 10));
-        card.style.opacity   = String(0.5 + e * 0.5);
+        // Covers stay opaque so the hover reveal doesn't bleed through them.
+        card.style.opacity   = "1";
       });
 
       rafRef.current = requestAnimationFrame(tick);

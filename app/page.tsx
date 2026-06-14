@@ -67,7 +67,11 @@ function Hero() {
     <section className="relative overflow-hidden px-5 md:px-10 pt-8 md:pt-12 pb-12 md:pb-16" aria-label="Introduction">
       <HeroStar />
       <div className="relative z-10">
-      <Reveal immediate as="p" className="mono-label text-ink-soft mb-6 md:mb-8">Brisbane graphic designer</Reveal>
+      <Reveal immediate as="div" className="mb-6 md:mb-8">
+        <span className="sticker-pill is-pink">
+          <span className="status-dot" aria-hidden="true" /> Brisbane graphic designer
+        </span>
+      </Reveal>
 
       <HeroHeadline text="Brand identity, editorial, web & motion." className="home-display text-ink max-w-[15ch]" />
 
@@ -79,16 +83,10 @@ function Hero() {
         </p>
         <div className="md:col-span-5 md:col-start-9">
           <p className="mono-label text-ink-soft mb-3">Available for</p>
-          <ul className="home-list">
-            <li>
-              <span className="status-dot" aria-hidden="true" />
-              <span className="text-ink" style={{ fontSize: "var(--text-small)" }}>Select freelance projects</span>
-            </li>
-            <li>
-              <span className="status-dot" aria-hidden="true" />
-              <span className="text-ink" style={{ fontSize: "var(--text-small)" }}>Permanent design roles</span>
-            </li>
-          </ul>
+          <div className="flex flex-wrap gap-2">
+            <span className="sticker-pill">Freelance projects</span>
+            <span className="sticker-pill">Permanent roles</span>
+          </div>
           <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6">
             <Link href="/work" className="home-link">View work →</Link>
             <Link href="/about#contact" className="home-link">Start a project →</Link>
