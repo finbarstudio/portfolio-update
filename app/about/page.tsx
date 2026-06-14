@@ -133,8 +133,10 @@ export default function AboutPage() {
             bring that to screen work as much as print.
           </p>
           <p>
-            I also lean on modern tools, AI included, to handle the technical lift and move quickly.
-            That frees me up to spend my time on the creative work and get more done for each client.
+            Away from client projects I tinker with creative coding, the interactive and generative kind
+            this site is built from. Leaning on Claude for the technical side is what lets me stay in the
+            design rather than getting buried in code, and a fair bit of what I work out there ends up
+            useful for clients too.
           </p>
         </div>
       </div>
@@ -169,12 +171,14 @@ export default function AboutPage() {
           Open to freelance projects and permanent design roles. Email is the fastest way to reach me.
         </p>
 
-        <a
-          href="mailto:finbar@finbar.studio"
-          className="home-display-sm text-ink hover:text-pink transition-colors break-words inline-block mb-8"
-        >
-          finbar@finbar.studio
-        </a>
+        <h3 className="mb-8">
+          <a
+            href="mailto:finbar@finbar.studio"
+            className="mono-h3 text-ink hover:text-pink transition-colors"
+          >
+            finbar@finbar.studio
+          </a>
+        </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl">
           <div>

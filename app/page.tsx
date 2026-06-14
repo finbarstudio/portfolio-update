@@ -123,18 +123,18 @@ function Approach() {
       <div className="grid md:grid-cols-12 gap-8">
         <div className="md:col-span-7 max-w-2xl space-y-4 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
           <p>
-            I move between expressive work and strict work. One day it&rsquo;s album and cover art,
-            the next it&rsquo;s a publication, a long-form layout or an infographic with a lot of
-            information to make clear. I like having both ends of that range in my week.
+            I move between loose work and tight work. One week it&rsquo;s cover art, the next it&rsquo;s a
+            publication or an infographic with a lot to make clear. Having both in my week keeps it interesting.
           </p>
           <p>
-            What ties it together is the craft underneath: typography, colour, and how a layout
-            leads the eye. I think about that for how a thing looks, and just as often for how
-            readable and accessible it needs to be.
+            Underneath all of it is the same craft: type, colour, and the way a layout moves your eye.
+            I care how something looks, and just as much about whether it reads well for the people using it.
           </p>
           <p>
-            I work creative first and move quickly, putting things in front of real content and
-            adjusting until they feel right.
+            Outside client work my main hobby is creative coding, building interactive and generative
+            pieces for the love of it. This site is one of them. Working with Claude to get past the
+            technical parts keeps me on the design instead of stuck in code, and what I learn there tends
+            to feed back into client work.
           </p>
         </div>
       </div>
@@ -169,7 +169,7 @@ function Products() {
       <SectionHead title="Studio products" aside={<Link href="/store" className="home-link">Visit store →</Link>} />
       <div className="grid md:grid-cols-12 gap-8 items-end">
         <div className="md:col-span-8">
-          <h3 className="home-h3 text-ink">{STORE_PRODUCT.fallback.name}</h3>
+          <h3 className="mono-h3 text-ink">{STORE_PRODUCT.fallback.name}</h3>
           <p className="text-ink-soft leading-relaxed mt-3 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
             {STORE_PRODUCT.fallback.blurb}
           </p>
@@ -198,7 +198,7 @@ function Contact() {
           <h3>
             <a
               href="mailto:finbar@finbar.studio"
-              className="home-h3 text-ink hover:text-pink transition-colors"
+              className="mono-h3 text-ink hover:text-pink transition-colors"
             >
               finbar@finbar.studio
             </a>

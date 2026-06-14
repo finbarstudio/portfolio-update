@@ -66,13 +66,14 @@ export default function ContactDrawer({ open, onClose }: { open: boolean; onClos
         <p className="text-ink-soft mb-3" style={{ fontSize: "var(--text-small)" }}>
           Got a project or a role in mind? Email is the fastest way to reach me.
         </p>
-        <a
-          href="mailto:finbar@finbar.studio"
-          className="block font-sans font-bold text-ink hover:text-pink transition-colors break-words mb-8"
-          style={{ fontSize: "var(--text-h2)" }}
-        >
-          finbar@finbar.studio
-        </a>
+        <h3 className="mb-8">
+          <a
+            href="mailto:finbar@finbar.studio"
+            className="mono-h3 text-ink hover:text-pink transition-colors"
+          >
+            finbar@finbar.studio
+          </a>
+        </h3>
 
         <div className="home-list mb-8" style={{ fontSize: "var(--text-small)" }}>
           <a href="tel:+61412796630" className="text-ink hover:text-pink transition-colors tabular-nums justify-between">

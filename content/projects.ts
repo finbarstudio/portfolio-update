@@ -763,7 +763,7 @@ export const projects: Project[] = [
     categories: ["Brand Identity", "Web Design", "NDIS"],
     skills: ["Brand Identity", "Web Design", "Framer Development"],
     oneLiner:
-      "Brand and website for an NDIS mentoring provider. Built around empowerment, independence and personal growth.",
+      "Brand and website for an NDIS mentoring provider, built to feel empowering and warm rather than clinical.",
     role: "Sole designer and developer. Built the brand identity and the Framer website end to end, from the logomark and colour through to a CMS the team can run themselves after launch.",
     problem:
       "Momentum needed a brand and site that read as empowering and independent without slipping into clinical or institutional territory. It had to feel approachable for participants and their families, and stay simple for a small team to maintain once it was live.",

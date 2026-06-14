@@ -505,9 +505,9 @@
     font-size: clamp(1.7rem, 4vw, 2.9rem);
   }
 
-  /* Home H3 tier — true monospace, caps, high tracking. A clear step down from
-     the H2 section heading above it (used for the contact email + product name). */
-  .home-h3 {
+  /* H3 tier — true monospace, caps, high tracking. A clear step down from an H2
+     above it. Used for the contact email (everywhere it appears) + product name. */
+  .mono-h3 {
     font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "Cascadia Mono", Consolas, monospace;
     text-transform: uppercase;
     letter-spacing: 0.16em;
@@ -980,7 +980,7 @@
   .card-rev {
     position: absolute;
     inset: 0;
-    transform: scaleX(0);
+    transform: scale(0);
     transform-origin: center;
     transition: transform 0.55s var(--ease);
     will-change: transform;
@@ -997,15 +997,15 @@
       border-color: var(--pink);
       transition: border-color 0.25s var(--ease) 0.66s;
     }
-    .group:hover .card-rev.c1 { transform: scaleX(1); transition-delay: 0s; }
-    .group:hover .card-rev.c2 { transform: scaleX(1); transition-delay: 0.08s; }
-    .group:hover .card-rev.c3 { transform: scaleX(1); transition-delay: 0.16s; }
+    .group:hover .card-rev.c1 { transform: scale(1); transition-delay: 0s; }
+    .group:hover .card-rev.c2 { transform: scale(1); transition-delay: 0.08s; }
+    .group:hover .card-rev.c3 { transform: scale(1); transition-delay: 0.16s; }
   }
   .group:active .card-thumb,
   .group:focus-within .card-thumb { border-color: var(--pink); }
-  .group:active .card-rev.c1, .group:focus-within .card-rev.c1 { transform: scaleX(1); transition-delay: 0s; }
-  .group:active .card-rev.c2, .group:focus-within .card-rev.c2 { transform: scaleX(1); transition-delay: 0.08s; }
-  .group:active .card-rev.c3, .group:focus-within .card-rev.c3 { transform: scaleX(1); transition-delay: 0.16s; }
+  .group:active .card-rev.c1, .group:focus-within .card-rev.c1 { transform: scale(1); transition-delay: 0s; }
+  .group:active .card-rev.c2, .group:focus-within .card-rev.c2 { transform: scale(1); transition-delay: 0.08s; }
+  .group:active .card-rev.c3, .group:focus-within .card-rev.c3 { transform: scale(1); transition-delay: 0.16s; }
 
   /* Hero scroll-driven fade (CSS only, no JS) */
   @supports (animation-timeline: scroll()) {
