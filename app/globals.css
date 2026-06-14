@@ -596,6 +596,35 @@
   }
   .cap-name { font-family: var(--font-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; font-size: 1.35rem; line-height: 1.05; color: var(--ink); transition: color var(--dur-fast) var(--ease); }
 
+  /* ── Capabilities: infinite auto-scrolling card slider (GSAP) ── */
+  .cap-slider {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .cap-track {
+    display: flex;
+    gap: clamp(0.75rem, 1.4vw, 1.25rem);
+    width: max-content;
+    will-change: transform;
+  }
+  .cap-card {
+    flex: 0 0 auto;
+    width: clamp(230px, 25vw, 310px);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5);
+    border: 1px solid var(--ink);
+    border-radius: 14px;
+    background: var(--surface-raised);
+    transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  }
+  @media (hover: hover) {
+    .cap-card:hover { background: var(--pink-soft); border-color: var(--pink); transform: translateY(-3px); }
+    .cap-card:hover .cap-name { color: var(--pink); }
+  }
+
   /* ── Store ──────────────────────────────────────────────────── */
   .store-media {
     position: relative;

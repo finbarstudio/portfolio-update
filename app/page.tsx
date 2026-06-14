@@ -6,6 +6,7 @@ import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HeroHeadline from "@/components/HeroHeadline";
 import HeroStar from "@/components/HeroStar";
+import CapabilitiesSlider from "@/components/CapabilitiesSlider";
 import { isLemonConfigured } from "@/lib/lemonsqueezy";
 import { STORE_PRODUCT } from "@/content/store";
 
@@ -141,19 +142,10 @@ function Approach() {
   );
 }
 
-/* ─── What I do (capabilities matrix) ───────────────────────── */
-const CAPABILITIES = [
-  { name: "Brand identity", desc: "Logomarks, colour and type, with guidelines to keep it consistent." },
-  { name: "Editorial & print", desc: "Publications and print-ready layouts, set in InDesign." },
-  { name: "Web & UI design", desc: "Brand-led websites and interfaces, built detail-first." },
-  { name: "Creative direction", desc: "Art direction and visual systems across a project." },
-  { name: "Motion graphics", desc: "Animated assets and short-form video, made in After Effects." },
-  { name: "Social campaigns", desc: "Static and motion sets sized for every channel." },
-];
-
+/* ─── What I do (infinite capabilities slider) ──────────────── */
 function Capabilities() {
   return (
-    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="What I do">
+    <Reveal as="section" className="home-section px-5 md:px-10 overflow-hidden" aria-label="What I do">
       <SectionHead
         title="What I do"
         aside={<Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>}
@@ -162,13 +154,8 @@ function Capabilities() {
         One designer across the whole range, from the first sketch to the finished thing. Open to
         freelance projects and permanent roles alike.
       </p>
-      <div className="cap-grid">
-        {CAPABILITIES.map((c) => (
-          <div key={c.name} className="cap-item">
-            <h3 className="cap-name">{c.name}</h3>
-            <p className="cap-desc">{c.desc}</p>
-          </div>
-        ))}
+      <div className="-mx-5 md:-mx-10">
+        <CapabilitiesSlider />
       </div>
     </Reveal>
   );
