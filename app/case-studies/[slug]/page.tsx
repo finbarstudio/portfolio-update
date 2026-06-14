@@ -15,6 +15,7 @@ import WhatWasDelivered from "@/components/WhatWasDelivered";
 import Outcomes from "@/components/Outcomes";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
+import Reveal from "@/components/Reveal";
 import PDFSlideshow from "@/components/PDFSlideshow";
 import {
   projects,
@@ -87,63 +88,104 @@ function Tag({
   return <span className={cls}>{label}</span>;
 }
 
-/* ─── Case study image, padded, max-height constrained ─────── */
+/* Parse an aspect-ratio string ("W/H") to a number; default 16/9. */
+function ratioOf(ar?: string): number {
+  if (!ar) return 16 / 9;
+  const [a, b] = ar.split("/").map(Number);
+  return b ? a / b : 16 / 9;
+}
+
+/* ─── Case study image — the frame matches the image's OWN aspect ratio, so
+   squares stay square and nothing is letterboxed into a white band. The image
+   sits on the page (transparent), object-cover fills the exactly-matched frame. */
 function CaseImage({
   src,
   alt,
   priority = false,
-  sizes = "(max-width: 768px) 100vw, calc(100vw - 224px)",
   aspectRatio = "16/9",
-  halfWidth = false,
+  sizes,
 }: {
   src: string;
   alt: string;
   priority?: boolean;
-  sizes?: string;
   aspectRatio?: string;
-  halfWidth?: boolean;
+  sizes?: string;
 }) {
   return (
     <div
       className="img-wrap"
-      style={{
-        aspectRatio,
-        marginTop: "var(--image-pad)",
-        marginBottom: "var(--image-pad)",
-        background: "white",
-      }}
+      style={{ aspectRatio, marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)", maxHeight: "none" }}
     >
       <ClientImage
         src={src}
         alt={alt}
         fill
         priority={priority}
-        sizes={halfWidth ? "(max-width: 768px) 100vw, calc((100vw - 224px) / 2)" : sizes}
-        className="object-contain"
+        sizes={sizes ?? "(max-width: 768px) 100vw, calc(100vw - 224px)"}
+        className="object-cover"
       />
     </div>
   );
 }
 
 /* ─── Case study media, image or looping video ─────────────── */
-function CaseMedia({ img, halfWidth = false }: { img: ProjectImage; halfWidth?: boolean }) {
+function CaseMedia({ img, full = false }: { img: ProjectImage; full?: boolean }) {
+  const sizes = full
+    ? "(max-width: 768px) 100vw, calc(100vw - 224px)"
+    : "(max-width: 768px) 100vw, calc((100vw - 224px) / 2)";
   if (img.video) {
     return (
       <div
         className="img-wrap"
-        style={{ aspectRatio: "1/1", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)", background: "white" }}
+        style={{ aspectRatio: img.aspectRatio ?? "16/9", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)" }}
       >
         <VideoPlayer src={img.video} poster={img.src} />
       </div>
     );
   }
+  return <CaseImage src={img.src} alt={img.alt} aspectRatio={img.aspectRatio ?? "16/9"} sizes={sizes} />;
+}
+
+/* Caption under a figure. */
+function Caption({ text }: { text: string }) {
   return (
-    <CaseImage
-      src={img.src}
-      alt={img.alt}
-      halfWidth={halfWidth}
-      aspectRatio={img.aspectRatio ?? "16/9"}
-    />
+    <figcaption
+      className="text-ink-soft font-sans leading-relaxed"
+      style={{ fontSize: "var(--text-caption)", marginTop: "-0.5rem", marginBottom: "var(--image-pad)" }}
+    >
+      {text}
+    </figcaption>
+  );
+}
+
+/* Aspect-aware gallery.
+   - A lone image: wide ones (>= 1.3) go full width; squares/portraits sit
+     centred at a contained width so they're never stretched or marooned.
+   - Multiple images: panoramic ones (>= 1.6) span the full width; everything
+     else pairs two-up. Each figure reveals on scroll (GSAP). */
+function Gallery({ images }: { images: ProjectImage[] }) {
+  if (images.length === 1) {
+    const img = images[0];
+    const wide = ratioOf(img.aspectRatio) >= 1.3;
+    return (
+      <Reveal as="figure" y={24} className={wide ? "" : "mx-auto w-full max-w-xl"}>
+        <CaseMedia img={img} full={wide} />
+        {img.caption && <Caption text={img.caption} />}
+      </Reveal>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+      {images.map((img, i) => {
+        const full = ratioOf(img.aspectRatio) >= 1.6;
+        return (
+          <Reveal as="figure" key={i} y={24} delay={(i % 2) * 0.06} className={full ? "md:col-span-2" : "min-w-0"}>
+            <CaseMedia img={img} full={full} />
+            {img.caption && <Caption text={img.caption} />}
+          </Reveal>
+        );
+      })}
+    </div>
   );
 }
 
@@ -171,51 +213,25 @@ function VisualBody({ project }: { project: Project }) {
   if (project.images.length === 0) return null;
   return (
     <div className="py-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-        {project.images.map((img, i) => (
-          <figure
-            key={i}
-            className={i === 0 && project.images.length >= 3 ? "md:col-span-2" : ""}
-          >
-            <CaseMedia img={img} halfWidth={!(i === 0 && project.images.length >= 3)} />
-            {img.caption && (
-              <figcaption className="text-ink-soft font-sans leading-relaxed" style={{ fontSize: "var(--text-caption)", marginTop: "-0.5rem", marginBottom: "var(--image-pad)" }}>
-                {img.caption}
-              </figcaption>
-            )}
-          </figure>
-        ))}
-      </div>
+      <Gallery images={project.images} />
     </div>
   );
 }
 
-/* ─── Depth section (Featured only) ───────────────────────── */
+/* ─── Depth sections — an editorial run of heading + body + gallery, each
+   block revealing on scroll. The heading is a pink mono eyebrow. ─── */
 function DepthSections({ sections }: { sections: DepthSection[] }) {
   return (
     <div className="py-8">
-      <div className="space-y-16">
+      <div className="space-y-16 md:space-y-24">
         {sections.map((section, i) => (
-          <div key={i}>
-            <h3 className="mono-heading text-ink mb-4">{section.heading}</h3>
-            <p className="text-ink leading-relaxed mb-2 max-w-2xl" style={{ fontSize: "var(--text-small)" }}>
+          <Reveal as="section" key={i} y={28}>
+            <h3 className="mono-heading text-pink mb-3">{section.heading}</h3>
+            <p className="text-ink leading-relaxed mb-2 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
               {section.body}
             </p>
-            {section.images.length > 0 && (
-              <div className={`grid gap-x-6 ${section.images.length === 1 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}>
-                {section.images.map((img, j) => (
-                  <figure key={j}>
-                    <CaseMedia img={img} halfWidth={section.images.length > 1} />
-                    {img.caption && (
-                      <figcaption className="text-ink-soft font-sans leading-relaxed" style={{ fontSize: "var(--text-caption)", marginTop: "-0.5rem", marginBottom: "var(--image-pad)" }}>
-                        {img.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                ))}
-              </div>
-            )}
-          </div>
+            {section.images.length > 0 && <Gallery images={section.images} />}
+          </Reveal>
         ))}
       </div>
     </div>

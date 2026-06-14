@@ -474,34 +474,52 @@ export const projects: Project[] = [
       src: "/images/compass-capability/hero.png",
       alt: "Compass Capability brand identity, logo mockup collage across touchpoints",
     },
-    images: [
+    images: [],
+    hasDepth: true,
+    depth: [
       {
-        src: "/images/compass-capability/graphic.png",
-        caption: "Brand graphic system: the directional motif pulled from the logomark, used as a flexible asset.",
-        alt: "Compass Capability brand graphic, directional compass motif used as a scalable brand asset",
+        heading: "The mark and the system",
+        body: "The logo reads as direction. From the mark came a flexible graphic motif and a repeating pattern, both built on the same geometry so the brand holds together wherever it lands.",
+        images: [
+          {
+            src: "/images/compass-capability/graphic.png",
+            aspectRatio: "1/1",
+            caption: "The directional motif, pulled from the logomark.",
+            alt: "Compass Capability brand graphic, directional compass motif used as a scalable brand asset",
+          },
+          {
+            src: "/images/compass-capability/pattern.png",
+            aspectRatio: "1/1",
+            caption: "A repeating pattern built from the logo geometry.",
+            alt: "Compass Capability repeating pattern, logo-derived geometric pattern for brand applications",
+          },
+        ],
       },
       {
-        src: "/images/compass-capability/pattern.png",
-        caption: "Repeating pattern built from the logo geometry. Used across brand touchpoints and digital backgrounds.",
-        alt: "Compass Capability repeating pattern, logo-derived geometric pattern for brand applications",
-      },
-      {
-        src: "/images/compass-capability/mockup-billboard.png",
-        caption: "Billboard mockup. Brand applied at large-format outdoor scale.",
-        alt: "Compass Capability brand identity on billboard mockup, large format outdoor application",
-      },
-      {
-        src: "/images/compass-capability/mockup-business-card.png",
-        caption: "Business card mockup: tight typography, logo mark at small print scale.",
-        alt: "Compass Capability business card mockup, logo and typography at small print scale",
-      },
-      {
-        src: "/images/compass-capability/mockup-stationary.png",
-        caption: "Stationery mockup: brand applied across letterhead and document templates.",
-        alt: "Compass Capability stationery mockup, letterhead and document templates with brand identity",
+        heading: "Applied",
+        body: "The same system, run across outdoor, print and stationery. It had to stay credible at billboard scale and at the size of a business card.",
+        images: [
+          {
+            src: "/images/compass-capability/mockup-billboard.png",
+            aspectRatio: "1/1",
+            caption: "Large-format outdoor.",
+            alt: "Compass Capability brand identity on billboard mockup, large format outdoor application",
+          },
+          {
+            src: "/images/compass-capability/mockup-business-card.png",
+            aspectRatio: "1/1",
+            caption: "Business card, mark at small print scale.",
+            alt: "Compass Capability business card mockup, logo and typography at small print scale",
+          },
+          {
+            src: "/images/compass-capability/mockup-stationary.png",
+            aspectRatio: "1/1",
+            caption: "Letterhead and document templates.",
+            alt: "Compass Capability stationery mockup, letterhead and document templates with brand identity",
+          },
+        ],
       },
     ],
-    hasDepth: false,
     pdfSlideshow: {
       title: "Brand Guidelines",
       pages: [
@@ -540,51 +558,84 @@ export const projects: Project[] = [
       src: "/images/norths-devils/desktop.png",
       alt: "Norths Devils RLFC prototype website desktop view with full-screen hero and navigation",
     },
-    images: [
+    images: [],
+    hasDepth: true,
+    depth: [
       {
-        src: "/images/norths-devils/video-desktop-poster.jpg",
-        video: "/images/norths-devils/video-desktop.webm",
-        caption: "Desktop scroll through the Norths Devils prototype site.",
-        alt: "Norths Devils prototype website desktop interaction, scroll through homepage, team and club sections",
+        heading: "A modernised mark",
+        body: "The brief was to feel current without losing the club. I kept the devil and tightened the vector construction so it holds at small sizes and in digital, where the old mark struggled. Angular type for aggression, rounded corners for a bit of vintage.",
+        images: [
+          {
+            src: "/images/norths-devils/logo-1.png",
+            aspectRatio: "1/1",
+            caption: "The refreshed primary mark.",
+            alt: "Norths Devils RLFC refreshed logo, modernised devil mark with thickened edges for digital reproduction",
+          },
+          {
+            src: "/images/norths-devils/logo-2.png",
+            aspectRatio: "1/1",
+            caption: "Before and after, old mark versus new.",
+            alt: "Norths Devils logo before and after comparison, original versus refreshed mark side by side",
+          },
+        ],
       },
       {
-        src: "/images/norths-devils/video-mobile-poster.jpg",
-        video: "/images/norths-devils/video-mobile.webm",
-        caption: "Mobile scroll showing the full responsive behaviour.",
-        alt: "Norths Devils prototype website mobile interaction, responsive scroll through the full site on iPhone",
+        heading: "The prototype site",
+        body: "Built from scratch and modelled on professional NRL club sites, so the brand could be judged in something close to the real thing rather than a static mockup.",
+        images: [
+          {
+            src: "/images/norths-devils/video-desktop-poster.jpg",
+            video: "/images/norths-devils/video-desktop.webm",
+            aspectRatio: "16/9",
+            caption: "Scrolling the desktop prototype.",
+            alt: "Norths Devils prototype website desktop interaction, scroll through homepage, team and club sections",
+          },
+        ],
       },
       {
-        src: "/images/norths-devils/logo-1.png",
-        caption: "Refreshed primary mark. Devil imagery kept; vector construction tightened.",
-        alt: "Norths Devils RLFC refreshed logo, modernised devil mark with thickened edges for digital reproduction",
+        heading: "On every screen",
+        body: "The same layout, holding its shape down to a phone.",
+        images: [
+          {
+            src: "/images/norths-devils/iphone-1.png",
+            aspectRatio: "4/3",
+            caption: "Mobile layout, club colours intact.",
+            alt: "Norths Devils prototype website on iPhone mockup, mobile responsive layout",
+          },
+          {
+            src: "/images/norths-devils/iphone-2.png",
+            aspectRatio: "4/3",
+            caption: "Team profile and news pages.",
+            alt: "Norths Devils prototype website iPhone mockup, team profile and news page layout",
+          },
+          {
+            src: "/images/norths-devils/video-mobile-poster.jpg",
+            video: "/images/norths-devils/video-mobile.webm",
+            aspectRatio: "4/3",
+            caption: "Scrolling the responsive site on mobile.",
+            alt: "Norths Devils prototype website mobile interaction, responsive scroll through the full site on iPhone",
+          },
+        ],
       },
       {
-        src: "/images/norths-devils/logo-2.png",
-        caption: "Before and after comparison. Angular type for aggression, rounded corners for a vintage feel.",
-        alt: "Norths Devils logo before and after comparison, original versus refreshed mark side by side",
-      },
-      {
-        src: "/images/norths-devils/iphone-1.png",
-        caption: "iPhone mockup: responsive layout at mobile scale, club colours intact.",
-        alt: "Norths Devils prototype website on iPhone mockup, mobile responsive layout",
-      },
-      {
-        src: "/images/norths-devils/iphone-2.png",
-        caption: "iPhone mockup: secondary page scroll showing team profile and news sections.",
-        alt: "Norths Devils prototype website iPhone mockup, team profile and news page layout",
-      },
-      {
-        src: "/images/norths-devils/mockup-wall.png",
-        caption: "Concrete wall mockup. Refreshed mark at large environmental scale.",
-        alt: "Norths Devils refreshed logo on concrete wall mockup, environmental scale brand application",
-      },
-      {
-        src: "/images/norths-devils/mockup-gallery.png",
-        caption: "Gallery wall mockup: logo silhouettes and brand applications across surfaces.",
-        alt: "Norths Devils brand identity gallery wall mockup, logo silhouettes across multiple brand applications",
+        heading: "Out in the world",
+        body: "And how the refreshed mark would carry into the club's physical spaces.",
+        images: [
+          {
+            src: "/images/norths-devils/mockup-wall.png",
+            aspectRatio: "3/2",
+            caption: "The mark at environmental scale.",
+            alt: "Norths Devils refreshed logo on concrete wall mockup, environmental scale brand application",
+          },
+          {
+            src: "/images/norths-devils/mockup-gallery.png",
+            aspectRatio: "4/3",
+            caption: "Brand applications across surfaces.",
+            alt: "Norths Devils brand identity gallery wall mockup, logo silhouettes across multiple brand applications",
+          },
+        ],
       },
     ],
-    hasDepth: false,
     liveUrl: "https://northsdevilsrlfc.framer.website",
   },
 
@@ -614,34 +665,58 @@ export const projects: Project[] = [
       src: "/images/copper-company/hero.png",
       alt: "Copper Company rum bottle, staged product photography showing the final label design and brand identity",
     },
-    images: [
+    images: [],
+    hasDepth: true,
+    depth: [
       {
-        src: "/images/copper-company/bottle-1.png",
-        caption: "Bottle front: monogram label at full print spec, ready for production.",
-        alt: "Copper Company rum bottle front, monogram label at print specification on amber glass bottle",
+        heading: "On the bottle",
+        body: "The monogram does the heavy lifting on pack. The front label keeps it to the mark and the name; the back carries tasting notes over the repeating pattern, built from the same geometry as the logo.",
+        images: [
+          {
+            src: "/images/copper-company/bottle-1.png",
+            aspectRatio: "1/1",
+            caption: "Front label, monogram at full print spec.",
+            alt: "Copper Company rum bottle front, monogram label at print specification on amber glass bottle",
+          },
+          {
+            src: "/images/copper-company/bottle-2.png",
+            aspectRatio: "1/1",
+            caption: "Back label, tasting notes over the repeat pattern.",
+            alt: "Copper Company rum bottle back, secondary label with tasting notes and repeating monogram pattern",
+          },
+        ],
       },
       {
-        src: "/images/copper-company/bottle-2.png",
-        caption: "Bottle back: secondary label with tasting notes and brand pattern.",
-        alt: "Copper Company rum bottle back, secondary label with tasting notes and repeating monogram pattern",
+        heading: "Print-ready artwork",
+        body: "The label as a flat net, set up for production with bleed and crop marks so it could go straight to the printer.",
+        images: [
+          {
+            src: "/images/copper-company/label-flat.png",
+            aspectRatio: "1.86/1",
+            caption: "Label flat, artwork with full bleed and crop marks.",
+            alt: "Copper Company label flat net, print-ready label design showing full bleed and artwork at flat view",
+          },
+        ],
       },
       {
-        src: "/images/copper-company/label-flat.png",
-        caption: "Label flat net: the full label design as print-ready artwork with bleed and crop marks.",
-        alt: "Copper Company label flat net, print-ready label design showing full bleed and artwork at flat view",
-      },
-      {
-        src: "/images/copper-company/insta-1.png",
-        caption: "Social content: brand-consistent product photography for Instagram.",
-        alt: "Copper Company Instagram post 1, brand-consistent social photography for rum product launch",
-      },
-      {
-        src: "/images/copper-company/insta-2.png",
-        caption: "Social content: lifestyle photography with the brand colour treatment.",
-        alt: "Copper Company Instagram post 2, lifestyle photography with brand copper and dark colour treatment",
+        heading: "On social",
+        body: "A short run of launch photography, graded to the copper-and-dark palette so the feed reads as one piece with the pack.",
+        images: [
+          {
+            src: "/images/copper-company/insta-1.png",
+            aspectRatio: "1/1",
+            caption: "Launch product photography.",
+            alt: "Copper Company Instagram post 1, brand-consistent social photography for rum product launch",
+          },
+          {
+            src: "/images/copper-company/insta-2.png",
+            aspectRatio: "1/1",
+            caption: "Lifestyle shot in the brand grade.",
+            alt: "Copper Company Instagram post 2, lifestyle photography with brand copper and dark colour treatment",
+          },
+        ],
       },
     ],
-    hasDepth: false,
   },
 
   /* 8. Lows Design and Build. Full */
@@ -671,34 +746,64 @@ export const projects: Project[] = [
       src: "/images/lows-design-build/hero.png",
       alt: "Lows Design and Build brand identity, hero composite showing logo and brand applications",
     },
-    images: [
+    images: [],
+    hasDepth: true,
+    depth: [
       {
-        src: "/images/lows-design-build/logo.png",
-        caption: "Scalable geometric mark, refined from the client's sketches and built on standard logo construction principles.",
-        alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
+        heading: "The mark",
+        body: "I refined the client's own sketches into a scalable geometric mark, then set a typeface and colour that hold up in print and on screen.",
+        images: [
+          {
+            src: "/images/lows-design-build/logo.png",
+            aspectRatio: "3.78/1",
+            caption: "The geometric mark, refined from the client's concepts.",
+            alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
+          },
+        ],
       },
       {
-        src: "/images/lows-design-build/bromley-fc.jpg",
-        caption: "Bromley FC sponsorship: the Lows mark in a Premier League-affiliated club's kit and branding.",
-        alt: "Lows Design and Build Bromley FC sponsorship, brand mark on football club materials and kit",
+        heading: "Bromley FC sponsorship",
+        body: "The real test was a football club. The mark went onto matchday kit and a pitch-side LED banner, where it had to read from across the stadium.",
+        images: [
+          {
+            src: "/images/lows-design-build/bromley-fc.jpg",
+            aspectRatio: "3/4",
+            caption: "The mark on club kit and matchday branding.",
+            alt: "Lows Design and Build Bromley FC sponsorship, brand mark on football club materials and kit",
+          },
+          {
+            src: "/images/lows-design-build/bromley-led-2.jpg",
+            aspectRatio: "3/4",
+            caption: "Pitch-side LED banner, brand at stadium scale.",
+            alt: "Lows Design and Build Bromley FC LED pitch-side advertising banner, brand at stadium scale",
+          },
+        ],
       },
       {
-        src: "/images/lows-design-build/bromley-led-2.jpg",
-        caption: "Bromley FC LED pitch-side banner. Brand at full stadium visibility.",
-        alt: "Lows Design and Build Bromley FC LED pitch-side advertising banner, brand at stadium scale",
+        heading: "On site",
+        body: "Closer to home, the same brand wraps the hoarding around a live construction site at street scale.",
+        images: [
+          {
+            src: "/images/lows-design-build/hoarding.jpg",
+            aspectRatio: "4/3",
+            caption: "Site hoarding on construction fencing.",
+            alt: "Lows Design and Build site hoarding, brand identity on construction site fence at street scale",
+          },
+        ],
       },
       {
-        src: "/images/lows-design-build/hoarding.jpg",
-        caption: "Site hoarding: brand applied to construction site fencing at street scale.",
-        alt: "Lows Design and Build site hoarding, brand identity on construction site fence at street scale",
-      },
-      {
-        src: "/images/lows-design-build/website.png",
-        caption: "Website: clean, brand-consistent design built for conversion and referral traffic.",
-        alt: "Lows Design and Build website, branded homepage design for the construction and design company",
+        heading: "The website",
+        body: "A clean, brand-consistent site built to turn referrals into enquiries.",
+        images: [
+          {
+            src: "/images/lows-design-build/website.png",
+            aspectRatio: "1920/4513",
+            caption: "The full homepage, top to bottom.",
+            alt: "Lows Design and Build website, branded homepage design for the construction and design company",
+          },
+        ],
       },
     ],
-    hasDepth: false,
   },
 
   /* 9. Nimbus Coffee Co. Full */
@@ -728,29 +833,52 @@ export const projects: Project[] = [
       src: "/images/nimbus-coffee/hero.png",
       alt: "Nimbus Coffee Co. packaging mockup, branded coffee bags showing the cloud-inspired mark and earthy palette",
     },
-    images: [
+    images: [],
+    hasDepth: true,
+    depth: [
       {
-        src: "/images/nimbus-coffee/mockup-2.png",
-        caption: "Packaging system: modular label design, scalable across bag sizes and blend types.",
-        alt: "Nimbus Coffee Co. packaging system mockup, modular label design on multiple coffee bag sizes",
+        heading: "The mark and palette",
+        body: "A cloud-formation mark with an earthy palette that nods to roasting terrain. The logotype is set to sit calmly beside it, warm rather than precious.",
+        images: [
+          {
+            src: "/images/nimbus-coffee/logo.jpg",
+            aspectRatio: "1/1",
+            caption: "The core logo and logotype.",
+            alt: "Nimbus Coffee Co. logo, cloud formation mark with logotype in earthy brand palette",
+          },
+          {
+            src: "/images/nimbus-coffee/creative-1.png",
+            aspectRatio: "1/1",
+            caption: "The identity on a digital touchpoint.",
+            alt: "Nimbus Coffee Co. brand creative, logo and brand identity applied to digital social asset",
+          },
+        ],
       },
       {
-        src: "/images/nimbus-coffee/logo.jpg",
-        caption: "Core logo: a cloud-formation-inspired mark with an earthy palette that nods to roasting terrain.",
-        alt: "Nimbus Coffee Co. logo, cloud formation mark with logotype in earthy brand palette",
+        heading: "Packaging",
+        body: "A modular label that scales across bag sizes and blend types, so a new release is a quick change rather than a redesign.",
+        images: [
+          {
+            src: "/images/nimbus-coffee/mockup-2.png",
+            aspectRatio: "4/3",
+            caption: "The packaging system across bag sizes.",
+            alt: "Nimbus Coffee Co. packaging system mockup, modular label design on multiple coffee bag sizes",
+          },
+        ],
       },
       {
-        src: "/images/nimbus-coffee/creative-1.png",
-        caption: "Brand creative: identity applied across digital touchpoints and social.",
-        alt: "Nimbus Coffee Co. brand creative, logo and brand identity applied to digital social asset",
-      },
-      {
-        src: "/images/nimbus-coffee/creative-2.png",
-        caption: "Brand creative: secondary touchpoint showing typographic hierarchy in use.",
-        alt: "Nimbus Coffee Co. brand creative 2, secondary digital asset with typographic brand system",
+        heading: "In use",
+        body: "The type hierarchy carried through to the wider brand creative.",
+        images: [
+          {
+            src: "/images/nimbus-coffee/creative-2.png",
+            aspectRatio: "1/1",
+            caption: "Typographic hierarchy in use.",
+            alt: "Nimbus Coffee Co. brand creative 2, secondary digital asset with typographic brand system",
+          },
+        ],
       },
     ],
-    hasDepth: false,
   },
 
   /* 10. Momentum Mentoring. Gallery */
@@ -820,19 +948,22 @@ export const projects: Project[] = [
       src: "/images/taswater/hero.jpg",
       alt: "TasWater infographic project: progression infographic showing Tasmania's water infrastructure milestones",
     },
-    images: [
+    images: [],
+    hasDepth: true,
+    depth: [
       {
-        src: "/images/taswater/map.jpg",
-        caption: "Interactive map infographic. TasWater's service area and infrastructure on a branded map.",
-        alt: "TasWater interactive map infographic, service area and infrastructure locations across Tasmania",
-      },
-      {
-        src: "/images/taswater/logo.png",
-        caption: "TasWater. Brand-compliant design inside their existing identity system.",
-        alt: "TasWater logo, the brand identity guiding all infographic design decisions",
+        heading: "Inside the guidelines",
+        body: "Two infographic projects in a month, both made to live inside TasWater's existing brand. The job was to show complex infrastructure data clearly without inventing a new visual language, so the new pieces read as native to what was already there. Leadership signed off on the brand alignment.",
+        images: [
+          {
+            src: "/images/taswater/map.jpg",
+            aspectRatio: "16/9",
+            caption: "Service area and infrastructure, mapped on a branded base.",
+            alt: "TasWater interactive map infographic, service area and infrastructure locations across Tasmania",
+          },
+        ],
       },
     ],
-    hasDepth: false,
   },
 
   /* 12. The London Home Show. Gallery */
@@ -855,44 +986,76 @@ export const projects: Project[] = [
       src: "/images/london-home-show/hero.jpg",
       alt: "The London Home Show event, branding and signage across the exhibition venue",
     },
-    images: [
+    images: [],
+    hasDepth: true,
+    depth: [
       {
-        src: "/images/london-home-show/flags.jpg",
-        caption: "Exterior flags: branding at street scale, welcoming attendees in.",
-        alt: "London Home Show exterior flags, branded event flags outside the exhibition venue",
+        heading: "Around the venue",
+        body: "The first affordable-homes exhibition of its kind needed to feel like an event from the street in. Flags outside, then directional signage and brand presence once you were through the doors.",
+        images: [
+          {
+            src: "/images/london-home-show/flags.jpg",
+            aspectRatio: "3/2",
+            caption: "Exterior flags at street scale.",
+            alt: "London Home Show exterior flags, branded event flags outside the exhibition venue",
+          },
+          {
+            src: "/images/london-home-show/banner.jpg",
+            aspectRatio: "3/2",
+            caption: "Interior wayfinding and signage.",
+            alt: "London Home Show banner, interior branded signage for event wayfinding",
+          },
+        ],
       },
       {
-        src: "/images/london-home-show/banner.jpg",
-        caption: "Banner and wayfinding: interior directional signage and brand presence.",
-        alt: "London Home Show banner, interior branded signage for event wayfinding",
+        heading: "On stage",
+        body: "A branded stage for the panel sessions, from the podium to the full backdrop behind the speakers.",
+        images: [
+          {
+            src: "/images/london-home-show/podium.jpg",
+            aspectRatio: "3/2",
+            caption: "Speaker podium.",
+            alt: "London Home Show speaker podium, branded stage and podium for exhibition panel sessions",
+          },
+          {
+            src: "/images/london-home-show/stage.jpg",
+            aspectRatio: "3/2",
+            caption: "Full-width stage backdrop.",
+            alt: "London Home Show stage backdrop, full-width branded graphic for the main exhibition stage",
+          },
+        ],
       },
       {
-        src: "/images/london-home-show/booklets.jpg",
-        caption: "Event booklets: programme and exhibitor guides for attendees.",
-        alt: "London Home Show event booklets, attendee programme and exhibitor guide printed collateral",
+        heading: "In print",
+        body: "The take-home pieces: the show brochure and the programme and exhibitor booklets.",
+        images: [
+          {
+            src: "/images/london-home-show/brochure.jpg",
+            aspectRatio: "3/2",
+            caption: "Show brochure.",
+            alt: "London Home Show brochure, primary printed collateral distributed at the exhibition",
+          },
+          {
+            src: "/images/london-home-show/booklets.jpg",
+            aspectRatio: "3/2",
+            caption: "Programme and exhibitor booklets.",
+            alt: "London Home Show event booklets, attendee programme and exhibitor guide printed collateral",
+          },
+        ],
       },
       {
-        src: "/images/london-home-show/brochure.jpg",
-        caption: "Show brochure: the main take-home piece of printed collateral.",
-        alt: "London Home Show brochure, primary printed collateral distributed at the exhibition",
-      },
-      {
-        src: "/images/london-home-show/podium.jpg",
-        caption: "Speaker podium: branded stage environment for the panel sessions.",
-        alt: "London Home Show speaker podium, branded stage and podium for exhibition panel sessions",
-      },
-      {
-        src: "/images/london-home-show/stage.jpg",
-        caption: "Stage backdrop: full-width branded graphic for the main event space.",
-        alt: "London Home Show stage backdrop, full-width branded graphic for the main exhibition stage",
-      },
-      {
-        src: "/images/london-home-show/brochure-10yr.jpg",
-        caption: "10-year anniversary brochure. A commemorative edition marking a decade of the show.",
-        alt: "London Home Show 10-year anniversary brochure, commemorative edition marking decade of the exhibition",
+        heading: "Ten years",
+        body: "And a commemorative brochure marking a decade of the show.",
+        images: [
+          {
+            src: "/images/london-home-show/brochure-10yr.jpg",
+            aspectRatio: "3/2",
+            caption: "The 10-year anniversary edition.",
+            alt: "London Home Show 10-year anniversary brochure, commemorative edition marking decade of the exhibition",
+          },
+        ],
       },
     ],
-    hasDepth: false,
   },
 
   /* Packer & Associates. First of the Selected Projects grid. */
