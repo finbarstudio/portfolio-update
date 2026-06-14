@@ -74,9 +74,11 @@ export async function generateMetadata({
 function Tag({
   label,
   variant = "default",
+  num = false,
 }: {
   label: string;
   variant?: "default" | "teal" | "pink" | "skill" | "mustard";
+  num?: boolean;
 }) {
   const cls = {
     default: "tag tag-default",
@@ -85,7 +87,7 @@ function Tag({
     skill: "tag tag-skill",
     mustard: "tag tag-mustard",
   }[variant];
-  return <span className={cls}>{label}</span>;
+  return <span className={`${cls}${num ? " tag-num" : ""}`}>{label}</span>;
 }
 
 /* Parse an aspect-ratio string ("W/H") to a number; default 16/9. */
@@ -404,7 +406,7 @@ export default async function CaseStudyPage({
           {project.categories.map((cat) => (
             <Tag key={cat} label={cat} />
           ))}
-          <Tag label={project.date} variant="teal" />
+          <Tag label={project.date} variant="teal" num />
           {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
         </div>
       </header>

@@ -93,7 +93,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   colorScheme: "light",
-  themeColor: "#FAFAF8",
+  themeColor: "#F6EFE1",
 };
 
 // Stable node id so other schema graphs can reference this one Person.
