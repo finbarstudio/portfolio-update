@@ -75,9 +75,15 @@ function Tag({
   variant = "default",
 }: {
   label: string;
-  variant?: "default" | "teal" | "pink";
+  variant?: "default" | "teal" | "pink" | "skill" | "mustard";
 }) {
-  const cls = { default: "tag tag-default", teal: "tag tag-teal", pink: "tag tag-pink" }[variant];
+  const cls = {
+    default: "tag tag-default",
+    teal: "tag tag-teal",
+    pink: "tag tag-pink",
+    skill: "tag tag-skill",
+    mustard: "tag tag-mustard",
+  }[variant];
   return <span className={cls}>{label}</span>;
 }
 
@@ -229,7 +235,7 @@ function FooterMeta({ project }: { project: Project }) {
           <p className="mono-label text-ink-soft mb-3">SKILLS</p>
           <div className="flex flex-wrap justify-center md:justify-start gap-2">
             {project.skills.map((skill) => (
-              <Tag key={skill} label={skill} />
+              <Tag key={skill} label={skill} variant="skill" />
             ))}
           </div>
         </div>

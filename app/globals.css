@@ -39,28 +39,29 @@
      │  BRAND COLOURS                                          │
      │  Change any value → ripples to every component.        │
      └─────────────────────────────────────────────────────────┘ */
-  --bg:         #FAFAF8;   /* page + sidebar ground, soft off-white       */
-  --ink:        #141414;   /* primary text, near-black                   */
-  --ink-soft:   #6B6B6B;   /* secondary text, captions, meta              */
-  --line:       #E8E8E4;   /* hairline borders, grid lines (softened)     */
+  /* Retro pastel palette — warm cream ground, muted accents (NYC poster feel). */
+  --bg:         #F6EFE1;   /* warm cream page ground                      */
+  --ink:        #211E1A;   /* warm near-black, primary text               */
+  --ink-soft:   #7C756A;   /* warm grey, secondary text                   */
+  --line:       #E2D8C5;   /* warm hairline borders                       */
 
-  --pink:       #FF1F8F;   /* ★ PRIMARY accent, magenta-pink             */
-                           /*   Used for: active links, hover, tags,      */
-                           /*   hero accent, globe, contact email hover    */
+  --pink:       #E8718B;   /* ★ PRIMARY accent, pastel coral-rose         */
+  --pink-soft:  #F6C9D1;   /* light wash of the accent (reveals, fills)   */
 
-  --teal:       #4DA8E0;   /* SECONDARY, OPEN FOR WORK badge + dot       */
-                           /*   Also used for: teal tag pills              */
+  --teal:       #6FAE9F;   /* SECONDARY, dusty sage-teal                  */
+
+  /* Retro accent set — used to colour-code pills (categories/skills etc.). */
+  --accent-blue:    #6E8CB0;  /* dusty blue   */
+  --accent-mustard: #E0B24A;  /* mustard      */
+  --accent-orange:  #DD8A5C;  /* terracotta   */
 
   /* ┌─────────────────────────────────────────────────────────┐
-     │  SURFACE + ELEVATION TOKENS                            │
-     │  Separation comes from surface shifts + soft elevation, │
-     │  NOT from solid intersecting lines. The page sits on a  │
-     │  soft off-white; cards/media sit on pure white, raised. │
+     │  SURFACE + ELEVATION TOKENS (warm, to match the cream)  │
      └─────────────────────────────────────────────────────────┘ */
-  --surface:        #FAFAF8;  /* page + chrome ground (soft off-white)    */
-  --surface-raised: #ffffff;  /* cards, media tiles, panels (pure white)  */
-  --surface-sunken: #F2F2EF;  /* grouped / inset regions                  */
-  --thumb-bg:       #e0e0e0;  /* shared background behind all thumbnails  */
+  --surface:        #F6EFE1;  /* page + chrome ground (cream)             */
+  --surface-raised: #FBF6EC;  /* cards, media tiles, panels (light cream) */
+  --surface-sunken: #EFE6D4;  /* grouped / inset regions                  */
+  --thumb-bg:       #EAE0CC;  /* shared background behind all thumbnails  */
 
   --elev-1: 0 1px 2px rgba(20,20,20,0.03), 0 2px 8px rgba(20,20,20,0.04);
   --elev-2: 0 2px 6px rgba(20,20,20,0.05), 0 10px 28px rgba(20,20,20,0.07);
@@ -254,6 +255,21 @@
   }
 }
 
+/* ─── Film grain overlay ─────────────────────────────────────────
+   Faint, tiled SVG noise over the whole viewport for a printed/retro feel.
+   pointer-events:none so it never blocks interaction. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+@media (prefers-reduced-motion: reduce) { .grain-overlay { opacity: 0.4; } }
+
 /* ─── Skip link ──────────────────────────────────────────────────
    Visually hidden until focused, then pinned top-left over the chrome. */
 .skip-link {
@@ -420,20 +436,18 @@
     .hero-star-draw { animation: none; stroke-dasharray: none; opacity: 0.4; }
   }
 
-  /* Kinetic hero headline — each word clips + springs up (see HeroHeadline). */
+  /* Kinetic hero headline — words swing up (no clip mask → no cropping). */
   .hh-word {
     display: inline-block;
-    overflow: hidden;
-    vertical-align: top;
-    margin-right: 0.22em;
-    padding-bottom: 0.16em;       /* room for serif descenders inside the mask */
-    margin-bottom: -0.16em;
+    vertical-align: baseline;
+    margin-right: 0.2em;
   }
   .hh-inner {
     display: inline-block;
     will-change: transform, opacity;
     transition: color var(--dur-fast) var(--ease);
   }
+  .hh-em { font-style: italic; }       /* the one contrast word (Bookmania italic) */
   @media (hover: hover) {
     .hh-word:hover .hh-inner { color: var(--pink) !important; }
   }
@@ -462,14 +476,16 @@
   }
 
   /* Massive display type that drives the hero + section openers. */
-  /* H1 — retro display serif (Bookmania), sentence case for the lowercase forms. */
+  /* H1 — retro display serif (Bookmania), sentence case + ligatures/swashes. */
   .home-display {
     font-family: var(--font-display);
     font-weight: 700;
     text-transform: none;
-    letter-spacing: -0.01em;
-    line-height: 0.98;
-    font-size: clamp(2.6rem, 8.5vw, 6.5rem);
+    letter-spacing: -0.015em;
+    line-height: 0.96;
+    font-size: clamp(2.8rem, 9vw, 7rem);
+    font-feature-settings: "liga" 1, "dlig" 1, "swsh" 1, "calt" 1;
+    font-variant-ligatures: common-ligatures discretionary-ligatures;
   }
   /* H2 — sans (Archivo Narrow), so it reads as a clearly different tier to the
      serif H1. Heavier tracking + a touch smaller line. */
@@ -683,20 +699,28 @@
   .sidebar-link.active { color: var(--pink); }
 
   /* Tag pill */
+  /* Tags are 1px-outline sticker pills, colour-coded by kind. */
   .tag {
     font-family: var(--font-label);
     font-weight: 700;
     font-size: var(--text-tag);
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    padding: 0.2em 0.6em;
-    border-radius: 2px;
+    padding: 0.35em 0.75em;
+    border-radius: 999px;
+    border: 1px solid var(--ink);
     display: inline-block;
-    line-height: 1.6;
+    line-height: 1;
+    background: transparent;
+    color: var(--ink);
   }
-  .tag-default { background: var(--line); color: var(--ink-soft); }
-  .tag-teal    { background: var(--teal); color: var(--ink); }
-  .tag-pink    { background: var(--pink); color: var(--bg); }
+  /* category = ink outline; skill = dusty-blue outline; teal/date = sage outline;
+     concept = filled coral (stands out). */
+  .tag-default { border-color: var(--ink);          color: var(--ink); }
+  .tag-skill   { border-color: var(--accent-blue);  color: var(--accent-blue); }
+  .tag-teal    { border-color: var(--teal);         color: var(--teal); }
+  .tag-mustard { border-color: var(--accent-mustard); color: var(--accent-mustard); }
+  .tag-pink    { background: var(--pink); border-color: var(--pink); color: var(--bg); }
 
   /* OPEN FOR WORK badge, pulsing dot */
   .status-badge {
@@ -883,9 +907,11 @@
     transition: transform 0.55s var(--ease);
     will-change: transform;
   }
-  .card-rev.c1 { background: var(--teal); }
-  .card-rev.c2 { background: var(--pink); }
-  .card-rev.c3 { background: #FFE9F4; }
+  /* All pink tones (no blue); top layer is a pink gradient. Base transition
+     delays are reversed so the channels stagger OUT on un-hover too. */
+  .card-rev.c1 { background: var(--pink);       transition-delay: 0.16s; }
+  .card-rev.c2 { background: var(--pink-soft);  transition-delay: 0.08s; }
+  .card-rev.c3 { background: linear-gradient(105deg, var(--pink-soft), var(--pink)); transition-delay: 0s; }
 
   @media (hover: hover) {
     .group:hover .card-thumb { border-color: var(--pink); }

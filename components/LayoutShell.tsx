@@ -76,6 +76,8 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
+      {/* Film grain — retro texture over everything (never blocks pointers). */}
+      <div className="grain-overlay" aria-hidden="true" />
       <MobileBar onMenu={() => setMobileMenuOpen(true)} />
       <Sidebar
         collapsed={collapsed}
