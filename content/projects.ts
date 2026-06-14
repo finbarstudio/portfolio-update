@@ -452,7 +452,6 @@ export const projects: Project[] = [
   /* 5. Compass Capability. Full */
   {
     slug: "compass-capability",
-    hidden: true,
     name: "Compass Capability",
     tier: "full",
     rank: 5,
@@ -517,7 +516,6 @@ export const projects: Project[] = [
   /* 6. Norths Devils RLFC. Full. CONCEPT */
   {
     slug: "norths-devils",
-    hidden: true,
     name: "Norths Devils RLFC",
     tier: "full",
     rank: 6,
@@ -593,7 +591,6 @@ export const projects: Project[] = [
   /* 7. Copper Company. Full */
   {
     slug: "copper-company",
-    hidden: true,
     name: "Copper Company",
     tier: "full",
     rank: 7,
@@ -650,7 +647,6 @@ export const projects: Project[] = [
   /* 8. Lows Design and Build. Full */
   {
     slug: "lows-design-build",
-    hidden: true,
     name: "Lows Design and Build",
     tier: "full",
     rank: 8,
@@ -708,7 +704,6 @@ export const projects: Project[] = [
   /* 9. Nimbus Coffee Co. Full */
   {
     slug: "nimbus-coffee",
-    hidden: true,
     name: "Nimbus Coffee Co.",
     tier: "full",
     rank: 9,
@@ -769,10 +764,11 @@ export const projects: Project[] = [
     skills: ["Brand Identity", "Web Design", "Framer Development"],
     oneLiner:
       "Brand and website for an NDIS mentoring provider. Built around empowerment, independence and personal growth.",
-    role: "Designer and developer.",
+    role: "Sole designer and developer. Built the brand identity and the Framer website end to end, from the logomark and colour through to a CMS the team can run themselves after launch.",
     problem:
-      "Momentum needed a brand and site that read as empowering and independent without slipping into clinical or institutional territory.",
-    outcome: "Live site: momentummentoring.co.",
+      "Momentum needed a brand and site that read as empowering and independent without slipping into clinical or institutional territory. It had to feel approachable for participants and their families, and stay simple for a small team to maintain once it was live.",
+    outcome:
+      "Brand and website delivered as a single piece of work and live at momentummentoring.co.",
     logo: "/images/momentum-mentoring/Logo2.svg",
     heroModel: {
       model: "/models/studio-display/display.gltf",
@@ -782,15 +778,30 @@ export const projects: Project[] = [
       src: "/images/momentum-mentoring/hero.webp",
       alt: "Momentum Mentoring brand identity and website for an NDIS mentoring provider",
     },
-    images: [],
+    images: [
+      {
+        src: "/images/momentum-mentoring/hero.webp",
+        caption: "Home page: a warm, approachable layout built for an NDIS mentoring audience.",
+        alt: "Momentum Mentoring website homepage with empowering, approachable NDIS branding",
+      },
+    ],
     hasDepth: false,
+    delivered: [
+      "Brand identity (logomark and logotype)",
+      "Brand colour system",
+      "Framer website, designed and built",
+      "CMS setup for team-managed content",
+      "Responsive, mobile-optimised layouts",
+      "Foundational SEO and technical setup",
+      "Domain connection",
+      "CMS handover session",
+    ],
     liveUrl: "https://momentummentoring.co",
   },
 
   /* 11. TasWater. Gallery */
   {
     slug: "taswater",
-    hidden: true,
     name: "TasWater",
     tier: "gallery",
     rank: 11,
@@ -827,7 +838,6 @@ export const projects: Project[] = [
   /* 12. The London Home Show. Gallery */
   {
     slug: "london-home-show",
-    hidden: true,
     name: "The London Home Show",
     tier: "gallery",
     rank: 12,

@@ -142,6 +142,7 @@ export default function KinayaShowcase() {
             model="/models/studio-display/display.gltf"
             video="/images/kinaya/accessibility.webm"
             fill
+            bare
             hoverable={false}
           />
         </div>

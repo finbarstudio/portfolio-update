@@ -1326,9 +1326,8 @@
     width: 100%;
     aspect-ratio: 16 / 9;
     max-height: 58vh;
-    background: white;
+    background: transparent;          /* 3D model sits on the page, no container */
     overflow: hidden;
-    border-radius: 16px;
   }
   .packer-pdf {
     position: relative;

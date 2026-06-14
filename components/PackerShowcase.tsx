@@ -199,6 +199,7 @@ export default function PackerShowcase() {
             model="/models/studio-display/display.gltf"
             video="/images/packer-associates/3D%20Model%20Video.webm"
             fill
+            bare
             hoverable={false}
           />
         </div>

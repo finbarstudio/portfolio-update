@@ -412,7 +412,7 @@ export default async function CaseStudyPage({
         <>
           <div className="mb-8">
             {project.heroModel ? (
-              <ModelDisplay {...project.heroModel} aspectRatio="16/9" hoverable={false} />
+              <ModelDisplay {...project.heroModel} aspectRatio="16/9" bare hoverable={false} />
             ) : project.heroSpline ? (
               <SplineScene scene={project.heroSpline} />
             ) : project.heroVideo ? (

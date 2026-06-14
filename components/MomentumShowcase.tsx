@@ -46,6 +46,7 @@ export default function MomentumShowcase() {
             model="/models/studio-display/display.gltf"
             video="/images/momentum-mentoring/screen.mp4"
             fill
+            bare
             hoverable={false}
           />
         </div>
