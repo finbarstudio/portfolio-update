@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * HeroHeadline — the hero H1 in Bookmania, as a considered type composition.
+ * HeroHeadline — the hero H1 in Bookmania.
  *
- * Words swing up from the lower-left with a springy ease and resolve from pink
- * to ink, staggered (GSAP). No clip mask, so serifs/descenders are never cropped.
- * One word is set in italic for contrast (Bookmania's italic carries the nicest
- * swashes), and discretionary ligatures/swashes are on. Real <h1> via aria-label.
- * No-ops under reduced motion / background tab.
+ * Words rise and resolve from pink to ink, together (small stagger). The entrance
+ * runs ONCE per page load (module guard, so React's double-invoke / remounts can't
+ * replay it) and waits for the webfont to be ready first, so it never animates in
+ * the fallback face and then jump when Bookmania swaps in. No-ops (shows instantly)
+ * under reduced motion or a backgrounded tab. One word is italic for contrast.
  */
 
 import { useRef, useLayoutEffect } from "react";
@@ -15,35 +15,54 @@ import { gsap } from "gsap";
 
 const ITALIC_WORDS = new Set(["editorial,"]);
 
+// Survives Strict Mode's double-invoke and any remount within the session, so the
+// headline pops in exactly once.
+let played = false;
+
 export default function HeroHeadline({ text, className }: { text: string; className?: string }) {
   const ref = useRef<HTMLHeadingElement>(null);
   const words = text.split(" ");
 
   useLayoutEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (document.visibilityState === "hidden") return;
-
+    if (!el || played) return;
     const inners = el.querySelectorAll<HTMLElement>(".hh-inner");
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        inners,
-        { opacity: 0, yPercent: 64, rotation: -5, transformOrigin: "0% 100%", color: "#E8718B" },
-        {
-          opacity: 1,
-          yPercent: 0,
-          rotation: 0,
-          color: "#211E1A",
-          duration: 1.05,
-          ease: "back.out(1.7)",
-          stagger: 0.08,
-          delay: 0.05,
-        }
-      );
-    }, ref);
 
-    return () => ctx.revert();
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || document.visibilityState === "hidden") {
+      played = true;
+      return; // leave the raw text visible, no animation
+    }
+
+    played = true;
+    // Hide synchronously (before paint) so there's no flash before the run.
+    gsap.set(inners, { opacity: 0, yPercent: 36, color: "#E8718B" });
+
+    let cancelled = false;
+    const run = () => {
+      if (cancelled || !ref.current) return;
+      gsap.to(inners, {
+        opacity: 1,
+        yPercent: 0,
+        color: "#211E1A",
+        duration: 0.7,
+        ease: "power3.out",
+        stagger: 0.045,
+      });
+    };
+
+    // Wait for the webfont (capped) so the words animate in their real shapes.
+    const fonts = (document as unknown as { fonts?: FontFaceSet }).fonts;
+    if (fonts && fonts.status !== "loaded") {
+      Promise.race([
+        fonts.ready,
+        new Promise((r) => setTimeout(r, 350)),
+      ]).then(run);
+    } else {
+      run();
+    }
+
+    return () => { cancelled = true; };
   }, []);
 
   return (

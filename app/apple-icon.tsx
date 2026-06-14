@@ -24,7 +24,7 @@ export default function AppleIcon() {
         }}
       >
         <svg width={124} height={124} viewBox="0 0 100 100">
-          <polygon points={STAR_POINTS} fill="#FF1F8F" />
+          <polygon points={STAR_POINTS} fill="#E8718B" />
         </svg>
       </div>
     ),

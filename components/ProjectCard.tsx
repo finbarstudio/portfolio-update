@@ -91,7 +91,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
               {project.name}
             </h2>
-            <span className="mono-label text-ink-soft whitespace-nowrap mt-px">{project.date}</span>
+            <span className="meta-mono text-ink-soft whitespace-nowrap mt-px">{project.date}</span>
           </div>
           <div className="hover-reveal">
             <div className="space-y-3">
@@ -154,7 +154,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">
               {project.name}
             </h2>
-            <span className="mono-label text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
+            <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
           </div>
           <div className="hover-reveal">
             <div className="space-y-2.5">
@@ -204,7 +204,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
         <div className="pb-6">
           <div className="flex items-start justify-between gap-3 mb-2.5">
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">{project.name}</h2>
-            <span className="mono-label text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
+            <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
           </div>
           <div className="hover-reveal">
             <div className="space-y-2.5">

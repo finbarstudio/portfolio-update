@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo_Narrow } from "next/font/google";
+import { Archivo_Narrow, Space_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import LayoutShell from "@/components/LayoutShell";
@@ -11,6 +11,14 @@ const archivoNarrow = Archivo_Narrow({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Space Mono — wide-tracked caps for small details (dates, badges, links).
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
+  subsets: ["latin"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -180,7 +188,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={archivoNarrow.variable}
+      className={`${archivoNarrow.variable} ${spaceMono.variable}`}
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
         {/* Bookmania (Adobe Fonts / Typekit) — H1 display serif */}

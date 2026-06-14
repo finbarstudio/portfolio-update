@@ -152,31 +152,9 @@
   --color-surface-sunken: var(--surface-sunken);
 
   --font-sans: var(--font-primary);
-  /* Drafting Mono (Owen Earl, SIL OFL) — the studio mono font. */
-  --font-mono: "Drafting Mono", ui-monospace, SFMono-Regular, Menlo, "Cascadia Mono", Consolas, monospace;
-}
-
-/* ─── Drafting Mono — self-hosted (SIL Open Font License) ──────── */
-@font-face {
-  font-family: "Drafting Mono";
-  src: url("/fonts/drafting-mono/DraftingMono-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Drafting Mono";
-  src: url("/fonts/drafting-mono/DraftingMono-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Drafting Mono";
-  src: url("/fonts/drafting-mono/DraftingMono-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+  /* Space Mono (Google) — wide-tracked caps for small details only: dates,
+     badges/tags, the contact email, and the editorial links. */
+  --font-mono: var(--font-space-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 /* ─── Keyframes ──────────────────────────────────────────────── */
@@ -387,9 +365,9 @@
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
 
-  /* Mono-caps label, uppercase tracking, used for nav, tags, meta */
+  /* Caps label (Archivo Narrow), uppercase tracking, used for nav, eyebrows, meta */
   .mono-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-weight: 700;
     font-size: var(--text-label);
     letter-spacing: 0.14em;
@@ -397,8 +375,17 @@
     line-height: 1.4;
   }
 
-  .mono-heading {
+  /* Small meta detail (dates) — Space Mono, wide-tracked caps. */
+  .meta-mono {
     font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+  }
+
+  .mono-heading {
+    font-family: var(--font-label);
     font-weight: 700;
     font-size: 0.75rem;
     letter-spacing: 0.16em;
@@ -508,10 +495,10 @@
     border: 1px solid var(--ink);
     border-radius: 999px;
     padding: 0.42em 0.95em;
-    font-family: var(--font-label);
+    font-family: var(--font-mono);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     font-size: var(--text-label);
     line-height: 1;
     color: var(--ink);
@@ -596,10 +583,10 @@
 
   /* Big underlined editorial link. */
   .home-link {
-    font-family: var(--font-label);
+    font-family: var(--font-mono);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     font-size: var(--text-label);
     color: var(--ink);
     display: inline-flex;
@@ -819,10 +806,10 @@
   /* Tag pill */
   /* Tags are 1px-outline sticker pills, colour-coded by kind. */
   .tag {
-    font-family: var(--font-label);
+    font-family: var(--font-mono);
     font-weight: 700;
     font-size: var(--text-tag);
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     padding: 0.35em 0.75em;
     border-radius: 999px;
@@ -845,7 +832,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4em;
-    font-family: var(--font-label);
+    font-family: var(--font-mono);
     font-weight: 700;
     font-size: var(--text-tag);
     letter-spacing: 0.12em;
@@ -2155,7 +2142,8 @@
      out past the border. */
   .sidebar-tab {
     position: fixed;
-    top: calc(var(--menubar-h) + (100dvh - var(--menubar-h)) / 2);
+    /* Up near the logo (the logo row is 48px tall), not mid-rail. */
+    top: calc(var(--menubar-h) + 24px);
     transform: translateY(-50%);
     z-index: 41;
     width: 15px;
