@@ -397,14 +397,26 @@
   }
   .hero-logo svg { width: 0.82em; height: 0.82em; flex: 0 0 auto; color: var(--pink); }
 
-  /* Kinetic hero headline (see HeroHeadline): masked word-reveal + parallax. */
+  /* Hero motion-path accent star (see HeroOrbit). */
+  .hero-orbit { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .hero-orbit-star {
+    position: absolute;
+    top: 16%;
+    right: 14%;
+    width: 120px;
+    height: 120px;
+    color: color-mix(in srgb, var(--pink) 13%, transparent);
+    will-change: transform;
+  }
+  .hero-orbit-star svg { width: 120px; height: 120px; }
+
+  /* Kinetic 3D hero headline (see HeroHeadline). */
+  .hh-3d { transform-style: preserve-3d; }
   .hh-word {
     display: inline-block;
-    overflow: hidden;
     vertical-align: top;
     margin-right: 0.26em;
-    padding-bottom: 0.12em;
-    margin-bottom: -0.12em;
+    transform-style: preserve-3d;
     will-change: transform;
   }
   .hh-inner {

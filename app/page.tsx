@@ -6,6 +6,7 @@ import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HeroLogo from "@/components/HeroLogo";
 import HeroHeadline from "@/components/HeroHeadline";
+import HeroOrbit from "@/components/HeroOrbit";
 import { isShopifyConfigured } from "@/lib/shopify";
 import { STORE_PRODUCT } from "@/content/store";
 
@@ -64,7 +65,9 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
 /* ─── Hero ──────────────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="px-5 md:px-10 pt-8 md:pt-12 pb-12 md:pb-16" aria-label="Introduction">
+    <section className="relative overflow-hidden px-5 md:px-10 pt-8 md:pt-12 pb-12 md:pb-16" aria-label="Introduction">
+      <HeroOrbit />
+      <div className="relative z-10">
       <HeroLogo />
       <Reveal immediate as="p" className="mono-label text-ink-soft mb-6 md:mb-8">Brisbane graphic designer</Reveal>
 
@@ -94,6 +97,7 @@ function Hero() {
           </div>
         </div>
       </Reveal>
+      </div>
     </section>
   );
 }
