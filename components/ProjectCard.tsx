@@ -5,6 +5,7 @@ import { Project } from "@/content/projects";
 import ZoomImage from "@/components/ZoomImage";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
+import CardThumb from "@/components/CardThumb";
 import PhoneCarousel from "@/components/PhoneCarousel";
 import MagazineCarousel from "@/components/MagazineCarousel";
 import HeroSlideshow from "@/components/HeroSlideshow";
@@ -57,7 +58,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
         {/* Thumbnail — grows to fill remaining height. On hover the revealed
             text steals from it; the slow reveal lets the mockup ease down to
             fit (brief over-size/clip during the transition is intentional). */}
-        <div className="card-thumb" style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
+        <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
           {project.heroPhones ? (
             <PhoneCarousel
               model={project.heroPhones.model}
@@ -70,7 +71,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
           ) : project.heroMagazine ? (
             <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (
-            <ModelDisplay {...project.heroModel} fill />
+            <ModelDisplay {...project.heroModel} fill bare />
           ) : project.heroSpline ? (
             <div style={{ height: "100%", pointerEvents: "none" }}>
               <SplineScene scene={project.heroSpline} style={{ aspectRatio: undefined, maxHeight: "none", height: "100%" }} />
@@ -83,7 +84,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
               sizes="(max-width: 768px) 100vw, calc(100vw - 224px)"
             />
           )}
-        </div>
+        </CardThumb>
 
         <div className="pb-8">
           <div className="flex items-start justify-between gap-4 mb-3">
@@ -120,7 +121,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
         aria-label={`View case study: ${project.name}`}
       >
         {/* Thumbnail — flex:1 so revealed text steals from it, not extends card */}
-        <div className="card-thumb" style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
+        <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
           {project.heroPdf ? (
             <PdfSlideshowThumb pages={project.heroPdf} />
           ) : project.heroPhones ? (
@@ -132,7 +133,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
           ) : project.heroMagazine ? (
             <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (
-            <ModelDisplay {...project.heroModel} fill />
+            <ModelDisplay {...project.heroModel} fill bare />
           ) : (
             <ZoomImage
               src={project.heroImage.src}
@@ -141,7 +142,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
               className="object-cover"
             />
           )}
-        </div>
+        </CardThumb>
 
         <div className="pb-6">
           <div className="flex items-start justify-between gap-3 mb-2.5">
@@ -178,13 +179,13 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
         aria-label={`View ${project.name}`}
       >
         {/* Thumbnail — flex:1 so revealed text steals from it */}
-        <div className="card-thumb" style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)", position: "relative" }}>
+        <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
           {project.heroPdf ? (
             <PdfSlideshowThumb pages={project.heroPdf} />
           ) : project.heroSlideshow ? (
             <HeroSlideshow images={project.heroSlideshow} fill />
           ) : project.heroModel ? (
-            <ModelDisplay {...project.heroModel} fill />
+            <ModelDisplay {...project.heroModel} fill bare />
           ) : (
             <ZoomImage
               src={project.heroImage.src}
@@ -193,7 +194,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
               className="object-cover"
             />
           )}
-        </div>
+        </CardThumb>
 
         <div className="pb-6">
           <div className="flex items-start justify-between gap-3 mb-2.5">

@@ -832,29 +832,54 @@
     max-height: 72vh;
   }
 
-  /* Card thumbnail — rounded media tile. Separation at REST comes from a soft
-     elevation over the off-white page (no borders). On hover it lifts and gains
-     the pink outline (kept — Finbar likes it). Add .card-thumb to any thumbnail
-     container; the .group on the <article> triggers hover anywhere on the card. */
+  /* Card thumbnail — sticker style: white tile with a 1px ink outline. On hover
+     a coloured panel reveals from the centre outward (grey → pink) with a pink
+     outline drawing in, BEHIND the media (.card-media stays on top). 3D mockups
+     have transparent canvases so the reveal shows around the model; static
+     images fill the tile so they just get the white card + outline. */
   .card-thumb {
-    border-radius: 16px;
+    position: relative;
+    isolation: isolate;
+    border-radius: 14px;
     overflow: hidden;
-    background: var(--thumb-bg);
-    box-shadow: var(--elev-1);
-    transition: box-shadow var(--dur) var(--ease);
+    background: var(--surface-raised);
+    border: 1px solid var(--ink);
+    transition: border-color var(--dur-fast) var(--ease);
   }
-  /* No transform on hover — translating the container makes WebGL mockups
-     (phone / Mac) visibly jump. Separation comes from elevation + the ring.
-     Hover only on hover-capable devices; on touch the pink outline shows on
-     tap (active/focus) instead, so there are no stuck hover glitches. */
+  .card-media { position: absolute; inset: 0; z-index: 1; }
+
+  /* The reveal panel: a centred bar that grows horizontally to fill the tile. */
+  .card-reveal {
+    position: absolute;
+    top: 0; bottom: 0; left: 50%;
+    width: 0;
+    transform: translateX(-50%);
+    background: var(--thumb-bg);
+    border: 1.5px solid transparent;
+    border-radius: 14px;
+    z-index: 0;
+    pointer-events: none;
+    transition: width 0.55s var(--ease), background-color 0.4s var(--ease), border-color 0.3s var(--ease);
+  }
+  /* Hover on capable devices; tap (active/focus) on touch. */
   @media (hover: hover) {
-    .group:hover .card-thumb {
-      box-shadow: var(--elev-2), 0 0 0 6px var(--pink);
+    .group:hover .card-thumb { border-color: var(--pink); }
+    .group:hover .card-reveal {
+      width: calc(100% + 2px);
+      background: #FFE9F4;
+      border-color: var(--pink);
+      transition: width 0.55s var(--ease),
+                  background-color 0.4s var(--ease) 0.18s,
+                  border-color 0.3s var(--ease) 0.22s;
     }
   }
   .group:active .card-thumb,
-  .group:focus-within .card-thumb {
-    box-shadow: var(--elev-2), 0 0 0 6px var(--pink);
+  .group:focus-within .card-thumb { border-color: var(--pink); }
+  .group:active .card-reveal,
+  .group:focus-within .card-reveal {
+    width: calc(100% + 2px);
+    background: #FFE9F4;
+    border-color: var(--pink);
   }
 
   /* Hero scroll-driven fade (CSS only, no JS) */

@@ -267,6 +267,9 @@ type Props = {
   className?: string;
   /** Disable hover animation (e.g. when used inside a parent that's already a link). */
   hoverable?: boolean;
+  /** Bare: transparent canvas + no scene-background fade, so a reveal layer
+   *  behind the model shows through (used in the sticker card thumbnails). */
+  bare?: boolean;
   /** Uniform scale applied to the loaded model — different glb's ship at wildly
    *  different units. Default 1. The macbook glb, for example, needs ~0.33. */
   modelScale?: number;
@@ -295,6 +298,7 @@ function ModelDisplayInner({
   fill = false,
   className,
   hoverable = true,
+  bare = false,
   modelScale = 1,
   screenRotation = 0,
   camDist = CAMERA_DISTANCE_DEFAULT,
@@ -446,7 +450,7 @@ function ModelDisplayInner({
         position: "relative",
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
-        background: "var(--thumb-bg, #e0e0e0)",
+        background: bare ? "transparent" : "var(--thumb-bg, #e0e0e0)",
         overflow: "hidden",
         cursor: hoverable ? "pointer" : "default",
       }}
@@ -493,7 +497,7 @@ function ModelDisplayInner({
               for the camera glide. */}
           <FrameDriver active={hovered} idleFps={30} />
           <LiveResize />
-          <BgFade hovered={hovered} />
+          {!bare && <BgFade hovered={hovered} />}
           <ambientLight intensity={0.6} />
           <directionalLight position={[5, 8, 5]} intensity={1.1} />
           <directionalLight position={[-4, 3, -2]} intensity={0.4} />

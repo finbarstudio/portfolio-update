@@ -487,13 +487,11 @@ function PhoneCarouselInner({
         position: "relative",
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
-        background: "var(--thumb-bg, #e0e0e0)",
+        background: "transparent",
         overflow: "hidden",
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Soft pink wash on hover, behind the canvas */}
-      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
 
       {/* Spinner until every phone is ready (they pop in together). */}
       {!ready && <Loader size={28} />}
@@ -541,7 +539,7 @@ const PhoneCarousel = dynamic(() => Promise.resolve(PhoneCarouselInner), {
         position: "relative",
         width: "100%",
         height: "100%",
-        background: "var(--thumb-bg, #e0e0e0)",
+        background: "transparent",
       }}
     >
       <Loader size={28} />
