@@ -99,7 +99,8 @@ export interface Project {
   heroAlbums?: {          // Row of glossy album-cover panels that skew to catch light
     images: string[];     // Square cover image URLs, rendered left-to-right
   };
-  heroSlideshow?: string[];   // Auto-advancing crossfade cover carousel (no WebGL)
+  heroSlideshow?: string[];   // Flowing cover carousel (card thumbnail + detail hero)
+  slideshowAspect?: string;   // Card shape for the carousel (e.g. "1/1", "3/2")
   heroPdf?: string[];         // Page images for a lightweight crossfade PDF thumbnail
 
   companyUrl?: string;
@@ -477,6 +478,14 @@ export const projects: Project[] = [
       src: "/images/compass-capability/hero.png",
       alt: "Compass Capability brand identity, logo mockup collage across touchpoints",
     },
+    heroSlideshow: [
+      "/images/compass-capability/graphic.png",
+      "/images/compass-capability/pattern.png",
+      "/images/compass-capability/mockup-billboard.png",
+      "/images/compass-capability/mockup-business-card.png",
+      "/images/compass-capability/mockup-stationary.png",
+    ],
+    slideshowAspect: "1/1",
     images: [],
     hasDepth: true,
     depth: [
@@ -668,6 +677,14 @@ export const projects: Project[] = [
       src: "/images/copper-company/hero.png",
       alt: "Copper Company rum bottle, staged product photography showing the final label design and brand identity",
     },
+    heroSlideshow: [
+      "/images/copper-company/hero.png",
+      "/images/copper-company/bottle-1.png",
+      "/images/copper-company/bottle-2.png",
+      "/images/copper-company/insta-1.png",
+      "/images/copper-company/insta-2.png",
+    ],
+    slideshowAspect: "1/1",
     images: [],
     hasDepth: true,
     depth: [
@@ -830,6 +847,14 @@ export const projects: Project[] = [
       src: "/images/nimbus-coffee/hero.png",
       alt: "Nimbus Coffee Co. packaging mockup, branded coffee bags showing the cloud-inspired mark and earthy palette",
     },
+    heroSlideshow: [
+      "/images/nimbus-coffee/hero.png",
+      "/images/nimbus-coffee/mockup-2.png",
+      "/images/nimbus-coffee/logo.jpg",
+      "/images/nimbus-coffee/creative-1.png",
+      "/images/nimbus-coffee/creative-2.png",
+    ],
+    slideshowAspect: "4/3",
     images: [],
     hasDepth: true,
     depth: [
@@ -945,6 +970,11 @@ export const projects: Project[] = [
       src: "/images/taswater/hero.jpg",
       alt: "TasWater infographic project: progression infographic showing Tasmania's water infrastructure milestones",
     },
+    heroSlideshow: [
+      "/images/taswater/hero.jpg",
+      "/images/taswater/map.jpg",
+    ],
+    slideshowAspect: "16/9",
     images: [],
     hasDepth: true,
     depth: [
@@ -983,6 +1013,17 @@ export const projects: Project[] = [
       src: "/images/london-home-show/hero.jpg",
       alt: "The London Home Show event, branding and signage across the exhibition venue",
     },
+    heroSlideshow: [
+      "/images/london-home-show/hero.jpg",
+      "/images/london-home-show/flags.jpg",
+      "/images/london-home-show/banner.jpg",
+      "/images/london-home-show/stage.jpg",
+      "/images/london-home-show/booklets.jpg",
+      "/images/london-home-show/brochure.jpg",
+      "/images/london-home-show/podium.jpg",
+      "/images/london-home-show/brochure-10yr.jpg",
+    ],
+    slideshowAspect: "3/2",
     images: [],
     hasDepth: true,
     depth: [

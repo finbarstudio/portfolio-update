@@ -16,6 +16,7 @@ import Outcomes from "@/components/Outcomes";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import Reveal from "@/components/Reveal";
+import HeroSlideshow from "@/components/HeroSlideshow";
 import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
 import {
   projects,
@@ -431,6 +432,8 @@ export default async function CaseStudyPage({
           <div className="mb-8">
             {project.heroModel ? (
               <ModelDisplay {...project.heroModel} aspectRatio="16/9" bare hoverable={false} />
+            ) : project.heroSlideshow ? (
+              <HeroSlideshow images={project.heroSlideshow} cardAspect={project.slideshowAspect} aspectRatio="5/2" />
             ) : project.heroSpline ? (
               <SplineScene scene={project.heroSpline} />
             ) : project.heroVideo ? (

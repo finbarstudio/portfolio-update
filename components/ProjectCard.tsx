@@ -134,7 +134,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
           ) : project.heroAlbums ? (
             <AlbumThumb images={project.heroAlbums.images} />
           ) : project.heroSlideshow ? (
-            <HeroSlideshow images={project.heroSlideshow} fill />
+            <HeroSlideshow images={project.heroSlideshow} cardAspect={project.slideshowAspect} fill />
           ) : project.heroMagazine ? (
             <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (
@@ -188,7 +188,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
           {project.heroPdf ? (
             <PdfSlideshowThumb pages={project.heroPdf} />
           ) : project.heroSlideshow ? (
-            <HeroSlideshow images={project.heroSlideshow} fill />
+            <HeroSlideshow images={project.heroSlideshow} cardAspect={project.slideshowAspect} fill />
           ) : project.heroModel ? (
             <ModelDisplay {...project.heroModel} fill bare />
           ) : (
