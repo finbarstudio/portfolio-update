@@ -25,7 +25,7 @@ export default function PdfSlideshowThumb({
   /** Show prev/next arrows + a page counter (for the detail-page viewer). */
   nav?: boolean;
 }) {
-  const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hover);
+  const { ref: hoverRef } = useGroupHover<HTMLDivElement>(hover);
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
   // Auto-advance pauses once the user takes manual control via the arrows.
@@ -76,15 +76,12 @@ export default function PdfSlideshowThumb({
         width: "100%",
         height: "100%",
         overflow: "hidden",
-        background: "var(--thumb-bg, #e0e0e0)",
+        background: "transparent",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      {/* Soft pink wash on hover */}
-      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
-
       {pages.map((src, i) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img

@@ -32,9 +32,8 @@
      └─────────────────────────────────────────────────────────┘ */
   --font-primary: var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
   --font-label:   var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
-  /* Display serif for H1 — swap "Bookmania" in once licensed (it leads the stack
-     so it's used automatically if present); Fraunces is the free fallback. */
-  --font-display: "Bookmania", var(--font-fraunces), Georgia, "Times New Roman", serif;
+  /* Display serif for H1 — Bookmania, loaded from Adobe Fonts (Typekit). */
+  --font-display: "bookmania", Georgia, "Times New Roman", serif;
 
   /* ┌─────────────────────────────────────────────────────────┐
      │  BRAND COLOURS                                          │
@@ -389,11 +388,10 @@
      off the bottom by the section, rotating + parallaxing on scroll. */
   .hero-star {
     position: absolute;
-    left: 58%;
-    bottom: -34%;
-    width: min(86vh, 820px);
+    top: -16%;
+    right: -12%;
+    width: min(64vh, 560px);
     aspect-ratio: 1;
-    transform: translateX(-50%);
     z-index: 0;
     pointer-events: none;
   }
@@ -402,11 +400,6 @@
 
   /* Keep small text legible over the star: sit it on the page ground so the
      star reads behind the big display type and in the margins, not the copy. */
-  .hero-legible {
-    background: var(--bg);
-    border-radius: 8px;
-    box-shadow: 0 0 0 6px var(--bg);
-  }
   .hero-star-track {
     fill: none;
     stroke: color-mix(in srgb, var(--pink) 9%, transparent);
@@ -444,13 +437,13 @@
   }
 
   /* Massive display type that drives the hero + section openers. */
-  /* H1 — retro display serif (Bookmania / Fraunces). */
+  /* H1 — retro display serif (Bookmania), sentence case for the lowercase forms. */
   .home-display {
     font-family: var(--font-display);
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0;
-    line-height: 0.94;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    line-height: 0.98;
     font-size: clamp(2.6rem, 8.5vw, 6.5rem);
   }
   /* H2 — sans (Archivo Narrow), so it reads as a clearly different tier to the
@@ -847,8 +840,8 @@
     isolation: isolate;
     border-radius: 14px;
     overflow: hidden;
-    background: var(--surface-raised);
-    border: 1px solid transparent;          /* invisible at rest */
+    background: transparent;                 /* invisible at rest (page shows) */
+    border: 1px solid transparent;           /* no outline at rest */
     transition: border-color var(--dur-fast) var(--ease);
   }
   .card-media { position: absolute; inset: 0; z-index: 1; }

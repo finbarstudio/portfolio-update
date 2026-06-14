@@ -99,8 +99,8 @@ export default function AboutPage() {
 
       <p className="mono-label text-ink-soft mb-6">Brisbane graphic designer</p>
       <h1
-        className="font-bold uppercase text-ink leading-[1.02]"
-        style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
+        className="font-bold text-ink leading-[1.02]"
+        style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}
       >
         Finbar Skitini.
       </h1>

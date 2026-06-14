@@ -14,8 +14,8 @@ export default function PrivacyPage() {
     <div className="px-5 md:px-10 pt-8 md:pt-12 pb-16">
       <p className="mono-label text-ink-soft mb-6">Privacy</p>
       <h1
-        className="font-bold uppercase text-ink leading-[1.02]"
-        style={{ fontSize: "var(--text-h1)", letterSpacing: "0.03em" }}
+        className="font-bold text-ink leading-[1.02]"
+        style={{ fontSize: "var(--text-h1)", letterSpacing: "-0.01em" }}
       >
         Privacy policy
       </h1>

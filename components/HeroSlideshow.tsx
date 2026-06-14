@@ -20,7 +20,7 @@ type Props = { images: string[]; aspectRatio?: string; fill?: boolean; sizes?: s
  * Subtle perspective tilt + white gradient masks on edges.
  */
 export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = false, sizes }: Props) {
-  const { ref: containerRef, hovered } = useGroupHover<HTMLDivElement>(true);
+  const { ref: containerRef } = useGroupHover<HTMLDivElement>(true);
   const offsetRef    = useRef(0);
   const lastTRef     = useRef<number | null>(null);
   const rafRef       = useRef<number>(0);
@@ -111,12 +111,9 @@ export default function HeroSlideshow({ images, aspectRatio = "3/2", fill = fals
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
         overflow: "hidden",
-        background: "var(--thumb-bg, #e0e0e0)",
+        background: "transparent",
       }}
     >
-      {/* Soft pink wash on hover, behind the cards */}
-      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
-
       {tiles.map((src, i) => (
         <div
           key={`${i}-${src}`}
