@@ -73,7 +73,8 @@ export interface Project {
   heroSpline?: string;
   heroModel?: {           // Interactive 3D model with looping video on its screen
     model: string;        // Path to .gltf (under /public)
-    video: string;        // Path to looping video shown on the screen
+    video?: string;       // Path to looping video shown on the screen
+    image?: string;       // OR a still image (e.g. a site screenshot) on the screen
     poster?: string;      // Poster shown until the canvas is ready
     modelScale?: number;  // Uniform scale of the loaded model (different glb's
                           // ship in wildly different units).
@@ -745,6 +746,10 @@ export const projects: Project[] = [
       "Strong growth in workload since launch. The Bromley FC sponsorship pulled real results.",
     logo: "/images/lows-design-build/logo.png",
     cardLogo: "/images/lows-design-build/logomark.svg",
+    heroModel: {
+      model: "/models/studio-display/display.gltf",
+      image: "/images/lows-design-build/website-live.webp",
+    },
     heroImage: {
       src: "/images/lows-design-build/hero.png",
       alt: "Lows Design and Build brand identity, hero composite showing logo and brand applications",
@@ -791,18 +796,6 @@ export const projects: Project[] = [
             aspectRatio: "4/3",
             caption: "Site hoarding on construction fencing.",
             alt: "Lows Design and Build site hoarding, brand identity on construction site fence at street scale",
-          },
-        ],
-      },
-      {
-        heading: "The website",
-        body: "A clean, brand-consistent site built to turn referrals into enquiries.",
-        images: [
-          {
-            src: "/images/lows-design-build/website.png",
-            aspectRatio: "1920/4513",
-            caption: "The full homepage, top to bottom.",
-            alt: "Lows Design and Build website, branded homepage design for the construction and design company",
           },
         ],
       },

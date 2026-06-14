@@ -51,7 +51,7 @@ const ISO_ROTATION_X = 0.12;           //   ~7°   (slight downward tilt)
 
 type DisplayModelProps = {
   modelUrl: string;
-  videoTexture: THREE.VideoTexture | null;
+  videoTexture: THREE.Texture | null;   // video OR still-image screen texture
   onReady?: () => void;
 };
 
@@ -205,7 +205,7 @@ function Rig({
 }: {
   hovered: boolean;
   modelUrl: string;
-  videoTexture: THREE.VideoTexture | null;
+  videoTexture: THREE.Texture | null;
   scale?: number;
   cam: { dist: number; distHover: number; y: number; yHover: number; lookYHover: number };
   modelY?: number;
@@ -257,7 +257,9 @@ type Props = {
   /** Path under /public, e.g. /models/studio-display/display.gltf */
   model: string;
   /** Looping video shown on the screen. WebM or MP4. */
-  video: string;
+  video?: string;
+  /** Still image shown on the screen instead of a video (e.g. a site screenshot). */
+  image?: string;
   /** Optional poster image, shown until the canvas is ready. */
   poster?: string;
   /** Override aspect ratio. Default 16/9 to match other thumbnails. */
@@ -293,6 +295,7 @@ type Props = {
 function ModelDisplayInner({
   model,
   video,
+  image,
   poster,
   aspectRatio = "16/9",
   fill = false,
@@ -357,7 +360,7 @@ function ModelDisplayInner({
   // Build a single <video> element + VideoTexture that lives for the
   // lifetime of this component. Autoplay, muted, looping, inline.
   const videoEl = useMemo(() => {
-    if (typeof document === "undefined") return null;
+    if (!video || typeof document === "undefined") return null;
     const el = document.createElement("video");
     el.src = video;
     el.loop = true;
@@ -404,6 +407,30 @@ function ModelDisplayInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoEl, screenRotation, screenRepeat[0], screenRepeat[1]]);
 
+  // Still-image screen texture (e.g. a website screenshot) — an alternative to
+  // the looping video. Same UV transform so it maps onto the screen identically.
+  const imageTexture = useMemo(() => {
+    if (!image || typeof window === "undefined") return null;
+    const tex = new THREE.TextureLoader().load(image, () => setVideoReady(true));
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.generateMipmaps = false;
+    tex.center.set(0.5, 0.5);
+    tex.rotation = screenRotation;
+    tex.wrapS = THREE.ClampToEdgeWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    const rx = screenRepeat[0];
+    const ry = screenRepeat[1];
+    tex.repeat.set(rx, ry);
+    tex.offset.set((1 - rx) / 2, (1 - ry) / 2);
+    return tex;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [image, screenRotation, screenRepeat[0], screenRepeat[1]]);
+
+  // The screen shows the image when provided, otherwise the video.
+  const screenTexture = image ? imageTexture : videoTexture;
+
   // Watch the container's viewport visibility (200px margin so it's ready just
   // before it scrolls in).
   useEffect(() => {
@@ -439,8 +466,9 @@ function ModelDisplayInner({
   useEffect(() => {
     return () => {
       videoTexture?.dispose();
+      imageTexture?.dispose();
     };
-  }, [videoTexture]);
+  }, [videoTexture, imageTexture]);
 
   return (
     <div
@@ -506,7 +534,7 @@ function ModelDisplayInner({
             <Rig
               hovered={hovered}
               modelUrl={model}
-              videoTexture={videoTexture}
+              videoTexture={screenTexture}
               scale={modelScale}
               modelY={modelY}
               cam={{
