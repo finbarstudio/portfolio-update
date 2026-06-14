@@ -5,6 +5,7 @@ import BrandStar from "@/components/BrandStar";
 import { isShopifyConfigured, getProduct, formatPrice } from "@/lib/shopify";
 import { startCheckout } from "@/lib/store-actions";
 import { STORE_PRODUCT } from "@/content/store";
+import WaitlistForm from "@/components/WaitlistForm";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -111,13 +112,8 @@ export default async function StorePage() {
               </form>
             ) : (
               <div>
-                <a
-                  href="mailto:finbar@finbar.studio?subject=Plugin%20launch"
-                  className="store-buy store-buy-ghost"
-                >
-                  Email me at launch
-                </a>
-                <p className="mono-label text-ink-soft mt-4">In development</p>
+                <WaitlistForm />
+                <p className="mono-label text-ink-soft mt-5">In development</p>
               </div>
             )}
           </div>

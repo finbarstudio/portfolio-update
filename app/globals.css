@@ -600,6 +600,45 @@
   .store-buy:hover { background: var(--pink); border-color: var(--pink); color: var(--bg); }
   .store-buy-ghost { background: transparent; color: var(--ink); }
   .store-buy-ghost:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .store-buy:disabled { opacity: 0.55; cursor: default; }
+
+  /* Waitlist email-capture form */
+  .waitlist-form { max-width: 30rem; }
+  .waitlist-row { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .waitlist-input {
+    flex: 1 1 14rem;
+    min-height: var(--hit);
+    padding: 0 0.9rem;
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-family: var(--font-primary);
+    font-size: var(--text-small);
+    color: var(--ink);
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+  .waitlist-input::placeholder { color: var(--ink-soft); }
+  .waitlist-input:focus { outline: none; border-color: var(--pink); }
+  .waitlist-consent {
+    display: flex;
+    gap: 0.55rem;
+    margin-top: 0.9rem;
+    color: var(--ink-soft);
+    font-size: var(--text-caption);
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .waitlist-consent input { margin-top: 0.18em; accent-color: var(--pink); flex: 0 0 auto; }
+  .waitlist-link { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+  .waitlist-link:hover { color: var(--pink); }
+  .waitlist-error { margin-top: 0.7rem; color: var(--pink); font-size: var(--text-caption); }
+  .waitlist-done {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ink);
+    font-size: var(--text-small);
+  }
   .cap-desc { margin-top: auto; padding-top: var(--space-4); color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; }
   @media (hover: hover) {
     .cap-item:hover { background: var(--surface-sunken); }

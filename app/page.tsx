@@ -228,6 +228,7 @@ function Contact() {
             <Link href="/about" className="mono-label text-ink-soft hover:text-pink transition-colors">About</Link>
             <Link href="/work" className="mono-label text-ink-soft hover:text-pink transition-colors">Work</Link>
             <Link href="/about#contact" className="mono-label text-ink-soft hover:text-pink transition-colors">Contact</Link>
+            <Link href="/privacy" className="mono-label text-ink-soft hover:text-pink transition-colors">Privacy</Link>
           </div>
         </div>
       </div>
