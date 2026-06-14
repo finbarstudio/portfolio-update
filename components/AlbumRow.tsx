@@ -169,7 +169,7 @@ function AlbumRowInner({
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {(!ready || !appReady) && <Loader />}
+      {(!ready || !appReady) && <Loader bare />}
 
       {appReady && (
       <Canvas
@@ -196,7 +196,7 @@ const AlbumRow = dynamic(() => Promise.resolve(AlbumRowInner), {
   ssr: false,
   loading: () => (
     <div style={{ position: "relative", width: "100%", height: "100%", background: "transparent" }}>
-      <Loader />
+      <Loader bare />
     </div>
   ),
 });

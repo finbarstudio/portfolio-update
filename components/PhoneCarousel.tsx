@@ -494,7 +494,7 @@ function PhoneCarouselInner({
     >
 
       {/* Spinner until every phone is ready (they pop in together). */}
-      {!ready && <Loader size={28} />}
+      {!ready && <Loader bare />}
 
       {appReady && (
       <Canvas
@@ -534,15 +534,8 @@ function PhoneCarouselInner({
 const PhoneCarousel = dynamic(() => Promise.resolve(PhoneCarouselInner), {
   ssr: false,
   loading: () => (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        background: "transparent",
-      }}
-    >
-      <Loader size={28} />
+    <div style={{ position: "relative", width: "100%", height: "100%", background: "transparent" }}>
+      <Loader bare />
     </div>
   ),
 });

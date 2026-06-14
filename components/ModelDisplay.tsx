@@ -473,7 +473,7 @@ function ModelDisplayInner({
           }}
         />
       )}
-      {!ready && <Loader />}
+      {!ready && <Loader bare={bare} />}
 
       {inView && appReady && (
         <Canvas
@@ -509,7 +509,16 @@ function ModelDisplayInner({
               videoTexture={videoTexture}
               scale={modelScale}
               modelY={modelY}
-              cam={{ dist: camDist, distHover: camDistHover, y: camY, yHover: camYHover, lookYHover }}
+              cam={{
+                // Detail-page heroes (non-hoverable) sit at the rest framing the
+                // whole time, so pull the camera back a touch for extra margin —
+                // the stand never crops off the bottom even in a short container.
+                dist: hoverable ? camDist : camDist + 2.5,
+                distHover: camDistHover,
+                y: camY,
+                yHover: camYHover,
+                lookYHover,
+              }}
               engageRef={engageRef}
               onModelReady={() => setModelReady(true)}
             />
@@ -525,15 +534,8 @@ function ModelDisplayInner({
 const ModelDisplay = dynamic(() => Promise.resolve(ModelDisplayInner), {
   ssr: false,
   loading: () => (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        background: "var(--thumb-bg, #e0e0e0)",
-      }}
-    >
-      <Loader />
+    <div style={{ position: "relative", width: "100%", height: "100%", background: "transparent" }}>
+      <Loader bare />
     </div>
   ),
 });

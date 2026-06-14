@@ -21,10 +21,15 @@ type Props = {
   className?: string;
   /** Hide the centred star spinner (skeleton-only). */
   hideSpinner?: boolean;
+  /** Transparent: just the star, no skeleton box. For transparent 3D thumbnails
+   *  + detail-page models, where the page must show through while it loads. */
+  bare?: boolean;
 };
 
-export default function Loader({ invisible = false, className, hideSpinner = false }: Props) {
+export default function Loader({ invisible = false, className, hideSpinner = false, bare = false }: Props) {
   if (invisible) return null;
+  // Bare: only the star spinner, on a transparent ground (no opaque skeleton).
+  if (bare) return hideSpinner ? null : <LoaderThree />;
   // Star renders as a SIBLING of the skeleton (not a child) so the skeleton's
   // opacity pulse doesn't dim the spinner — only the placeholder breathes.
   return (

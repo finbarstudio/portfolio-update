@@ -953,7 +953,7 @@
     position: relative;
     width: 100%;
     overflow: hidden;
-    background-color: var(--surface-raised);
+    background-color: transparent;   /* image sits on the page, no white box */
     max-height: 72vh;
   }
 
@@ -1326,10 +1326,10 @@
   .packer-website-visual {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
-    max-height: 58vh;
+    aspect-ratio: 16 / 9;             /* true 16/9 — no max-height clamp, or the
+                                          box goes wide-and-short and crops the model */
     background: transparent;          /* 3D model sits on the page, no container */
-    overflow: hidden;
+    overflow: visible;                /* never clip the model's edges */
   }
   .packer-pdf {
     position: relative;

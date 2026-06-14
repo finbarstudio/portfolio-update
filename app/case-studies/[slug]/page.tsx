@@ -416,11 +416,11 @@ export default async function CaseStudyPage({
             ) : project.heroSpline ? (
               <SplineScene scene={project.heroSpline} />
             ) : project.heroVideo ? (
-              <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>
+              <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
                 <VideoPlayer src={project.heroVideo} poster={project.heroImage.src} />
               </div>
             ) : (
-              <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh", background: "white" }}>
+              <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
                 <ClientImage
                   src={project.heroImage.src}
                   alt={project.heroImage.alt}

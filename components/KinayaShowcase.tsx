@@ -14,8 +14,8 @@ import Loader from "./Loader";
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ssr: false,
   loading: () => (
-    <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--thumb-bg, #e0e0e0)" }}>
-      <Loader />
+    <div style={{ position: "relative", width: "100%", height: "100%", background: "transparent" }}>
+      <Loader bare />
     </div>
   ),
 });
