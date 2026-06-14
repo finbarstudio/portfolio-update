@@ -1013,6 +1013,27 @@
   }
   .card-media { position: absolute; inset: 0; z-index: 1; }
 
+  /* Logo-as-thumbnail (e.g. Lows): centred mark, gently scales up on hover while
+     the reveal fills behind it. */
+  .card-logo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 7%, 3.5rem);
+  }
+  .card-logo img {
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    object-fit: contain;
+    transition: transform var(--dur-slow) var(--ease);
+  }
+  .group:hover .card-logo img { transform: scale(1.06); }
+  @media (prefers-reduced-motion: reduce) { .group:hover .card-logo img { transform: none; } }
+
   /* Reveal: three colour channels, each a full-height bar scaled to 0 at rest
      (truly invisible — no sliver) that grow horizontally from the centre with
      staggered delays, so the leading edges separate into colour channels. */
@@ -1591,7 +1612,7 @@
     position: absolute;
     inset: 0;
     z-index: 4;
-    background: var(--thumb-bg, #e0e0e0);
+    background: transparent;          /* wireframe only — page shows through */
     color: var(--ink-soft);
     animation: phone-wire-pulse 1.8s var(--ease) infinite;
   }

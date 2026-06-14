@@ -67,6 +67,8 @@ export interface Project {
   mediaRows?: MediaRow[];  // When set, replaces images + depth body on case study page
 
   logo?: string;          // Small client/brand logo. Shown in card + case study header.
+  cardLogo?: string;      // When set, the home/archive card thumbnail shows this
+                          // logo (centred, animates on hover) instead of media.
   liveUrl?: string;
   heroSpline?: string;
   heroModel?: {           // Interactive 3D model with looping video on its screen
@@ -454,7 +456,7 @@ export const projects: Project[] = [
     slug: "compass-capability",
     name: "Compass Capability",
     tier: "full",
-    rank: 5,
+    rank: 10,
     date: "2024",
     categories: ["Brand Identity", "Brand Guidelines"],
     skills: [
@@ -536,7 +538,7 @@ export const projects: Project[] = [
     slug: "norths-devils",
     name: "Norths Devils RLFC",
     tier: "full",
-    rank: 6,
+    rank: 7,
     isConcept: true,
     date: "2024",
     categories: ["Brand Refresh", "Web Design", "Sports Branding"],
@@ -644,7 +646,7 @@ export const projects: Project[] = [
     slug: "copper-company",
     name: "Copper Company",
     tier: "full",
-    rank: 7,
+    rank: 6,
     date: "2023",
     categories: ["Brand Identity", "Packaging Design"],
     skills: [
@@ -742,6 +744,7 @@ export const projects: Project[] = [
     outcome:
       "Strong growth in workload since launch. The Bromley FC sponsorship pulled real results.",
     logo: "/images/lows-design-build/logo.png",
+    cardLogo: "/images/lows-design-build/logomark.svg",
     heroImage: {
       src: "/images/lows-design-build/hero.png",
       alt: "Lows Design and Build brand identity, hero composite showing logo and brand applications",
@@ -886,7 +889,7 @@ export const projects: Project[] = [
     slug: "momentum-mentoring",
     name: "Momentum Mentoring",
     tier: "gallery",
-    rank: 6,
+    rank: 11,
     date: "2024",
     categories: ["Brand Identity", "Web Design", "NDIS"],
     skills: ["Brand Identity", "Web Design", "Framer Development"],
@@ -932,7 +935,7 @@ export const projects: Project[] = [
     slug: "taswater",
     name: "TasWater",
     tier: "gallery",
-    rank: 11,
+    rank: 12,
     date: "2023",
     categories: ["Infographic Design", "Information Design"],
     skills: ["Infographic Design", "Information Design", "Brand-Compliant Design"],
@@ -971,7 +974,7 @@ export const projects: Project[] = [
     slug: "london-home-show",
     name: "The London Home Show",
     tier: "gallery",
-    rank: 12,
+    rank: 13,
     date: "2022",
     categories: ["Event Design", "Print & Digital"],
     skills: ["Event Design", "Print Design", "Digital Campaign"],

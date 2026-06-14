@@ -16,7 +16,7 @@ import Outcomes from "@/components/Outcomes";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import Reveal from "@/components/Reveal";
-import PDFSlideshow from "@/components/PDFSlideshow";
+import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
 import {
   projects,
   type Project,
@@ -456,10 +456,12 @@ export default async function CaseStudyPage({
       )}
 
       {project.pdfSlideshow && (
-        <PDFSlideshow
-          title={project.pdfSlideshow.title}
-          pages={project.pdfSlideshow.pages}
-        />
+        <div className="py-8">
+          <p className="mono-label text-ink-soft mb-4">{project.pdfSlideshow.title}</p>
+          <div className="packer-pdf">
+            <PdfSlideshowThumb pages={project.pdfSlideshow.pages} hover={false} nav />
+          </div>
+        </div>
       )}
 
       {/* Bottom info block — same layout for every case study:

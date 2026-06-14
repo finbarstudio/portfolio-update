@@ -50,6 +50,7 @@ export default function PdfSlideshowThumb({
     setManual(true);
     setActive((i) => (i + dir + pages.length) % pages.length);
   };
+  const goTo = (i: number) => { setManual(true); setActive(i); };
 
   // Touch swipe to change page (mobile primary nav).
   const touchX = useRef<number | null>(null);
@@ -110,11 +111,25 @@ export default function PdfSlideshowThumb({
           </button>
         )}
 
-        {/* Dots are display-only indicators (navigate via swipe / arrows). */}
+        {/* In nav mode the dots are clickable (jump to any page); otherwise
+            they're display-only indicators. */}
         <div className="pdf-dots">
-          {pages.map((_, i) => (
-            <span key={i} className="pdf-dot" data-active={i === active} aria-hidden="true" />
-          ))}
+          {pages.map((_, i) =>
+            nav ? (
+              <button
+                key={i}
+                type="button"
+                className="pdf-dot-btn"
+                onClick={() => goTo(i)}
+                aria-label={`Go to page ${i + 1} of ${pages.length}`}
+                aria-current={i === active ? "true" : undefined}
+              >
+                <span className="pdf-dot" data-active={i === active} />
+              </button>
+            ) : (
+              <span key={i} className="pdf-dot" data-active={i === active} aria-hidden="true" />
+            )
+          )}
         </div>
 
         {nav && pages.length > 1 && (

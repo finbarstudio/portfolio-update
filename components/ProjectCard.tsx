@@ -122,7 +122,12 @@ export function FullCard({ project, index }: { project: Project; index: number }
       >
         {/* Thumbnail — flex:1 so revealed text steals from it, not extends card */}
         <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
-          {project.heroPdf ? (
+          {project.cardLogo ? (
+            <div className="card-logo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={project.cardLogo} alt={`${project.name} logo`} />
+            </div>
+          ) : project.heroPdf ? (
             <PdfSlideshowThumb pages={project.heroPdf} />
           ) : project.heroPhones ? (
             <PhoneCarousel model={project.heroPhones.model} videos={project.heroPhones.videos} poster={project.heroPhones.poster} fill />

@@ -46,7 +46,7 @@ export default function VideoPlayer({
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {!ready && <Loader size={24} />}
+      {!ready && <Loader bare />}
       <video
         ref={ref}
         src={src}
@@ -57,7 +57,7 @@ export default function VideoPlayer({
         preload={eager ? "auto" : "metadata"}
         onLoadedData={() => { setReady(true); onReady?.(); }}
         className={className}
-        style={{ width: "100%", height: "100%", objectFit: "contain", background: "white", display: "block", ...style }}
+        style={{ width: "100%", height: "100%", objectFit: "contain", background: "transparent", display: "block", ...style }}
       />
     </div>
   );
