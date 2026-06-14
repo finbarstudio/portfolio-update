@@ -104,7 +104,7 @@ function SelectedWork() {
   const picks = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean) as typeof projects;
   let i = 0;
   return (
-    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="Selected work">
+    <Reveal as="section" className="home-section home-section--flush px-5 md:px-10" aria-label="Selected work">
       <SectionHead title="Selected work" aside={<Link href="/work" className="home-link">Full archive →</Link>} />
       <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
         {picks.map((project) => (

@@ -392,6 +392,8 @@
     padding-top: var(--space-6);
     padding-bottom: var(--space-9);
   }
+  /* First section under the hero — no divider rule. */
+  .home-section--flush { border-top: none; }
   .home-section-index {
     display: flex;
     align-items: baseline;
