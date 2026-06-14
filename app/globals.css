@@ -484,8 +484,13 @@
     letter-spacing: -0.015em;
     line-height: 0.96;
     font-size: clamp(2.8rem, 9vw, 7rem);
-    font-feature-settings: "liga" 1, "dlig" 1, "swsh" 1, "calt" 1;
-    font-variant-ligatures: common-ligatures discretionary-ligatures;
+    /* Swashes + discretionary ligatures off — they forced ornate, badly-kerned
+       glyphs mid-word (the "a", the "ti" in "motion"). Keep standard ligatures,
+       contextual alternates and real kerning: clean, well-spaced Bookmania.
+       (The italic word keeps its natural swashy terminals.) */
+    font-feature-settings: "liga" 1, "dlig" 0, "swsh" 0, "calt" 1, "kern" 1;
+    font-variant-ligatures: common-ligatures no-discretionary-ligatures;
+    font-kerning: normal;
   }
   /* H2 — sans (Archivo Narrow), so it reads as a clearly different tier to the
      serif H1. Heavier tracking + a touch smaller line. */
@@ -914,7 +919,11 @@
   .card-rev.c3 { background: linear-gradient(105deg, var(--pink-soft), var(--pink)); transition-delay: 0s; }
 
   @media (hover: hover) {
-    .group:hover .card-thumb { border-color: var(--pink); }
+    /* Outline only appears once the reveal has finished filling (~0.7s). */
+    .group:hover .card-thumb {
+      border-color: var(--pink);
+      transition: border-color 0.25s var(--ease) 0.66s;
+    }
     .group:hover .card-rev.c1 { transform: scaleX(1); transition-delay: 0s; }
     .group:hover .card-rev.c2 { transform: scaleX(1); transition-delay: 0.08s; }
     .group:hover .card-rev.c3 { transform: scaleX(1); transition-delay: 0.16s; }
