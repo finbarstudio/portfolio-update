@@ -195,12 +195,14 @@ function Contact() {
           <p className="text-ink-soft mb-4" style={{ fontSize: "var(--text-small)" }}>
             Got a project or a role in mind? Email is the best way to reach me.
           </p>
-          <a
-            href="mailto:finbar@finbar.studio"
-            className="home-display-sm text-ink hover:text-pink transition-colors break-words"
-          >
-            finbar@finbar.studio
-          </a>
+          <h3>
+            <a
+              href="mailto:finbar@finbar.studio"
+              className="home-email text-ink hover:text-pink transition-colors"
+            >
+              finbar@finbar.studio
+            </a>
+          </h3>
         </div>
         <div className="md:col-span-4 space-y-3">
           <div>

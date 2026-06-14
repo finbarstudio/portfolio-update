@@ -503,6 +503,18 @@
     font-size: clamp(1.7rem, 4vw, 2.9rem);
   }
 
+  /* Contact email — H3 tier, true monospace, caps, high tracking. A clear step
+     down from the H2 section heading above it. */
+  .home-email {
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "Cascadia Mono", Consolas, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 500;
+    line-height: 1.2;
+    font-size: clamp(0.95rem, 2.2vw, 1.45rem);
+    word-break: break-word;
+  }
+
   /* Availability status row — teal pulsing dot + line. */
   .home-status {
     display: inline-flex;
@@ -1558,10 +1570,12 @@
   }
   .sm-tile {
     margin: 0;
-    background: white;
-    border-radius: 10px;
-    box-shadow: var(--elev-1);
-    padding: clamp(0.6rem, 1.4vw, 1.1rem);
+    /* Cutout, not a container — graphics sit straight on the page, no white
+       card / shadow behind them. */
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: clamp(0.4rem, 1vw, 0.8rem);
     display: flex;
     align-items: center;
     justify-content: center;
