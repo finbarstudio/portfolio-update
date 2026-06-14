@@ -954,7 +954,7 @@ export const projects: Project[] = [
     slug: "taswater",
     name: "TasWater",
     tier: "gallery",
-    rank: 13,
+    rank: 7.5,
     date: "2023",
     categories: ["Infographic Design", "Information Design"],
     skills: ["Infographic Design", "Information Design", "Brand-Compliant Design"],
@@ -968,13 +968,8 @@ export const projects: Project[] = [
     logo: "/images/taswater/logo.png",
     heroImage: {
       src: "/images/taswater/hero.jpg",
-      alt: "TasWater infographic project: progression infographic showing Tasmania's water infrastructure milestones",
+      alt: "TasWater 'first 12 months' employee onboarding journey infographic, designed inside the TasWater brand",
     },
-    heroSlideshow: [
-      "/images/taswater/hero.jpg",
-      "/images/taswater/map.jpg",
-    ],
-    slideshowAspect: "16/9",
     images: [],
     hasDepth: true,
     depth: [
