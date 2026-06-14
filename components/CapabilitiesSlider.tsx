@@ -25,12 +25,12 @@ type Capability = {
 };
 
 const CAPABILITIES: Capability[] = [
-  { name: "Brand identity", desc: "Logomarks, colour and type, with guidelines to keep it consistent.", variant: "gem", color: "#E8718B" },
+  { name: "Brand identity", desc: "Logomarks, colour and type, with guidelines to keep it consistent.", variant: "star", color: "#E8718B" },
   { name: "Editorial & print", desc: "Publications and print-ready layouts, set in InDesign.", variant: "book", color: "#E0B24A" },
   { name: "Web & UI design", desc: "Brand-led websites and interfaces, built detail-first.", variant: "screen", color: "#6E8CB0" },
-  { name: "Creative direction", desc: "Art direction and visual systems across a project.", variant: "knot", color: "#DD8A5C" },
-  { name: "Motion graphics", desc: "Animated assets and short-form video, made in After Effects.", variant: "ico", color: "#6FAE9F" },
-  { name: "Social campaigns", desc: "Static and motion sets sized for every channel.", variant: "ring", color: "#D17BA0" },
+  { name: "Creative direction", desc: "Art direction and visual systems across a project.", variant: "studio", color: "#DD8A5C" },
+  { name: "Motion graphics", desc: "Animated assets and short-form video, made in After Effects.", variant: "motion", color: "#6FAE9F" },
+  { name: "Social campaigns", desc: "Static and motion sets sized for every channel.", variant: "social", color: "#D17BA0" },
 ];
 
 function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
@@ -88,11 +88,7 @@ export default function CapabilitiesSlider() {
       tween = gsap.to(track, { xPercent: -50, duration: 32, ease: "none", repeat: -1 });
     }, trackRef);
 
-    const slow = () => { if (tween) gsap.to(tween, { timeScale: 0, duration: 0.5, overwrite: true }); };
-    const go = () => { if (tween) gsap.to(tween, { timeScale: 1, duration: 0.5, overwrite: true }); };
-    root.addEventListener("pointerenter", slow);
-    root.addEventListener("pointerleave", go);
-
+    // Keeps scrolling through hover; only pauses when off-screen (perf).
     const io = new IntersectionObserver(
       ([e]) => { if (tween) (e.isIntersecting ? tween.play() : tween.pause()); },
       { rootMargin: "120px" }
@@ -100,8 +96,6 @@ export default function CapabilitiesSlider() {
     io.observe(root);
 
     return () => {
-      root.removeEventListener("pointerenter", slow);
-      root.removeEventListener("pointerleave", go);
       io.disconnect();
       ctx.revert();
     };
