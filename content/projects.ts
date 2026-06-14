@@ -321,7 +321,7 @@ export const projects: Project[] = [
     seo: {
       title: "Salesmasters: Sales Playbook Design & Production | Finbar Studio",
       description:
-        "How I designed and produced 15+ bespoke sales process playbooks for a national sales consultancy, end to end, from content writing to print-ready delivery.",
+        "How I designed and produced 15+ custom sales process playbooks for a national sales consultancy, end to end, from content writing to print-ready delivery.",
     },
     companyUrl: "https://salesmasters.com.au",
     date: "2023–2024",
@@ -335,7 +335,7 @@ export const projects: Project[] = [
       "Print Production",
     ],
     oneLiner:
-      "Bespoke Sales Process Playbooks for a Brisbane sales consultancy. Researched, written, designed, illustrated and print-managed in-house.",
+      "Custom Sales Process Playbooks for a Brisbane sales consultancy. Researched, written, designed, illustrated and print-managed in-house.",
     role: "Sole designer and writer. Researched each client's industry, wrote all content (3,000 to 3,500 words per playbook), built the InDesign documents from scratch, designed the illustrations and infographics, and managed print delivery.",
     problem:
       "Salesmasters needed unique 40 to 50-page playbooks for each client. Text-heavy but still readable, brand-compliant, and ready to print. There was no template to start from. Every playbook had to feel custom while still reading as part of the same set.",
@@ -717,10 +717,10 @@ export const projects: Project[] = [
       "Brand Systems",
     ],
     oneLiner:
-      "Visual identity system for an artisan roastery. Earthy palette, cloud-inspired mark, built to extend into print, web and experiential.",
+      "Visual identity system for a specialty coffee roastery. Earthy palette, cloud-inspired mark, made to work across packaging, print and web.",
     role: "Sole designer. Built the core logo, typography, palette and brand system. Applied across business cards, packaging, merchandise and digital.",
     problem:
-      "Nimbus wanted to feel artisanal and considered without coming across precious or cold. The identity had to hold its own on specialty retail shelves and scale into e-commerce, pop-ups and whatever came next.",
+      "Nimbus wanted to feel handmade and warm without tipping into fussy or cold. The identity had to hold its own on specialty retail shelves and scale into online sales, pop-ups and whatever came next.",
     outcome:
       "Brand system delivered across the initial set of touchpoints.",
     logo: "/images/nimbus-coffee/logo.jpg",

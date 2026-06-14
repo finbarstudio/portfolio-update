@@ -28,10 +28,10 @@ export default function MomentumShowcase() {
           <h2 className="kinaya-section-name">Brand &amp; Website</h2>
         </header>
         <p className="packer-section-body">
-          Brand identity and a Framer website for an NDIS mentoring provider, built
-          around empowerment, independence and personal growth. Warm and human,
-          never clinical. Designed and developed end to end, ready for the team to
-          run themselves.
+          Brand identity and a Framer website for an NDIS mentoring provider. The
+          goal was something warm and human that still felt empowering, never
+          clinical. Designed and built end to end, ready for the team to run
+          themselves.
         </p>
         <a
           href="https://momentummentoring.co"

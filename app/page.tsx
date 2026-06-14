@@ -127,8 +127,9 @@ function Approach() {
             publication or an infographic with a lot to make clear. Having both in my week keeps it interesting.
           </p>
           <p>
-            Underneath all of it is the same craft: type, colour, and the way a layout moves your eye.
-            I care how something looks, and just as much about whether it reads well for the people using it.
+            Underneath all of it is the same handful of things: type, colour, and how a layout moves
+            your eye. I care how something looks, and just as much about whether it reads well for the
+            people using it.
           </p>
           <p>
             Outside client work my main hobby is creative coding, building interactive and generative

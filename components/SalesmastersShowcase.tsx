@@ -79,7 +79,7 @@ export default function SalesmastersShowcase() {
       <section className="kinaya-section">
         <SectionHeader index={1} name="The Clients" />
         <p className="packer-section-body">
-          Salesmasters brought me in to produce bespoke sales playbooks for their
+          Salesmasters brought me in to produce custom sales playbooks for their
           own clients: established companies across healthcare, manufacturing,
           technology, storage and professional services. Each one was built from
           scratch to that client&apos;s brand, industry and sales process. The
@@ -123,7 +123,7 @@ export default function SalesmastersShowcase() {
           sales jargon, and pulled content and imagery straight from their own
           site. Then I wrote the playbook end to end (3,000 to 3,500 words),
           always with the salesperson reading it in mind, and structured it into
-          ordered chapters with a contents page, bespoke title pages and a
+          ordered chapters with a contents page, custom title pages and a
           cohesive layout that ties the whole document together. Delivered as both
           an interactive, distributable PDF and a print edition, with the print
           pre-production managed through to delivery.
@@ -139,7 +139,7 @@ export default function SalesmastersShowcase() {
         <p className="packer-section-body">
           To hold the reader&apos;s attention through dense material, I tied each
           playbook together with custom graphics, all built to the client&apos;s
-          brand: bespoke Sales Wheels mapping their process, technique frameworks
+          brand: custom Sales Wheels that map their process, technique frameworks
           like BANT and STAR drawn as purpose-built diagrams, client-specific
           process maps, and custom icon sets.
         </p>
@@ -165,13 +165,13 @@ export default function SalesmastersShowcase() {
         </Company>
 
         {/* Bus4x4 — tyre wheel first, then six-point walkround, both tall */}
-        <Company name="Bus4x4" caption="The bespoke tyre-wheel illustration and the custom six-point walkround diagram.">
+        <Company name="Bus4x4" caption="The hand-drawn tyre-wheel illustration and the custom six-point walkround diagram.">
           <Tile src={`${G}/bus4x4/wheel.webp`} tall />
           <Tile src={`${G}/bus4x4/technical.webp`} tall wide />
         </Company>
 
         {/* Active Medical — Sales Wheel (tall) + 3×2 icon grid */}
-        <Company name="Active Medical" caption="Sales Wheel and a bespoke icon set.">
+        <Company name="Active Medical" caption="Sales Wheel and a custom icon set.">
           <Tile src={`${G}/active-medical/wheel.webp`} tall />
           <div className="sm-co-3x2">
             {AM_ICONS.map((src) => <Tile key={src} src={src} icon />)}
