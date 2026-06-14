@@ -54,10 +54,11 @@ export default function PrivacyPage() {
         <section className="space-y-3">
           <h2 className="mono-heading text-ink">Who processes it</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
-            Waitlist emails are stored in <strong>Shopify</strong>, which acts as a processor for that
-            list. The site is hosted on <strong>Vercel</strong>. Both may process data on servers
-            outside your country under their own safeguards. I don&rsquo;t sell your data or share it
-            with anyone else.
+            Waitlist emails are handled by <strong>MailerLite</strong> (the email service), and any
+            future purchases go through <strong>Lemon Squeezy</strong> (the checkout / merchant of
+            record). The site is hosted on <strong>Vercel</strong>. These providers may process data
+            on servers outside your country under their own safeguards. I don&rsquo;t sell your data
+            or share it with anyone else.
           </p>
         </section>
 

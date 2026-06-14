@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import ClientImage from "@/components/ClientImage";
 import BrandStar from "@/components/BrandStar";
-import { isShopifyConfigured, getProduct, formatPrice } from "@/lib/shopify";
+import { isLemonConfigured, getProduct } from "@/lib/lemonsqueezy";
 import { startCheckout } from "@/lib/store-actions";
 import { STORE_PRODUCT } from "@/content/store";
 import WaitlistForm from "@/components/WaitlistForm";
@@ -23,27 +23,25 @@ export const metadata: Metadata = {
 };
 
 export default async function StorePage() {
-  const product = isShopifyConfigured() ? await getProduct(STORE_PRODUCT.handle) : null;
-  const live = !!product && !!product.variantId && product.availableForSale;
+  const product = isLemonConfigured() ? await getProduct() : null;
+  const live = !!product && product.available;
 
   const fb = STORE_PRODUCT.fallback;
-  const name = product?.title ?? fb.name;
-  const priceLabel = product ? formatPrice(product.price.amount, product.price.currencyCode) : fb.priceLabel;
-  const imageUrl = product?.image?.url ?? fb.image;
-  const imageAlt = product?.image?.altText ?? name;
+  const name = product?.name ?? fb.name;
+  const priceLabel = product?.priceFormatted || fb.priceLabel;
+  const imageUrl = fb.image;
+  const imageAlt = name;
 
   const productJsonLd = live && product
     ? {
         "@context": "https://schema.org",
         "@type": "Product",
-        name: product.title,
+        name: product.name,
         description: fb.tagline,
-        image: product.image?.url ? [product.image.url] : undefined,
         brand: { "@type": "Brand", name: "finbar✶studio" },
         offers: {
           "@type": "Offer",
-          price: product.price.amount,
-          priceCurrency: product.price.currencyCode,
+          ...(priceLabel ? { price: priceLabel.replace(/[^0-9.]/g, "") } : {}),
           availability: "https://schema.org/InStock",
           url: `${SITE_URL}/store`,
         },
@@ -86,7 +84,7 @@ export default async function StorePage() {
           )}
 
           <div className="mt-6 max-w-prose text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-            {product ? (
+            {product?.descriptionHtml ? (
               // eslint-disable-next-line react/no-danger
               <div dangerouslySetInnerHTML={{ __html: product.descriptionHtml }} />
             ) : (
@@ -103,9 +101,8 @@ export default async function StorePage() {
           )}
 
           <div className="mt-9">
-            {live && product?.variantId ? (
+            {live ? (
               <form action={startCheckout}>
-                <input type="hidden" name="variantId" value={product.variantId} />
                 <button type="submit" className="store-buy">
                   Buy now{priceLabel ? ` — ${priceLabel}` : ""}
                 </button>

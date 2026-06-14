@@ -4,7 +4,7 @@
  * WaitlistForm — launch email capture for the store. Email + an explicit,
  * unticked consent checkbox linking the privacy policy (GDPR: consent is the
  * lawful basis). Submits to the subscribeToWaitlist server action, which adds a
- * single-opt-in marketing customer in Shopify. Progressive: works without JS;
+ * single-opt-in subscriber in MailerLite. Progressive: works without JS;
  * with JS it shows pending + result inline.
  */
 

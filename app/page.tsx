@@ -6,7 +6,7 @@ import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HeroHeadline from "@/components/HeroHeadline";
 import HeroStar from "@/components/HeroStar";
-import { isShopifyConfigured } from "@/lib/shopify";
+import { isLemonConfigured } from "@/lib/lemonsqueezy";
 import { STORE_PRODUCT } from "@/content/store";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -178,7 +178,7 @@ function Capabilities() {
 
 /* ─── Studio products ───────────────────────────────────────── */
 function Products() {
-  const comingSoon = !isShopifyConfigured();
+  const comingSoon = !isLemonConfigured();
   return (
     <Reveal as="section" className="home-section px-5 md:px-10" aria-label="Studio products">
       <SectionHead title="Studio products" aside={<Link href="/store" className="home-link">Visit store →</Link>} />
