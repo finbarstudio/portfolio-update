@@ -169,7 +169,7 @@ function Products() {
       <SectionHead title="Studio products" aside={<Link href="/store" className="home-link">Visit store →</Link>} />
       <div className="grid md:grid-cols-12 gap-8 items-end">
         <div className="md:col-span-8">
-          <h3 className="home-display-sm text-ink">{STORE_PRODUCT.fallback.name}</h3>
+          <h3 className="home-h3 text-ink">{STORE_PRODUCT.fallback.name}</h3>
           <p className="text-ink-soft leading-relaxed mt-3 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
             {STORE_PRODUCT.fallback.blurb}
           </p>
@@ -198,7 +198,7 @@ function Contact() {
           <h3>
             <a
               href="mailto:finbar@finbar.studio"
-              className="home-email text-ink hover:text-pink transition-colors"
+              className="home-h3 text-ink hover:text-pink transition-colors"
             >
               finbar@finbar.studio
             </a>
