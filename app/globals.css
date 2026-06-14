@@ -397,18 +397,40 @@
   }
   .hero-logo svg { width: 0.82em; height: 0.82em; flex: 0 0 auto; color: var(--pink); }
 
-  /* Hero motion-path accent star (see HeroOrbit). */
-  .hero-orbit { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-  .hero-orbit-star {
+  /* Big hero backdrop star (see HeroStar): glowing self-tracing outline, cropped
+     off the bottom by the section, rotating + parallaxing on scroll. */
+  .hero-star {
     position: absolute;
-    top: 16%;
-    right: 14%;
-    width: 120px;
-    height: 120px;
-    color: color-mix(in srgb, var(--pink) 13%, transparent);
+    left: 58%;
+    bottom: -34%;
+    width: min(86vh, 820px);
+    aspect-ratio: 1;
+    transform: translateX(-50%);
+    z-index: 0;
+    pointer-events: none;
     will-change: transform;
   }
-  .hero-orbit-star svg { width: 120px; height: 120px; }
+  .hero-star-svg { width: 100%; height: 100%; overflow: visible; }
+  .hero-star-track {
+    fill: none;
+    stroke: color-mix(in srgb, var(--pink) 9%, transparent);
+    stroke-width: 0.9;
+    stroke-linejoin: round;
+  }
+  .hero-star-draw {
+    fill: none;
+    stroke: var(--pink);
+    stroke-width: 1.1;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    animation: star-draw 7s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--pink) 45%, transparent));
+    opacity: 0.7;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-star-draw { animation: none; stroke-dasharray: none; opacity: 0.4; }
+  }
 
   /* Kinetic 3D hero headline (see HeroHeadline). */
   .hh-3d { transform-style: preserve-3d; }
