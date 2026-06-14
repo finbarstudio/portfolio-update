@@ -164,14 +164,11 @@ function AlbumRowInner({
         position: "relative",
         width: "100%",
         ...(fill ? { height: "100%" } : { aspectRatio }),
-        background: "var(--thumb-bg, #e0e0e0)",
+        background: "transparent",
         overflow: "hidden",
         cursor: hoverable ? "pointer" : "default",
       }}
     >
-      {/* Light pink background, fades in on hover */}
-      <div className="mockup-pink-bg" aria-hidden="true" style={{ opacity: hovered ? 1 : 0 }} />
-
       {(!ready || !appReady) && <Loader />}
 
       {appReady && (
@@ -198,7 +195,7 @@ function AlbumRowInner({
 const AlbumRow = dynamic(() => Promise.resolve(AlbumRowInner), {
   ssr: false,
   loading: () => (
-    <div style={{ position: "relative", width: "100%", height: "100%", background: "var(--thumb-bg, #e0e0e0)" }}>
+    <div style={{ position: "relative", width: "100%", height: "100%", background: "transparent" }}>
       <Loader />
     </div>
   ),

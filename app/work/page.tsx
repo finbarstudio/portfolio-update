@@ -110,7 +110,7 @@ function WorkHeader() {
     <header className="px-5 md:px-10 pt-8 md:pt-12 pb-10 md:pb-14">
       <p className="mono-label text-ink-soft mb-5">Archive of branding, web, publication &amp; motion</p>
       <h1
-        className="font-sans font-bold uppercase text-ink leading-[1.02]"
+        className="font-bold uppercase text-ink leading-[1.02]"
         style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
       >
         Selected work.

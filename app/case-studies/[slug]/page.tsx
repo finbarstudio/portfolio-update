@@ -369,7 +369,7 @@ export default async function CaseStudyPage({
             </div>
           )}
           <h1
-            className="font-sans font-bold uppercase text-ink leading-[1.02]"
+            className="font-bold uppercase text-ink leading-[1.02]"
             style={{ fontSize: "var(--text-display)", letterSpacing: "0.03em" }}
           >
             {project.name}

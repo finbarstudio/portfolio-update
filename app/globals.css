@@ -32,6 +32,9 @@
      └─────────────────────────────────────────────────────────┘ */
   --font-primary: var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
   --font-label:   var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
+  /* Display serif for H1 — swap "Bookmania" in once licensed (it leads the stack
+     so it's used automatically if present); Fraunces is the free fallback. */
+  --font-display: "Bookmania", var(--font-fraunces), Georgia, "Times New Roman", serif;
 
   /* ┌─────────────────────────────────────────────────────────┐
      │  BRAND COLOURS                                          │
@@ -234,6 +237,8 @@
 
   /* Large type stays tight so display/headings never fragment into loose lines */
   h1, h2, .display { line-height: var(--leading-tight); }
+  /* H1 leads with the display serif unless a component opts out. */
+  h1 { font-family: var(--font-display); }
   h3 { line-height: var(--leading-snug); }
 
   :focus-visible {
@@ -411,13 +416,10 @@
   .hero-star-draw {
     fill: none;
     stroke: var(--pink);
-    stroke-width: 1.1;
+    stroke-width: 1.5;
     stroke-linejoin: round;
     stroke-linecap: round;
-    stroke-dasharray: 1;
-    animation: star-draw 7s ease-in-out infinite;
-    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--pink) 45%, transparent));
-    opacity: 0.7;
+    opacity: 0.9;
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-star-draw { animation: none; stroke-dasharray: none; opacity: 0.4; }
@@ -442,21 +444,24 @@
   }
 
   /* Massive display type that drives the hero + section openers. */
+  /* H1 — retro display serif (Bookmania / Fraunces). */
   .home-display {
-    font-family: var(--font-primary);
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: -0.005em;
-    line-height: 0.96;
+    letter-spacing: 0;
+    line-height: 0.94;
     font-size: clamp(2.6rem, 8.5vw, 6.5rem);
   }
+  /* H2 — sans (Archivo Narrow), so it reads as a clearly different tier to the
+     serif H1. Heavier tracking + a touch smaller line. */
   .home-display-sm {
     font-family: var(--font-primary);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.005em;
+    letter-spacing: 0.04em;
     line-height: 1.0;
-    font-size: clamp(1.85rem, 4.5vw, 3.25rem);
+    font-size: clamp(1.7rem, 4vw, 2.9rem);
   }
 
   /* Availability status row — teal pulsing dot + line. */
@@ -843,44 +848,38 @@
     border-radius: 14px;
     overflow: hidden;
     background: var(--surface-raised);
-    border: 1px solid var(--ink);
+    border: 1px solid transparent;          /* invisible at rest */
     transition: border-color var(--dur-fast) var(--ease);
   }
   .card-media { position: absolute; inset: 0; z-index: 1; }
 
-  /* The reveal panel: a centred bar that grows horizontally to fill the tile. */
-  .card-reveal {
+  /* Reveal: three colour channels, each a full-height bar scaled to 0 at rest
+     (truly invisible — no sliver) that grow horizontally from the centre with
+     staggered delays, so the leading edges separate into colour channels. */
+  .card-reveal { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .card-rev {
     position: absolute;
-    top: 0; bottom: 0; left: 50%;
-    width: 0;
-    transform: translateX(-50%);
-    background: var(--thumb-bg);
-    border: 1.5px solid transparent;
-    border-radius: 14px;
-    z-index: 0;
-    pointer-events: none;
-    transition: width 0.55s var(--ease), background-color 0.4s var(--ease), border-color 0.3s var(--ease);
+    inset: 0;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.55s var(--ease);
+    will-change: transform;
   }
-  /* Hover on capable devices; tap (active/focus) on touch. */
+  .card-rev.c1 { background: var(--teal); }
+  .card-rev.c2 { background: var(--pink); }
+  .card-rev.c3 { background: #FFE9F4; }
+
   @media (hover: hover) {
     .group:hover .card-thumb { border-color: var(--pink); }
-    .group:hover .card-reveal {
-      width: calc(100% + 2px);
-      background: #FFE9F4;
-      border-color: var(--pink);
-      transition: width 0.55s var(--ease),
-                  background-color 0.4s var(--ease) 0.18s,
-                  border-color 0.3s var(--ease) 0.22s;
-    }
+    .group:hover .card-rev.c1 { transform: scaleX(1); transition-delay: 0s; }
+    .group:hover .card-rev.c2 { transform: scaleX(1); transition-delay: 0.08s; }
+    .group:hover .card-rev.c3 { transform: scaleX(1); transition-delay: 0.16s; }
   }
   .group:active .card-thumb,
   .group:focus-within .card-thumb { border-color: var(--pink); }
-  .group:active .card-reveal,
-  .group:focus-within .card-reveal {
-    width: calc(100% + 2px);
-    background: #FFE9F4;
-    border-color: var(--pink);
-  }
+  .group:active .card-rev.c1, .group:focus-within .card-rev.c1 { transform: scaleX(1); transition-delay: 0s; }
+  .group:active .card-rev.c2, .group:focus-within .card-rev.c2 { transform: scaleX(1); transition-delay: 0.08s; }
+  .group:active .card-rev.c3, .group:focus-within .card-rev.c3 { transform: scaleX(1); transition-delay: 0.16s; }
 
   /* Hero scroll-driven fade (CSS only, no JS) */
   @supports (animation-timeline: scroll()) {
@@ -1925,15 +1924,18 @@
     inset: 0;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: clamp(6px, 2vw, 12px);
-    padding: clamp(10px, 4vw, 22px);
-    place-items: center;
+    grid-auto-rows: 1fr;
+    gap: clamp(8px, 3vw, 14px);
+    padding: clamp(12px, 5vw, 24px);
+    align-content: center;
   }
   .album-grid img {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+    aspect-ratio: 1 / 1;          /* covers are square — keep them square */
+    height: auto;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--ink); /* sticker outline */
   }
 
   /* Soft pink wash behind a 3D mockup, faded in on hover (canvas is transparent

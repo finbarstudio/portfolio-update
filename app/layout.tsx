@@ -1,14 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo_Narrow } from "next/font/google";
+import { Archivo_Narrow, Fraunces } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import LayoutShell from "@/components/LayoutShell";
 
-// Single font family. Archivo Narrow used for both body and mono/label text.
+// Body + mono/label text.
 const archivoNarrow = Archivo_Narrow({
   variable: "--font-archivo-narrow",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Display serif for H1 — placeholder for Bookmania (a commercial font). Fraunces
+// is the closest free, characterful retro serif. To use real Bookmania: drop the
+// woff2 in /public/fonts and swap this for next/font/local; --font-display in
+// globals.css picks it up everywhere.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "900"],
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -179,7 +191,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={archivoNarrow.variable}
+      className={`${archivoNarrow.variable} ${fraunces.variable}`}
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
         <LayoutShell>{children}</LayoutShell>
