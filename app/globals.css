@@ -980,6 +980,8 @@
   .card-rev {
     position: absolute;
     inset: 0;
+    border-radius: 14px;              /* match the container so corners stay rounded
+                                          as the channel scales out from the centre */
     transform: scale(0);
     transform-origin: center;
     transition: transform 0.55s var(--ease);
