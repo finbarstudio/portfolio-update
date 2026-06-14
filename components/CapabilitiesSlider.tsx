@@ -3,22 +3,75 @@
 /**
  * CapabilitiesSlider — the "What I do" disciplines as an infinite, auto-scrolling
  * card slider (GSAP). The set is duplicated and the track loops by exactly one
- * set (xPercent -50), so it's seamless. Slows to a stop on hover (so you can
- * read), pauses off-screen. Sticker cards: 1px outline, pink wash on hover.
- * No-ops under reduced motion (static row).
+ * set (xPercent -50), so it's seamless. Slows to a stop on hover, pauses
+ * off-screen. No-ops under reduced motion (static row).
+ *
+ * Each card uses the same treatment as the project thumbnails: transparent at
+ * rest (no white box, no outline), and on hover a pink reveal grows from the
+ * centre while a 3D animation spins BEHIND the text; the outline only draws in
+ * once the reveal has finished. The 3D canvas is mounted on hover and torn down
+ * shortly after, so at most one or two WebGL contexts are ever live.
  */
 
-import { useRef, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import CapabilityScene, { type SceneVariant } from "./CapabilityScene";
 
-const CAPABILITIES = [
-  { name: "Brand identity", desc: "Logomarks, colour and type, with guidelines to keep it consistent." },
-  { name: "Editorial & print", desc: "Publications and print-ready layouts, set in InDesign." },
-  { name: "Web & UI design", desc: "Brand-led websites and interfaces, built detail-first." },
-  { name: "Creative direction", desc: "Art direction and visual systems across a project." },
-  { name: "Motion graphics", desc: "Animated assets and short-form video, made in After Effects." },
-  { name: "Social campaigns", desc: "Static and motion sets sized for every channel." },
+type Capability = {
+  name: string;
+  desc: string;
+  variant: SceneVariant;
+  color: string;
+};
+
+const CAPABILITIES: Capability[] = [
+  { name: "Brand identity", desc: "Logomarks, colour and type, with guidelines to keep it consistent.", variant: "gem", color: "#E8718B" },
+  { name: "Editorial & print", desc: "Publications and print-ready layouts, set in InDesign.", variant: "book", color: "#E0B24A" },
+  { name: "Web & UI design", desc: "Brand-led websites and interfaces, built detail-first.", variant: "screen", color: "#6E8CB0" },
+  { name: "Creative direction", desc: "Art direction and visual systems across a project.", variant: "knot", color: "#DD8A5C" },
+  { name: "Motion graphics", desc: "Animated assets and short-form video, made in After Effects.", variant: "ico", color: "#6FAE9F" },
+  { name: "Social campaigns", desc: "Static and motion sets sized for every channel.", variant: "ring", color: "#D17BA0" },
 ];
+
+function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
+  // Mount the 3D canvas on hover; keep it briefly after leaving so it can fade
+  // out with the reveal rather than vanishing instantly.
+  const [mounted, setMounted] = useState(false);
+  const unmountTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (unmountTimer.current) clearTimeout(unmountTimer.current); }, []);
+
+  const onEnter = () => {
+    if (unmountTimer.current) { clearTimeout(unmountTimer.current); unmountTimer.current = null; }
+    setMounted(true);
+  };
+  const onLeave = () => {
+    if (unmountTimer.current) clearTimeout(unmountTimer.current);
+    unmountTimer.current = setTimeout(() => setMounted(false), 700);
+  };
+
+  return (
+    <article
+      className="cap-card group"
+      aria-hidden={hidden || undefined}
+      onPointerEnter={onEnter}
+      onPointerLeave={onLeave}
+    >
+      <span className="card-reveal" aria-hidden="true">
+        <span className="card-rev c1" />
+        <span className="card-rev c2" />
+        <span className="card-rev c3" />
+      </span>
+      <div className="cap-scene" aria-hidden="true">
+        {mounted && <CapabilityScene variant={c.variant} color={c.color} />}
+      </div>
+      <div className="cap-card-body">
+        <h3 className="cap-name">{c.name}</h3>
+        <p className="cap-desc">{c.desc}</p>
+      </div>
+    </article>
+  );
+}
 
 export default function CapabilitiesSlider() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -59,10 +112,7 @@ export default function CapabilitiesSlider() {
     <div ref={rootRef} className="cap-slider">
       <div ref={trackRef} className="cap-track">
         {items.map((c, i) => (
-          <article className="cap-card" key={i} aria-hidden={i >= CAPABILITIES.length ? true : undefined}>
-            <h3 className="cap-name">{c.name}</h3>
-            <p className="cap-desc">{c.desc}</p>
-          </article>
+          <CapabilityCard key={i} c={c} hidden={i >= CAPABILITIES.length} />
         ))}
       </div>
     </div>

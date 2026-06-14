@@ -608,9 +608,14 @@
   }
   .cap-name { font-family: var(--font-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; font-size: 1.35rem; line-height: 1.05; color: var(--ink); transition: color var(--dur-fast) var(--ease); }
 
-  /* ── Capabilities: infinite auto-scrolling card slider (GSAP) ── */
+  /* ── Capabilities: infinite auto-scrolling card slider (GSAP) ──
+     Each card mirrors the project thumbnails: transparent at rest (no box, no
+     outline), and on hover the centre-out pink reveal grows behind a 3D shape
+     that spins behind the text; the outline only draws in once the reveal has
+     filled. Vertical padding gives the cards room so nothing crops. */
   .cap-slider {
     overflow: hidden;
+    padding-block: 0.75rem;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   }
@@ -621,21 +626,46 @@
     will-change: transform;
   }
   .cap-card {
+    position: relative;
+    isolation: isolate;
     flex: 0 0 auto;
     width: clamp(230px, 25vw, 310px);
-    min-height: 200px;
+    min-height: 230px;
+    display: flex;                            /* body fills height */
+    border-radius: 14px;
+    overflow: hidden;
+    background: transparent;                  /* no white box at rest */
+    border: 1px solid transparent;            /* no outline at rest */
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+  /* 3D animation layer: above the reveal, behind the text. Fades with hover. */
+  .cap-scene {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+  }
+  .cap-card-body {
+    position: relative;
+    z-index: 2;
+    flex: 1;
     display: flex;
     flex-direction: column;
     padding: var(--space-5);
-    border: 1px solid var(--ink);
-    border-radius: 14px;
-    background: var(--surface-raised);
-    transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+    pointer-events: none;                     /* hover is tracked on the card */
   }
   @media (hover: hover) {
-    .cap-card:hover { background: var(--pink-soft); border-color: var(--pink); transform: translateY(-3px); }
-    .cap-card:hover .cap-name { color: var(--pink); }
+    .cap-card:hover .cap-scene { opacity: 1; }
+    /* Outline only appears once the reveal has finished filling (~0.7s). */
+    .cap-card:hover {
+      border-color: var(--pink);
+      transition: border-color 0.25s var(--ease) 0.66s;
+    }
   }
+  .cap-card:focus-within .cap-scene { opacity: 1; }
+  .cap-card:focus-within { border-color: var(--pink); }
 
   /* ── Store ──────────────────────────────────────────────────── */
   .store-media {
