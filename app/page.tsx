@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 /* The strongest three for the homepage; the rest live in /work. */
-const SELECTED = ["tmyr", "salesmasters", "kinaya"];
+const SELECTED = ["tmyr", "salesmasters", "palmsmotel"];
 
 function HomeJsonLd() {
   const jsonLd = {
@@ -151,9 +151,9 @@ function Capabilities() {
         title="What I do"
         aside={<Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>}
       />
-      <p className="text-ink-soft leading-relaxed mb-8 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
-        One designer across the whole range, from the first sketch to the finished thing. Open to
-        freelance projects and permanent roles alike.
+      <p className="text-ink-soft leading-relaxed mb-5 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
+        One designer across the whole range, from the first sketch to the finished thing. Tap a
+        discipline to see that work.
       </p>
       <div className="-mx-5 md:-mx-10">
         <CapabilitiesSlider />

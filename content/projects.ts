@@ -800,8 +800,8 @@ export const projects: Project[] = [
         body: "I refined the client's own sketches into a scalable geometric mark, then set a typeface and colour that hold up in print and on screen.",
         images: [
           {
-            src: "/images/lows-design-build/logo.png",
-            aspectRatio: "3.78/1",
+            src: "/images/lows-design-build/logomark.svg",
+            aspectRatio: "300/80",
             caption: "The geometric mark, refined from the client's concepts.",
             alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
           },

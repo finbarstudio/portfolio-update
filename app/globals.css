@@ -346,7 +346,7 @@
   transition: color var(--dur-fast) var(--ease);
 }
 .sidebar-logo:hover { color: var(--pink); }
-.sidebar-logo svg { width: 16px; height: 16px; flex: 0 0 auto; color: var(--pink); }
+.sidebar-logo svg { width: 18px; height: 18px; flex: 0 0 auto; color: var(--pink); }
 .sidebar-logo .logo-word {
   font-weight: 700;
   text-transform: uppercase;
@@ -432,7 +432,7 @@
     align-items: baseline;
     justify-content: space-between;
     gap: var(--space-4);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-4);
   }
 
   /* Big hero backdrop star (see HeroStar): glowing self-tracing outline, cropped
@@ -699,9 +699,9 @@
     pointer-events: none;                     /* hover is tracked on the card */
   }
   @media (hover: hover) {
-    .cap-card:hover .cap-scene { opacity: 1; }
+    .cap-card:hover .cap-scene,
+    .cap-card:focus-within .cap-scene { opacity: 1; }
   }
-  .cap-card:focus-within .cap-scene { opacity: 1; }
   /* Touch devices have no hover to reveal the card, so give it a legible resting
      state — a soft tile with an outline and the discipline name in pink. */
   @media (hover: none) {
@@ -1131,15 +1131,16 @@
   .card-rev.c2 { background: var(--pink-soft);  transition-delay: 0.08s; }
   .card-rev.c3 { background: linear-gradient(105deg, var(--pink-soft), var(--pink)); transition-delay: 0s; }
 
+  /* Pointer/keyboard only — never on touch, so mobile taps don't fire the pink
+     reveal (the page just navigates). */
   @media (hover: hover) {
-    /* Reveal only — no 1px outline on the thumbnail. */
-    .group:hover .card-rev.c1 { transform: scale(1); transition-delay: 0s; }
-    .group:hover .card-rev.c2 { transform: scale(1); transition-delay: 0.08s; }
-    .group:hover .card-rev.c3 { transform: scale(1); transition-delay: 0.16s; }
+    .group:hover .card-rev.c1,
+    .group:focus-within .card-rev.c1 { transform: scale(1); transition-delay: 0s; }
+    .group:hover .card-rev.c2,
+    .group:focus-within .card-rev.c2 { transform: scale(1); transition-delay: 0.08s; }
+    .group:hover .card-rev.c3,
+    .group:focus-within .card-rev.c3 { transform: scale(1); transition-delay: 0.16s; }
   }
-  .group:active .card-rev.c1, .group:focus-within .card-rev.c1 { transform: scale(1); transition-delay: 0s; }
-  .group:active .card-rev.c2, .group:focus-within .card-rev.c2 { transform: scale(1); transition-delay: 0.08s; }
-  .group:active .card-rev.c3, .group:focus-within .card-rev.c3 { transform: scale(1); transition-delay: 0.16s; }
 
   /* Hero scroll-driven fade (CSS only, no JS) */
   @supports (animation-timeline: scroll()) {

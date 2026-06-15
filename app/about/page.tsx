@@ -38,16 +38,16 @@ const FACTS = [
 
 const PRINCIPLES = [
   {
-    heading: "Print discipline, on screen",
-    body: "My background is print and editorial, so type, grids and spacing are second nature. I bring that same care to interfaces and motion, not just to the page.",
+    heading: "First principles",
+    body: "I strip a brief back to what it actually needs, then build the design up from there, rather than starting from a template or whatever's trending.",
   },
   {
-    heading: "Creative first, and fast",
-    body: "I put things in front of real content early and adjust until they feel right, rather than polishing in a vacuum. It keeps the work honest and the feedback useful.",
+    heading: "Tech as a lever",
+    body: "I lean on the latest tools to clear the technical barriers, so the time goes into the design and the craft instead of fighting the software.",
   },
   {
-    heading: "One designer, whole range",
-    body: "Brand to publication to website, handled end to end by the same person, so the identity, the layout and the build all hold together as one thing.",
+    heading: "Genuinely care",
+    body: "I care about the work landing right about as much as I care about getting paid for it, and that tends to show up in the details.",
   },
 ];
 
@@ -134,7 +134,7 @@ export default function AboutPage() {
       <Reveal as="div" className="mt-12 md:mt-16 grid md:grid-cols-12 gap-8 md:gap-12 items-start">
         <div className="md:col-span-4">
           <div
-            style={{ width: "100%", maxWidth: 320, aspectRatio: "4/5", position: "relative", borderRadius: 10, overflow: "hidden", background: "var(--surface-sunken)" }}
+            style={{ width: "100%", maxWidth: 256, aspectRatio: "4/5", position: "relative", borderRadius: 10, overflow: "hidden", background: "var(--surface-sunken)" }}
           >
             <ClientImage
               src="/images/headshot.webp"
@@ -154,9 +154,9 @@ export default function AboutPage() {
             are where I&rsquo;m strongest, and I bring the same eye to everything on screen.
           </p>
           <p>
-            I studied design in London and Brighton, then moved to Australia and started working as
-            finbar studio. Most jobs begin with the brand, the logo, colour and type, then run into
-            whatever&rsquo;s next: a publication, a website, a campaign.
+            I trained at Ravensbourne University in London and the University of Brighton, then moved
+            to Australia and started working as finbar studio. Most jobs begin with the brand, the
+            logo, colour and type, then run into whatever&rsquo;s next: a publication, a website, a campaign.
           </p>
           <p>
             Away from client work I tinker with creative coding, the interactive and generative kind

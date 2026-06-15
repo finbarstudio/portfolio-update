@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     // Local /public/images/* paths are used, no remote patterns needed.
     remotePatterns: [],
+    // Allow our own SVGs (e.g. the Lows wordmark) through next/image, sandboxed.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   // Contact was merged into /about (with a quick-contact drawer site-wide).
   // Preserve the old URL's link equity with a permanent redirect.
