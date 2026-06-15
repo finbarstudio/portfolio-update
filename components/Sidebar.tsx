@@ -145,7 +145,7 @@ function YearStamp({ collapsed }: { collapsed: boolean }) {
    than disappear/reappear when the sidebar toggles. */
 function SocialDock({ collapsed }: { collapsed: boolean }) {
   const BOX = 24;   // icon tap box
-  const GAP = 30;   // centre-to-centre spacing
+  const GAP = collapsed ? 40 : 38;   // centre-to-centre spacing (roomier)
   const railCenterX = SIDEBAR_COLLAPSED_W / 2;
 
   return (
@@ -156,16 +156,16 @@ function SocialDock({ collapsed }: { collapsed: boolean }) {
         left: 0,
         bottom: 0,
         width: SIDEBAR_EXPANDED_W,
-        height: 170,
+        height: 230,
         pointerEvents: "none",
         zIndex: 41,
       }}
     >
       {socials.map((s, i) => {
-        // x/y are offsets from the dock's bottom-left corner. Lifted slightly
-        // above the very bottom so the small year stamp fits below the dock.
-        const x = collapsed ? railCenterX - BOX / 2 : 12 + i * GAP;
-        const y = collapsed ? 28 + i * GAP : 22; // px up from the bottom
+        // x/y are offsets from the dock's bottom-left corner. Lifted well clear
+        // of the year stamp so the cluster has room to breathe.
+        const x = collapsed ? railCenterX - BOX / 2 : 14 + i * GAP;
+        const y = collapsed ? 44 + i * GAP : 40; // px up from the bottom
         return (
           <a
             key={s.href}
