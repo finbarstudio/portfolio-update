@@ -50,6 +50,12 @@ export default function Reveal({
     if (document.visibilityState === "hidden") return;
     if (!registered) { gsap.registerPlugin(ScrollTrigger); registered = true; }
 
+    // If the element is already on screen when we mount (e.g. a section sitting
+    // right at the fold on load), reveal it immediately rather than gating it
+    // behind a ScrollTrigger whose start line lands right at the viewport border —
+    // that borderline state flickers as fonts/layout settle.
+    const inViewOnLoad = el.getBoundingClientRect().top < window.innerHeight;
+
     const ctx = gsap.context(() => {
       if (section) {
         // Stagger the section's blocks up, and wipe the heading in from the left.
@@ -57,11 +63,15 @@ export default function Reveal({
         // the top and plays again on re-entry.
         const kids = Array.from(el.children) as HTMLElement[];
         const head = el.querySelector<HTMLElement>(".home-display-sm");
-        const tl = gsap.timeline({
-          // Replays both ways: plays in on the way down, reverses out the top on
-          // the way up, and re-plays when you scroll back up into it from below.
-          scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "restart none restart reverse" },
-        });
+        const tl = gsap.timeline(
+          inViewOnLoad
+            ? {} // already visible → just play in on mount, no borderline trigger
+            : {
+                // Replays both ways: plays in on the way down, reverses out the top
+                // on the way up, and re-plays when you scroll back into it.
+                scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "restart none restart reverse" },
+              }
+        );
         tl.fromTo(
           kids,
           { opacity: 0, y: 46 },
@@ -78,7 +88,7 @@ export default function Reveal({
         return;
       }
       const to: gsap.TweenVars = { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", delay };
-      if (!immediate) {
+      if (!immediate && !inViewOnLoad) {
         // Replay on re-scroll: reverse out on scroll-up, play again on re-entry.
         to.scrollTrigger = { trigger: el, start: "top 88%", toggleActions: "play none none reverse" };
       }

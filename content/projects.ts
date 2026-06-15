@@ -569,6 +569,7 @@ export const projects: Project[] = [
     name: "Norths Devils RLFC",
     tier: "full",
     rank: 6,
+    hidden: true,
     isConcept: true,
     date: "2024",
     categories: ["Brand Refresh", "Web Design", "Sports Branding"],
