@@ -57,9 +57,9 @@ const REST_SLOTS: Slot[] = [
   // don't crowd the bottom edge of the card. Centre + far slots unchanged.
   { x:  0.40, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 0: far off-right (invisible)
   { x:  0.27, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.30, opacity: 0.0 },// 1: entering right (no decoder)
-  { x:  0.17, y:  0.00, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.70 },// 2: RIGHT (live video)
+  { x:  0.165, y: 0.00, z: -0.02, rotZ: -FLANK_ROT, scale: 0.66, opacity: 0.65 },// 2: RIGHT (live video)
   { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER (live video)
-  { x: -0.17, y:  0.00, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.70 },// 4: LEFT (live video)
+  { x: -0.165, y: 0.00, z: -0.02, rotZ:  FLANK_ROT, scale: 0.66, opacity: 0.65 },// 4: LEFT (live video)
   { x: -0.27, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.30, opacity: 0.0 },// 5: exiting left (no decoder)
   { x: -0.40, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 6: far off-left
 ];

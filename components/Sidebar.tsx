@@ -227,6 +227,7 @@ function DesktopSidebar({
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         className="sidebar-tab hidden md:flex"
+        data-collapsed={collapsed}
         style={{ left: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W }}
       >
         {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}

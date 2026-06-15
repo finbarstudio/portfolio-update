@@ -401,8 +401,8 @@
      section index label, print-editorial. */
   .home-section {
     position: relative;
-    padding-top: var(--space-7);
-    padding-bottom: var(--space-10);   /* more breathing room; fine to scroll */
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-10);   /* lots of negative space between sections */
   }
   .home-section::before {
     content: "";
@@ -2287,27 +2287,29 @@
     top: calc(var(--menubar-h) + 24px);
     transform: translateY(-50%);
     z-index: 41;
-    width: 15px;
-    height: 46px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: -1px;
-    color: var(--ink-soft);
-    background: var(--bg);
-    border: 1px solid var(--ink);
-    border-left: none;
-    border-radius: 0 7px 7px 0;
+    width: 9px;
+    height: 26px;
+    padding: 0;
+    margin-left: -1px;            /* right angle flush against the sidebar border */
+    /* A small right-angle bevel rather than a bordered handle: vertical leg on
+       the sidebar edge, tapering out. No outline — just a faint pastel wash. */
+    background: color-mix(in srgb, var(--pink) 24%, var(--bg));
+    border: none;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
     cursor: pointer;
-    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
+    transition: background var(--dur-fast) var(--ease),
                 width var(--dur-fast) var(--ease),
                 left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .sidebar-tab:hover {
-    color: var(--pink);
-    background: var(--surface-sunken);
-    width: 18px;
+  /* Expanded: mirror the bevel to the bottom as a quiet state cue. */
+  .sidebar-tab[data-collapsed="false"] {
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
   }
+  .sidebar-tab:hover {
+    background: color-mix(in srgb, var(--pink) 52%, var(--bg));
+    width: 12px;
+  }
+  .sidebar-tab svg { display: none; }
 
   /* Sidebar nav — one persistent list. Icons stay put; labels slide/fade in as
      the rail expands, so items expand into place rather than swap out. */
@@ -2572,6 +2574,10 @@
     :root {
       --space-section: var(--space-7);  /* 48px */
       --image-pad: var(--space-5);       /* 24px */
+    }
+    .home-section {
+      padding-top: var(--space-7);       /* 48px — airy but not endless scroll */
+      padding-bottom: var(--space-8);    /* 64px */
     }
   }
 }

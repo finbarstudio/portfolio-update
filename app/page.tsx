@@ -7,8 +7,6 @@ import Reveal from "@/components/Reveal";
 import HeroHeadline from "@/components/HeroHeadline";
 import HeroStar from "@/components/HeroStar";
 import CapabilitiesSlider from "@/components/CapabilitiesSlider";
-import { isLemonConfigured } from "@/lib/lemonsqueezy";
-import { STORE_PRODUCT } from "@/content/store";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -65,7 +63,7 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
 /* ─── Hero ──────────────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="relative overflow-hidden px-5 md:px-10 pt-8 md:pt-12 pb-12 md:pb-16" aria-label="Introduction">
+    <section className="relative overflow-hidden px-5 md:px-10 pt-12 md:pt-24 pb-16 md:pb-24" aria-label="Introduction">
       <HeroStar />
       <div className="relative z-10">
       <Reveal immediate as="div" className="mb-6 md:mb-8">
@@ -106,7 +104,7 @@ function SelectedWork() {
   return (
     <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="Selected work">
       <SectionHead title="Selected work" aside={<Link href="/work" className="home-link">Full archive →</Link>} />
-      <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
+      <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-28">
         {picks.map((project) => (
           <ProjectCard key={project.slug} project={project} index={i++} />
         ))}
@@ -162,30 +160,6 @@ function Capabilities() {
   );
 }
 
-/* ─── Studio products ───────────────────────────────────────── */
-function Products() {
-  const comingSoon = !isLemonConfigured();
-  return (
-    <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="Studio products">
-      <SectionHead title="Studio products" aside={<Link href="/store" className="home-link">Visit store →</Link>} />
-      <div className="grid md:grid-cols-12 gap-8 items-end">
-        <div className="md:col-span-8">
-          <h3 className="mono-h3 text-ink">{STORE_PRODUCT.fallback.name}</h3>
-          <p className="text-ink-soft leading-relaxed mt-3 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
-            {STORE_PRODUCT.fallback.blurb}
-          </p>
-        </div>
-        <div className="md:col-span-4 md:text-right">
-          {comingSoon && <span className="tag tag-teal mb-3 inline-block">Coming soon</span>}
-          <div className="md:flex md:justify-end">
-            <Link href="/store" className="home-link">{comingSoon ? "Get notified →" : "View product →"}</Link>
-          </div>
-        </div>
-      </div>
-    </Reveal>
-  );
-}
-
 /* ─── Contact ───────────────────────────────────────────────── */
 function Contact() {
   return (
@@ -230,7 +204,6 @@ export default function HomePage() {
       <SelectedWork />
       <Approach />
       <Capabilities />
-      <Products />
       <Contact />
     </>
   );
