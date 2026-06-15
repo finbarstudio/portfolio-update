@@ -2254,12 +2254,11 @@
      out past the border. */
   .sidebar-tab {
     position: fixed;
-    /* Up near the logo (the logo row is 48px tall), not mid-rail. */
-    top: calc(var(--menubar-h) + 24px);
-    transform: translateY(-50%);
+    /* Flush to the very top of the rail. */
+    top: var(--menubar-h);
     z-index: 41;
-    width: 9px;
-    height: 26px;
+    width: 11px;
+    height: 34px;
     padding: 0;
     margin-left: -1px;            /* right angle flush against the sidebar border */
     /* A small right-angle bevel rather than a bordered handle: vertical leg on
@@ -2278,7 +2277,7 @@
   }
   .sidebar-tab:hover {
     background: color-mix(in srgb, var(--pink) 52%, var(--bg));
-    width: 12px;
+    width: 14px;
   }
   .sidebar-tab svg { display: none; }
 
@@ -2349,11 +2348,6 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     white-space: nowrap;
-    /* Uppercase Space Mono caps sit high in the line box (no descenders), so the
-       pink pill reads with more space below than above. Collapse the leading and
-       nudge the ink down 1px so the highlight is optically even top/bottom. */
-    line-height: 1;
-    padding-top: 1px;
   }
   .nav-slot-text { flex: 1; text-align: left; min-width: 0; }
 
