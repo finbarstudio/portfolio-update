@@ -53,9 +53,13 @@ export default function Reveal({
     const ctx = gsap.context(() => {
       if (section) {
         // Stagger the section's blocks up, and wipe the heading in from the left.
+        // toggleActions replays it: it reverses out when you scroll back up past
+        // the top and plays again on re-entry.
         const kids = Array.from(el.children) as HTMLElement[];
         const head = el.querySelector<HTMLElement>(".home-display-sm");
-        const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 80%", once: true } });
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none reverse" },
+        });
         tl.fromTo(
           kids,
           { opacity: 0, y: 46 },
@@ -73,7 +77,8 @@ export default function Reveal({
       }
       const to: gsap.TweenVars = { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", delay };
       if (!immediate) {
-        to.scrollTrigger = { trigger: el, start: "top 88%", once: true };
+        // Replay on re-scroll: reverse out on scroll-up, play again on re-entry.
+        to.scrollTrigger = { trigger: el, start: "top 88%", toggleActions: "play none none reverse" };
       }
       gsap.fromTo(el, { opacity: 0, y }, to);
     }, ref);

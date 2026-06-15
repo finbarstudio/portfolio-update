@@ -1176,56 +1176,70 @@ export const projects: Project[] = [
     hasDepth: false,
   },
 
-  /* ─── Palms Motel — WIREFRAME ─────────────────────────────────────
-     Self-initiated retro motel concept (was on the old Framer site). This is a
-     scaffold to fill in: replace every "TODO" string with the real copy, drop the
-     images into /public/images/palmsmotel/ (hero.jpg, logo.jpg, palette.jpg,
-     sign.jpg, web.jpg or your own), then delete `hidden: true` to publish.
-     Slug is kept as "palmsmotel" to match the URL the old site already had indexed. */
+  /* ─── Palms Motel — personal AI image-direction + TikTok series ───
+     Pulled across from the old Framer site. Copy + numbers are real; refine the
+     wording as you like. Slug kept as "palmsmotel" to match the indexed URL. */
   {
     slug: "palmsmotel",
-    hidden: true,
     name: "Palms Motel",
     tier: "full",
-    rank: 20,
-    isConcept: true,
-    date: "2024",                                   // TODO
-    categories: ["Brand Identity", "Web Design"],   // TODO
-    skills: ["Brand Identity", "Logo Design", "Web Design", "Signage"], // TODO
+    rank: 8.5,
+    date: "2024",
+    categories: ["Art Direction", "AI Imagery", "Social Content"],
+    skills: ["Midjourney", "Prompt Engineering", "Photoshop", "Art Direction", "Social Content"],
     oneLiner:
-      "TODO — one line on the Palms Motel concept (a retro roadside motel brand and booking site).",
-    role: "TODO — your role on the project.",
+      "A personal project: a fictional 1970s Palm Springs motel, built as an AI image world and run as a TikTok slideshow series.",
+    role: "Solo. Directed the look, built the Midjourney prompt system, graded and finished every image in Photoshop, and ran the TikTok series end to end.",
     problem:
-      "TODO — the brief, or what this self-initiated concept set out to explore.",
+      "Most AI imagery falls apart as a set: every picture looks like a different photographer on a different day. The aim was the opposite. One motel, one world, every post looking like it was shot on the same afternoon, in the same light, by the same person.",
     outcome:
-      "TODO — the outcome / status (self-initiated concept).",
+      "Forty-eight slideshow posts off the back of one prompt system. The series passed 100k likes, and the top post hit 770k views.",
+    heroSlideshow: [
+      "/images/palmsmotel/scene-1.webp",
+      "/images/palmsmotel/scene-2.webp",
+      "/images/palmsmotel/scene-3.webp",
+    ],
+    slideshowAspect: "4/3",
     heroImage: {
-      src: "/images/palmsmotel/hero.jpg",
-      alt: "Palms Motel — TODO describe the hero image",
+      src: "/images/palmsmotel/scene-1.webp",
+      alt: "Palms Motel, an AI-generated 1970s Palm Springs motel scene with a kidney pool, palms and a mid-century house",
     },
     images: [],
     hasDepth: true,
+    outcomes: {
+      subtitle: "Across the series",
+      stats: [
+        { value: "770k", delta: "Top post", label: "Views" },
+        { value: "48", delta: "One prompt system", label: "Slideshow posts" },
+        { value: "288+", delta: "From the same recipe", label: "Images generated" },
+      ],
+    },
     depth: [
       {
-        heading: "Identity",
-        body: "TODO — the logomark, type and the retro palette.",
+        heading: "The idea",
+        body: "A motel that never existed, told one post at a time. Each slideshow was six images under the same line, “POV: you just moved to Palm Springs, 1977,” set to a piece of viral audio. The point was the world, not the single image.",
         images: [
-          { src: "/images/palmsmotel/logo.jpg", aspectRatio: "1/1", caption: "TODO", alt: "Palms Motel logomark — TODO" },
-          { src: "/images/palmsmotel/palette.jpg", aspectRatio: "1/1", caption: "TODO", alt: "Palms Motel palette — TODO" },
+          {
+            src: "/images/palmsmotel/sign.png",
+            aspectRatio: "4/5",
+            caption: "The motel sign, the anchor of the world.",
+            alt: "Palms Motel illuminated roadside sign at dusk, framed by palm trees",
+          },
         ],
       },
       {
-        heading: "Signage",
-        body: "TODO — the roadside sign and environmental applications.",
-        images: [
-          { src: "/images/palmsmotel/sign.jpg", aspectRatio: "3/2", caption: "TODO", alt: "Palms Motel signage — TODO" },
-        ],
+        heading: "The prompt system",
+        body: "Consistency came from a prompt framework split into fixed and variable parts. Fixed: the era, the camera (Hasselblad, 28mm), a sage-and-coral colour temperature, and a Slim Aarons / Architectural Digest reference. Variable: the scene. Same recipe, different room, so 288 images still read as one set.",
+        images: [],
       },
       {
-        heading: "Website",
-        body: "TODO — the booking-site concept.",
+        heading: "Finishing and the store",
+        body: "Raw Midjourney outputs went through Photoshop for grading and artifact cleanup, then out as TikTok slideshows. A handful sold as poster prints through a Shopify store before the time it took to run made it not worth keeping open.",
         images: [
-          { src: "/images/palmsmotel/web.jpg", aspectRatio: "16/9", caption: "TODO", alt: "Palms Motel website — TODO" },
+          { src: "/images/palmsmotel/poster-1.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
+          { src: "/images/palmsmotel/poster-2.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
+          { src: "/images/palmsmotel/poster-3.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
+          { src: "/images/palmsmotel/poster-4.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
         ],
       },
     ],
