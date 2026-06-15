@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import Link from "next/link";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
+import { WORK_FILTERS, projectMatchesFilter, filterLabel } from "@/content/filters";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -69,12 +71,34 @@ function WorkJsonLd() {
   );
 }
 
+/* ─── Filter chips ──────────────────────────────────────────── */
+function FilterChips({ active }: { active?: string }) {
+  const chip = (key: string | undefined, label: string) => {
+    const on = (active ?? "") === (key ?? "");
+    const href = key ? `/work?filter=${key}` : "/work";
+    return (
+      <Link key={label} href={href} scroll={false} className={`tag ${on ? "tag-pink" : "tag-default"}`} aria-current={on ? "true" : undefined}>
+        {label}
+      </Link>
+    );
+  };
+  return (
+    <div className="flex flex-wrap gap-2 px-5 md:px-10 mb-12 md:mb-14">
+      {chip(undefined, "All")}
+      {WORK_FILTERS.map((f) => chip(f.key, f.label))}
+    </div>
+  );
+}
+
 /* ─── Work grid ─────────────────────────────────────────────────
-   Featured: full-width. Everything else (full + gallery): 2-col grid. */
-function WorkGrid() {
-  const sorted = [...projects].filter((p) => !p.hidden).sort((a, b) => a.rank - b.rank);
-  const featured = sorted.filter((p) => p.tier === "featured");
-  const rest = sorted.filter((p) => p.tier !== "featured");
+   Featured: full-width. Everything else (full + gallery): 2-col grid.
+   When a filter is active, everything drops into the uniform 2-col grid. */
+function WorkGrid({ filter }: { filter?: string }) {
+  const sorted = [...projects]
+    .filter((p) => !p.hidden && projectMatchesFilter(p, filter))
+    .sort((a, b) => a.rank - b.rank);
+  const featured = filter ? [] : sorted.filter((p) => p.tier === "featured");
+  const rest = filter ? sorted : sorted.filter((p) => p.tier !== "featured");
 
   let cardIndex = 0;
 
@@ -85,21 +109,27 @@ function WorkGrid() {
       style={{ paddingBottom: "var(--space-section)" }}
       aria-label="Selected work"
     >
-      {/* Featured, full-width */}
-      <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-24 mb-20 md:mb-24">
-        {featured.map((project) => {
-          const i = cardIndex++;
-          return <ProjectCard key={project.slug} project={project} index={i} />;
-        })}
-      </div>
+      {featured.length > 0 && (
+        <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-24 mb-20 md:mb-24">
+          {featured.map((project) => {
+            const i = cardIndex++;
+            return <ProjectCard key={project.slug} project={project} index={i} />;
+          })}
+        </div>
+      )}
 
-      {/* All other projects, uniform 2-col grid */}
-      <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
-        {rest.map((project) => {
-          const i = cardIndex++;
-          return <ProjectCard key={project.slug} project={project} index={i} />;
-        })}
-      </div>
+      {rest.length > 0 ? (
+        <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
+          {rest.map((project) => {
+            const i = cardIndex++;
+            return <ProjectCard key={project.slug} project={project} index={i} />;
+          })}
+        </div>
+      ) : (
+        <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
+          Nothing under that filter yet. <Link href="/work" className="text-pink">Show all →</Link>
+        </p>
+      )}
     </section>
   );
 }
@@ -123,12 +153,19 @@ function WorkHeader() {
   );
 }
 
-export default function WorkPage() {
+export default async function WorkPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string }>;
+}) {
+  const sp = await searchParams;
+  const filter = typeof sp.filter === "string" && filterLabel(sp.filter) ? sp.filter : undefined;
   return (
     <>
       <WorkJsonLd />
       <WorkHeader />
-      <WorkGrid />
+      <FilterChips active={filter} />
+      <WorkGrid filter={filter} />
 
       <footer
         className="px-5 md:px-10 py-12 md:py-16 border-t border-line"

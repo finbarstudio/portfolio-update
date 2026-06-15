@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { gsap } from "gsap";
 import CapabilityScene, { type SceneVariant } from "./CapabilityScene";
 
@@ -22,15 +23,16 @@ type Capability = {
   desc: string;
   variant: SceneVariant;
   color: string;
+  filter: string;   // /work?filter=<key>
 };
 
 const CAPABILITIES: Capability[] = [
-  { name: "Brand identity", desc: "Logomarks, colour and type, with guidelines to keep it consistent.", variant: "star", color: "#E8718B" },
-  { name: "Editorial & print", desc: "Publications and print-ready layouts, set in InDesign.", variant: "book", color: "#E0B24A" },
-  { name: "Web & UI design", desc: "Brand-led websites and interfaces, built detail-first.", variant: "screen", color: "#6E8CB0" },
-  { name: "Creative direction", desc: "Art direction and visual systems across a project.", variant: "studio", color: "#DD8A5C" },
-  { name: "Motion graphics", desc: "Animated assets and short-form video, made in After Effects.", variant: "motion", color: "#6FAE9F" },
-  { name: "Social campaigns", desc: "Static and motion sets sized for every channel.", variant: "social", color: "#D17BA0" },
+  { name: "Brand identity", desc: "Logomarks, colour and type, with guidelines to keep it consistent.", variant: "star", color: "#E8718B", filter: "brand" },
+  { name: "Editorial & print", desc: "Publications and print-ready layouts, set in InDesign.", variant: "book", color: "#E0B24A", filter: "editorial" },
+  { name: "Web & UI design", desc: "Brand-led websites and interfaces, built detail-first.", variant: "screen", color: "#6E8CB0", filter: "web" },
+  { name: "Creative direction", desc: "Art direction and visual systems across a project.", variant: "studio", color: "#DD8A5C", filter: "art" },
+  { name: "Motion graphics", desc: "Animated assets and short-form video, made in After Effects.", variant: "motion", color: "#6FAE9F", filter: "motion" },
+  { name: "Social campaigns", desc: "Static and motion sets sized for every channel.", variant: "social", color: "#D17BA0", filter: "motion" },
 ];
 
 function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
@@ -51,9 +53,12 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
   };
 
   return (
-    <article
+    <Link
+      href={`/work?filter=${c.filter}`}
       className="cap-card group"
+      aria-label={`${c.name} — see this work`}
       aria-hidden={hidden || undefined}
+      tabIndex={hidden ? -1 : undefined}
       onPointerEnter={onEnter}
       onPointerLeave={onLeave}
     >
@@ -69,7 +74,7 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
         <h3 className="cap-name">{c.name}</h3>
         <p className="cap-desc">{c.desc}</p>
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -82,6 +87,8 @@ export default function CapabilitiesSlider() {
     const track = trackRef.current;
     if (!root || !track) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // On touch, don't auto-marquee — let the row scroll natively (swipeable).
+    if (window.matchMedia("(hover: none)").matches) return;
 
     let tween: gsap.core.Tween | undefined;
     const ctx = gsap.context(() => {

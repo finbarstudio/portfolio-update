@@ -661,6 +661,11 @@
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   }
+  /* Touch: no auto-marquee, swipe the row natively. */
+  @media (hover: none) {
+    .cap-slider { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .cap-slider::-webkit-scrollbar { display: none; }
+  }
   .cap-track {
     display: flex;
     gap: clamp(0.75rem, 1.4vw, 1.25rem);
@@ -1504,6 +1509,11 @@
     filter: drop-shadow(0 6px 18px rgba(20, 20, 20, 0.12));
   }
   .pdf-page[data-active="true"] { transform: scale(1); }
+  /* Mobile, nav viewer only (not the card thumbnail): pull the page up so it
+     isn't crowding the controls below it. */
+  @media (max-width: 640px) {
+    .pdf-thumb.has-nav .pdf-page { top: 5%; height: 66%; }
+  }
 
   /* PDF viewer bottom controls — thin pill bars. */
   .pdf-controls {
