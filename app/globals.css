@@ -1011,9 +1011,48 @@
   @media (min-width: 768px) {
     .gallery-cols { grid-template-columns: repeat(var(--g-cols, 4), minmax(0, 1fr)); }
   }
-  /* TikTok creator embed frame — keep it tidy within the column. */
-  .tiktok-frame { width: 100%; max-width: 420px; }
-  .tiktok-frame .tiktok-embed { width: 100% !important; }
+  /* Brand-styled TikTok call-out (replaces the tall raw embed). */
+  .tt-callout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    border: 1px solid var(--ink);
+    border-radius: 16px;
+    background: var(--surface-sunken);
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+  .tt-callout-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: var(--text-small);
+    color: var(--ink);
+  }
+  .tt-callout-sub {
+    color: var(--ink-soft);
+    font-size: var(--text-small);
+    line-height: 1.5;
+    max-width: 34ch;
+  }
+  .tt-callout-cta {
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: var(--text-label);
+    color: var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 2px;
+    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  }
+  @media (hover: hover) {
+    .tt-callout:hover { border-color: var(--pink); }
+    .tt-callout:hover .tt-callout-cta { color: var(--pink); border-color: var(--pink); }
+  }
 
   /* Card thumbnail — sticker style: white tile with a 1px ink outline. On hover
      a coloured panel reveals from the centre outward (grey → pink) with a pink
@@ -1025,11 +1064,31 @@
     isolation: isolate;
     border-radius: 14px;
     overflow: hidden;
-    background: transparent;                 /* invisible at rest (page shows) */
+    /* A very subtle warm tint so non-full-bleed thumbnails (3D models, carousels,
+       the logo) read as a tile against the page. Full-bleed covers hide it. */
+    background: var(--surface-sunken);
     border: 1px solid transparent;           /* no outline at rest */
     transition: border-color var(--dur-fast) var(--ease);
   }
   .card-media { position: absolute; inset: 0; z-index: 1; }
+
+  /* Stacked thumbnail (e.g. two infographics): both contained, not full-bleed. */
+  .card-stack {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.6rem, 2%, 1rem);
+    padding: clamp(0.9rem, 4%, 1.6rem);
+  }
+  .card-stack img {
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+  }
 
   /* Logo-as-thumbnail (e.g. Lows): centred mark, gently scales up on hover while
      the reveal fills behind it. */

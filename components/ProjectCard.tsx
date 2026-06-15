@@ -37,6 +37,7 @@ function TagRow({ project }: { project: Project }) {
         <Tag key={cat} label={cat} />
       ))}
       {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
+      {project.isHobby && <Tag label="Hobby project" variant="pink" />}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {hasNDIS && <img src="/images/ndis-logo.png" alt="NDIS" style={{ height: 16, width: "auto", objectFit: "contain", opacity: 0.8 }} />}
     </div>
@@ -185,7 +186,14 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
       >
         {/* Thumbnail — flex:1 so revealed text steals from it */}
         <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
-          {project.heroPdf ? (
+          {project.cardStack ? (
+            <div className="card-stack" aria-hidden="true">
+              {project.cardStack.map((src) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={src} src={src} alt="" loading="lazy" />
+              ))}
+            </div>
+          ) : project.heroPdf ? (
             <PdfSlideshowThumb pages={project.heroPdf} />
           ) : project.heroSlideshow ? (
             <HeroSlideshow images={project.heroSlideshow} cardAspect={project.slideshowAspect} fill />

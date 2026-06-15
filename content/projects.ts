@@ -51,6 +51,8 @@ export interface Project {
   tier: Tier;
   rank: number;
   isConcept?: boolean;
+  /** Personal / hobby project — shows a "Hobby project" pink tag. */
+  isHobby?: boolean;
   /** Per-page SEO overrides. Used to preserve the exact title/description that
    *  the live site already ranks for on migrated slugs. Falls back to a
    *  generated title + oneLiner when omitted. */
@@ -72,6 +74,8 @@ export interface Project {
   logo?: string;          // Small client/brand logo. Shown in card + case study header.
   cardLogo?: string;      // When set, the home/archive card thumbnail shows this
                           // logo (centred, animates on hover) instead of media.
+  cardStack?: string[];   // When set, the card thumbnail stacks these images
+                          // (contained, not full-bleed) — e.g. two infographics.
   liveUrl?: string;
   heroSpline?: string;
   heroModel?: {           // Interactive 3D model with looping video on its screen
@@ -143,7 +147,7 @@ export const projects: Project[] = [
     slug: "kinaya",
     name: "KinAya",
     tier: "full",
-    rank: 5,
+    rank: 4,
     seo: {
       title: "KinAya: Brand Identity & Framer Website | Finbar Studio",
       description:
@@ -389,7 +393,7 @@ export const projects: Project[] = [
     slug: "joe-devine",
     name: "Joe Devine",
     tier: "full",
-    rank: 4,
+    rank: 7,
     date: "2023",
     categories: ["Art Direction", "Cover Artwork", "Photography"],
     skills: [
@@ -474,7 +478,7 @@ export const projects: Project[] = [
     slug: "compass-capability",
     name: "Compass Capability",
     tier: "full",
-    rank: 11,
+    rank: 14,
     date: "2024",
     categories: ["Brand Identity", "Brand Guidelines"],
     skills: [
@@ -564,7 +568,7 @@ export const projects: Project[] = [
     slug: "norths-devils",
     name: "Norths Devils RLFC",
     tier: "full",
-    rank: 8,
+    rank: 6,
     isConcept: true,
     date: "2024",
     categories: ["Brand Refresh", "Web Design", "Sports Branding"],
@@ -672,7 +676,7 @@ export const projects: Project[] = [
     slug: "copper-company",
     name: "Copper Company",
     tier: "full",
-    rank: 6,
+    rank: 9,
     date: "2023",
     categories: ["Brand Identity", "Packaging Design"],
     skills: [
@@ -760,7 +764,7 @@ export const projects: Project[] = [
     slug: "lows-design-build",
     name: "Lows Design and Build",
     tier: "full",
-    rank: 9,
+    rank: 8,
     date: "2023",
     categories: ["Brand Identity", "Web Design", "Environmental Graphics"],
     skills: [
@@ -841,7 +845,7 @@ export const projects: Project[] = [
     slug: "nimbus-coffee",
     name: "Nimbus Coffee Co.",
     tier: "full",
-    rank: 10,
+    rank: 13,
     date: "2024",
     categories: ["Brand Identity", "Packaging Design"],
     skills: [
@@ -924,7 +928,7 @@ export const projects: Project[] = [
     slug: "momentum-mentoring",
     name: "Momentum Mentoring",
     tier: "gallery",
-    rank: 12,
+    rank: 10,
     date: "2024",
     categories: ["Brand Identity", "Web Design", "NDIS"],
     skills: ["Brand Identity", "Web Design", "Framer Development"],
@@ -970,7 +974,7 @@ export const projects: Project[] = [
     slug: "taswater",
     name: "TasWater",
     tier: "gallery",
-    rank: 7.5,
+    rank: 12,
     date: "2023",
     categories: ["Infographic Design", "Information Design"],
     skills: ["Infographic Design", "Information Design", "Brand-Compliant Design"],
@@ -982,6 +986,7 @@ export const projects: Project[] = [
     outcome:
       "Client confirmed they were happy. Leadership signed off on the brand alignment.",
     logo: "/images/taswater/logo.png",
+    cardStack: ["/images/taswater/hero.jpg", "/images/taswater/map.jpg"],
     heroImage: {
       src: "/images/taswater/hero.jpg",
       alt: "TasWater 'first 12 months' employee onboarding journey infographic, designed inside the TasWater brand",
@@ -1009,7 +1014,7 @@ export const projects: Project[] = [
     slug: "london-home-show",
     name: "The London Home Show",
     tier: "gallery",
-    rank: 7,
+    rank: 11,
     date: "2022",
     categories: ["Event Design", "Print & Digital"],
     skills: ["Event Design", "Print Design", "Digital Campaign"],
@@ -1189,7 +1194,8 @@ export const projects: Project[] = [
     slug: "palmsmotel",
     name: "Palms Motel",
     tier: "full",
-    rank: 8.5,
+    rank: 5,
+    isHobby: true,
     tiktok: "palmsmotel",
     date: "2024",
     categories: ["Art Direction", "AI Imagery", "Social Content"],

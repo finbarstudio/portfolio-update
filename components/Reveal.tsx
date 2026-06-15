@@ -58,7 +58,9 @@ export default function Reveal({
         const kids = Array.from(el.children) as HTMLElement[];
         const head = el.querySelector<HTMLElement>(".home-display-sm");
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none reverse" },
+          // Replays both ways: plays in on the way down, reverses out the top on
+          // the way up, and re-plays when you scroll back up into it from below.
+          scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "restart none restart reverse" },
         });
         tl.fromTo(
           kids,

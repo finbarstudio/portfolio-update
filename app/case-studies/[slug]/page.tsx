@@ -17,7 +17,15 @@ import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import Reveal from "@/components/Reveal";
 import HeroSlideshow from "@/components/HeroSlideshow";
-import TikTokEmbed from "@/components/TikTokEmbed";
+
+/* TikTok glyph (inline, currentColor). */
+function TikTokGlyph() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ display: "inline-block", verticalAlign: "-0.12em" }}>
+      <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.1v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1-2.59-2.59 2.59 2.59 0 0 1 3.43-2.45V7.7a5.7 5.7 0 0 0-.84-.06A5.69 5.69 0 0 0 4.16 13.4a5.69 5.69 0 0 0 5.69 5.69 5.69 5.69 0 0 0 5.69-5.69V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3a4.28 4.28 0 0 1-3.04-1.48Z" />
+    </svg>
+  );
+}
 import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
 import {
   projects,
@@ -255,6 +263,34 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
   );
 }
 
+/* ─── TasWater: both infographics at one contained, equal size (no full-bleed) ─ */
+function TaswaterShowcase({ project }: { project: Project }) {
+  const intro = project.depth?.[0]?.body;
+  const pics = [
+    { src: project.heroImage.src, alt: project.heroImage.alt, caption: "The first 12-month employee onboarding journey." },
+    ...(project.depth?.[0]?.images ?? []).map((i) => ({ src: i.src, alt: i.alt, caption: i.caption })),
+  ];
+  return (
+    <div className="mb-8">
+      {intro && (
+        <p className="text-ink leading-relaxed max-w-2xl mb-8 md:mb-10" style={{ fontSize: "var(--text-body)" }}>
+          {intro}
+        </p>
+      )}
+      <div className="space-y-10 md:space-y-14">
+        {pics.map((p, i) => (
+          <Reveal as="figure" key={i} y={24} className="mx-auto w-full max-w-4xl">
+            <div className="img-wrap" style={{ aspectRatio: "16/9", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)", maxHeight: "none" }}>
+              <ClientImage src={p.src} alt={p.alt} fill sizes="(max-width: 768px) 100vw, 900px" className="object-cover" />
+            </div>
+            {p.caption && <Caption text={p.caption} />}
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Footer: Skills | Company | Open for work + clean back link ─── */
 function FooterMeta({ project }: { project: Project }) {
   const showCompany = Boolean(project.liveUrl || project.companyUrl);
@@ -423,17 +459,30 @@ export default async function CaseStudyPage({
           ))}
           <Tag label={project.date} variant="teal" num />
           {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
+          {project.isHobby && <Tag label="Hobby project" variant="pink" />}
         </div>
       </header>
 
-      {/* TikTok-led intro: the live profile embed beside the headline metrics. */}
+      {/* TikTok-led intro: a brand-styled TikTok call-out beside the headline
+          metrics (the raw embed ran too tall and unbalanced the row). */}
       {project.tiktok && (
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-16">
-          <div className="tiktok-frame">
-            <TikTokEmbed username={project.tiktok} />
-          </div>
+        <div className="grid md:grid-cols-12 gap-8 md:gap-10 items-center mb-12 md:mb-16">
+          <a
+            href={`https://www.tiktok.com/@${project.tiktok}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tt-callout group md:col-span-5"
+          >
+            <span className="tt-callout-head">
+              <TikTokGlyph /> @{project.tiktok}
+            </span>
+            <p className="tt-callout-sub">
+              A fictional 1970s Palm Springs motel, posted one slideshow at a time.
+            </p>
+            <span className="tt-callout-cta">Watch the series on TikTok →</span>
+          </a>
           {project.outcomes && (
-            <div className="grid grid-cols-3 gap-x-6 gap-y-8">
+            <div className="md:col-span-7 grid grid-cols-3 gap-x-6 gap-y-8">
               {project.outcomes.stats.map((s) => (
                 <div key={s.label} className="outcomes-stat">
                   <div className="outcomes-value">{s.value}</div>
@@ -457,6 +506,8 @@ export default async function CaseStudyPage({
         <SalesmastersShowcase />
       ) : project.slug === "momentum-mentoring" ? (
         <MomentumShowcase />
+      ) : project.slug === "taswater" ? (
+        <TaswaterShowcase project={project} />
       ) : project.heroAlbums ? (
         <AlbumShowcase images={project.images.map(({ src, alt }) => ({ src, alt }))} />
       ) : project.mediaRows && project.mediaRows.length > 0 ? (
