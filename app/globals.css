@@ -1001,6 +1001,20 @@
     max-height: 72vh;
   }
 
+  /* Forced even gallery grid (e.g. small poster rows): 2-up on mobile, --g-cols
+     across on desktop. */
+  .gallery-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1rem;
+  }
+  @media (min-width: 768px) {
+    .gallery-cols { grid-template-columns: repeat(var(--g-cols, 4), minmax(0, 1fr)); }
+  }
+  /* TikTok creator embed frame — keep it tidy within the column. */
+  .tiktok-frame { width: 100%; max-width: 420px; }
+  .tiktok-frame .tiktok-embed { width: 100% !important; }
+
   /* Card thumbnail — sticker style: white tile with a 1px ink outline. On hover
      a coloured panel reveals from the centre outward (grey → pink) with a pink
      outline drawing in, BEHIND the media (.card-media stays on top). 3D mockups

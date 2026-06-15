@@ -17,6 +17,7 @@ import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import Reveal from "@/components/Reveal";
 import HeroSlideshow from "@/components/HeroSlideshow";
+import TikTokEmbed from "@/components/TikTokEmbed";
 import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
 import {
   projects,
@@ -166,7 +167,20 @@ function Caption({ text }: { text: string }) {
      centred at a contained width so they're never stretched or marooned.
    - Multiple images: panoramic ones (>= 1.6) span the full width; everything
      else pairs two-up. Each figure reveals on scroll (GSAP). */
-function Gallery({ images }: { images: ProjectImage[] }) {
+function Gallery({ images, cols }: { images: ProjectImage[]; cols?: number }) {
+  // Forced even grid (e.g. a row of small posters): 2-up on mobile, N-up on desktop.
+  if (cols) {
+    return (
+      <div className="gallery-cols" style={{ ["--g-cols" as string]: cols }}>
+        {images.map((img, i) => (
+          <Reveal as="figure" key={i} y={20} delay={(i % cols) * 0.05} className="min-w-0">
+            <CaseMedia img={img} full={false} />
+            {img.caption && <Caption text={img.caption} />}
+          </Reveal>
+        ))}
+      </div>
+    );
+  }
   if (images.length === 1) {
     const img = images[0];
     const wide = ratioOf(img.aspectRatio) >= 1.3;
@@ -233,7 +247,7 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
             <p className="text-ink leading-relaxed mb-2 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
               {section.body}
             </p>
-            {section.images.length > 0 && <Gallery images={section.images} />}
+            {section.images.length > 0 && <Gallery images={section.images} cols={section.cols} />}
           </Reveal>
         ))}
       </div>
@@ -412,6 +426,26 @@ export default async function CaseStudyPage({
         </div>
       </header>
 
+      {/* TikTok-led intro: the live profile embed beside the headline metrics. */}
+      {project.tiktok && (
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-16">
+          <div className="tiktok-frame">
+            <TikTokEmbed username={project.tiktok} />
+          </div>
+          {project.outcomes && (
+            <div className="grid grid-cols-3 gap-x-6 gap-y-8">
+              {project.outcomes.stats.map((s) => (
+                <div key={s.label} className="outcomes-stat">
+                  <div className="outcomes-value">{s.value}</div>
+                  {s.delta && <div className="outcomes-delta">{s.delta}</div>}
+                  <div className="outcomes-label">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Hero + body. heroAlbums uses a bespoke editorial showcase (no mockup,
           no standard image grid). mediaRows handles its own layout. Otherwise
           the standard hero + visual body + depth chain. */}
@@ -475,7 +509,9 @@ export default async function CaseStudyPage({
         <Testimonial quote={project.testimonial.quote} author={project.testimonial.author} />
       )}
 
-      {project.outcomes && (
+      {/* Outcomes render at the bottom, unless they've been hoisted to the
+          TikTok intro block at the top. */}
+      {project.outcomes && !project.tiktok && (
         <Outcomes
           intro={project.outcomes.intro}
           subtitle={project.outcomes.subtitle}

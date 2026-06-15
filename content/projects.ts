@@ -29,6 +29,9 @@ export interface DepthSection {
   heading: string;
   body: string;
   images: ProjectImage[];
+  /** Force an even N-up grid (e.g. 4 small posters in a row) instead of the
+   *  default aspect-aware layout. */
+  cols?: number;
 }
 
 // One horizontal row of media (images or videos) sharing a single caption.
@@ -126,6 +129,9 @@ export interface Project {
   };
   /** Hide from the home grid + sitemap. Detail page still exists if linked. */
   hidden?: boolean;
+  /** TikTok creator handle (no @). When set, the case study embeds the profile
+   *  at the top with the metrics beside it. */
+  tiktok?: string;
 }
 
 /* PROJECTS, ranked, all tiers */
@@ -1184,6 +1190,7 @@ export const projects: Project[] = [
     name: "Palms Motel",
     tier: "full",
     rank: 8.5,
+    tiktok: "palmsmotel",
     date: "2024",
     categories: ["Art Direction", "AI Imagery", "Social Content"],
     skills: ["Midjourney", "Prompt Engineering", "Photoshop", "Art Direction", "Social Content"],
@@ -1235,6 +1242,7 @@ export const projects: Project[] = [
       {
         heading: "Finishing and the store",
         body: "Raw Midjourney outputs went through Photoshop for grading and artifact cleanup, then out as TikTok slideshows. A handful sold as poster prints through a Shopify store before the time it took to run made it not worth keeping open.",
+        cols: 4,
         images: [
           { src: "/images/palmsmotel/poster-1.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
           { src: "/images/palmsmotel/poster-2.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
