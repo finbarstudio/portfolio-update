@@ -707,6 +707,35 @@
     .cap-card:hover .cap-scene,
     .cap-card:focus-within .cap-scene { opacity: 1; }
   }
+
+  /* Per-card hover effects: typewriter caret (Editorial) + RGB-split glitch
+     name (Motion). Both pointer-only, so touch just shows the static card. */
+  .tw-caret { color: var(--pink); margin-left: 1px; }
+  .cap-glitch { position: relative; display: inline-block; }
+  @media (hover: hover) {
+    .cap-card:hover .cap-glitch { animation: cap-glitch 0.55s steps(2, jump-none) infinite; }
+    .cap-card:hover .cap-glitch::before,
+    .cap-card:hover .cap-glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .cap-card:hover .cap-glitch::before { color: var(--accent-blue); transform: translateX(-2px); clip-path: inset(0 0 55% 0); }
+    .cap-card:hover .cap-glitch::after  { color: var(--pink);        transform: translateX(2px);  clip-path: inset(55% 0 0 0); }
+  }
+  @keyframes cap-glitch {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-1px, 1px); }
+    50% { transform: translate(1px, -1px); }
+    75% { transform: translate(-1px, -1px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cap-card:hover .cap-glitch { animation: none; }
+  }
   /* Touch devices have no hover to reveal the card, so give it a legible resting
      state — a soft tile with an outline and the discipline name in pink. */
   @media (hover: none) {
