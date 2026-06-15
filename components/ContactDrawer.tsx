@@ -70,6 +70,7 @@ export default function ContactDrawer({ open, onClose }: { open: boolean; onClos
           <a
             href="mailto:finbar@finbar.studio"
             className="mono-h3 text-ink hover:text-pink transition-colors"
+            style={{ whiteSpace: "nowrap", letterSpacing: "0.05em", fontSize: "clamp(0.9rem, 4.6vw, 1.2rem)" }}
           >
             finbar@finbar.studio
           </a>

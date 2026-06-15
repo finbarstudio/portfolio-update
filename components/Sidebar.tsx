@@ -82,15 +82,6 @@ function EnvelopeIcon() {
   );
 }
 
-function BagIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M3 5h10l-.8 8.2a1 1 0 0 1-1 .9H4.8a1 1 0 0 1-1-.9L3 5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-      <path d="M5.6 5V3.9a2.4 2.4 0 0 1 4.8 0V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  );
-}
-
 const socials = [
   { label: "Are.na",    href: "https://are.na/finbar-studio",          icon: <ArenaIcon /> },
   { label: "X",         href: "https://x.com/finbarstudio",            icon: <SiX size={11} aria-hidden="true" /> },
@@ -214,7 +205,6 @@ function DesktopSidebar({
 
   const isHome    = pathname === "/";
   const isAbout   = pathname.startsWith("/about");
-  const isStore   = pathname.startsWith("/store");
   const isWork    = pathname === "/work" || pathname.startsWith("/case-studies/");
 
   // The project sublist has its own toggle (separate from the rail collapse) so
@@ -239,7 +229,7 @@ function DesktopSidebar({
         {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
       </button>
     <aside
-      className="hidden md:flex fixed left-0 border-r border-ink flex-col z-40 bg-bg"
+      className="hidden md:flex fixed left-0 border-r border-line flex-col z-40 bg-bg"
       style={{
         top: "var(--menubar-h)",
         bottom: 0,
@@ -354,19 +344,6 @@ function DesktopSidebar({
           </span>
         </Link>
 
-        <Link
-          href="/store"
-          title="Store"
-          aria-label="Store"
-          aria-current={isStore ? "page" : undefined}
-          className={`nav-row ${isStore ? "active" : ""}`}
-        >
-          <span className="nav-track">
-            <span className="nav-slot nav-slot-ico"><BagIcon /></span>
-            <span className="nav-slot nav-slot-label">Store</span>
-          </span>
-        </Link>
-
         <button
           type="button"
           onClick={onContactOpen}
@@ -445,7 +422,6 @@ function MobileMenu({
     { label: "Home",  href: "/" },
     { label: "Work",  href: "/work" },
     { label: "About", href: "/about" },
-    { label: "Store", href: "/store" },
   ];
   const isActive = (href: string) =>
     href === "/"
