@@ -126,7 +126,7 @@ export default function AboutPage() {
       <Reveal immediate as="header" className="max-w-[18ch] md:max-w-none">
         <p className="mono-label text-ink-soft mb-6">Brisbane graphic designer · AU + UK</p>
         <h1 className="home-display text-ink max-w-[20ch]">
-          I&rsquo;m Finbar, a designer who sweats the small stuff.
+          I&rsquo;m Finbar, a Brisbane graphic designer who sweats the small stuff.
         </h1>
       </Reveal>
 
@@ -134,14 +134,14 @@ export default function AboutPage() {
       <Reveal as="div" className="mt-12 md:mt-16 grid md:grid-cols-12 gap-8 md:gap-12 items-start">
         <div className="md:col-span-4">
           <div
-            style={{ width: "100%", maxWidth: 256, aspectRatio: "4/5", position: "relative", borderRadius: 10, overflow: "hidden", background: "var(--surface-sunken)" }}
+            style={{ width: "100%", maxWidth: 256, aspectRatio: "1", position: "relative", borderRadius: 10, overflow: "hidden", background: "var(--surface-sunken)" }}
           >
             <ClientImage
               src="/images/headshot.webp"
               alt="Finbar Skitini, Brisbane graphic designer"
               fill
               priority
-              sizes="(max-width: 768px) 80vw, 320px"
+              sizes="(max-width: 768px) 80vw, 256px"
               className="object-cover"
             />
           </div>

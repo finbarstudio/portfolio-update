@@ -27,7 +27,7 @@ export const metadata: Metadata = {
    portfolio. Only ranked, non-hidden projects with a real case study page. */
 function WorkJsonLd() {
   const listed = [...projects]
-    .filter((p) => !p.hidden && p.tier !== "gallery")
+    .filter((p) => !p.hidden)
     .sort((a, b) => a.rank - b.rank);
 
   const jsonLd = {
@@ -127,7 +127,7 @@ function WorkGrid({ filter }: { filter?: string }) {
         </div>
       ) : (
         <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
-          Nothing under that filter yet. <Link href="/work" className="text-pink">Show all →</Link>
+          Nothing under that filter yet. <Link href="/work" className="text-ink underline underline-offset-2 decoration-pink hover:text-pink transition-colors">Show all →</Link>
         </p>
       )}
     </section>

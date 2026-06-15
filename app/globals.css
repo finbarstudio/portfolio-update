@@ -42,7 +42,7 @@
   /* Retro pastel palette — warm cream ground, muted accents (NYC poster feel). */
   --bg:         #F6EFE1;   /* warm cream page ground                      */
   --ink:        #211E1A;   /* warm near-black, primary text               */
-  --ink-soft:   #7C756A;   /* warm grey, secondary text                   */
+  --ink-soft:   #6E675C;   /* warm grey, secondary text (AA on cream)     */
   --line:       #E2D8C5;   /* warm hairline borders                       */
 
   --pink:       #E8718B;   /* ★ PRIMARY accent, pastel coral-rose         */
@@ -89,7 +89,7 @@
   --text-small:   0.875rem;    /* 14px, card summaries, metadata         */
   --text-caption: 0.75rem;     /* 12px, image captions                   */
   --text-label:   0.6875rem;   /* 11px, uppercase caps labels, nav       */
-  --text-tag:     0.5625rem;   /* 9px , tag pills                        */
+  --text-tag:     0.625rem;    /* 10px, tag pills                        */
 
   --leading-tight:  1.04;   /* large display / headings (no fragmentation) */
   --leading-snug:   1.25;   /* sub-headings                                */
@@ -244,7 +244,9 @@
   h3 { line-height: var(--leading-snug); }
 
   :focus-visible {
-    outline: 2px solid var(--pink);
+    /* Ink, not pink: pink on cream is only ~2.6:1, under the 3:1 focus-indicator
+       minimum. Ink reads clearly on every surface. */
+    outline: 2px solid var(--ink);
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -326,6 +328,8 @@
     border-left: none; border-top: 1px solid var(--line);
     border-radius: 16px 16px 0 0;
     transform: translateY(100%);
+    /* clear the home indicator on notched phones */
+    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
   }
   .contact-drawer-root.is-open .contact-drawer-panel { transform: translateY(0); }
 }
@@ -711,9 +715,11 @@
      state — a soft tile with an outline and the discipline name in pink. */
   @media (hover: none) {
     /* Outlined sticker chip on touch — no white fill, just a 1px ink outline
-       and the discipline name in pink. */
-    .cap-card { background: transparent; border-color: var(--ink); }
+       and the discipline name in pink. No 3D scene ever shows on touch, so drop
+       the tall reserve space and let name/desc/CTA stack compactly. */
+    .cap-card { background: transparent; border-color: var(--ink); min-height: 0; }
     .cap-card .cap-name { color: var(--pink); }
+    .cap-card .cap-desc { margin-top: var(--space-3); }
   }
 
   /* Persistent "See work →" cue — makes the cards read as tappable (vital on
@@ -728,13 +734,17 @@
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--pink);
+    /* Ink label (pink at 11px is ~2.6:1, fails AA) with a pink arrow to keep the
+       accent; the whole CTA goes pink on desktop hover. */
+    color: var(--ink);
   }
   .cap-cta-arrow {
     display: inline-block;
+    color: var(--pink);
     transition: transform var(--dur-fast) var(--ease);
   }
   @media (hover: hover) {
+    .cap-card:hover .cap-cta { color: var(--pink); }
     .cap-card:hover .cap-cta-arrow { transform: translateX(3px); }
   }
   .cap-cta.is-loading { color: var(--ink-soft); }
@@ -865,7 +875,7 @@
   .tag {
     font-family: var(--font-mono);
     font-weight: 400;
-    font-size: var(--text-tag);    /* small again (9px), lighter weight */
+    font-size: var(--text-tag);    /* 10px, lighter weight */
     letter-spacing: 0.06em;
     text-transform: uppercase;
     padding: 0.4em 0.8em;
@@ -875,6 +885,7 @@
     line-height: 1;
     background: transparent;
     color: var(--ink);
+    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
   }
   /* category = ink outline; skill = dusty-blue outline; teal/date = sage outline;
      concept = filled coral (stands out). */
@@ -883,6 +894,13 @@
   .tag-teal    { border-color: var(--teal);         color: var(--teal); }
   .tag-mustard { border-color: var(--accent-mustard); color: var(--accent-mustard); }
   .tag-pink    { background: var(--pink); border-color: var(--pink); color: var(--bg); }
+  /* Active filter chip: ink text on the pink fill (cream-on-pink is ~2.6:1).
+     Scoped to aria-current so decorative CONCEPT/Hobby .tag-pink badges keep cream. */
+  .tag[aria-current="true"] { color: var(--ink); border-color: var(--ink); }
+  /* Inactive filter chips get the same pink hover as every other link. */
+  @media (hover: hover) {
+    a.tag-default:hover { color: var(--pink); border-color: var(--pink); }
+  }
   /* Numeric tags (dates) — Archivo, since mono numerals read badly. */
   .tag-num     { font-family: var(--font-label); letter-spacing: 0.1em; }
 
@@ -1697,6 +1715,9 @@
   @media (hover: none) {
     .sm-logo-marquee { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .sm-logo-track { animation: none; }
+    /* Touch has no hover to restore colour, so show the logos in full colour at
+       rest rather than as flat grey silhouettes. */
+    .sm-logo img { filter: none; opacity: 1; }
   }
 
   /* Playbook book viewer — two facing pages per spread. */
@@ -1912,6 +1933,7 @@
     cursor: pointer;
     overflow: hidden;
   }
+  .reel-track:focus-visible { outline: 2px solid var(--bg); outline-offset: 3px; }
   .reel-fill {
     height: 100%;
     border-radius: 4px;
@@ -1971,7 +1993,7 @@
 
   .kinaya-logo-dev {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: clamp(0.5rem, 1.5vw, 1.25rem);
     align-items: center;
     background: white;
@@ -2427,6 +2449,9 @@
     overflow: hidden;     /* keep clipping the slot-machine track */
     color: inherit;
   }
+  /* The overflow:hidden above (and on the wrapper) clips a normal focus ring, so
+     draw it inset on keyboard focus. */
+  .nav-row-work .nav-row-link:focus-visible { outline-offset: -2px; }
   .nav-work-toggle {
     flex: 0 0 auto;
     width: 30px;

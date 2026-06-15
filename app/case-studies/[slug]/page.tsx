@@ -64,6 +64,9 @@ export async function generateMetadata({
     title: { absolute: seoTitle },
     description: seoDescription,
     alternates: { canonical: url },
+    // Hidden projects keep their page (migrated Framer backlinks may target the
+    // slug) but are dropped from the sitemap + index — tell crawlers explicitly.
+    robots: project.hidden ? { index: false, follow: true } : undefined,
     openGraph: {
       title: seoTitle,
       description: seoDescription,
@@ -321,7 +324,7 @@ function FooterMeta({ project }: { project: Project }) {
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block font-mono text-teal hover:text-pink transition-colors break-words"
+                  className="block font-mono text-ink underline underline-offset-2 decoration-line hover:text-pink hover:decoration-pink transition-colors break-words"
                   style={{ fontSize: "var(--text-small)" }}
                 >
                   {project.liveUrl.replace(/^https?:\/\//, "")} ↗
@@ -332,7 +335,7 @@ function FooterMeta({ project }: { project: Project }) {
                   href={project.companyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block font-mono text-teal hover:text-pink transition-colors break-words"
+                  className="block font-mono text-ink underline underline-offset-2 decoration-line hover:text-pink hover:decoration-pink transition-colors break-words"
                   style={{ fontSize: "var(--text-small)" }}
                 >
                   {project.companyUrl.replace(/^https?:\/\//, "")} ↗
@@ -382,6 +385,9 @@ export default async function CaseStudyPage({
   if (!project) notFound();
 
   const pageUrl = `${SITE_URL}/case-studies/${project.slug}`;
+  // project.date is a display string (e.g. "2022–2023"); schema.org/Date needs valid
+  // ISO 8601, so emit just the leading 4-digit year and keep the human range separately.
+  const startYear = project.date.match(/\d{4}/)?.[0];
 
   const creativeWorkJsonLd = {
     "@context": "https://schema.org",
@@ -390,7 +396,8 @@ export default async function CaseStudyPage({
     name: project.name,
     headline: `${project.name}: ${project.categories.join(", ")}`,
     description: project.oneLiner,
-    dateCreated: project.date,
+    ...(startYear ? { datePublished: startYear } : {}),
+    temporalCoverage: project.date,
     genre: project.categories,
     creator: { "@id": `${SITE_URL}/#person` },
     author: { "@id": `${SITE_URL}/#person` },
@@ -411,7 +418,8 @@ export default async function CaseStudyPage({
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: project.name, item: pageUrl },
+      { "@type": "ListItem", position: 2, name: "Work", item: `${SITE_URL}/work` },
+      { "@type": "ListItem", position: 3, name: project.name, item: pageUrl },
     ],
   };
 
@@ -482,7 +490,7 @@ export default async function CaseStudyPage({
             <span className="tt-callout-cta">Watch the series on TikTok →</span>
           </a>
           {project.outcomes && (
-            <div className="md:col-span-7 grid grid-cols-3 gap-x-6 gap-y-8">
+            <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-8">
               {project.outcomes.stats.map((s) => (
                 <div key={s.label} className="outcomes-stat">
                   <div className="outcomes-value">{s.value}</div>

@@ -14,9 +14,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
   ];
 
-  // Only projects with a real case study page get indexed (gallery tier has no page)
+  // Every non-hidden project has a real /case-studies/<slug> page (generateStaticParams
+  // builds them all, and gallery cards link to them), so index them all but the hidden ones.
   const projectRoutes: MetadataRoute.Sitemap = projects
-    .filter((p) => p.tier !== "gallery" && !p.hidden)
+    .filter((p) => !p.hidden)
     .map((p) => ({
       url: `${SITE_URL}/case-studies/${p.slug}`,
       lastModified: now,

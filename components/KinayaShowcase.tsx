@@ -77,10 +77,9 @@ export default function KinayaShowcase() {
         </p>
 
         <p className="kinaya-sub">Logo Development</p>
-        <div
-          className="kinaya-logo-dev"
-          style={{ gridTemplateColumns: `repeat(${LOGO_DEV.length}, 1fr)` }}
-        >
+        {/* Columns come from .kinaya-logo-dev so the mobile media query can reflow
+            the row; no inline grid override (it would beat the breakpoint). */}
+        <div className="kinaya-logo-dev">
           {LOGO_DEV.map((src) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img key={src} src={src} alt="" aria-hidden="true" />

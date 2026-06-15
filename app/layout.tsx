@@ -110,7 +110,7 @@ const personJsonLd = {
   jobTitle: "Graphic Designer",
   description:
     "Brisbane graphic designer working in brand identity, editorial, web and motion design.",
-  email: "mailto:finbar@finbar.studio",
+  email: "finbar@finbar.studio",
   telephone: "+61412796630",
   knowsLanguage: ["en-AU", "en-GB"],
   address: {
@@ -151,6 +151,7 @@ const personJsonLd = {
   brand: { "@type": "Brand", name: "finbar✶studio" },
   nationality: { "@type": "Country", name: "United Kingdom" },
   alumniOf: [
+    { "@type": "EducationalOrganization", name: "Ravensbourne University London" },
     { "@type": "EducationalOrganization", name: "University of Brighton" },
   ],
   knowsAbout: [

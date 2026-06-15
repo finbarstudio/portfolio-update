@@ -12,7 +12,7 @@ const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
   description:
-    "Finbar Studio is the independent practice of Finbar Skitini, a Brisbane graphic designer working in brand identity, editorial, web and motion for businesses in Australia and the UK.",
+    "Finbar Skitini is a Brisbane graphic designer working in brand identity, editorial, web and motion for businesses across Australia and the UK.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "Finbar Studio | Brisbane Graphic Designer",
