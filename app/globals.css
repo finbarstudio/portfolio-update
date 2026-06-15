@@ -401,8 +401,8 @@
      section index label, print-editorial. */
   .home-section {
     position: relative;
-    padding-top: var(--space-6);
-    padding-bottom: var(--space-9);
+    padding-top: var(--space-7);
+    padding-bottom: var(--space-10);   /* more breathing room; fine to scroll */
   }
   .home-section::before {
     content: "";
@@ -505,8 +505,8 @@
     font-family: var(--font-mono);
     font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.75rem;            /* ~12px, a touch larger */
+    letter-spacing: 0.06em;
+    font-size: var(--text-label);  /* smaller again (11px), lighter weight */
     line-height: 1;
     color: var(--ink);
     background: var(--bg);
@@ -705,7 +705,9 @@
   /* Touch devices have no hover to reveal the card, so give it a legible resting
      state — a soft tile with an outline and the discipline name in pink. */
   @media (hover: none) {
-    .cap-card { background: var(--surface-raised); border-color: var(--line); }
+    /* Outlined sticker chip on touch — no white fill, just a 1px ink outline
+       and the discipline name in pink. */
+    .cap-card { background: transparent; border-color: var(--ink); }
     .cap-card .cap-name { color: var(--pink); }
   }
 
@@ -821,8 +823,8 @@
   .tag {
     font-family: var(--font-mono);
     font-weight: 400;
-    font-size: 0.6875rem;          /* ~11px, up from 9px */
-    letter-spacing: 0.08em;
+    font-size: var(--text-tag);    /* small again (9px), lighter weight */
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     padding: 0.4em 0.8em;
     border-radius: 999px;
@@ -1984,6 +1986,17 @@
     margin-top: clamp(0.5rem, 1.5vw, 1rem);
   }
 
+  /* Static 2x2 cover grid (AlbumThumb fallback) — fills the card, no clipping. */
+  .album-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+  }
+  .album-grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
   /* Album showcase — slow horizontal marquee. Covers scroll continuously with a
      soft edge-fade mask; pauses on hover; per-cover lift for detail. */
   .album-marquee {
@@ -2244,10 +2257,11 @@
     padding-left: 10px;
     padding-right: 10px;
     gap: 8px;
-    font-family: var(--font-primary);
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     white-space: nowrap;
   }
   .nav-slot-text { flex: 1; text-align: left; min-width: 0; }

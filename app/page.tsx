@@ -104,7 +104,7 @@ function SelectedWork() {
   const picks = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean) as typeof projects;
   let i = 0;
   return (
-    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="Selected work">
+    <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="Selected work">
       <SectionHead title="Selected work" aside={<Link href="/work" className="home-link">Full archive →</Link>} />
       <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
         {picks.map((project) => (
@@ -118,7 +118,7 @@ function SelectedWork() {
 /* ─── How I work ────────────────────────────────────────────── */
 function Approach() {
   return (
-    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="How I work">
+    <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="How I work">
       <SectionHead title="How I work" />
       <div className="grid md:grid-cols-12 gap-8">
         <div className="md:col-span-7 max-w-2xl space-y-4 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
@@ -146,7 +146,7 @@ function Approach() {
 /* ─── What I do (infinite capabilities slider) ──────────────── */
 function Capabilities() {
   return (
-    <Reveal as="section" className="home-section px-5 md:px-10 overflow-hidden" aria-label="What I do">
+    <Reveal section as="section" className="home-section px-5 md:px-10 overflow-hidden" aria-label="What I do">
       <SectionHead
         title="What I do"
         aside={<Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>}
@@ -166,7 +166,7 @@ function Capabilities() {
 function Products() {
   const comingSoon = !isLemonConfigured();
   return (
-    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="Studio products">
+    <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="Studio products">
       <SectionHead title="Studio products" aside={<Link href="/store" className="home-link">Visit store →</Link>} />
       <div className="grid md:grid-cols-12 gap-8 items-end">
         <div className="md:col-span-8">
@@ -189,7 +189,7 @@ function Products() {
 /* ─── Contact ───────────────────────────────────────────────── */
 function Contact() {
   return (
-    <Reveal as="section" className="home-section px-5 md:px-10" aria-label="Contact">
+    <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="Contact">
       <SectionHead title="Get in touch" />
       <div className="grid md:grid-cols-12 gap-8 items-end">
         <div className="md:col-span-8">

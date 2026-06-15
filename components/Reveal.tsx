@@ -23,6 +23,9 @@ type RevealProps = {
   y?: number;
   delay?: number;
   immediate?: boolean;
+  /** Richer editorial entrance: the section heading wipes in left-to-right while
+   *  the section's blocks rise and stagger up. Used for the home sections. */
+  section?: boolean;
 } & Record<string, unknown>;
 
 export default function Reveal({
@@ -32,6 +35,7 @@ export default function Reveal({
   y = 28,
   delay = 0,
   immediate = false,
+  section = false,
   ...rest
 }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
@@ -47,6 +51,26 @@ export default function Reveal({
     if (!registered) { gsap.registerPlugin(ScrollTrigger); registered = true; }
 
     const ctx = gsap.context(() => {
+      if (section) {
+        // Stagger the section's blocks up, and wipe the heading in from the left.
+        const kids = Array.from(el.children) as HTMLElement[];
+        const head = el.querySelector<HTMLElement>(".home-display-sm");
+        const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 80%", once: true } });
+        tl.fromTo(
+          kids,
+          { opacity: 0, y: 46 },
+          { opacity: 1, y: 0, duration: 0.85, ease: "power3.out", stagger: 0.12 }
+        );
+        if (head) {
+          tl.fromTo(
+            head,
+            { clipPath: "inset(0 100% 0 0)" },
+            { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power3.inOut" },
+            0.12
+          );
+        }
+        return;
+      }
       const to: gsap.TweenVars = { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", delay };
       if (!immediate) {
         to.scrollTrigger = { trigger: el, start: "top 88%", once: true };
@@ -55,7 +79,7 @@ export default function Reveal({
     }, ref);
 
     return () => ctx.revert();
-  }, [y, delay, immediate]);
+  }, [y, delay, immediate, section]);
 
   return createElement(Tag, { ref, className, ...rest }, children);
 }

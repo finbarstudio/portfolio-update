@@ -131,10 +131,10 @@ export function FullCard({ project, index }: { project: Project; index: number }
             <PdfSlideshowThumb pages={project.heroPdf} />
           ) : project.heroPhones ? (
             <PhoneCarousel model={project.heroPhones.model} videos={project.heroPhones.videos} poster={project.heroPhones.poster} fill />
-          ) : project.heroAlbums ? (
-            <AlbumThumb images={project.heroAlbums.images} />
           ) : project.heroSlideshow ? (
             <HeroSlideshow images={project.heroSlideshow} cardAspect={project.slideshowAspect} fill />
+          ) : project.heroAlbums ? (
+            <AlbumThumb images={project.heroAlbums.images} />
           ) : project.heroMagazine ? (
             <MagazineCarousel pages={project.heroMagazine.pages} fill />
           ) : project.heroModel ? (

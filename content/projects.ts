@@ -413,6 +413,16 @@ export const projects: Project[] = [
         "/images/joe-devine/albums/too-far-gone.webp",
       ],
     },
+    // Card thumbnail uses the flowing cover carousel (square covers, no clipping);
+    // the detail page still uses the bespoke AlbumShowcase via heroAlbums.
+    heroSlideshow: [
+      "/images/joe-devine/albums/baby-steps.webp",
+      "/images/joe-devine/albums/giant-leap.webp",
+      "/images/joe-devine/albums/a-perfect-contrast.webp",
+      "/images/joe-devine/albums/one-foot-forward.webp",
+      "/images/joe-devine/albums/too-far-gone.webp",
+    ],
+    slideshowAspect: "1/1",
     images: [
       {
         src: "/images/joe-devine/albums/baby-steps-md.webp",
@@ -1164,6 +1174,61 @@ export const projects: Project[] = [
     },
     images: [],
     hasDepth: false,
+  },
+
+  /* ─── Palms Motel — WIREFRAME ─────────────────────────────────────
+     Self-initiated retro motel concept (was on the old Framer site). This is a
+     scaffold to fill in: replace every "TODO" string with the real copy, drop the
+     images into /public/images/palmsmotel/ (hero.jpg, logo.jpg, palette.jpg,
+     sign.jpg, web.jpg or your own), then delete `hidden: true` to publish.
+     Slug is kept as "palmsmotel" to match the URL the old site already had indexed. */
+  {
+    slug: "palmsmotel",
+    hidden: true,
+    name: "Palms Motel",
+    tier: "full",
+    rank: 20,
+    isConcept: true,
+    date: "2024",                                   // TODO
+    categories: ["Brand Identity", "Web Design"],   // TODO
+    skills: ["Brand Identity", "Logo Design", "Web Design", "Signage"], // TODO
+    oneLiner:
+      "TODO — one line on the Palms Motel concept (a retro roadside motel brand and booking site).",
+    role: "TODO — your role on the project.",
+    problem:
+      "TODO — the brief, or what this self-initiated concept set out to explore.",
+    outcome:
+      "TODO — the outcome / status (self-initiated concept).",
+    heroImage: {
+      src: "/images/palmsmotel/hero.jpg",
+      alt: "Palms Motel — TODO describe the hero image",
+    },
+    images: [],
+    hasDepth: true,
+    depth: [
+      {
+        heading: "Identity",
+        body: "TODO — the logomark, type and the retro palette.",
+        images: [
+          { src: "/images/palmsmotel/logo.jpg", aspectRatio: "1/1", caption: "TODO", alt: "Palms Motel logomark — TODO" },
+          { src: "/images/palmsmotel/palette.jpg", aspectRatio: "1/1", caption: "TODO", alt: "Palms Motel palette — TODO" },
+        ],
+      },
+      {
+        heading: "Signage",
+        body: "TODO — the roadside sign and environmental applications.",
+        images: [
+          { src: "/images/palmsmotel/sign.jpg", aspectRatio: "3/2", caption: "TODO", alt: "Palms Motel signage — TODO" },
+        ],
+      },
+      {
+        heading: "Website",
+        body: "TODO — the booking-site concept.",
+        images: [
+          { src: "/images/palmsmotel/web.jpg", aspectRatio: "16/9", caption: "TODO", alt: "Palms Motel website — TODO" },
+        ],
+      },
+    ],
   },
 ];
 
