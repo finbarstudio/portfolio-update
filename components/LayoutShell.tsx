@@ -14,27 +14,35 @@ import ContactDrawer from "./ContactDrawer";
 export const SIDEBAR_EXPANDED_W = 224; // px
 export const SIDEBAR_COLLAPSED_W = 48; // px
 
-/* Slim mobile-only top bar (the desktop sidebar is hidden on mobile). */
+/* Mobile-only top chrome. Transparent and borderless to mimic the airy desktop
+   site (no solid OS-style bar); the logo and hamburger float as two small chipped
+   controls that stay legible over scrolled content. */
 function MobileBar({ onMenu }: { onMenu: () => void }) {
+  const chip = {
+    background: "color-mix(in srgb, var(--bg) 78%, transparent)",
+    backdropFilter: "blur(6px)",
+    WebkitBackdropFilter: "blur(6px)",
+  } as React.CSSProperties;
   return (
     <header
-      className="md:hidden fixed top-0 left-0 right-0 z-50 border-b border-ink bg-bg flex items-center justify-between px-3"
+      className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-3 pointer-events-none"
       style={{ height: "var(--menubar-h)" }}
       role="banner"
     >
       <Link
         href="/"
-        className="font-bold uppercase tracking-[0.08em] text-[13px] hover:text-pink transition-colors"
+        className="pointer-events-auto inline-flex items-center font-bold uppercase tracking-[0.08em] text-[13px] text-ink hover:text-pink transition-colors rounded-full px-2.5 py-1"
+        style={chip}
         aria-label="finbar.studio, home"
       >
-        finbar<BrandStar className="pixel-star" size="0.85em" />studio
+        finbar<BrandStar className="pixel-star" size={20} />studio
       </Link>
       <button
         type="button"
         onClick={onMenu}
         aria-label="Open navigation menu"
-        className="flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2.5"
-        style={{ width: 44, height: 44 }}
+        className="pointer-events-auto flex items-center justify-center text-ink hover:text-pink transition-colors rounded-full -mr-1"
+        style={{ width: 44, height: 44, ...chip }}
       >
         <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
           <path d="M1 1.5h20M1 8h20M1 14.5h20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />

@@ -15,7 +15,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { RoundedBox } from "@react-three/drei";
+import { RoundedBox, Environment, Lightformer, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
 import { STAR_POINTS } from "./brand-star";
 
@@ -55,7 +55,7 @@ function StarScene({ color }: { color: string }) {
   return (
     <group ref={ref}>
       <mesh geometry={geo}>
-        <meshStandardMaterial color={color} roughness={0.38} metalness={0.12} />
+        <meshStandardMaterial color={color} roughness={0.32} metalness={0.15} envMapIntensity={1.1} />
       </mesh>
     </group>
   );
@@ -74,17 +74,17 @@ function BookScene({ color }: { color: string }) {
       {/* spine / cover behind the pages */}
       <mesh position={[0, 0, -0.16]}>
         <boxGeometry args={[2.05, 1.78, 0.18]} />
-        <meshStandardMaterial color={color} roughness={0.5} />
+        <meshStandardMaterial color={color} roughness={0.55} metalness={0} envMapIntensity={0.7} />
       </mesh>
       {/* left page, fanned open */}
       <mesh position={[-0.52, 0, 0.02]} rotation={[0, 0.32, 0]}>
         <boxGeometry args={[1.0, 1.62, 0.05]} />
-        <meshStandardMaterial color={PAPER} roughness={0.9} />
+        <meshStandardMaterial color={PAPER} roughness={0.85} envMapIntensity={0.6} />
       </mesh>
       {/* right page */}
       <mesh position={[0.52, 0, 0.02]} rotation={[0, -0.32, 0]}>
         <boxGeometry args={[1.0, 1.62, 0.05]} />
-        <meshStandardMaterial color={PAPER} roughness={0.9} />
+        <meshStandardMaterial color={PAPER} roughness={0.85} envMapIntensity={0.6} />
       </mesh>
     </group>
   );
@@ -101,26 +101,26 @@ function ScreenScene({ color }: { color: string }) {
   return (
     <group ref={ref}>
       <RoundedBox args={[2.3, 1.5, 0.12]} radius={0.07} smoothness={4}>
-        <meshStandardMaterial color={INK} roughness={0.5} metalness={0.2} />
+        <meshPhysicalMaterial color={INK} roughness={0.45} metalness={0.2} clearcoat={0.6} clearcoatRoughness={0.5} envMapIntensity={1.3} />
       </RoundedBox>
       {/* screen face */}
       <mesh position={[0, -0.08, 0.067]}>
         <planeGeometry args={[2.1, 1.2]} />
-        <meshStandardMaterial color={color} roughness={0.45} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={color} roughness={0.4} metalness={0.1} envMapIntensity={0.9} side={THREE.DoubleSide} />
       </mesh>
       {/* chrome bar */}
       <mesh position={[0, 0.55, 0.069]}>
         <planeGeometry args={[2.1, 0.16]} />
-        <meshStandardMaterial color={INK} roughness={0.6} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={INK} roughness={0.6} envMapIntensity={0.5} side={THREE.DoubleSide} />
       </mesh>
       {/* content lines */}
       <mesh position={[-0.55, 0.18, 0.07]}>
         <planeGeometry args={[0.9, 0.1]} />
-        <meshStandardMaterial color={PAPER} roughness={0.8} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={PAPER} roughness={0.8} envMapIntensity={0.5} side={THREE.DoubleSide} />
       </mesh>
       <mesh position={[-0.7, -0.02, 0.07]}>
         <planeGeometry args={[0.6, 0.1]} />
-        <meshStandardMaterial color={PAPER} roughness={0.8} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={PAPER} roughness={0.8} envMapIntensity={0.5} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -138,15 +138,15 @@ function StudioScene({ color }: { color: string }) {
     <group ref={ref}>
       <mesh position={[-0.6, -0.1, 0]} rotation={[0.3, 0.4, 0]}>
         <boxGeometry args={[0.85, 0.85, 0.85]} />
-        <meshStandardMaterial color={color} roughness={0.5} flatShading />
+        <meshStandardMaterial color={color} roughness={0.45} metalness={0} envMapIntensity={0.85} flatShading />
       </mesh>
       <mesh position={[0.6, 0.28, 0.2]}>
         <sphereGeometry args={[0.5, 32, 32]} />
-        <meshStandardMaterial color={INK} roughness={0.3} metalness={0.1} />
+        <meshPhysicalMaterial color={INK} roughness={0.28} metalness={0.1} clearcoat={0.7} clearcoatRoughness={0.35} envMapIntensity={1.35} />
       </mesh>
       <mesh position={[0.18, -0.5, 0.45]} rotation={[0, 0, 0.28]}>
         <coneGeometry args={[0.4, 0.9, 32]} />
-        <meshStandardMaterial color={PAPER} roughness={0.7} />
+        <meshStandardMaterial color={PAPER} roughness={0.7} metalness={0} envMapIntensity={0.6} />
       </mesh>
     </group>
   );
@@ -167,15 +167,15 @@ function MotionScene({ color }: { color: string }) {
     <group>
       <mesh ref={a}>
         <torusGeometry args={[1.15, 0.06, 16, 90]} />
-        <meshStandardMaterial color={color} roughness={0.4} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.3} envMapIntensity={1.1} />
       </mesh>
       <mesh ref={b}>
         <torusGeometry args={[0.85, 0.06, 16, 90]} />
-        <meshStandardMaterial color={INK} roughness={0.4} />
+        <meshPhysicalMaterial color={INK} roughness={0.35} metalness={0.2} clearcoat={0.5} clearcoatRoughness={0.4} envMapIntensity={1.3} />
       </mesh>
       <mesh ref={c}>
         <torusGeometry args={[0.55, 0.06, 16, 90]} />
-        <meshStandardMaterial color={color} roughness={0.4} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.3} envMapIntensity={1.1} />
       </mesh>
     </group>
   );
@@ -192,26 +192,26 @@ function SocialScene({ color }: { color: string }) {
   return (
     <group ref={ref} rotation={[0.06, 0, 0]}>
       <RoundedBox args={[1.2, 2.1, 0.16]} radius={0.16} smoothness={4}>
-        <meshStandardMaterial color={INK} roughness={0.5} metalness={0.2} />
+        <meshPhysicalMaterial color={INK} roughness={0.45} metalness={0.2} clearcoat={0.6} clearcoatRoughness={0.5} envMapIntensity={1.3} />
       </RoundedBox>
       {/* screen */}
       <mesh position={[0, 0, 0.085]}>
         <planeGeometry args={[1.0, 1.85]} />
-        <meshStandardMaterial color={color} roughness={0.45} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={color} roughness={0.4} metalness={0.1} envMapIntensity={0.9} side={THREE.DoubleSide} />
       </mesh>
       {/* post */}
       <mesh position={[0, 0.32, 0.09]}>
         <planeGeometry args={[0.74, 0.74]} />
-        <meshStandardMaterial color={PAPER} roughness={0.8} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={PAPER} roughness={0.8} envMapIntensity={0.5} side={THREE.DoubleSide} />
       </mesh>
       {/* caption bars */}
       <mesh position={[-0.1, -0.45, 0.09]}>
         <planeGeometry args={[0.54, 0.1]} />
-        <meshStandardMaterial color={PAPER} roughness={0.8} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={PAPER} roughness={0.8} envMapIntensity={0.5} side={THREE.DoubleSide} />
       </mesh>
       <mesh position={[-0.22, -0.62, 0.09]}>
         <planeGeometry args={[0.3, 0.1]} />
-        <meshStandardMaterial color={PAPER} roughness={0.8} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={PAPER} roughness={0.8} envMapIntensity={0.5} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -234,13 +234,52 @@ function Inner({ variant, color }: { variant: SceneVariant; color: string }) {
     <Canvas
       camera={{ position: [0, 0, 5], fov: 35, near: 0.1, far: 20 }}
       dpr={[1, 1.5]}
-      gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
+      gl={{
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance",
+        preserveDrawingBuffer: false,
+        // Filmic tone mappers (AgX/ACES) are built for HDR photographic input and
+        // crush these stylised flat accents into dark/muted tones on the bright
+        // cream card. Neutral mapping keeps the rose/gold/blue/mauve true and light;
+        // the soft studio look comes from the Environment reflections, not a curve.
+        toneMapping: THREE.NeutralToneMapping,
+        toneMappingExposure: 1.15,
+      }}
+      onCreated={({ gl }) => {
+        // Lock a transparent clear + sRGB output regardless of any fiber heuristic.
+        gl.setClearColor(0x000000, 0);
+        gl.outputColorSpace = THREE.SRGBColorSpace;
+      }}
       style={{ position: "absolute", inset: 0 }}
     >
-      <ambientLight intensity={0.55} />
-      <hemisphereLight args={["#ffffff", "#b08968", 0.5]} />
-      <directionalLight position={[4, 6, 6]} intensity={1.0} />
-      <directionalLight position={[-5, -2, -3]} intensity={0.3} />
+      {/* Warm Cream Gallery: a procedural in-GPU softbox (no network/HDR fetch).
+          background={false} → the env map drives reflections only, never a backdrop,
+          so the cream card shows through (alpha preserved). frames={1} bakes the
+          cubemap once on mount; only the meshes spin, so per-frame env cost is zero. */}
+      <Environment frames={1} resolution={128} background={false} environmentIntensity={0.85}>
+        {/* big warm overhead softbox — dominant paper-cream fill (matches --color-bg) */}
+        <Lightformer form="rect" intensity={2.1} color="#FBF6EC" position={[0, 4.5, 1]} rotation={[-Math.PI / 2, 0, 0]} scale={[10, 8, 1]} />
+        {/* cooler key from camera-left → form + a soft tonal gradient down the body */}
+        <Lightformer form="rect" intensity={1.15} color="#EAF1F2" position={[-5, 1.5, 3]} rotation={[0, Math.PI / 2, 0]} scale={[6, 6, 1]} />
+        {/* warm low bounce from camera-right → fills the shadow side like a foamcore card */}
+        <Lightformer form="rect" intensity={0.75} color="#F3E2C8" position={[5, -1.5, 2]} rotation={[0, -Math.PI / 2, 0]} scale={[6, 5, 1]} />
+        {/* brand-accent rim — picks up the per-discipline colour so each card's env
+            is subtly tinted to its discipline (pink/gold/blue/orange/green/mauve) */}
+        <Lightformer form="ring" intensity={1.1} color={color} position={[2.5, 2, -4]} scale={2.2} />
+        {/* faint rear fill so back-facing geometry never goes muddy */}
+        <Lightformer form="rect" intensity={0.4} color="#FBF6EC" position={[0, 0, -6]} rotation={[0, Math.PI, 0]} scale={[8, 8, 1]} />
+      </Environment>
+
+      {/* one soft warm directional for gentle form definition + a small live specular */}
+      <directionalLight position={[3, 5, 4]} intensity={0.55} color="#FFF6E8" />
+      {/* whisper of ambient so deep crevices (extrude bevels, book gutter) don't crush */}
+      <ambientLight intensity={0.14} />
+
+      {/* faked soft floor shadow — grounds the objects with no real-time shadow-map
+          cost. Sits below even the tall phone/rings and is baked once (frames={1}). */}
+      <ContactShadows position={[0, -1.9, 0]} scale={7} blur={3.2} opacity={0.3} far={4} resolution={256} color="#2A2620" frames={1} />
+
       <SceneFor variant={variant} color={color} />
     </Canvas>
   );

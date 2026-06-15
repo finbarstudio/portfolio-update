@@ -346,7 +346,7 @@
   transition: color var(--dur-fast) var(--ease);
 }
 .sidebar-logo:hover { color: var(--pink); }
-.sidebar-logo svg { width: 18px; height: 18px; flex: 0 0 auto; color: var(--pink); }
+.sidebar-logo svg { width: 20px; height: 20px; flex: 0 0 auto; color: var(--pink); }
 .sidebar-logo .logo-word {
   font-weight: 700;
   text-transform: uppercase;
@@ -357,9 +357,9 @@
   transition: opacity 0.3s var(--ease), max-width 0.4s var(--ease);
   max-width: 8ch;
 }
-/* Collapsed: hide the wordmark either side and centre just the star. */
+/* Collapsed: hide the wordmark either side and centre just the star (same 20px,
+   so the mark never resizes when toggling). */
 .sidebar-logo.is-collapsed { justify-content: center; gap: 0; padding: 0; }
-.sidebar-logo.is-collapsed svg { width: 22px; height: 22px; }
 .sidebar-logo.is-collapsed .logo-word { opacity: 0; max-width: 0; }
 
 /* ─── Components ─────────────────────────────────────────────── */
@@ -706,35 +706,6 @@
   @media (hover: hover) {
     .cap-card:hover .cap-scene,
     .cap-card:focus-within .cap-scene { opacity: 1; }
-  }
-
-  /* Per-card hover effects: typewriter caret (Editorial) + RGB-split glitch
-     name (Motion). Both pointer-only, so touch just shows the static card. */
-  .tw-caret { color: var(--pink); margin-left: 1px; }
-  .cap-glitch { position: relative; display: inline-block; }
-  @media (hover: hover) {
-    .cap-card:hover .cap-glitch { animation: cap-glitch 0.55s steps(2, jump-none) infinite; }
-    .cap-card:hover .cap-glitch::before,
-    .cap-card:hover .cap-glitch::after {
-      content: attr(data-text);
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      overflow: hidden;
-      pointer-events: none;
-    }
-    .cap-card:hover .cap-glitch::before { color: var(--accent-blue); transform: translateX(-2px); clip-path: inset(0 0 55% 0); }
-    .cap-card:hover .cap-glitch::after  { color: var(--pink);        transform: translateX(2px);  clip-path: inset(55% 0 0 0); }
-  }
-  @keyframes cap-glitch {
-    0%, 100% { transform: translate(0, 0); }
-    25% { transform: translate(-1px, 1px); }
-    50% { transform: translate(1px, -1px); }
-    75% { transform: translate(-1px, -1px); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .cap-card:hover .cap-glitch { animation: none; }
   }
   /* Touch devices have no hover to reveal the card, so give it a legible resting
      state — a soft tile with an outline and the discipline name in pink. */
@@ -2365,7 +2336,7 @@
     align-items: center;
     min-width: 0;
   }
-  .nav-slot-ico { justify-content: center; }
+  .nav-slot-ico { justify-content: center; align-items: center; }
   .nav-slot-ico > svg { flex-shrink: 0; }
 
   .nav-slot-label {
@@ -2378,6 +2349,11 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     white-space: nowrap;
+    /* Uppercase Space Mono caps sit high in the line box (no descenders), so the
+       pink pill reads with more space below than above. Collapse the leading and
+       nudge the ink down 1px so the highlight is optically even top/bottom. */
+    line-height: 1;
+    padding-top: 1px;
   }
   .nav-slot-text { flex: 1; text-align: left; min-width: 0; }
 
@@ -2393,6 +2369,47 @@
     flex-shrink: 0;
     transition: transform var(--dur) var(--ease);
   }
+
+  /* Work row — a flex wrapper (label link + caret toggle) rather than a bare
+     anchor, so the caret can collapse the sublist without nesting a button in a
+     link. Inherits the nav-row look. */
+  .nav-row-work {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    height: 34px;
+    border-radius: 8px;
+    overflow: hidden;
+    color: var(--ink);
+    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  }
+  .nav-row-work:hover { color: var(--pink); background: var(--surface-sunken); }
+  .nav-row-work.active { color: var(--pink); background: color-mix(in srgb, var(--pink) 12%, transparent); }
+  .nav-row-work .nav-row-link {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: stretch;
+    height: 34px;
+    overflow: hidden;     /* keep clipping the slot-machine track */
+    color: inherit;
+  }
+  .nav-work-toggle {
+    flex: 0 0 auto;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .nav-work-toggle:hover { color: var(--pink); }
+  .nav-work-caret { transition: transform var(--dur) var(--ease); }
+  .nav-work-caret.is-open { transform: rotate(180deg); }
 
   /* Work block — collapses to nothing in the rail, grows in on expand. */
   .nav-work {
@@ -2410,10 +2427,26 @@
     transition: grid-template-rows 0.4s var(--ease);
   }
   .nav-sublist[data-open="true"] { grid-template-rows: 1fr; }
-  .nav-sublist-inner { overflow: hidden; display: flex; flex-direction: column; gap: 2px; }
+  .nav-sublist-inner {
+    overflow: hidden;            /* required for the 0fr collapse to clip */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* When open, cap the height and scroll internally so the 14-project list
+       never pushes the bottom contact/social block off-screen (~7 rows shown). */
+    max-height: 196px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .nav-sublist-inner::-webkit-scrollbar { width: 6px; }
+  .nav-sublist-inner::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+  .nav-sublist-inner::-webkit-scrollbar-track { background: transparent; }
 
   .nav-sub {
     display: block;
+    flex: 0 0 auto;            /* keep natural height so the capped inner scrolls, not squishes */
     padding: 5px 10px 5px 39px;
     border-radius: 8px;
     font-family: var(--font-primary);
@@ -2426,6 +2459,61 @@
   }
   .nav-sub:hover { color: var(--pink); background: var(--surface-sunken); }
   .nav-sub.active { color: var(--pink); font-weight: 600; }
+
+  /* Mobile full-screen menu — scaled-up desktop nav rows in Space Mono caps with
+     a pink-tint active pill, so the overlay reads as the same site as the rail. */
+  .mobile-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 18px 16px;
+    border-radius: 10px;
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  }
+  .mobile-nav-row:hover,
+  .mobile-nav-row:active { color: var(--pink); background: var(--surface-sunken); }
+  .mobile-nav-row.active {
+    color: var(--pink);
+    background: color-mix(in srgb, var(--pink) 12%, transparent);
+  }
+  .mobile-nav-arrow { font-family: var(--font-mono); font-size: 1rem; color: var(--ink-soft); }
+  .mobile-nav-row:hover .mobile-nav-arrow,
+  .mobile-nav-row.active .mobile-nav-arrow { color: var(--pink); }
+
+  /* Branded, roomy footer — hairline-topped to match the desktop footer. */
+  .mobile-menu-foot {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mobile-foot-email {
+    font-family: var(--font-primary);
+    font-size: 15px;
+    color: var(--ink);
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .mobile-foot-email:hover { color: var(--pink); }
+  .mobile-foot-tel {
+    font-family: var(--font-primary);
+    font-size: 13px;
+    color: var(--ink-soft);
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .mobile-foot-tel:hover { color: var(--pink); }
+  .mobile-foot-socials { display: flex; align-items: center; gap: 22px; margin-top: 8px; }
 
   /* Persistent social dock — each icon tweens between collapsed (vertical rail)
      and expanded (horizontal row) slots. Soft overshoot so they settle in. */

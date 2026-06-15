@@ -118,7 +118,7 @@ function YearStamp({ collapsed }: { collapsed: boolean }) {
       style={{
         position: "fixed",
         left: collapsed ? 0 : 12,
-        bottom: 4,
+        bottom: 8,
         width: collapsed ? SIDEBAR_COLLAPSED_W : "auto",
         textAlign: collapsed ? "center" : "left",
         fontFamily: "var(--font-label)",
@@ -156,7 +156,7 @@ function SocialDock({ collapsed }: { collapsed: boolean }) {
         left: 0,
         bottom: 0,
         width: SIDEBAR_EXPANDED_W,
-        height: 230,
+        height: 188,
         pointerEvents: "none",
         zIndex: 41,
       }}
@@ -165,7 +165,7 @@ function SocialDock({ collapsed }: { collapsed: boolean }) {
         // x/y are offsets from the dock's bottom-left corner. Lifted well clear
         // of the year stamp so the cluster has room to breathe.
         const x = collapsed ? railCenterX - BOX / 2 : 14 + i * GAP;
-        const y = collapsed ? 44 + i * GAP : 40; // px up from the bottom
+        const y = collapsed ? 56 + i * GAP : 30; // px up from the bottom
         return (
           <a
             key={s.href}
@@ -216,6 +216,12 @@ function DesktopSidebar({
   const isAbout   = pathname.startsWith("/about");
   const isStore   = pathname.startsWith("/store");
   const isWork    = pathname === "/work" || pathname.startsWith("/case-studies/");
+
+  // The project sublist has its own toggle (separate from the rail collapse) so
+  // the 14-item list doesn't shove the bottom contact/social block off-screen.
+  // Opens automatically when you're actually inside Work so the active project shows.
+  const [worksOpen, setWorksOpen] = useState(false);
+  useEffect(() => { if (isWork) setWorksOpen(true); }, [isWork]);
 
   return (
     <>
@@ -272,27 +278,50 @@ function DesktopSidebar({
           </span>
         </Link>
 
-        {/* Work — links to the /work archive; the project quick-list sits beneath
-            it (expanded-only; collapses to nothing in the rail). */}
-        <Link
-          href="/work"
-          title="Work"
-          aria-label="Work"
-          aria-current={isWork ? "page" : undefined}
-          className={`nav-row ${isWork ? "active" : ""}`}
-        >
-          <span className="nav-track">
-            <span className="nav-slot nav-slot-ico"><GridIcon /></span>
-            <span className="nav-slot nav-slot-label">
-              <span className="nav-slot-text">Work</span>
-              <span className="nav-count tabular-nums">{sortedProjects.length}</span>
+        {/* Work — the label links to the /work archive; a caret toggles the project
+            quick-list beneath it (expanded-only; collapses to nothing in the rail). */}
+        <div className={`nav-row-work ${isWork ? "active" : ""}`}>
+          <Link
+            href="/work"
+            title="Work"
+            aria-label="Work"
+            aria-current={isWork ? "page" : undefined}
+            className="nav-row-link"
+          >
+            <span className="nav-track">
+              <span className="nav-slot nav-slot-ico"><GridIcon /></span>
+              <span className="nav-slot nav-slot-label">
+                <span className="nav-slot-text">Work</span>
+                <span className="nav-count tabular-nums">{sortedProjects.length}</span>
+              </span>
             </span>
-          </span>
-        </Link>
+          </Link>
+          {!collapsed && (
+            <button
+              type="button"
+              className="nav-work-toggle"
+              aria-expanded={worksOpen}
+              aria-controls="nav-work-sublist"
+              aria-label={worksOpen ? "Collapse project list" : "Expand project list"}
+              title={worksOpen ? "Collapse project list" : "Expand project list"}
+              onClick={() => setWorksOpen((v) => !v)}
+            >
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true" className={`nav-work-caret ${worksOpen ? "is-open" : ""}`}>
+                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )}
+        </div>
 
         <div className="nav-work" data-open={collapsed ? "false" : "true"}>
           <div className="nav-work-inner">
-            <div className="nav-sublist" data-open={!collapsed ? "true" : "false"}>
+            <div
+              className="nav-sublist"
+              id="nav-work-sublist"
+              data-open={!collapsed && worksOpen ? "true" : "false"}
+              role="region"
+              aria-label="Projects"
+            >
               <div className="nav-sublist-inner">
                 {sortedProjects.map((p) => {
                   const isActive = pathname === `/case-studies/${p.slug}`;
@@ -355,7 +384,7 @@ function DesktopSidebar({
 
       {/* Status / contact — expanded only. Socials are in the persistent dock. */}
       {!collapsed && (
-        <div className="px-3 space-y-2 border-t border-line pt-3" style={{ paddingBottom: 56 }}>
+        <div className="px-3 space-y-2.5 border-t border-line pt-3" style={{ paddingBottom: 96 }}>
           <span className="status-badge reveal-y" style={{ animationDelay: "0.18s" }}>OPEN FOR WORK</span>
 
           <a
@@ -441,10 +470,10 @@ function MobileMenu({
         style={{ height: "var(--menubar-h)" }}
       >
         <span
-          className="font-bold uppercase tracking-[0.08em] text-[12px]"
+          className="font-bold uppercase tracking-[0.08em] text-[13px] inline-flex items-center"
           aria-hidden="true"
         >
-          finbar<BrandStar className="pixel-star" size="0.85em" />studio
+          finbar<BrandStar className="pixel-star" size={20} />studio
         </span>
         <button
           type="button"
@@ -459,21 +488,18 @@ function MobileMenu({
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-5 pt-8 pb-8 flex flex-col" aria-label="Mobile primary">
-        <ul className="space-y-0 mb-auto divide-y divide-line" role="list">
+      <nav className="flex-1 overflow-y-auto px-4 pt-6 pb-8 flex flex-col" aria-label="Mobile primary">
+        <ul className="flex flex-col gap-1 mb-auto" role="list">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
                 onClick={onClose}
-                className={`flex items-center justify-between font-sans font-semibold py-4 transition-colors ${
-                  isActive(link.href) ? "text-pink" : "text-ink hover:text-pink"
-                }`}
-                style={{ fontSize: "1.75rem", letterSpacing: "-0.01em", lineHeight: 1.1 }}
                 aria-current={isActive(link.href) ? "page" : undefined}
+                className={`mobile-nav-row ${isActive(link.href) ? "active" : ""}`}
               >
-                <span>{link.label}</span>
-                <span className="mono-label text-ink-soft" aria-hidden="true">→</span>
+                <span className="mobile-nav-label">{link.label}</span>
+                <span className="mobile-nav-arrow" aria-hidden="true">→</span>
               </Link>
             </li>
           ))}
@@ -482,34 +508,19 @@ function MobileMenu({
               type="button"
               onClick={() => { onClose(); onContactOpen(); }}
               aria-haspopup="dialog"
-              className="w-full flex items-center justify-between font-sans font-semibold py-4 text-ink hover:text-pink transition-colors text-left"
-              style={{ fontSize: "1.75rem", letterSpacing: "-0.01em", lineHeight: 1.1 }}
+              className="mobile-nav-row w-full text-left"
             >
-              <span>Contact</span>
-              <span className="mono-label text-ink-soft" aria-hidden="true">→</span>
+              <span className="mobile-nav-label">Contact</span>
+              <span className="mobile-nav-arrow" aria-hidden="true">→</span>
             </button>
           </li>
         </ul>
 
-        <div className="pt-10 border-t border-line mt-10">
-          <div className="mb-4">
-            <span className="status-badge">OPEN FOR WORK</span>
-          </div>
-          <a
-            href="mailto:finbar@finbar.studio"
-            className="block font-sans text-ink hover:text-pink transition-colors mb-1"
-            style={{ fontSize: "14px" }}
-          >
-            finbar@finbar.studio
-          </a>
-          <a
-            href="tel:+61412796630"
-            className="block font-sans text-ink-soft hover:text-pink transition-colors mb-6 tabular-nums"
-            style={{ fontSize: "13px" }}
-          >
-            +61 412 796 630
-          </a>
-          <div className="flex items-center gap-6">
+        <div className="mobile-menu-foot">
+          <span className="status-badge">OPEN FOR WORK</span>
+          <a href="mailto:finbar@finbar.studio" className="mobile-foot-email">finbar@finbar.studio</a>
+          <a href="tel:+61412796630" className="mobile-foot-tel tabular-nums">+61 412 796 630</a>
+          <div className="mobile-foot-socials">
             {socials.map((s) => (
               <a
                 key={s.href}
