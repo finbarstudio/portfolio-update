@@ -53,13 +53,15 @@ const REST_SLOTS: Slot[] = [
   // Only slots 2/3/4 hold a video src + active decoder (see ONSTAGE_THRESHOLD).
   // Slots 1/5 keep a tiny scale for smooth scale-in/out at the edges without
   // costing a decoder; slots 0/6 are fully invisible.
-  { x:  0.40, y: -0.14, z: -0.15, rotZ: -FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 0: far off-right (invisible)
-  { x:  0.27, y: -0.08, z: -0.07, rotZ: -FLANK_ROT, scale: 0.30, opacity: 0.0 },// 1: entering right (no decoder)
-  { x:  0.17, y: -0.04, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.70 },// 2: RIGHT (live video)
-  { x:  0.00, y:  0.00, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER (live video)
-  { x: -0.17, y: -0.04, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.70 },// 4: LEFT (live video)
-  { x: -0.27, y: -0.08, z: -0.07, rotZ:  FLANK_ROT, scale: 0.30, opacity: 0.0 },// 5: exiting left (no decoder)
-  { x: -0.40, y: -0.14, z: -0.15, rotZ:  FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 6: far off-left
+  // Whole rest cluster lifted ~+0.05 vs centre so the fanned/rotated phones
+  // aren't crowding the bottom edge of the card.
+  { x:  0.40, y: -0.09, z: -0.15, rotZ: -FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 0: far off-right (invisible)
+  { x:  0.27, y: -0.03, z: -0.07, rotZ: -FLANK_ROT, scale: 0.30, opacity: 0.0 },// 1: entering right (no decoder)
+  { x:  0.17, y:  0.01, z: -0.02, rotZ: -FLANK_ROT, scale: 0.78, opacity: 0.70 },// 2: RIGHT (live video)
+  { x:  0.00, y:  0.05, z:  0.00, rotZ:  0,         scale: 1.0,  opacity: 1.0  },// 3: CENTER (live video)
+  { x: -0.17, y:  0.01, z: -0.02, rotZ:  FLANK_ROT, scale: 0.78, opacity: 0.70 },// 4: LEFT (live video)
+  { x: -0.27, y: -0.03, z: -0.07, rotZ:  FLANK_ROT, scale: 0.30, opacity: 0.0 },// 5: exiting left (no decoder)
+  { x: -0.40, y: -0.09, z: -0.15, rotZ:  FLANK_ROT, scale: 0.0,  opacity: 0.0 }, // 6: far off-left
 ];
 
 const HOVER_SLOTS: Slot[] = [

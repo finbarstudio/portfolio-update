@@ -6,12 +6,12 @@ import ProjectCard from "@/components/ProjectCard";
 const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
-  title: "Work: Selected Projects",
+  title: "Selected Work",
   description:
     "Selected branding, web design, publication and motion projects by Finbar Skitini, a Brisbane graphic designer working with clients across Australia and the UK.",
   alternates: { canonical: "/work" },
   openGraph: {
-    title: "Work: Selected Projects | Finbar Studio",
+    title: "Selected Work | Finbar Studio",
     description:
       "Branding, web design, publication and motion projects from finbar✶studio, a Brisbane creative practice.",
     url: "/work",

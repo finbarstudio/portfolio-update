@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import ClientImage from "@/components/ClientImage";
+import Reveal from "@/components/Reveal";
 import { projects } from "@/content/projects";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -27,6 +28,28 @@ const aboutJsonLd = {
     },
   },
 };
+
+const FACTS = [
+  { label: "Based in", value: "Brisbane, QLD" },
+  { label: "Working with", value: "Clients in AU + UK" },
+  { label: "From", value: "London, originally" },
+  { label: "Status", value: "Open for work" },
+];
+
+const PRINCIPLES = [
+  {
+    heading: "Print discipline, on screen",
+    body: "My background is print and editorial, so type, grids and spacing are second nature. I bring that same care to interfaces and motion, not just to the page.",
+  },
+  {
+    heading: "Creative first, and fast",
+    body: "I put things in front of real content early and adjust until they feel right, rather than polishing in a vacuum. It keeps the work honest and the feedback useful.",
+  },
+  {
+    heading: "One designer, whole range",
+    body: "Brand to publication to website, handled end to end by the same person, so the identity, the layout and the build all hold together as one thing.",
+  },
+];
 
 const CAPABILITIES = [
   {
@@ -55,21 +78,23 @@ function AboutTestimonials() {
   const quotes = projects.filter((p) => p.testimonial).map((p) => ({ ...p.testimonial!, slug: p.slug }));
   if (!quotes.length) return null;
   return (
-    <section className="home-section" aria-label="Client testimonials">
-      <p className="mono-label text-ink-soft mb-6">Kind words</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+    <Reveal section as="section" className="home-section" aria-label="Client testimonials">
+      <div className="home-section-index">
+        <h2 className="home-display-sm text-ink">Kind words</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
         {quotes.map((q) => (
           <figure key={q.slug} className="max-w-prose">
             <blockquote className="font-sans text-ink leading-relaxed" style={{ fontSize: "var(--text-body)", lineHeight: 1.6 }}>
               &ldquo;{q.quote}&rdquo;
             </blockquote>
-            <figcaption className="mono-label text-ink-soft mt-4" style={{ fontSize: "11px" }}>
+            <figcaption className="meta-mono text-ink-soft mt-4" style={{ fontSize: "11px" }}>
               {q.author}
             </figcaption>
           </figure>
         ))}
       </div>
-    </section>
+    </Reveal>
   );
 }
 
@@ -97,59 +122,91 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
       />
 
-      <p className="mono-label text-ink-soft mb-6">Brisbane graphic designer</p>
-      <h1
-        className="font-bold text-ink leading-[1.02]"
-        style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}
-      >
-        Finbar Skitini.
-      </h1>
+      {/* ── Statement ─────────────────────────────────────────── */}
+      <Reveal immediate as="header" className="max-w-[18ch] md:max-w-none">
+        <p className="mono-label text-ink-soft mb-6">Brisbane graphic designer · AU + UK</p>
+        <h1 className="home-display text-ink max-w-[20ch]">
+          I&rsquo;m Finbar, a designer who sweats the small stuff.
+        </h1>
+      </Reveal>
 
-      {/* Headshot + bio */}
-      <div className="mt-10 md:mt-14 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
-        <div
-          className="shrink-0"
-          style={{ width: 160, height: 160, position: "relative", borderRadius: 6, overflow: "hidden", background: "var(--surface-sunken)" }}
-        >
-          <ClientImage
-            src="/images/headshot.webp"
-            alt="Finbar Skitini, Brisbane graphic designer"
-            fill
-            priority
-            sizes="160px"
-            className="object-cover"
-          />
+      {/* ── Portrait + bio + facts ───────────────────────────── */}
+      <Reveal as="div" className="mt-12 md:mt-16 grid md:grid-cols-12 gap-8 md:gap-12 items-start">
+        <div className="md:col-span-4">
+          <div
+            style={{ width: "100%", maxWidth: 320, aspectRatio: "4/5", position: "relative", borderRadius: 10, overflow: "hidden", background: "var(--surface-sunken)" }}
+          >
+            <ClientImage
+              src="/images/headshot.webp"
+              alt="Finbar Skitini, Brisbane graphic designer"
+              fill
+              priority
+              sizes="(max-width: 768px) 80vw, 320px"
+              className="object-cover"
+            />
+          </div>
         </div>
-        <div className="max-w-2xl space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
-          <p>
-            I&rsquo;m Finbar, a graphic designer in Brisbane, originally from London. I studied
-            design in London and Brighton, then moved to Australia and started working as finbar
-            studio.
-          </p>
-          <p>
-            My background is brand and editorial. Most jobs start with the brand, the logo, colour
-            and type, then run into whatever&rsquo;s next: a publication, a website, a campaign. I
-            care about the details, the kerning, the spacing, the way a thing holds together, and I
-            bring that to screen work as much as print.
-          </p>
-          <p>
-            Away from client projects I tinker with creative coding, the interactive and generative kind
-            this site is built from. Leaning on Claude for the technical side is what lets me stay in the
-            design rather than getting buried in code, and a fair bit of what I work out there ends up
-            useful for clients too.
-          </p>
-        </div>
-      </div>
 
-      {/* Capabilities */}
-      <section className="home-section mt-16 md:mt-24" aria-label="Capabilities">
-        <p className="mono-label text-ink-soft mb-8">Capabilities</p>
+        <div className="md:col-span-5 space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
+          <p>
+            I design brand identities, publications and websites for businesses across Australia
+            and the UK. My background is print and editorial, so type, grids and the small details
+            are where I&rsquo;m strongest, and I bring the same eye to everything on screen.
+          </p>
+          <p>
+            I studied design in London and Brighton, then moved to Australia and started working as
+            finbar studio. Most jobs begin with the brand, the logo, colour and type, then run into
+            whatever&rsquo;s next: a publication, a website, a campaign.
+          </p>
+          <p>
+            Away from client work I tinker with creative coding, the interactive and generative kind
+            this site is built from. Leaning on Claude for the technical side keeps me in the design
+            rather than buried in code, and a fair bit of what I work out there ends up useful for
+            clients too.
+          </p>
+        </div>
+
+        {/* Facts */}
+        <div className="md:col-span-3 md:border-l md:border-line md:pl-6">
+          <dl className="grid grid-cols-2 md:grid-cols-1 gap-6">
+            {FACTS.map((f) => (
+              <div key={f.label}>
+                <dt className="mono-label text-ink-soft mb-1.5">{f.label}</dt>
+                <dd className="text-ink" style={{ fontSize: "var(--text-small)" }}>{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </Reveal>
+
+      {/* ── How I work ────────────────────────────────────────── */}
+      <Reveal section as="section" className="home-section" aria-label="How I work">
+        <div className="home-section-index">
+          <h2 className="home-display-sm text-ink">How I work</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-10">
+          {PRINCIPLES.map((p) => (
+            <div key={p.heading}>
+              <h3 className="mono-heading text-pink mb-3">{p.heading}</h3>
+              <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
+                {p.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </Reveal>
+
+      {/* ── Capabilities ──────────────────────────────────────── */}
+      <Reveal section as="section" className="home-section" aria-label="Capabilities">
+        <div className="home-section-index">
+          <h2 className="home-display-sm text-ink">What I do</h2>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-12">
           {CAPABILITIES.map(({ heading, items }) => (
             <div key={heading} className="border-l border-line pl-5">
-              <h2 className="font-sans font-bold uppercase text-ink mb-4 tracking-wider" style={{ fontSize: "var(--text-small)" }}>
+              <h3 className="font-sans font-bold uppercase text-ink mb-4 tracking-wider" style={{ fontSize: "var(--text-small)" }}>
                 {heading}
-              </h2>
+              </h3>
               <ul className="space-y-2">
                 {items.map((item) => (
                   <li key={item} className="font-sans text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
@@ -160,22 +217,22 @@ export default function AboutPage() {
             </div>
           ))}
         </div>
-      </section>
+      </Reveal>
 
       <AboutTestimonials />
 
-      {/* Contact — merged in from the old /contact page */}
-      <section className="home-section" id="contact" aria-label="Contact">
-        <h2 className="home-display-sm text-ink mb-2">Get in touch</h2>
+      {/* ── Contact ───────────────────────────────────────────── */}
+      <Reveal section as="section" className="home-section" id="contact" aria-label="Contact">
+        <div className="home-section-index">
+          <h2 className="home-display-sm text-ink">Let&rsquo;s work together</h2>
+          <span className="status-badge">Open for work</span>
+        </div>
         <p className="text-ink-soft mb-6 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
-          Open to freelance projects and permanent design roles. Email is the fastest way to reach me.
+          Got a project or a role in mind? Email is the fastest way to reach me.
         </p>
 
         <h3 className="mb-8">
-          <a
-            href="mailto:finbar@finbar.studio"
-            className="mono-h3 text-ink hover:text-pink transition-colors"
-          >
+          <a href="mailto:finbar@finbar.studio" className="mono-h3 text-ink hover:text-pink transition-colors">
             finbar@finbar.studio
           </a>
         </h3>
@@ -203,11 +260,7 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-
-        <div className="mt-8">
-          <span className="status-badge">OPEN FOR WORK</span>
-        </div>
-      </section>
+      </Reveal>
     </div>
   );
 }
