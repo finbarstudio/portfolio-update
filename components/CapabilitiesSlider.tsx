@@ -14,9 +14,25 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { gsap } from "gsap";
 import CapabilityScene, { type SceneVariant } from "./CapabilityScene";
+
+/* A persistent "See work" cue so the cards read as tappable (touch has no hover),
+ * and a spinner the moment a card is tapped so the slow route change has feedback.
+ * useLinkStatus reads the enclosing <Link>'s navigation state. */
+function CapCta() {
+  const { pending } = useLinkStatus();
+  return (
+    <span className={`cap-cta${pending ? " is-loading" : ""}`} aria-hidden="true">
+      {pending ? (
+        <><span className="cap-spinner" />Loading</>
+      ) : (
+        <>See work <span className="cap-cta-arrow">&rarr;</span></>
+      )}
+    </span>
+  );
+}
 
 type Capability = {
   name: string;
@@ -73,6 +89,7 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
       <div className="cap-card-body">
         <h3 className="cap-name">{c.name}</h3>
         <p className="cap-desc">{c.desc}</p>
+        <CapCta />
       </div>
     </Link>
   );

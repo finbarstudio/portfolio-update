@@ -683,7 +683,7 @@
     overflow: hidden;
     background: transparent;                  /* no white box at rest */
     border: 1px solid transparent;            /* no outline at rest */
-    transition: border-color var(--dur-fast) var(--ease);
+    transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
   }
   /* 3D animation layer: above the reveal, behind the text. Fades with hover. */
   .cap-scene {
@@ -714,6 +714,43 @@
        and the discipline name in pink. */
     .cap-card { background: transparent; border-color: var(--ink); }
     .cap-card .cap-name { color: var(--pink); }
+  }
+
+  /* Persistent "See work →" cue — makes the cards read as tappable (vital on
+     touch, where there's no hover) and turns into a spinner the instant a card
+     is tapped, so the route change isn't a silent dead pause. */
+  .cap-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pink);
+  }
+  .cap-cta-arrow {
+    display: inline-block;
+    transition: transform var(--dur-fast) var(--ease);
+  }
+  @media (hover: hover) {
+    .cap-card:hover .cap-cta-arrow { transform: translateX(3px); }
+  }
+  .cap-cta.is-loading { color: var(--ink-soft); }
+  .cap-spinner {
+    width: 11px;
+    height: 11px;
+    border: 1.5px solid var(--line);
+    border-top-color: var(--pink);
+    border-radius: 50%;
+    animation: cap-spin 0.6s linear infinite;
+  }
+  @keyframes cap-spin { to { transform: rotate(360deg); } }
+  .cap-card:active { transform: scale(0.985); }
+  @media (prefers-reduced-motion: reduce) {
+    .cap-spinner { animation: none; }
+    .cap-card:active { transform: none; }
   }
 
   /* ── Store ──────────────────────────────────────────────────── */

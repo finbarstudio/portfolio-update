@@ -464,13 +464,15 @@ function MobileMenu({
       aria-modal="true"
       aria-label="Navigation menu"
     >
-      {/* Header mirrors MenuBar — brand left, close (X) right */}
+      {/* Header mirrors the closed MobileBar — borderless, brand left aligned to
+          the bar's chip inset (pl-2.5 = the chip's 10px) so the logo doesn't shift
+          when the menu opens; close (X) right, same -mr-1 as the hamburger. */}
       <div
-        className="flex items-center justify-between px-3 border-b border-ink"
+        className="flex items-center justify-between px-3"
         style={{ height: "var(--menubar-h)" }}
       >
         <span
-          className="font-bold uppercase tracking-[0.08em] text-[13px] inline-flex items-center"
+          className="font-bold uppercase tracking-[0.08em] text-[13px] inline-flex items-center pl-2.5"
           aria-hidden="true"
         >
           finbar<BrandStar className="pixel-star" size={20} />studio
@@ -479,7 +481,7 @@ function MobileMenu({
           type="button"
           onClick={onClose}
           aria-label="Close navigation menu"
-          className="flex items-center justify-center text-ink hover:text-pink transition-colors -mr-2.5"
+          className="flex items-center justify-center text-ink hover:text-pink transition-colors -mr-1"
           style={{ width: 44, height: 44 }}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
