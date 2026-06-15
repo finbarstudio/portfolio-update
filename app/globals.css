@@ -2426,13 +2426,17 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    /* When open, cap the height and scroll internally so the 14-project list
-       never pushes the bottom contact/social block off-screen (~7 rows shown). */
-    max-height: 196px;
+    /* When open, cap the height and scroll internally so the project list never
+       pushes the bottom contact/social block off-screen. The cap deliberately
+       cuts a row in half (peek) and the bottom fades out, so it's obvious there's
+       more to scroll. */
+    max-height: 230px;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
     scrollbar-color: var(--line) transparent;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent);
   }
   .nav-sublist-inner::-webkit-scrollbar { width: 6px; }
   .nav-sublist-inner::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
@@ -2441,7 +2445,7 @@
   .nav-sub {
     display: block;
     flex: 0 0 auto;            /* keep natural height so the capped inner scrolls, not squishes */
-    padding: 5px 10px 5px 39px;
+    padding: 2.5px 10px 2.5px 39px;
     border-radius: 8px;
     font-family: var(--font-primary);
     font-size: 12.5px;
