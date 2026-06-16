@@ -192,6 +192,16 @@ export default function RootLayout({
       className={`${archivoNarrow.variable} ${spaceMono.variable}`}
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
+        {/* Pre-paint: on the sandbox subdomain the URL is rewritten so usePathname
+            can't see it — flag the host here (before paint, no flash) so CSS can
+            drop the portfolio chrome. */}
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(location.hostname.split(':')[0].indexOf('sandbox.')===0)document.documentElement.setAttribute('data-bare-host','');}catch(e){}",
+          }}
+        />
         {/* Bookmania (Adobe Fonts / Typekit) — H1 display serif */}
         <link rel="stylesheet" href="https://use.typekit.net/rlo3ixj.css" />
         <LayoutShell>{children}</LayoutShell>

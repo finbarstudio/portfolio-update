@@ -22,12 +22,12 @@ export const metadata: Metadata = {
 function SandboxHeader() {
   return (
     <header className="sb-header">
-      <Link href="/sandbox" className="sb-wordmark" aria-label="finbar studio Sandbox, home">
+      <Link href="/" className="sb-wordmark" aria-label="finbar studio Sandbox, home">
         finbar<span className="sb-star" aria-hidden="true">✶</span>studio
         <span className="sb-header-tag mono-label">Sandbox</span>
       </Link>
       <nav className="sb-header-nav mono-label" aria-label="Sandbox">
-        <Link href="/sandbox">Tools</Link>
+        <Link href="/">Tools</Link>
         <a href="https://www.finbar.studio" target="_blank" rel="noopener noreferrer">
           finbar.studio ↗
         </a>

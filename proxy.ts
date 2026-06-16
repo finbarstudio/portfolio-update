@@ -16,26 +16,33 @@ import type { NextRequest } from "next/server";
  */
 
 const SANDBOX_HOSTS = new Set(["sandbox.finbar.studio", "sandbox.localhost"]);
+const MAIN_HOSTS = new Set(["www.finbar.studio", "finbar.studio"]);
 
 export function proxy(request: NextRequest): NextResponse {
   const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
   const { pathname } = request.nextUrl;
 
+  // ── Sandbox subdomain: clean URLs (no visible /sandbox prefix) ──────────────
   if (SANDBOX_HOSTS.has(host)) {
-    // Already under /sandbox or /embed → serve as-is; otherwise map into /sandbox.
-    if (pathname.startsWith("/sandbox") || pathname.startsWith("/embed")) {
-      return NextResponse.next();
+    // Embeds are served as-is on every host (stable embed URLs).
+    if (pathname.startsWith("/embed")) return NextResponse.next();
+    // If the prefix leaked into the URL, 308 it to the clean path.
+    if (pathname.startsWith("/sandbox")) {
+      const clean = pathname.replace(/^\/sandbox/, "") || "/";
+      if (clean !== pathname) {
+        const url = request.nextUrl.clone();
+        url.pathname = clean;
+        return NextResponse.redirect(url, 308);
+      }
     }
+    // Clean path → rewrite into the internal /sandbox route tree (URL stays clean).
     const url = request.nextUrl.clone();
     url.pathname = `/sandbox${pathname === "/" ? "" : pathname}`;
     return NextResponse.rewrite(url);
   }
 
-  if (
-    process.env.SANDBOX_CANONICAL_REDIRECT === "1" &&
-    (host === "www.finbar.studio" || host === "finbar.studio") &&
-    pathname.startsWith("/sandbox")
-  ) {
+  // ── Main host: the Sandbox lives on its subdomain, so 308 /sandbox/* there ──
+  if (MAIN_HOSTS.has(host) && pathname.startsWith("/sandbox")) {
     const url = request.nextUrl.clone();
     url.host = "sandbox.finbar.studio";
     url.pathname = pathname.replace(/^\/sandbox/, "") || "/";

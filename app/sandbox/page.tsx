@@ -5,7 +5,7 @@ const TOOLS: Tool[] = [
     title: "Phone Mockup",
     blurb:
       "Drop your images or videos onto a cycling 3D iPhone carousel and export a looping video, stills, a GIF or an embed.",
-    href: "/sandbox/phone-mockup",
+    href: "/phone-mockup",
     status: "live",
     tag: "3D · WebGL",
   },

@@ -101,16 +101,22 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-      {/* Film grain — retro texture over everything (never blocks pointers). */}
-      <div className="grain-overlay" aria-hidden="true" />
-      <MobileBar onMenu={() => setMobileMenuOpen(true)} />
-      <Sidebar
-        collapsed={collapsed}
-        onToggle={toggle}
-        mobileMenuOpen={mobileMenuOpen}
-        onMobileMenuClose={() => setMobileMenuOpen(false)}
-        onContactOpen={() => setContactOpen(true)}
-      />
+      {/* Portfolio chrome, grouped so it can be dropped on the sandbox subdomain
+          (where the rewritten URL means usePathname can't detect it — a pre-paint
+          script sets html[data-bare-host] and CSS hides .site-chrome). */}
+      <div className="site-chrome">
+        {/* Film grain — retro texture over everything (never blocks pointers). */}
+        <div className="grain-overlay" aria-hidden="true" />
+        <MobileBar onMenu={() => setMobileMenuOpen(true)} />
+        <Sidebar
+          collapsed={collapsed}
+          onToggle={toggle}
+          mobileMenuOpen={mobileMenuOpen}
+          onMobileMenuClose={() => setMobileMenuOpen(false)}
+          onContactOpen={() => setContactOpen(true)}
+        />
+        <ContactDrawer open={contactOpen} onClose={() => setContactOpen(false)} />
+      </div>
       <main
         className="min-w-0 ml-0 md:ml-[var(--sidebar-w)]"
         style={
@@ -127,7 +133,6 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       >
         {children}
       </main>
-      <ContactDrawer open={contactOpen} onClose={() => setContactOpen(false)} />
     </>
   );
 }
