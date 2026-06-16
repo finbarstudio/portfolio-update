@@ -49,8 +49,10 @@ function makeVideoDescriptor(src: string): MacTextureDescriptor {
   el.style.cssText =
     "position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none;";
   el.src = src;
-  if (typeof document !== "undefined" && document.body) document.body.appendChild(el);
-  el.load();
+  // NOTE: appendChild + load() are deferred to an effect in useMacTextures (below)
+  // so this useMemo factory stays pure. StrictMode double-invokes the factory in
+  // dev; mutating document.body here would orphan a decoding <video> the cleanup
+  // effect can't reach. (Mirrors ModelDisplay's attach-in-effect pattern.)
 
   const tex = new THREE.VideoTexture(el);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -169,6 +171,20 @@ export function useMacTextures(
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
+
+  // Attach video elements to the DOM + start decoding here (an effect), not in the
+  // useMemo factory, so render stays pure. Several browsers won't decode frames for
+  // a WebGL texture unless the <video> is in the DOM; dispose() detaches them.
+  useEffect(() => {
+    if (typeof document === "undefined" || !document.body) return;
+    descriptors.forEach((d) => {
+      const v = d.video;
+      if (v && !v.parentNode) {
+        document.body.appendChild(v);
+        v.load();
+      }
+    });
+  }, [descriptors]);
 
   useEffect(() => {
     descriptors.forEach((d) => d.recompose(fit, bgColor));
