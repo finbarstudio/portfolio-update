@@ -6,17 +6,16 @@
  * set (xPercent -50), so it's seamless. Slows to a stop on hover, pauses
  * off-screen. No-ops under reduced motion (static row).
  *
- * Each card uses the same treatment as the project thumbnails: transparent at
- * rest (no white box, no outline), and on hover a pink reveal grows from the
- * centre while a 3D animation spins BEHIND the text; the outline only draws in
- * once the reveal has finished. The 3D canvas is mounted on hover and torn down
- * shortly after, so at most one or two WebGL contexts are ever live.
+ * Each card is transparent at rest (no white box, no outline); on hover a pink
+ * reveal grows from the centre and a bespoke SVG + GSAP vignette plays BEHIND the
+ * text (one per discipline). These are pure SVG/GSAP — no WebGL — so hovering and
+ * navigating away never spins up a canvas or janks the page.
  */
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Link, { useLinkStatus } from "next/link";
 import { gsap } from "gsap";
-import CapabilityScene, { type SceneVariant } from "./CapabilityScene";
+import CapabilityViz, { type VizVariant } from "./CapabilityViz";
 
 /* A persistent "See work" cue so the cards read as tappable (touch has no hover),
  * and a spinner the moment a card is tapped so the slow route change has feedback.
@@ -37,7 +36,7 @@ function CapCta() {
 type Capability = {
   name: string;
   desc: string;
-  variant: SceneVariant;
+  variant: VizVariant;
   color: string;
   filter: string;          // /work?filter=<key>
 };
@@ -52,21 +51,9 @@ const CAPABILITIES: Capability[] = [
 ];
 
 function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
-  // Mount the 3D canvas on hover; keep it briefly after leaving so it can fade
-  // out with the reveal rather than vanishing instantly.
-  const [mounted, setMounted] = useState(false);
-  const unmountTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => () => { if (unmountTimer.current) clearTimeout(unmountTimer.current); }, []);
-
-  const onEnter = () => {
-    if (unmountTimer.current) { clearTimeout(unmountTimer.current); unmountTimer.current = null; }
-    setMounted(true);
-  };
-  const onLeave = () => {
-    if (unmountTimer.current) clearTimeout(unmountTimer.current);
-    unmountTimer.current = setTimeout(() => setMounted(false), 700);
-  };
+  // The vignette is cheap SVG/GSAP, so it's always mounted (paused); hovering
+  // just plays its timeline and fades the layer in.
+  const [active, setActive] = useState(false);
 
   return (
     <Link
@@ -75,8 +62,10 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
       aria-label={`${c.name} — see this work`}
       aria-hidden={hidden || undefined}
       tabIndex={hidden ? -1 : undefined}
-      onPointerEnter={onEnter}
-      onPointerLeave={onLeave}
+      onPointerEnter={() => setActive(true)}
+      onPointerLeave={() => setActive(false)}
+      onFocus={() => setActive(true)}
+      onBlur={() => setActive(false)}
     >
       <span className="card-reveal" aria-hidden="true">
         <span className="card-rev c1" />
@@ -84,7 +73,7 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
         <span className="card-rev c3" />
       </span>
       <div className="cap-scene" aria-hidden="true">
-        {mounted && <CapabilityScene variant={c.variant} color={c.color} />}
+        <CapabilityViz variant={c.variant} color={c.color} active={active && !hidden} />
       </div>
       <div className="cap-card-body">
         <h3 className="cap-name">{c.name}</h3>

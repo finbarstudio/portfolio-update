@@ -689,7 +689,7 @@
     border: 1px solid transparent;            /* no outline at rest */
     transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
   }
-  /* 3D animation layer: above the reveal, behind the text. Fades with hover. */
+  /* Vignette layer (SVG + GSAP): above the reveal, behind the text. Fades with hover. */
   .cap-scene {
     position: absolute;
     inset: 0;
@@ -697,6 +697,18 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.5s var(--ease);
+  }
+  .cap-viz-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cap-viz {
+    width: 82%;
+    height: 78%;
+    overflow: visible;       /* let back.out overshoot / sweeps spill past the box */
   }
   .cap-card-body {
     position: relative;
