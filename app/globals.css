@@ -337,24 +337,19 @@
   .contact-drawer-backdrop, .contact-drawer-panel { transition: none; }
 }
 
-/* Sidebar header: brand (home) + the integrated collapse/expand toggle. */
+/* Sidebar header: brand (home) + the integrated collapse/expand toggle, always on
+   one row. The toggle is pushed to the right edge (margin-left:auto), so as the
+   rail widens the wordmark slides in and the chevron slides out — no vertical
+   layout shift between states. */
 .sidebar-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 4px;
   flex: 0 0 auto;
   height: 48px;
-  padding: 0 12px 0 14px;
+  padding: 0 12px;
   border-bottom: 1px solid var(--line);
 }
-.sidebar-head.is-collapsed {
-  flex-direction: column;
-  justify-content: center;
-  gap: 7px;
-  height: auto;
-  padding: 12px 0 11px;
-}
+.sidebar-head.is-collapsed { padding: 0 4px; }
 
 .sidebar-logo {
   display: flex;
@@ -384,6 +379,7 @@
    to collapse; rotates to point right when collapsed (= expand). */
 .sidebar-toggle {
   flex: 0 0 auto;
+  margin-left: auto;          /* sit at the right edge; slides out as the rail widens */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -394,9 +390,12 @@
   background: none;
   border: none;
   cursor: pointer;
-  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
+              width var(--dur) var(--ease), height var(--dur) var(--ease);
 }
 .sidebar-toggle:hover { color: var(--pink); background: var(--surface-sunken); }
+/* Shrink to fit alongside the star in the narrow collapsed rail. */
+.sidebar-head.is-collapsed .sidebar-toggle { width: 18px; height: 18px; }
 .sidebar-toggle svg { transition: transform var(--dur) var(--ease); }
 .sidebar-head.is-collapsed .sidebar-toggle svg { transform: rotate(180deg); }
 
