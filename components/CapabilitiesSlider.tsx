@@ -12,13 +12,14 @@
  * navigating away never spins up a canvas or janks the page.
  */
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import Link, { useLinkStatus } from "next/link";
 import { gsap } from "gsap";
 import CapabilityViz, { type VizVariant } from "./CapabilityViz";
 
-/* A persistent "See work" cue so the cards read as tappable (touch has no hover),
- * and a spinner the moment a card is tapped so the slow route change has feedback.
+/* The hover call-to-action: a bold "SEE WORK" that rises in as the vignette plays
+ * (hidden at rest on desktop, always shown on touch). Turns into a spinner the
+ * instant the card is tapped so the route change isn't a silent pause.
  * useLinkStatus reads the enclosing <Link>'s navigation state. */
 function CapCta() {
   const { pending } = useLinkStatus();
@@ -59,6 +60,7 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
     <Link
       href={`/work?filter=${c.filter}`}
       className="cap-card group"
+      style={{ "--cap-accent": c.color } as CSSProperties}
       aria-label={`${c.name} — see this work`}
       aria-hidden={hidden || undefined}
       tabIndex={hidden ? -1 : undefined}
@@ -73,12 +75,14 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
         <span className="card-rev c3" />
       </span>
       <div className="cap-scene" aria-hidden="true">
-        <CapabilityViz variant={c.variant} color={c.color} active={active && !hidden} />
+        <CapabilityViz variant={c.variant} color={c.color} active={active} />
       </div>
       <div className="cap-card-body">
         <h3 className="cap-name">{c.name}</h3>
-        <p className="cap-desc">{c.desc}</p>
-        <CapCta />
+        <div className="cap-foot">
+          <p className="cap-desc">{c.desc}</p>
+          <CapCta />
+        </div>
       </div>
     </Link>
   );
@@ -87,6 +91,7 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
 export default function CapabilitiesSlider() {
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const tweenRef = useRef<gsap.core.Tween | null>(null);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -96,14 +101,13 @@ export default function CapabilitiesSlider() {
     // On touch, don't auto-marquee — let the row scroll natively (swipeable).
     if (window.matchMedia("(hover: none)").matches) return;
 
-    let tween: gsap.core.Tween | undefined;
     const ctx = gsap.context(() => {
-      tween = gsap.to(track, { xPercent: -50, duration: 32, ease: "none", repeat: -1 });
+      tweenRef.current = gsap.to(track, { xPercent: -50, duration: 36, ease: "none", repeat: -1 });
     }, trackRef);
 
-    // Keeps scrolling through hover; only pauses when off-screen (perf).
+    // Pause when off-screen (perf).
     const io = new IntersectionObserver(
-      ([e]) => { if (tween) (e.isIntersecting ? tween.play() : tween.pause()); },
+      ([e]) => { const t = tweenRef.current; if (t) (e.isIntersecting ? t.play() : t.pause()); },
       { rootMargin: "120px" }
     );
     io.observe(root);
@@ -111,12 +115,19 @@ export default function CapabilitiesSlider() {
     return () => {
       io.disconnect();
       ctx.revert();
+      tweenRef.current = null;
     };
   }, []);
 
+  // Slow the marquee to a stop while hovering so the card under the cursor holds
+  // still and its vignette can play fully (otherwise the card slides away and the
+  // hover restarts/half-plays).
+  const slow = () => { if (tweenRef.current) gsap.to(tweenRef.current, { timeScale: 0, duration: 0.5, ease: "power2.out" }); };
+  const resume = () => { if (tweenRef.current) gsap.to(tweenRef.current, { timeScale: 1, duration: 0.7, ease: "power2.out" }); };
+
   const items = [...CAPABILITIES, ...CAPABILITIES];
   return (
-    <div ref={rootRef} className="cap-slider">
+    <div ref={rootRef} className="cap-slider" onPointerEnter={slow} onPointerLeave={resume}>
       <div ref={trackRef} className="cap-track">
         {items.map((c, i) => (
           <CapabilityCard key={i} c={c} hidden={i >= CAPABILITIES.length} />

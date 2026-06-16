@@ -722,6 +722,12 @@
   @media (hover: hover) {
     .cap-card:hover .cap-scene,
     .cap-card:focus-within .cap-scene { opacity: 1; }
+    /* On hover the vignette is the focus: drop the descriptive text (so it's not
+       obstructed) and rise the bold CTA in to replace it. */
+    .cap-card:hover .cap-desc,
+    .cap-card:focus-within .cap-desc { opacity: 0; transform: translateY(6px); }
+    .cap-card:hover .cap-cta,
+    .cap-card:focus-within .cap-cta { opacity: 1; transform: none; }
   }
   /* Touch devices have no hover to reveal the card, so give it a legible resting
      state — a soft tile with an outline and the discipline name in pink. */
@@ -731,33 +737,51 @@
        the tall reserve space and let name/desc/CTA stack compactly. */
     .cap-card { background: transparent; border-color: var(--ink); min-height: 0; }
     .cap-card .cap-name { color: var(--pink); }
-    .cap-card .cap-desc { margin-top: var(--space-3); }
   }
 
-  /* Persistent "See work →" cue — makes the cards read as tappable (vital on
-     touch, where there's no hover) and turns into a spinner the instant a card
-     is tapped, so the route change isn't a silent dead pause. */
+  /* Desc + CTA share the bottom of the card. On hover-capable devices they stack
+     in one grid cell and swap (desc out, CTA in); on touch they stack normally
+     and both stay visible. */
+  .cap-foot { margin-top: auto; }
+  @media (hover: hover) {
+    .cap-foot { display: grid; }
+    .cap-foot > * { grid-area: 1 / 1; align-self: end; }
+  }
+  @media (hover: none) {
+    .cap-foot { display: flex; flex-direction: column; gap: var(--space-3); }
+  }
+
+  /* The hover CTA — a bold "SEE WORK" statement that rises in with the vignette.
+     Hidden at rest on desktop (revealed on hover above); always shown on touch as
+     the tappable cue. Turns into a spinner the instant the card is tapped. */
   .cap-cta {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    margin-top: var(--space-3);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
+    gap: 0.45em;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    /* Ink label (pink at 11px is ~2.6:1, fails AA) with a pink arrow to keep the
-       accent; the whole CTA goes pink on desktop hover. */
+    line-height: 1;
     color: var(--ink);
+    opacity: 0;                       /* hidden at rest on hover-capable; hover reveals */
+    transform: translateY(14px);
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
   }
   .cap-cta-arrow {
     display: inline-block;
-    color: var(--pink);
+    font-size: 1.2em;
+    color: var(--cap-accent, var(--pink));   /* the discipline's accent — ties the CTA to its vignette */
     transition: transform var(--dur-fast) var(--ease);
   }
   @media (hover: hover) {
-    .cap-card:hover .cap-cta { color: var(--pink); }
-    .cap-card:hover .cap-cta-arrow { transform: translateX(3px); }
+    .cap-card:hover .cap-cta-arrow,
+    .cap-card:focus-within .cap-cta-arrow { transform: translateX(5px); }
+  }
+  @media (hover: none) {
+    /* touch has no hover state — show the CTA as the persistent tappable cue */
+    .cap-cta { opacity: 1; transform: none; font-size: 0.95rem; }
   }
   .cap-cta.is-loading { color: var(--ink-soft); }
   .cap-spinner {
@@ -853,7 +877,7 @@
     color: var(--ink);
     font-size: var(--text-small);
   }
-  .cap-desc { margin-top: auto; padding-top: var(--space-4); color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; }
+  .cap-desc { color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); }
   @media (hover: hover) {
     .cap-item:hover { background: var(--surface-sunken); }
     .cap-item:hover .cap-name { color: var(--pink); }
