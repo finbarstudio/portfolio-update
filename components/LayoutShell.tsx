@@ -79,44 +79,24 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   const sidebarW = collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
 
-  // The Sandbox + embeds get their own chrome (a distinct "techy" layout, or none
-  // at all for embeds) — skip the portfolio sidebar, mobile bar, grain and the
-  // sidebar offset entirely for those paths.
-  const isBare = pathname.startsWith("/sandbox") || pathname.startsWith("/embed");
-  if (isBare) {
-    return (
-      <>
-        <a href="#main-content" className="skip-link">
-          Skip to content
-        </a>
-        <main id="main-content" tabIndex={-1} className="min-w-0" style={{ minHeight: "100vh" }}>
-          {children}
-        </main>
-      </>
-    );
-  }
-
+  // Only the portfolio routes (app/(site)) render this shell — the Sandbox + embeds
+  // live outside that route group and never mount LayoutShell at all.
   return (
     <>
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-      {/* Portfolio chrome, grouped so it can be dropped on the sandbox subdomain
-          (where the rewritten URL means usePathname can't detect it — a pre-paint
-          script sets html[data-bare-host] and CSS hides .site-chrome). */}
-      <div className="site-chrome">
-        {/* Film grain — retro texture over everything (never blocks pointers). */}
-        <div className="grain-overlay" aria-hidden="true" />
-        <MobileBar onMenu={() => setMobileMenuOpen(true)} />
-        <Sidebar
-          collapsed={collapsed}
-          onToggle={toggle}
-          mobileMenuOpen={mobileMenuOpen}
-          onMobileMenuClose={() => setMobileMenuOpen(false)}
-          onContactOpen={() => setContactOpen(true)}
-        />
-        <ContactDrawer open={contactOpen} onClose={() => setContactOpen(false)} />
-      </div>
+      {/* Film grain — retro texture over everything (never blocks pointers). */}
+      <div className="grain-overlay" aria-hidden="true" />
+      <MobileBar onMenu={() => setMobileMenuOpen(true)} />
+      <Sidebar
+        collapsed={collapsed}
+        onToggle={toggle}
+        mobileMenuOpen={mobileMenuOpen}
+        onMobileMenuClose={() => setMobileMenuOpen(false)}
+        onContactOpen={() => setContactOpen(true)}
+      />
+      <ContactDrawer open={contactOpen} onClose={() => setContactOpen(false)} />
       <main
         className="min-w-0 ml-0 md:ml-[var(--sidebar-w)]"
         style={

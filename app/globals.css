@@ -392,20 +392,6 @@
 .sidebar-toggle svg { transition: transform var(--dur) var(--ease); }
 .sidebar-toggle[data-collapsed="true"] svg { transform: rotate(180deg); }
 
-/* Portfolio chrome wrapper. Transparent to layout normally; on the sandbox
-   subdomain (html[data-bare-host], set pre-paint) it's dropped entirely and the
-   main content fills the viewport — the sandbox brings its own techy chrome. */
-.site-chrome { display: contents; }
-html[data-bare-host] .site-chrome { display: none; }
-/* In the utilities layer so this out-cascades Tailwind's md:ml-[…] margin utility
-   (higher specificity, same layer); !important also beats the inline padding-top. */
-@layer utilities {
-  html[data-bare-host] #main-content {
-    margin: 0 !important;
-    padding-top: 0 !important;
-  }
-}
-
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
 

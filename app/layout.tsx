@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Archivo_Narrow, Space_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import LayoutShell from "@/components/LayoutShell";
 
 // Body + mono/label text. The H1 display serif is Bookmania, loaded from Adobe
 // Fonts (Typekit) via the <link> in <body>; --font-display in globals uses it.
@@ -190,25 +189,13 @@ export default function RootLayout({
     <html
       lang="en-AU"
       className={`${archivoNarrow.variable} ${spaceMono.variable}`}
-      // The pre-paint script below sets data-bare-host on the sandbox host before
-      // React hydrates; suppress the resulting attribute-mismatch warning so React
-      // leaves that flag in place (instead of reverting it and re-showing the chrome).
-      suppressHydrationWarning
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
-        {/* Pre-paint: on the sandbox subdomain the URL is rewritten so usePathname
-            can't see it — flag the host here (before paint, no flash) so CSS can
-            drop the portfolio chrome. */}
-        <script
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{if(location.hostname.split(':')[0].indexOf('sandbox.')===0)document.documentElement.setAttribute('data-bare-host','');}catch(e){}",
-          }}
-        />
         {/* Bookmania (Adobe Fonts / Typekit) — H1 display serif */}
         <link rel="stylesheet" href="https://use.typekit.net/rlo3ixj.css" />
-        <LayoutShell>{children}</LayoutShell>
+        {/* Routes bring their own chrome: portfolio routes via app/(site)/layout
+            (the sidebar shell); the Sandbox + embeds via their own bare layouts. */}
+        {children}
         <Script
           id="ld-person"
           type="application/ld+json"
