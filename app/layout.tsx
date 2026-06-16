@@ -190,6 +190,10 @@ export default function RootLayout({
     <html
       lang="en-AU"
       className={`${archivoNarrow.variable} ${spaceMono.variable}`}
+      // The pre-paint script below sets data-bare-host on the sandbox host before
+      // React hydrates; suppress the resulting attribute-mismatch warning so React
+      // leaves that flag in place (instead of reverting it and re-showing the chrome).
+      suppressHydrationWarning
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
         {/* Pre-paint: on the sandbox subdomain the URL is rewritten so usePathname
