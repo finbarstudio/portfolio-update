@@ -10,6 +10,14 @@ const TOOLS: Tool[] = [
     tag: "3D · WebGL",
   },
   {
+    title: "Mac Mockup",
+    blurb:
+      "Set a screenshot or screen recording on a 3D Studio Display and export a looping turntable video, stills, a GIF or an embed.",
+    href: "/mac-mockup",
+    status: "live",
+    tag: "3D · WebGL",
+  },
+  {
     title: "Album Wall",
     blurb: "Arrange cover art on a light-catching gallery wall and export the render.",
     status: "soon",

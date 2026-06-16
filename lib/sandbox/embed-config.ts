@@ -85,22 +85,22 @@ export function aspectToCss(aspect: string): string {
   return "16 / 9";
 }
 
-export function buildEmbedUrl(origin: string, config: EmbedConfig): string {
+export function buildEmbedUrl(origin: string, config: EmbedConfig, toolPath = "/embed/phone"): string {
   const sp = encodeEmbedConfig(config, origin);
-  return `${origin.replace(/\/$/, "")}/embed/phone?${sp.toString()}`;
+  return `${origin.replace(/\/$/, "")}${toolPath}?${sp.toString()}`;
 }
 
 /**
  * The ~1KB responsive iframe snippet + "Made with finbar.studio" backlink.
  * Padding-top trick keeps the embed responsive without JS.
  */
-export function buildEmbedSnippet(origin: string, config: EmbedConfig): string {
-  const url = buildEmbedUrl(origin, config);
+export function buildEmbedSnippet(origin: string, config: EmbedConfig, toolPath = "/embed/phone"): string {
+  const url = buildEmbedUrl(origin, config, toolPath);
   const [w, h] = config.aspect.split(/[:/]/).map((n) => parseFloat(n));
   const pct = w && h ? ((h / w) * 100).toFixed(2) : "56.25";
   return `<div style="position:relative;width:100%;max-width:640px;margin:auto">
   <div style="position:relative;width:100%;padding-top:${pct}%">
-    <iframe src="${url}" title="finbar.studio phone mockup" loading="lazy"
+    <iframe src="${url}" title="finbar.studio mockup" loading="lazy"
       style="position:absolute;inset:0;width:100%;height:100%;border:0"
       allowtransparency="true"></iframe>
   </div>

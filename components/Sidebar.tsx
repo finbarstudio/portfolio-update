@@ -66,6 +66,18 @@ function EnvelopeIcon() {
     </svg>
   );
 }
+function SandboxIcon() {
+  // A little beaker — the sandbox of experimental tools.
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M6.5 2v4.2L3.2 12a1 1 0 00.86 1.5h7.88a1 1 0 00.86-1.5L9.5 6.2V2" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
+      <path d="M5.5 2h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+      <path d="M5.1 9.5h5.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+const SANDBOX_HREF = "https://sandbox.finbar.studio";
 
 const socials = [
   { label: "Are.na",    href: "https://are.na/finbar-studio",          icon: <ArenaIcon /> },
@@ -337,6 +349,23 @@ function DesktopSidebar({
           </span>
         </Link>
 
+        {/* Subtle cross-link to the Sandbox (sits on its own subdomain), tucked at
+            the bottom of the nav just above Contact. */}
+        <a
+          href={SANDBOX_HREF}
+          title="Sandbox — free creative tools"
+          aria-label="Sandbox, free creative tools"
+          className="nav-row nav-row-sandbox"
+        >
+          <span className="nav-track">
+            <span className="nav-slot nav-slot-ico"><SandboxIcon /></span>
+            <span className="nav-slot nav-slot-label">
+              <span className="nav-slot-text">Sandbox</span>
+              <span className="nav-ext" aria-hidden="true">↗</span>
+            </span>
+          </span>
+        </a>
+
         <button
           type="button"
           onClick={onContactOpen}
@@ -474,6 +503,17 @@ function MobileMenu({
               </Link>
             </li>
           ))}
+          <li>
+            <a
+              href={SANDBOX_HREF}
+              onClick={onClose}
+              className="mobile-nav-row"
+              aria-label="Sandbox, free creative tools"
+            >
+              <span className="mobile-nav-label">Sandbox</span>
+              <span className="mobile-nav-arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
           <li>
             <button
               type="button"

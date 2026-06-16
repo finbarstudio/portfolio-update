@@ -59,6 +59,7 @@ export default function ControlPanel({
   onFit,
   background,
   onBackground,
+  presetLabels = { carousel: "Carousel", flat: "Flat" },
 }: {
   preset: AnimationPreset;
   onPreset: (v: AnimationPreset) => void;
@@ -68,6 +69,8 @@ export default function ControlPanel({
   onFit: (v: FitMode) => void;
   background: string;
   onBackground: (v: string) => void;
+  /** Override the two preset button labels (the Mac tool uses Angle / Flat). */
+  presetLabels?: { carousel: string; flat: string };
 }) {
   const customActive = !SWATCHES.some((s) => s.value === background);
 
@@ -80,8 +83,8 @@ export default function ControlPanel({
         value={preset}
         onChange={onPreset}
         options={[
-          { value: "carousel", label: "Carousel" },
-          { value: "flat", label: "Flat" },
+          { value: "carousel", label: presetLabels.carousel },
+          { value: "flat", label: presetLabels.flat },
         ]}
       />
 

@@ -145,3 +145,27 @@ export const DEMO_MEDIA: MediaAsset[] = TMYR_REELS.map((name) => ({
   height: 1920,
   isDemo: true,
 }));
+
+/** Public landscape screens — seed the Mac display so it's never empty. The
+ *  website screenshot is first so it paints instantly (no decode wait); the screen
+ *  recording follows to show off the slideshow + on-screen video. */
+export const MAC_DEMO_MEDIA: MediaAsset[] = [
+  {
+    id: "mac-demo-kinaya",
+    kind: "image",
+    src: "/images/kinaya/desktop.png",
+    name: "desktop.png",
+    width: 1920,
+    height: 1080,
+    isDemo: true,
+  },
+  {
+    id: "mac-demo-momentum",
+    kind: "video",
+    src: "/images/momentum-mentoring/screen.mp4",
+    name: "screen.mp4",
+    width: 1920,
+    height: 1080,
+    isDemo: true,
+  },
+];

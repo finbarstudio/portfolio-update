@@ -2445,6 +2445,18 @@
     color: var(--ink-soft);
     flex-shrink: 0;
   }
+
+  /* Subtle Sandbox cross-link — quieter than the primary rows (it lives on a
+     separate subdomain), but lifts to pink on hover like everything else. */
+  .nav-row-sandbox { color: var(--ink-soft); }
+  .nav-row-sandbox:hover { color: var(--pink); }
+  .nav-ext {
+    font-size: 10px;
+    color: var(--ink-soft);
+    flex-shrink: 0;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .nav-row-sandbox:hover .nav-ext { color: var(--pink); }
   .nav-chevron {
     width: 10px;
     height: 10px;
