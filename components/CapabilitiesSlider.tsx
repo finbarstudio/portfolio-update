@@ -119,15 +119,9 @@ export default function CapabilitiesSlider() {
     };
   }, []);
 
-  // Slow the marquee to a stop while hovering so the card under the cursor holds
-  // still and its vignette can play fully (otherwise the card slides away and the
-  // hover restarts/half-plays).
-  const slow = () => { if (tweenRef.current) gsap.to(tweenRef.current, { timeScale: 0, duration: 0.5, ease: "power2.out" }); };
-  const resume = () => { if (tweenRef.current) gsap.to(tweenRef.current, { timeScale: 1, duration: 0.7, ease: "power2.out" }); };
-
   const items = [...CAPABILITIES, ...CAPABILITIES];
   return (
-    <div ref={rootRef} className="cap-slider" onPointerEnter={slow} onPointerLeave={resume}>
+    <div ref={rootRef} className="cap-slider">
       <div ref={trackRef} className="cap-track">
         {items.map((c, i) => (
           <CapabilityCard key={i} c={c} hidden={i >= CAPABILITIES.length} />

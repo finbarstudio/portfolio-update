@@ -337,27 +337,17 @@
   .contact-drawer-backdrop, .contact-drawer-panel { transition: none; }
 }
 
-/* Sidebar header: brand (home) + the integrated collapse/expand toggle, always on
-   one row. The toggle is pushed to the right edge (margin-left:auto), so as the
-   rail widens the wordmark slides in and the chevron slides out — no vertical
-   layout shift between states. */
-.sidebar-head {
-  display: flex;
-  align-items: center;
-  flex: 0 0 auto;
-  height: 48px;
-  padding: 0 12px;
-  border-bottom: 1px solid var(--line);
-}
-.sidebar-head.is-collapsed { padding: 0 4px; }
-
+/* Sidebar logo, pinned at the top of the rail. Centred star (aligned with the
+   nav icons) when collapsed; full wordmark when expanded. */
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 2px;
-  flex: 0 1 auto;
-  min-width: 0;
+  flex: 0 0 auto;
+  height: 48px;
+  padding: 0 14px;
   color: var(--ink);
+  border-bottom: 1px solid var(--line);
   transition: color var(--dur-fast) var(--ease);
 }
 .sidebar-logo:hover { color: var(--pink); }
@@ -372,32 +362,35 @@
   transition: opacity 0.3s var(--ease), max-width 0.4s var(--ease);
   max-width: 8ch;
 }
-.sidebar-logo.is-collapsed { justify-content: center; gap: 0; }
+.sidebar-logo.is-collapsed { justify-content: center; gap: 0; padding: 0; }
 .sidebar-logo.is-collapsed .logo-word { opacity: 0; max-width: 0; }
 
-/* Integrated rail toggle — a light chevron, not a floating handle. Points left
-   to collapse; rotates to point right when collapsed (= expand). */
+/* Tiny collapse/expand chevron protruding just past the rail's right edge,
+   level with the logo — so the star stays centred with the nav icons. Slides
+   with the rail edge; rotates to point right (= expand) when collapsed. */
 .sidebar-toggle {
-  flex: 0 0 auto;
-  margin-left: auto;          /* sit at the right edge; slides out as the rail widens */
+  position: fixed;
+  top: calc(var(--menubar-h) + 24px);   /* vertical centre of the 48px logo row */
+  transform: translateY(-50%);
+  z-index: 41;
+  margin-left: -9px;                     /* straddle the edge, mostly protruding right */
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   color: var(--ink-soft);
-  background: none;
-  border: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  box-shadow: var(--elev-1);
   cursor: pointer;
-  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
-              width var(--dur) var(--ease), height var(--dur) var(--ease);
+  transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
-.sidebar-toggle:hover { color: var(--pink); background: var(--surface-sunken); }
-/* Shrink to fit alongside the star in the narrow collapsed rail. */
-.sidebar-head.is-collapsed .sidebar-toggle { width: 18px; height: 18px; }
+.sidebar-toggle:hover { color: var(--pink); border-color: var(--pink); }
 .sidebar-toggle svg { transition: transform var(--dur) var(--ease); }
-.sidebar-head.is-collapsed .sidebar-toggle svg { transform: rotate(180deg); }
+.sidebar-toggle[data-collapsed="true"] svg { transform: rotate(180deg); }
 
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {

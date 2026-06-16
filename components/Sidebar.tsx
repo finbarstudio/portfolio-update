@@ -200,6 +200,23 @@ function DesktopSidebar({
 
   return (
     <>
+      {/* A tiny chevron that protrudes just past the rail's right edge, vertically
+          level with the logo. Kept outside the (clipped) <aside> so it can stick
+          out; the star stays centred on the same axis as the nav icons. */}
+      <button
+        type="button"
+        onClick={onToggle}
+        className="sidebar-toggle hidden md:flex"
+        data-collapsed={collapsed}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        aria-expanded={!collapsed}
+        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        style={{ left: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W }}
+      >
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 4 L6 8 l4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
     <aside
       className="hidden md:flex fixed left-0 border-r border-line flex-col z-40 bg-bg"
       style={{
@@ -215,33 +232,18 @@ function DesktopSidebar({
       }}
       aria-label="Site navigation"
     >
-      {/* Header: brand (home link) + the collapse/expand toggle, integrated into
-          the rail (no floating handle). Expanded → wordmark left, chevron right;
-          collapsed → star above, chevron below, both centred. */}
-      <div className={`sidebar-head ${collapsed ? "is-collapsed" : ""}`}>
-        <Link
-          href="/"
-          className={`sidebar-logo ${collapsed ? "is-collapsed" : ""}`}
-          aria-label="finbar.studio, home"
-          title="finbar.studio, home"
-        >
-          <span className="logo-word logo-pre">finbar</span>
-          <BrandStar className="pixel-star" size={16} />
-          <span className="logo-word logo-post">studio</span>
-        </Link>
-        <button
-          type="button"
-          className="sidebar-toggle"
-          onClick={onToggle}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          aria-expanded={!collapsed}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M10 4 L6 8 l4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </div>
+      {/* Logo, pinned at the top of the rail. Just the star (centred, aligned with
+          the nav icons) when collapsed; the full wordmark when expanded. */}
+      <Link
+        href="/"
+        className={`sidebar-logo ${collapsed ? "is-collapsed" : ""}`}
+        aria-label="finbar.studio, home"
+        title="finbar.studio, home"
+      >
+        <span className="logo-word logo-pre">finbar</span>
+        <BrandStar className="pixel-star" size={16} />
+        <span className="logo-word logo-post">studio</span>
+      </Link>
 
       {/* Persistent nav — one list for both states. The icons stay put and the
           labels slide/fade in as the rail expands (no remove/replace swap). */}
