@@ -79,6 +79,23 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   const sidebarW = collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
 
+  // The Sandbox + embeds get their own chrome (a distinct "techy" layout, or none
+  // at all for embeds) — skip the portfolio sidebar, mobile bar, grain and the
+  // sidebar offset entirely for those paths.
+  const isBare = pathname.startsWith("/sandbox") || pathname.startsWith("/embed");
+  if (isBare) {
+    return (
+      <>
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
+        <main id="main-content" tabIndex={-1} className="min-w-0" style={{ minHeight: "100vh" }}>
+          {children}
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <a href="#main-content" className="skip-link">
