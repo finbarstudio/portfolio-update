@@ -2308,39 +2308,45 @@
     background: color-mix(in srgb, var(--pink) 12%, transparent);
   }
 
-  /* Expand handle — a little tab protruding from the right edge of the
-     collapsed sidebar. Rendered outside the (clipped) <aside> so it can stick
-     out past the border. */
+  /* Expand handle — a corner-tucked triangle protruding from the top of the
+     rail's edge. Rendered outside the (clipped) <aside> so it can stick out past
+     the border. The triangle's top + left edges sit flush with the rail's top +
+     edge; the 1px line strokes around it (continuing the rail edge) and a soft
+     bevel gives it the same depth as the rail. */
   .sidebar-tab {
     position: fixed;
-    /* Flush to the very top of the rail in both states. */
-    top: var(--menubar-h);
+    top: var(--menubar-h);        /* top edge flush with the very top */
     z-index: 41;
-    /* Equilateral triangle: width = height * sin(60deg) ≈ 0.866 * height. */
-    width: 13px;
-    height: 15px;
+    width: 22px;                  /* generous hit area; 15px triangle, top-left */
+    height: 22px;
     padding: 0;
-    margin-left: -1px;            /* flush against the sidebar edge */
-    transform-origin: left center;
-    /* No outline — just a faint pastel wash giving a tiny bit of depth. */
-    background: color-mix(in srgb, var(--pink) 24%, var(--bg));
+    margin-left: -1px;            /* sit over the rail's 1px edge line */
+    transform-origin: left top;
+    background: none;
     border: none;
-    /* Collapsed: points right (open). */
-    clip-path: polygon(0 0, 0 100%, 100% 50%);
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease),
-                transform var(--dur-fast) var(--ease),
+    align-items: flex-start;
+    justify-content: flex-start;
+    /* Depth: soft shadow follows the triangle silhouette + a faint top-left
+       highlight, matching the rail edge's bevel. */
+    filter: drop-shadow(1px 1.5px 1px rgba(20, 18, 16, 0.14))
+            drop-shadow(-0.5px -0.5px 0 rgba(255, 255, 255, 0.55));
+    transition: transform var(--dur-fast) var(--ease),
                 left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* Expanded: points left (collapse). */
-  .sidebar-tab[data-collapsed="false"] {
-    clip-path: polygon(100% 0, 100% 100%, 0 50%);
+  .sidebar-tab svg { display: block; overflow: visible; }
+  .sidebar-tab polygon {
+    fill: color-mix(in srgb, var(--pink) 24%, var(--bg));
+    stroke: var(--line);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    transition: fill var(--dur-fast) var(--ease);
   }
-  .sidebar-tab:hover {
-    background: color-mix(in srgb, var(--pink) 52%, var(--bg));
-    transform: scale(1.2);
+  .sidebar-tab:hover { transform: scale(1.14); }
+  .sidebar-tab:hover polygon { fill: color-mix(in srgb, var(--pink) 50%, var(--bg)); }
+  @media (prefers-reduced-motion: reduce) {
+    .sidebar-tab:hover { transform: none; }
   }
-  .sidebar-tab svg { display: none; }
 
   /* Sidebar nav — one persistent list. Icons stay put; labels slide/fade in as
      the rail expands, so items expand into place rather than swap out. */

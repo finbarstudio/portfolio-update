@@ -31,21 +31,6 @@ function LinkedInIcon({ size = 13 }: { size?: number }) {
   );
 }
 
-/* ── Toggle chevrons (sidebar collapse) ───────────────────────── */
-function ChevronLeftIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
-}
-function ChevronRightIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
-}
 
 /* ── Collapsed-mode glyphs ────────────────────────────────────── */
 function HomeIcon() {
@@ -216,8 +201,9 @@ function DesktopSidebar({
   return (
     <>
       {/* Protruding toggle handle — lives outside the clipped <aside> so it can
-          stick out past the border. Sits in the same spot in both states,
-          sliding with the sidebar edge; chevron flips to match. */}
+          stick out past the border. A corner-tucked triangle whose top + side
+          edges sit flush with the rail's top + edge, so it reads as part of the
+          rail; the 1px line strokes around it and a soft bevel adds depth. */}
       <button
         onClick={onToggle}
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -226,7 +212,9 @@ function DesktopSidebar({
         data-collapsed={collapsed}
         style={{ left: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W }}
       >
-        {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        <svg viewBox="0 0 15 15" width="15" height="15" aria-hidden="true">
+          <polygon points="0,0 15,0 0,15" />
+        </svg>
       </button>
     <aside
       className="hidden md:flex fixed left-0 border-r border-line flex-col z-40 bg-bg"
@@ -236,6 +224,10 @@ function DesktopSidebar({
         width: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W,
         transition: "width 0.5s cubic-bezier(0.4,0,0.2,1)",
         overflow: "hidden",
+        // Subtle edge depth: a faint inner highlight catches the light, a soft
+        // shadow lifts the rail off the content.
+        boxShadow:
+          "inset -1px 0 0 0 rgba(255,255,255,0.5), 4px 0 16px -9px rgba(20,18,16,0.12)",
       }}
       aria-label="Site navigation"
     >
