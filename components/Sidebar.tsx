@@ -36,33 +36,33 @@ function LinkedInIcon({ size = 13 }: { size?: number }) {
 function HomeIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M2 7.5L8 2l6 5.5V14a.5.5 0 01-.5.5H10V10H6v4.5H2.5A.5.5 0 012 14V7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+      <path d="M2 7.5L8 2l6 5.5V14a.5.5 0 01-.5.5H10V10H6v4.5H2.5A.5.5 0 012 14V7.5z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
     </svg>
   );
 }
 function GridIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <rect x="1.5" y="1.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
-      <rect x="9.5" y="1.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
-      <rect x="1.5" y="9.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
-      <rect x="9.5" y="9.5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="1.5" y="1.5" width="5" height="5" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="9.5" y="1.5" width="5" height="5" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="1.5" y="9.5" width="5" height="5" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="9.5" y="9.5" width="5" height="5" stroke="currentColor" strokeWidth="1.2" />
     </svg>
   );
 }
 function PersonIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M2.5 14c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M2.5 14c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
     </svg>
   );
 }
 function EnvelopeIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <rect x="1.5" y="3.5" width="13" height="9" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M1.5 5.5l6.5 4 6.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <rect x="1.5" y="3.5" width="13" height="9" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M1.5 5.5l6.5 4 6.5-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
@@ -200,22 +200,6 @@ function DesktopSidebar({
 
   return (
     <>
-      {/* Protruding toggle handle — lives outside the clipped <aside> so it can
-          stick out past the border. A corner-tucked triangle whose top + side
-          edges sit flush with the rail's top + edge, so it reads as part of the
-          rail; the 1px line strokes around it and a soft bevel adds depth. */}
-      <button
-        onClick={onToggle}
-        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="sidebar-tab hidden md:flex"
-        data-collapsed={collapsed}
-        style={{ left: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W }}
-      >
-        <svg viewBox="0 0 15 15" width="15" height="15" aria-hidden="true">
-          <polygon points="0,0 15,0 0,15" />
-        </svg>
-      </button>
     <aside
       className="hidden md:flex fixed left-0 border-r border-line flex-col z-40 bg-bg"
       style={{
@@ -231,18 +215,33 @@ function DesktopSidebar({
       }}
       aria-label="Site navigation"
     >
-      {/* Logo, pinned at the top of the rail (replaces the old top bar). Shows
-          just the star when collapsed, the full wordmark when expanded. */}
-      <Link
-        href="/"
-        className={`sidebar-logo ${collapsed ? "is-collapsed" : ""}`}
-        aria-label="finbar.studio, home"
-        title="finbar.studio, home"
-      >
-        <span className="logo-word logo-pre">finbar</span>
-        <BrandStar className="pixel-star" size={16} />
-        <span className="logo-word logo-post">studio</span>
-      </Link>
+      {/* Header: brand (home link) + the collapse/expand toggle, integrated into
+          the rail (no floating handle). Expanded → wordmark left, chevron right;
+          collapsed → star above, chevron below, both centred. */}
+      <div className={`sidebar-head ${collapsed ? "is-collapsed" : ""}`}>
+        <Link
+          href="/"
+          className={`sidebar-logo ${collapsed ? "is-collapsed" : ""}`}
+          aria-label="finbar.studio, home"
+          title="finbar.studio, home"
+        >
+          <span className="logo-word logo-pre">finbar</span>
+          <BrandStar className="pixel-star" size={16} />
+          <span className="logo-word logo-post">studio</span>
+        </Link>
+        <button
+          type="button"
+          className="sidebar-toggle"
+          onClick={onToggle}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M10 4 L6 8 l4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
 
       {/* Persistent nav — one list for both states. The icons stay put and the
           labels slide/fade in as the rail expands (no remove/replace swap). */}
@@ -289,7 +288,7 @@ function DesktopSidebar({
               onClick={() => setWorksOpen((v) => !v)}
             >
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true" className={`nav-work-caret ${worksOpen ? "is-open" : ""}`}>
-                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           )}

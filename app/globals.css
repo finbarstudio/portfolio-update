@@ -337,16 +337,32 @@
   .contact-drawer-backdrop, .contact-drawer-panel { transition: none; }
 }
 
-/* Sidebar logo block, pinned at the top of the rail (the old top-bar logo). */
+/* Sidebar header: brand (home) + the integrated collapse/expand toggle. */
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  flex: 0 0 auto;
+  height: 48px;
+  padding: 0 12px 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+.sidebar-head.is-collapsed {
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  height: auto;
+  padding: 12px 0 11px;
+}
+
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 2px;
-  flex: 0 0 auto;
-  height: 48px;
-  padding: 0 14px;
+  flex: 0 1 auto;
+  min-width: 0;
   color: var(--ink);
-  border-bottom: 1px solid var(--line);
   transition: color var(--dur-fast) var(--ease);
 }
 .sidebar-logo:hover { color: var(--pink); }
@@ -361,10 +377,28 @@
   transition: opacity 0.3s var(--ease), max-width 0.4s var(--ease);
   max-width: 8ch;
 }
-/* Collapsed: hide the wordmark either side and centre just the star (same 20px,
-   so the mark never resizes when toggling). */
-.sidebar-logo.is-collapsed { justify-content: center; gap: 0; padding: 0; }
+.sidebar-logo.is-collapsed { justify-content: center; gap: 0; }
 .sidebar-logo.is-collapsed .logo-word { opacity: 0; max-width: 0; }
+
+/* Integrated rail toggle — a light chevron, not a floating handle. Points left
+   to collapse; rotates to point right when collapsed (= expand). */
+.sidebar-toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.sidebar-toggle:hover { color: var(--pink); background: var(--surface-sunken); }
+.sidebar-toggle svg { transition: transform var(--dur) var(--ease); }
+.sidebar-head.is-collapsed .sidebar-toggle svg { transform: rotate(180deg); }
 
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
@@ -2342,46 +2376,6 @@
   .rail-btn.active {
     color: var(--pink);
     background: color-mix(in srgb, var(--pink) 12%, transparent);
-  }
-
-  /* Expand handle — a corner-tucked triangle protruding from the top of the
-     rail's edge. Rendered outside the (clipped) <aside> so it can stick out past
-     the border. The triangle's top + left edges sit flush with the rail's top +
-     edge; the 1px line strokes around it (continuing the rail edge) and a soft
-     bevel gives it the same depth as the rail. */
-  .sidebar-tab {
-    position: fixed;
-    top: var(--menubar-h);        /* top edge flush with the very top */
-    z-index: 41;
-    width: 22px;                  /* generous hit area; 15px triangle, top-left */
-    height: 22px;
-    padding: 0;
-    margin-left: -1px;            /* sit over the rail's 1px edge line */
-    transform-origin: left top;
-    background: none;
-    border: none;
-    cursor: pointer;
-    align-items: flex-start;
-    justify-content: flex-start;
-    /* Depth: soft shadow follows the triangle silhouette + a faint top-left
-       highlight, matching the rail edge's bevel. */
-    filter: drop-shadow(1px 1.5px 1px rgba(20, 18, 16, 0.14))
-            drop-shadow(-0.5px -0.5px 0 rgba(255, 255, 255, 0.55));
-    transition: transform var(--dur-fast) var(--ease),
-                left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .sidebar-tab svg { display: block; overflow: visible; }
-  .sidebar-tab polygon {
-    fill: color-mix(in srgb, var(--pink) 24%, var(--bg));
-    stroke: var(--line);
-    stroke-width: 1;
-    vector-effect: non-scaling-stroke;
-    transition: fill var(--dur-fast) var(--ease);
-  }
-  .sidebar-tab:hover { transform: scale(1.14); }
-  .sidebar-tab:hover polygon { fill: color-mix(in srgb, var(--pink) 50%, var(--bg)); }
-  @media (prefers-reduced-motion: reduce) {
-    .sidebar-tab:hover { transform: none; }
   }
 
   /* Sidebar nav — one persistent list. Icons stay put; labels slide/fade in as
