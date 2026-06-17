@@ -16,6 +16,7 @@ import type { AnimationPreset, FitMode } from "@/components/phone/phone-config";
 import {
   DEMO_MEDIA,
   ingestFiles,
+  ingestImageUrl,
   revokeAsset,
   type MediaAsset,
 } from "@/lib/sandbox/media";
@@ -76,6 +77,19 @@ export default function PhoneMockupTool() {
     }
   }, []);
 
+  const handleAddUrl = useCallback(async (url: string) => {
+    const current = assetsRef.current;
+    const replacingDemos = current.length > 0 && current.every((a) => a.isDemo);
+    const result = await ingestImageUrl(url, replacingDemos ? 0 : current.length);
+    setMessages({ errors: result.errors, warnings: result.warnings });
+    if (result.assets.length) {
+      setAssets((prev) => {
+        const onlyDemos = prev.length > 0 && prev.every((a) => a.isDemo);
+        return onlyDemos ? result.assets : [...prev, ...result.assets];
+      });
+    }
+  }, []);
+
   const handleRemove = useCallback((id: string) => {
     setAssets((prev) => {
       const target = prev.find((a) => a.id === id);
@@ -92,6 +106,17 @@ export default function PhoneMockupTool() {
       if (i < 0 || j < 0 || j >= prev.length) return prev;
       const next = prev.slice();
       [next[i], next[j]] = [next[j], next[i]];
+      return next;
+    });
+  }, []);
+
+  const handleReorder = useCallback((id: string, toIndex: number) => {
+    setAssets((prev) => {
+      const from = prev.findIndex((a) => a.id === id);
+      if (from < 0 || toIndex === from) return prev;
+      const next = prev.slice();
+      const [item] = next.splice(from, 1);
+      next.splice(Math.max(0, Math.min(next.length, toIndex)), 0, item);
       return next;
     });
   }, []);
@@ -146,8 +171,10 @@ export default function PhoneMockupTool() {
           <UploadDropzone
             assets={assets}
             onAddFiles={handleAddFiles}
+            onAddUrl={handleAddUrl}
             onRemove={handleRemove}
             onMove={handleMove}
+            onReorder={handleReorder}
             messages={messages}
           />
           <ControlPanel

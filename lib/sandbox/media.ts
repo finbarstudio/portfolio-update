@@ -79,14 +79,18 @@ export type IngestResult = {
  * Rejects unsupported types, enforces the 1..10 count cap and the hard size cap,
  * warns on soft size limits, and reads dimensions for each accepted file.
  */
-export async function ingestFiles(files: File[], existingCount: number): Promise<IngestResult> {
+export async function ingestFiles(
+  files: File[],
+  existingCount: number,
+  maxItems: number = MAX_PHONES,
+): Promise<IngestResult> {
   const errors: string[] = [];
   const warnings: string[] = [];
   const accepted: MediaAsset[] = [];
 
-  let slots = MAX_PHONES - existingCount;
+  let slots = maxItems - existingCount;
   if (slots <= 0) {
-    errors.push(`You can use up to ${MAX_PHONES} items. Remove one to add more.`);
+    errors.push(`You can use up to ${maxItems} item${maxItems === 1 ? "" : "s"}. Remove one to add more.`);
     return { assets: [], errors, warnings };
   }
 
@@ -101,7 +105,7 @@ export async function ingestFiles(files: File[], existingCount: number): Promise
       continue;
     }
     if (slots <= 0) {
-      warnings.push(`Reached the ${MAX_PHONES}-item limit — "${file.name}" was skipped.`);
+      warnings.push(`Reached the ${maxItems}-item limit — "${file.name}" was skipped.`);
       continue;
     }
     const softCap = kind === "image" ? SOFT_CAP_IMAGE : SOFT_CAP_VIDEO;
@@ -116,6 +120,55 @@ export async function ingestFiles(files: File[], existingCount: number): Promise
   }
 
   return { assets: accepted, errors, warnings };
+}
+
+/** Load a remote image (CORS-enabled) to verify it's usable on a canvas and read
+ *  its dimensions. Resolves null if it can't be loaded for cross-origin use. */
+function loadRemoteImage(url: string): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve({ width: img.naturalWidth || 1, height: img.naturalHeight || 1 });
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+/**
+ * Ingest a public image URL (so it can be used in a live embed — uploaded blobs
+ * can't). The URL must be a direct, CORS-enabled image so it also works on the
+ * export/embed canvas.
+ */
+export async function ingestImageUrl(
+  url: string,
+  existingCount: number,
+  maxItems: number = MAX_PHONES,
+): Promise<IngestResult> {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const trimmed = url.trim();
+
+  if (!/^https?:\/\//i.test(trimmed)) {
+    errors.push("Enter a full image URL starting with http:// or https://");
+    return { assets: [], errors, warnings };
+  }
+  if (maxItems - existingCount <= 0) {
+    errors.push(`You can use up to ${maxItems} item${maxItems === 1 ? "" : "s"}. Remove one to add more.`);
+    return { assets: [], errors, warnings };
+  }
+
+  const dims = await loadRemoteImage(trimmed);
+  if (!dims) {
+    errors.push("Couldn't load that image — it may block cross-origin use. Try a direct image link (e.g. ending .png/.jpg).");
+    return { assets: [], errors, warnings };
+  }
+
+  const name = trimmed.split("/").pop()?.split("?")[0] || "image";
+  return {
+    assets: [{ id: genId(), kind: "image", src: trimmed, name, width: dims.width, height: dims.height }],
+    errors,
+    warnings,
+  };
 }
 
 /** Revoke an asset's object URL (no-op for demo/public URLs). */
