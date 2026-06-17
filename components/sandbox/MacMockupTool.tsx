@@ -15,6 +15,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
 import type { AnimationPreset, FitMode } from "@/components/mac/mac-config";
+import { CYCLE_SPEED as MAC_CYCLE_SPEED } from "@/components/mac/mac-config";
+import { loopSeconds } from "@/components/phone/phone-config";
 import {
   MAC_DEMO_MEDIA,
   ingestFiles,
@@ -190,6 +192,7 @@ export default function MacMockupTool() {
             onCopyEmbed={handleCopyEmbed}
             embeddableCount={embeddableCount}
             transparentBg={background === "transparent"}
+            loopSeconds={loopSeconds(Math.max(1, assets.length), MAC_CYCLE_SPEED)}
           />
         </div>
       </div>

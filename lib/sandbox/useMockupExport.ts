@@ -18,6 +18,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
 import type { FitMode } from "@/components/phone/phone-config";
+import { loopSeconds } from "@/components/phone/phone-config";
 import type { MediaAsset } from "./media";
 import { drawWatermark } from "./watermark";
 import { downloadBlob, safeName } from "./download";
@@ -84,7 +85,7 @@ export type MockupExport = {
   videoSupported: boolean;
   exportStill: (focusIndex: number) => void;
   exportAllStills: () => void;
-  exportVideo: () => void;
+  exportVideo: (loops?: number) => void;
   exportGif: () => void;
   cancel: () => void;
 };
@@ -217,7 +218,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
     });
   }, [withExport, getConfig, makeRenderer, controllerRef]);
 
-  const exportVideo = useCallback(() => {
+  const exportVideo = useCallback((loops: number = 1) => {
     void withExport("Rendering video…", async () => {
       if (!videoSupported) {
         throw new Error("Video export isn’t supported in this browser — try Chrome, or export a GIF.");
@@ -229,17 +230,14 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
       const ctrl = controllerRef.current;
       if (!ctrl) throw new Error("The mockup isn’t ready yet.");
       const period = ctrl.numPhones;
-      const fps = 30;
-      const naturalDur = period / ctrl.cycleSpeed;
-      const dur = Math.min(Math.max(naturalDur, 4), 8);
-      const frames = Math.round(dur * fps);
       const res = await recordLoop({
         canvas,
         draw,
         period,
         hover: config.poseHover,
-        fps,
-        frames,
+        fps: 30,
+        durationMs: loopSeconds(period, ctrl.cycleSpeed) * 1000,
+        loops: Math.max(1, Math.round(loops)),
         onProgress,
         shouldCancel,
       });
@@ -258,9 +256,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
       if (!ctrl) throw new Error("The mockup isn’t ready yet.");
       const period = ctrl.numPhones;
       const fps = 12;
-      const naturalDur = period / ctrl.cycleSpeed;
-      const dur = Math.min(Math.max(naturalDur, 3), 5);
-      const frames = Math.round(dur * fps);
+      const frames = Math.max(8, Math.round(loopSeconds(period, ctrl.cycleSpeed) * fps));
       const blob = await encodeGif({
         canvas,
         draw,

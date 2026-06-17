@@ -21,7 +21,7 @@ export default function EmbedWatermark() {
       >
         <span
           style={{
-            opacity: 0.3,
+            opacity: 0.05,
             fontWeight: 700,
             fontSize: "clamp(22px, 11vw, 110px)",
             color: "#ffffff",
@@ -29,7 +29,6 @@ export default function EmbedWatermark() {
             alignItems: "center",
             whiteSpace: "nowrap",
             letterSpacing: "0.01em",
-            textShadow: "0 2px 10px rgba(0,0,0,0.18)",
           }}
         >
           finbar
@@ -46,14 +45,13 @@ export default function EmbedWatermark() {
           position: "absolute",
           right: 10,
           bottom: 8,
-          font: "11px ui-monospace, 'Space Mono', Menlo, monospace",
-          color: "rgba(20,20,20,0.62)",
-          background: "rgba(255,255,255,0.55)",
-          backdropFilter: "blur(4px)",
-          padding: "3px 8px",
-          borderRadius: 6,
+          font: "700 11px ui-monospace, 'Space Mono', Menlo, monospace",
+          color: "#ffffff",
           textDecoration: "none",
           letterSpacing: "0.02em",
+          // Legible on white (dark text-stroke) and on black (harsh shadow).
+          WebkitTextStroke: "0.4px rgba(0,0,0,0.55)",
+          textShadow: "0 1px 3px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.9)",
         }}
       >
         finbar.studio

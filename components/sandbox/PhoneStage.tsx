@@ -27,6 +27,7 @@ export default function PhoneStage({
   media,
   pose,
   speed,
+  prominence,
   fit,
   background,
   aspect,
@@ -37,6 +38,7 @@ export default function PhoneStage({
   media: MediaAsset[];
   pose: number;
   speed: number;
+  prominence: number;
   fit: FitMode;
   background: string;
   aspect: string;
@@ -75,6 +77,7 @@ export default function PhoneStage({
           media={items}
           pose={pose}
           speed={speed}
+          prominence={prominence}
           fit={fit}
           background={background}
           fill

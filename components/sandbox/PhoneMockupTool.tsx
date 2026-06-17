@@ -13,7 +13,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
 import type { FitMode } from "@/components/phone/phone-config";
-import { poseFromAngle, DEFAULT_ANGLE, DEFAULT_SPEED } from "@/components/phone/phone-config";
+import {
+  poseFromAngle,
+  fillCount,
+  loopSeconds,
+  CYCLE_SPEED,
+  DEFAULT_ANGLE,
+  DEFAULT_SPEED,
+  DEFAULT_PROMINENCE,
+} from "@/components/phone/phone-config";
 import {
   DEMO_MEDIA,
   ingestFiles,
@@ -37,6 +45,7 @@ export default function PhoneMockupTool() {
   const [assets, setAssets] = useState<MediaAsset[]>(() => DEMO_MEDIA.slice());
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
   const [angle, setAngle] = useState(DEFAULT_ANGLE);
+  const [prominence, setProminence] = useState(DEFAULT_PROMINENCE);
   const [aspect, setAspect] = useState<AspectToken>("16:9");
   const [fit, setFit] = useState<FitMode>("cover");
   const [background, setBackground] = useState<string>("transparent");
@@ -48,6 +57,7 @@ export default function PhoneMockupTool() {
   });
 
   const pose = poseFromAngle(angle);
+  const videoLoopSeconds = loopSeconds(fillCount(Math.max(1, assets.length)), CYCLE_SPEED * speed);
   const controllerRef = useRef<PhoneSceneController | null>(null);
 
   // Latest-value refs for the export hook + unmount cleanup, synced after render.
@@ -136,6 +146,7 @@ export default function PhoneMockupTool() {
       preset: "carousel",
       pose,
       speed,
+      prominence,
       fit,
       aspect,
       background,
@@ -144,7 +155,7 @@ export default function PhoneMockupTool() {
     const snippet = buildEmbedSnippet(origin, config);
     navigator.clipboard.writeText(snippet).catch(() => {});
     return true;
-  }, [assets, pose, speed, fit, aspect, background]);
+  }, [assets, pose, speed, prominence, fit, aspect, background]);
 
   return (
     <div className="sb-tool">
@@ -165,6 +176,7 @@ export default function PhoneMockupTool() {
             media={assets}
             pose={pose}
             speed={speed}
+            prominence={prominence}
             fit={fit}
             background={background}
             aspect={aspect}
@@ -190,7 +202,14 @@ export default function PhoneMockupTool() {
             onFit={setFit}
             background={background}
             onBackground={setBackground}
-            motion={{ speed, angle, onSpeed: setSpeed, onAngle: setAngle }}
+            motion={{
+              speed,
+              angle,
+              prominence,
+              onSpeed: setSpeed,
+              onAngle: setAngle,
+              onProminence: setProminence,
+            }}
           />
           <ExportPanel
             exp={exp}
@@ -200,6 +219,7 @@ export default function PhoneMockupTool() {
             onCopyEmbed={handleCopyEmbed}
             embeddableCount={embeddableCount}
             transparentBg={background === "transparent"}
+            loopSeconds={videoLoopSeconds}
           />
         </div>
       </div>

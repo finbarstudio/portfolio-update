@@ -33,6 +33,7 @@ export default function EmbedPhone({ config }: { config: EmbedConfig }) {
   const pose =
     config.pose != null ? config.pose : config.preset === "flat" ? 1 : poseFromAngle(DEFAULT_ANGLE);
   const speed = config.speed != null ? config.speed : DEFAULT_SPEED;
+  const prominence = config.prominence ?? 0;
 
   return (
     <div
@@ -51,6 +52,7 @@ export default function EmbedPhone({ config }: { config: EmbedConfig }) {
           media={media}
           pose={pose}
           speed={speed}
+          prominence={prominence}
           fit={config.fit}
           background={config.background}
           fill

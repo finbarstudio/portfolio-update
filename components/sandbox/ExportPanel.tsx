@@ -11,6 +11,12 @@
 import { useState } from "react";
 import type { MockupExport } from "@/lib/sandbox/useMockupExport";
 
+function formatDur(s: number): string {
+  if (s < 60) return `${Math.round(s)}s`;
+  const m = Math.floor(s / 60);
+  return `${m}m ${Math.round(s - m * 60)}s`;
+}
+
 export default function ExportPanel({
   exp,
   mediaCount,
@@ -19,6 +25,7 @@ export default function ExportPanel({
   onCopyEmbed,
   embeddableCount,
   transparentBg,
+  loopSeconds,
 }: {
   exp: MockupExport;
   mediaCount: number;
@@ -27,8 +34,11 @@ export default function ExportPanel({
   onCopyEmbed: () => boolean;
   embeddableCount: number;
   transparentBg: boolean;
+  /** Seconds for one perfect loop (drives the length readout). */
+  loopSeconds?: number;
 }) {
   const [copied, setCopied] = useState(false);
+  const [loops, setLoops] = useState(1);
   const disabled = exp.busy || mediaCount === 0;
 
   const handleCopy = () => {
@@ -44,7 +54,7 @@ export default function ExportPanel({
       <h3 className="sb-panel-title mono-heading">Export</h3>
 
       <div className="sb-export-grid">
-        <button type="button" className="sb-btn is-primary" disabled={disabled} onClick={exp.exportVideo}>
+        <button type="button" className="sb-btn" disabled={disabled} onClick={() => exp.exportVideo(loops)}>
           {exp.videoSupported ? "Loop video" : "Loop video (Chrome)"}
         </button>
         <button type="button" className="sb-btn" disabled={disabled} onClick={exp.exportGif}>
@@ -57,6 +67,28 @@ export default function ExportPanel({
           All stills
         </button>
       </div>
+
+      {exp.videoSupported && loopSeconds != null && (
+        <div className="sb-field sb-loops">
+          <span className="mono-label sb-field-label">
+            Video loops
+            <span className="sb-range-val">≈ {formatDur(loopSeconds * loops)}</span>
+          </span>
+          <div className="sb-segmented" role="group" aria-label="Video loops">
+            {[1, 2, 3, 4].map((n) => (
+              <button
+                key={n}
+                type="button"
+                className={`sb-seg ${loops === n ? "is-active" : ""}`}
+                aria-pressed={loops === n}
+                onClick={() => setLoops(n)}
+              >
+                {n}×
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {mediaCount > 1 && (
         <label className="sb-field sb-focus">

@@ -41,6 +41,9 @@ import {
   offsetForFocus,
   hoverTargetFor,
   fillCount,
+  ANGLED_H,
+  ANGLE_SPREAD,
+  PROMINENCE_K,
   type AnimationPreset,
   type FitMode,
   type PhoneMediaItem,
@@ -91,6 +94,8 @@ export type PhoneSceneProps = {
   pose?: number;
   /** Carousel cycle-rate multiplier (sandbox Speed slider). Default 1. */
   speed?: number;
+  /** Main-phone prominence 0..1 — shrinks the flanks relative to the centre. */
+  prominence?: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady?: () => void;
 };
@@ -212,6 +217,7 @@ type CarouselProps = {
   presetOverride?: AnimationPreset;
   pose?: number;
   speed: number;
+  prominence: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady: () => void;
 };
@@ -227,6 +233,7 @@ function Carousel({
   presetOverride,
   pose,
   speed,
+  prominence,
   controllerRef,
   onReady,
 }: CarouselProps) {
@@ -308,11 +315,17 @@ function Carousel({
       const rest = slotAt(REST_SLOTS, arc);
       const hov = slotAt(HOVER_SLOTS, arc);
 
-      const x = lerp(rest.x, hov.x, h);
       const y = lerp(rest.y, hov.y, h);
       const z = lerp(rest.z, hov.z, h);
       const rotZ = lerp(rest.rotZ, hov.rotZ, h);
       const scale = lerp(rest.scale, hov.scale, h);
+
+      // H1: at extreme angle the extrapolated pose pulls flanks inward — spread
+      // x back out proportional to how angled we are so the gap stays open.
+      const angledness = ANGLED_H < 0 ? Math.max(0, Math.min(1, -h / -ANGLED_H)) : 0;
+      const x = lerp(rest.x, hov.x, h) * (1 + ANGLE_SPREAD * angledness);
+      // H2: prominence shrinks the flanks (scale<1) while the centre (≈1) holds.
+      const renderScale = prominence > 0 ? Math.pow(scale, 1 + prominence * PROMINENCE_K) : scale;
 
       phone.position.set(x, y, z);
       phone.rotation.z = rotZ;
@@ -322,7 +335,7 @@ function Carousel({
 
       const visible = scale > 0.02 && hasFrame;
       if (phone.visible !== visible) phone.visible = visible;
-      phone.scale.setScalar(scale);
+      phone.scale.setScalar(renderScale);
       if (scale > 0.02 && !hasFrame) pendingFrames++;
 
       if (scale > 0.02) onScreenByDesc[di] = true;
@@ -417,6 +430,7 @@ export default function PhoneScene({
   paused = false,
   pose,
   speed = 1,
+  prominence = 0,
   controllerRef,
   onReady,
 }: PhoneSceneProps) {
@@ -501,6 +515,7 @@ export default function PhoneScene({
               presetOverride={presetOverride}
               pose={pose}
               speed={speed}
+              prominence={prominence}
               controllerRef={controllerRef}
               onReady={handleReady}
             />

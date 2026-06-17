@@ -71,6 +71,15 @@ export default function UploadDropzone({
   };
   const onTilePointerMove = (e: React.PointerEvent) => {
     if (dragId == null) return;
+    // Lift the grabbed tile and keep it under the finger (measure its natural
+    // position with the transform cleared, then offset to the pointer).
+    const tileEl = e.currentTarget as HTMLElement;
+    tileEl.style.transform = "";
+    const r = tileEl.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2);
+    const dy = e.clientY - (r.top + r.height / 2);
+    tileEl.style.transform = `translate(${dx}px, ${dy}px) scale(1.14)`;
+    // Reorder live: whatever tile is under the pointer takes the dragged item's slot.
     const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
     const tile = el?.closest("[data-thumb-id]") as HTMLElement | null;
     const overId = tile?.getAttribute("data-thumb-id");
@@ -79,7 +88,11 @@ export default function UploadDropzone({
       if (toIndex >= 0) onReorder?.(dragId, toIndex);
     }
   };
-  const endDrag = () => setDragId(null);
+  const endDrag = (e: React.PointerEvent) => {
+    const tileEl = e.currentTarget as HTMLElement;
+    if (tileEl) tileEl.style.transform = "";
+    setDragId(null);
+  };
 
   return (
     <div className="sb-panel">
