@@ -16,16 +16,24 @@ export default function UploadDropzone({
   onRemove,
   onMove,
   messages,
+  maxItems = MAX_PHONES,
+  hint,
 }: {
   assets: MediaAsset[];
   onAddFiles: (files: File[]) => void;
   onRemove: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
   messages: { errors: string[]; warnings: string[] };
+  maxItems?: number;
+  hint?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
-  const full = assets.length >= MAX_PHONES;
+  // Placeholder demo cards don't count toward the limit — the first real upload
+  // replaces them — so only count the user's own media.
+  const realCount = assets.filter((a) => !a.isDemo).length;
+  const allDemos = assets.length > 0 && realCount === 0;
+  const full = realCount >= maxItems;
 
   const handleFiles = (list: FileList | null) => {
     if (!list || list.length === 0) return;
@@ -37,7 +45,7 @@ export default function UploadDropzone({
       <div className="sb-panel-head">
         <h3 className="sb-panel-title mono-heading">Media</h3>
         <span className="mono-label sb-count">
-          {assets.length}/{MAX_PHONES}
+          {allDemos ? `${assets.length} demo` : `${realCount}/${maxItems}`}
         </span>
       </div>
 
@@ -76,9 +84,13 @@ export default function UploadDropzone({
           }}
         />
         <span className="sb-dropzone-text">
-          {full ? `Limit reached (${MAX_PHONES})` : "Drop images or videos, or click to browse"}
+          {full
+            ? `Limit reached (${maxItems})`
+            : allDemos
+              ? "Drop images or videos to replace the demo"
+              : "Drop images or videos, or click to browse"}
         </span>
-        <span className="mono-label sb-dropzone-hint">PNG · JPG · WebP · MP4 · WebM</span>
+        <span className="mono-label sb-dropzone-hint">{hint ?? "PNG · JPG · WebP · MP4 · WebM"}</span>
       </div>
 
       {(messages.errors.length > 0 || messages.warnings.length > 0) && (

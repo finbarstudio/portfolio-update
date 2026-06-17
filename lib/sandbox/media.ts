@@ -137,8 +137,8 @@ function mb(bytes: number): string {
 /** Generated numbered cards — seed media so the canvas is never empty. They draw
  *  procedurally (no files to ship/404), and aren't real public URLs, so they're
  *  non-embeddable and get replaced wholesale the moment a user adds their own. */
-function generatedDemoMedia(width: number, height: number): MediaAsset[] {
-  return Array.from({ length: GENERATED_DEMO_COUNT }, (_, i) => {
+function generatedDemoMedia(width: number, height: number, count: number): MediaAsset[] {
+  return Array.from({ length: count }, (_, i) => {
     const n = i + 1;
     return {
       id: `demo-gen-${n}`,
@@ -152,8 +152,8 @@ function generatedDemoMedia(width: number, height: number): MediaAsset[] {
   });
 }
 
-/** Portrait cards seed the phone tool. */
-export const DEMO_MEDIA: MediaAsset[] = generatedDemoMedia(1290, 2796);
+/** Portrait cards (1–10) seed the phone carousel. */
+export const DEMO_MEDIA: MediaAsset[] = generatedDemoMedia(1290, 2796, GENERATED_DEMO_COUNT);
 
-/** Landscape cards seed the Mac display. */
-export const MAC_DEMO_MEDIA: MediaAsset[] = generatedDemoMedia(1920, 1080);
+/** A single landscape card seeds the Mac display (one screen at a time). */
+export const MAC_DEMO_MEDIA: MediaAsset[] = generatedDemoMedia(1920, 1080, 1);
