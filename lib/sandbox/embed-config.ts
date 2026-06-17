@@ -29,9 +29,10 @@ export const DEFAULT_EMBED: EmbedConfig = {
   background: "transparent",
 };
 
-/** Only public (non-blob, non-data) URLs can be embedded. */
+/** Only public (non-blob, non-data) URLs can be embedded. Generated placeholder
+ *  cards (`gen:<n>`) aren't real assets, so they're excluded too. */
 export function isEmbeddableSrc(src: string): boolean {
-  return !src.startsWith("blob:") && !src.startsWith("data:");
+  return !src.startsWith("blob:") && !src.startsWith("data:") && !src.startsWith("gen:");
 }
 
 /** Absolutise a src against an origin so the snippet works on any host. */

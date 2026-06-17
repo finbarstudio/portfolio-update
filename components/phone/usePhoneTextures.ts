@@ -25,6 +25,7 @@ import {
   type PhoneMediaItem,
 } from "./phone-config";
 import { fitRect } from "@/lib/sandbox/fit";
+import { drawNumberCard, isGeneratedSrc, parseCardNumber } from "@/lib/sandbox/demo-cards";
 
 export type PhoneTextureDescriptor = {
   kind: "video" | "image";
@@ -183,6 +184,58 @@ function makeImageDescriptor(src: string): PhoneTextureDescriptor {
   };
 }
 
+/** A procedurally-drawn numbered card (the default placeholder reel). Animates
+ *  only while on-screen; freezes on a settled frame during export. */
+function makeGeneratedDescriptor(src: string): PhoneTextureDescriptor {
+  const H = 1024;
+  const W = Math.max(2, Math.round(H * PHONE_SCREEN_ASPECT));
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = false;
+  tex.flipY = false; // canvas is top-to-bottom, same as the image/video paths
+  applyMirror(tex);
+
+  const n = parseCardNumber(src);
+  let onScreen = false;
+  let frozen = false;
+  let painted = false;
+  const render = (t: number) => {
+    if (!ctx) return;
+    drawNumberCard(ctx, W, H, n, t);
+    tex.needsUpdate = true;
+    painted = true;
+  };
+  render(0); // never blank
+
+  return {
+    kind: "image",
+    src,
+    texture: tex,
+    video: null,
+    hasFrame: () => painted,
+    tick: () => {
+      if (onScreen && !frozen) render(performance.now());
+    },
+    sync: (on, _onStage, paused) => {
+      onScreen = on;
+      frozen = paused;
+      if (paused && on) render(performance.now()); // settle a frame for export
+    },
+    pauseVideo: () => {},
+    recompose: () => {},
+    dispose: () => {
+      tex.dispose();
+    },
+  };
+}
+
 export function usePhoneTextures(
   media: PhoneMediaItem[],
   fit: FitMode,
@@ -193,7 +246,11 @@ export function usePhoneTextures(
   const descriptors = useMemo(() => {
     if (typeof document === "undefined") return [] as PhoneTextureDescriptor[];
     return media.map((m) =>
-      m.kind === "video" ? makeVideoDescriptor(m.src) : makeImageDescriptor(m.src),
+      isGeneratedSrc(m.src)
+        ? makeGeneratedDescriptor(m.src)
+        : m.kind === "video"
+          ? makeVideoDescriptor(m.src)
+          : makeImageDescriptor(m.src),
     );
     // Rebuilt only when the media set changes (not on fit/bg — handled below).
     // eslint-disable-next-line react-hooks/exhaustive-deps

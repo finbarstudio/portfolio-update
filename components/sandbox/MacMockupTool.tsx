@@ -64,10 +64,18 @@ export default function MacMockupTool() {
   const exp = useMockupExport({ controllerRef, setPaused, getConfig });
 
   const handleAddFiles = useCallback(async (files: File[]) => {
-    const existing = assetsRef.current.length;
-    const result = await ingestFiles(files, existing);
+    // The default reel is placeholder cards — the first real upload replaces them
+    // wholesale (so 1 upload loops alone, 2 loop together, etc.).
+    const current = assetsRef.current;
+    const replacingDemos = current.length > 0 && current.every((a) => a.isDemo);
+    const result = await ingestFiles(files, replacingDemos ? 0 : current.length);
     setMessages({ errors: result.errors, warnings: result.warnings });
-    if (result.assets.length) setAssets((prev) => [...prev, ...result.assets]);
+    if (result.assets.length) {
+      setAssets((prev) => {
+        const onlyDemos = prev.length > 0 && prev.every((a) => a.isDemo);
+        return onlyDemos ? result.assets : [...prev, ...result.assets];
+      });
+    }
   }, []);
 
   const handleRemove = useCallback((id: string) => {
