@@ -76,6 +76,7 @@ export default function MacStage({
           immediate
           preserveDrawingBuffer
           paused={paused}
+          motion={false}
           controllerRef={controllerRef}
           onReady={onReady}
         />

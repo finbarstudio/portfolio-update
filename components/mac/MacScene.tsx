@@ -72,6 +72,8 @@ export type MacSceneProps = {
   preserveDrawingBuffer?: boolean;
   /** Freeze the time-driven animation; offset/hover come from the controller. */
   paused?: boolean;
+  /** Live turntable + camera zoom. Default on (embed); the tool passes false. */
+  motion?: boolean;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady?: () => void;
 };
@@ -88,6 +90,8 @@ type MacShowProps = {
   hovered: boolean;
   inView: boolean;
   paused: boolean;
+  /** Live turntable + camera dolly. Off in the tool preview (kept for the embed). */
+  motion: boolean;
   presetOverride?: AnimationPreset;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady: () => void;
@@ -101,6 +105,7 @@ function MacShow({
   hovered,
   inView,
   paused,
+  motion,
   presetOverride,
   controllerRef,
   onReady,
@@ -212,7 +217,8 @@ function MacShow({
     if (!paused) {
       const target = poseTargetFor(presetOverride, hovered);
       hoverProgressRef.current += (target - hoverProgressRef.current) * STATE_LERP;
-      offsetRef.current += delta * CYCLE_SPEED;
+      // Only advance the turntable when motion is on (the tool preview holds still).
+      if (motion) offsetRef.current += delta * CYCLE_SPEED;
     }
     const h = hoverProgressRef.current;
     const offset = offsetRef.current;
@@ -230,18 +236,24 @@ function MacShow({
       descriptors[i].sync(onScreen, onScreen, paused);
     }
 
-    // Pose: isometric (h=0) → flat front-on (h=1), with the live turntable yaw.
+    // Turntable + camera dolly run when motion is on (embed) OR while exporting
+    // (paused: the controller drives the frames). The live tool preview — motion
+    // off, not paused — stays still, no wiggle, no zoom.
+    const animate = motion || paused;
+
+    // Pose: isometric (h=0) → flat front-on (h=1), with the (animate-only) yaw.
     if (groupRef.current) {
       groupRef.current.rotation.x = lerp(ISO_ROTATION_X, 0, h);
-      groupRef.current.rotation.y = lerp(ISO_ROTATION_Y, 0, h) + turntableYaw(offset);
+      groupRef.current.rotation.y = lerp(ISO_ROTATION_Y, 0, h) + (animate ? turntableYaw(offset) : 0);
     }
 
-    // Camera glides in + up toward the screen face as the pose flattens.
+    // Camera glides in + up toward the screen as the pose flattens.
     const cam = camera as THREE.PerspectiveCamera;
-    cam.position.z = lerp(CAMERA_DISTANCE_DEFAULT, CAMERA_DISTANCE_HOVER, h);
-    cam.position.y = lerp(CAMERA_Y_DEFAULT, CAMERA_Y_HOVER, h);
+    const camH = animate ? h : 0;
+    cam.position.z = lerp(CAMERA_DISTANCE_DEFAULT, CAMERA_DISTANCE_HOVER, camH);
+    cam.position.y = lerp(CAMERA_Y_DEFAULT, CAMERA_Y_HOVER, camH);
     cam.position.x = 0;
-    cam.lookAt(0, lerp(0, LOOKAT_Y_HOVER, h), 0);
+    cam.lookAt(0, lerp(0, LOOKAT_Y_HOVER, camH), 0);
 
     if (!reportedReady.current && (!active || active.hasFrame())) {
       reportedReady.current = true;
@@ -314,6 +326,7 @@ export default function MacScene({
   immediate = false,
   preserveDrawingBuffer = false,
   paused = false,
+  motion = true,
   controllerRef,
   onReady,
 }: MacSceneProps) {
@@ -390,6 +403,7 @@ export default function MacScene({
               hovered={hovered}
               inView={inView || paused}
               paused={paused}
+              motion={motion}
               presetOverride={presetOverride}
               controllerRef={controllerRef}
               onReady={handleReady}
