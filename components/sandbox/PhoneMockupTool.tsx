@@ -13,7 +13,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
 import type { FitMode } from "@/components/phone/phone-config";
-import { poseFromAngle, DEFAULT_ANGLE, DEFAULT_SPEED } from "@/components/phone/phone-config";
+import {
+  poseFromAngle,
+  fillCount,
+  loopSeconds,
+  CYCLE_SPEED,
+  DEFAULT_ANGLE,
+  DEFAULT_SPEED,
+} from "@/components/phone/phone-config";
 import {
   DEMO_MEDIA,
   ingestFiles,
@@ -48,6 +55,7 @@ export default function PhoneMockupTool() {
   });
 
   const pose = poseFromAngle(angle);
+  const videoLoopSeconds = loopSeconds(fillCount(Math.max(1, assets.length)), CYCLE_SPEED * speed);
   const controllerRef = useRef<PhoneSceneController | null>(null);
 
   // Latest-value refs for the export hook + unmount cleanup, synced after render.
@@ -200,6 +208,7 @@ export default function PhoneMockupTool() {
             onCopyEmbed={handleCopyEmbed}
             embeddableCount={embeddableCount}
             transparentBg={background === "transparent"}
+            loopSeconds={videoLoopSeconds}
           />
         </div>
       </div>

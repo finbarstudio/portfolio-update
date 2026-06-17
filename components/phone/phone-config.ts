@@ -111,6 +111,13 @@ export function poseFromAngle(angle: number): number {
   return FLAT_H + (ANGLED_H - FLAT_H) * a;
 }
 
+/** Seconds for one perfect loop at the given period (phone count) + cycle rate,
+ *  clamped to a sane export range. Used by both the export and the UI readout. */
+export function loopSeconds(period: number, cycleSpeed: number): number {
+  if (!cycleSpeed) return 30;
+  return Math.min(30, Math.max(1.5, period / cycleSpeed));
+}
+
 
 /**
  * Ease the raw offset so each phone dwells briefly at every integer slot (incl.
