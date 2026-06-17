@@ -2894,7 +2894,10 @@
 .sb-tool-sub { color: var(--ink-soft); font-size: var(--text-small); line-height: 1.55; max-width: 60ch; }
 .sb-tool-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
 @media (min-width: 900px) { .sb-tool-grid { grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr); align-items: start; } }
-.sb-stage-col { position: sticky; top: 80px; }
+/* The preview sticks beside the controls only in the 2-column desktop layout.
+   In the single-column mobile layout it must stay in normal flow — otherwise it
+   pins to the top and the controls scroll up behind it. */
+@media (min-width: 900px) { .sb-stage-col { position: sticky; top: 80px; } }
 .sb-controls-col { display: flex; flex-direction: column; gap: 16px; }
 
 .sb-stage-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink-soft); }
