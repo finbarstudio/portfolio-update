@@ -53,9 +53,9 @@ export function drawWatermark(
 ): void {
   const s = opts.scale ?? Math.max(1, Math.min(width, height) / 360);
 
-  // ── Big centred wordmark at ~30% opacity ───────────────────────────────────
+  // ── Big centred wordmark at ~5% opacity (barely-there) ─────────────────────
   ctx.save();
-  ctx.globalAlpha = 0.3;
+  ctx.globalAlpha = 0.05;
   ctx.textBaseline = "middle";
   ctx.textAlign = "left";
 
@@ -92,16 +92,22 @@ export function drawWatermark(
   ctx.fillText(POST, x, cy);
   ctx.restore();
 
-  // ── Subtle finbar.studio backlink, bottom-right ────────────────────────────
+  // ── finbar.studio backlink, bottom-right — legible on white AND black via a
+  //    dark outline (for light backgrounds) + a harsh drop shadow (for dark). ──
   ctx.save();
-  const urlSize = 11 * s;
+  const urlSize = 12 * s;
   const margin = 14 * s;
-  ctx.font = `${urlSize}px ui-monospace, "Space Mono", Menlo, monospace`;
+  ctx.font = `700 ${urlSize}px ui-monospace, "Space Mono", Menlo, monospace`;
   ctx.textAlign = "right";
   ctx.textBaseline = "alphabetic";
-  ctx.shadowColor = "rgba(0,0,0,0.35)";
-  ctx.shadowBlur = 3 * s;
-  ctx.fillStyle = "rgba(255,255,255,0.88)";
+  ctx.lineJoin = "round";
+  ctx.lineWidth = 3 * s;
+  ctx.strokeStyle = "rgba(0,0,0,0.6)";
+  ctx.strokeText(URL_TEXT, width - margin, height - margin);
+  ctx.shadowColor = "rgba(0,0,0,0.9)";
+  ctx.shadowBlur = 4 * s;
+  ctx.shadowOffsetY = 1 * s;
+  ctx.fillStyle = "#ffffff";
   ctx.fillText(URL_TEXT, width - margin, height - margin);
   ctx.restore();
 }

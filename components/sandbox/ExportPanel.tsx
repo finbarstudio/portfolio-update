@@ -44,7 +44,7 @@ export default function ExportPanel({
       <h3 className="sb-panel-title mono-heading">Export</h3>
 
       <div className="sb-export-grid">
-        <button type="button" className="sb-btn is-primary" disabled={disabled} onClick={exp.exportVideo}>
+        <button type="button" className="sb-btn" disabled={disabled} onClick={exp.exportVideo}>
           {exp.videoSupported ? "Loop video" : "Loop video (Chrome)"}
         </button>
         <button type="button" className="sb-btn" disabled={disabled} onClick={exp.exportGif}>
