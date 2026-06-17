@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SandboxNav from "@/components/sandbox/SandboxNav";
+import SandboxTransition from "@/components/sandbox/SandboxTransition";
 
 const SANDBOX_URL = "https://sandbox.finbar.studio";
 
@@ -23,7 +24,9 @@ export default function SandboxLayout({ children }: { children: React.ReactNode 
   return (
     <div className="sb-root">
       <SandboxNav />
-      <div className="sb-content">{children}</div>
+      <div className="sb-content">
+        <SandboxTransition>{children}</SandboxTransition>
+      </div>
       <div className="sb-screen-mask" aria-hidden="true" />
     </div>
   );

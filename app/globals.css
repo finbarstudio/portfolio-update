@@ -1087,22 +1087,20 @@
      reveal on hover/focus. Touch / no-hover devices always show it. */
   .hover-reveal { }
   @media (hover: hover) and (pointer: fine) {
-    /* Reserve the reveal's space at rest (rows stay 1fr) and fade/slide it in on
-       hover — so the thumbnail keeps a fixed height and the image never re-crops
-       (no bottom clip). Only the gentle scale zoom animates the picture. */
     .hover-reveal {
       display: grid;
-      grid-template-rows: 1fr;
+      grid-template-rows: 0fr;
       opacity: 0;
-      transform: translateY(4px);
-      transition: opacity var(--dur-fast) var(--ease),
-                  transform var(--dur-fast) var(--ease);
+      /* Slow grow so a featured card's thumbnail eases down (steals space)
+         gradually enough for the WebGL mockup to refit smoothly. */
+      transition: grid-template-rows 320ms var(--ease),
+                  opacity var(--dur-fast) var(--ease);
     }
     .hover-reveal > * { overflow: hidden; min-height: 0; }
     .group:hover .hover-reveal,
     .group:focus-within .hover-reveal {
+      grid-template-rows: 1fr;
       opacity: 1;
-      transform: none;
     }
   }
 
@@ -1246,31 +1244,25 @@
      (truly invisible — no sliver) that grow horizontally from the centre with
      staggered delays, so the leading edges separate into colour channels. */
   .card-reveal { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  /* Calm pink reveal: a clean, quick eased fade in and out (no scale-out stagger,
+     which read as flashy / glitchy). The top gradient channel is what shows. */
   .card-rev {
     position: absolute;
     inset: 0;
-    border-radius: 14px;              /* match the container so corners stay rounded
-                                          as the channel scales out from the centre */
-    transform: scale(0);
-    transform-origin: center;
-    transition: transform 0.55s var(--ease);
-    will-change: transform;
+    border-radius: 14px;
+    opacity: 0;
+    transition: opacity 0.2s var(--ease);
+    will-change: opacity;
   }
-  /* All pink tones (no blue); top layer is a pink gradient. Base transition
-     delays are reversed so the channels stagger OUT on un-hover too. */
-  .card-rev.c1 { background: var(--pink);       transition-delay: 0.16s; }
-  .card-rev.c2 { background: var(--pink-soft);  transition-delay: 0.08s; }
-  .card-rev.c3 { background: linear-gradient(105deg, var(--pink-soft), var(--pink)); transition-delay: 0s; }
+  .card-rev.c1 { background: var(--pink); }
+  .card-rev.c2 { background: var(--pink-soft); }
+  .card-rev.c3 { background: linear-gradient(105deg, var(--pink-soft), var(--pink)); }
 
   /* Pointer/keyboard only — never on touch, so mobile taps don't fire the pink
      reveal (the page just navigates). */
   @media (hover: hover) {
-    .group:hover .card-rev.c1,
-    .group:focus-within .card-rev.c1 { transform: scale(1); transition-delay: 0s; }
-    .group:hover .card-rev.c2,
-    .group:focus-within .card-rev.c2 { transform: scale(1); transition-delay: 0.08s; }
-    .group:hover .card-rev.c3,
-    .group:focus-within .card-rev.c3 { transform: scale(1); transition-delay: 0.16s; }
+    .group:hover .card-rev,
+    .group:focus-within .card-rev { opacity: 1; }
   }
 
   /* Hero scroll-driven fade (CSS only, no JS) */
@@ -2947,6 +2939,39 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .sb-home-ring circle { animation: none; stroke-dasharray: none; }
+}
+
+/* ── Page slide on route change (matches the nav highlight's direction) ── */
+.sb-page { animation: sb-slide-in 420ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+.sb-page[data-dir="right"] { --sb-from: 26px; }
+.sb-page[data-dir="left"]  { --sb-from: -26px; }
+@keyframes sb-slide-in {
+  from { opacity: 0; transform: translateX(var(--sb-from, 26px)); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-page { animation: none; }
+}
+
+/* ── Mockups index: centred technical pill buttons, titles only ── */
+.sb-mockups {
+  flex: 1; min-height: 72vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px;
+}
+.sb-mock-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: clamp(240px, 34vw, 340px);
+  padding: 17px 30px;
+  border: 1px solid var(--line); border-radius: 13px;
+  background: color-mix(in srgb, var(--ink) 6%, var(--bg));
+  font-family: var(--font-mono); font-size: 13px;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--ink); text-decoration: none;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.sb-mock-btn:hover {
+  background: var(--pink); border-color: var(--pink); color: #fff;
 }
 
 /* ── Tool layout ─────────────────────────────────────────── */
