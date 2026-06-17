@@ -111,7 +111,7 @@ export default function ExportPanel({
       {exp.error && <p className="sb-msg is-error" role="alert">{exp.error}</p>}
 
       <p className="mono-label sb-watermark-note">
-        Free exports carry a finbar.studio watermark.
+        Free exports are SD with a finbar.studio watermark. HD, 2K &amp; 4K coming soon.
         {transparentBg ? " Video & GIF are opaque (transparent → matte); PNG keeps alpha." : ""}
       </p>
     </div>
