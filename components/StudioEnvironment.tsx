@@ -23,16 +23,24 @@ export default function StudioEnvironment() {
   const invalidate = useThree((s) => s.invalidate);
 
   useEffect(() => {
-    const pmrem = new THREE.PMREMGenerator(gl);
-    const envTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    let pmrem: THREE.PMREMGenerator | null = null;
+    let envTexture: THREE.Texture | null = null;
     const previous = scene.environment;
-    scene.environment = envTexture;
-    invalidate();
+    try {
+      pmrem = new THREE.PMREMGenerator(gl);
+      envTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environment = envTexture;
+      invalidate();
+    } catch (err) {
+      // Lighting is a nice-to-have — never let it take down the scene. The
+      // directional/ambient lights still render the model without IBL.
+      console.error("StudioEnvironment: skipping IBL —", err);
+    }
 
     return () => {
       scene.environment = previous;
-      envTexture.dispose();
-      pmrem.dispose();
+      envTexture?.dispose();
+      pmrem?.dispose();
     };
   }, [gl, scene, invalidate]);
 
