@@ -24,6 +24,13 @@ export function proxy(request: NextRequest): NextResponse {
 
   // ── Sandbox subdomain: clean URLs (no visible /sandbox prefix) ──────────────
   if (SANDBOX_HOSTS.has(host)) {
+    // Static files from /public (3D models, images, video, fonts, …) are served
+    // from the ROOT path and must NOT get the /sandbox app-route prefix, or they
+    // 404 on the subdomain — which is what broke the tools: the page shell loaded
+    // (its JS is under the excluded _next/static) but the model fetch to
+    // /models/…glb got rewritten to /sandbox/models/…glb → 404 → useGLTF threw.
+    // Public assets are identifiable by a file extension in the last path segment.
+    if (/\.[^/]+$/.test(pathname)) return NextResponse.next();
     // Embeds are served as-is on every host (stable embed URLs).
     if (pathname.startsWith("/embed")) return NextResponse.next();
     // If the prefix leaked into the URL, 308 it to the clean path.
