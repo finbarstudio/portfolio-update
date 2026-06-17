@@ -18,6 +18,7 @@ import type { AnimationPreset, FitMode } from "@/components/mac/mac-config";
 import {
   MAC_DEMO_MEDIA,
   ingestFiles,
+  ingestImageUrl,
   revokeAsset,
   type MediaAsset,
 } from "@/lib/sandbox/media";
@@ -34,6 +35,7 @@ import UploadDropzone from "./UploadDropzone";
 import ExportPanel from "./ExportPanel";
 
 const MAC_EMBED_PATH = "/embed/mac";
+const MAC_MAX = 1; // the Studio Display shows a single screen
 
 export default function MacMockupTool() {
   const [assets, setAssets] = useState<MediaAsset[]>(() => MAC_DEMO_MEDIA.slice());
@@ -64,18 +66,28 @@ export default function MacMockupTool() {
   const exp = useMockupExport({ controllerRef, setPaused, getConfig });
 
   const handleAddFiles = useCallback(async (files: File[]) => {
-    // The default reel is placeholder cards — the first real upload replaces them
-    // wholesale (so 1 upload loops alone, 2 loop together, etc.).
-    const current = assetsRef.current;
-    const replacingDemos = current.length > 0 && current.every((a) => a.isDemo);
-    const result = await ingestFiles(files, replacingDemos ? 0 : current.length);
+    // The Studio Display shows one screen — a single media item replaces the
+    // placeholder card (and any prior pick).
+    const result = await ingestFiles(files, 0, MAC_MAX);
     setMessages({ errors: result.errors, warnings: result.warnings });
-    if (result.assets.length) {
-      setAssets((prev) => {
-        const onlyDemos = prev.length > 0 && prev.every((a) => a.isDemo);
-        return onlyDemos ? result.assets : [...prev, ...result.assets];
-      });
-    }
+    if (result.assets.length) setAssets(result.assets.slice(0, MAC_MAX));
+  }, []);
+
+  const handleAddUrl = useCallback(async (url: string) => {
+    const result = await ingestImageUrl(url, 0, MAC_MAX);
+    setMessages({ errors: result.errors, warnings: result.warnings });
+    if (result.assets.length) setAssets(result.assets.slice(0, MAC_MAX));
+  }, []);
+
+  const handleReorder = useCallback((id: string, toIndex: number) => {
+    setAssets((prev) => {
+      const from = prev.findIndex((a) => a.id === id);
+      if (from < 0 || toIndex === from) return prev;
+      const next = prev.slice();
+      const [item] = next.splice(from, 1);
+      next.splice(Math.max(0, Math.min(next.length, toIndex)), 0, item);
+      return next;
+    });
   }, []);
 
   const handleRemove = useCallback((id: string) => {
@@ -148,9 +160,14 @@ export default function MacMockupTool() {
           <UploadDropzone
             assets={assets}
             onAddFiles={handleAddFiles}
+            onAddUrl={handleAddUrl}
             onRemove={handleRemove}
             onMove={handleMove}
+            onReorder={handleReorder}
             messages={messages}
+            maxItems={MAC_MAX}
+            landscapeThumbs
+            hint="A looping video works best — a still image is fine too"
           />
           <ControlPanel
             preset={preset}
