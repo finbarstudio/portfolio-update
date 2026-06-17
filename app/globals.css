@@ -1243,17 +1243,18 @@
   /* Reveal: three colour channels, each a full-height bar scaled to 0 at rest
      (truly invisible — no sliver) that grow horizontally from the centre with
      staggered delays, so the leading edges separate into colour channels. */
-  /* Calm pink reveal: fade the whole group as ONE layer (the stacked channels
-     flatten to the top gradient first, then that composite fades). Fading each
-     opaque channel independently blended into a pale/washed flash on release —
-     this avoids it. A clean, quick eased fade in and out. */
-  .card-reveal {
-    position: absolute; inset: 0; z-index: 0; pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s var(--ease);
-    will-change: opacity;
+  /* Calm pink reveal via a synchronized scale from the centre. NOT element
+     opacity: fading an opacity layer behind the transparent WebGL thumbnails
+     promoted a compositing layer that flashed white on release. Scaling the
+     (always-opaque) channels never flashes; synchronized (no per-channel stagger)
+     keeps it calm rather than the old flashy chromatic offset. */
+  .card-reveal { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .card-rev {
+    position: absolute; inset: 0; border-radius: 14px;
+    transform: scale(0); transform-origin: center;
+    transition: transform 0.34s var(--ease);
+    will-change: transform;
   }
-  .card-rev { position: absolute; inset: 0; border-radius: 14px; }
   .card-rev.c1 { background: var(--pink); }
   .card-rev.c2 { background: var(--pink-soft); }
   .card-rev.c3 { background: linear-gradient(105deg, var(--pink-soft), var(--pink)); }
@@ -1261,8 +1262,8 @@
   /* Pointer/keyboard only — never on touch, so mobile taps don't fire the pink
      reveal (the page just navigates). */
   @media (hover: hover) {
-    .group:hover .card-reveal,
-    .group:focus-within .card-reveal { opacity: 1; }
+    .group:hover .card-rev,
+    .group:focus-within .card-rev { transform: scale(1); }
   }
 
   /* Hero scroll-driven fade (CSS only, no JS) */
