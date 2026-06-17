@@ -108,6 +108,7 @@ export default function ControlPanel({
   onBackground,
   presetLabels = { carousel: "Carousel", flat: "Flat" },
   motion,
+  showAspect = true,
 }: {
   preset?: AnimationPreset;
   onPreset?: (v: AnimationPreset) => void;
@@ -121,6 +122,8 @@ export default function ControlPanel({
   presetLabels?: { carousel: string; flat: string };
   /** When set, replace the Animation toggle with Speed + Angle sliders (phone). */
   motion?: MotionControls;
+  /** Hide the aspect selector (the Mac tool is locked to 16:9). */
+  showAspect?: boolean;
 }) {
   const customActive = !SWATCHES.some((s) => s.value === background);
 
@@ -170,16 +173,18 @@ export default function ControlPanel({
         />
       )}
 
-      <Segmented<AspectToken>
-        label="Aspect"
-        value={aspect}
-        onChange={onAspect}
-        options={[
-          { value: "9:16", label: "9:16" },
-          { value: "1:1", label: "1:1" },
-          { value: "16:9", label: "16:9" },
-        ]}
-      />
+      {showAspect && (
+        <Segmented<AspectToken>
+          label="Aspect"
+          value={aspect}
+          onChange={onAspect}
+          options={[
+            { value: "9:16", label: "9:16" },
+            { value: "1:1", label: "1:1" },
+            { value: "16:9", label: "16:9" },
+          ]}
+        />
+      )}
 
       <Segmented<FitMode>
         label="Screen fit"

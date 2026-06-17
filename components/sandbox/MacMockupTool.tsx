@@ -183,6 +183,7 @@ export default function MacMockupTool() {
             background={background}
             onBackground={setBackground}
             presetLabels={{ carousel: "Angle", flat: "Flat" }}
+            showAspect={false}
           />
           <ExportPanel
             exp={exp}
