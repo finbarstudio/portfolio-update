@@ -1087,20 +1087,22 @@
      reveal on hover/focus. Touch / no-hover devices always show it. */
   .hover-reveal { }
   @media (hover: hover) and (pointer: fine) {
+    /* Reserve the reveal's space at rest (rows stay 1fr) and fade/slide it in on
+       hover — so the thumbnail keeps a fixed height and the image never re-crops
+       (no bottom clip). Only the gentle scale zoom animates the picture. */
     .hover-reveal {
       display: grid;
-      grid-template-rows: 0fr;
+      grid-template-rows: 1fr;
       opacity: 0;
-      /* Slow grow so a featured card's thumbnail eases down (steals space)
-         gradually enough for the WebGL mockup to refit smoothly. */
-      transition: grid-template-rows 320ms var(--ease),
-                  opacity var(--dur-fast) var(--ease);
+      transform: translateY(4px);
+      transition: opacity var(--dur-fast) var(--ease),
+                  transform var(--dur-fast) var(--ease);
     }
     .hover-reveal > * { overflow: hidden; min-height: 0; }
     .group:hover .hover-reveal,
     .group:focus-within .hover-reveal {
-      grid-template-rows: 1fr;
       opacity: 1;
+      transform: none;
     }
   }
 
