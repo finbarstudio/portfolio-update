@@ -34,24 +34,9 @@ const TOOLS: Tool[] = [
 export default function SandboxLanding() {
   return (
     <section className="sb-landing">
-      <div className="sb-landing-intro">
-        <p className="mono-label sb-eyebrow">Studio tools</p>
-        <h1 className="sb-landing-title">The Sandbox</h1>
-        <p className="sb-landing-lede">
-          A workshop of small, free creative tools — pieces of the finbar✶studio site, pulled out so
-          you can use them on your own work. More land here over time.
-        </p>
-      </div>
-
-      <div className="sb-index-bar mono-label">
-        <span>Index</span>
-        <span>
-          {TOOLS.length} Tools · {TOOLS.filter((t) => t.status === "live").length} Live
-        </span>
-      </div>
       <div className="sb-grid">
-        {TOOLS.map((tool, i) => (
-          <ToolCard key={tool.title} tool={tool} index={i} />
+        {TOOLS.map((tool) => (
+          <ToolCard key={tool.title} tool={tool} />
         ))}
       </div>
     </section>

@@ -2815,88 +2815,47 @@
   --sb-surface: color-mix(in srgb, var(--ink) 2.5%, var(--bg));
   --sb-surface-2: color-mix(in srgb, var(--ink) 5%, var(--bg));
   --sb-line: var(--line);
+  /* Background blueprint grid drawn across the whole page. */
+  --sb-grid-cell: 56px;
+  --sb-grid-ink: color-mix(in srgb, var(--ink) 7%, transparent);
+  /* Apple-style continuous corner radius for the screen mask. */
+  --sb-screen-radius: 44px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: var(--bg);
+  background-image:
+    linear-gradient(to right, var(--sb-grid-ink) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--sb-grid-ink) 1px, transparent 1px);
+  background-size: var(--sb-grid-cell) var(--sb-grid-cell);
   color: var(--ink);
   font-family: var(--font-primary);
 }
 
-.sb-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 11px clamp(16px, 4vw, 40px);
-  border-bottom: 1px solid var(--ink);
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: blur(6px);
-  position: sticky;
-  top: 0;
-  z-index: 20;
+/* Rounds the page edges by painting black into the four square corners,
+   so the viewport reads like a device screen with an Apple corner radius. */
+.sb-screen-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  border-radius: var(--sb-screen-radius);
+  box-shadow: 0 0 0 50vmax #000;
 }
-.sb-wordmark {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-weight: 700;
-  text-transform: lowercase;
-  letter-spacing: 0.01em;
-  font-size: 15px;
-  color: var(--ink);
-}
-.sb-star { color: var(--pink); margin: 0 1px; }
-.sb-header-tag {
-  margin-left: 14px;
-  padding: 3px 8px;
-  border: 1px solid var(--ink);
-  border-radius: 0;
-  color: var(--ink);
-  background: transparent;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 9px;
-}
-.sb-header-nav { display: flex; gap: 22px; text-transform: uppercase; letter-spacing: 0.14em; }
-.sb-header-nav a { color: var(--ink-soft); transition: color 0.2s var(--ease); }
-.sb-header-nav a:hover { color: var(--pink); }
 
 .sb-content { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: clamp(28px, 5vw, 64px) clamp(16px, 4vw, 40px); }
-.sb-footer {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px clamp(16px, 4vw, 40px);
-  border-top: 1px solid var(--sb-line);
-  color: var(--ink-soft);
-  text-transform: uppercase; letter-spacing: 0.14em;
-}
 
 /* ── Landing ─────────────────────────────────────────────── */
 .sb-eyebrow { color: var(--ink-soft); letter-spacing: 0.2em; text-transform: uppercase; }
-.sb-landing-intro { max-width: 72ch; margin-bottom: clamp(28px, 5vw, 52px); }
-.sb-landing-title {
-  font-family: var(--font-primary); font-weight: 700;
-  font-size: clamp(2.6rem, 9vw, 6rem); line-height: 0.92;
-  text-transform: uppercase; letter-spacing: -0.015em;
-  margin: 14px 0 18px;
-}
-.sb-landing-lede { color: var(--ink-soft); font-size: var(--text-body); line-height: 1.55; max-width: 58ch; }
 
-/* Archive index header above the grid. */
-.sb-index-bar {
-  display: flex; align-items: baseline; justify-content: space-between;
-  padding: 7px 1px; border-top: 1px solid var(--ink);
-  text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-soft);
-}
-
-/* Divided archive grid: cells share hairline rules (a research-catalog table). */
+/* Minimal tool grid — no dividing rules, sits on the page's bg grid. */
 .sb-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(264px, 1fr));
-  gap: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line);
+  gap: 14px;
 }
 .sb-card {
   display: flex; flex-direction: column; gap: 9px;
   padding: 16px 16px 14px; min-height: 208px;
-  border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
   border-radius: 0; background: transparent;
   text-decoration: none; color: var(--ink);
   transition: background 0.18s var(--ease), color 0.18s var(--ease);
@@ -2909,9 +2868,7 @@
 .sb-card.is-live:hover .sb-card-cta { color: #fff; }
 .sb-card.is-live:hover .sb-card-status { color: #fff; border-color: rgba(255,255,255,0.55); }
 .sb-card.is-soon { opacity: 0.5; }
-.sb-card-top { display: flex; align-items: center; justify-content: space-between; }
-.sb-card-code { font-family: var(--font-mono); color: var(--pink); letter-spacing: 0.14em; }
-.sb-card.is-soon .sb-card-code { color: var(--ink-soft); }
+.sb-card-top { display: flex; align-items: center; justify-content: flex-end; }
 .sb-card-status { font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.16em; padding: 2px 6px; border: 1px solid; border-radius: 0; }
 .sb-card-status.is-live { color: var(--pink); border-color: color-mix(in srgb, var(--pink) 55%, transparent); }
 .sb-card-status.is-soon { color: var(--ink-soft); border-color: var(--line); }

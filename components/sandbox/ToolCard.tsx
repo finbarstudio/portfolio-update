@@ -13,13 +13,10 @@ export type Tool = {
   tag?: string;
 };
 
-export default function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
-  // Catalog code, archive-style (SB-01, SB-02 …) — the research-center treatment.
-  const code = `SB-${String(index + 1).padStart(2, "0")}`;
+export default function ToolCard({ tool }: { tool: Tool }) {
   const inner = (
     <>
       <div className="sb-card-top">
-        <span className="sb-card-code mono-label">{code}</span>
         <span className={`sb-card-status ${tool.status === "live" ? "is-live" : "is-soon"}`}>
           {tool.status === "live" ? "Live" : "Soon"}
         </span>
