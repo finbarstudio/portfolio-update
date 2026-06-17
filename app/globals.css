@@ -2841,25 +2841,28 @@
   border-radius: 13px;
   background: color-mix(in srgb, var(--ink) 6%, var(--bg));
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  padding: 5px;
   font-family: var(--font-mono); font-size: 11px;
   text-transform: uppercase; letter-spacing: 0.14em;
 }
 
-.sb-corner-tr {
-  right: 16px;
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 13px 18px;
-  color: var(--ink-soft); text-decoration: none;
-  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+/* Top-right: same outer bubble as the tab, with an inner pink pill (mirrors the
+   active tab's highlight) holding the link + a superscript arrow. */
+.sb-corner-tr { right: 16px; display: inline-block; text-decoration: none; }
+.sb-corner-pill {
+  display: inline-block;
+  padding: 8px 16px; border-radius: 9px;
+  background: var(--pink); color: #fff;
+  transition: background 0.2s var(--ease);
 }
-.sb-corner-tr:hover { color: var(--pink); border-color: color-mix(in srgb, var(--pink) 45%, var(--line)); }
-.sb-arrow { display: inline-block; transition: transform 0.2s var(--ease); }
-.sb-corner-tr:hover .sb-arrow { transform: translate(2px, -2px); }
+.sb-corner-tr:hover .sb-corner-pill { background: color-mix(in srgb, var(--pink) 86%, #000); }
+.sb-arrow { font-size: 0.66em; vertical-align: super; margin-left: 3px; display: inline-block; transition: transform 0.2s var(--ease); }
+.sb-corner-tr:hover .sb-arrow { transform: translate(1px, -1px); }
 
 .sb-tabs {
   left: 16px;
   display: grid; grid-template-columns: 1fr 1fr;
-  padding: 5px; isolation: isolate;
+  isolation: isolate;
 }
 /* The active "button": a pink rounded pill that slides between the two tabs. */
 .sb-tabs-glow {
@@ -2914,24 +2917,35 @@
 .sb-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
 .sb-card-cta { color: var(--pink); }
 
-/* ── Fresh home (placeholder — to be designed) ───────────── */
+/* ── Fresh home: just the star, with an outline drawing itself around it ── */
 .sb-home {
   flex: 1; min-height: 72vh;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; gap: 18px;
+  display: flex; align-items: center; justify-content: center;
 }
-.sb-home-star { color: var(--pink); }
-.sb-home-title {
-  font-family: var(--font-primary); font-weight: 700;
-  font-size: clamp(2.6rem, 8vw, 5rem); line-height: 0.95;
-  text-transform: lowercase; letter-spacing: -0.01em;
+.sb-home-mark {
+  position: relative; display: grid; place-items: center;
+  width: clamp(160px, 30vw, 248px); aspect-ratio: 1;
 }
-.sb-home-lede { color: var(--ink-soft); font-size: var(--text-body); line-height: 1.55; max-width: 44ch; }
-.sb-home-link {
-  color: var(--pink); font-family: var(--font-mono);
-  text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; text-decoration: none;
+.sb-home-star {
+  position: relative; z-index: 1; color: var(--pink);
+  width: clamp(56px, 11vw, 86px); height: auto;   /* CSS overrides the size attr */
 }
-.sb-home-link:hover { text-decoration: underline; }
+.sb-home-ring {
+  position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
+}
+.sb-home-ring circle {
+  fill: none; stroke: var(--ink); stroke-width: 1.25; stroke-linecap: round;
+  /* circumference for r=54 ≈ 339.29: a long arc + gap that orbits the star. */
+  stroke-dasharray: 250 89;
+  animation: sb-ring-draw 2.9s linear infinite;
+}
+@keyframes sb-ring-draw {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -339.29; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-home-ring circle { animation: none; stroke-dasharray: none; }
+}
 
 /* ── Tool layout ─────────────────────────────────────────── */
 .sb-tool-head { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--ink); }

@@ -1,18 +1,15 @@
-import Link from "next/link";
 import BrandStar from "@/components/BrandStar";
 
-// Fresh main page — intentionally minimal for now; to be designed.
+// Fresh main page — just the brand star with an outline that draws itself around it.
 export default function SandboxHome() {
   return (
     <section className="sb-home">
-      <BrandStar className="sb-home-star" size="2.4em" />
-      <h1 className="sb-home-title">fs.sandbox</h1>
-      <p className="sb-home-lede">
-        A workshop of small, free tools, pulled out of the finbar✶studio site.
-      </p>
-      <Link href="/mockups" className="sb-home-link">
-        Mockups →
-      </Link>
+      <div className="sb-home-mark">
+        <svg className="sb-home-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="54" />
+        </svg>
+        <BrandStar className="sb-home-star" size={72} />
+      </div>
     </section>
   );
 }

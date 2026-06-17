@@ -37,7 +37,9 @@ export default function SandboxNav() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        finbar.studio <span className="sb-arrow" aria-hidden="true">↗</span>
+        <span className="sb-corner-pill">
+          finbar.studio<span className="sb-arrow" aria-hidden="true">↗</span>
+        </span>
       </a>
     </>
   );
