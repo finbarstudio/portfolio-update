@@ -391,6 +391,13 @@
 .sidebar-toggle:hover { color: var(--pink); border-color: var(--pink); }
 .sidebar-toggle svg { transition: transform var(--dur) var(--ease); }
 .sidebar-toggle[data-collapsed="true"] svg { transform: rotate(180deg); }
+/* The rail (and its toggle) is desktop-only — the `hidden md:flex` utility can't
+   win here because this unlayered rule's `display:flex` outranks Tailwind's
+   layered `hidden`. Hide it below the md breakpoint in the same (unlayered)
+   context so it never leaks onto the mobile layout. */
+@media (max-width: 767px) {
+  .sidebar-toggle { display: none; }
+}
 
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {

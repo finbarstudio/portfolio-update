@@ -19,9 +19,10 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import * as THREE from "three";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, Environment, Center } from "@react-three/drei";
+import { useGLTF, Center } from "@react-three/drei";
 
 import Loader from "../Loader";
+import StudioEnvironment from "../StudioEnvironment";
 import { useGroupHover } from "../useGroupHover";
 import { FrameDriver } from "../FrameDriver";
 import { useAppReady } from "../useAppReady";
@@ -379,8 +380,8 @@ export default function MacScene({
           <ambientLight intensity={0.6} />
           <directionalLight position={[5, 8, 5]} intensity={1.1} />
           <directionalLight position={[-4, 3, -2]} intensity={0.4} />
+          <StudioEnvironment />
           <Suspense fallback={null}>
-            <Environment preset="city" />
             <MacShow
               model={model}
               media={media}
