@@ -54,10 +54,26 @@ export default function SandboxError({
           Back to tools
         </Link>
       </div>
-      {error.digest && (
-        <p className="mono-label" style={{ opacity: 0.5, fontSize: 11, marginTop: 8 }}>
-          Ref: {error.digest}
-        </p>
+      {(error.message || error.digest) && (
+        <pre
+          className="mono-label"
+          style={{
+            opacity: 0.7,
+            fontSize: 11,
+            marginTop: 12,
+            padding: "10px 12px",
+            border: "1px solid var(--line)",
+            borderRadius: 8,
+            maxWidth: "100%",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            letterSpacing: 0,
+            textTransform: "none",
+          }}
+        >
+          {error.message || "(no message)"}
+          {error.digest ? `\nRef: ${error.digest}` : ""}
+        </pre>
       )}
     </div>
   );
