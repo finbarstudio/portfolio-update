@@ -2804,15 +2804,10 @@
    ════════════════════════════════════════════════════════════════════ */
 
 .sb-root {
-  /* ── Dark "screen" skin: a black viewport with white text and the brand pink
-     accent, framed by a thin very-dark-grey device radius. Scoped to the
-     Sandbox only — the warm portfolio is untouched. */
-  --bg: #000000;            /* black screen */
-  --ink: #FFFFFF;           /* white text */
-  --ink-soft: #9A9A9A;      /* muted grey (reads white-ish) for secondary text */
-  --line: rgba(255, 255, 255, 0.16);  /* faint light hairline on black */
-  --sb-surface: color-mix(in srgb, var(--ink) 4%, var(--bg));
-  --sb-surface-2: color-mix(in srgb, var(--ink) 8%, var(--bg));
+  /* Sandbox uses the main site's warm palette (cream bg, warm ink, pink accent) —
+     it just adds its own subtle surfaces + the device-radius tokens. */
+  --sb-surface: color-mix(in srgb, var(--ink) 2.5%, var(--bg));
+  --sb-surface-2: color-mix(in srgb, var(--ink) 5%, var(--bg));
   --sb-line: var(--line);
   /* Small device corner radius + the neutral very-dark-grey it paints into. */
   --sb-screen-radius: 16px;
