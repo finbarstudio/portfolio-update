@@ -376,13 +376,14 @@ function Carousel({
    `apply()` dedupes, so a stable size costs nothing and TMYR is unchanged. */
 function LiveResize() {
   const gl = useThree((s) => s.gl);
+  const scene = useThree((s) => s.scene);
   const camera = useThree((s) => s.camera);
   const setSize = useThree((s) => s.setSize);
   const invalidate = useThree((s) => s.invalidate);
   const last = useRef({ w: 0, h: 0 });
 
   const apply = useCallback(
-    (w: number, h: number) => {
+    (w: number, h: number, immediate = false) => {
       if (w < 1 || h < 1) return;
       if (w === last.current.w && h === last.current.h) return;
       last.current = { w, h };
@@ -392,17 +393,24 @@ function LiveResize() {
         cam.aspect = w / h;
         cam.updateProjectionMatrix();
       }
-      invalidate();
+      // `setSize` reallocates the drawing buffer to a cleared (transparent) state.
+      // The per-frame poll runs inside the rAF loop, so r3f redraws the same tick
+      // and the buffer is never seen blank. The ResizeObserver fires OUTSIDE the
+      // loop, so deferring the redraw to a later demand frame (invalidate) presents
+      // the cleared buffer for a frame — the un-hover "white" flash. Render it
+      // synchronously here so the resized buffer is filled in the same tick.
+      if (immediate) gl.render(scene, camera);
+      else invalidate();
     },
-    [setSize, camera, invalidate],
+    [setSize, camera, invalidate, gl, scene],
   );
 
   useEffect(() => {
     const parent = gl.domElement.parentElement;
     if (!parent) return;
-    const ro = new ResizeObserver(() => apply(parent.clientWidth, parent.clientHeight));
+    const ro = new ResizeObserver(() => apply(parent.clientWidth, parent.clientHeight, true));
     ro.observe(parent);
-    apply(parent.clientWidth, parent.clientHeight);
+    apply(parent.clientWidth, parent.clientHeight, true);
     return () => ro.disconnect();
   }, [gl, apply]);
 
