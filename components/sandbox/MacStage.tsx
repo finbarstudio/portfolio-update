@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
-import type { AnimationPreset, FitMode, MacMediaItem } from "@/components/mac/mac-config";
+import type { FitMode, MacMediaItem } from "@/components/mac/mac-config";
 import { MAC_MODEL } from "@/components/mac/mac-config";
 import type { MediaAsset } from "@/lib/sandbox/media";
 import { aspectToCss } from "@/lib/sandbox/embed-config";
@@ -23,7 +23,7 @@ const MacScene = dynamic(() => import("@/components/mac/MacScene"), {
 
 export default function MacStage({
   media,
-  preset,
+  pose,
   fit,
   background,
   aspect,
@@ -32,7 +32,7 @@ export default function MacStage({
   onReady,
 }: {
   media: MediaAsset[];
-  preset: AnimationPreset;
+  pose: number;
   fit: FitMode;
   background: string;
   aspect: string;
@@ -68,7 +68,7 @@ export default function MacStage({
         <MacScene
           model={MAC_MODEL}
           media={items}
-          presetOverride={preset}
+          pose={pose}
           fit={fit}
           background={background}
           fill

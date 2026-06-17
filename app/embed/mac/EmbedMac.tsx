@@ -27,8 +27,8 @@ export default function EmbedMac({ config }: { config: EmbedConfig }) {
     return MAC_DEMO_MEDIA.map((m) => ({ kind: m.kind, src: m.src }));
   }, [config.media]);
 
-  const hoverable = config.preset !== "flat";
-  const presetOverride = config.preset === "flat" ? "flat" : undefined;
+  // New embeds carry a continuous pose; fall back to the old preset.
+  const pose = config.pose != null ? config.pose : config.preset === "flat" ? 1 : 0;
 
   return (
     <div
@@ -44,11 +44,11 @@ export default function EmbedMac({ config }: { config: EmbedConfig }) {
       <div style={{ width: "100%", height: "100%", aspectRatio: aspectToCss(config.aspect), maxWidth: "100%", maxHeight: "100%" }}>
         <MacScene
           media={media}
-          presetOverride={presetOverride}
+          pose={pose}
           fit={config.fit}
           background={config.background}
           fill
-          hoverable={hoverable}
+          hoverable={false}
           immediate
         />
       </div>

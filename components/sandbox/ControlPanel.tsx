@@ -12,12 +12,12 @@ import { MAX_SPEED } from "@/components/phone/phone-config";
 export type AspectToken = "9:16" | "1:1" | "16:9";
 
 export type MotionControls = {
-  speed: number;
   angle: number;
-  prominence: number;
-  onSpeed: (v: number) => void;
   onAngle: (v: number) => void;
-  onProminence: (v: number) => void;
+  speed?: number;
+  onSpeed?: (v: number) => void;
+  prominence?: number;
+  onProminence?: (v: number) => void;
 };
 
 function Range({
@@ -108,6 +108,7 @@ export default function ControlPanel({
   onBackground,
   presetLabels = { carousel: "Carousel", flat: "Flat" },
   motion,
+  showAspect = true,
 }: {
   preset?: AnimationPreset;
   onPreset?: (v: AnimationPreset) => void;
@@ -119,8 +120,11 @@ export default function ControlPanel({
   onBackground: (v: string) => void;
   /** Override the two preset button labels (the Mac tool uses Angle / Flat). */
   presetLabels?: { carousel: string; flat: string };
-  /** When set, replace the Animation toggle with Speed + Angle sliders (phone). */
+  /** When set, replace the Animation toggle with sliders (Angle always; Speed +
+   *  prominence when their handlers are provided). */
   motion?: MotionControls;
+  /** Show the aspect-ratio control (the Mac tool locks to widescreen). */
+  showAspect?: boolean;
 }) {
   const customActive = !SWATCHES.some((s) => s.value === background);
 
@@ -130,15 +134,17 @@ export default function ControlPanel({
 
       {motion ? (
         <>
-          <Range
-            label="Speed"
-            value={motion.speed}
-            min={0}
-            max={MAX_SPEED}
-            step={0.05}
-            display={motion.speed === 0 ? "Still" : `${motion.speed.toFixed(2)}×`}
-            onChange={motion.onSpeed}
-          />
+          {motion.onSpeed && motion.speed != null && (
+            <Range
+              label="Speed"
+              value={motion.speed}
+              min={0}
+              max={MAX_SPEED}
+              step={0.05}
+              display={motion.speed === 0 ? "Still" : `${motion.speed.toFixed(2)}×`}
+              onChange={motion.onSpeed}
+            />
+          )}
           <Range
             label="Angle"
             value={motion.angle}
@@ -148,15 +154,17 @@ export default function ControlPanel({
             display={`${Math.round(motion.angle * 100)}%`}
             onChange={motion.onAngle}
           />
-          <Range
-            label="Main phone size"
-            value={motion.prominence}
-            min={0}
-            max={1}
-            step={0.01}
-            display={`${Math.round(motion.prominence * 100)}%`}
-            onChange={motion.onProminence}
-          />
+          {motion.onProminence && motion.prominence != null && (
+            <Range
+              label="Main phone size"
+              value={motion.prominence}
+              min={0}
+              max={1}
+              step={0.01}
+              display={`${Math.round(motion.prominence * 100)}%`}
+              onChange={motion.onProminence}
+            />
+          )}
         </>
       ) : (
         <Segmented<AnimationPreset>
@@ -170,16 +178,18 @@ export default function ControlPanel({
         />
       )}
 
-      <Segmented<AspectToken>
-        label="Aspect"
-        value={aspect}
-        onChange={onAspect}
-        options={[
-          { value: "9:16", label: "9:16" },
-          { value: "1:1", label: "1:1" },
-          { value: "16:9", label: "16:9" },
-        ]}
-      />
+      {showAspect && (
+        <Segmented<AspectToken>
+          label="Aspect"
+          value={aspect}
+          onChange={onAspect}
+          options={[
+            { value: "9:16", label: "9:16" },
+            { value: "1:1", label: "1:1" },
+            { value: "16:9", label: "16:9" },
+          ]}
+        />
+      )}
 
       <Segmented<FitMode>
         label="Screen fit"

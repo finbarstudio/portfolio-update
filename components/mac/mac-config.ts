@@ -84,3 +84,13 @@ export function poseTargetFor(preset: "carousel" | "flat" | undefined, hovered: 
   if (preset) return preset === "flat" ? 1 : 0;
   return hovered ? 1 : 0;
 }
+
+/* Continuous Angle slider (sandbox tool): blends the pose `h` from flat (front-on)
+   to angled, with a little past the iso rest for extra tilt. */
+export const MAC_FLAT_H = 1;
+export const MAC_ANGLED_H = -0.3;
+export const DEFAULT_MAC_ANGLE = 0.8;
+export function macPoseFromAngle(angle: number): number {
+  const a = Math.max(0, Math.min(1, angle));
+  return MAC_FLAT_H + (MAC_ANGLED_H - MAC_FLAT_H) * a;
+}

@@ -14,8 +14,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
-import type { AnimationPreset, FitMode } from "@/components/mac/mac-config";
-import { CYCLE_SPEED as MAC_CYCLE_SPEED } from "@/components/mac/mac-config";
+import type { FitMode } from "@/components/mac/mac-config";
+import {
+  CYCLE_SPEED as MAC_CYCLE_SPEED,
+  macPoseFromAngle,
+  DEFAULT_MAC_ANGLE,
+} from "@/components/mac/mac-config";
 import { loopSeconds } from "@/components/phone/phone-config";
 import {
   MAC_DEMO_MEDIA,
@@ -41,8 +45,8 @@ const MAC_MAX = 1; // the Studio Display shows a single screen
 
 export default function MacMockupTool() {
   const [assets, setAssets] = useState<MediaAsset[]>(() => MAC_DEMO_MEDIA.slice());
-  const [preset, setPreset] = useState<AnimationPreset>("carousel"); // carousel = Angle (iso)
-  const [aspect, setAspect] = useState<AspectToken>("16:9");
+  const [angle, setAngle] = useState(DEFAULT_MAC_ANGLE);
+  const [aspect] = useState<AspectToken>("16:9"); // locked to widescreen
   const [fit, setFit] = useState<FitMode>("cover");
   const [background, setBackground] = useState<string>("transparent");
   const [paused, setPaused] = useState(false);
@@ -54,8 +58,9 @@ export default function MacMockupTool() {
 
   const controllerRef = useRef<PhoneSceneController | null>(null);
 
-  // Mac pose: flat (front-on) = 1, angled = 0 — the export captures it as the hover.
-  const poseHover = preset === "flat" ? 1 : 0;
+  // Continuous Angle → pose blend; the export captures it as the hover.
+  const pose = macPoseFromAngle(angle);
+  const poseHover = pose;
   const configRef = useRef<ExportConfig>({ media: assets, poseHover, fit, aspect, background });
   const assetsRef = useRef(assets);
   useEffect(() => {
@@ -123,7 +128,8 @@ export default function MacMockupTool() {
     if (typeof navigator === "undefined" || !navigator.clipboard) return false;
     const config: EmbedConfig = {
       media: assets.filter((a) => isEmbeddableSrc(a.src)).map((a) => ({ src: a.src, kind: a.kind })),
-      preset,
+      preset: "flat",
+      pose,
       fit,
       aspect,
       background,
@@ -132,7 +138,7 @@ export default function MacMockupTool() {
     const snippet = buildEmbedSnippet(origin, config, MAC_EMBED_PATH);
     navigator.clipboard.writeText(snippet).catch(() => {});
     return true;
-  }, [assets, preset, fit, aspect, background]);
+  }, [assets, pose, fit, aspect, background]);
 
   return (
     <div className="sb-tool">
@@ -151,7 +157,7 @@ export default function MacMockupTool() {
         <div className="sb-stage-col">
           <MacStage
             media={assets}
-            preset={preset}
+            pose={pose}
             fit={fit}
             background={background}
             aspect={aspect}
@@ -174,15 +180,14 @@ export default function MacMockupTool() {
             hint="A looping video works best — a still image is fine too"
           />
           <ControlPanel
-            preset={preset}
-            onPreset={setPreset}
             aspect={aspect}
-            onAspect={setAspect}
+            onAspect={() => {}}
             fit={fit}
             onFit={setFit}
             background={background}
             onBackground={setBackground}
-            presetLabels={{ carousel: "Angle", flat: "Flat" }}
+            motion={{ angle, onAngle: setAngle }}
+            showAspect={false}
           />
           <ExportPanel
             exp={exp}

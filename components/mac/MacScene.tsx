@@ -74,6 +74,9 @@ export type MacSceneProps = {
   paused?: boolean;
   /** Live turntable + camera zoom. Default on (embed); the tool passes false. */
   motion?: boolean;
+  /** Continuous pose blend (Angle slider): 1 = flat … 0 = iso … negative = more
+   *  angled. Overrides presetOverride when set. */
+  pose?: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady?: () => void;
 };
@@ -92,6 +95,7 @@ type MacShowProps = {
   paused: boolean;
   /** Live turntable + camera dolly. Off in the tool preview (kept for the embed). */
   motion: boolean;
+  pose?: number;
   presetOverride?: AnimationPreset;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady: () => void;
@@ -106,6 +110,7 @@ function MacShow({
   inView,
   paused,
   motion,
+  pose,
   presetOverride,
   controllerRef,
   onReady,
@@ -182,7 +187,9 @@ function MacShow({
 
   const groupRef = useRef<THREE.Group>(null);
   const offsetRef = useRef(0);
-  const hoverProgressRef = useRef(presetOverride ? poseTargetFor(presetOverride, false) : 0);
+  const hoverProgressRef = useRef(
+    pose != null ? pose : presetOverride ? poseTargetFor(presetOverride, false) : 0,
+  );
   const lastIndexRef = useRef(-1);
 
   // Build + expose the imperative controller (gl/scene/camera live inside Canvas).
@@ -215,7 +222,7 @@ function MacShow({
 
     // Pose blend (frozen during export — the controller writes the ref directly).
     if (!paused) {
-      const target = poseTargetFor(presetOverride, hovered);
+      const target = pose != null ? pose : poseTargetFor(presetOverride, hovered);
       hoverProgressRef.current += (target - hoverProgressRef.current) * STATE_LERP;
       // Only advance the turntable when motion is on (the tool preview holds still).
       if (motion) offsetRef.current += delta * CYCLE_SPEED;
@@ -327,6 +334,7 @@ export default function MacScene({
   preserveDrawingBuffer = false,
   paused = false,
   motion = true,
+  pose,
   controllerRef,
   onReady,
 }: MacSceneProps) {
@@ -404,6 +412,7 @@ export default function MacScene({
               inView={inView || paused}
               paused={paused}
               motion={motion}
+              pose={pose}
               presetOverride={presetOverride}
               controllerRef={controllerRef}
               onReady={handleReady}
