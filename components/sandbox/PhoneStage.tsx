@@ -62,7 +62,7 @@ export default function PhoneStage({
         maxWidth: "min(100%, 70vh)",
         margin: "0 auto",
         aspectRatio: aspectToCss(aspect),
-        borderRadius: 12,
+        borderRadius: 0,
         overflow: "hidden",
         // A checkerboard reads "transparent" in the preview; solid colors paint flat.
         background: checker

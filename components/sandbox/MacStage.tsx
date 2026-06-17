@@ -56,7 +56,7 @@ export default function MacStage({
         maxWidth: "min(100%, 86vh)",
         margin: "0 auto",
         aspectRatio: aspectToCss(aspect),
-        borderRadius: 12,
+        borderRadius: 0,
         overflow: "hidden",
         background: checker
           ? "repeating-conic-gradient(#ececea 0% 25%, #f8f8f6 0% 50%) 50% / 22px 22px"

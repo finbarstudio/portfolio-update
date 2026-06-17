@@ -43,9 +43,15 @@ export default function SandboxLanding() {
         </p>
       </div>
 
+      <div className="sb-index-bar mono-label">
+        <span>Index</span>
+        <span>
+          {TOOLS.length} Tools · {TOOLS.filter((t) => t.status === "live").length} Live
+        </span>
+      </div>
       <div className="sb-grid">
-        {TOOLS.map((tool) => (
-          <ToolCard key={tool.title} tool={tool} />
+        {TOOLS.map((tool, i) => (
+          <ToolCard key={tool.title} tool={tool} index={i} />
         ))}
       </div>
     </section>
