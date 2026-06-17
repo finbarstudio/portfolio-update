@@ -2845,13 +2845,13 @@
    active tab's highlight) holding the link + a superscript arrow. */
 .sb-corner-tr { right: 16px; display: inline-block; text-decoration: none; }
 .sb-corner-pill {
-  display: inline-block;
+  display: inline-block; white-space: nowrap;
   padding: 8px 16px; border-radius: 9px;
   background: var(--pink); color: #fff;
   transition: background 0.2s var(--ease);
 }
 .sb-corner-tr:hover .sb-corner-pill { background: color-mix(in srgb, var(--pink) 86%, #000); }
-.sb-arrow { font-size: 0.66em; vertical-align: super; margin-left: 3px; display: inline-block; transition: transform 0.2s var(--ease); }
+.sb-arrow { display: inline-block; width: 0.82em; height: 0.82em; margin-left: 4px; vertical-align: 0.32em; transition: transform 0.2s var(--ease); }
 .sb-corner-tr:hover .sb-arrow { transform: translate(1px, -1px); }
 
 .sb-tabs {
