@@ -28,9 +28,9 @@ function SandboxHeader() {
         <span className="sb-header-tag mono-label">Sandbox</span>
       </Link>
       <nav className="sb-header-nav mono-label" aria-label="Sandbox">
-        <Link href="/">Tools</Link>
+        <Link href="/"><span className="sb-nav-num">01</span>Tools</Link>
         <a href="https://www.finbar.studio" target="_blank" rel="noopener noreferrer">
-          finbar.studio ↗
+          <span className="sb-nav-num">02</span>finbar.studio ↗
         </a>
       </nav>
     </header>
@@ -43,8 +43,11 @@ export default function SandboxLayout({ children }: { children: React.ReactNode 
       <SandboxHeader />
       <div className="sb-content">{children}</div>
       <footer className="sb-footer mono-label">
-        <span>finbar<BrandStar className="sb-star" size="0.82em" />studio Sandbox</span>
-        <span>Experimental · built with Claude</span>
+        <span className="sb-foot-left">
+          <span className="sb-mark">(FS<span className="sb-mark-dot">·</span>SB)<sup className="sb-reg">®</sup></span>
+          finbar<BrandStar className="sb-star" size="0.82em" />studio Sandbox
+        </span>
+        <span>Experimental · Built with Claude</span>
       </footer>
     </div>
   );

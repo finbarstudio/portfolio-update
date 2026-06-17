@@ -49,7 +49,7 @@ export default function SandboxLanding() {
           {TOOLS.length} Tools · {TOOLS.filter((t) => t.status === "live").length} Live
         </span>
       </div>
-      <div className="sb-grid">
+      <div className="sb-list">
         {TOOLS.map((tool, i) => (
           <ToolCard key={tool.title} tool={tool} index={i} />
         ))}
