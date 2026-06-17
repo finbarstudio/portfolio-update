@@ -2899,6 +2899,11 @@
    pins to the top and the controls scroll up behind it. */
 @media (min-width: 900px) { .sb-stage-col { position: sticky; top: 80px; } }
 .sb-controls-col { display: flex; flex-direction: column; gap: 16px; }
+/* On mobile the preview stacks above the controls — float the Style panel
+   (Speed/Angle/size sliders) directly under it so edits update in view. */
+@media (max-width: 899px) {
+  .sb-controls-col > :nth-child(2) { order: -1; }
+}
 
 .sb-stage-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink-soft); }
 .sandbox-stage-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink-soft); }
@@ -2951,9 +2956,13 @@
 .sb-thumb-gen { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-family: var(--font-label, sans-serif); font-weight: 700; font-size: 22px; color: var(--pink); background: radial-gradient(120% 120% at 30% 20%, var(--pink-soft), var(--bg) 62%); }
 .sb-thumb-badge { position: absolute; top: 3px; left: 3px; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 4px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 70%, transparent); color: var(--bg); }
 .sb-thumb-media.is-landscape { aspect-ratio: 16/9; }
-.sb-thumb-media.is-grab { cursor: grab; touch-action: none; }
-.sb-thumb.is-dragging { opacity: 0.55; }
-.sb-thumb.is-dragging .sb-thumb-media.is-grab { cursor: grabbing; }
+.sb-thumb-media.is-grab { cursor: grab; touch-action: none; transition: box-shadow 0.15s ease, border-color 0.15s ease; }
+/* A faint grip glyph signals the tile can be dragged to reorder. */
+.sb-thumb-media.is-grab::after { content: "⠿"; position: absolute; top: 1px; right: 4px; font-size: 11px; line-height: 1; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.65); opacity: 0.7; pointer-events: none; }
+/* While dragging, the grabbed tile lifts (scale + shadow, via inline transform)
+   and rides above the others, which reflow live underneath it. */
+.sb-thumb.is-dragging { z-index: 6; }
+.sb-thumb.is-dragging .sb-thumb-media { cursor: grabbing; pointer-events: none; box-shadow: 0 10px 26px -6px rgba(20,18,16,0.5); border-color: var(--pink); }
 /* Paste-an-image-URL row (for embeddable media). */
 .sb-url-row { display: flex; gap: 6px; margin-top: 8px; }
 .sb-url-input { flex: 1; min-width: 0; font-size: 12px; padding: 7px 9px; border-radius: 6px; border: 1px solid var(--sb-line); background: var(--sb-surface-2); color: var(--ink); }
