@@ -14,6 +14,10 @@ export type EmbedMedia = { src: string; kind: PhoneMediaKind };
 export type EmbedConfig = {
   media: EmbedMedia[];
   preset: AnimationPreset;
+  /** Phone continuous pose blend (Angle slider). Overrides preset when present. */
+  pose?: number;
+  /** Phone carousel speed multiplier. */
+  speed?: number;
   fit: FitMode;
   /** Aspect ratio token, e.g. "9:16" | "1:1" | "16:9". */
   aspect: string;
@@ -49,6 +53,8 @@ export function encodeEmbedConfig(config: EmbedConfig, origin = ""): URLSearchPa
     sp.append("t", m.kind);
   }
   sp.set("p", config.preset);
+  if (config.pose != null) sp.set("h", String(config.pose));
+  if (config.speed != null) sp.set("spd", String(config.speed));
   sp.set("f", config.fit);
   sp.set("a", config.aspect);
   sp.set("bg", config.background);
@@ -75,8 +81,18 @@ export function decodeEmbedConfig(params: RawParams): EmbedConfig {
     params.f === "contain" ? "contain" : params.f === "stretch" ? "stretch" : "cover";
   const aspect = typeof params.a === "string" ? params.a : DEFAULT_EMBED.aspect;
   const background = typeof params.bg === "string" ? params.bg : DEFAULT_EMBED.background;
+  const pose = typeof params.h === "string" && params.h !== "" ? Number(params.h) : undefined;
+  const speed = typeof params.spd === "string" && params.spd !== "" ? Number(params.spd) : undefined;
 
-  return { media, preset, fit, aspect, background };
+  return {
+    media,
+    preset,
+    pose: Number.isFinite(pose) ? pose : undefined,
+    speed: Number.isFinite(speed) ? speed : undefined,
+    fit,
+    aspect,
+    background,
+  };
 }
 
 /** Aspect token "9:16" -> CSS aspect-ratio "9 / 16". */

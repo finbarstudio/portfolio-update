@@ -14,6 +14,7 @@ import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
 import type { PhoneMediaItem } from "@/components/phone/phone-config";
+import { poseFromAngle, DEFAULT_ANGLE, DEFAULT_SPEED } from "@/components/phone/phone-config";
 import { DEMO_MEDIA } from "@/lib/sandbox/media";
 import { aspectToCss, type EmbedConfig } from "@/lib/sandbox/embed-config";
 import EmbedWatermark from "@/components/sandbox/EmbedWatermark";
@@ -28,8 +29,10 @@ export default function EmbedPhone({ config }: { config: EmbedConfig }) {
     return DEMO_MEDIA.slice(0, 7).map((m) => ({ kind: m.kind, src: m.src }));
   }, [config.media]);
 
-  const hoverable = config.preset !== "flat";
-  const presetOverride = config.preset === "flat" ? "flat" : undefined;
+  // New embeds carry a continuous pose + speed; fall back to the old preset.
+  const pose =
+    config.pose != null ? config.pose : config.preset === "flat" ? 1 : poseFromAngle(DEFAULT_ANGLE);
+  const speed = config.speed != null ? config.speed : DEFAULT_SPEED;
 
   return (
     <div
@@ -46,11 +49,12 @@ export default function EmbedPhone({ config }: { config: EmbedConfig }) {
         <PhoneScene
           model={MODEL}
           media={media}
-          presetOverride={presetOverride}
+          pose={pose}
+          speed={speed}
           fit={config.fit}
           background={config.background}
           fill
-          hoverable={hoverable}
+          hoverable={false}
           immediate
         />
       </div>

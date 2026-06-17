@@ -12,7 +12,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
-import type { AnimationPreset, FitMode } from "@/components/phone/phone-config";
+import type { FitMode } from "@/components/phone/phone-config";
+import { poseFromAngle, DEFAULT_ANGLE, DEFAULT_SPEED } from "@/components/phone/phone-config";
 import {
   DEMO_MEDIA,
   ingestFiles,
@@ -34,7 +35,8 @@ import ExportPanel from "./ExportPanel";
 
 export default function PhoneMockupTool() {
   const [assets, setAssets] = useState<MediaAsset[]>(() => DEMO_MEDIA.slice());
-  const [preset, setPreset] = useState<AnimationPreset>("carousel");
+  const [speed, setSpeed] = useState(DEFAULT_SPEED);
+  const [angle, setAngle] = useState(DEFAULT_ANGLE);
   const [aspect, setAspect] = useState<AspectToken>("16:9");
   const [fit, setFit] = useState<FitMode>("cover");
   const [background, setBackground] = useState<string>("transparent");
@@ -45,13 +47,14 @@ export default function PhoneMockupTool() {
     warnings: [],
   });
 
+  const pose = poseFromAngle(angle);
   const controllerRef = useRef<PhoneSceneController | null>(null);
 
   // Latest-value refs for the export hook + unmount cleanup, synced after render.
-  const configRef = useRef<ExportConfig>({ media: assets, preset, fit, aspect, background });
+  const configRef = useRef<ExportConfig>({ media: assets, poseHover: pose, fit, aspect, background });
   const assetsRef = useRef(assets);
   useEffect(() => {
-    configRef.current = { media: assets, preset, fit, aspect, background };
+    configRef.current = { media: assets, poseHover: pose, fit, aspect, background };
     assetsRef.current = assets;
   });
   useEffect(() => () => assetsRef.current.forEach(revokeAsset), []);
@@ -130,7 +133,9 @@ export default function PhoneMockupTool() {
     if (typeof navigator === "undefined" || !navigator.clipboard) return false;
     const config: EmbedConfig = {
       media: assets.filter((a) => isEmbeddableSrc(a.src)).map((a) => ({ src: a.src, kind: a.kind })),
-      preset,
+      preset: "carousel",
+      pose,
+      speed,
       fit,
       aspect,
       background,
@@ -139,7 +144,7 @@ export default function PhoneMockupTool() {
     const snippet = buildEmbedSnippet(origin, config);
     navigator.clipboard.writeText(snippet).catch(() => {});
     return true;
-  }, [assets, preset, fit, aspect, background]);
+  }, [assets, pose, speed, fit, aspect, background]);
 
   return (
     <div className="sb-tool">
@@ -158,7 +163,8 @@ export default function PhoneMockupTool() {
         <div className="sb-stage-col">
           <PhoneStage
             media={assets}
-            preset={preset}
+            pose={pose}
+            speed={speed}
             fit={fit}
             background={background}
             aspect={aspect}
@@ -178,14 +184,13 @@ export default function PhoneMockupTool() {
             messages={messages}
           />
           <ControlPanel
-            preset={preset}
-            onPreset={setPreset}
             aspect={aspect}
             onAspect={setAspect}
             fit={fit}
             onFit={setFit}
             background={background}
             onBackground={setBackground}
+            motion={{ speed, angle, onSpeed: setSpeed, onAngle: setAngle }}
           />
           <ExportPanel
             exp={exp}

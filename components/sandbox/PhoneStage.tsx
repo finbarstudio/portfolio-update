@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
-import type { AnimationPreset, FitMode, PhoneMediaItem } from "@/components/phone/phone-config";
+import type { FitMode, PhoneMediaItem } from "@/components/phone/phone-config";
 import type { MediaAsset } from "@/lib/sandbox/media";
 import { aspectToCss } from "@/lib/sandbox/embed-config";
 
@@ -25,7 +25,8 @@ const MODEL = "/models/iphone/iphone-15-pro-max.glb";
 
 export default function PhoneStage({
   media,
-  preset,
+  pose,
+  speed,
   fit,
   background,
   aspect,
@@ -34,7 +35,8 @@ export default function PhoneStage({
   onReady,
 }: {
   media: MediaAsset[];
-  preset: AnimationPreset;
+  pose: number;
+  speed: number;
   fit: FitMode;
   background: string;
   aspect: string;
@@ -71,7 +73,8 @@ export default function PhoneStage({
         <PhoneScene
           model={MODEL}
           media={items}
-          presetOverride={preset}
+          pose={pose}
+          speed={speed}
           fit={fit}
           background={background}
           fill

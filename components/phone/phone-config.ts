@@ -95,6 +95,23 @@ export function fillCount(mediaCount: number): number {
   return m * reps;
 }
 
+/* ── Continuous Angle + Speed (sandbox tool) ───────────────────────
+   The tool replaces the carousel/flat toggle with an Angle slider that drives
+   the pose blend `h` continuously, and can push PAST the rest pose for a more
+   extreme tilt. Speed is a plain multiplier on the carousel cycle rate. */
+export const FLAT_H = 1;        // angle 0 → flat front-on row
+export const ANGLED_H = -0.5;   // angle 1 → extrapolated past REST = extra tilt/depth
+export const DEFAULT_ANGLE = 0.7;   // a touch more angled than the old carousel rest
+export const DEFAULT_SPEED = 1;
+export const MAX_SPEED = 2.5;
+
+/** Map the 0..1 Angle slider to the pose blend `h` (1 = flat … negative = extra angled). */
+export function poseFromAngle(angle: number): number {
+  const a = Math.max(0, Math.min(1, angle));
+  return FLAT_H + (ANGLED_H - FLAT_H) * a;
+}
+
+
 /**
  * Ease the raw offset so each phone dwells briefly at every integer slot (incl.
  * the centre) before sliding to the next. Linear time -> stair-stepped progress.

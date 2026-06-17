@@ -52,10 +52,12 @@ export default function MacMockupTool() {
 
   const controllerRef = useRef<PhoneSceneController | null>(null);
 
-  const configRef = useRef<ExportConfig>({ media: assets, preset, fit, aspect, background });
+  // Mac pose: flat (front-on) = 1, angled = 0 — the export captures it as the hover.
+  const poseHover = preset === "flat" ? 1 : 0;
+  const configRef = useRef<ExportConfig>({ media: assets, poseHover, fit, aspect, background });
   const assetsRef = useRef(assets);
   useEffect(() => {
-    configRef.current = { media: assets, preset, fit, aspect, background };
+    configRef.current = { media: assets, poseHover, fit, aspect, background };
     assetsRef.current = assets;
   });
   useEffect(() => () => assetsRef.current.forEach(revokeAsset), []);
