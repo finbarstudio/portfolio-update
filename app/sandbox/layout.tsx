@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import BrandStar from "@/components/BrandStar";
 
 const SANDBOX_URL = "https://sandbox.finbar.studio";
 
@@ -23,7 +24,7 @@ function SandboxHeader() {
   return (
     <header className="sb-header">
       <Link href="/" className="sb-wordmark" aria-label="finbar studio Sandbox, home">
-        finbar<span className="sb-star" aria-hidden="true">✶</span>studio
+        finbar<BrandStar className="sb-star" size="0.82em" />studio
         <span className="sb-header-tag mono-label">Sandbox</span>
       </Link>
       <nav className="sb-header-nav mono-label" aria-label="Sandbox">
@@ -42,7 +43,7 @@ export default function SandboxLayout({ children }: { children: React.ReactNode 
       <SandboxHeader />
       <div className="sb-content">{children}</div>
       <footer className="sb-footer mono-label">
-        <span>finbar✶studio Sandbox</span>
+        <span>finbar<BrandStar className="sb-star" size="0.82em" />studio Sandbox</span>
         <span>Experimental · built with Claude</span>
       </footer>
     </div>

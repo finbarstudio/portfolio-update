@@ -17,6 +17,7 @@ import { useMemo } from "react";
 import type { MacMediaItem } from "@/components/mac/mac-config";
 import { MAC_DEMO_MEDIA } from "@/lib/sandbox/media";
 import { aspectToCss, type EmbedConfig } from "@/lib/sandbox/embed-config";
+import EmbedWatermark from "@/components/sandbox/EmbedWatermark";
 
 const MacScene = dynamic(() => import("@/components/mac/MacScene"), { ssr: false });
 
@@ -52,27 +53,8 @@ export default function EmbedMac({ config }: { config: EmbedConfig }) {
         />
       </div>
 
-      {/* Forced watermark: wordmark + clickable backlink. */}
-      <a
-        href="https://www.finbar.studio"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          position: "absolute",
-          right: 10,
-          bottom: 8,
-          font: "11px ui-monospace, 'Space Mono', Menlo, monospace",
-          color: "rgba(20,20,20,0.62)",
-          background: "rgba(255,255,255,0.55)",
-          backdropFilter: "blur(4px)",
-          padding: "3px 8px",
-          borderRadius: 6,
-          textDecoration: "none",
-          letterSpacing: "0.02em",
-        }}
-      >
-        finbar.studio
-      </a>
+      {/* Forced watermark: big centred mark + subtle clickable backlink. */}
+      <EmbedWatermark />
     </div>
   );
 }

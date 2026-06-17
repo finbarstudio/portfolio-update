@@ -1,22 +1,48 @@
 /**
  * watermark — the finbar✶studio mark stamped onto every exported frame.
  *
- * MVP is free but always watermarked: a corner wordmark + URL for attribution,
- * plus a faint tiled repeat so the mark can't simply be cropped out. Removing it
- * is the future paid unlock — every export/embed call sites this behind a single
- * `if (!licensed)` gate (see useMockupExport / embed-config), which is the whole
- * monetization seam.
+ * MVP is free but always watermarked: a large, centred wordmark at ~30% opacity
+ * (using the real brand star, not a font glyph) plus a subtle finbar.studio
+ * backlink in the bottom-right. Removing it is the future paid unlock — every
+ * export call sites this behind a single `if (!licensed)` gate (see
+ * useMockupExport), which is the whole monetization seam.
  */
+
+import { STAR_POINTS } from "@/components/brand-star";
 
 export type WatermarkOptions = {
   /** Resolution scale so the mark stays proportional at any export size. */
   scale?: number;
-  /** Skip the faint tiled repeat (e.g. very small GIFs where it muddies). */
+  /** Reserved (kept for call-site compatibility). */
   tiled?: boolean;
 };
 
-const MARK = "finbar✱studio"; // ✶
 const URL_TEXT = "finbar.studio";
+const PRE = "finbar";
+const POST = "studio";
+const PINK = "#E8718B";
+
+/** Draw the brand star (the real polygon mark) centred at (cx,cy), `size` wide. */
+function drawStar(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  fill: string,
+): void {
+  const pts = STAR_POINTS.split(" ");
+  ctx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    const [px, py] = pts[i].split(",").map(Number);
+    const X = cx + (px / 100 - 0.5) * size;
+    const Y = cy + (py / 100 - 0.5) * size;
+    if (i === 0) ctx.moveTo(X, Y);
+    else ctx.lineTo(X, Y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+}
 
 /** Draw the watermark onto a 2D context sized `width`×`height` (device px). */
 export function drawWatermark(
@@ -26,82 +52,56 @@ export function drawWatermark(
   opts: WatermarkOptions = {},
 ): void {
   const s = opts.scale ?? Math.max(1, Math.min(width, height) / 360);
-  const tiled = opts.tiled ?? true;
 
+  // ── Big centred wordmark at ~30% opacity ───────────────────────────────────
   ctx.save();
+  ctx.globalAlpha = 0.3;
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
 
-  // Faint diagonal tiled repeat across the whole frame.
-  if (tiled) {
-    ctx.save();
-    ctx.globalAlpha = 0.07;
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `${12 * s}px ui-monospace, "Space Mono", Menlo, monospace`;
-    ctx.textBaseline = "middle";
-    const stepX = 180 * s;
-    const stepY = 120 * s;
-    ctx.translate(width / 2, height / 2);
-    ctx.rotate(-Math.PI / 9);
-    ctx.translate(-width / 2 - stepX, -height / 2 - stepY);
-    for (let y = 0; y < height + stepY * 2; y += stepY) {
-      for (let x = 0; x < width + stepX * 2; x += stepX) {
-        ctx.fillText(URL_TEXT, x, y);
-      }
-    }
-    ctx.restore();
-  }
+  // Size the wordmark to ~72% of the frame width (star ≈ 0.8em, small gaps).
+  const starRatio = 0.8;
+  const gapRatio = 0.14;
+  const base = 100;
+  ctx.font = `700 ${base}px ui-sans-serif, system-ui, sans-serif`;
+  const unit =
+    (ctx.measureText(PRE).width + ctx.measureText(POST).width) / base +
+    starRatio +
+    gapRatio * 2;
+  const fs = (width * 0.72) / unit;
+  const starSize = fs * starRatio;
+  const gap = fs * gapRatio;
 
-  // Solid corner badge (bottom-right) for legibility on any background.
-  const padX = 12 * s;
-  const padY = 8 * s;
-  const markSize = 15 * s;
-  const urlSize = 10 * s;
-  const gap = 3 * s;
+  ctx.font = `700 ${fs}px ui-sans-serif, system-ui, sans-serif`;
+  const preW = ctx.measureText(PRE).width;
+  const postW = ctx.measureText(POST).width;
+  const totalW = preW + gap + starSize + gap + postW;
+  let x = (width - totalW) / 2;
+  const cy = height / 2;
 
-  ctx.font = `700 ${markSize}px ui-sans-serif, system-ui, sans-serif`;
-  const markW = ctx.measureText(MARK).width;
-  ctx.font = `${urlSize}px ui-monospace, "Space Mono", Menlo, monospace`;
-  const urlW = ctx.measureText(URL_TEXT).width;
+  // A soft shadow keeps the mark legible over both light and dark content.
+  ctx.shadowColor = "rgba(0,0,0,0.18)";
+  ctx.shadowBlur = fs * 0.04;
 
-  const boxW = Math.max(markW, urlW) + padX * 2;
-  const boxH = markSize + gap + urlSize + padY * 2;
-  const margin = 14 * s;
-  const bx = width - boxW - margin;
-  const by = height - boxH - margin;
-
-  // Pill background.
-  const r = 8 * s;
-  ctx.fillStyle = "rgba(20, 20, 20, 0.55)";
-  roundRect(ctx, bx, by, boxW, boxH, r);
-  ctx.fill();
-
-  // Wordmark.
-  ctx.fillStyle = "rgba(255,255,255,0.96)";
-  ctx.textBaseline = "top";
-  ctx.font = `700 ${markSize}px ui-sans-serif, system-ui, sans-serif`;
-  ctx.fillText(MARK, bx + padX, by + padY);
-
-  // URL.
-  ctx.fillStyle = "rgba(255, 45, 120, 0.95)"; // brand pink
-  ctx.font = `${urlSize}px ui-monospace, "Space Mono", Menlo, monospace`;
-  ctx.fillText(URL_TEXT, bx + padX, by + padY + markSize + gap);
-
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(PRE, x, cy);
+  x += preW + gap;
+  drawStar(ctx, x + starSize / 2, cy, starSize, PINK);
+  x += starSize + gap;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(POST, x, cy);
   ctx.restore();
-}
 
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-): void {
-  const rr = Math.min(r, w / 2, h / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + rr, y);
-  ctx.arcTo(x + w, y, x + w, y + h, rr);
-  ctx.arcTo(x + w, y + h, x, y + h, rr);
-  ctx.arcTo(x, y + h, x, y, rr);
-  ctx.arcTo(x, y, x + w, y, rr);
-  ctx.closePath();
+  // ── Subtle finbar.studio backlink, bottom-right ────────────────────────────
+  ctx.save();
+  const urlSize = 11 * s;
+  const margin = 14 * s;
+  ctx.font = `${urlSize}px ui-monospace, "Space Mono", Menlo, monospace`;
+  ctx.textAlign = "right";
+  ctx.textBaseline = "alphabetic";
+  ctx.shadowColor = "rgba(0,0,0,0.35)";
+  ctx.shadowBlur = 3 * s;
+  ctx.fillStyle = "rgba(255,255,255,0.88)";
+  ctx.fillText(URL_TEXT, width - margin, height - margin);
+  ctx.restore();
 }
