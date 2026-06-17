@@ -40,7 +40,7 @@ export default function SandboxNav() {
         <span className="sb-corner-pill">
           finbar.studio
           <svg className="sb-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <path d="M3.25 8.75L8.75 3.25M8.75 3.25H4.5M8.75 3.25V7.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M3.25 8.75L8.75 3.25M8.75 3.25H4.5M8.75 3.25V7.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
       </a>

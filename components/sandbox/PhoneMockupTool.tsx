@@ -160,14 +160,7 @@ export default function PhoneMockupTool() {
   return (
     <div className="sb-tool">
       <header className="sb-tool-head">
-        <div>
-          <p className="mono-label sb-eyebrow">Sandbox / Tool</p>
-          <h1 className="sb-tool-title">Phone Mockup</h1>
-          <p className="sb-tool-sub">
-            Drop your images or videos onto the phones, pick the motion, and export a looping video,
-            stills, a GIF, or an embed. Free, watermarked.
-          </p>
-        </div>
+        <p className="sb-tool-sub">Your images or videos on a 3D iPhone, ready to export. Free, watermarked.</p>
       </header>
 
       <div className="sb-tool-grid">

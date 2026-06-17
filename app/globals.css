@@ -2852,7 +2852,7 @@
   transition: background 0.2s var(--ease);
 }
 .sb-corner-tr:hover .sb-corner-pill { background: color-mix(in srgb, var(--pink) 86%, #000); }
-.sb-arrow { display: inline-block; width: 0.82em; height: 0.82em; margin-left: 4px; vertical-align: 0.32em; transition: transform 0.2s var(--ease); }
+.sb-arrow { display: inline-block; width: 0.82em; height: 0.82em; margin-left: 4px; vertical-align: -0.1em; transition: transform 0.2s var(--ease); }
 .sb-corner-tr:hover .sb-arrow { transform: translate(1px, -1px); }
 
 .sb-tabs {
@@ -2877,7 +2877,7 @@
 .sb-tab:hover { color: var(--ink); }
 .sb-tab.is-active { color: #fff; }
 
-.sb-content { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: 84px clamp(16px, 4vw, 40px) clamp(40px, 6vw, 72px); }
+.sb-content { flex: 1; width: 100%; max-width: 1560px; margin: 0 auto; padding: 84px clamp(12px, 2.2vw, 26px) clamp(40px, 6vw, 72px); }
 
 /* ── Landing ─────────────────────────────────────────────── */
 .sb-eyebrow { color: var(--ink-soft); letter-spacing: 0.2em; text-transform: uppercase; }
@@ -2980,9 +2980,8 @@
 }
 
 /* ── Tool layout ─────────────────────────────────────────── */
-.sb-tool-head { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--ink); }
-.sb-tool-title { font-family: var(--font-primary); font-weight: 700; font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.0; text-transform: uppercase; letter-spacing: -0.012em; margin: 8px 0 10px; }
-.sb-tool-sub { color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; max-width: 64ch; }
+.sb-tool-head { margin-bottom: 20px; }
+.sb-tool-sub { color: var(--ink-soft); font-size: var(--text-small); line-height: 1.4; }
 .sb-tool-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
 @media (min-width: 900px) { .sb-tool-grid { grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr); align-items: start; } }
 /* The preview sticks beside the controls only in the 2-column desktop layout.

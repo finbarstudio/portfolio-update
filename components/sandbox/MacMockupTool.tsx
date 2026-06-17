@@ -137,14 +137,7 @@ export default function MacMockupTool() {
   return (
     <div className="sb-tool">
       <header className="sb-tool-head">
-        <div>
-          <p className="mono-label sb-eyebrow">Sandbox / Tool</p>
-          <h1 className="sb-tool-title">Mac Mockup</h1>
-          <p className="sb-tool-sub">
-            Drop a screenshot or screen recording onto a 3D Studio Display, pick the angle, and
-            export a looping turntable video, stills, a GIF, or an embed. Free, watermarked.
-          </p>
-        </div>
+        <p className="sb-tool-sub">Your screen on a 3D Studio Display, ready to export. Free, watermarked.</p>
       </header>
 
       <div className="sb-tool-grid">
