@@ -20,6 +20,7 @@ import {
   CYCLE_SPEED,
   DEFAULT_ANGLE,
   DEFAULT_SPEED,
+  DEFAULT_PROMINENCE,
 } from "@/components/phone/phone-config";
 import {
   DEMO_MEDIA,
@@ -44,6 +45,7 @@ export default function PhoneMockupTool() {
   const [assets, setAssets] = useState<MediaAsset[]>(() => DEMO_MEDIA.slice());
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
   const [angle, setAngle] = useState(DEFAULT_ANGLE);
+  const [prominence, setProminence] = useState(DEFAULT_PROMINENCE);
   const [aspect, setAspect] = useState<AspectToken>("16:9");
   const [fit, setFit] = useState<FitMode>("cover");
   const [background, setBackground] = useState<string>("transparent");
@@ -144,6 +146,7 @@ export default function PhoneMockupTool() {
       preset: "carousel",
       pose,
       speed,
+      prominence,
       fit,
       aspect,
       background,
@@ -152,7 +155,7 @@ export default function PhoneMockupTool() {
     const snippet = buildEmbedSnippet(origin, config);
     navigator.clipboard.writeText(snippet).catch(() => {});
     return true;
-  }, [assets, pose, speed, fit, aspect, background]);
+  }, [assets, pose, speed, prominence, fit, aspect, background]);
 
   return (
     <div className="sb-tool">
@@ -173,6 +176,7 @@ export default function PhoneMockupTool() {
             media={assets}
             pose={pose}
             speed={speed}
+            prominence={prominence}
             fit={fit}
             background={background}
             aspect={aspect}
@@ -198,7 +202,14 @@ export default function PhoneMockupTool() {
             onFit={setFit}
             background={background}
             onBackground={setBackground}
-            motion={{ speed, angle, onSpeed: setSpeed, onAngle: setAngle }}
+            motion={{
+              speed,
+              angle,
+              prominence,
+              onSpeed: setSpeed,
+              onAngle: setAngle,
+              onProminence: setProminence,
+            }}
           />
           <ExportPanel
             exp={exp}

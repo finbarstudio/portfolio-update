@@ -104,6 +104,13 @@ export const ANGLED_H = -0.5;   // angle 1 → extrapolated past REST = extra ti
 export const DEFAULT_ANGLE = 0.7;   // a touch more angled than the old carousel rest
 export const DEFAULT_SPEED = 1;
 export const MAX_SPEED = 2.5;
+// At extreme angle the extrapolated pose pulls flanks inward; spread x back out
+// proportional to how angled we are so the centre/flank gap stays open.
+export const ANGLE_SPREAD = 0.55;
+// Prominence: raise each phone's scale to (1 + prominence*K). The centre (≈1)
+// holds while the flanks shrink, so the main phone reads bigger.
+export const PROMINENCE_K = 1.7;
+export const DEFAULT_PROMINENCE = 0;
 
 /** Map the 0..1 Angle slider to the pose blend `h` (1 = flat … negative = extra angled). */
 export function poseFromAngle(angle: number): number {

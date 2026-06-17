@@ -18,6 +18,8 @@ export type EmbedConfig = {
   pose?: number;
   /** Phone carousel speed multiplier. */
   speed?: number;
+  /** Phone main-phone prominence 0..1. */
+  prominence?: number;
   fit: FitMode;
   /** Aspect ratio token, e.g. "9:16" | "1:1" | "16:9". */
   aspect: string;
@@ -55,6 +57,7 @@ export function encodeEmbedConfig(config: EmbedConfig, origin = ""): URLSearchPa
   sp.set("p", config.preset);
   if (config.pose != null) sp.set("h", String(config.pose));
   if (config.speed != null) sp.set("spd", String(config.speed));
+  if (config.prominence != null) sp.set("pr", String(config.prominence));
   sp.set("f", config.fit);
   sp.set("a", config.aspect);
   sp.set("bg", config.background);
@@ -83,12 +86,14 @@ export function decodeEmbedConfig(params: RawParams): EmbedConfig {
   const background = typeof params.bg === "string" ? params.bg : DEFAULT_EMBED.background;
   const pose = typeof params.h === "string" && params.h !== "" ? Number(params.h) : undefined;
   const speed = typeof params.spd === "string" && params.spd !== "" ? Number(params.spd) : undefined;
+  const prominence = typeof params.pr === "string" && params.pr !== "" ? Number(params.pr) : undefined;
 
   return {
     media,
     preset,
     pose: Number.isFinite(pose) ? pose : undefined,
     speed: Number.isFinite(speed) ? speed : undefined,
+    prominence: Number.isFinite(prominence) ? prominence : undefined,
     fit,
     aspect,
     background,

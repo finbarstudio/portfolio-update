@@ -14,8 +14,10 @@ export type AspectToken = "9:16" | "1:1" | "16:9";
 export type MotionControls = {
   speed: number;
   angle: number;
+  prominence: number;
   onSpeed: (v: number) => void;
   onAngle: (v: number) => void;
+  onProminence: (v: number) => void;
 };
 
 function Range({
@@ -145,6 +147,15 @@ export default function ControlPanel({
             step={0.01}
             display={`${Math.round(motion.angle * 100)}%`}
             onChange={motion.onAngle}
+          />
+          <Range
+            label="Main phone size"
+            value={motion.prominence}
+            min={0}
+            max={1}
+            step={0.01}
+            display={`${Math.round(motion.prominence * 100)}%`}
+            onChange={motion.onProminence}
           />
         </>
       ) : (
