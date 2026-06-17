@@ -2815,122 +2815,68 @@
   --sb-surface: color-mix(in srgb, var(--ink) 2.5%, var(--bg));
   --sb-surface-2: color-mix(in srgb, var(--ink) 5%, var(--bg));
   --sb-line: var(--line);
+  /* Background blueprint grid drawn across the whole page. */
+  --sb-grid-cell: 56px;
+  --sb-grid-ink: color-mix(in srgb, var(--ink) 7%, transparent);
+  /* Apple-style continuous corner radius for the screen mask. */
+  --sb-screen-radius: 44px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: var(--bg);
+  background-image:
+    linear-gradient(to right, var(--sb-grid-ink) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--sb-grid-ink) 1px, transparent 1px);
+  background-size: var(--sb-grid-cell) var(--sb-grid-cell);
   color: var(--ink);
   font-family: var(--font-primary);
 }
 
-.sb-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 11px clamp(16px, 4vw, 40px);
-  border-bottom: 1px solid var(--ink);
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: blur(6px);
-  position: sticky;
-  top: 0;
-  z-index: 20;
+/* Rounds the page edges by painting black into the four square corners,
+   so the viewport reads like a device screen with an Apple corner radius. */
+.sb-screen-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  border-radius: var(--sb-screen-radius);
+  box-shadow: 0 0 0 50vmax #000;
 }
-.sb-wordmark {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-weight: 700;
-  text-transform: lowercase;
-  letter-spacing: 0.01em;
-  font-size: 15px;
-  color: var(--ink);
-}
-.sb-star { color: var(--pink); margin: 0 1px; }
-.sb-header-tag {
-  margin-left: 14px;
-  padding: 3px 8px;
-  border: 1px solid var(--ink);
-  border-radius: 0;
-  color: var(--ink);
-  background: transparent;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 9px;
-}
-.sb-header-nav { display: flex; gap: 22px; text-transform: uppercase; letter-spacing: 0.14em; }
-.sb-header-nav a { color: var(--ink-soft); transition: color 0.2s var(--ease); }
-.sb-header-nav a:hover { color: var(--pink); }
 
 .sb-content { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: clamp(28px, 5vw, 64px) clamp(16px, 4vw, 40px); }
-.sb-footer {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px clamp(16px, 4vw, 40px);
-  border-top: 1px solid var(--sb-line);
-  color: var(--ink-soft);
-  text-transform: uppercase; letter-spacing: 0.14em;
-}
-/* Monospace nav numbering (01 / 02 …). */
-.sb-nav-num { margin-right: 6px; color: color-mix(in srgb, var(--ink-soft) 65%, transparent); font-variant-numeric: tabular-nums; }
-.sb-header-nav a:hover .sb-nav-num { color: inherit; }
-/* (FS·SB)® registered-mark footer glyph. */
-.sb-foot-left { display: inline-flex; align-items: center; gap: 10px; }
-.sb-mark { color: var(--ink); letter-spacing: 0.08em; }
-.sb-mark-dot { color: var(--pink); }
-.sb-reg { font-size: 0.62em; vertical-align: super; margin-left: 1px; color: var(--ink-soft); }
 
 /* ── Landing ─────────────────────────────────────────────── */
 .sb-eyebrow { color: var(--ink-soft); letter-spacing: 0.2em; text-transform: uppercase; }
-.sb-landing-intro { max-width: 72ch; margin-bottom: clamp(28px, 5vw, 52px); }
-.sb-landing-title {
-  font-family: var(--font-primary); font-weight: 700;
-  font-size: clamp(2.6rem, 9vw, 6rem); line-height: 0.92;
-  text-transform: uppercase; letter-spacing: -0.015em;
-  margin: 14px 0 18px;
-}
-.sb-landing-lede { color: var(--ink-soft); font-size: var(--text-body); line-height: 1.55; max-width: 58ch; }
 
-/* Archive index header above the grid. */
-.sb-index-bar {
-  display: flex; align-items: baseline; justify-content: space-between;
-  padding: 7px 1px; border-top: 1px solid var(--ink);
-  text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-soft);
+/* Minimal tool grid — no dividing rules, sits on the page's bg grid. */
+.sb-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(264px, 1fr));
+  gap: 14px;
 }
-
-/* Archive index list: full-width rows divided by hairline rules, whole-row pink
-   hover (after the site's project list). The big arrow slides in on hover. */
-.sb-list { border-top: 1px solid var(--line); }
-.sb-row {
-  display: flex; align-items: center; gap: 18px;
-  padding: 15px 6px; min-height: 56px;
-  border-bottom: 1px solid var(--line);
+.sb-card {
+  display: flex; flex-direction: column; gap: 9px;
+  padding: 16px 16px 14px; min-height: 208px;
+  border-radius: 0; background: transparent;
   text-decoration: none; color: var(--ink);
-  transition: background 0.16s var(--ease), color 0.16s var(--ease), padding 0.16s var(--ease);
+  transition: background 0.18s var(--ease), color 0.18s var(--ease);
 }
-.sb-row.is-live { cursor: pointer; }
-.sb-row.is-live:hover { background: var(--pink); color: #fff; padding-left: 14px; padding-right: 14px; }
-.sb-row.is-live:hover .sb-row-code,
-.sb-row.is-live:hover .sb-row-blurb,
-.sb-row.is-live:hover .sb-row-tag,
-.sb-row.is-live:hover .sb-row-arrow { color: #fff; }
-.sb-row.is-live:hover .sb-row-status { color: #fff; border-color: rgba(255,255,255,0.6); }
-.sb-row.is-live:hover .sb-row-arrow { opacity: 1; transform: translateX(0); }
-.sb-row.is-soon { opacity: 0.5; }
-
-.sb-row-code { flex: 0 0 auto; width: 52px; font-family: var(--font-mono); color: var(--pink); letter-spacing: 0.12em; }
-.sb-row.is-soon .sb-row-code { color: var(--ink-soft); }
-.sb-row-title { flex: 0 0 auto; width: clamp(140px, 20vw, 220px); font-family: var(--font-primary); font-weight: 700; font-size: 1.375rem; line-height: 1.0; text-transform: uppercase; }
-.sb-row-blurb { flex: 1 1 auto; min-width: 0; color: var(--ink-soft); font-size: var(--text-small); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sb-row-tag { flex: 0 0 auto; color: var(--ink-soft); }
-.sb-row-status { flex: 0 0 auto; font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.16em; padding: 2px 6px; border: 1px solid; border-radius: 0; }
-.sb-row-status.is-live { color: var(--pink); border-color: color-mix(in srgb, var(--pink) 55%, transparent); }
-.sb-row-status.is-soon { color: var(--ink-soft); border-color: var(--line); }
-.sb-row-arrow { flex: 0 0 auto; width: 18px; text-align: right; color: var(--pink); opacity: 0; transform: translateX(-6px); transition: opacity 0.16s var(--ease), transform 0.16s var(--ease); }
-
-@media (max-width: 720px) {
-  .sb-row { gap: 12px; flex-wrap: wrap; }
-  .sb-row-title { width: auto; flex: 1 1 auto; }
-  .sb-row-blurb, .sb-row-tag { display: none; }
-}
+.sb-card.is-live { cursor: pointer; }
+.sb-card.is-live:hover { background: var(--pink); color: #fff; }
+.sb-card.is-live:hover .sb-card-blurb,
+.sb-card.is-live:hover .sb-card-code,
+.sb-card.is-live:hover .sb-card-tag,
+.sb-card.is-live:hover .sb-card-cta { color: #fff; }
+.sb-card.is-live:hover .sb-card-status { color: #fff; border-color: rgba(255,255,255,0.55); }
+.sb-card.is-soon { opacity: 0.5; }
+.sb-card-top { display: flex; align-items: center; justify-content: flex-end; }
+.sb-card-status { font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.16em; padding: 2px 6px; border: 1px solid; border-radius: 0; }
+.sb-card-status.is-live { color: var(--pink); border-color: color-mix(in srgb, var(--pink) 55%, transparent); }
+.sb-card-status.is-soon { color: var(--ink-soft); border-color: var(--line); }
+.sb-card-tag { color: var(--ink-soft); }
+.sb-card-title { font-family: var(--font-primary); font-weight: 700; font-size: 1.5rem; line-height: 1.0; text-transform: uppercase; letter-spacing: 0; margin-top: 2px; }
+.sb-card-blurb { color: var(--ink-soft); font-size: var(--text-small); line-height: 1.45; flex: 1; }
+.sb-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
+.sb-card-cta { color: var(--pink); }
 
 /* ── Tool layout ─────────────────────────────────────────── */
 .sb-tool-head { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--ink); }
