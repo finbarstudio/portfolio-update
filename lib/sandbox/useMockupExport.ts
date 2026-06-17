@@ -28,6 +28,17 @@ import { encodeGif } from "./export-gif";
 /** MVP is free but always watermarked. The future license unlock flips this. */
 const LICENSED = false;
 
+/**
+ * Export resolution tiers (short-side px). The free plan renders at SD; the
+ * 1080 / 2K / 4K tiers unlock with payment (coming soon). Until then every
+ * export uses FREE_TIER — flip `activeTier` to the paid value once licensed.
+ */
+const TIERS = { sd: 540, hd: 1080, "2k": 1440, "4k": 2160 } as const;
+const FREE_TIER = TIERS.sd;
+const activeTier: number = LICENSED ? TIERS.hd : FREE_TIER;
+/** GIFs stay small regardless of tier (palette + file size). */
+const GIF_BASE = 360;
+
 /** Opaque matte for video/GIF when the chosen background is transparent. */
 const MATTE = "#FAFAF8";
 
@@ -173,7 +184,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
     (focusIndex: number) => {
       void withExport("Rendering still…", async () => {
         const config = getConfig();
-        const { w, h } = resolutionFor(config.aspect, 1080);
+        const { w, h } = resolutionFor(config.aspect, activeTier);
         const bgColor = config.background === "transparent" ? null : config.background;
         const { canvas, draw } = makeRenderer(w, h, bgColor);
         const offset = controllerRef.current?.offsetForFocus(focusIndex) ?? focusIndex;
@@ -189,7 +200,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
   const exportAllStills = useCallback(() => {
     void withExport("Rendering stills…", async () => {
       const config = getConfig();
-      const { w, h } = resolutionFor(config.aspect, 1080);
+      const { w, h } = resolutionFor(config.aspect, activeTier);
       const bgColor = config.background === "transparent" ? null : config.background;
       const { canvas, draw } = makeRenderer(w, h, bgColor);
       const n = config.media.length;
@@ -211,7 +222,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
         throw new Error("Video export isn’t supported in this browser — try Chrome, or export a GIF.");
       }
       const config = getConfig();
-      const { w, h } = resolutionFor(config.aspect, 720);
+      const { w, h } = resolutionFor(config.aspect, activeTier);
       const matte = config.background === "transparent" ? MATTE : config.background;
       const { canvas, draw } = makeRenderer(w, h, matte);
       const ctrl = controllerRef.current;
@@ -239,7 +250,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
   const exportGif = useCallback(() => {
     void withExport("Encoding GIF…", async () => {
       const config = getConfig();
-      const { w, h } = resolutionFor(config.aspect, 360);
+      const { w, h } = resolutionFor(config.aspect, GIF_BASE);
       const matte = config.background === "transparent" ? MATTE : config.background;
       const { canvas, draw } = makeRenderer(w, h, matte, true);
       const ctrl = controllerRef.current;

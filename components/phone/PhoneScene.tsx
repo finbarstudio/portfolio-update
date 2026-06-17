@@ -40,7 +40,7 @@ import {
   easedOffset,
   offsetForFocus,
   hoverTargetFor,
-  clampCount,
+  fillCount,
   type AnimationPreset,
   type FitMode,
   type PhoneMediaItem,
@@ -226,7 +226,9 @@ function Carousel({
   const sceneRoot = gltf.scene;
 
   const items = useMemo(() => media.slice(0, MAX_PHONES), [media]);
-  const count = clampCount(items.length);
+  // One descriptor per unique item; the ring repeats them so there are never gaps.
+  const mediaCount = Math.max(1, items.length);
+  const count = fillCount(mediaCount);
   const descriptors = usePhoneTextures(items, fit, bgColor);
 
   // Off screen: the render loop is stopped — pause every video to halt decode.
@@ -280,9 +282,16 @@ function Carousel({
     const lerp = THREE.MathUtils.lerp;
     let pendingFrames = 0;
 
+    // A media item maps to several phones in the ring; track whether any of them
+    // is on-screen / on-stage so each unique descriptor is synced once (a shared
+    // <video> can't play for one phone and pause for another).
+    const onScreenByDesc = new Array(descriptors.length).fill(false);
+    const onStageByDesc = new Array(descriptors.length).fill(false);
+
     for (let i = 0; i < count; i++) {
       const phone = phoneGroups.current[i];
       if (!phone) continue;
+      const di = i % mediaCount;
 
       const arc = arcPosFor(i, count, offset);
       const rest = slotAt(REST_SLOTS, arc);
@@ -297,8 +306,7 @@ function Carousel({
       phone.position.set(x, y, z);
       phone.rotation.z = rotZ;
 
-      const onStage = scale > ONSTAGE_THRESHOLD;
-      const d = descriptors[i];
+      const d = descriptors[di];
       const hasFrame = !!d && d.hasFrame();
 
       const visible = scale > 0.02 && hasFrame;
@@ -306,7 +314,12 @@ function Carousel({
       phone.scale.setScalar(scale);
       if (scale > 0.02 && !hasFrame) pendingFrames++;
 
-      if (d) d.sync(scale > 0.02, onStage, paused);
+      if (scale > 0.02) onScreenByDesc[di] = true;
+      if (scale > ONSTAGE_THRESHOLD) onStageByDesc[di] = true;
+    }
+
+    for (let di = 0; di < descriptors.length; di++) {
+      descriptors[di].sync(onScreenByDesc[di], onStageByDesc[di], paused);
     }
 
     if (pendingFrames === 0 && !reportedReady.current) {
@@ -321,7 +334,7 @@ function Carousel({
         <PhoneInstance
           key={i}
           sceneRoot={sceneRoot}
-          texture={descriptors[i]?.texture ?? null}
+          texture={descriptors[i % mediaCount]?.texture ?? null}
           groupSetter={(g) => { phoneGroups.current[i] = g; }}
         />
       ))}

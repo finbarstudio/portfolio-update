@@ -81,6 +81,20 @@ export function clampCount(n: number): number {
   return Math.max(MIN_PHONES, Math.min(MAX_PHONES, Math.floor(n)));
 }
 
+/** The carousel ring is always filled by repeating the media in whole cycles, so
+ *  a single upload populates every screen and N uploads tile 1..N-1..N… with no
+ *  gaps. Returns how many phones to render for `mediaCount` unique items: the
+ *  multiple of mediaCount closest to RING_TARGET, capped at RING_MAX. Whole
+ *  cycles keep the 1-2-3-1-2-3 pattern seamless across the loop. */
+export const RING_TARGET = 9;
+export const RING_MAX = 12;
+export function fillCount(mediaCount: number): number {
+  const m = Math.max(1, mediaCount);
+  let reps = Math.max(1, Math.round(RING_TARGET / m));
+  if (m * reps > RING_MAX) reps = Math.max(1, Math.floor(RING_MAX / m));
+  return m * reps;
+}
+
 /**
  * Ease the raw offset so each phone dwells briefly at every integer slot (incl.
  * the centre) before sliding to the next. Linear time -> stair-stepped progress.
