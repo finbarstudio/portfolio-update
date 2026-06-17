@@ -32,7 +32,7 @@ export default function SandboxNav() {
       </nav>
 
       <a
-        className="sb-corner sb-corner-tr"
+        className="sb-corner-tr"
         href="https://www.finbar.studio"
         target="_blank"
         rel="noopener noreferrer"
