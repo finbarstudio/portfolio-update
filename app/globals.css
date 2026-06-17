@@ -2963,6 +2963,8 @@
    and rides above the others, which reflow live underneath it. */
 .sb-thumb.is-dragging { z-index: 6; }
 .sb-thumb.is-dragging .sb-thumb-media { cursor: grabbing; pointer-events: none; box-shadow: 0 10px 26px -6px rgba(20,18,16,0.5); border-color: var(--pink); }
+/* The slot the dragged tile will drop into. */
+.sb-thumb.is-drop-target .sb-thumb-media { outline: 2px dashed var(--pink); outline-offset: 2px; }
 /* Paste-an-image-URL row (for embeddable media). */
 .sb-url-row { display: flex; gap: 6px; margin-top: 8px; }
 .sb-url-input { flex: 1; min-width: 0; font-size: 12px; padding: 7px 9px; border-radius: 6px; border: 1px solid var(--sb-line); background: var(--sb-surface-2); color: var(--ink); }

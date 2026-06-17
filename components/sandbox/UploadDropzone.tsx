@@ -58,39 +58,60 @@ export default function UploadDropzone({
     setUrl("");
   };
 
-  // Pointer-based reorder: while dragging, find the tile under the pointer and
-  // move the dragged item to its slot (live). Works for mouse + touch.
+  // Pointer-based reorder (mouse + touch). To stay smooth we DON'T reorder the
+  // array or measure layout on every move — the grabbed tile just follows the
+  // finger via a cheap start-delta transform, the drop target is highlighted
+  // imperatively (no re-render), and the reorder is committed once on drop.
+  const drag = useRef<{
+    id: string;
+    startX: number;
+    startY: number;
+    el: HTMLElement;
+    target: HTMLElement | null;
+  } | null>(null);
+
   const onTilePointerDown = (e: React.PointerEvent, id: string) => {
-    if (!canReorder) return;
-    setDragId(id);
+    if (!canReorder || e.button > 0) return;
+    const el = e.currentTarget as HTMLElement;
+    drag.current = { id, startX: e.clientX, startY: e.clientY, el, target: null };
     try {
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      el.setPointerCapture(e.pointerId);
     } catch {
       /* ignore */
     }
+    setDragId(id);
   };
+
   const onTilePointerMove = (e: React.PointerEvent) => {
-    if (dragId == null) return;
-    // Lift the grabbed tile and keep it under the finger (measure its natural
-    // position with the transform cleared, then offset to the pointer).
-    const tileEl = e.currentTarget as HTMLElement;
-    tileEl.style.transform = "";
-    const r = tileEl.getBoundingClientRect();
-    const dx = e.clientX - (r.left + r.width / 2);
-    const dy = e.clientY - (r.top + r.height / 2);
-    tileEl.style.transform = `translate(${dx}px, ${dy}px) scale(1.14)`;
-    // Reorder live: whatever tile is under the pointer takes the dragged item's slot.
-    const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-    const tile = el?.closest("[data-thumb-id]") as HTMLElement | null;
-    const overId = tile?.getAttribute("data-thumb-id");
-    if (overId && overId !== dragId) {
-      const toIndex = assets.findIndex((a) => a.id === overId);
-      if (toIndex >= 0) onReorder?.(dragId, toIndex);
+    const d = drag.current;
+    if (!d) return;
+    // Follow the finger (no layout reads — offset from where the drag started).
+    const dx = e.clientX - d.startX;
+    const dy = e.clientY - d.startY;
+    d.el.style.transform = `translate(${dx}px, ${dy}px) scale(1.08)`;
+    // Highlight the tile under the pointer as the drop target (imperative).
+    const over = (document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null)?.closest(
+      "[data-thumb-id]",
+    ) as HTMLElement | null;
+    const next = over && over.getAttribute("data-thumb-id") !== d.id ? over : null;
+    if (next !== d.target) {
+      d.target?.classList.remove("is-drop-target");
+      next?.classList.add("is-drop-target");
+      d.target = next;
     }
   };
-  const endDrag = (e: React.PointerEvent) => {
-    const tileEl = e.currentTarget as HTMLElement;
-    if (tileEl) tileEl.style.transform = "";
+
+  const endDrag = () => {
+    const d = drag.current;
+    if (!d) return;
+    d.el.style.transform = "";
+    d.target?.classList.remove("is-drop-target");
+    const overId = d.target?.getAttribute("data-thumb-id");
+    if (overId) {
+      const toIndex = assets.findIndex((a) => a.id === overId);
+      if (toIndex >= 0) onReorder?.(d.id, toIndex);
+    }
+    drag.current = null;
     setDragId(null);
   };
 
