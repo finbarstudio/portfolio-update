@@ -2804,46 +2804,53 @@
    ════════════════════════════════════════════════════════════════════ */
 
 .sb-root {
-  /* ── Research-center skin (after mouthwash.studio): a cool, stark, technical
-     palette scoped to the Sandbox only — the warm portfolio is untouched.
-     Square corners, hairline rules, uppercase grotesk + mono labels, coded
-     archive entries. The brand pink stays the single accent. */
-  --bg: #FAFAF8;            /* clean near-white ground (vs the warm cream site) */
-  --ink: #1A1A1A;           /* neutral near-black */
-  --ink-soft: #6B6B6B;      /* neutral grey */
-  --line: #DCDBD6;          /* cool hairline rules */
-  --sb-surface: color-mix(in srgb, var(--ink) 2.5%, var(--bg));
-  --sb-surface-2: color-mix(in srgb, var(--ink) 5%, var(--bg));
+  /* ── Dark "screen" skin: a black viewport with white text and the brand pink
+     accent, framed by a thin very-dark-grey device radius. Scoped to the
+     Sandbox only — the warm portfolio is untouched. */
+  --bg: #000000;            /* black screen */
+  --ink: #FFFFFF;           /* white text */
+  --ink-soft: #9A9A9A;      /* muted grey (reads white-ish) for secondary text */
+  --line: rgba(255, 255, 255, 0.16);  /* faint light hairline on black */
+  --sb-surface: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  --sb-surface-2: color-mix(in srgb, var(--ink) 8%, var(--bg));
   --sb-line: var(--line);
-  /* Background blueprint grid drawn across the whole page. */
-  --sb-grid-cell: 56px;
-  --sb-grid-ink: color-mix(in srgb, var(--ink) 7%, transparent);
-  /* Apple-style continuous corner radius for the screen mask. */
-  --sb-screen-radius: 44px;
+  /* Small device corner radius + the neutral very-dark-grey it paints into. */
+  --sb-screen-radius: 16px;
+  --sb-screen-frame: #1C1C1C;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: var(--bg);
-  background-image:
-    linear-gradient(to right, var(--sb-grid-ink) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--sb-grid-ink) 1px, transparent 1px);
-  background-size: var(--sb-grid-cell) var(--sb-grid-cell);
   color: var(--ink);
   font-family: var(--font-primary);
 }
 
-/* Rounds the page edges by painting black into the four square corners,
-   so the viewport reads like a device screen with an Apple corner radius. */
+/* Rounds the page edges by painting a neutral dark grey into the four square
+   corners, so the black viewport reads like a device screen. */
 .sb-screen-mask {
   position: fixed;
   inset: 0;
   z-index: 100;
   pointer-events: none;
   border-radius: var(--sb-screen-radius);
-  box-shadow: 0 0 0 50vmax #000;
+  box-shadow: 0 0 0 50vmax var(--sb-screen-frame);
 }
 
-.sb-content { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: clamp(28px, 5vw, 64px) clamp(16px, 4vw, 40px); }
+/* ── Corner navs ─────────────────────────────────────────── */
+.sb-corner {
+  position: fixed; top: 0; z-index: 110;
+  display: inline-flex; align-items: center; gap: 16px;
+  padding: 18px clamp(16px, 4vw, 30px);
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em;
+}
+.sb-corner-tl { left: 0; }
+.sb-corner-tr { right: 0; color: var(--ink); text-decoration: none; }
+.sb-corner-tr:hover { color: var(--pink); }
+.sb-logo { display: inline-flex; align-items: center; color: var(--pink); }
+.sb-corner-link { color: var(--ink); text-decoration: none; transition: color 0.2s var(--ease); }
+.sb-corner-link:hover { color: var(--pink); }
+
+.sb-content { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: 84px clamp(16px, 4vw, 40px) clamp(40px, 6vw, 72px); }
 
 /* ── Landing ─────────────────────────────────────────────── */
 .sb-eyebrow { color: var(--ink-soft); letter-spacing: 0.2em; text-transform: uppercase; }
@@ -2856,10 +2863,11 @@
 .sb-card {
   display: flex; flex-direction: column; gap: 9px;
   padding: 16px 16px 14px; min-height: 208px;
-  border-radius: 0; background: transparent;
+  border: 1px solid var(--line); border-radius: 0; background: transparent;
   text-decoration: none; color: var(--ink);
-  transition: background 0.18s var(--ease), color 0.18s var(--ease);
+  transition: background 0.18s var(--ease), color 0.18s var(--ease), border-color 0.18s var(--ease);
 }
+.sb-card.is-live:hover { border-color: var(--pink); }
 .sb-card.is-live { cursor: pointer; }
 .sb-card.is-live:hover { background: var(--pink); color: #fff; }
 .sb-card.is-live:hover .sb-card-blurb,
@@ -2877,6 +2885,25 @@
 .sb-card-blurb { color: var(--ink-soft); font-size: var(--text-small); line-height: 1.45; flex: 1; }
 .sb-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
 .sb-card-cta { color: var(--pink); }
+
+/* ── Fresh home (placeholder — to be designed) ───────────── */
+.sb-home {
+  flex: 1; min-height: 72vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 18px;
+}
+.sb-home-star { color: var(--pink); }
+.sb-home-title {
+  font-family: var(--font-primary); font-weight: 700;
+  font-size: clamp(2.6rem, 8vw, 5rem); line-height: 0.95;
+  text-transform: lowercase; letter-spacing: -0.01em;
+}
+.sb-home-lede { color: var(--ink-soft); font-size: var(--text-body); line-height: 1.55; max-width: 44ch; }
+.sb-home-link {
+  color: var(--pink); font-family: var(--font-mono);
+  text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; text-decoration: none;
+}
+.sb-home-link:hover { text-decoration: underline; }
 
 /* ── Tool layout ─────────────────────────────────────────── */
 .sb-tool-head { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--ink); }
