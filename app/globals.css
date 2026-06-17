@@ -2944,6 +2944,7 @@
 .sb-thumb-media img, .sb-thumb-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sb-thumb-video { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(160deg, color-mix(in srgb, var(--ink) 10%, var(--bg)), color-mix(in srgb, var(--ink) 18%, var(--bg))); }
 .sb-thumb-play { color: var(--ink-soft); font-size: 16px; line-height: 1; }
+.sb-thumb-gen { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-family: var(--font-label, sans-serif); font-weight: 700; font-size: 22px; color: var(--pink); background: radial-gradient(120% 120% at 30% 20%, var(--pink-soft), var(--bg) 62%); }
 .sb-thumb-badge { position: absolute; top: 3px; left: 3px; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 4px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 70%, transparent); color: var(--bg); }
 .sb-thumb-controls { display: flex; gap: 3px; }
 .sb-thumb-btn { flex: 1; padding: 2px 0; font-size: 13px; line-height: 1; border: 1px solid var(--sb-line); border-radius: 4px; background: var(--bg); color: var(--ink-soft); cursor: pointer; transition: color 0.15s var(--ease), border-color 0.15s var(--ease); }

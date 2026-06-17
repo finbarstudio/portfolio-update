@@ -8,6 +8,7 @@
  */
 
 import { MAX_PHONES, MIN_PHONES, type PhoneMediaKind } from "@/components/phone/phone-config";
+import { GEN_PREFIX, GENERATED_DEMO_COUNT } from "./demo-cards";
 
 export { MAX_PHONES, MIN_PHONES };
 
@@ -133,39 +134,26 @@ function mb(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(0)}MB`;
 }
 
-const TMYR_REELS = ["Anthony", "Freya", "Katie", "Kiran", "Lauren", "Molly", "Olu"];
+/** Generated numbered cards — seed media so the canvas is never empty. They draw
+ *  procedurally (no files to ship/404), and aren't real public URLs, so they're
+ *  non-embeddable and get replaced wholesale the moment a user adds their own. */
+function generatedDemoMedia(width: number, height: number): MediaAsset[] {
+  return Array.from({ length: GENERATED_DEMO_COUNT }, (_, i) => {
+    const n = i + 1;
+    return {
+      id: `demo-gen-${n}`,
+      kind: "image" as const,
+      src: `${GEN_PREFIX}${n}`,
+      name: `Card ${n}`,
+      width,
+      height,
+      isDemo: true,
+    };
+  });
+}
 
-/** Public TMYR reels — seed media so the canvas is never empty (and embeddable). */
-export const DEMO_MEDIA: MediaAsset[] = TMYR_REELS.map((name) => ({
-  id: `demo-${name.toLowerCase()}`,
-  kind: "video" as const,
-  src: `/images/tmyr/1080x1920%20IG%20Reels/${name}.webm`,
-  name: `${name}.webm`,
-  width: 1080,
-  height: 1920,
-  isDemo: true,
-}));
+/** Portrait cards seed the phone tool. */
+export const DEMO_MEDIA: MediaAsset[] = generatedDemoMedia(1290, 2796);
 
-/** Public landscape screens — seed the Mac display so it's never empty. The
- *  website screenshot is first so it paints instantly (no decode wait); the screen
- *  recording follows to show off the slideshow + on-screen video. */
-export const MAC_DEMO_MEDIA: MediaAsset[] = [
-  {
-    id: "mac-demo-kinaya",
-    kind: "image",
-    src: "/images/kinaya/desktop.png",
-    name: "desktop.png",
-    width: 1920,
-    height: 1080,
-    isDemo: true,
-  },
-  {
-    id: "mac-demo-momentum",
-    kind: "video",
-    src: "/images/momentum-mentoring/screen.mp4",
-    name: "screen.mp4",
-    width: 1920,
-    height: 1080,
-    isDemo: true,
-  },
-];
+/** Landscape cards seed the Mac display. */
+export const MAC_DEMO_MEDIA: MediaAsset[] = generatedDemoMedia(1920, 1080);

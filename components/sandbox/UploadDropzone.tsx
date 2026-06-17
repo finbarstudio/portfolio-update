@@ -8,6 +8,7 @@
 
 import { useRef, useState } from "react";
 import { ACCEPT_ATTR, MAX_PHONES, type MediaAsset } from "@/lib/sandbox/media";
+import { isGeneratedSrc, parseCardNumber } from "@/lib/sandbox/demo-cards";
 
 export default function UploadDropzone({
   assets,
@@ -100,7 +101,12 @@ export default function UploadDropzone({
           {assets.map((a, i) => (
             <li key={a.id} className="sb-thumb">
               <div className="sb-thumb-media">
-                {a.kind === "image" ? (
+                {isGeneratedSrc(a.src) ? (
+                  // Procedural placeholder — no real URL, so draw a mini card.
+                  <span className="sb-thumb-gen" aria-label={a.name}>
+                    {parseCardNumber(a.src)}
+                  </span>
+                ) : a.kind === "image" ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={a.src} alt={a.name} loading="lazy" />
                 ) : (
