@@ -89,7 +89,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
             <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
               {project.name}
             </h2>
-            <span className="meta-mono text-ink-soft whitespace-nowrap mt-px">{project.date}</span>
+            <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
           </div>
           <div className="hover-reveal">
             <div className="space-y-3">
