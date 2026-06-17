@@ -2910,7 +2910,11 @@
 .sb-count { color: var(--ink-soft); }
 
 .sb-field { display: flex; flex-direction: column; gap: 7px; }
-.sb-field-label { color: var(--ink-soft); }
+.sb-field-label { color: var(--ink-soft); display: flex; align-items: baseline; justify-content: space-between; }
+.sb-range-val { color: var(--ink); font-variant-numeric: tabular-nums; }
+.sb-range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 999px; background: var(--sb-line, var(--line)); outline: none; }
+.sb-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--pink); border: 2px solid var(--bg); cursor: pointer; box-shadow: 0 1px 3px rgba(20,18,16,0.25); }
+.sb-range::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--pink); border: 2px solid var(--bg); cursor: pointer; }
 
 .sb-segmented { display: inline-flex; border: 1px solid var(--sb-line); border-radius: 8px; overflow: hidden; background: var(--bg); }
 .sb-seg { flex: 1; padding: 7px 10px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--ink-soft); background: transparent; border: none; border-right: 1px solid var(--sb-line); cursor: pointer; transition: background 0.15s var(--ease), color 0.15s var(--ease); white-space: nowrap; }

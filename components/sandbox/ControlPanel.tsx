@@ -7,8 +7,53 @@
  */
 
 import type { AnimationPreset, FitMode } from "@/components/phone/phone-config";
+import { MAX_SPEED } from "@/components/phone/phone-config";
 
 export type AspectToken = "9:16" | "1:1" | "16:9";
+
+export type MotionControls = {
+  speed: number;
+  angle: number;
+  onSpeed: (v: number) => void;
+  onAngle: (v: number) => void;
+};
+
+function Range({
+  label,
+  value,
+  min,
+  max,
+  step,
+  display,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  display: string;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="sb-field">
+      <span className="mono-label sb-field-label">
+        {label}
+        <span className="sb-range-val">{display}</span>
+      </span>
+      <input
+        type="range"
+        className="sb-range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        aria-label={label}
+      />
+    </div>
+  );
+}
 
 function Segmented<T extends string>({
   label,
@@ -51,7 +96,7 @@ const SWATCHES: { value: string; label: string }[] = [
 ];
 
 export default function ControlPanel({
-  preset,
+  preset = "carousel",
   onPreset,
   aspect,
   onAspect,
@@ -60,9 +105,10 @@ export default function ControlPanel({
   background,
   onBackground,
   presetLabels = { carousel: "Carousel", flat: "Flat" },
+  motion,
 }: {
-  preset: AnimationPreset;
-  onPreset: (v: AnimationPreset) => void;
+  preset?: AnimationPreset;
+  onPreset?: (v: AnimationPreset) => void;
   aspect: AspectToken;
   onAspect: (v: AspectToken) => void;
   fit: FitMode;
@@ -71,6 +117,8 @@ export default function ControlPanel({
   onBackground: (v: string) => void;
   /** Override the two preset button labels (the Mac tool uses Angle / Flat). */
   presetLabels?: { carousel: string; flat: string };
+  /** When set, replace the Animation toggle with Speed + Angle sliders (phone). */
+  motion?: MotionControls;
 }) {
   const customActive = !SWATCHES.some((s) => s.value === background);
 
@@ -78,15 +126,38 @@ export default function ControlPanel({
     <div className="sb-panel">
       <h3 className="sb-panel-title mono-heading">Style</h3>
 
-      <Segmented<AnimationPreset>
-        label="Animation"
-        value={preset}
-        onChange={onPreset}
-        options={[
-          { value: "carousel", label: presetLabels.carousel },
-          { value: "flat", label: presetLabels.flat },
-        ]}
-      />
+      {motion ? (
+        <>
+          <Range
+            label="Speed"
+            value={motion.speed}
+            min={0}
+            max={MAX_SPEED}
+            step={0.05}
+            display={motion.speed === 0 ? "Still" : `${motion.speed.toFixed(2)}×`}
+            onChange={motion.onSpeed}
+          />
+          <Range
+            label="Angle"
+            value={motion.angle}
+            min={0}
+            max={1}
+            step={0.01}
+            display={`${Math.round(motion.angle * 100)}%`}
+            onChange={motion.onAngle}
+          />
+        </>
+      ) : (
+        <Segmented<AnimationPreset>
+          label="Animation"
+          value={preset}
+          onChange={onPreset ?? (() => {})}
+          options={[
+            { value: "carousel", label: presetLabels.carousel },
+            { value: "flat", label: presetLabels.flat },
+          ]}
+        />
+      )}
 
       <Segmented<AspectToken>
         label="Aspect"

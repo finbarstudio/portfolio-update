@@ -86,6 +86,11 @@ export type PhoneSceneProps = {
   preserveDrawingBuffer?: boolean;
   /** Freeze the time-driven animation; offset/hover come from the controller. */
   paused?: boolean;
+  /** Continuous pose blend (sandbox Angle slider): 1 = flat … negative = extra
+   *  angled. Overrides presetOverride/hover when set. */
+  pose?: number;
+  /** Carousel cycle-rate multiplier (sandbox Speed slider). Default 1. */
+  speed?: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady?: () => void;
 };
@@ -205,6 +210,8 @@ type CarouselProps = {
   inView: boolean;
   paused: boolean;
   presetOverride?: AnimationPreset;
+  pose?: number;
+  speed: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady: () => void;
 };
@@ -218,6 +225,8 @@ function Carousel({
   inView,
   paused,
   presetOverride,
+  pose,
+  speed,
   controllerRef,
   onReady,
 }: CarouselProps) {
@@ -239,7 +248,9 @@ function Carousel({
 
   const phoneGroups = useRef<(THREE.Group | null)[]>([]);
   const offsetRef = useRef(0);
-  const hoverProgressRef = useRef(presetOverride ? hoverTargetFor(false, presetOverride) : 0);
+  const hoverProgressRef = useRef(
+    pose != null ? pose : presetOverride ? hoverTargetFor(false, presetOverride) : 0,
+  );
 
   // Build + expose the imperative controller (gl/scene/camera live here, inside
   // the Canvas). The export hook seeks offset/hover and pulls frames through it.
@@ -258,11 +269,11 @@ function Carousel({
       setOffset: (o: number) => { offsetRef.current = o; },
       setHover: (h: number) => { hoverProgressRef.current = h; },
       offsetForFocus: (i: number) => offsetForFocus(i),
-      cycleSpeed: CYCLE_SPEED,
+      cycleSpeed: CYCLE_SPEED * speed,
       numPhones: count,
     };
     return () => { ref.current = null; };
-  }, [controllerRef, gl, scene, camera, invalidate, count]);
+  }, [controllerRef, gl, scene, camera, invalidate, count, speed]);
 
   useFrame((_, delta) => {
     // Re-upload only the textures whose video is actually PLAYING.
@@ -270,13 +281,13 @@ function Carousel({
 
     // Hover blend (frozen during export — controller writes the ref directly).
     if (!paused) {
-      const target = hoverTargetFor(hovered, presetOverride);
+      const target = pose != null ? pose : hoverTargetFor(hovered, presetOverride);
       hoverProgressRef.current += (target - hoverProgressRef.current) * STATE_LERP;
     }
     const h = hoverProgressRef.current;
 
     // Carousel offset (frozen during export — controller seeks it).
-    if (!paused) offsetRef.current += delta * CYCLE_SPEED;
+    if (!paused) offsetRef.current += delta * CYCLE_SPEED * speed;
     const offset = easedOffset(offsetRef.current);
 
     const lerp = THREE.MathUtils.lerp;
@@ -404,6 +415,8 @@ export default function PhoneScene({
   immediate = false,
   preserveDrawingBuffer = false,
   paused = false,
+  pose,
+  speed = 1,
   controllerRef,
   onReady,
 }: PhoneSceneProps) {
@@ -470,7 +483,7 @@ export default function PhoneScene({
         >
           {/* 60fps when animating; 30fps at rest in view; nothing off screen or
               when paused (export drives invalidate() manually). */}
-          <FrameDriver active={(hovered || !!presetOverride) && inView && !paused} idleFps={paused ? 0 : inView ? 30 : 0} />
+          <FrameDriver active={(hovered || !!presetOverride || pose != null) && inView && !paused} idleFps={paused ? 0 : inView ? 30 : 0} />
           <LiveResize />
           <ambientLight intensity={0.65} />
           <directionalLight position={[4, 5, 5]} intensity={1.0} />
@@ -486,6 +499,8 @@ export default function PhoneScene({
               inView={inView || paused}
               paused={paused}
               presetOverride={presetOverride}
+              pose={pose}
+              speed={speed}
               controllerRef={controllerRef}
               onReady={handleReady}
             />

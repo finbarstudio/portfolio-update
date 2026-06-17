@@ -17,7 +17,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { PhoneSceneController } from "@/components/phone/PhoneScene";
-import type { AnimationPreset, FitMode } from "@/components/phone/phone-config";
+import type { FitMode } from "@/components/phone/phone-config";
 import type { MediaAsset } from "./media";
 import { drawWatermark } from "./watermark";
 import { downloadBlob, safeName } from "./download";
@@ -44,7 +44,9 @@ const MATTE = "#FAFAF8";
 
 export type ExportConfig = {
   media: MediaAsset[];
-  preset: AnimationPreset;
+  /** The pose blend captured in the export (phone: from the Angle slider; mac:
+   *  1 for flat, 0 otherwise). */
+  poseHover: number;
   fit: FitMode;
   aspect: string; // "9:16" | "1:1" | "16:9"
   background: string; // "transparent" | css color
@@ -177,7 +179,6 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
     [setPaused],
   );
 
-  const hoverFor = (preset: AnimationPreset) => (preset === "flat" ? 1 : 0);
   const baseName = (config: ExportConfig) => safeName(config.media[0]?.name ?? "phone-mockup");
 
   const exportStill = useCallback(
@@ -188,7 +189,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
         const bgColor = config.background === "transparent" ? null : config.background;
         const { canvas, draw } = makeRenderer(w, h, bgColor);
         const offset = controllerRef.current?.offsetForFocus(focusIndex) ?? focusIndex;
-        const blob = await renderStillBlob(canvas, draw, offset, hoverFor(config.preset));
+        const blob = await renderStillBlob(canvas, draw, offset, config.poseHover);
         if (cancelledRef.current || !blob) return;
         downloadBlob(blob, `${baseName(config)}-still.png`);
         progressRef.current = 1;
@@ -204,7 +205,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
       const bgColor = config.background === "transparent" ? null : config.background;
       const { canvas, draw } = makeRenderer(w, h, bgColor);
       const n = config.media.length;
-      const hover = hoverFor(config.preset);
+      const hover = config.poseHover;
       for (let i = 0; i < n; i++) {
         if (cancelledRef.current) break;
         const offset = controllerRef.current?.offsetForFocus(i) ?? i;
@@ -236,7 +237,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
         canvas,
         draw,
         period,
-        hover: hoverFor(config.preset),
+        hover: config.poseHover,
         fps,
         frames,
         onProgress,
@@ -264,7 +265,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
         canvas,
         draw,
         period,
-        hover: hoverFor(config.preset),
+        hover: config.poseHover,
         fps,
         frames,
         onProgress,
