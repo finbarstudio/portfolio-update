@@ -228,18 +228,9 @@ function DesktopSidebar({
       }}
       aria-label="Site navigation"
     >
-      {/* Logo, pinned at the top of the rail. Just the star (centred, aligned with
-          the nav icons) when collapsed; the full wordmark when expanded. */}
-      <Link
-        href="/"
-        className={`sidebar-logo ${collapsed ? "is-collapsed" : ""}`}
-        aria-label="finbar.studio, home"
-        title="finbar.studio, home"
-      >
-        <span className="logo-word logo-pre">finbar</span>
-        <BrandStar className="pixel-star" size={16} />
-        <span className="logo-word logo-post">studio</span>
-      </Link>
+      {/* Top spacer — keeps the toggle tab's vertical anchor. The brand logo/star
+          has been removed from the rail (home lives in the nav below). */}
+      <div className="sidebar-head" aria-hidden="true" />
 
       {/* Persistent nav — one list for both states. The icons stay put and the
           labels slide/fade in as the rail expands (no remove/replace swap). */}

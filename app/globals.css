@@ -341,6 +341,9 @@
   .contact-drawer-backdrop, .contact-drawer-panel { transition: none; }
 }
 
+/* Top spacer where the brand mark used to sit (no rule). */
+.sidebar-head { height: 48px; flex: 0 0 auto; }
+
 /* Sidebar logo, pinned at the top of the rail. Centred star (aligned with the
    nav icons) when collapsed; full wordmark when expanded. */
 .sidebar-logo {
@@ -381,19 +384,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  color: var(--ink-soft);
-  background: var(--surface-raised);
-  border: 1px solid var(--line);
-  box-shadow: var(--elev-1);
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--ink);
   cursor: pointer;
   transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
               color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
 .sidebar-toggle:hover { color: var(--pink); border-color: var(--pink); }
-.sidebar-toggle svg { transition: transform var(--dur) var(--ease); }
+/* Icon rotates around its own centre to flip between the open/closed chevron. */
+.sidebar-toggle svg { transform-origin: center; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
 .sidebar-toggle[data-collapsed="true"] svg { transform: rotate(180deg); }
 /* The rail (and its toggle) is desktop-only — the `hidden md:flex` utility can't
    win here because this unlayered rule's `display:flex` outranks Tailwind's
@@ -3225,7 +3228,7 @@ body:has(.sb-root) {
    The content reacts: --sidebar-w collapses to 0 so the main reflows full width
    while the nav is away and narrows as it returns. ── */
 .sidebar-toggle {
-  transition: opacity 0.45s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
+  transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 .sidebar-mobilebar { transition: opacity 0.45s var(--ease); }
 :root[data-intro-active="true"] .sidebar-aside {
@@ -3331,8 +3334,7 @@ body:has(.sb-root) {
 }
 .site-footer-rule {
   height: 1px;
-  background: currentColor;
-  opacity: 0.16;
+  background: var(--ink);
   margin: 0 clamp(20px, 3vw, 40px);
 }
 .site-footer-info {
@@ -3354,16 +3356,16 @@ body:has(.sb-root) {
     gap: 1.5rem 2rem;
   }
 }
-/* Desktop: a 12-column grid with each cluster placed. */
+/* Desktop: 12-column grid — hiring/contact left, locations middle, credit right. */
 @media (min-width: 1024px) {
   .site-footer-info {
     grid-template-columns: repeat(12, 1fr);
     align-items: end;
     gap: 2rem;
   }
-  .sf-credit    { grid-column: 1 / span 4; }
-  .sf-contact   { grid-column: 6 / span 4; }
-  .sf-locations { grid-column: 10 / span 3; }
+  .sf-contact   { grid-column: 1 / span 4; }
+  .sf-locations { grid-column: 6 / span 4; }
+  .sf-credit    { grid-column: 10 / span 3; align-items: flex-end; text-align: right; }
 }
 .sf-cluster {
   display: flex;
@@ -3378,9 +3380,9 @@ body:has(.sb-root) {
 
 .site-footer-mark {
   width: 100%;
-  /* Same gutters as the rest of the page, plus matching bottom padding so the
-     wordmark isn't flush/clipped at the very bottom. */
-  padding: 0 clamp(20px, 3vw, 40px) clamp(20px, 3vw, 40px);
+  /* Slightly tighter than the info gutters so the wordmark's optical left edge
+     lines up with the info text above it; matching (small) bottom padding. */
+  padding: 0 clamp(14px, 2vw, 28px) clamp(12px, 1.4vw, 20px);
   line-height: 0.82;
 }
 .site-footer-mark-inner {

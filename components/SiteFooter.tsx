@@ -43,10 +43,6 @@ export default function SiteFooter() {
       <div className="site-footer-rule" aria-hidden="true" />
 
       <div className="site-footer-info">
-        <div className="sf-cluster sf-credit">
-          <span>© {year} finbar studio</span>
-        </div>
-
         <div className="sf-cluster sf-contact">
           <span className="sf-heading">Hiring or have a project?</span>
           <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>
@@ -56,6 +52,10 @@ export default function SiteFooter() {
         <div className="sf-cluster sf-locations">
           <span>Brisbane, QLD</span>
           <span>London, UK</span>
+        </div>
+
+        <div className="sf-cluster sf-credit">
+          <span>© {year} finbar studio</span>
         </div>
       </div>
 
