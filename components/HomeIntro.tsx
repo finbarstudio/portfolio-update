@@ -18,9 +18,13 @@ import { STAR_POINTS } from "./brand-star";
 
 type Phase = "trace" | "fill" | "fly" | "done";
 
-const TRACE_MS = 1700;
+const TRACE_MS = 2000;
 const FILL_MS = 450;
 const FLY_MS = 850;
+
+// The star as a single continuous path (one start point → closed outline), so
+// the stroke-dash trace is reliable (pathLength on a <polygon> is not).
+const STAR_PATH = `M${STAR_POINTS.replace(/ /g, "L")}Z`;
 
 export default function HomeIntro() {
   const lockupRef = useRef<HTMLDivElement>(null);
@@ -35,10 +39,15 @@ export default function HomeIntro() {
     const el = lockupRef.current;
     if (!el) return;
     const fit = () => {
-      const avail = el.parentElement?.clientWidth ?? el.clientWidth;
+      const parent = el.parentElement;
+      if (!parent) return;
+      const cs = getComputedStyle(parent);
+      // Full width of the screen minus the section's L/R padding.
+      const avail = parent.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      // Measure the lockup's intrinsic content width (it's width:max-content).
       el.style.fontSize = "100px";
       const natural = el.scrollWidth;
-      if (natural > 0) el.style.fontSize = `${Math.max(28, (avail / natural) * 100)}px`;
+      if (natural > 0 && avail > 0) el.style.fontSize = `${Math.max(20, (avail / natural) * 100)}px`;
     };
     fit();
     window.addEventListener("resize", fit);
@@ -91,13 +100,14 @@ export default function HomeIntro() {
           style={flyTransform ? { transform: flyTransform } : undefined}
         >
           <svg viewBox="0 0 100 100" className="intro-fly-star">
-            <polygon
-              points={STAR_POINTS}
+            <path
+              d={STAR_PATH}
               pathLength={1}
               fill="var(--pink)"
               stroke="var(--pink)"
               strokeWidth={1}
               strokeLinejoin="round"
+              strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
           </svg>

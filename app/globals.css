@@ -3157,9 +3157,10 @@ body:has(.sb-root) {
 .home-intro-mark {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.16em;
-  width: 100%;
+  width: max-content;       /* content-sized: measures right + the JS fit spans it */
+  max-width: 100%;
+  margin: 0 auto;
   white-space: nowrap;
   font-family: var(--font-primary);
   font-weight: 700;
@@ -3202,19 +3203,19 @@ body:has(.sb-root) {
   pointer-events: none;
 }
 .intro-fly-star { width: 100%; height: auto; display: block; overflow: visible; }
-.intro-fly-star polygon {
+.intro-fly-star path {
   fill: var(--pink);
   fill-opacity: 0;
   stroke: var(--pink);
   stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: star-trace 1.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  stroke-dashoffset: 1;            /* one start point; draws to a complete outline */
+  animation: star-trace 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   transition: fill-opacity 0.45s var(--ease);
 }
-.intro-fly.is-fill .intro-fly-star polygon,
-.intro-fly.is-fly .intro-fly-star polygon { fill-opacity: 1; }
+.intro-fly.is-fill .intro-fly-star path,
+.intro-fly.is-fly .intro-fly-star path { fill-opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  .intro-fly-star polygon { animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
+  .intro-fly-star path { animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
   .intro-fly { transition: none; }
 }
 
