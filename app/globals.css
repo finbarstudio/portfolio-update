@@ -3217,3 +3217,26 @@ body:has(.sb-root) {
   .intro-fly-star polygon { animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
   .intro-fly { transition: none; }
 }
+
+/* ── Intro chrome: full-bleed intro + hide the nav over it, slide/fade it in
+   from the left once you scroll past (home only; driven by [data-intro-active]
+   on <html>). The reserved sidebar gutter stays put, so no content reflow. ── */
+@media (min-width: 768px) {
+  .home-intro { margin-left: calc(-1 * var(--sidebar-w)); width: 100vw; }
+}
+.sidebar-toggle {
+  transition: opacity 0.45s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.sidebar-mobilebar { transition: opacity 0.45s var(--ease); }
+:root[data-intro-active="true"] .sidebar-aside {
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+:root[data-intro-active="true"] .sidebar-toggle,
+:root[data-intro-active="true"] .sidebar-dock,
+:root[data-intro-active="true"] .sidebar-year,
+:root[data-intro-active="true"] .sidebar-mobilebar {
+  opacity: 0;
+  pointer-events: none;
+}

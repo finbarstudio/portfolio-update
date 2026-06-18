@@ -25,7 +25,7 @@ function MobileBar({ onMenu }: { onMenu: () => void }) {
   } as React.CSSProperties;
   return (
     <header
-      className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-3 pointer-events-none"
+      className="sidebar-mobilebar md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-3 pointer-events-none"
       style={{ height: "var(--menubar-h)" }}
       role="banner"
     >
@@ -67,6 +67,29 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   useEffect(() => {
     setMobileMenuOpen(false);
     setContactOpen(false);
+  }, [pathname]);
+
+  // Home only: hide the nav chrome over the intro screen, then let it slide in
+  // from the left once you scroll past it. Driven by a [data-intro-active] flag
+  // on <html> so all the (separately-positioned) sidebar pieces can respond.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (pathname !== "/") {
+      delete root.dataset.introActive;
+      return;
+    }
+    const update = () => {
+      const past = window.scrollY > window.innerHeight * 0.5;
+      root.dataset.introActive = past ? "false" : "true";
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      delete root.dataset.introActive;
+    };
   }, [pathname]);
 
   const toggle = () => {

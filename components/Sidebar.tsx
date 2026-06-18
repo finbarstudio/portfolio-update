@@ -101,7 +101,7 @@ function YearStamp({ collapsed }: { collapsed: boolean }) {
   const text = collapsed ? `© ${String(year).slice(-2)}` : `© ${year} finbar studio`;
   return (
     <div
-      className="hidden md:block"
+      className="hidden md:block sidebar-year"
       aria-label={`Copyright ${year} finbar studio`}
       style={{
         position: "fixed",
@@ -138,7 +138,7 @@ function SocialDock({ collapsed }: { collapsed: boolean }) {
 
   return (
     <div
-      className="hidden md:block"
+      className="hidden md:block sidebar-dock"
       style={{
         position: "fixed",
         left: 0,
@@ -230,12 +230,12 @@ function DesktopSidebar({
         </svg>
       </button>
     <aside
-      className="hidden md:flex fixed left-0 border-r border-line flex-col z-40 bg-bg"
+      className="sidebar-aside hidden md:flex fixed left-0 border-r border-line flex-col z-40 bg-bg"
       style={{
         top: "var(--menubar-h)",
         bottom: 0,
         width: collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W,
-        transition: "width 0.5s cubic-bezier(0.4,0,0.2,1)",
+        transition: "width 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.55s var(--ease), opacity 0.4s var(--ease)",
         overflow: "hidden",
         // Subtle edge depth: a faint inner highlight catches the light, a soft
         // shadow lifts the rail off the content.
