@@ -232,7 +232,7 @@ export default function AboutPage() {
         </p>
 
         <h3 className="mb-8">
-          <a href="mailto:finbar@finbar.studio" className="mono-h3 text-ink hover:text-pink transition-colors">
+          <a href="mailto:finbar@finbar.studio" className="mono-h3 u-underline">
             finbar@finbar.studio
           </a>
         </h3>
@@ -240,7 +240,7 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl">
           <div>
             <p className="mono-label text-ink-soft mb-2">Phone</p>
-            <a href="tel:+61412796630" className="text-ink hover:text-pink transition-colors tabular-nums" style={{ fontSize: "var(--text-small)" }}>
+            <a href="tel:+61412796630" className="u-underline tabular-nums" style={{ fontSize: "var(--text-small)" }}>
               +61 412 796 630
             </a>
           </div>
@@ -253,7 +253,7 @@ export default function AboutPage() {
             <p className="mono-label text-ink-soft mb-2">Elsewhere</p>
             <div className="flex flex-col gap-1.5">
               {SOCIALS.map((s) => (
-                <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors" style={{ fontSize: "var(--text-small)" }}>
+                <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" className="u-underline" style={{ fontSize: "var(--text-small)" }}>
                   {s.label}
                 </a>
               ))}

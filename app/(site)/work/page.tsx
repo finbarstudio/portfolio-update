@@ -127,7 +127,7 @@ function WorkGrid({ filter }: { filter?: string }) {
         </div>
       ) : (
         <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
-          Nothing under that filter yet. <Link href="/work" className="text-ink underline underline-offset-2 decoration-pink hover:text-pink transition-colors">Show all →</Link>
+          Nothing under that filter yet. <Link href="/work" className="u-underline">Show all →</Link>
         </p>
       )}
     </section>
@@ -166,19 +166,6 @@ export default async function WorkPage({
       <WorkHeader />
       <FilterChips active={filter} />
       <WorkGrid filter={filter} />
-
-      <footer
-        className="px-5 md:px-10 py-12 md:py-16 border-t border-line"
-        aria-label="Site footer"
-      >
-        <a
-          href="mailto:finbar@finbar.studio"
-          className="font-sans font-medium text-ink hover:text-pink transition-colors"
-          style={{ fontSize: "var(--text-h2)" }}
-        >
-          finbar@finbar.studio
-        </a>
-      </footer>
     </>
   );
 }

@@ -228,9 +228,6 @@ function DesktopSidebar({
       }}
       aria-label="Site navigation"
     >
-      {/* Top spacer — keeps the toggle tab's vertical anchor. The brand logo/star
-          has been removed from the rail (home lives in the nav below). */}
-      <div className="sidebar-head" aria-hidden="true" />
 
       {/* Persistent nav — one list for both states. The icons stay put and the
           labels slide/fade in as the rail expands (no remove/replace swap). */}

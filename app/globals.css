@@ -341,9 +341,6 @@
   .contact-drawer-backdrop, .contact-drawer-panel { transition: none; }
 }
 
-/* Top spacer where the brand mark used to sit (no rule). */
-.sidebar-head { height: 48px; flex: 0 0 auto; }
-
 /* Sidebar logo, pinned at the top of the rail. Centred star (aligned with the
    nav icons) when collapsed; full wordmark when expanded. */
 .sidebar-logo {
@@ -377,7 +374,7 @@
    with the rail edge; rotates to point right (= expand) when collapsed. */
 .sidebar-toggle {
   position: fixed;
-  top: calc(var(--menubar-h) + 24px);   /* vertical centre of the 48px logo row */
+  top: calc(var(--menubar-h) + 29px);   /* vertical centre of the first nav row */
   transform: translateY(-50%);
   z-index: 41;
   margin-left: -9px;                     /* straddle the edge, mostly protruding right */

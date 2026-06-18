@@ -318,13 +318,13 @@ function FooterMeta({ project }: { project: Project }) {
             <p className="mono-label text-ink-soft mb-3">
               {project.liveUrl && project.companyUrl ? "LINKS" : project.liveUrl ? "LIVE SITE" : "COMPANY"}
             </p>
-            <div className="space-y-1.5">
+            <div className="flex flex-col items-start gap-1.5">
               {project.liveUrl && (
                 <a
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block font-mono text-ink underline underline-offset-2 decoration-line hover:text-pink hover:decoration-pink transition-colors break-words"
+                  className="u-underline font-mono break-words"
                   style={{ fontSize: "var(--text-small)" }}
                 >
                   {project.liveUrl.replace(/^https?:\/\//, "")} ↗
@@ -335,7 +335,7 @@ function FooterMeta({ project }: { project: Project }) {
                   href={project.companyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block font-mono text-ink underline underline-offset-2 decoration-line hover:text-pink hover:decoration-pink transition-colors break-words"
+                  className="u-underline font-mono break-words"
                   style={{ fontSize: "var(--text-small)" }}
                 >
                   {project.companyUrl.replace(/^https?:\/\//, "")} ↗
@@ -350,7 +350,7 @@ function FooterMeta({ project }: { project: Project }) {
           <p className="mono-label text-ink-soft mb-3">OPEN FOR WORK</p>
           <a
             href="mailto:finbar@finbar.studio"
-            className="font-sans font-medium text-ink hover:text-pink transition-colors link-wipe break-words"
+            className="u-underline font-sans font-medium break-words"
             style={{ fontSize: "var(--text-h3)" }}
           >
             finbar@finbar.studio
@@ -363,7 +363,7 @@ function FooterMeta({ project }: { project: Project }) {
       <div className="pt-6 pb-8 text-center md:text-left">
         <Link
           href="/work"
-          className="inline-flex items-center min-h-[44px] py-2 font-sans font-bold uppercase text-ink hover:text-pink transition-colors"
+          className="u-underline min-h-[44px] py-2 font-sans font-bold uppercase"
           style={{ fontSize: "0.875rem", letterSpacing: "0.16em" }}
         >
           Back to Work
