@@ -3436,6 +3436,25 @@ body:has(.sb-root) {
   flex-wrap: wrap;
   min-width: 0;
 }
+/* Social icons, top right. */
+.top-nav-social {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 0 0 auto;
+}
+.top-nav-social-item {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  transition: color var(--dur-fast) var(--ease);
+}
+.top-nav-social-item:hover { color: var(--pink); }
+.top-nav-social-item svg { width: 100%; height: 100%; display: block; }
 /* The .tag-default hover is scoped to anchors; mirror it for this button. */
 @media (hover: hover) {
   .intro-menu-btn:hover { color: var(--pink); border-color: var(--pink); }
