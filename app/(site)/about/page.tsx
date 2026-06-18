@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Script from "next/script";
-import ClientImage from "@/components/ClientImage";
 import Reveal from "@/components/Reveal";
 import { projects } from "@/content/projects";
 
@@ -30,72 +28,25 @@ const aboutJsonLd = {
   },
 };
 
-const FACTS = [
-  { label: "Based in", value: "Brisbane, QLD" },
-  { label: "Working with", value: "Clients in AU + UK" },
-  { label: "From", value: "London, originally" },
-  { label: "Status", value: "Open for work" },
+const SERVICES = [
+  "Brand identity",
+  "Editorial & print",
+  "Web & UI design",
+  "Motion graphics",
+  "Creative direction",
 ];
 
-const PRINCIPLES = [
-  {
-    heading: "First principles",
-    body: "I strip a brief back to what it actually needs, then build the design up from there, rather than starting from a template or whatever's trending.",
-  },
-  {
-    heading: "Tech as a lever",
-    body: "I lean on the latest tools to clear the technical barriers, so the time goes into the design and the craft instead of fighting the software.",
-  },
-  {
-    heading: "Genuinely care",
-    body: "I care about the work landing right about as much as I care about getting paid for it, and that tends to show up in the details.",
-  },
-];
+const CLIENTS = [...projects]
+  .filter((p) => !p.hidden)
+  .sort((a, b) => a.rank - b.rank)
+  .map((p) => p.name);
 
-const CAPABILITIES = [
-  {
-    heading: "Brand identity",
-    items: ["Logo & logomark", "Colour systems", "Typography", "Brand guidelines", "Asset systems"],
-  },
-  {
-    heading: "Editorial & print",
-    items: ["Publication design (InDesign)", "Infographics", "Layout & typesetting", "Print production", "Content writing"],
-  },
-  {
-    heading: "Web, motion & more",
-    items: ["Website & UI design", "Creative direction", "Motion graphics (After Effects)", "Photoshop & Illustrator", "AI-assisted workflow"],
-  },
-];
-
-const SOCIALS = [
-  { label: "Are.na", href: "https://are.na/finbar-studio" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/finbarskitini" },
-  { label: "Instagram", href: "https://instagram.com/finbar.studio" },
-  { label: "X", href: "https://x.com/finbarstudio" },
-];
-
-/* Testimonials gathered from any project that has one. */
-function AboutTestimonials() {
-  const quotes = projects.filter((p) => p.testimonial).map((p) => ({ ...p.testimonial!, slug: p.slug }));
-  if (!quotes.length) return null;
+/* Inline dingbat, set in the same Noto Sans Symbols 2 face as the home wall. */
+function Ding({ char }: { char: string }) {
   return (
-    <Reveal section as="section" className="home-section" aria-label="Client testimonials">
-      <div className="home-section-index">
-        <h2 className="home-display-sm text-ink">Kind words</h2>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-        {quotes.map((q) => (
-          <figure key={q.slug} className="max-w-prose">
-            <blockquote className="font-sans text-ink leading-relaxed" style={{ fontSize: "var(--text-body)", lineHeight: 1.6 }}>
-              &ldquo;{q.quote}&rdquo;
-            </blockquote>
-            <figcaption className="meta-mono text-ink-soft mt-4" style={{ fontSize: "11px" }}>
-              {q.author}
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-    </Reveal>
+    <span className="home-disc-icon" aria-hidden="true">
+      {char}
+    </span>
   );
 }
 
@@ -114,13 +65,8 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
-  const clients = [...projects]
-    .filter((p) => !p.hidden)
-    .sort((a, b) => a.rank - b.rank)
-    .map((p) => p.name);
-
   return (
-    <div className="px-5 md:px-10 pt-8 md:pt-12 pb-10">
+    <div className="px-5 md:px-10 pb-10">
       <Script
         id="ld-about"
         type="application/ld+json"
@@ -128,175 +74,70 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
       />
 
-      {/* ── Hero: statement + lead ────────────────────────────── */}
-      <Reveal immediate as="header" className="max-w-none">
-        <p className="mono-label text-ink-soft mb-6">Brisbane graphic designer · AU + UK</p>
-        <h1 className="home-display text-ink max-w-[20ch]">
-          I&rsquo;m Finbar, a Brisbane graphic designer who sweats the small stuff.
+      {/* ── Big statement with inline icons ───────────────────── */}
+      <section
+        className="min-h-[70svh] flex items-center py-16 md:py-24"
+        aria-label="Introduction"
+      >
+        <h1
+          className="home-disc"
+          aria-label="Nice to meet you, I'm Finbar. One day I woke up and found my feet in design and I haven't moved since."
+        >
+          <span aria-hidden="true">Nice to meet you</span>
+          <Ding char="✶" />
+          <span aria-hidden="true">I&rsquo;m</span>{" "}
+          <span className="home-disc-pink" aria-hidden="true">Finbar</span>
+          <Ding char="❧" />
+          <span aria-hidden="true">one day I woke up and found my feet in design</span>
+          <Ding char="☞" />
+          <span aria-hidden="true">and I haven&rsquo;t moved since</span>
+          <Ding char="❤" />
         </h1>
-        <p className="mt-8 md:mt-10 font-sans leading-relaxed text-ink max-w-2xl" style={{ fontSize: "var(--text-h3)" }}>
-          I design brand identities, publications and websites for businesses across Australia and
-          the UK. Print and editorial are my roots, so type, grids and the small details are where
-          I&rsquo;m strongest.
-        </p>
+      </section>
 
-        {/* Facts strip */}
-        <dl className="mt-10 md:mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-3xl">
-          {FACTS.map((f) => (
-            <div key={f.label}>
-              <dt className="mono-label text-ink-soft mb-1.5">{f.label}</dt>
-              <dd className="text-ink" style={{ fontSize: "var(--text-small)" }}>{f.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </Reveal>
+      {/* ── Four columns: services / clients / bio / mission ──── */}
+      <section
+        id="contact"
+        className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12 border-t border-line pt-10 md:pt-12"
+        aria-label="Services, clients and about"
+      >
+        <Reveal as="div">
+          <h2 className="mono-label text-ink-soft mb-4">Services</h2>
+          <ul className="space-y-2">
+            {SERVICES.map((s) => (
+              <li key={s} className="text-ink" style={{ fontSize: "var(--text-small)" }}>{s}</li>
+            ))}
+          </ul>
+        </Reveal>
 
-      {/* ── Full-width image band ─────────────────────────────── */}
-      <Reveal as="div" className="-mx-5 md:-mx-10 mt-12 md:mt-16">
-        <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", background: "var(--surface-sunken)" }}>
-          <ClientImage
-            src="/images/palmsmotel/scene-1.webp"
-            alt="A scene from Palms Motel, one of Finbar Studio's projects"
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
-        </div>
-      </Reveal>
+        <Reveal as="div">
+          <h2 className="mono-label text-ink-soft mb-4">Clients</h2>
+          <ul className="space-y-2">
+            {CLIENTS.map((c) => (
+              <li key={c} className="text-ink" style={{ fontSize: "var(--text-small)" }}>{c}</li>
+            ))}
+          </ul>
+        </Reveal>
 
-      {/* ── The approach: portrait + bio ──────────────────────── */}
-      <Reveal section as="section" className="home-section" aria-label="The approach">
-        <div className="grid md:grid-cols-12 gap-8 md:gap-12 items-start">
-          <div className="md:col-span-4">
-            <h2 className="home-display-sm text-ink mb-6">The approach</h2>
-            <div
-              style={{ width: "100%", maxWidth: 256, aspectRatio: "1", position: "relative", borderRadius: 10, overflow: "hidden", background: "var(--surface-sunken)" }}
-            >
-              <ClientImage
-                src="/images/headshot.webp"
-                alt="Finbar Skitini, Brisbane graphic designer"
-                fill
-                sizes="(max-width: 768px) 80vw, 256px"
-                className="object-cover"
-              />
-            </div>
-          </div>
-
-          <div className="md:col-span-8 md:col-start-6 space-y-4 font-sans leading-relaxed text-ink" style={{ fontSize: "var(--text-body)" }}>
+        <Reveal as="div">
+          <h2 className="mono-label text-ink-soft mb-4">Bio</h2>
+          <div className="space-y-3 text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
             <p>
-              I trained at Ravensbourne University in London and the University of Brighton, then moved
-              to Australia and started working as finbar studio. Most jobs begin with the brand, the
-              logo, colour and type, then run into whatever&rsquo;s next: a publication, a website, a campaign.
+              BA (Hons), Brighton &amp; Ravensbourne University (admittedly, I don&rsquo;t think they
+              mean much).
             </p>
-            <p>
-              Away from client work I tinker with creative coding, the interactive and generative kind
-              this site is built from. Leaning on Claude for the technical side keeps me in the design
-              rather than buried in code, and a fair bit of what I work out there ends up useful for
-              clients too.
-            </p>
+            <p>I explore design with my clients.</p>
           </div>
-        </div>
-      </Reveal>
+        </Reveal>
 
-      {/* ── Selected clients strip ────────────────────────────── */}
-      <Reveal section as="section" className="home-section" aria-label="Selected clients">
-        <div className="home-section-index">
-          <h2 className="home-display-sm text-ink">Selected clients</h2>
-          <Link href="/work" className="home-link">View all work →</Link>
-        </div>
-        <ul className="flex flex-wrap gap-x-6 gap-y-2.5">
-          {clients.map((name) => (
-            <li key={name} className="mono-heading text-ink-soft">{name}</li>
-          ))}
-        </ul>
-      </Reveal>
-
-      {/* ── How I work (numbered) ─────────────────────────────── */}
-      <Reveal section as="section" className="home-section" aria-label="How I work">
-        <div className="home-section-index">
-          <h2 className="home-display-sm text-ink">How I work</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-10">
-          {PRINCIPLES.map((p, i) => (
-            <div key={p.heading} className="border-t border-line pt-4">
-              <span className="meta-mono text-pink" style={{ fontSize: "11px" }}>
-                {String(i + 1).padStart(2, "0")} / {String(PRINCIPLES.length).padStart(2, "0")}
-              </span>
-              <h3 className="mono-heading text-ink mt-3 mb-2">{p.heading}</h3>
-              <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
-                {p.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </Reveal>
-
-      {/* ── Capabilities grid ─────────────────────────────────── */}
-      <Reveal section as="section" className="home-section" aria-label="Capabilities">
-        <div className="home-section-index">
-          <h2 className="home-display-sm text-ink">What I do</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-12">
-          {CAPABILITIES.map(({ heading, items }) => (
-            <div key={heading} className="border-l border-line pl-5">
-              <h3 className="font-sans font-bold uppercase text-ink mb-4 tracking-wider" style={{ fontSize: "var(--text-small)" }}>
-                {heading}
-              </h3>
-              <ul className="space-y-2 mb-5">
-                {items.map((item) => (
-                  <li key={item} className="font-sans text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/work" className="u-underline">Explore work →</Link>
-            </div>
-          ))}
-        </div>
-      </Reveal>
-
-      <AboutTestimonials />
-
-      {/* ── Contact ───────────────────────────────────────────── */}
-      <Reveal section as="section" className="home-section" id="contact" aria-label="Contact">
-        <div className="home-section-index">
-          <h2 className="home-display-sm text-ink">Let&rsquo;s work together</h2>
-          <span className="status-badge">Open for work</span>
-        </div>
-        <p className="text-ink-soft mb-6 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
-          Got a project or a role in mind? Email is the fastest way to reach me.
-        </p>
-
-        <h3 className="mb-8">
-          <a href="mailto:finbar@finbar.studio" className="mono-h3 u-underline">
-            finbar@finbar.studio
-          </a>
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl">
-          <div>
-            <p className="mono-label text-ink-soft mb-2">Phone</p>
-            <a href="tel:+61412796630" className="u-underline tabular-nums" style={{ fontSize: "var(--text-small)" }}>
-              +61 412 796 630
-            </a>
-          </div>
-          <div>
-            <p className="mono-label text-ink-soft mb-2">Location</p>
-            <p className="text-ink" style={{ fontSize: "var(--text-small)" }}>Brisbane, QLD</p>
-            <p className="text-ink-soft" style={{ fontSize: "var(--text-caption)" }}>Remote-friendly</p>
-          </div>
-          <div>
-            <p className="mono-label text-ink-soft mb-2">Elsewhere</p>
-            <div className="flex flex-col gap-1.5">
-              {SOCIALS.map((s) => (
-                <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" className="u-underline" style={{ fontSize: "var(--text-small)" }}>
-                  {s.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Reveal>
+        <Reveal as="div">
+          <h2 className="mono-label text-ink-soft mb-4">Mission</h2>
+          <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
+            To bring high-end studio outcomes to a much wider audience. Because we all want to look
+            good, right?!
+          </p>
+        </Reveal>
+      </section>
     </div>
   );
 }
