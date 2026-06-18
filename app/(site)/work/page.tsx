@@ -83,7 +83,7 @@ function FilterChips({ active }: { active?: string }) {
     );
   };
   return (
-    <div className="flex flex-wrap gap-2 px-5 md:px-10 mb-12 md:mb-14">
+    <div className="flex flex-wrap gap-2 px-5 md:px-10 pt-8 md:pt-12 mb-12 md:mb-14">
       {chip(undefined, "All")}
       {WORK_FILTERS.map((f) => chip(f.key, f.label))}
     </div>
@@ -134,25 +134,6 @@ function WorkGrid({ filter }: { filter?: string }) {
   );
 }
 
-/* ─── Archive header ─────────────────────────────────────────── */
-function WorkHeader() {
-  return (
-    <header className="px-5 md:px-10 pt-8 md:pt-12 pb-10 md:pb-14">
-      <p className="mono-label text-ink-soft mb-5">Archive of branding, web, publication &amp; motion</p>
-      <h1
-        className="font-bold text-ink leading-[1.02]"
-        style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}
-      >
-        Selected work.
-      </h1>
-      <p className="text-ink-soft font-sans leading-relaxed mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
-        A working archive of projects for brands and businesses across Australia and the UK:
-        visual identities, websites, publications and campaigns, designed and built end to end.
-      </p>
-    </header>
-  );
-}
-
 export default async function WorkPage({
   searchParams,
 }: {
@@ -163,7 +144,6 @@ export default async function WorkPage({
   return (
     <>
       <WorkJsonLd />
-      <WorkHeader />
       <FilterChips active={filter} />
       <WorkGrid filter={filter} />
     </>

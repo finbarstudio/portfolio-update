@@ -5,12 +5,24 @@
 // page the intro wordmark scroll-shrinks up into the centre of the nav (see
 // HomeIntro) — the nav itself is always present.
 
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import TopNav from "./TopNav";
 import SmoothScroll from "./SmoothScroll";
 import SiteFooter from "./SiteFooter";
 import "lenis/dist/lenis.css";
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  // Reset scroll to the top on every route change. Lenis manages its own scroll
+  // position and doesn't reset on client navigation, which otherwise leaves you
+  // partway down (or at the bottom of) the new page.
+  useEffect(() => {
+    if (window.__lenis) window.__lenis.scrollTo(0, { immediate: true });
+    else window.scrollTo(0, 0);
+  }, [pathname]);
+
   // Only the portfolio routes (app/(site)) render this shell — the Sandbox + embeds
   // live outside that route group and never mount LayoutShell at all.
   return (
