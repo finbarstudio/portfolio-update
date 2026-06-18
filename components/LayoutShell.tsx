@@ -10,6 +10,8 @@ import Link from "next/link";
 import Sidebar from "./Sidebar";
 import BrandStar from "./BrandStar";
 import ContactDrawer from "./ContactDrawer";
+import SmoothScroll from "./SmoothScroll";
+import "lenis/dist/lenis.css";
 
 export const SIDEBAR_EXPANDED_W = 224; // px
 export const SIDEBAR_COLLAPSED_W = 48; // px
@@ -113,7 +115,10 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   // The "menu" tag scrolls down to where the nav reveals (rather than forcing it
   // open) — so scrolling back up tucks it away again, naturally.
   const revealNav = () => {
-    document.getElementById("nav-reveal-sentinel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const target = document.getElementById("nav-reveal-sentinel");
+    if (!target) return;
+    if (window.__lenis) window.__lenis.scrollTo(target, { offset: 0 });
+    else target.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const toggle = () => {
@@ -133,6 +138,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
+      <SmoothScroll />
       {/* Film grain — retro texture over everything (never blocks pointers). */}
       <div className="grain-overlay" aria-hidden="true" />
       {/* Over the intro zone the sidebar is hidden; this tag scrolls down to it. */}

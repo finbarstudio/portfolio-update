@@ -78,6 +78,9 @@ export default function HomeIntro() {
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Tell Lenis to hold still while the preloader plays (it may mount after us).
+    document.documentElement.dataset.introLock = "1";
+    window.__lenis?.stop();
     window.scrollTo(0, 0);
 
     const toFill = setTimeout(() => setPhase("fill"), TRACE_MS);
@@ -97,6 +100,8 @@ export default function HomeIntro() {
     const toDone = setTimeout(() => {
       setPhase("done");
       document.body.style.overflow = prevOverflow;
+      delete document.documentElement.dataset.introLock;
+      window.__lenis?.start();
     }, TRACE_MS + FILL_MS + FLY_MS);
 
     return () => {
@@ -104,6 +109,8 @@ export default function HomeIntro() {
       clearTimeout(toFly);
       clearTimeout(toDone);
       document.body.style.overflow = prevOverflow;
+      delete document.documentElement.dataset.introLock;
+      window.__lenis?.start();
     };
   }, []);
 
