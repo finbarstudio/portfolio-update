@@ -12,13 +12,23 @@ import { MAX_SPEED } from "@/components/phone/phone-config";
 export type AspectToken = "9:16" | "1:1" | "16:9";
 
 export type MotionControls = {
-  speed: number;
+  /** Carousel speed multiplier (phone only). Omit `onSpeed` to hide the slider. */
+  speed?: number;
+  onSpeed?: (v: number) => void;
   angle: number;
-  prominence: number;
-  onSpeed: (v: number) => void;
   onAngle: (v: number) => void;
-  onProminence: (v: number) => void;
+  /** Size slider value (phone: main-phone prominence; mac: whole-display scale). */
+  size: number;
+  onSize: (v: number) => void;
+  /** Size slider label + range. Default to the phone's "Main phone size" (0..1 %). */
+  sizeLabel?: string;
+  sizeMin?: number;
+  sizeMax?: number;
+  sizeStep?: number;
+  sizeDisplay?: (v: number) => string;
 };
+
+const pct = (v: number) => `${Math.round(v * 100)}%`;
 
 function Range({
   label,
@@ -133,32 +143,34 @@ export default function ControlPanel({
 
       {motion ? (
         <>
-          <Range
-            label="Speed"
-            value={motion.speed}
-            min={0}
-            max={MAX_SPEED}
-            step={0.05}
-            display={motion.speed === 0 ? "Still" : `${motion.speed.toFixed(2)}×`}
-            onChange={motion.onSpeed}
-          />
+          {motion.onSpeed && motion.speed != null && (
+            <Range
+              label="Speed"
+              value={motion.speed}
+              min={0}
+              max={MAX_SPEED}
+              step={0.05}
+              display={motion.speed === 0 ? "Still" : `${motion.speed.toFixed(2)}×`}
+              onChange={motion.onSpeed}
+            />
+          )}
           <Range
             label="Angle"
             value={motion.angle}
             min={0}
             max={1}
             step={0.01}
-            display={`${Math.round(motion.angle * 100)}%`}
+            display={pct(motion.angle)}
             onChange={motion.onAngle}
           />
           <Range
-            label="Main phone size"
-            value={motion.prominence}
-            min={0}
-            max={1}
-            step={0.01}
-            display={`${Math.round(motion.prominence * 100)}%`}
-            onChange={motion.onProminence}
+            label={motion.sizeLabel ?? "Main phone size"}
+            value={motion.size}
+            min={motion.sizeMin ?? 0}
+            max={motion.sizeMax ?? 1}
+            step={motion.sizeStep ?? 0.01}
+            display={(motion.sizeDisplay ?? pct)(motion.size)}
+            onChange={motion.onSize}
           />
         </>
       ) : (

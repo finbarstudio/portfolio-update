@@ -2816,6 +2816,16 @@
   overflow-x: clip;   /* the page-swipe travel must not add a scrollbar */
 }
 
+/* On the sandbox the document background is the colour iOS Safari paints into the
+   rubber-band overscroll gap at the very top/bottom — beyond the fixed rounded
+   screen mask. The portfolio's cream root would peek through there as a light
+   strip past the rounded edges, so paint it black to match the device frame.
+   (Unlayered, so it overrides the @layer base html/body cream.) */
+html:has(.sb-root),
+body:has(.sb-root) {
+  background-color: #000;
+}
+
 /* Rounds the page edges by painting a neutral dark grey into the four square
    corners, so the black viewport reads like a device screen. */
 .sb-screen-mask {

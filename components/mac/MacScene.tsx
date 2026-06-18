@@ -57,6 +57,11 @@ export type MacSceneProps = {
   media: MacMediaItem[];
   /** Force a preset pose (sandbox). When unset, pointer hover drives the blend. */
   presetOverride?: AnimationPreset;
+  /** Continuous pose blend (sandbox Angle slider): 0 = iso rest … 1 = flat,
+   *  negative = past the rest for extra tilt. Overrides presetOverride/hover. */
+  pose?: number;
+  /** Whole-display scale (sandbox Size slider). 1 = the natural framed size. */
+  scale?: number;
   /** How media fills the screen. Only affects images; video keeps the base UVs. */
   fit?: FitMode;
   /** Background: a CSS color painted behind the display, or "transparent". */
@@ -93,6 +98,10 @@ type MacShowProps = {
   /** Live turntable + camera dolly. Off in the tool preview (kept for the embed). */
   motion: boolean;
   presetOverride?: AnimationPreset;
+  /** Continuous pose blend; overrides presetOverride/hover when set. */
+  pose?: number;
+  /** Whole-display scale (1 = natural). */
+  scale: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady: () => void;
 };
@@ -107,6 +116,8 @@ function MacShow({
   paused,
   motion,
   presetOverride,
+  pose,
+  scale,
   controllerRef,
   onReady,
 }: MacShowProps) {
@@ -182,7 +193,9 @@ function MacShow({
 
   const groupRef = useRef<THREE.Group>(null);
   const offsetRef = useRef(0);
-  const hoverProgressRef = useRef(presetOverride ? poseTargetFor(presetOverride, false) : 0);
+  const hoverProgressRef = useRef(
+    pose != null ? pose : presetOverride ? poseTargetFor(presetOverride, false) : 0,
+  );
   const lastIndexRef = useRef(-1);
 
   // Build + expose the imperative controller (gl/scene/camera live inside Canvas).
@@ -215,7 +228,7 @@ function MacShow({
 
     // Pose blend (frozen during export — the controller writes the ref directly).
     if (!paused) {
-      const target = poseTargetFor(presetOverride, hovered);
+      const target = pose != null ? pose : poseTargetFor(presetOverride, hovered);
       hoverProgressRef.current += (target - hoverProgressRef.current) * STATE_LERP;
       // Only advance the turntable when motion is on (the tool preview holds still).
       if (motion) offsetRef.current += delta * CYCLE_SPEED;
@@ -242,14 +255,17 @@ function MacShow({
     const animate = motion || paused;
 
     // Pose: isometric (h=0) → flat front-on (h=1), with the (animate-only) yaw.
+    // Size scales the whole display in place (Center keeps it framed).
     if (groupRef.current) {
       groupRef.current.rotation.x = lerp(ISO_ROTATION_X, 0, h);
       groupRef.current.rotation.y = lerp(ISO_ROTATION_Y, 0, h) + (animate ? turntableYaw(offset) : 0);
+      groupRef.current.scale.setScalar(scale);
     }
 
-    // Camera glides in + up toward the screen as the pose flattens.
+    // Camera glides in + up toward the screen as the pose flattens. Clamp to the
+    // [iso, flat] range so an extra-tilt angle (h<0) doesn't dolly out of frame.
     const cam = camera as THREE.PerspectiveCamera;
-    const camH = animate ? h : 0;
+    const camH = animate ? THREE.MathUtils.clamp(h, 0, 1) : 0;
     cam.position.z = lerp(CAMERA_DISTANCE_DEFAULT, CAMERA_DISTANCE_HOVER, camH);
     cam.position.y = lerp(CAMERA_Y_DEFAULT, CAMERA_Y_HOVER, camH);
     cam.position.x = 0;
@@ -317,6 +333,8 @@ export default function MacScene({
   model = MAC_MODEL,
   media,
   presetOverride,
+  pose,
+  scale = 1,
   fit = "cover",
   background = "transparent",
   aspectRatio = "16/9",
@@ -405,6 +423,8 @@ export default function MacScene({
               paused={paused}
               motion={motion}
               presetOverride={presetOverride}
+              pose={pose}
+              scale={scale}
               controllerRef={controllerRef}
               onReady={handleReady}
             />

@@ -27,8 +27,11 @@ export default function EmbedMac({ config }: { config: EmbedConfig }) {
     return MAC_DEMO_MEDIA.map((m) => ({ kind: m.kind, src: m.src }));
   }, [config.media]);
 
-  const hoverable = config.preset !== "flat";
-  const presetOverride = config.preset === "flat" ? "flat" : undefined;
+  // A configured pose (from the tool's Angle slider) is shown statically; only the
+  // bare preset embed keeps the rest-eases-flat-on-hover behaviour.
+  const hasPose = config.pose != null;
+  const hoverable = !hasPose && config.preset !== "flat";
+  const presetOverride = !hasPose && config.preset === "flat" ? "flat" : undefined;
 
   return (
     <div
@@ -45,6 +48,8 @@ export default function EmbedMac({ config }: { config: EmbedConfig }) {
         <MacScene
           media={media}
           presetOverride={presetOverride}
+          pose={config.pose}
+          scale={config.scale}
           fit={config.fit}
           background={config.background}
           fill

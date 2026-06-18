@@ -20,6 +20,8 @@ export type EmbedConfig = {
   speed?: number;
   /** Phone main-phone prominence 0..1. */
   prominence?: number;
+  /** Mac whole-display scale (Size slider). 1 = natural framed size. */
+  scale?: number;
   fit: FitMode;
   /** Aspect ratio token, e.g. "9:16" | "1:1" | "16:9". */
   aspect: string;
@@ -58,6 +60,7 @@ export function encodeEmbedConfig(config: EmbedConfig, origin = ""): URLSearchPa
   if (config.pose != null) sp.set("h", String(config.pose));
   if (config.speed != null) sp.set("spd", String(config.speed));
   if (config.prominence != null) sp.set("pr", String(config.prominence));
+  if (config.scale != null) sp.set("sc", String(config.scale));
   sp.set("f", config.fit);
   sp.set("a", config.aspect);
   sp.set("bg", config.background);
@@ -87,6 +90,7 @@ export function decodeEmbedConfig(params: RawParams): EmbedConfig {
   const pose = typeof params.h === "string" && params.h !== "" ? Number(params.h) : undefined;
   const speed = typeof params.spd === "string" && params.spd !== "" ? Number(params.spd) : undefined;
   const prominence = typeof params.pr === "string" && params.pr !== "" ? Number(params.pr) : undefined;
+  const scale = typeof params.sc === "string" && params.sc !== "" ? Number(params.sc) : undefined;
 
   return {
     media,
@@ -94,6 +98,7 @@ export function decodeEmbedConfig(params: RawParams): EmbedConfig {
     pose: Number.isFinite(pose) ? pose : undefined,
     speed: Number.isFinite(speed) ? speed : undefined,
     prominence: Number.isFinite(prominence) ? prominence : undefined,
+    scale: Number.isFinite(scale) ? scale : undefined,
     fit,
     aspect,
     background,

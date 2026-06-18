@@ -1,8 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import SandboxNav from "@/components/sandbox/SandboxNav";
 import SandboxTransition from "@/components/sandbox/SandboxTransition";
 
 const SANDBOX_URL = "https://sandbox.finbar.studio";
+
+// The sandbox reads as a dark "device screen" framed by the rounded mask, so tint
+// iOS Safari's top/bottom chrome black (the portfolio root sets a warm cream) —
+// otherwise a light strip shows past the rounded edges at the very top/bottom.
+export const viewport: Viewport = {
+  themeColor: "#000000",
+};
 
 export const metadata: Metadata = {
   title: {
