@@ -628,20 +628,35 @@
   /* Big underlined editorial link. */
   .home-link {
     font-family: var(--font-mono);
-    font-weight: 700;
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-size: var(--text-label);
     color: var(--ink);
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding-bottom: 2px;
-    border-bottom: 1.5px solid var(--ink);
-    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), gap var(--dur) var(--ease);
+    /* Sit the underline a little below the text. */
+    padding-bottom: 5px;
+    transition: color var(--dur-fast) var(--ease), gap var(--dur) var(--ease);
+  }
+  /* Underline draws itself in from left → right on hover. */
+  .home-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1.5px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur) var(--ease);
   }
   @media (hover: hover) {
-    .home-link:hover { color: var(--pink); border-color: var(--pink); gap: 0.85rem; }
+    .home-link:hover { color: var(--pink); gap: 0.85rem; }
+    .home-link:hover::after { transform: scaleX(1); }
   }
 
   /* Hero load entrance — gentle fade-up, staggered via inline animation-delay. */

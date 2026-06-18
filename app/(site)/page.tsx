@@ -114,14 +114,10 @@ function SelectedWork() {
 /* ─── What I do (infinite capabilities slider) ──────────────── */
 function Capabilities() {
   return (
-    <Reveal section as="section" className="home-section px-5 md:px-10 overflow-hidden" aria-label="What I do">
-      <SectionHead
-        title="What I do"
-        aside={<Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>}
-      />
-      <p className="text-ink-soft leading-relaxed mb-5 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
-        One designer across the whole range. Tap a discipline to see the work.
-      </p>
+    <Reveal section as="section" className="home-section no-rule px-5 md:px-10 overflow-hidden mt-12 md:mt-24" aria-label="What I do">
+      <div className="flex justify-end mb-7">
+        <Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>
+      </div>
       <div className="-mx-5 md:-mx-10">
         <CapabilitiesSlider />
       </div>
