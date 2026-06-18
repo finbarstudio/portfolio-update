@@ -111,20 +111,6 @@ function SelectedWork() {
   );
 }
 
-/* ─── How I work ────────────────────────────────────────────── */
-function Approach() {
-  return (
-    <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="How I work">
-      <SectionHead title="How I work" />
-      <div className="grid md:grid-cols-12 gap-8">
-        <div className="md:col-span-7 max-w-2xl text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-          <p>Loose work and tight — cover art one week, a publication the next. Held together by type, colour, and how a layout moves your eye.</p>
-        </div>
-      </div>
-    </Reveal>
-  );
-}
-
 /* ─── What I do (infinite capabilities slider) ──────────────── */
 function Capabilities() {
   return (
@@ -185,7 +171,6 @@ export default function HomePage() {
       <HomeJsonLd />
       <Hero />
       <SelectedWork />
-      <Approach />
       <Capabilities />
       <Contact />
     </>
