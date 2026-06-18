@@ -9,7 +9,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Sidebar from "./Sidebar";
 import BrandStar from "./BrandStar";
-import ContactDrawer from "./ContactDrawer";
 import SmoothScroll from "./SmoothScroll";
 import SiteFooter from "./SiteFooter";
 import "lenis/dist/lenis.css";
@@ -58,7 +57,6 @@ function MobileBar({ onMenu }: { onMenu: () => void }) {
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [contactOpen, setContactOpen] = useState(false);
   // Home only: the nav stays hidden over the intro + disciplines sections (the
   // "intro zone"), with a "menu" button to summon it; otherwise it slides in
   // once you scroll past them.
@@ -73,7 +71,6 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   // Close transient UI on route change
   useEffect(() => {
     setMobileMenuOpen(false);
-    setContactOpen(false);
   }, [pathname]);
 
   // Track whether we're still in the home "intro zone": before the
@@ -154,9 +151,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         onToggle={toggle}
         mobileMenuOpen={mobileMenuOpen}
         onMobileMenuClose={() => setMobileMenuOpen(false)}
-        onContactOpen={() => setContactOpen(true)}
       />
-      <ContactDrawer open={contactOpen} onClose={() => setContactOpen(false)} />
       <main
         className="min-w-0 ml-0 md:ml-[var(--sidebar-w)]"
         style={

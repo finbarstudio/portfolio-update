@@ -58,14 +58,6 @@ function PersonIcon() {
     </svg>
   );
 }
-function EnvelopeIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <rect x="1.5" y="3.5" width="13" height="9" stroke="currentColor" strokeWidth="1.2"/>
-      <path d="M1.5 5.5l6.5 4 6.5-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
-}
 function SandboxIcon() {
   // A little beaker — the sandbox of experimental tools.
   return (
@@ -187,12 +179,10 @@ function DesktopSidebar({
   pathname,
   collapsed,
   onToggle,
-  onContactOpen,
 }: {
   pathname: string;
   collapsed: boolean;
   onToggle: () => void;
-  onContactOpen: () => void;
 }) {
 
   const sortedProjects = useMemo(
@@ -203,12 +193,6 @@ function DesktopSidebar({
   const isHome    = pathname === "/";
   const isAbout   = pathname.startsWith("/about");
   const isWork    = pathname === "/work" || pathname.startsWith("/case-studies/");
-
-  // The project sublist has its own toggle (separate from the rail collapse) so
-  // the 14-item list doesn't shove the bottom contact/social block off-screen.
-  // Opens automatically when you're actually inside Work so the active project shows.
-  const [worksOpen, setWorksOpen] = useState(false);
-  useEffect(() => { if (isWork) setWorksOpen(true); }, [isWork]);
 
   return (
     <>
@@ -291,21 +275,6 @@ function DesktopSidebar({
               </span>
             </span>
           </Link>
-          {!collapsed && (
-            <button
-              type="button"
-              className="nav-work-toggle"
-              aria-expanded={worksOpen}
-              aria-controls="nav-work-sublist"
-              aria-label={worksOpen ? "Collapse project list" : "Expand project list"}
-              title={worksOpen ? "Collapse project list" : "Expand project list"}
-              onClick={() => setWorksOpen((v) => !v)}
-            >
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true" className={`nav-work-caret ${worksOpen ? "is-open" : ""}`}>
-                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          )}
         </div>
 
         <div className="nav-work" data-open={collapsed ? "false" : "true"}>
@@ -313,7 +282,7 @@ function DesktopSidebar({
             <div
               className="nav-sublist"
               id="nav-work-sublist"
-              data-open={!collapsed && worksOpen ? "true" : "false"}
+              data-open={!collapsed ? "true" : "false"}
               role="region"
               aria-label="Projects"
             >
@@ -366,41 +335,30 @@ function DesktopSidebar({
           </span>
         </a>
 
-        <button
-          type="button"
-          onClick={onContactOpen}
-          title="Contact"
-          aria-label="Contact"
-          aria-haspopup="dialog"
-          className="nav-row"
-        >
-          <span className="nav-track">
-            <span className="nav-slot nav-slot-ico"><EnvelopeIcon /></span>
-            <span className="nav-slot nav-slot-label">Contact</span>
-          </span>
-        </button>
       </nav>
 
-      {/* Contact — expanded only. Just the email + the made-with line, in mono.
-          Phone, location + the full contact details now live in the site footer. */}
+      {/* Contact — expanded only. Email (caps) + phone, each with the tokened
+          hover underline. Pinned below the scrolling nav. */}
       {!collapsed && (
-        <div className="px-3 space-y-2.5 border-t border-line pt-3" style={{ paddingBottom: 96 }}>
-          <a
-            href="mailto:finbar@finbar.studio"
-            className="block text-ink hover:text-pink transition-colors reveal-y"
-            style={{ fontFamily: "var(--font-mono)", fontSize: "12px", letterSpacing: "0.02em", animationDelay: "0.2s" }}
-          >
-            finbar@finbar.studio
-          </a>
-
-          <p
-            className="text-ink-soft reveal-y pt-1"
-            style={{ fontFamily: "var(--font-mono)", fontSize: "10px", letterSpacing: "0.06em", animationDelay: "0.24s" }}
-          >
-            Made with{" "}
-            <span style={{ color: "var(--pink)" }} aria-hidden="true">♥</span>
-            <span className="sr-only">love</span> by finbar &amp; claude
-          </p>
+        <div className="px-3 space-y-1.5 pt-3" style={{ paddingBottom: 96 }}>
+          <div>
+            <a
+              href="mailto:finbar@finbar.studio"
+              className="u-underline reveal-y"
+              style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", animationDelay: "0.2s" }}
+            >
+              finbar@finbar.studio
+            </a>
+          </div>
+          <div>
+            <a
+              href="tel:+61412796630"
+              className="u-underline tabular-nums reveal-y"
+              style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.06em", animationDelay: "0.24s" }}
+            >
+              +61 412 796 630
+            </a>
+          </div>
         </div>
       )}
     </aside>
@@ -418,12 +376,10 @@ function DesktopSidebar({
 function MobileMenu({
   open,
   onClose,
-  onContactOpen,
   pathname,
 }: {
   open: boolean;
   onClose: () => void;
-  onContactOpen: () => void;
   pathname: string;
 }) {
   useEffect(() => {
@@ -505,17 +461,6 @@ function MobileMenu({
               <span className="mobile-nav-arrow" aria-hidden="true">↗</span>
             </a>
           </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => { onClose(); onContactOpen(); }}
-              aria-haspopup="dialog"
-              className="mobile-nav-row w-full text-left"
-            >
-              <span className="mobile-nav-label">Contact</span>
-              <span className="mobile-nav-arrow" aria-hidden="true">→</span>
-            </button>
-          </li>
         </ul>
 
         <div className="mobile-menu-foot">
@@ -547,16 +492,13 @@ export default function Sidebar({
   onToggle,
   mobileMenuOpen = false,
   onMobileMenuClose,
-  onContactOpen,
 }: {
   collapsed?: boolean;
   onToggle?: () => void;
   mobileMenuOpen?: boolean;
   onMobileMenuClose?: () => void;
-  onContactOpen?: () => void;
 }) {
   const pathname = usePathname();
-  const openContact = onContactOpen ?? (() => {});
 
   return (
     <>
@@ -564,12 +506,10 @@ export default function Sidebar({
         pathname={pathname}
         collapsed={collapsed}
         onToggle={onToggle ?? (() => {})}
-        onContactOpen={openContact}
       />
       <MobileMenu
         open={mobileMenuOpen}
         onClose={onMobileMenuClose ?? (() => {})}
-        onContactOpen={openContact}
         pathname={pathname}
       />
     </>

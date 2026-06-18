@@ -239,8 +239,12 @@
 
   /* Large type stays tight so display/headings never fragment into loose lines */
   h1, h2, .display { line-height: var(--leading-tight); }
-  /* H1 leads with the display serif unless a component opts out. */
-  h1 { font-family: var(--font-display); }
+  /* H1 — Space Mono in caps (replaces the old Bookmania display serif). */
+  h1 {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
   h3 { line-height: var(--leading-snug); }
 
   :focus-visible {
@@ -555,20 +559,14 @@
   }
 
   /* Massive display type that drives the hero + section openers. */
-  /* H1 — retro display serif (Bookmania), sentence case + ligatures/swashes. */
+  /* H1 — Space Mono in caps (replaces the old Bookmania display serif). */
   .home-display {
-    font-family: var(--font-display);
+    font-family: var(--font-mono);
     font-weight: 700;
-    text-transform: none;
-    letter-spacing: -0.015em;
-    line-height: 0.96;
-    font-size: clamp(2.8rem, 9vw, 7rem);
-    /* Swashes + discretionary ligatures off — they forced ornate, badly-kerned
-       glyphs mid-word (the "a", the "ti" in "motion"). Keep standard ligatures,
-       contextual alternates and real kerning: clean, well-spaced Bookmania.
-       (The italic word keeps its natural swashy terminals.) */
-    font-feature-settings: "liga" 1, "dlig" 0, "swsh" 0, "calt" 1, "kern" 1;
-    font-variant-ligatures: common-ligatures no-discretionary-ligatures;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.98;
+    font-size: clamp(2.4rem, 7.5vw, 5.6rem);
     font-kerning: normal;
   }
   /* H2 — sans (Archivo Narrow), so it reads as a clearly different tier to the
@@ -2547,21 +2545,9 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    /* When open, cap the height and scroll internally so the project list never
-       pushes the bottom contact/social block off-screen. The cap deliberately
-       cuts a row in half (peek) and the bottom fades out, so it's obvious there's
-       more to scroll. */
-    max-height: 230px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: var(--line) transparent;
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent);
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent);
+    /* Full project list, no inner scroll — the whole nav scrolls instead
+       (.side-nav is flex:1 / overflow-y:auto, with the contact block pinned). */
   }
-  .nav-sublist-inner::-webkit-scrollbar { width: 6px; }
-  .nav-sublist-inner::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
-  .nav-sublist-inner::-webkit-scrollbar-track { background: transparent; }
 
   .nav-sub {
     display: block;
@@ -3361,7 +3347,15 @@ body:has(.sb-root) {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-@media (min-width: 768px) {
+/* Tablet: two columns (clusters flow, locations wraps to the next row). */
+@media (min-width: 600px) {
+  .site-footer-info {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem 2rem;
+  }
+}
+/* Desktop: a 12-column grid with each cluster placed. */
+@media (min-width: 1024px) {
   .site-footer-info {
     grid-template-columns: repeat(12, 1fr);
     align-items: end;

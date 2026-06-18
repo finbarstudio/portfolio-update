@@ -196,7 +196,7 @@ function Gallery({ images, cols }: { images: ProjectImage[]; cols?: number }) {
     const img = images[0];
     const wide = ratioOf(img.aspectRatio) >= 1.3;
     return (
-      <Reveal as="figure" y={24} className={wide ? "" : "mx-auto w-full max-w-xl"}>
+      <Reveal as="figure" y={24} className={wide ? "" : "mr-auto w-full max-w-xl"}>
         <CaseMedia img={img} full={wide} />
         {img.caption && <Caption text={img.caption} />}
       </Reveal>
