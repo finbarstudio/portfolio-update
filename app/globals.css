@@ -3256,10 +3256,14 @@ body:has(.sb-root) {
   font-size: clamp(1.6rem, 5.5vw, 4.5rem);
   color: var(--ink);
 }
+/* Inline dingbats between the words. The glyph font-size is tied to the type's
+   x-height (ex unit), nudged up a touch so the symbol reads at x-height rather
+   than sitting tiny inside its em box. */
 .home-disc-icon {
-  width: 1ex;
-  height: 1ex;
-  margin: 0 0.34em;
+  font-family: var(--font-dingbat), var(--font-mono);
+  font-size: 1.7ex;
+  line-height: 1;
+  margin: 0 0.32em;
   color: var(--pink);
   display: inline-block;
   vertical-align: middle;

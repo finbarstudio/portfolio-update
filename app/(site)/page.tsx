@@ -6,7 +6,6 @@ import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import CapabilitiesSlider from "@/components/CapabilitiesSlider";
 import HomeIntro from "@/components/HomeIntro";
-import BrandStar from "@/components/BrandStar";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -60,22 +59,15 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
   );
 }
 
-/* ─── Disciplines: a big-type wall with small icons set inline in the type ── */
-function DiscIcon({ kind }: { kind: "star" | "arrow" | "spark" | "dot" | "ring" | "tri" }) {
-  if (kind === "star") return <BrandStar className="home-disc-icon" size="0.6em" />;
-  const p = { className: "home-disc-icon", viewBox: "0 0 24 24", "aria-hidden": true as const };
-  switch (kind) {
-    case "arrow":
-      return <svg {...p} fill="none"><path d="M6 18L18 6M18 6H9M18 6V15" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-    case "spark":
-      return <svg {...p}><path d="M12 1.5c.7 5.4 3.4 8.1 8.5 8.5-5.1.4-7.8 3.1-8.5 8.5-.7-5.4-3.4-8.1-8.5-8.5 5.1-.4 7.8-3.1 8.5-8.5z" fill="currentColor" /></svg>;
-    case "dot":
-      return <svg {...p}><circle cx="12" cy="12" r="6.5" fill="currentColor" /></svg>;
-    case "ring":
-      return <svg {...p} fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2.4" /></svg>;
-    case "tri":
-      return <svg {...p} fill="none"><path d="M12 4l9 15.5H3z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" /></svg>;
-  }
+/* ─── Disciplines: a big-type wall with dingbats set inline in the type ──────
+   Glyphs are drawn from the Noto Sans Symbols 2 dingbat font (OFL, loaded in
+   layout.tsx as --font-dingbat) — quirky little marks between each word. */
+function Ding({ char }: { char: string }) {
+  return (
+    <span className="home-disc-icon" aria-hidden="true">
+      {char}
+    </span>
+  );
 }
 
 function Disciplines() {
@@ -83,17 +75,17 @@ function Disciplines() {
     <section className="home-disciplines px-5 md:px-10" aria-label="What I do">
       <h2 className="home-disc" aria-label="Brand, digital, print, social, web, editorial and whatever else your heart desires">
         <span aria-hidden="true">Brand</span>
-        <DiscIcon kind="star" />
+        <Ding char="✶" />
         <span aria-hidden="true">Digital</span>
-        <DiscIcon kind="dot" />
+        <Ding char="❧" />
         <span aria-hidden="true">Print</span>
-        <DiscIcon kind="arrow" />
+        <Ding char="☞" />
         <span aria-hidden="true">Social</span>
-        <DiscIcon kind="spark" />
+        <Ding char="❄" />
         <span aria-hidden="true">Web</span>
-        <DiscIcon kind="ring" />
+        <Ding char="✺" />
         <span aria-hidden="true">Editorial</span>
-        <DiscIcon kind="tri" />
+        <Ding char="❦" />
         <span aria-hidden="true">and whatever else your heart desires</span>
       </h2>
     </section>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo_Narrow, Space_Mono } from "next/font/google";
+import { Archivo_Narrow, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -18,6 +18,15 @@ const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   subsets: ["latin"],
   weight: ["400", "700"],
+  display: "swap",
+});
+
+// Dingbat/symbol font (OFL) — quirky Unicode glyphs set inline in the
+// big-type disciplines wall on the home page. --font-dingbat in globals.
+const notoSymbols = Noto_Sans_Symbols_2({
+  variable: "--font-dingbat",
+  subsets: ["symbols"],
+  weight: ["400"],
   display: "swap",
 });
 
@@ -188,7 +197,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={`${archivoNarrow.variable} ${spaceMono.variable}`}
+      className={`${archivoNarrow.variable} ${spaceMono.variable} ${notoSymbols.variable}`}
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
         {/* Bookmania (Adobe Fonts / Typekit) — H1 display serif */}
