@@ -3269,6 +3269,9 @@ body:has(.sb-root) {
   vertical-align: middle;
 }
 
+/* In-type accent word (e.g. "and") picked out in the brand pink. */
+.home-disc-pink { color: var(--pink); }
+
 /* Selected work: no top rule (HR). */
 .home-section.no-rule::before { content: none; }
 

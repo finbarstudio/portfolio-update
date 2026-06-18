@@ -85,7 +85,12 @@ function Disciplines() {
         <span aria-hidden="true">Web</span>
         <Ding char="✺" />
         <span aria-hidden="true">Editorial</span>
-        <span aria-hidden="true"> and whatever else your heart desires</span>
+        <span aria-hidden="true">
+          {" "}
+          <span className="home-disc-pink">and</span> whatever else your heart
+        </span>
+        <Ding char="❤" />
+        <span aria-hidden="true">desires</span>
       </h2>
     </section>
   );
