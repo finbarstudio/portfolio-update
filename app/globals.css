@@ -3438,12 +3438,12 @@ body:has(.sb-root) {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 13px;
   flex: 0 0 auto;
 }
 .top-nav-social-item {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
