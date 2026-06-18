@@ -84,3 +84,22 @@ export function poseTargetFor(preset: "carousel" | "flat" | undefined, hovered: 
   if (preset) return preset === "flat" ? 1 : 0;
   return hovered ? 1 : 0;
 }
+
+/* ── Continuous Angle + Size (sandbox tool) ───────────────────────────────
+   The tool swaps the Angle/Flat preset toggle for two sliders, mirroring the
+   phone tool: an Angle slider drives the pose blend `h` continuously (and can
+   push a touch past the iso rest for extra tilt), and a Size slider scales the
+   whole display inside its frame. The embed honours both too. */
+export const FLAT_H = 1;            // angle 0 → flat, front-on
+export const ANGLED_H = -0.5;       // angle 1 → past the iso rest = extra tilt
+export const DEFAULT_ANGLE = 2 / 3; // poseFromAngle(2/3) === 0 → the proven iso rest
+
+export const MIN_SCALE = 0.65;
+export const MAX_SCALE = 1.4;
+export const DEFAULT_SCALE = 1;     // 1 = the display's natural framed size
+
+/** Map the 0..1 Angle slider to the pose blend `h` (1 = flat … negative = extra tilt). */
+export function poseFromAngle(angle: number): number {
+  const a = Math.max(0, Math.min(1, angle));
+  return FLAT_H + (ANGLED_H - FLAT_H) * a;
+}

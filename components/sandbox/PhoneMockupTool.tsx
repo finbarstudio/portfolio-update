@@ -198,10 +198,10 @@ export default function PhoneMockupTool() {
             motion={{
               speed,
               angle,
-              prominence,
+              size: prominence,
               onSpeed: setSpeed,
               onAngle: setAngle,
-              onProminence: setProminence,
+              onSize: setProminence,
             }}
           />
           <ExportPanel
