@@ -83,7 +83,7 @@ function FilterChips({ active }: { active?: string }) {
     );
   };
   return (
-    <div className="flex flex-wrap gap-2 px-5 md:px-10 pt-8 md:pt-12 mb-12 md:mb-14">
+    <div className="flex flex-wrap gap-2 px-5 md:px-10 pt-1.5 md:pt-2 mb-12 md:mb-14">
       {chip(undefined, "All")}
       {WORK_FILTERS.map((f) => chip(f.key, f.label))}
     </div>
