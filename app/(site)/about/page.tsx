@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
 import Reveal from "@/components/Reveal";
 import { projects } from "@/content/projects";
@@ -102,20 +103,23 @@ export default function AboutPage() {
         aria-label="Services, clients and about"
       >
         <Reveal as="div">
-          <h2 className="mono-label text-ink-soft mb-4">Services</h2>
-          <ul className="space-y-2">
+          <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "var(--text-body)" }}>Services</h2>
+          <ul className="text-pink font-sans leading-snug" style={{ fontSize: "var(--text-body)" }}>
             {SERVICES.map((s) => (
-              <li key={s} className="text-ink" style={{ fontSize: "var(--text-small)" }}>{s}</li>
+              <li key={s}>{s}</li>
             ))}
           </ul>
         </Reveal>
 
         <Reveal as="div">
-          <h2 className="mono-label text-ink-soft mb-4">Clients</h2>
-          <ul className="space-y-2">
+          <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "var(--text-body)" }}>Clients</h2>
+          <ul className="text-pink font-sans leading-snug" style={{ fontSize: "var(--text-body)" }}>
             {CLIENTS.map((c) => (
-              <li key={c} className="text-ink" style={{ fontSize: "var(--text-small)" }}>{c}</li>
+              <li key={c}>{c}</li>
             ))}
+            <li>
+              <Link href="/work" className="text-pink u-underline">View all &rarr;</Link>
+            </li>
           </ul>
         </Reveal>
 
