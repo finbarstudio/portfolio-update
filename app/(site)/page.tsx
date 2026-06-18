@@ -4,10 +4,9 @@ import Script from "next/script";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
-import HeroHeadline from "@/components/HeroHeadline";
-import HeroStar from "@/components/HeroStar";
 import CapabilitiesSlider from "@/components/CapabilitiesSlider";
 import HomeIntro from "@/components/HomeIntro";
+import BrandStar from "@/components/BrandStar";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -61,37 +60,44 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
   );
 }
 
-/* ─── Hero ──────────────────────────────────────────────────── */
-function Hero() {
+/* ─── Disciplines: a big-type wall with small icons set inline in the type ── */
+function DiscIcon({ kind }: { kind: "star" | "arrow" | "spark" | "dot" | "ring" | "tri" }) {
+  if (kind === "star") return <BrandStar className="home-disc-icon" size="0.6em" />;
+  const p = { className: "home-disc-icon", viewBox: "0 0 24 24", "aria-hidden": true as const };
+  switch (kind) {
+    case "arrow":
+      return <svg {...p} fill="none"><path d="M6 18L18 6M18 6H9M18 6V15" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+    case "spark":
+      return <svg {...p}><path d="M12 1.5c.7 5.4 3.4 8.1 8.5 8.5-5.1.4-7.8 3.1-8.5 8.5-.7-5.4-3.4-8.1-8.5-8.5 5.1-.4 7.8-3.1 8.5-8.5z" fill="currentColor" /></svg>;
+    case "dot":
+      return <svg {...p}><circle cx="12" cy="12" r="6.5" fill="currentColor" /></svg>;
+    case "ring":
+      return <svg {...p} fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2.4" /></svg>;
+    case "tri":
+      return <svg {...p} fill="none"><path d="M12 4l9 15.5H3z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" /></svg>;
+  }
+}
+
+function Disciplines() {
   return (
-    <section className="relative overflow-hidden px-5 md:px-10 pt-12 md:pt-24 pb-16 md:pb-24" aria-label="Introduction">
-      <HeroStar />
-      <div className="relative z-10">
-      <Reveal immediate as="div" className="mb-6 md:mb-8">
-        <span className="sticker-pill is-pink">
-          <span className="status-dot" aria-hidden="true" /> Brisbane graphic designer
-        </span>
-      </Reveal>
-
-      <HeroHeadline text="Brand identity, editorial, web & motion." className="home-display text-ink max-w-[15ch]" />
-
-      <Reveal immediate delay={0.18} className="mt-8 md:mt-10 grid md:grid-cols-12 gap-6 md:gap-8 items-end">
-        <p className="md:col-span-7 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-          I&rsquo;m Finbar — brand identities, publications and websites for clients in Australia and the UK.
-        </p>
-        <div className="md:col-span-5 md:col-start-9">
-          <p className="mono-label text-ink-soft mb-3">Available for</p>
-          <div className="flex flex-wrap gap-2">
-            <span className="sticker-pill">Freelance projects</span>
-            <span className="sticker-pill">Permanent roles</span>
-          </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6">
-            <Link href="/work" className="home-link">View work →</Link>
-            <Link href="/about#contact" className="home-link">Start a project →</Link>
-          </div>
-        </div>
-      </Reveal>
-      </div>
+    <section className="home-disciplines px-5 md:px-10" aria-label="What I do">
+      <h2 className="home-disc" aria-label="Brand, identity, digital, print, editorial, social, web, motion">
+        <span aria-hidden="true">Brand</span>
+        <DiscIcon kind="star" />
+        <span aria-hidden="true">Identity</span>
+        <DiscIcon kind="dot" />
+        <span aria-hidden="true">Digital</span>
+        <DiscIcon kind="arrow" />
+        <span aria-hidden="true">Print</span>
+        <DiscIcon kind="spark" />
+        <span aria-hidden="true">Editorial</span>
+        <DiscIcon kind="ring" />
+        <span aria-hidden="true">Social</span>
+        <DiscIcon kind="tri" />
+        <span aria-hidden="true">Web</span>
+        <DiscIcon kind="star" />
+        <span aria-hidden="true">Motion</span>
+      </h2>
     </section>
   );
 }
@@ -101,8 +107,7 @@ function SelectedWork() {
   const picks = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean) as typeof projects;
   let i = 0;
   return (
-    <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="Selected work">
-      <SectionHead title="Selected work" aside={<Link href="/work" className="home-link">Full archive →</Link>} />
+    <Reveal section as="section" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
       <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-28">
         {picks.map((project) => (
           <ProjectCard key={project.slug} project={project} index={i++} />
@@ -171,7 +176,9 @@ export default function HomePage() {
     <>
       <HomeJsonLd />
       <HomeIntro />
-      <Hero />
+      <Disciplines />
+      {/* Past this point the auto-hidden nav slides in (see LayoutShell). */}
+      <div id="nav-reveal-sentinel" aria-hidden="true" />
       <SelectedWork />
       <Capabilities />
       <Contact />

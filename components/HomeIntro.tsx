@@ -30,8 +30,29 @@ export default function HomeIntro() {
   const lockupRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLSpanElement>(null);
   const flyRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
   const [phase, setPhase] = useState<Phase>("trace");
   const [flyTransform, setFlyTransform] = useState<string | null>(null);
+
+  // Star trace, JS-driven (the reliable self-drawing technique): seed the dash to
+  // the path's real length so the whole outline is "hidden", then animate the
+  // offset to 0 so it draws from the single start point to a complete outline.
+  useLayoutEffect(() => {
+    const p = pathRef.current;
+    if (!p) return;
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = `${len}`;
+    p.style.strokeDashoffset = `${len}`;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      p.style.strokeDashoffset = "0";
+      return;
+    }
+    const id = requestAnimationFrame(() => {
+      p.style.transition = `stroke-dashoffset ${TRACE_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+      p.style.strokeDashoffset = "0";
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   // Fit the wordmark to the available width: measure at a reference size, then
   // scale the font-size so the lockup spans the row (keeps the natural spacing).
@@ -101,8 +122,8 @@ export default function HomeIntro() {
         >
           <svg viewBox="0 0 100 100" className="intro-fly-star">
             <path
+              ref={pathRef}
               d={STAR_PATH}
-              pathLength={1}
               fill="var(--pink)"
               stroke="var(--pink)"
               strokeWidth={1}

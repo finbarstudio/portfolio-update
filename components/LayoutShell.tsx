@@ -56,6 +56,11 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const [collapsed, setCollapsed] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  // Home only: the nav stays hidden over the intro + disciplines sections (the
+  // "intro zone"), with a "menu" button to summon it; otherwise it slides in
+  // once you scroll past them.
+  const [introZone, setIntroZone] = useState(false);
+  const [navForced, setNavForced] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -69,18 +74,21 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     setContactOpen(false);
   }, [pathname]);
 
-  // Home only: hide the nav chrome over the intro screen, then let it slide in
-  // from the left once you scroll past it. Driven by a [data-intro-active] flag
-  // on <html> so all the (separately-positioned) sidebar pieces can respond.
+  // Track whether we're still in the home "intro zone": before the
+  // #nav-reveal-sentinel (placed after the disciplines section) scrolls past the
+  // top. Off-home there's no intro zone.
   useEffect(() => {
-    const root = document.documentElement;
+    setNavForced(false);
     if (pathname !== "/") {
-      delete root.dataset.introActive;
+      setIntroZone(false);
       return;
     }
     const update = () => {
-      const past = window.scrollY > window.innerHeight * 0.5;
-      root.dataset.introActive = past ? "false" : "true";
+      const sentinel = document.getElementById("nav-reveal-sentinel");
+      const inZone = sentinel
+        ? sentinel.getBoundingClientRect().top > 0
+        : window.scrollY < window.innerHeight * 0.5;
+      setIntroZone(inZone);
     };
     update();
     window.addEventListener("scroll", update, { passive: true });
@@ -88,9 +96,19 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     return () => {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
-      delete root.dataset.introActive;
     };
   }, [pathname]);
+
+  // Hide the nav while in the intro zone (unless the user summoned it via "menu").
+  // Drives a [data-intro-active] flag on <html> so the separately-positioned
+  // sidebar pieces can all respond.
+  const navHidden = pathname === "/" && introZone && !navForced;
+  useEffect(() => {
+    const root = document.documentElement;
+    if (navHidden) root.dataset.introActive = "true";
+    else delete root.dataset.introActive;
+    return () => { delete root.dataset.introActive; };
+  }, [navHidden]);
 
   const toggle = () => {
     setCollapsed((prev) => {
@@ -111,6 +129,12 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       </a>
       {/* Film grain — retro texture over everything (never blocks pointers). */}
       <div className="grain-overlay" aria-hidden="true" />
+      {/* Over the intro zone the sidebar is hidden; this little tag summons it. */}
+      {navHidden && (
+        <button type="button" className="intro-menu-btn" onClick={() => setNavForced(true)}>
+          menu
+        </button>
+      )}
       <MobileBar onMenu={() => setMobileMenuOpen(true)} />
       <Sidebar
         collapsed={collapsed}
