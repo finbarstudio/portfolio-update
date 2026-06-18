@@ -34,9 +34,9 @@ export default function HomeIntro() {
   const [phase, setPhase] = useState<Phase>("trace");
   const [flyTransform, setFlyTransform] = useState<string | null>(null);
 
-  // Star trace, JS-driven (the reliable self-drawing technique): seed the dash to
-  // the path's real length so the whole outline is "hidden", then animate the
-  // offset to 0 so it draws from the single start point to a complete outline.
+  // Star trace via the Web Animations API (most reliable): dash = the real path
+  // length so the whole outline is one hidden dash, then animate the offset from
+  // len → 0 so a single line draws from one point to the complete outline.
   useLayoutEffect(() => {
     const p = pathRef.current;
     if (!p) return;
@@ -47,11 +47,11 @@ export default function HomeIntro() {
       p.style.strokeDashoffset = "0";
       return;
     }
-    const id = requestAnimationFrame(() => {
-      p.style.transition = `stroke-dashoffset ${TRACE_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`;
-      p.style.strokeDashoffset = "0";
-    });
-    return () => cancelAnimationFrame(id);
+    const anim = p.animate(
+      [{ strokeDashoffset: len }, { strokeDashoffset: 0 }],
+      { duration: TRACE_MS, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" },
+    );
+    return () => anim.cancel();
   }, []);
 
   // Fit the wordmark to the available width: measure at a reference size, then

@@ -60,7 +60,6 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   // "intro zone"), with a "menu" button to summon it; otherwise it slides in
   // once you scroll past them.
   const [introZone, setIntroZone] = useState(false);
-  const [navForced, setNavForced] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -78,15 +77,15 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   // #nav-reveal-sentinel (placed after the disciplines section) scrolls past the
   // top. Off-home there's no intro zone.
   useEffect(() => {
-    setNavForced(false);
     if (pathname !== "/") {
       setIntroZone(false);
       return;
     }
     const update = () => {
       const sentinel = document.getElementById("nav-reveal-sentinel");
+      // Reveal a bit before the section fully clears the top (felt too late at 0).
       const inZone = sentinel
-        ? sentinel.getBoundingClientRect().top > 0
+        ? sentinel.getBoundingClientRect().top > window.innerHeight * 0.4
         : window.scrollY < window.innerHeight * 0.5;
       setIntroZone(inZone);
     };
@@ -99,16 +98,23 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     };
   }, [pathname]);
 
-  // Hide the nav while in the intro zone (unless the user summoned it via "menu").
-  // Drives a [data-intro-active] flag on <html> so the separately-positioned
-  // sidebar pieces can all respond.
-  const navHidden = pathname === "/" && introZone && !navForced;
+  // Hide the nav while in the intro zone. Drives a [data-intro-active] flag on
+  // <html> so the separately-positioned sidebar pieces can all respond. The
+  // content reacts too: --sidebar-w collapses to 0, so the main reflows full
+  // width while the nav is away and narrows again as it slides in.
+  const navHidden = pathname === "/" && introZone;
   useEffect(() => {
     const root = document.documentElement;
     if (navHidden) root.dataset.introActive = "true";
     else delete root.dataset.introActive;
     return () => { delete root.dataset.introActive; };
   }, [navHidden]);
+
+  // The "menu" tag scrolls down to where the nav reveals (rather than forcing it
+  // open) — so scrolling back up tucks it away again, naturally.
+  const revealNav = () => {
+    document.getElementById("nav-reveal-sentinel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const toggle = () => {
     setCollapsed((prev) => {
@@ -118,7 +124,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     });
   };
 
-  const sidebarW = collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
+  const sidebarW = navHidden ? 0 : collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
 
   // Only the portfolio routes (app/(site)) render this shell — the Sandbox + embeds
   // live outside that route group and never mount LayoutShell at all.
@@ -129,9 +135,9 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       </a>
       {/* Film grain — retro texture over everything (never blocks pointers). */}
       <div className="grain-overlay" aria-hidden="true" />
-      {/* Over the intro zone the sidebar is hidden; this little tag summons it. */}
+      {/* Over the intro zone the sidebar is hidden; this tag scrolls down to it. */}
       {navHidden && (
-        <button type="button" className="intro-menu-btn" onClick={() => setNavForced(true)}>
+        <button type="button" className="intro-menu-btn sticker-pill" onClick={revealNav}>
           menu
         </button>
       )}

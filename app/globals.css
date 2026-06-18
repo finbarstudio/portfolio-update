@@ -3217,12 +3217,10 @@ body:has(.sb-root) {
   .intro-fly { transition: none; }
 }
 
-/* ── Intro chrome: full-bleed intro + hide the nav over it, slide/fade it in
-   from the left once you scroll past (home only; driven by [data-intro-active]
-   on <html>). The reserved sidebar gutter stays put, so no content reflow. ── */
-@media (min-width: 768px) {
-  .home-intro { margin-left: calc(-1 * var(--sidebar-w)); width: 100vw; }
-}
+/* ── Intro chrome: hide the nav over the intro/disciplines, slide it in from the
+   left once you scroll past (home only; driven by [data-intro-active] on <html>).
+   The content reacts: --sidebar-w collapses to 0 so the main reflows full width
+   while the nav is away and narrows as it returns. ── */
 .sidebar-toggle {
   transition: opacity 0.45s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
@@ -3247,46 +3245,34 @@ body:has(.sb-root) {
   align-items: center;
   padding-block: clamp(64px, 12vh, 180px);
 }
+/* Centred, Space Mono caps, with the icons set inline at the font's x-height. */
 .home-disc {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.06em 0.3em;
-  font-family: var(--font-display);
+  text-align: center;
+  font-family: var(--font-mono);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 0.9;
-  font-size: clamp(2.6rem, 9vw, 8rem);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.18;
+  font-size: clamp(1.6rem, 5.5vw, 4.5rem);
   color: var(--ink);
 }
-.home-disc-icon { width: 0.56em; height: 0.56em; color: var(--pink); flex: 0 0 auto; }
+.home-disc-icon {
+  width: 1ex;
+  height: 1ex;
+  margin: 0 0.34em;
+  color: var(--pink);
+  display: inline-block;
+  vertical-align: middle;
+}
 
 /* Selected work: no top rule (HR). */
 .home-section.no-rule::before { content: none; }
 
-/* Intro-zone "menu" tag (Space Mono bubble) — shown while the nav is hidden. */
+/* Intro-zone "menu" tag — top-left, reuses the .sticker-pill bubble style. */
 .intro-menu-btn {
   position: fixed;
   top: 16px;
-  right: 16px;
+  left: 16px;
   z-index: 95;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-transform: lowercase;
-  letter-spacing: 0.08em;
-  color: var(--ink);
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid var(--ink);
-  border-radius: 999px;
-  padding: 7px 15px;
   cursor: pointer;
-  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
-}
-.intro-menu-btn:hover { color: var(--pink); border-color: var(--pink); }
-
-/* Disciplines is full-bleed too (no gutter while the nav is hidden). */
-@media (min-width: 768px) {
-  .home-disciplines { margin-left: calc(-1 * var(--sidebar-w)); width: 100vw; }
 }
