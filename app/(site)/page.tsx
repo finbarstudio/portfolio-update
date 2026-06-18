@@ -81,22 +81,20 @@ function DiscIcon({ kind }: { kind: "star" | "arrow" | "spark" | "dot" | "ring" 
 function Disciplines() {
   return (
     <section className="home-disciplines px-5 md:px-10" aria-label="What I do">
-      <h2 className="home-disc" aria-label="Brand, identity, digital, print, editorial, social, web, motion">
+      <h2 className="home-disc" aria-label="Brand, digital, print, social, web, editorial and whatever else your heart desires">
         <span aria-hidden="true">Brand</span>
         <DiscIcon kind="star" />
-        <span aria-hidden="true">Identity</span>
-        <DiscIcon kind="dot" />
         <span aria-hidden="true">Digital</span>
-        <DiscIcon kind="arrow" />
+        <DiscIcon kind="dot" />
         <span aria-hidden="true">Print</span>
-        <DiscIcon kind="spark" />
-        <span aria-hidden="true">Editorial</span>
-        <DiscIcon kind="ring" />
+        <DiscIcon kind="arrow" />
         <span aria-hidden="true">Social</span>
-        <DiscIcon kind="tri" />
+        <DiscIcon kind="spark" />
         <span aria-hidden="true">Web</span>
-        <DiscIcon kind="star" />
-        <span aria-hidden="true">Motion</span>
+        <DiscIcon kind="ring" />
+        <span aria-hidden="true">Editorial</span>
+        <DiscIcon kind="tri" />
+        <span aria-hidden="true">and whatever else your heart desires</span>
       </h2>
     </section>
   );
