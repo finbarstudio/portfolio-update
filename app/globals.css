@@ -976,11 +976,6 @@
   .tag-teal    { border-color: var(--teal);         color: var(--teal); }
   .tag-mustard { border-color: var(--accent-mustard); color: var(--accent-mustard); }
   .tag-pink    { background: var(--pink); border-color: var(--pink); color: var(--bg); }
-  /* Active tag (nav tab or filter chip): ink text on the pink fill (cream-on-pink
-     is ~2.6:1). Matches any aria-current value so the nav tab (aria-current=page)
-     and the filter chip (aria-current=true) read identically; scoped to
-     aria-current so decorative CONCEPT/Hobby .tag-pink badges keep cream. */
-  .tag[aria-current] { color: var(--ink); border-color: var(--ink); }
   /* Inactive filter chips get the same pink hover as every other link. */
   @media (hover: hover) {
     a.tag-default:hover { color: var(--pink); border-color: var(--pink); }
