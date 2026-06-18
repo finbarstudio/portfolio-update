@@ -7,6 +7,8 @@ import Reveal from "@/components/Reveal";
 import HeroHeadline from "@/components/HeroHeadline";
 import HeroStar from "@/components/HeroStar";
 import CapabilitiesSlider from "@/components/CapabilitiesSlider";
+import BrandStar from "@/components/BrandStar";
+import Preloader from "@/components/Preloader";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -57,6 +59,19 @@ function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode 
       <h2 className="home-display-sm text-ink">{title}</h2>
       {aside}
     </div>
+  );
+}
+
+/* ─── Intro: a blank first screen with the wordmark across the bottom ── */
+function Intro() {
+  return (
+    <section className="home-intro" aria-label="finbar studio">
+      <div className="home-intro-mark" aria-hidden="true">
+        <span className="home-intro-word">finbar</span>
+        <BrandStar className="home-intro-star" size="1em" />
+        <span className="home-intro-word">studio</span>
+      </div>
+    </section>
   );
 }
 
@@ -169,6 +184,8 @@ export default function HomePage() {
   return (
     <>
       <HomeJsonLd />
+      <Preloader />
+      <Intro />
       <Hero />
       <SelectedWork />
       <Capabilities />
