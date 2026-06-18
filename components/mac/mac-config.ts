@@ -79,27 +79,30 @@ export function offsetForFocus(i: number): number {
   return i + 0.25;
 }
 
-/** Target pose blend (0 = Angle/iso, 1 = Flat/front-on) for the given preset. */
+/** Embed fallback when no continuous pose is supplied: signed pose `p` for the
+ *  preset/hover (flat = 0, rest = angled). */
 export function poseTargetFor(preset: "carousel" | "flat" | undefined, hovered: boolean): number {
-  if (preset) return preset === "flat" ? 1 : 0;
-  return hovered ? 1 : 0;
+  if (preset) return preset === "flat" ? 0 : MAC_REST_P;
+  return hovered ? 0 : MAC_REST_P;
 }
 
-/* ── Continuous Angle + Size (sandbox tool) ───────────────────────────────
-   The tool swaps the Angle/Flat preset toggle for two sliders, mirroring the
-   phone tool: an Angle slider drives the pose blend `h` continuously (and can
-   push a touch past the iso rest for extra tilt), and a Size slider scales the
-   whole display inside its frame. The embed honours both too. */
-export const FLAT_H = 1;            // angle 0 → flat, front-on
-export const ANGLED_H = -0.5;       // angle 1 → past the iso rest = extra tilt
-export const DEFAULT_ANGLE = 2 / 3; // poseFromAngle(2/3) === 0 → the proven iso rest
+/* ── Continuous Angle (bidirectional) + Size — sandbox tool ───────────────
+   The Angle slider runs through a single signed pose `p`: 0 = flat/front-on,
+   negative = angled one way, positive = the other, |p| = 1 the maximum tilt
+   (a touch past the old iso rest for more depth). The Size slider scales the
+   whole display. Exports + embeds carry `p` via the shared pose field. */
+export const MAC_MAX_YAW = 0.62;    // ~36° turn at each extreme (was iso 0.45)
+export const MAC_MAX_PITCH = 0.16;  // ~9°  downward tilt at the extreme (was 0.12)
+export const MAC_REST_P = -0.72;    // default angled pose ≈ the old iso look
+export const DEFAULT_ANGLE = (MAC_REST_P + 1) / 2; // slider value for the rest pose
 
 export const MIN_SCALE = 0.65;
 export const MAX_SCALE = 1.4;
 export const DEFAULT_SCALE = 1;     // 1 = the display's natural framed size
 
-/** Map the 0..1 Angle slider to the pose blend `h` (1 = flat … negative = extra tilt). */
+/** Map the 0..1 Angle slider to the signed pose `p` ∈ [-1, 1] (0.5 = flat;
+ *  each end = the maximum tilt, in opposite directions). */
 export function poseFromAngle(angle: number): number {
   const a = Math.max(0, Math.min(1, angle));
-  return FLAT_H + (ANGLED_H - FLAT_H) * a;
+  return a * 2 - 1;
 }

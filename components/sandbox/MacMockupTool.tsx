@@ -48,7 +48,7 @@ const MAC_MAX = 1; // the Studio Display shows a single screen
 
 export default function MacMockupTool() {
   const [assets, setAssets] = useState<MediaAsset[]>(() => MAC_DEMO_MEDIA.slice());
-  const [angle, setAngle] = useState(DEFAULT_ANGLE); // continuous iso → flat (Angle slider)
+  const [angle, setAngle] = useState(DEFAULT_ANGLE); // Angle slider: 0.5 = flat, each end tilts the opposite way
   const [scale, setScale] = useState(DEFAULT_SCALE); // whole-display size (Size slider)
   const [aspect, setAspect] = useState<AspectToken>("16:9");
   const [fit, setFit] = useState<FitMode>("cover");
@@ -62,8 +62,8 @@ export default function MacMockupTool() {
 
   const controllerRef = useRef<PhoneSceneController | null>(null);
 
-  // The Angle slider drives the continuous pose blend (1 = flat … negative = extra
-  // tilt). The export captures exactly that pose as the "hover".
+  // The Angle slider drives the signed pose (0 = flat, ± angles either way). The
+  // export captures exactly that pose as the "hover".
   const poseHover = poseFromAngle(angle);
   const configRef = useRef<ExportConfig>({ media: assets, poseHover, fit, aspect, background });
   const assetsRef = useRef(assets);
@@ -187,8 +187,12 @@ export default function MacMockupTool() {
             onBackground={setBackground}
             motion={{
               angle,
-              size: scale,
               onAngle: setAngle,
+              angleDisplay: (a) => {
+                const p = Math.round((a * 2 - 1) * 100);
+                return p === 0 ? "Flat" : `${p < 0 ? "Left" : "Right"} ${Math.abs(p)}%`;
+              },
+              size: scale,
               onSize: setScale,
               sizeLabel: "Size",
               sizeMin: MIN_SCALE,

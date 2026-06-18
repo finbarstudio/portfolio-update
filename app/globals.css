@@ -2804,37 +2804,43 @@
   --sb-surface: color-mix(in srgb, var(--ink) 2.5%, var(--bg));
   --sb-surface-2: color-mix(in srgb, var(--ink) 5%, var(--bg));
   --sb-line: var(--line);
-  /* Small device corner radius + the neutral very-dark-grey it paints into. */
+  /* Small device corner radius + the neutral very-dark-grey bezel it paints into. */
   --sb-screen-radius: 16px;
   --sb-screen-frame: #1C1C1C;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg);
   color: var(--ink);
   font-family: var(--font-primary);
-  overflow-x: clip;   /* the page-swipe travel must not add a scrollbar */
 }
 
-/* On the sandbox the document background is the colour iOS Safari paints into the
-   rubber-band overscroll gap at the very top/bottom — beyond the fixed rounded
-   screen mask. The portfolio's cream root would peek through there as a light
-   strip past the rounded edges, so paint it the bezel colour (--sb-screen-frame)
-   to match the device frame. (Unlayered, so it overrides the @layer base cream.) */
+/* Sandbox shell: the device "screen" (.sb-screen) is a FIXED, rounded, CLIPPED
+   scroller — the content scrolls inside it, the document itself never does.
+   Because the page doesn't scroll, iOS Safari keeps its top/bottom chrome in place
+   (it only collapses on document scroll), so nothing is revealed past the rounded
+   edges; and the overflow clip keeps content inside the radius at every scroll
+   position — a real screen, not an overlay. The bezel shows in the rounded corners.
+   (Unlayered, so it overrides the @layer base html/body.) */
 html:has(.sb-root),
 body:has(.sb-root) {
-  background-color: #1C1C1C;
+  height: 100%;
+  overflow: hidden;
+  background-color: #1C1C1C;   /* bezel — visible in the rounded corner notches */
+  overscroll-behavior: none;
 }
 
-/* Rounds the page edges by painting a neutral dark grey into the four square
-   corners, so the black viewport reads like a device screen. */
-.sb-screen-mask {
+.sb-screen {
   position: fixed;
-  inset: 0;
-  z-index: 100;
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;               /* fallback */
+  height: 100dvh;              /* visible area; stable since the doc doesn't scroll */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;          /* clip the page-swipe travel */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   border-radius: var(--sb-screen-radius);
-  box-shadow: 0 0 0 50vmax var(--sb-screen-frame);
+  background-color: var(--bg);
 }
 
 /* ── Corner navs ─────────────────────────────────────────────

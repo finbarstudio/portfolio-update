@@ -17,6 +17,8 @@ export type MotionControls = {
   onSpeed?: (v: number) => void;
   angle: number;
   onAngle: (v: number) => void;
+  /** Format the Angle value (the Mac uses a bidirectional Left/Flat/Right readout). */
+  angleDisplay?: (v: number) => string;
   /** Size slider value (phone: main-phone prominence; mac: whole-display scale). */
   size: number;
   onSize: (v: number) => void;
@@ -160,7 +162,7 @@ export default function ControlPanel({
             min={0}
             max={1}
             step={0.01}
-            display={pct(motion.angle)}
+            display={(motion.angleDisplay ?? pct)(motion.angle)}
             onChange={motion.onAngle}
           />
           <Range
