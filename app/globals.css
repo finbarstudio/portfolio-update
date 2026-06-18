@@ -121,18 +121,18 @@
      │  RETRO OS CHROME                                        │
      │  Bars, windows, beveled shadows for the OS aesthetic    │
      └─────────────────────────────────────────────────────────┘ */
-  --menubar-h:    40px;      /* slim mobile top bar (logo + hamburger)    */
+  --menubar-h:    48px;      /* top nav bar height                         */
+  --sidebar-w:    0px;       /* legacy: content no longer reflows for a rail */
   --statusbar-h:  22px;      /* bottom status bar height                  */
   --titlebar-h:   22px;      /* window chrome title bar height            */
   --win-shadow:    var(--elev-2);
   --win-shadow-sm: var(--elev-1);
 }
 
-/* No global top bar on desktop — the logo lives at the top of the sidebar.
-   Only mobile keeps a slim bar, so the desktop offset collapses to 0. */
+/* Top nav bar — a touch taller on desktop. */
 @media (min-width: 768px) {
   :root {
-    --menubar-h: 0px;
+    --menubar-h: 56px;
   }
 }
 
@@ -3240,6 +3240,13 @@ body:has(.sb-root) {
   opacity: 0;
   pointer-events: none;
 }
+/* Top nav slides up out of view over the home intro zone (the menu pill
+   scrolls down to reveal it). */
+:root[data-intro-active="true"] .top-nav {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
 
 /* ── Disciplines: big-type wall (replaces the hero), icons set inline ── */
 .home-disciplines {
@@ -3406,6 +3413,31 @@ body:has(.sb-root) {
   left: 16px;
   z-index: 95;
   cursor: pointer;
+}
+
+/* ── Top nav ───────────────────────────────────────────────────────
+   A fixed bar across the top; every item is a pill tag (.tag) for now. */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: var(--menubar-h);
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(14px, 3vw, 36px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.45s var(--ease), opacity 0.45s var(--ease);
+}
+.top-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 /* The .tag-default hover is scoped to anchors; mirror it for this button. */
 @media (hover: hover) {
