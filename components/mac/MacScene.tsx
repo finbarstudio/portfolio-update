@@ -35,8 +35,8 @@ import {
   CAMERA_Y_DEFAULT,
   CAMERA_Y_HOVER,
   LOOKAT_Y_HOVER,
-  ISO_ROTATION_X,
-  ISO_ROTATION_Y,
+  MAC_MAX_YAW,
+  MAC_MAX_PITCH,
   STATE_LERP,
   CYCLE_SPEED,
   MAX_MEDIA,
@@ -254,22 +254,24 @@ function MacShow({
     // off, not paused — stays still, no wiggle, no zoom.
     const animate = motion || paused;
 
-    // Pose: isometric (h=0) → flat front-on (h=1), with the (animate-only) yaw.
-    // Size scales the whole display in place (Center keeps it framed).
+    // Signed pose `h`(=p): 0 = flat/front-on, ± angles either way; |p| = max tilt.
+    // yaw carries the direction; pitch tilts down a touch as it angles. Size
+    // scales the whole display in place (Center keeps it framed).
+    const flat = 1 - Math.min(1, Math.abs(h)); // 1 at flat … 0 at the extremes
     if (groupRef.current) {
-      groupRef.current.rotation.x = lerp(ISO_ROTATION_X, 0, h);
-      groupRef.current.rotation.y = lerp(ISO_ROTATION_Y, 0, h) + (animate ? turntableYaw(offset) : 0);
+      groupRef.current.rotation.x = MAC_MAX_PITCH * (1 - flat);
+      groupRef.current.rotation.y = MAC_MAX_YAW * h + (animate ? turntableYaw(offset) : 0);
       groupRef.current.scale.setScalar(scale);
     }
 
-    // Camera glides in + up toward the screen as the pose flattens. Clamp to the
-    // [iso, flat] range so an extra-tilt angle (h<0) doesn't dolly out of frame.
+    // Camera glides in + up toward the screen as the pose flattens (either way);
+    // pulled back to frame the whole display at the angled extremes.
     const cam = camera as THREE.PerspectiveCamera;
-    const camH = animate ? THREE.MathUtils.clamp(h, 0, 1) : 0;
-    cam.position.z = lerp(CAMERA_DISTANCE_DEFAULT, CAMERA_DISTANCE_HOVER, camH);
-    cam.position.y = lerp(CAMERA_Y_DEFAULT, CAMERA_Y_HOVER, camH);
+    const camFlat = animate ? flat : 0;
+    cam.position.z = lerp(CAMERA_DISTANCE_DEFAULT, CAMERA_DISTANCE_HOVER, camFlat);
+    cam.position.y = lerp(CAMERA_Y_DEFAULT, CAMERA_Y_HOVER, camFlat);
     cam.position.x = 0;
-    cam.lookAt(0, lerp(0, LOOKAT_Y_HOVER, camH), 0);
+    cam.lookAt(0, lerp(0, LOOKAT_Y_HOVER, camFlat), 0);
 
     if (!reportedReady.current && (!active || active.hasFrame())) {
       reportedReady.current = true;
