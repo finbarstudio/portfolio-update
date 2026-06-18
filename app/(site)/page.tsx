@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Script from "next/script";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
@@ -46,16 +45,6 @@ function HomeJsonLd() {
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
-  );
-}
-
-/* Section heading row: a natural H2 with an optional link on the right. */
-function SectionHead({ title, aside }: { title: string; aside?: React.ReactNode }) {
-  return (
-    <div className="home-section-index">
-      <h2 className="home-display-sm text-ink">{title}</h2>
-      {aside}
-    </div>
   );
 }
 
@@ -115,47 +104,8 @@ function SelectedWork() {
 function Capabilities() {
   return (
     <Reveal section as="section" className="home-section no-rule px-5 md:px-10 overflow-hidden mt-12 md:mt-24" aria-label="What I do">
-      <div className="flex justify-end mb-7">
-        <Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>
-      </div>
       <div className="-mx-5 md:-mx-10">
         <CapabilitiesSlider />
-      </div>
-    </Reveal>
-  );
-}
-
-/* ─── Contact ───────────────────────────────────────────────── */
-function Contact() {
-  return (
-    <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="Contact">
-      <SectionHead title="Get in touch" />
-      <div className="grid md:grid-cols-12 gap-8 items-end">
-        <div className="md:col-span-8">
-          <p className="text-ink-soft mb-4" style={{ fontSize: "var(--text-small)" }}>
-            Email&rsquo;s the best way to reach me.
-          </p>
-          <h3>
-            <a
-              href="mailto:finbar@finbar.studio"
-              className="mono-h3 text-ink hover:text-pink transition-colors"
-            >
-              finbar@finbar.studio
-            </a>
-          </h3>
-        </div>
-        <div className="md:col-span-4 space-y-3">
-          <div>
-            <p className="mono-label text-ink-soft mb-1">Location</p>
-            <p className="text-ink" style={{ fontSize: "var(--text-small)" }}>Brisbane, QLD. Remote-friendly.</p>
-          </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2">
-            <Link href="/about" className="mono-label text-ink-soft hover:text-pink transition-colors">About</Link>
-            <Link href="/work" className="mono-label text-ink-soft hover:text-pink transition-colors">Work</Link>
-            <Link href="/about#contact" className="mono-label text-ink-soft hover:text-pink transition-colors">Contact</Link>
-            <Link href="/privacy" className="mono-label text-ink-soft hover:text-pink transition-colors">Privacy</Link>
-          </div>
-        </div>
       </div>
     </Reveal>
   );
@@ -171,7 +121,6 @@ export default function HomePage() {
       <div id="nav-reveal-sentinel" aria-hidden="true" />
       <SelectedWork />
       <Capabilities />
-      <Contact />
     </>
   );
 }

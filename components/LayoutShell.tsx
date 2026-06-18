@@ -11,6 +11,7 @@ import Sidebar from "./Sidebar";
 import BrandStar from "./BrandStar";
 import ContactDrawer from "./ContactDrawer";
 import SmoothScroll from "./SmoothScroll";
+import SiteFooter from "./SiteFooter";
 import "lenis/dist/lenis.css";
 
 export const SIDEBAR_EXPANDED_W = 224; // px
@@ -171,6 +172,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         tabIndex={-1}
       >
         {children}
+        <SiteFooter />
       </main>
     </>
   );

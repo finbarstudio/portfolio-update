@@ -381,30 +381,21 @@ function DesktopSidebar({
         </button>
       </nav>
 
-      {/* Status / contact — expanded only. Socials are in the persistent dock. */}
+      {/* Contact — expanded only. Just the email + the made-with line, in mono.
+          Phone, location + the full contact details now live in the site footer. */}
       {!collapsed && (
         <div className="px-3 space-y-2.5 border-t border-line pt-3" style={{ paddingBottom: 96 }}>
-          <span className="status-badge reveal-y" style={{ animationDelay: "0.18s" }}>OPEN FOR WORK</span>
-
           <a
             href="mailto:finbar@finbar.studio"
-            className="block font-sans text-ink hover:text-pink transition-colors reveal-y"
-            style={{ fontSize: "12px", letterSpacing: "0.02em", animationDelay: "0.22s" }}
+            className="block text-ink hover:text-pink transition-colors reveal-y"
+            style={{ fontFamily: "var(--font-mono)", fontSize: "12px", letterSpacing: "0.02em", animationDelay: "0.2s" }}
           >
             finbar@finbar.studio
           </a>
 
-          <a
-            href="tel:+61412796630"
-            className="block font-sans text-ink-soft hover:text-pink transition-colors tabular-nums reveal-y"
-            style={{ fontSize: "11px", letterSpacing: "0.02em", animationDelay: "0.26s" }}
-          >
-            +61 412 796 630
-          </a>
-
           <p
             className="text-ink-soft reveal-y pt-1"
-            style={{ fontSize: "10px", letterSpacing: "0.06em", animationDelay: "0.3s" }}
+            style={{ fontFamily: "var(--font-mono)", fontSize: "10px", letterSpacing: "0.06em", animationDelay: "0.24s" }}
           >
             Made with{" "}
             <span style={{ color: "var(--pink)" }} aria-hidden="true">♥</span>
@@ -528,7 +519,6 @@ function MobileMenu({
         </ul>
 
         <div className="mobile-menu-foot">
-          <span className="status-badge">OPEN FOR WORK</span>
           <a href="mailto:finbar@finbar.studio" className="mobile-foot-email">finbar@finbar.studio</a>
           <a href="tel:+61412796630" className="mobile-foot-tel tabular-nums">+61 412 796 630</a>
           <div className="mobile-foot-socials">
