@@ -32,10 +32,14 @@ export default function SandboxLayout({ children }: { children: React.ReactNode 
   return (
     <div className="sb-root">
       <SandboxNav />
-      <div className="sb-content">
-        <SandboxTransition>{children}</SandboxTransition>
+      {/* The device "screen": a fixed, rounded, clipped scroller. Content scrolls
+          inside it; the document itself never does — so iOS Safari's top/bottom
+          chrome stays put and nothing leaks past the rounded edges. */}
+      <div className="sb-screen">
+        <div className="sb-content">
+          <SandboxTransition>{children}</SandboxTransition>
+        </div>
       </div>
-      <div className="sb-screen-mask" aria-hidden="true" />
     </div>
   );
 }
