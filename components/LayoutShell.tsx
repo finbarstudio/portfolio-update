@@ -144,7 +144,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       <div className="grain-overlay" aria-hidden="true" />
       {/* Over the intro zone the sidebar is hidden; this tag scrolls down to it. */}
       {navHidden && (
-        <button type="button" className="intro-menu-btn sticker-pill" onClick={revealNav}>
+        <button type="button" className="intro-menu-btn tag tag-default" onClick={revealNav}>
           menu
         </button>
       )}

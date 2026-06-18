@@ -3422,3 +3422,7 @@ body:has(.sb-root) {
   z-index: 95;
   cursor: pointer;
 }
+/* The .tag-default hover is scoped to anchors; mirror it for this button. */
+@media (hover: hover) {
+  .intro-menu-btn:hover { color: var(--pink); border-color: var(--pink); }
+}
