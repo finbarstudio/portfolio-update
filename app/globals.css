@@ -3165,7 +3165,9 @@ body:has(.sb-root) {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 clamp(14px, 3vw, 36px) clamp(18px, 3.5vh, 52px);
+  /* Equal inset on left, right and bottom — tighter than before so the
+     wordmark fills more of the screen. */
+  padding: 0 clamp(14px, 2vh, 30px) clamp(14px, 2vh, 30px);
 }
 /* The lockup: FINBAR ✶ STUDIO. font-size is set by JS so it spans the row at
    its natural spacing (see HomeIntro). nowrap keeps it on one measurable line. */
@@ -3259,6 +3261,18 @@ body:has(.sb-root) {
   display: flex;
   align-items: center;
   padding-block: clamp(64px, 12vh, 180px);
+}
+
+/* The intro wordmark + the disciplines wall stay pinned to the full viewport
+   width, so they DON'T react to the nav reflow (the main's --sidebar-w margin).
+   They counter that margin and span 100vw, moving in lockstep with it. */
+@media (min-width: 768px) {
+  .home-intro,
+  .home-disciplines {
+    margin-left: calc(-1 * var(--sidebar-w));
+    width: 100vw;
+    transition: margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 /* Centred, Space Mono caps, with the icons set inline at the font's x-height. */
 .home-disc {
