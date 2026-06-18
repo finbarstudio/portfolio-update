@@ -3158,12 +3158,18 @@ body:has(.sb-root) {
 /* The lockup: FINBAR ✶ STUDIO. font-size is set by JS so it spans the row at
    its natural spacing (see HomeIntro). nowrap keeps it on one measurable line. */
 .home-intro-mark {
+  /* Fixed so it can shrink + rise from the bottom of the first screen into the
+     centre of the nav as you scroll (transform driven by JS in HomeIntro). */
+  position: fixed;
+  left: 50%;
+  top: 0;
+  z-index: 60;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
   display: flex;
   align-items: center;
   gap: 0.16em;
-  width: max-content;       /* content-sized: measures right + the JS fit spans it */
-  max-width: 100%;
-  margin: 0 auto;
+  width: max-content;       /* content-sized: the JS fit spans it */
   white-space: nowrap;
   font-family: var(--font-primary);
   font-weight: 700;
@@ -3172,6 +3178,7 @@ body:has(.sb-root) {
   line-height: 0.82;
   font-size: clamp(2rem, 13vw, 16rem); /* fallback before JS fit */
   color: var(--ink);
+  will-change: transform;
 }
 .home-intro-word { display: block; }
 .home-intro-slot {
@@ -3237,13 +3244,6 @@ body:has(.sb-root) {
 :root[data-intro-active="true"] .sidebar-dock,
 :root[data-intro-active="true"] .sidebar-year,
 :root[data-intro-active="true"] .sidebar-mobilebar {
-  opacity: 0;
-  pointer-events: none;
-}
-/* Top nav slides up out of view over the home intro zone (the menu pill
-   scrolls down to reveal it). */
-:root[data-intro-active="true"] .top-nav {
-  transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
 }
@@ -3427,10 +3427,7 @@ body:has(.sb-root) {
   display: flex;
   align-items: center;
   padding: 0 clamp(14px, 3vw, 36px);
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: transform 0.45s var(--ease), opacity 0.45s var(--ease);
+  background: transparent;
 }
 .top-nav-inner {
   display: flex;

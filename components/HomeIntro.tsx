@@ -54,25 +54,56 @@ export default function HomeIntro() {
     return () => anim.cancel();
   }, []);
 
-  // Fit the wordmark to the available width: measure at a reference size, then
-  // scale the font-size so the lockup spans the row (keeps the natural spacing).
+  // Fit the wordmark to the available width, then drive a scroll-linked morph:
+  // as you scroll through the first screen it shrinks and rises from the bottom
+  // into the centre of the top nav (where it stays as the small logo).
   useLayoutEffect(() => {
     const el = lockupRef.current;
     if (!el) return;
+
+    let bigFont = 0;
+    let natH = 0;
+
     const fit = () => {
       const parent = el.parentElement;
       if (!parent) return;
       const cs = getComputedStyle(parent);
       // Full width of the screen minus the section's L/R padding.
       const avail = parent.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      // Measure the lockup's intrinsic content width (it's width:max-content).
       el.style.fontSize = "100px";
       const natural = el.scrollWidth;
       if (natural > 0 && avail > 0) el.style.fontSize = `${Math.max(20, (avail / natural) * 100)}px`;
+      bigFont = parseFloat(getComputedStyle(el).fontSize) || 100;
+      // Unscaled height at scale(1), for the rest position near the bottom.
+      const prev = el.style.transform;
+      el.style.transform = "translate(-50%, -50%) scale(1)";
+      natH = el.offsetHeight;
+      el.style.transform = prev;
     };
+
+    const apply = () => {
+      const vh = window.innerHeight;
+      const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--menubar-h")) || 56;
+      const span = Math.max(1, vh * 0.7);
+      const p = Math.min(1, Math.max(0, window.scrollY / span));
+      const startCenterY = vh - natH / 2 - 34;   // big, near the bottom
+      const endCenterY = navH / 2;                // small, centred in the nav
+      const cy = startCenterY + (endCenterY - startCenterY) * p;
+      const target = Math.min(1, 18 / (bigFont || 18));
+      const scale = 1 + (target - 1) * p;
+      el.style.transform = `translate(-50%, calc(-50% + ${cy}px)) scale(${scale})`;
+    };
+
     fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
+    apply();
+    const onScroll = () => apply();
+    const onResize = () => { fit(); apply(); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   useEffect(() => {
