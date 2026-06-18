@@ -76,9 +76,7 @@ function Hero() {
 
       <Reveal immediate delay={0.18} className="mt-8 md:mt-10 grid md:grid-cols-12 gap-6 md:gap-8 items-end">
         <p className="md:col-span-7 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-          I&rsquo;m Finbar. I design brand identities, publications and websites for businesses in
-          Australia and the UK. My background is print and editorial, so type, grids and the small
-          details are where I&rsquo;m strongest, and I bring the same eye to everything on screen.
+          I&rsquo;m Finbar — brand identities, publications and websites for clients in Australia and the UK.
         </p>
         <div className="md:col-span-5 md:col-start-9">
           <p className="mono-label text-ink-soft mb-3">Available for</p>
@@ -119,22 +117,8 @@ function Approach() {
     <Reveal section as="section" className="home-section px-5 md:px-10" aria-label="How I work">
       <SectionHead title="How I work" />
       <div className="grid md:grid-cols-12 gap-8">
-        <div className="md:col-span-7 max-w-2xl space-y-4 text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-          <p>
-            I move between loose work and tight work. One week it&rsquo;s cover art, the next it&rsquo;s a
-            publication or an infographic with a lot to make clear. Having both in my week keeps it interesting.
-          </p>
-          <p>
-            Underneath all of it is the same handful of things: type, colour, and how a layout moves
-            your eye. I care how something looks, and just as much about whether it reads well for the
-            people using it.
-          </p>
-          <p>
-            Outside client work my main hobby is creative coding, building interactive and generative
-            pieces for the love of it. This site is one of them. Working with Claude to get past the
-            technical parts keeps me on the design instead of stuck in code, and what I learn there tends
-            to feed back into client work.
-          </p>
+        <div className="md:col-span-7 max-w-2xl text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
+          <p>Loose work and tight — cover art one week, a publication the next. Held together by type, colour, and how a layout moves your eye.</p>
         </div>
       </div>
     </Reveal>
@@ -150,8 +134,7 @@ function Capabilities() {
         aside={<Link href="/about#contact" className="home-link">Hiring or have a project? →</Link>}
       />
       <p className="text-ink-soft leading-relaxed mb-5 max-w-xl" style={{ fontSize: "var(--text-small)" }}>
-        One designer across the whole range, from the first sketch to the finished thing. Tap a
-        discipline to see that work.
+        One designer across the whole range. Tap a discipline to see the work.
       </p>
       <div className="-mx-5 md:-mx-10">
         <CapabilitiesSlider />
@@ -168,7 +151,7 @@ function Contact() {
       <div className="grid md:grid-cols-12 gap-8 items-end">
         <div className="md:col-span-8">
           <p className="text-ink-soft mb-4" style={{ fontSize: "var(--text-small)" }}>
-            Got a project or a role in mind? Email is the best way to reach me.
+            Email&rsquo;s the best way to reach me.
           </p>
           <h3>
             <a
