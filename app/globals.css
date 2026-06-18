@@ -3367,9 +3367,9 @@ body:has(.sb-root) {
     align-items: end;
     gap: 2rem;
   }
-  .sf-credit  { grid-column: 1 / span 4; }
-  .sf-contact { grid-column: 6 / span 4; }
-  .sf-social  { grid-column: 10 / span 3; }
+  .sf-credit    { grid-column: 1 / span 4; }
+  .sf-contact   { grid-column: 6 / span 4; }
+  .sf-locations { grid-column: 10 / span 3; }
 }
 .sf-cluster {
   display: flex;
@@ -3379,21 +3379,15 @@ body:has(.sb-root) {
 }
 .sf-muted { opacity: 0.55; }
 .sf-heart { color: var(--pink); }
-.sf-social-item { gap: 0.55em; }
-.sf-social-ico {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1em;
-  height: 1em;            /* track the font, sits on the baseline */
-  flex: 0 0 auto;
-}
-.sf-social-ico svg { width: 100%; height: 100%; display: block; }
+/* Contact heading (plain text, not a link). */
+.sf-heading { margin-bottom: 0.25rem; }
 
 .site-footer-mark {
   width: 100%;
-  overflow: hidden;
-  line-height: 0.74;       /* crop the line box tight */
+  /* Same gutters as the rest of the page, plus matching bottom padding so the
+     wordmark isn't flush/clipped at the very bottom. */
+  padding: 0 clamp(20px, 3vw, 40px) clamp(20px, 3vw, 40px);
+  line-height: 0.82;
 }
 .site-footer-mark-inner {
   display: inline-flex;
@@ -3405,9 +3399,7 @@ body:has(.sb-root) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: -0.02em;
-  font-size: clamp(2rem, 13vw, 18rem);  /* fallback before the JS fit */
-  /* Nudge down so the wordmark sits flush and is slightly clipped at the bottom. */
-  transform: translateY(0.08em);
+  font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
 }
 .sf-mark-star { color: var(--pink); }
 
