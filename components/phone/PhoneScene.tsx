@@ -289,7 +289,10 @@ function Carousel({
     // Hover blend (frozen during export — controller writes the ref directly).
     if (!paused) {
       const target = pose != null ? pose : hoverTargetFor(hovered, presetOverride);
-      hoverProgressRef.current += (target - hoverProgressRef.current) * STATE_LERP;
+      // Asymmetric: ease IN at the normal rate, but settle OUT (un-hover) more
+      // gently — a shallow, slow return so a mid-animation release isn't sharp.
+      const k = target < hoverProgressRef.current ? STATE_LERP * 0.55 : STATE_LERP;
+      hoverProgressRef.current += (target - hoverProgressRef.current) * k;
       // Keep the demand loop running at full fps for the WHOLE blend — including
       // the un-hover ease-out, when the FrameDriver has already dropped to idle.
       // Otherwise the release renders in sparse idle frames and looks jumpy.

@@ -1262,7 +1262,9 @@
   .card-rev {
     position: absolute; inset: 0; border-radius: 14px;
     transform: scale(0); transform-origin: center;
-    transition: transform 0.34s var(--ease);
+    /* Un-hover (leave): a slow, shallow settle so a mid-animation release isn't
+       sharp — matches the 3D thumbnails' gentle ease-out. */
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
   }
   .card-rev.c1 { background: var(--pink); }
@@ -1273,7 +1275,10 @@
      reveal (the page just navigates). */
   @media (hover: hover) {
     .group:hover .card-rev,
-    .group:focus-within .card-rev { transform: scale(1); }
+    .group:focus-within .card-rev {
+      transform: scale(1);
+      transition: transform 0.34s var(--ease);   /* quicker on the way in */
+    }
   }
 
   /* Hero scroll-driven fade (CSS only, no JS) */

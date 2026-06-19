@@ -229,7 +229,13 @@ function MacShow({
     // Pose blend (frozen during export — the controller writes the ref directly).
     if (!paused) {
       const target = pose != null ? pose : poseTargetFor(presetOverride, hovered);
-      hoverProgressRef.current += (target - hoverProgressRef.current) * STATE_LERP;
+      // Asymmetric: ease IN normally, settle OUT (un-hover) more gently so a
+      // mid-animation release is a shallow, slow return rather than a sharp one.
+      const k = target < hoverProgressRef.current ? STATE_LERP * 0.55 : STATE_LERP;
+      hoverProgressRef.current += (target - hoverProgressRef.current) * k;
+      // Keep the demand loop running through the WHOLE blend (incl. the un-hover
+      // ease-out) so it doesn't render in sparse idle frames and look glitchy.
+      if (Math.abs(target - hoverProgressRef.current) > 0.0015) invalidate();
       // Only advance the turntable when motion is on (the tool preview holds still).
       if (motion) offsetRef.current += delta * CYCLE_SPEED;
     }
