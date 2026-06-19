@@ -30,29 +30,11 @@ export default function HomeIntro() {
   const lockupRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLSpanElement>(null);
   const flyRef = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
   const [phase, setPhase] = useState<Phase>("trace");
   const [flyTransform, setFlyTransform] = useState<string | null>(null);
 
-  // Star trace via the Web Animations API (most reliable): dash = the real path
-  // length so the whole outline is one hidden dash, then animate the offset from
-  // len → 0 so a single line draws from one point to the complete outline.
-  useLayoutEffect(() => {
-    const p = pathRef.current;
-    if (!p) return;
-    const len = p.getTotalLength();
-    p.style.strokeDasharray = `${len}`;
-    p.style.strokeDashoffset = `${len}`;
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      p.style.strokeDashoffset = "0";
-      return;
-    }
-    const anim = p.animate(
-      [{ strokeDashoffset: len }, { strokeDashoffset: 0 }],
-      { duration: TRACE_MS, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" },
-    );
-    return () => anim.cancel();
-  }, []);
+  // The star trims itself in pure CSS (one path, pathLength=100, dash 100→0) —
+  // see .intro-fly-star path in globals.css. No JS getTotalLength needed.
 
   // Fit the wordmark to the available width, then drive a scroll-linked morph:
   // as you scroll through the first screen it shrinks and rises from the bottom
@@ -160,8 +142,8 @@ export default function HomeIntro() {
         >
           <svg viewBox="0 0 100 100" className="intro-fly-star">
             <path
-              ref={pathRef}
               d={STAR_PATH}
+              pathLength={100}
               fill="var(--pink)"
               stroke="var(--pink)"
               strokeWidth={1}

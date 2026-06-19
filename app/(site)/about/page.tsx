@@ -37,10 +37,15 @@ const SERVICES = [
   "Creative direction",
 ];
 
+// Personal / concept work — not commissioned clients.
+const NON_CLIENT_SLUGS = new Set(["palmsmotel", "london-home-show"]);
+// Some projects carry their real client's name rather than the project title.
+const CLIENT_NAME: Record<string, string> = { tmyr: "Share to Buy" };
+
 const CLIENTS = [...projects]
-  .filter((p) => !p.hidden)
+  .filter((p) => !p.hidden && !NON_CLIENT_SLUGS.has(p.slug))
   .sort((a, b) => a.rank - b.rank)
-  .map((p) => p.name);
+  .map((p) => CLIENT_NAME[p.slug] ?? p.name);
 
 /* Inline dingbat, set in the same Noto Sans Symbols 2 face as the home wall. */
 function Ding({ char }: { char: string }) {

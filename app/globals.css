@@ -3210,13 +3210,19 @@ body:has(.sb-root) {
   pointer-events: none;
 }
 .intro-fly-star { width: 100%; height: auto; display: block; overflow: visible; }
-/* stroke-dasharray/offset + the draw transition are set in JS (getTotalLength). */
+/* The star is ONE continuous path, normalised to pathLength=100 (set on the
+   element). We trim it with a single dash the length of the whole path and
+   animate the offset 100 → 0, so one clean line draws the entire outline. */
 .intro-fly-star path {
   fill: var(--pink);
   fill-opacity: 0;
   stroke: var(--pink);
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: star-draw 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   transition: fill-opacity 0.45s var(--ease);
 }
+@keyframes star-draw { to { stroke-dashoffset: 0; } }
 .intro-fly.is-fill .intro-fly-star path,
 .intro-fly.is-fly .intro-fly-star path { fill-opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
@@ -3423,9 +3429,19 @@ body:has(.sb-root) {
   height: var(--menubar-h);
   display: flex;
   align-items: center;
-  padding: 0 clamp(14px, 3vw, 36px);
+  /* Match the page gutter (px-5 / md:px-10) so the pills line up with content
+     and the filter chips below. */
+  padding: 0 20px;
   background: transparent;
+  /* The bar itself is transparent and overlaps content on scroll — let clicks
+     pass through it; only the pills/icons are interactive. */
+  pointer-events: none;
 }
+@media (min-width: 768px) {
+  .top-nav { padding: 0 40px; }
+}
+.top-nav a,
+.top-nav button { pointer-events: auto; }
 .top-nav-inner {
   display: flex;
   align-items: center;

@@ -290,6 +290,10 @@ function Carousel({
     if (!paused) {
       const target = pose != null ? pose : hoverTargetFor(hovered, presetOverride);
       hoverProgressRef.current += (target - hoverProgressRef.current) * STATE_LERP;
+      // Keep the demand loop running at full fps for the WHOLE blend — including
+      // the un-hover ease-out, when the FrameDriver has already dropped to idle.
+      // Otherwise the release renders in sparse idle frames and looks jumpy.
+      if (Math.abs(target - hoverProgressRef.current) > 0.0015) invalidate();
     }
     const h = hoverProgressRef.current;
 
