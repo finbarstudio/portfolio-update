@@ -11,16 +11,16 @@
  * Drop it into any positioned container; it centres itself.
  */
 
-import { STAR_POINTS } from "@/components/brand-star";
+import { ASTERISK_POINTS } from "@/components/brand-asterisk";
 
 export function LoaderThree({ size = 46 }: { size?: number }) {
   return (
     <span className="star-loader" aria-label="Loading" role="status">
       <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
-        <polygon className="star-loader-track" points={STAR_POINTS} />
+        <polygon className="star-loader-track" points={ASTERISK_POINTS} />
         <polygon
           className="star-loader-draw"
-          points={STAR_POINTS}
+          points={ASTERISK_POINTS}
           pathLength={1}
         />
       </svg>

@@ -3580,6 +3580,31 @@ body:has(.sb-root) {
 @media (max-width: 767px) {
   .top-nav-social { display: none; }
 }
+/* Superscript project count inside the Work pill. */
+.nav-count {
+  font-size: 0.72em;
+  vertical-align: super;
+  line-height: 1;
+  margin-left: 0.2em;
+  opacity: 0.65;
+}
+/* External-link bubble inside the Sandbox pill — small filled circle with arrow. */
+.nav-ext-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3em;
+  height: 1.3em;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.8em;
+  line-height: 1;
+  margin-left: 0.45em;
+  vertical-align: middle;
+  transition: background var(--dur-fast) var(--ease);
+}
+a.tag-default:hover .nav-ext-bubble { background: var(--pink); }
 /* The .tag-default hover is scoped to anchors; mirror it for this button. */
 @media (hover: hover) {
   .intro-menu-btn:hover { color: var(--pink); border-color: var(--pink); }

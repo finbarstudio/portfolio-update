@@ -6,8 +6,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
+import { projects } from "@/content/projects";
 
 const SANDBOX_HREF = "https://sandbox.finbar.studio";
+
+const PROJECT_COUNT = projects.length;
 
 const items = [
   { label: "Home", href: "/" },
@@ -71,10 +74,13 @@ export default function TopNav() {
             className={`tag ${isActive(it.href) ? "tag-pink" : "tag-default"}`}
           >
             {it.label}
+            {it.href === "/work" && (
+              <sup className="nav-count">{PROJECT_COUNT}</sup>
+            )}
           </Link>
         ))}
         <a href={SANDBOX_HREF} className="tag tag-default">
-          Sandbox ↗
+          Sandbox<span className="nav-ext-bubble" aria-hidden="true">↗</span>
         </a>
       </nav>
 
