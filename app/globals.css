@@ -3177,7 +3177,8 @@ body:has(.sb-root) {
   color: var(--ink);
   will-change: transform;
 }
-.home-intro-word { display: block; }
+/* The wordmark's text reveals via clip-path (GSAP); the slot ✳ holds the spot. */
+.home-intro-text { display: inline-flex; }
 .home-intro-slot {
   display: inline-flex;
   align-items: center;
@@ -3185,34 +3186,20 @@ body:has(.sb-root) {
   opacity: 0;
 }
 .home-intro-slot.is-shown { opacity: 1; }
-.home-intro-star { width: 0.72em; height: 0.72em; display: block; }
-.home-intro-star polygon { fill: var(--pink); }
+.home-intro-slot-star { width: 1em; height: 1em; display: block; }
 
-/* Preloader veil — covers everything while the star traces + fills. */
-.intro-veil {
-  position: fixed;
-  inset: 0;
-  z-index: 9990;
-  background: var(--bg);
-}
-.intro-veil.is-out { animation: intro-veil-out 0.7s var(--ease) forwards; pointer-events: none; }
-@keyframes intro-veil-out { to { opacity: 0; } }
-
-/* The flying star: centre-screen during trace/fill, then FLIPs to the slot. */
+/* The flying asterisk: traces centre-screen, then GSAP drives it to the slot. */
 .intro-fly {
   position: fixed;
   top: 50%;
   left: 50%;
-  z-index: 9991;
-  width: clamp(120px, 22vw, 300px);
-  transform: translate(-50%, -50%);
-  transition: transform 0.85s cubic-bezier(0.65, 0, 0.35, 1);
+  z-index: 70;
+  width: clamp(120px, 20vw, 280px);
   pointer-events: none;
 }
 .intro-fly-star { width: 100%; height: auto; display: block; overflow: visible; }
-/* Preloader star — its own look (distinct from the thumbnail loader): a crisp
-   1px outline, sharp mitred points like the logo star, no glow. One <polygon>
-   normalised to pathLength=1, trimmed by a single dash 1 → 0. */
+/* Crisp 1px outline, sharp mitred points (the brand mark), no glow. dash +
+   fill-opacity are driven by GSAP (see HomeIntro). */
 .intro-fly-star polygon {
   fill: var(--pink);
   fill-opacity: 0;
@@ -3220,13 +3207,6 @@ body:has(.sb-root) {
   stroke-width: 1;
   stroke-linejoin: miter;
   stroke-linecap: butt;
-  /* dash + offset set by JS; GSAP tweens the offset to draw it (see HomeIntro). */
-  transition: fill-opacity 0.45s var(--ease);
-}
-.intro-fly.is-fill .intro-fly-star polygon,
-.intro-fly.is-fly .intro-fly-star polygon { fill-opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .intro-fly { transition: none; }
 }
 
 /* ── Intro chrome: hide the nav over the intro/disciplines, slide it in from the
@@ -3309,6 +3289,8 @@ body:has(.sb-root) {
   overflow: hidden;
   vertical-align: bottom;
 }
+/* Icons rise too but must not be clipped (wide glyphs + the hover reel). */
+.mr-mask-open { overflow: visible; }
 .mr-inner {
   display: inline-flex;
   will-change: transform;
@@ -3470,6 +3452,8 @@ body:has(.sb-root) {
 .sf-heart { color: var(--pink); }
 /* Contact heading (plain text, not a link). */
 .sf-heading { margin-bottom: 0.25rem; }
+/* Credit (copyright + design/build) is right-aligned at every size. */
+.sf-credit { align-items: flex-end; text-align: right; }
 
 .site-footer-mark {
   width: 100%;

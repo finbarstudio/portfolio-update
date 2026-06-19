@@ -67,11 +67,11 @@ export default function SiteFooter() {
       gsap.set(rule, { scaleX: 0 });
       gsap.set(mark, { yPercent: 120 });
       const tl = gsap.timeline({
-        delay: 0.15,
+        delay: 0.35,
         scrollTrigger: {
           trigger: footer,
-          // Fires just before the absolute bottom, so it plays when you arrive.
-          start: "bottom bottom+=90",
+          // Fire only right at the very bottom (not early when scrolling slowly).
+          start: "bottom bottom",
           toggleActions: "play none none reverse",
         },
       });

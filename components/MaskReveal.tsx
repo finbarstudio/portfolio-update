@@ -21,9 +21,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 let registered = false;
 
-function Word({ children }: { children: ReactNode }) {
+function Word({ children, open }: { children: ReactNode; open?: boolean }) {
   return (
-    <span className="mr-mask">
+    <span className={open ? "mr-mask mr-mask-open" : "mr-mask"}>
       <span className="mr-inner">{children}</span>
     </span>
   );
@@ -47,7 +47,9 @@ export default function MaskReveal({
         else tokens.push(<Word key={key++}>{part}</Word>);
       });
     } else if (isValidElement(child)) {
-      tokens.push(<Word key={key++}>{child}</Word>);
+      // Icons / inline elements rise too, but in a NON-clipping mask so wide
+      // glyphs (and the hover reel) are never cropped.
+      tokens.push(<Word key={key++} open>{child}</Word>);
     }
   });
 
