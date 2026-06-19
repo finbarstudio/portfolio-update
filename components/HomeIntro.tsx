@@ -18,10 +18,11 @@
  * top-right and the page content starts immediately (handled in CSS).
  */
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ASTERISK_POINTS, ASTERISK_PERIMETER } from "./brand-asterisk";
 import { scrollToHero } from "@/lib/scroll";
+import { GOTO_HERO_KEY } from "./NavLogo";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 const PLAYED_KEY = "finbar-intro-played";
@@ -34,6 +35,26 @@ export default function HomeIntro() {
   const starRef = useRef<SVGPolygonElement>(null);
   const screenRef = useRef<HTMLDivElement>(null);
   const [done, setDone] = useState(false);
+
+  // Arriving from another page via NavLogo: once any intro lock clears, smooth-
+  // scroll to the hero (so the logo lands you at the start of the hero text).
+  useEffect(() => {
+    let want = false;
+    try { want = sessionStorage.getItem(GOTO_HERO_KEY) === "1"; } catch { /* ignore */ }
+    if (!want) return;
+    try { sessionStorage.removeItem(GOTO_HERO_KEY); } catch { /* ignore */ }
+    let tries = 0;
+    const go = () => {
+      // Wait out the intro scroll-lock + the route-change scroll reset.
+      if (document.documentElement.dataset.introLock === "1" && tries++ < 80) {
+        setTimeout(go, 100);
+        return;
+      }
+      requestAnimationFrame(() => scrollToHero());
+    };
+    const t = setTimeout(go, 80);
+    return () => clearTimeout(t);
+  }, []);
 
   // Resting logo: fit-to-width + scroll-shrink into the nav. This ALWAYS runs on
   // desktop — independent of whether the preloader plays — so the logo is always

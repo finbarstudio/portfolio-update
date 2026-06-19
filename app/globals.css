@@ -3376,6 +3376,30 @@ body:has(.sb-root) {
   text-transform: uppercase;
   letter-spacing: -0.01em;
 }
+
+/* Persistent resting logo on non-home pages — centred in the nav (matching where
+   the home intro lockup comes to rest), top-right on mobile to clear the pills. */
+.nav-logo {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: var(--menubar-h);
+  display: inline-flex;
+  align-items: center;
+  z-index: 60;
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1;
+}
+@media (max-width: 767px) {
+  .nav-logo {
+    left: auto;
+    right: 16px;
+    transform: none;
+    font-size: 13px;
+  }
+}
 .brand-wordmark-mark {
   color: var(--pink);
   font-size: 0.72em;         /* tuned to sit at the cap/x-height of the Space Mono text */

@@ -8,6 +8,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import TopNav from "./TopNav";
+import NavLogo from "./NavLogo";
 import SmoothScroll from "./SmoothScroll";
 import SiteFooter from "./SiteFooter";
 import "lenis/dist/lenis.css";
@@ -34,6 +35,9 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       {/* Film grain — retro texture over everything (never blocks pointers). */}
       <div className="grain-overlay" aria-hidden="true" />
       <TopNav />
+      {/* The home page renders the animated HomeIntro lockup; every other page
+          gets the persistent resting logo. */}
+      {pathname !== "/" && <NavLogo />}
       <main
         className="min-w-0"
         style={{
