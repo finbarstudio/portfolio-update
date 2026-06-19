@@ -3576,7 +3576,13 @@ body:has(.sb-root) {
   .site-footer-asterisk {
     display: block;
     width: 100%;
+    /* Full-bleed width; the square asterisk is cropped at its horizontal midline
+       (only the top half shows). overflow clips the lower half. */
+    height: 50vw;
+    overflow: hidden;
     margin-top: clamp(28px, 7vh, 72px);
+    /* A bit of background below it to read as the bottom padding distance. */
+    margin-bottom: clamp(16px, 4vh, 40px);
     line-height: 0;
   }
   .site-footer-asterisk svg { width: 100%; height: auto; display: block; }
