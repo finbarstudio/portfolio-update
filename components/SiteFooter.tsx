@@ -50,10 +50,10 @@ export default function SiteFooter() {
         if (Math.abs(measured - avail) <= 0.5) break;
         size = size * (avail / measured);
       }
-      // Slight overshoot so the edges kiss the gutters — covers the -0.05em
+      // Slight overshoot so the edges kiss the gutters — covers the -0.09em
       // left-bearing pull (see .site-footer-mark-inner) so the asterisk still
       // reaches the right edge.
-      el.style.fontSize = `${Math.max(20, size * 1.008)}px`;
+      el.style.fontSize = `${Math.max(20, size * 1.012)}px`;
     };
     fit();
     requestAnimationFrame(fit);
@@ -87,12 +87,19 @@ export default function SiteFooter() {
         setRevealed(true);
       }
     };
-    check();
     const lenis = window.__lenis;
-    window.addEventListener("scroll", check, { passive: true });
-    window.addEventListener("resize", check);
-    lenis?.on?.("scroll", check);
+    // Defer attaching + the first check to the next frame: this lets the armed
+    // (hidden) state paint first AND lets the route-change scroll-reset settle, so
+    // navigating Home -> About doesn't instantly reveal with a stale scroll
+    // position (which read as "the footer never draws in" on About).
+    const raf = requestAnimationFrame(() => {
+      check();
+      window.addEventListener("scroll", check, { passive: true });
+      window.addEventListener("resize", check);
+      lenis?.on?.("scroll", check);
+    });
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("scroll", check);
       window.removeEventListener("resize", check);
       lenis?.off?.("scroll", check);

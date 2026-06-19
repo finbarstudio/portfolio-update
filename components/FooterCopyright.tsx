@@ -35,14 +35,31 @@ export default function FooterCopyright({ year }: { year: number }) {
     };
   }, [pathname]);
 
-  // Dock into the footer slot once it's reached.
+  // Dock into the footer slot seamlessly: the pin floats at bottom:16px of the
+  // viewport, so we hand off to the in-flow slot exactly when the slot's line
+  // rises to that same resting line — no jump, it just "sticks" there.
   useEffect(() => {
     const el = anchorRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => setDocked(e.isIntersecting), { threshold: 1 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+    const ph = el.querySelector<HTMLElement>(".sf-copyright-ph");
+    if (!ph) return;
+    const PIN_BOTTOM = 16; // matches .sf-copyright-pin bottom
+    const check = () => {
+      const slotBottom = ph.getBoundingClientRect().bottom;
+      // Dock once the slot has risen to (or above) the pin's resting line.
+      setDocked(slotBottom <= window.innerHeight - PIN_BOTTOM + 0.5);
+    };
+    check();
+    const lenis = window.__lenis;
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    lenis?.on?.("scroll", check);
+    return () => {
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+      lenis?.off?.("scroll", check);
+    };
+  }, [pathname]);
 
   return (
     <span className="sf-copyright" ref={anchorRef}>

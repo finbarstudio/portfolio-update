@@ -72,6 +72,14 @@ export default function TopNav() {
             href={it.href}
             aria-current={isActive(it.href) ? "page" : undefined}
             className={`tag ${isActive(it.href) ? "tag-pink" : "tag-default"}`}
+            onClick={(e) => {
+              // "Home" while already home: smooth-scroll to the top instead of a no-op nav.
+              if (it.href === "/" && pathname === "/") {
+                e.preventDefault();
+                if (window.__lenis) window.__lenis.scrollTo(0, { duration: 1.1 });
+                else window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
           >
             {it.label}
             {it.href === "/work" && (

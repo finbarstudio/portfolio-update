@@ -3377,7 +3377,7 @@ body:has(.sb-root) {
 }
 .brand-wordmark-mark {
   color: var(--pink);
-  font-size: 0.62em;         /* ≈ the x-height of the Space Mono text */
+  font-size: 0.72em;         /* tuned to sit at the cap/x-height of the Space Mono text */
   line-height: 1;
   align-self: center;
   display: inline-flex;
@@ -3516,11 +3516,10 @@ body:has(.sb-root) {
 
 .site-footer-mark {
   width: 100%;
-  /* Equal gutter on all three edges — left, right AND bottom — so the wordmark is
-     inset uniformly. The bottom padding is also what gives the rounded-cap
-     overshoot (S/O/U) room below the baseline: overflow clips at the padding-box
-     edge, far below the glyphs, so nothing gets cut. */
-  padding: 0 clamp(20px, 3vw, 40px) clamp(20px, 3vw, 40px);
+  /* Tighter side gutters than the content above (the wordmark is meant to read
+     large, near the edges). Bottom padding is smaller than the sides but still
+     clears the rounded-cap overshoot via the padding-box clip. */
+  padding: 0 clamp(14px, 2.2vw, 30px) clamp(8px, 1.2vw, 16px);
   line-height: 0.82;
   overflow: hidden;          /* masks the slide-up reveal */
 }
@@ -3531,8 +3530,8 @@ body:has(.sb-root) {
   white-space: nowrap;
   font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
   /* Pull left by Space Mono's cap side-bearing so the "F" ink kisses the left
-     gutter (the JS fit already pushes the asterisk to the right gutter). */
-  margin-left: -0.05em;
+     gutter (the JS fit pushes the asterisk to the right gutter to match). */
+  margin-left: -0.09em;
 }
 
 /* Reveal at the very bottom (sentinel + observer flips is-revealed). JS arms the

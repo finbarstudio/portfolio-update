@@ -19,7 +19,6 @@
  */
 
 import { useLayoutEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { gsap } from "gsap";
 import { ASTERISK_POINTS } from "./brand-asterisk";
 
@@ -128,9 +127,11 @@ export default function HomeIntro() {
       fly.style.height = `${sRect0.width}px`;
     }
 
-    const len = star.getTotalLength() || 0;
+    // Normalised pathLength=1 (set on the polygon) — dasharray 1 == the full
+    // perimeter, so the trace always completes 100% (getTotalLength under-measures
+    // polygon perimeters in some browsers, leaving the outline a few % short).
     gsap.set(fly, { xPercent: -50, yPercent: -50, x: 0, y: 0, opacity: 1 });
-    gsap.set(star, { strokeDasharray: len, strokeDashoffset: reduce ? 0 : len, fillOpacity: reduce ? 1 : 0 });
+    gsap.set(star, { strokeDasharray: 1, strokeDashoffset: reduce ? 0 : 1, fillOpacity: reduce ? 1 : 0 });
     gsap.set(screen, { opacity: 1 });
 
     // Translation deltas (fly centre → slot centre), measured after sizing.
@@ -169,12 +170,23 @@ export default function HomeIntro() {
       {!done && (
         <div ref={flyRef} className="intro-fly" aria-hidden="true">
           <svg viewBox="0 0 100 100" className="intro-fly-star">
-            <polygon ref={starRef} points={ASTERISK_POINTS} vectorEffect="non-scaling-stroke" />
+            <polygon ref={starRef} points={ASTERISK_POINTS} pathLength={1} vectorEffect="non-scaling-stroke" />
           </svg>
         </div>
       )}
 
-      <Link href="/" className="home-intro-mark brand-wordmark" ref={lockupRef} aria-label="finbarstudio home">
+      <a
+        href="/"
+        className="home-intro-mark brand-wordmark"
+        ref={lockupRef}
+        aria-label="Back to top"
+        onClick={(e) => {
+          // The logo lives only on home — smooth-scroll to the top rather than navigate.
+          e.preventDefault();
+          if (window.__lenis) window.__lenis.scrollTo(0, { duration: 1.1 });
+          else window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      >
         <span className={`home-intro-text ${done ? "is-revealed" : ""}`} ref={textRef} aria-hidden="true">FINBARSTUDIO</span>
         <span
           className={`brand-wordmark-mark home-intro-slot ${done ? "is-shown" : ""}`}
@@ -185,7 +197,7 @@ export default function HomeIntro() {
             <polygon points={ASTERISK_POINTS} fill="var(--pink)" />
           </svg>
         </span>
-      </Link>
+      </a>
     </section>
   );
 }
