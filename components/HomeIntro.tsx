@@ -121,7 +121,8 @@ export default function HomeIntro() {
         const s = slot.getBoundingClientRect();
         const dx = s.left + s.width / 2 - (f.left + f.width / 2);
         const dy = s.top + s.height / 2 - (f.top + f.height / 2);
-        const scale = f.width ? s.width / f.width : 0.1;
+        // The mark slot (❘) is narrow, so size the star to its height.
+        const scale = f.height ? s.height / f.height : 0.1;
         setFlyTransform(`translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(${scale})`);
       }
       setPhase("fly");
@@ -164,14 +165,15 @@ export default function HomeIntro() {
         </div>
       )}
 
-      <div className="home-intro-mark" ref={lockupRef}>
-        <span className="home-intro-word">FINBAR</span>
-        <span className={`home-intro-slot ${phase === "done" ? "is-shown" : ""}`} ref={slotRef}>
-          <svg viewBox="0 0 100 100" className="home-intro-star" aria-hidden="true">
-            <polygon points={STAR_POINTS} fill="var(--pink)" />
-          </svg>
+      <div className="home-intro-mark brand-wordmark" ref={lockupRef} aria-label="finbarstudio">
+        <span aria-hidden="true">FINBARSTUDIO</span>
+        <span
+          className={`brand-wordmark-mark home-intro-slot ${phase === "done" ? "is-shown" : ""}`}
+          ref={slotRef}
+          aria-hidden="true"
+        >
+          {"❘"}
         </span>
-        <span className="home-intro-word">STUDIO</span>
       </div>
     </section>
   );

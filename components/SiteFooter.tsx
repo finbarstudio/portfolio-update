@@ -12,7 +12,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import BrandStar from "./BrandStar";
+import BrandWordmark from "./BrandWordmark";
 
 let registered = false;
 
@@ -115,12 +115,8 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="site-footer-mark" aria-label="finbar studio">
-        <span ref={markRef} className="site-footer-mark-inner">
-          finbar
-          <BrandStar className="sf-mark-star" size="0.62em" />
-          studio
-        </span>
+      <div className="site-footer-mark" aria-label="finbarstudio">
+        <BrandWordmark ref={markRef} className="site-footer-mark-inner" />
       </div>
     </footer>
   );

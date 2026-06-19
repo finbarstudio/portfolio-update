@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
-import CapabilitiesSlider from "@/components/CapabilitiesSlider";
 import HomeIntro from "@/components/HomeIntro";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -100,14 +100,29 @@ function SelectedWork() {
   );
 }
 
-/* ─── What I do (infinite capabilities slider) ──────────────── */
+/* ─── What I do: category names as big inline pill-bubbles ──────
+   Same size/layout as the disciplines wall (.home-disc), but each word set in a
+   nav-style bubble, wrapping inline like a paragraph. */
+const CAP_PILLS = [
+  { name: "Brand identity", filter: "brand" },
+  { name: "Editorial & print", filter: "editorial" },
+  { name: "Web & UI design", filter: "web" },
+  { name: "Creative direction", filter: "art" },
+  { name: "Motion graphics", filter: "motion" },
+  { name: "Social campaigns", filter: "motion" },
+];
+
 function Capabilities() {
   return (
-    <Reveal section as="section" className="home-section no-rule px-5 md:px-10 overflow-hidden mt-12 md:mt-24" aria-label="What I do">
-      <div className="-mx-5 md:-mx-10">
-        <CapabilitiesSlider />
+    <section className="home-disciplines px-5 md:px-10" aria-label="Services">
+      <div className="home-disc home-cap-wrap">
+        {CAP_PILLS.map((c) => (
+          <Link key={c.name} href={`/work?filter=${c.filter}`} className="home-cap-pill">
+            {c.name}
+          </Link>
+        ))}
       </div>
-    </Reveal>
+    </section>
   );
 }
 

@@ -3164,14 +3164,9 @@ body:has(.sb-root) {
   transform: translate(-50%, -50%);
   transform-origin: center center;
   display: flex;
-  align-items: center;
-  gap: 0.16em;
+  align-items: baseline;
   width: max-content;       /* content-sized: the JS fit spans it */
   white-space: nowrap;
-  font-family: var(--font-primary);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
   line-height: 0.82;
   font-size: clamp(2rem, 13vw, 16rem); /* fallback before JS fit */
   color: var(--ink);
@@ -3296,6 +3291,47 @@ body:has(.sb-root) {
 /* In-type accent word (e.g. "and") picked out in the brand pink. */
 .home-disc-pink { color: var(--pink); }
 
+/* ── Brand wordmark token ─────────────────────────────────────────
+   The canonical logo, used everywhere: FINBARSTUDIO in Space Mono caps with a
+   pink ❘ (U+2758, Noto Sans Symbols 2) on the end, no space. */
+.brand-wordmark {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+.brand-wordmark-mark {
+  font-family: var(--font-dingbat);
+  color: var(--pink);
+  font-size: 0.5em;          /* ≈ the x-height of the Space Mono text */
+  line-height: 1;
+}
+
+/* "What I do" — category names as big inline pill-bubbles, set at the
+   disciplines-wall size (.home-disc) and wrapping like a paragraph. */
+.home-cap-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.28em 0.36em;
+}
+.home-cap-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.16em 0.62em 0.22em;
+  line-height: 1;
+  color: var(--ink);
+  transition: color var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+@media (hover: hover) {
+  .home-cap-pill:hover { color: var(--bg); background: var(--pink); border-color: var(--pink); }
+}
+
 /* ── Shared hover-underline link ───────────────────────────────────
    A thin 1px underline that draws in left → right and is only as wide as the
    text (width: fit-content), sitting close to the bottom of the font. */
@@ -3397,17 +3433,11 @@ body:has(.sb-root) {
 }
 .site-footer-mark-inner {
   display: inline-flex;
-  align-items: center;
-  gap: 0.06em;
+  align-items: baseline;
   width: max-content;
   white-space: nowrap;
-  font-family: var(--font-primary);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
   font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
 }
-.sf-mark-star { color: var(--pink); }
 
 /* Selected work: no top rule (HR). */
 .home-section.no-rule::before { content: none; }
