@@ -31,12 +31,33 @@ const aboutJsonLd = {
   },
 };
 
-const SERVICES = [
-  "Brand identity",
-  "Editorial & print",
-  "Web & UI design",
-  "Motion graphics",
-  "Creative direction",
+const SERVICE_GROUPS = [
+  {
+    label: "Brand",
+    items: ["Logo design", "Brand identity & guidelines", "Creative direction"],
+  },
+  {
+    label: "Web & digital",
+    items: ["Website design & development", "CMS systems", "UI design", "Email (EDM) design"],
+  },
+  {
+    label: "Print & artwork",
+    items: [
+      "Artworking",
+      "Booklets, reports & flyers",
+      "Editorial & print media",
+      "Large-format print",
+      "Business cards",
+    ],
+  },
+  {
+    label: "Motion & social",
+    items: [
+      "Motion graphics",
+      "Social media campaigns",
+      "Social reels & thumbnails",
+    ],
+  },
 ];
 
 // Personal / concept work — not commissioned clients.
@@ -103,11 +124,18 @@ export default function AboutPage() {
       >
         <Reveal as="div">
           <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>Services</h2>
-          <ul className="text-pink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>
-            {SERVICES.map((s) => (
-              <li key={s}>{s}</li>
+          <div className="flex flex-col gap-3">
+            {SERVICE_GROUPS.map((g) => (
+              <div key={g.label}>
+                <p className="font-mono uppercase text-ink-soft mb-0.5" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>{g.label}</p>
+                <ul className="text-pink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.35rem)" }}>
+                  {g.items.map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         </Reveal>
 
         <Reveal as="div">
