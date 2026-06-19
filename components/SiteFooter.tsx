@@ -10,6 +10,7 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import BrandWordmark from "./BrandWordmark";
 import FooterCopyright from "./FooterCopyright";
 
@@ -18,6 +19,7 @@ export default function SiteFooter() {
   const [year, setYear] = useState(2026);
   useEffect(() => setYear(new Date().getFullYear()), []);
 
+  const pathname = usePathname();
   const footerRef = useRef<HTMLElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
@@ -51,25 +53,25 @@ export default function SiteFooter() {
     return () => ro.disconnect();
   }, []);
 
-  // Reveal only once you reach the very bottom — a bottom sentinel + observer
-  // (robust, unlike a scroll-position trigger) flips a class; the CSS transitions
-  // (eased, delayed) draw the rule left→right and rise the wordmark in.
+  // Re-arm + re-reveal on every page visit (pathname change resets the reveal so
+  // the footer animates in fresh each time rather than starting already shown).
   useLayoutEffect(() => {
-    const footer = footerRef.current;
     const sentinel = sentinelRef.current;
-    if (!footer || !sentinel) return;
+    if (!sentinel) return;
+    setRevealed(false);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setArmed(false);
       setRevealed(true);
       return;
     }
-    setArmed(true); // hide the rule + wordmark, ready to reveal
+    setArmed(true);
     const io = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) setRevealed(true); },
       { rootMargin: "0px 0px -8px 0px" },
     );
     io.observe(sentinel);
     return () => io.disconnect();
-  }, []);
+  }, [pathname]);
 
   return (
     <footer

@@ -12,11 +12,12 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { ASTERISK_POINTS } from "./brand-asterisk";
 
 export default function HomeIntro() {
-  const lockupRef = useRef<HTMLDivElement>(null);
+  const lockupRef = useRef<HTMLAnchorElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const slotRef = useRef<HTMLSpanElement>(null);
   const flyRef = useRef<HTMLDivElement>(null);
@@ -97,6 +98,7 @@ export default function HomeIntro() {
     const finish = () => {
       if (finished) return;
       finished = true;
+      text.classList.add("is-revealed"); // failsafe: ensure text is visible
       try { sessionStorage.setItem("finbar-intro-played", "1"); } catch { /* ignore */ }
       setDone(true);
       document.body.style.overflow = prevOverflow;
@@ -108,16 +110,19 @@ export default function HomeIntro() {
     const failsafe = setTimeout(finish, 5000);
 
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const len = star.getTotalLength();
-    gsap.set(star, { strokeDasharray: len, strokeDashoffset: reduce ? 0 : len, fillOpacity: reduce ? 1 : 0 });
-    gsap.set(text, { clipPath: reduce ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)" });
     gsap.set(fly, { xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1, opacity: 1 });
 
-    if (reduce) { clearTimeout(failsafe); finish(); return; }
+    if (reduce) { text.classList.add("is-revealed"); clearTimeout(failsafe); finish(); return; }
 
     let tl: gsap.core.Timeline | undefined;
-    // Defer one frame so the wordmark fit + scroll-morph have positioned the slot.
-    const raf = requestAnimationFrame(() => {
+    let cancelled = false;
+    // Two rAF frames: first lets the fixed elements settle layout, second measures.
+    const raf = requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (cancelled) return;
+      // getTotalLength() needs the SVG to be in a laid-out document.
+      const len = star.getTotalLength() || 0;
+      gsap.set(star, { strokeDasharray: len, strokeDashoffset: len, fillOpacity: 0 });
+
       const f = fly.getBoundingClientRect();
       const s = slot.getBoundingClientRect();
       const dyDown = (s.top + s.height / 2) - (f.top + f.height / 2);
@@ -125,14 +130,15 @@ export default function HomeIntro() {
       const scale = f.height ? s.height / f.height : 0.12;
 
       tl = gsap.timeline({ onComplete: () => { clearTimeout(failsafe); finish(); } });
-      tl.to(star, { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" })   // trace
-        .to(star, { fillOpacity: 1, duration: 0.28, ease: "power1.out" })          // fill
-        .to(fly, { y: dyDown, duration: 0.5, ease: "power3.inOut" }, "+=0.05")     // drop to centre-bottom
-        .to(fly, { x: dxRight, scale, duration: 0.6, ease: "power3.inOut" })       // slide right to the slot
-        .to(text, { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power3.inOut" }, "-=0.12"); // wordmark reveal
-    });
+      tl.to(star, { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" })         // trace
+        .to(star, { fillOpacity: 1, duration: 0.28, ease: "power1.out" })                // fill
+        .to(fly, { y: dyDown, duration: 0.5, ease: "power3.inOut" }, "+=0.05")           // drop
+        .to(fly, { x: dxRight, scale, duration: 0.6, ease: "power3.inOut" })             // slide to slot
+        .call(() => { text.classList.add("is-revealed"); }, undefined, "-=0.12");        // wordmark reveal
+    }));
 
     return () => {
+      cancelled = true;
       clearTimeout(failsafe);
       cancelAnimationFrame(raf);
       tl?.kill();
@@ -152,18 +158,18 @@ export default function HomeIntro() {
         </div>
       )}
 
-      <div className="home-intro-mark brand-wordmark" ref={lockupRef} aria-label="finbarstudio">
-        <span className="home-intro-text" ref={textRef} aria-hidden="true">FINBARSTUDIO</span>
+      <Link href="/" className="home-intro-mark brand-wordmark" ref={lockupRef} aria-label="finbarstudio home">
+        <span className={`home-intro-text ${done ? "is-revealed" : ""}`} ref={textRef} aria-hidden="true">FINBARSTUDIO</span>
         <span
           className={`brand-wordmark-mark home-intro-slot ${done ? "is-shown" : ""}`}
           ref={slotRef}
           aria-hidden="true"
         >
-          <svg viewBox="0 0 100 100" className="home-intro-slot-star">
+          <svg viewBox="0 0 100 100" className="home-intro-slot-star brand-wordmark-asterisk">
             <polygon points={ASTERISK_POINTS} fill="var(--pink)" />
           </svg>
         </span>
-      </div>
+      </Link>
     </section>
   );
 }

@@ -3178,7 +3178,12 @@ body:has(.sb-root) {
   will-change: transform;
 }
 /* The wordmark's text reveals via clip-path (GSAP); the slot ✳ holds the spot. */
-.home-intro-text { display: inline-flex; }
+.home-intro-text {
+  display: inline-flex;
+  clip-path: inset(0 100% 0 0);    /* hidden by default; .is-revealed slides it in */
+  transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.home-intro-text.is-revealed { clip-path: inset(0 0% 0 0); }
 .home-intro-slot {
   display: inline-flex;
   align-items: center;
@@ -3196,6 +3201,7 @@ body:has(.sb-root) {
   z-index: 70;
   width: clamp(120px, 20vw, 280px);
   pointer-events: none;
+  opacity: 0; /* GSAP sets opacity:1 when animation starts; prevents SSR flash */
 }
 .intro-fly-star { width: 100%; height: auto; display: block; overflow: visible; }
 /* Crisp 1px outline, sharp mitred points (the brand mark), no glow. dash +
@@ -3338,11 +3344,18 @@ body:has(.sb-root) {
   letter-spacing: -0.01em;
 }
 .brand-wordmark-mark {
-  font-family: var(--font-dingbat);
   color: var(--pink);
   font-size: 0.62em;         /* ≈ the x-height of the Space Mono text */
   line-height: 1;
-  align-self: center;        /* centre the asterisk on the wordmark */
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+}
+.brand-wordmark-asterisk {
+  width: 1em;
+  height: 1em;
+  display: block;
+  flex: 0 0 auto;
 }
 
 /* "What I do" — category names as big inline pill-bubbles, set at the
@@ -3415,7 +3428,7 @@ body:has(.sb-root) {
   color: var(--ink);         /* one uniform colour for everything inside */
   /* Clear the (overlapping) fixed nav and leave the same top inset the nav has,
      so the rule sits at a matching rhythm below the nav items. */
-  padding-top: calc(var(--menubar-h) + 16px);
+  padding-top: calc(var(--menubar-h) + 6px);
   /* Bottom padding the masked wordmark sits beneath. */
   padding-bottom: clamp(18px, 2.6vh, 44px);
 }
@@ -3494,11 +3507,11 @@ body:has(.sb-root) {
 .site-footer.is-armed .site-footer-mark-inner { transform: translateY(120%); }
 .site-footer.is-armed.is-revealed .site-footer-rule {
   transform: scaleX(1);
-  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
 }
 .site-footer.is-armed.is-revealed .site-footer-mark-inner {
   transform: translateY(0);
-  transition: transform 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.45s;
+  transition: transform 1.15s cubic-bezier(0.16, 1, 0.3, 1) 1.2s;
 }
 
 /* Selected work: no top rule (HR). */
