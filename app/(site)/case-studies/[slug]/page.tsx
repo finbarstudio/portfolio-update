@@ -350,23 +350,23 @@ function FooterMeta({ project }: { project: Project }) {
           <p className="mono-label text-ink-soft mb-3">OPEN FOR WORK</p>
           <a
             href="mailto:finbar@finbar.studio"
-            className="u-underline font-sans font-medium break-words"
-            style={{ fontSize: "var(--text-h3)" }}
+            className="u-underline font-mono break-words"
+            style={{ fontSize: "var(--text-small)" }}
           >
-            finbar@finbar.studio
+            finbar@finbar.studio ↗
           </a>
         </div>
       </div>
 
-      {/* Clean back link — black Archivo, uppercase, tracked. Centred on mobile.
-          Generous tap target via py. */}
+      {/* Clean back link — Space Mono, uppercase, tracked (matches the link
+          treatment above). Centred on mobile. Generous tap target via py. */}
       <div className="pt-6 pb-8 text-center md:text-left">
         <Link
           href="/work"
-          className="u-underline min-h-[44px] py-2 font-sans font-bold uppercase"
-          style={{ fontSize: "0.875rem", letterSpacing: "0.16em" }}
+          className="u-underline min-h-[44px] py-2 font-mono uppercase inline-flex items-center"
+          style={{ fontSize: "var(--text-small)", letterSpacing: "0.12em" }}
         >
-          Back to Work
+          ← Back to Work
         </Link>
       </div>
     </>
