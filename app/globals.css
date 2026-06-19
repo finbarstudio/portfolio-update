@@ -3626,6 +3626,13 @@ body:has(.sb-root) {
 }
 .top-nav-social-item:hover { color: var(--pink); }
 .top-nav-social-item svg { width: 100%; height: 100%; display: block; }
+/* Mail = Noto Sans Symbols 2 glyph (🖄) instead of an SVG, sized to the row. */
+.top-nav-glyph {
+  font-family: var(--font-dingbat), var(--font-mono);
+  font-size: 15px;
+  line-height: 1;
+  display: block;
+}
 /* Mobile: keep the pills on one row; the socials live in the footer instead. */
 @media (max-width: 767px) {
   .top-nav-social { display: none; }

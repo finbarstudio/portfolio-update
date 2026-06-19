@@ -32,14 +32,6 @@ function LinkedInIcon() {
     </svg>
   );
 }
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" width="100%" height="100%">
-      <rect x="3" y="5" width="18" height="14" rx="1.5" />
-      <path d="M3.5 6.5l8.5 7 8.5-7" />
-    </svg>
-  );
-}
 function PhoneIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="100%" height="100%">
@@ -90,7 +82,7 @@ export default function TopNav() {
 
       <div className="top-nav-social">
         <a href="mailto:finbar@finbar.studio" aria-label="Email" title="Email" className="top-nav-social-item">
-          <MailIcon />
+          <span className="top-nav-glyph" aria-hidden="true">{"\u{1F584}"}</span>
         </a>
         <a href="tel:+61412796630" aria-label="Phone" title="Phone" className="top-nav-social-item">
           <PhoneIcon />
