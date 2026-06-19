@@ -21,7 +21,6 @@ export default function SiteFooter() {
 
   const pathname = usePathname();
   const footerRef = useRef<HTMLElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
   const [armed, setArmed] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -64,11 +63,13 @@ export default function SiteFooter() {
     return () => ro.disconnect();
   }, []);
 
-  // Re-arm + re-reveal on every page visit (pathname change resets the reveal so
-  // the footer animates in fresh each time rather than starting already shown).
+  // Re-arm + reveal on every page visit. A plain scroll-position check (robust,
+  // unlike a sentinel that can sit below the clipped 100svh footer) flips the
+  // reveal once the footer has scrolled well into view; the CSS transitions then
+  // draw the rule and rise the wordmark.
   useLayoutEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
+    const footer = footerRef.current;
+    if (!footer) return;
     setRevealed(false);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setArmed(false);
@@ -76,12 +77,26 @@ export default function SiteFooter() {
       return;
     }
     setArmed(true);
-    const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setRevealed(true); },
-      { rootMargin: "0px 0px -8px 0px" },
-    );
-    io.observe(sentinel);
-    return () => io.disconnect();
+    let revealedLocal = false;
+    const check = () => {
+      if (revealedLocal) return;
+      // Fire when the footer's top has risen past the middle of the viewport
+      // (i.e. the footer fills the lower half — you've reached the bottom).
+      if (footer.getBoundingClientRect().top < window.innerHeight * 0.5) {
+        revealedLocal = true;
+        setRevealed(true);
+      }
+    };
+    check();
+    const lenis = window.__lenis;
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    lenis?.on?.("scroll", check);
+    return () => {
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+      lenis?.off?.("scroll", check);
+    };
   }, [pathname]);
 
   return (
@@ -113,7 +128,6 @@ export default function SiteFooter() {
       <div className="site-footer-mark" aria-label="finbarstudio">
         <BrandWordmark ref={markRef} className="site-footer-mark-inner" />
       </div>
-      <div className="site-footer-sentinel" aria-hidden="true" ref={sentinelRef} />
     </footer>
   );
 }

@@ -79,7 +79,7 @@ export default function TopNav() {
             )}
           </Link>
         ))}
-        <a href={SANDBOX_HREF} className="tag tag-default tag-ext">
+        <a href={SANDBOX_HREF} target="_blank" rel="noopener noreferrer" className="tag tag-default tag-ext">
           Sandbox
           <span className="nav-ext-bubble" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="100%" height="100%">

@@ -25,6 +25,11 @@ import { ASTERISK_POINTS } from "./brand-asterisk";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 
+// Module-level flag: the preloader plays on every full page LOAD (this resets to
+// false on reload) but is skipped on client-side navigation back to home (the
+// module stays alive). No sessionStorage — that permanently blocked replays.
+let introPlayed = false;
+
 export default function HomeIntro() {
   const lockupRef = useRef<HTMLAnchorElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -88,9 +93,7 @@ export default function HomeIntro() {
   // measure it synchronously.
   useLayoutEffect(() => {
     if (window.matchMedia(MOBILE_QUERY).matches) { setDone(true); return; }
-    let played = false;
-    try { played = !!sessionStorage.getItem("finbar-intro-played"); } catch { /* ignore */ }
-    if (played) { setDone(true); return; }
+    if (introPlayed) { setDone(true); return; }
 
     const fly = flyRef.current, star = starRef.current, slot = slotRef.current,
       text = textRef.current, screen = screenRef.current;
@@ -106,8 +109,8 @@ export default function HomeIntro() {
     const finish = () => {
       if (finished) return;
       finished = true;
+      introPlayed = true;
       text.classList.add("is-revealed");
-      try { sessionStorage.setItem("finbar-intro-played", "1"); } catch { /* ignore */ }
       setDone(true);
       document.body.style.overflow = prevOverflow;
       delete document.documentElement.dataset.introLock;

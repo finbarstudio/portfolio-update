@@ -3620,13 +3620,14 @@ body:has(.sb-root) {
    its TOP edge sits level with the cap-top of WORK (doesn't shift the label). */
 .nav-work-count {
   font-size: 0.7em;
+  font-weight: 700;
   color: inherit;
   line-height: 1;
   margin-left: 0.25em;
   display: inline-block;
   vertical-align: baseline;
   position: relative;
-  top: -0.16em;
+  top: -0.3em;
 }
 /* The Sandbox pill nests a circular bubble in its rounded end. Tighten the right
    padding so the gap around the bubble matches the pill's vertical padding. */
