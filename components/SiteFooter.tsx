@@ -121,10 +121,10 @@ export default function SiteFooter() {
       <div className="site-footer-rule" aria-hidden="true" />
 
       <div className="site-footer-info">
-        <div className="sf-col">
+        <div className="sf-col sf-col-aus">
           <FooterClock />
         </div>
-        <div className="sf-col">
+        <div className="sf-col sf-col-eng">
           <span className="sf-loc">
             <span className="sf-label">ENG/LON</span>
             <EngFlag />

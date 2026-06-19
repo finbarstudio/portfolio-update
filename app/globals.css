@@ -3555,15 +3555,24 @@ body:has(.sb-root) {
   align-items: flex-start;   /* left-aligned; underlines span only their text */
   gap: 0;                    /* tight, line-height-only spacing (matches the clock) */
 }
-/* Last column (copyright) is right-aligned at the 5-col layout. */
+/* Copyright column is right-aligned (every size — so it sits bottom-right, where
+   its sticky pin docks). */
+.sf-col-end { align-items: flex-end; text-align: right; }
+/* Mobile layout (2-col grid): ENG/LON + contacts span full width on top, then the
+   two sticky-docking blocks share the bottom row — AUS clock bottom-left,
+   copyright bottom-right — so the fixed bottom-corner pins slot straight into
+   their slots instead of jumping on the last bit of scroll. */
+.sf-col-eng { grid-column: 1 / -1; order: 1; }
+.sf-contact { grid-column: 1 / -1; order: 2; }
+.sf-col-aus { order: 3; }
+.sf-col-end { order: 4; }
 @media (min-width: 768px) {
-  .sf-col-end { align-items: flex-end; text-align: right; }
-}
-/* Mobile: the contact block (hiring + email + phone, stacked tight) spans both
-   columns and drops to the very bottom of the info, just above the asterisk. */
-.sf-contact { grid-column: 1 / -1; order: 1; }
-@media (min-width: 768px) {
-  .sf-contact { grid-column: auto; order: 0; }
+  .sf-col-eng,
+  .sf-contact { grid-column: auto; }
+  .sf-col-eng,
+  .sf-contact,
+  .sf-col-aus,
+  .sf-col-end { order: 0; }
 }
 .sf-label { color: var(--ink); }          /* hiring / build-by — ink */
 /* Cheeky aside next to ENG/LON. */

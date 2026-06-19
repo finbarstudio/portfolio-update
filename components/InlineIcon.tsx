@@ -40,7 +40,14 @@ export default function InlineIcon({ char, className }: { char?: string; classNa
   };
 
   return (
-    <span ref={ref} className={className} onMouseEnter={reel} aria-hidden="true">
+    <span
+      ref={ref}
+      className={className}
+      onMouseEnter={reel}
+      onClick={reel}            /* tap to reel on touch devices */
+      aria-hidden="true"
+      style={{ cursor: "pointer" }}
+    >
       {base}
     </span>
   );
