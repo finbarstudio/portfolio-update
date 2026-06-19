@@ -13,7 +13,7 @@ import { useRef } from "react";
 // of two glyphs that must stay together (no space).
 export const ICON_BATCH = [
   "⦿", "✱", "❉", "♡", "👪", "🖄", "⮔", "🚭", "📦", "🞋",
-  "🖧", "🗑", "🗺", "⛖", "🮲🮳", "🅮", "✎", "✈", "☣",
+  "🖧", "🗑", "🗺", "⛖", "🮲🮳", "🅮", "✎", "✈", "☣", "✌", "🏄", "🂱",
 ];
 
 export default function InlineIcon({ char, className }: { char?: string; className?: string }) {
