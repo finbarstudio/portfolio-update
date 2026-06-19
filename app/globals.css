@@ -3489,15 +3489,17 @@ body:has(.sb-root) {
   line-height: 0.82;
   overflow: hidden;          /* mask the wordmark's bottom */
 }
-/* Give the container enough height to clear the optical overshoot of rounded
-   caps (S, O, U extend slightly below the baseline at large sizes). */
-.site-footer-mark-inner { margin-bottom: 0.12em; }
+/* line-height 0.82 (on .site-footer-mark) makes the line box shorter than the
+   glyphs, so the rounded cap overshoot (S, O, U dip below baseline) pokes out the
+   bottom of the inner box and hits the parent's overflow clip. padding-bottom
+   keeps the glyph bottoms inside the inner box, clear of the clip edge. */
 .site-footer-mark-inner {
   display: inline-flex;
   align-items: baseline;
   width: max-content;
   white-space: nowrap;
   font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
+  padding-bottom: 0.16em;
 }
 
 /* Reveal at the very bottom (sentinel + observer flips is-revealed). JS arms the
@@ -3581,30 +3583,43 @@ body:has(.sb-root) {
   .top-nav-social { display: none; }
 }
 /* Superscript project count inside the Work pill. */
-.nav-count {
-  font-size: 0.72em;
-  vertical-align: super;
+/* Project count on the Work pill — small, same ink colour as the label, raised so
+   its TOP edge sits level with the cap-top of WORK (doesn't shift the label). */
+.nav-work-count {
+  font-size: 0.7em;
+  color: inherit;
   line-height: 1;
-  margin-left: 0.2em;
-  opacity: 0.65;
+  margin-left: 0.25em;
+  display: inline-block;
+  vertical-align: baseline;
+  position: relative;
+  top: -0.42em;
 }
-/* External-link bubble inside the Sandbox pill — small filled circle with arrow. */
+/* The Sandbox pill nests a circular bubble in its rounded end. Tighten the right
+   padding so the gap around the bubble matches the pill's vertical padding. */
+.tag-ext {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding-right: 0.4em;
+}
+/* External-link bubble — filled circle, sized to nest with even padding inside
+   the pill radius, holding a weighty north-east arrow. */
 .nav-ext-bubble {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.3em;
-  height: 1.3em;
+  width: 1.55em;
+  height: 1.55em;
   border-radius: 50%;
   background: var(--ink);
   color: var(--bg);
-  font-size: 0.8em;
-  line-height: 1;
   margin-left: 0.45em;
-  vertical-align: middle;
+  flex: 0 0 auto;
   transition: background var(--dur-fast) var(--ease);
 }
-a.tag-default:hover .nav-ext-bubble { background: var(--pink); }
+.nav-ext-bubble svg { width: 0.84em; height: 0.84em; display: block; }
+a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* The .tag-default hover is scoped to anchors; mirror it for this button. */
 @media (hover: hover) {
   .intro-menu-btn:hover { color: var(--pink); border-color: var(--pink); }

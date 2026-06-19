@@ -75,12 +75,17 @@ export default function TopNav() {
           >
             {it.label}
             {it.href === "/work" && (
-              <sup className="nav-count">{PROJECT_COUNT}</sup>
+              <span className="nav-work-count">{PROJECT_COUNT}</span>
             )}
           </Link>
         ))}
-        <a href={SANDBOX_HREF} className="tag tag-default">
-          Sandbox<span className="nav-ext-bubble" aria-hidden="true">↗</span>
+        <a href={SANDBOX_HREF} className="tag tag-default tag-ext">
+          Sandbox
+          <span className="nav-ext-bubble" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="100%" height="100%">
+              <path d="M8 16L16 8M9.5 8H16v6.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
         </a>
       </nav>
 
