@@ -65,7 +65,7 @@ export default function FooterClock() {
       </span>
       <span className={`sf-clock-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
         <span className="sf-clock-inner">
-          <span className="sf-value">AUS/BNE</span>
+          <span className="sf-label">AUS/BNE</span>
           <span className="sf-value tabular-nums" suppressHydrationWarning>{time || " "}</span>
         </span>
       </span>

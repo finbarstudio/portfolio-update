@@ -3358,7 +3358,7 @@ body:has(.sb-root) {
 }
 .sf-copyright-inner {
   display: inline-block;
-  color: var(--pink);              /* copyright is pink, floating + docked */
+  color: var(--ink);               /* copyright is the ink top-line, floating + docked */
   transform: translateY(118%);     /* hidden beneath the mask until revealed */
   transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
 }

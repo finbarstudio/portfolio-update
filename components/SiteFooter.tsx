@@ -121,7 +121,7 @@ export default function SiteFooter() {
           <FooterClock />
         </div>
         <div className="sf-col">
-          <span className="sf-value">UK/LON</span>
+          <span className="sf-label">UK/LON</span>
           <LiveTime tz="Europe/London" />
         </div>
         <div className="sf-col">
@@ -132,8 +132,8 @@ export default function SiteFooter() {
           <a href="tel:+61412796630" className="sf-value u-underline tabular-nums">+61 412 796 630</a>
         </div>
         <div className="sf-col sf-col-end">
-          <span className="sf-label">Design and build by finbarstudio</span>
           <FooterCopyright year={year} />
+          <span className="sf-value">Design and build by finbarstudio</span>
         </div>
       </div>
 
