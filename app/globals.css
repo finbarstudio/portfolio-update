@@ -3489,9 +3489,9 @@ body:has(.sb-root) {
   line-height: 0.82;
   overflow: hidden;          /* mask the wordmark's bottom */
 }
-/* Pull the container slightly shorter than the wordmark so it clips the empty
-   descender band (not the cap bottoms) — masks the logo beneath the padding. */
-.site-footer-mark-inner { margin-bottom: -0.05em; }
+/* Give the container enough height to clear the optical overshoot of rounded
+   caps (S, O, U extend slightly below the baseline at large sizes). */
+.site-footer-mark-inner { margin-bottom: 0.12em; }
 .site-footer-mark-inner {
   display: inline-flex;
   align-items: baseline;
@@ -3511,7 +3511,7 @@ body:has(.sb-root) {
 }
 .site-footer.is-armed.is-revealed .site-footer-mark-inner {
   transform: translateY(0);
-  transition: transform 1.15s cubic-bezier(0.16, 1, 0.3, 1) 1.2s;
+  transition: transform 1.15s cubic-bezier(0.16, 1, 0.3, 1) 1.0s;
 }
 
 /* Selected work: no top rule (HR). */

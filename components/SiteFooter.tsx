@@ -42,9 +42,9 @@ export default function SiteFooter() {
       if (natural <= 0) return;
       const size = (avail / natural) * 100;
       el.style.fontSize = `${Math.max(20, size)}px`;
-      // Correct any sub-pixel undershoot so it spans the full width.
+      // Correction pass + 0.3% overshoot so the wordmark always fills edge-to-edge.
       const measured = el.scrollWidth;
-      if (measured > 0) el.style.fontSize = `${Math.max(20, size * (avail / measured))}px`;
+      if (measured > 0) el.style.fontSize = `${Math.max(20, size * (avail / measured) * 1.003)}px`;
     };
     fit();
     document.fonts?.ready.then(fit).catch(() => {});
