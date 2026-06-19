@@ -10,7 +10,11 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import BrandStar from "./BrandStar";
+
+let registered = false;
 
 export default function SiteFooter() {
   // Deterministic initial year (matches SSR), then corrected on the client.
@@ -18,9 +22,11 @@ export default function SiteFooter() {
   useEffect(() => setYear(new Date().getFullYear()), []);
 
   const footerRef = useRef<HTMLElement>(null);
+  const ruleRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
 
-  // Fit the giant wordmark to the container width (minus its gutters) on one line.
+  // Fit the giant wordmark to the container width (minus its gutters) on one
+  // line, with a correction pass so its edges land exactly on the page margins.
   useLayoutEffect(() => {
     const el = markRef.current;
     if (!el) return;
@@ -29,9 +35,15 @@ export default function SiteFooter() {
       if (!parent) return;
       const cs = getComputedStyle(parent);
       const avail = parent.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      if (avail <= 0) return;
       el.style.fontSize = "100px";
       const natural = el.scrollWidth;
-      if (natural > 0 && avail > 0) el.style.fontSize = `${Math.max(20, (avail / natural) * 100)}px`;
+      if (natural <= 0) return;
+      const size = (avail / natural) * 100;
+      el.style.fontSize = `${Math.max(20, size)}px`;
+      // Correct any sub-pixel undershoot so it spans the full width.
+      const measured = el.scrollWidth;
+      if (measured > 0) el.style.fontSize = `${Math.max(20, size * (avail / measured))}px`;
     };
     fit();
     document.fonts?.ready.then(fit).catch(() => {});
@@ -40,37 +52,48 @@ export default function SiteFooter() {
     return () => ro.disconnect();
   }, []);
 
-  // Reveal-on-enter (like SAL's data-sal): once the footer scrolls into view,
-  // arm + reveal — the rule draws left→right and the wordmark rises from the
-  // bottom, both via CSS transitions on the .is-in class. Armed in JS so the
-  // footer is never stuck hidden without JS.
-  const [armed, setArmed] = useState(false);
-  const [inView, setInView] = useState(false);
+  // Scroll-driven reveals via GSAP ScrollTrigger (scrub = tied to scroll speed):
+  // the rule draws left→right as the footer enters; the wordmark rises in from
+  // the bottom as you reach the very bottom.
   useLayoutEffect(() => {
     const footer = footerRef.current;
-    if (!footer) return;
+    const rule = ruleRef.current;
+    const mark = markRef.current;
+    if (!footer || !rule || !mark) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setArmed(true); // hide the rule + wordmark, ready to reveal
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setInView(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.12 },
-    );
-    io.observe(footer);
-    return () => io.disconnect();
+    if (!registered) { gsap.registerPlugin(ScrollTrigger); registered = true; }
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        rule,
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          ease: "none",
+          scrollTrigger: { trigger: footer, start: "top 70%", end: "top 20%", scrub: true },
+        },
+      );
+      gsap.fromTo(
+        mark,
+        { yPercent: 120 },
+        {
+          yPercent: 0,
+          ease: "none",
+          scrollTrigger: { trigger: mark, start: "top bottom", end: "bottom bottom", scrub: true },
+        },
+      );
+    }, footer);
+
+    // Layout settles (fonts/fit) after mount — make sure trigger positions are right.
+    const refresh = () => ScrollTrigger.refresh();
+    document.fonts?.ready.then(refresh).catch(() => {});
+    const t = setTimeout(refresh, 400);
+    return () => { clearTimeout(t); ctx.revert(); };
   }, []);
 
   return (
-    <footer
-      className={`site-footer ${armed ? "js-reveal" : ""} ${inView ? "is-in" : ""}`}
-      aria-label="Footer"
-      ref={footerRef}
-    >
-      <div className="site-footer-rule" aria-hidden="true" />
+    <footer className="site-footer" aria-label="Footer" ref={footerRef}>
+      <div className="site-footer-rule" aria-hidden="true" ref={ruleRef} />
 
       <div className="site-footer-info">
         <div className="sf-cluster sf-contact">

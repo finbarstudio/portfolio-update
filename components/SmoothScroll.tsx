@@ -7,10 +7,14 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+
+    gsap.registerPlugin(ScrollTrigger);
 
     const lenis = new Lenis({
       // A longish, easing-out glide — heavier than a native scroll, like the
@@ -22,6 +26,10 @@ export default function SmoothScroll() {
       touchMultiplier: 1.6,
     });
     window.__lenis = lenis;
+
+    // Keep ScrollTrigger in lockstep with Lenis so scrubbed triggers track the
+    // smooth scroll position (not the native one).
+    lenis.on("scroll", ScrollTrigger.update);
 
     let raf = 0;
     const loop = (time: number) => {
