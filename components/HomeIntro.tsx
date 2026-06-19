@@ -136,13 +136,11 @@ export default function HomeIntro() {
           aria-hidden="true"
           style={flyTransform ? { transform: flyTransform } : undefined}
         >
+          {/* Exact thumbnail-loader trace: faint track + glowing pink draw that
+              loops around the star (see .star-loader-* in globals). */}
           <svg viewBox="0 0 100 100" className="intro-fly-star">
-            <polygon
-              points={STAR_POINTS}
-              pathLength={1}
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
-            />
+            <polygon className="star-loader-track" points={STAR_POINTS} />
+            <polygon className="star-loader-draw" points={STAR_POINTS} pathLength={1} />
           </svg>
         </div>
       )}

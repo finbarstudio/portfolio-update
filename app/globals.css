@@ -3210,25 +3210,19 @@ body:has(.sb-root) {
   pointer-events: none;
 }
 .intro-fly-star { width: 100%; height: auto; display: block; overflow: visible; }
-/* Same trim mechanic as the thumbnail loader (.star-loader-draw): a single
-   <polygon> normalised to pathLength=1, one dash the length of the whole
-   outline, offset 1 → 0 so one clean line draws the entire star. */
-.intro-fly-star polygon {
+/* The trace itself is the thumbnail loader (.star-loader-track / -draw). On the
+   fill + fly phases we stop the loop at the full outline and flood it pink. */
+.intro-fly .star-loader-draw { transition: fill-opacity 0.45s var(--ease); fill-opacity: 0; }
+.intro-fly.is-fill .star-loader-draw,
+.intro-fly.is-fly .star-loader-draw {
+  animation: none;
+  stroke-dashoffset: 0;
   fill: var(--pink);
-  fill-opacity: 0;
-  stroke: var(--pink);
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: intro-star-draw 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  transition: fill-opacity 0.45s var(--ease);
+  fill-opacity: 1;
 }
-@keyframes intro-star-draw { to { stroke-dashoffset: 0; } }
-.intro-fly.is-fill .intro-fly-star polygon,
-.intro-fly.is-fly .intro-fly-star polygon { fill-opacity: 1; }
+.intro-fly.is-fill .star-loader-track,
+.intro-fly.is-fly .star-loader-track { stroke: var(--pink); }
 @media (prefers-reduced-motion: reduce) {
-  .intro-fly-star polygon { animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
   .intro-fly { transition: none; }
 }
 
@@ -3347,8 +3341,23 @@ body:has(.sb-root) {
   height: 1px;
   background: var(--ink);
   margin: 0 clamp(20px, 3vw, 40px);
-  /* GSAP draws this left→right on scroll (see SiteFooter). */
   transform-origin: left;
+}
+/* Reveal-on-enter (see SiteFooter): JS arms the hidden start state with
+   .js-reveal, then .is-in transitions them in. Without JS, both stay visible. */
+.site-footer.js-reveal .site-footer-rule {
+  transform: scaleX(0);
+  transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.site-footer.js-reveal .site-footer-mark-inner {
+  transform: translateY(112%);
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.18s;
+}
+.site-footer.js-reveal.is-in .site-footer-rule { transform: scaleX(1); }
+.site-footer.js-reveal.is-in .site-footer-mark-inner { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .site-footer.js-reveal .site-footer-rule,
+  .site-footer.js-reveal .site-footer-mark-inner { transition: none; }
 }
 .site-footer-info {
   margin-top: auto;          /* push the info row + wordmark to the bottom */
