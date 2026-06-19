@@ -3213,13 +3213,25 @@ body:has(.sb-root) {
   .home-intro-slot-star { width: 24px; height: 24px; }
 }
 
-/* The flying asterisk: traces centre-screen, then GSAP drives it to the slot. */
+/* The opaque intro screen — covers everything during the trace + fill, then
+   GSAP fades it to transparent ("the screen opens") so the page shows through. */
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 65;
+  pointer-events: none;
+}
+
+/* The flying asterisk: traces centre-screen at its FINAL logo size (JS sets the
+   width to match the slot), then GSAP only ever TRANSLATES it to the slot — it
+   never scales. */
 .intro-fly {
   position: fixed;
   top: 50%;
   left: 50%;
   z-index: 70;
-  width: clamp(120px, 20vw, 280px);
+  width: clamp(72px, 9vw, 150px);   /* fallback; JS overrides to the slot size */
   pointer-events: none;
   opacity: 0; /* GSAP sets opacity:1 when animation starts; prevents SSR flash */
 }
@@ -3449,8 +3461,8 @@ body:has(.sb-root) {
   /* Clear the (overlapping) fixed nav and leave the same top inset the nav has,
      so the rule sits at a matching rhythm below the nav items. */
   padding-top: calc(var(--menubar-h) + 6px);
-  /* Bottom padding the masked wordmark sits beneath. */
-  padding-bottom: clamp(18px, 2.6vh, 44px);
+  /* Bottom gap is owned by .site-footer-mark (so it can equal the side gutters). */
+  padding-bottom: 0;
 }
 .site-footer-rule {
   height: 1px;
@@ -3504,22 +3516,23 @@ body:has(.sb-root) {
 
 .site-footer-mark {
   width: 100%;
-  /* Same gutters as the rule + info above, so every footer edge lines up. */
-  padding: 0 clamp(20px, 3vw, 40px);
+  /* Equal gutter on all three edges — left, right AND bottom — so the wordmark is
+     inset uniformly. The bottom padding is also what gives the rounded-cap
+     overshoot (S/O/U) room below the baseline: overflow clips at the padding-box
+     edge, far below the glyphs, so nothing gets cut. */
+  padding: 0 clamp(20px, 3vw, 40px) clamp(20px, 3vw, 40px);
   line-height: 0.82;
-  overflow: hidden;          /* mask the wordmark's bottom */
+  overflow: hidden;          /* masks the slide-up reveal */
 }
-/* line-height 0.82 (on .site-footer-mark) makes the line box shorter than the
-   glyphs, so the rounded cap overshoot (S, O, U dip below baseline) pokes out the
-   bottom of the inner box and hits the parent's overflow clip. padding-bottom
-   keeps the glyph bottoms inside the inner box, clear of the clip edge. */
 .site-footer-mark-inner {
   display: inline-flex;
   align-items: baseline;
   width: max-content;
   white-space: nowrap;
   font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
-  padding-bottom: 0.16em;
+  /* Pull left by Space Mono's cap side-bearing so the "F" ink kisses the left
+     gutter (the JS fit already pushes the asterisk to the right gutter). */
+  margin-left: -0.05em;
 }
 
 /* Reveal at the very bottom (sentinel + observer flips is-revealed). JS arms the

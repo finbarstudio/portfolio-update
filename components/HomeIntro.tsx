@@ -1,18 +1,21 @@
 "use client";
 
 /**
- * HomeIntro — the opening screen + preloader sequence.
+ * HomeIntro — opening preloader + resting logo.
  *
- * DESKTOP: the brand asterisk outline traces itself in the centre of a blank
- * screen, fills pink, drops to the centre-bottom (the wordmark line), slides
- * right into its slot, and FINBARSTUDIO mask-reveals to its left. The resting
- * wordmark then scroll-shrinks up into the nav as you scroll the first screen.
+ * Preloader (desktop, once per session) — the asterisk NEVER scales, only
+ * translates:
+ *   1. the brand asterisk outline traces itself (centre screen, at final size)
+ *   2. it fills pink
+ *   3. the intro screen "opens" — the opaque overlay fades to transparent
+ *   4. the asterisk translates down to the middle-bottom of the screen
+ *   5. then translates right into its slot (bottom-right of the lockup)
+ *   6. FINBARSTUDIO slides in from the left to complete the logo
+ *   7. scrolling unlocks
+ * The resting lockup then scroll-shrinks up into the nav.
  *
- * MOBILE: no preloader, no scroll-morph — the wordmark is a small static logo
- * pinned top-right (clear of the left-aligned nav), and the page content starts
- * immediately beneath the nav. (CSS handles the static placement.)
- *
- * Plays once per browser session.
+ * Mobile: no preloader / no scroll-morph — a small static asterisk logo sits
+ * top-right and the page content starts immediately (handled in CSS).
  */
 
 import { useLayoutEffect, useRef, useState } from "react";
@@ -28,27 +31,15 @@ export default function HomeIntro() {
   const slotRef = useRef<HTMLSpanElement>(null);
   const flyRef = useRef<HTMLDivElement>(null);
   const starRef = useRef<SVGPolygonElement>(null);
+  const screenRef = useRef<HTMLDivElement>(null);
   const [done, setDone] = useState(false);
 
-  // Whether to skip the whole intro (already played this session, or mobile).
-  const skipRef = useRef(false);
+  // Resting logo: fit-to-width + scroll-shrink into the nav. This ALWAYS runs on
+  // desktop — independent of whether the preloader plays — so the logo is always
+  // correctly positioned (even on a revisit when the intro is skipped). Mobile is
+  // skipped (CSS pins a static corner mark instead).
   useLayoutEffect(() => {
-    const mobile = window.matchMedia(MOBILE_QUERY).matches;
-    let played = false;
-    try { played = !!sessionStorage.getItem("finbar-intro-played"); } catch { /* ignore */ }
-    // On mobile the wordmark is just a static corner logo — no preloader, ever.
-    if (mobile || played) {
-      skipRef.current = true;
-      setDone(true);
-    }
-    // The "played" flag is set in finish() (not here) so a Strict-Mode remount
-    // in dev doesn't skip the real run.
-  }, []);
-
-  // Desktop only: fit the wordmark to the screen width, then drive the
-  // scroll-linked morph (shrink + rise into the centre of the nav).
-  useLayoutEffect(() => {
-    if (skipRef.current) return;
+    if (window.matchMedia(MOBILE_QUERY).matches) return;
     const el = lockupRef.current;
     if (!el) return;
     let bigFont = 0;
@@ -92,13 +83,18 @@ export default function HomeIntro() {
     };
   }, []);
 
-  // Desktop only: the preloader choreography (GSAP timeline). The wordmark-fit
-  // effect above runs first (same commit, synchronous), so the slot is already
-  // sized + positioned — we measure it directly, no rAF gymnastics.
+  // Preloader choreography — desktop, once per session. Runs AFTER the fit effect
+  // above (same commit, in order), so the slot is already laid out and we can
+  // measure it synchronously.
   useLayoutEffect(() => {
-    if (skipRef.current) return;
-    const fly = flyRef.current, star = starRef.current, slot = slotRef.current, text = textRef.current;
-    if (!fly || !star || !slot || !text) return;
+    if (window.matchMedia(MOBILE_QUERY).matches) { setDone(true); return; }
+    let played = false;
+    try { played = !!sessionStorage.getItem("finbar-intro-played"); } catch { /* ignore */ }
+    if (played) { setDone(true); return; }
+
+    const fly = flyRef.current, star = starRef.current, slot = slotRef.current,
+      text = textRef.current, screen = screenRef.current;
+    if (!fly || !star || !slot || !text || !screen) { setDone(true); return; }
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -117,36 +113,43 @@ export default function HomeIntro() {
       delete document.documentElement.dataset.introLock;
       window.__lenis?.start();
     };
-    // Failsafe: never leave scroll locked if the ticker stalls (background tab).
-    const failsafe = setTimeout(finish, 6000);
-
+    const failsafe = setTimeout(finish, 7000);
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-    // Measure synchronously — the layout from the fit effect is already applied.
+    // Size the flying asterisk to EXACTLY the slot asterisk, so it only ever
+    // translates — never scales (per spec). Both draw the same polygon, so a
+    // matching width means a pixel-identical mark at the handoff.
+    const sRect0 = slot.getBoundingClientRect();
+    if (sRect0.width > 0) {
+      fly.style.width = `${sRect0.width}px`;
+      fly.style.height = `${sRect0.width}px`;
+    }
+
     const len = star.getTotalLength() || 0;
+    gsap.set(fly, { xPercent: -50, yPercent: -50, x: 0, y: 0, opacity: 1 });
+    gsap.set(star, { strokeDasharray: len, strokeDashoffset: reduce ? 0 : len, fillOpacity: reduce ? 1 : 0 });
+    gsap.set(screen, { opacity: 1 });
+
+    // Translation deltas (fly centre → slot centre), measured after sizing.
     const f = fly.getBoundingClientRect();
     const s = slot.getBoundingClientRect();
-    const dyDown = (s.top + s.height / 2) - (f.top + f.height / 2);
-    const dxRight = (s.left + s.width / 2) - (f.left + f.width / 2);
-    const scale = f.height ? s.height / f.height : 0.12;
+    const dx = (s.left + s.width / 2) - (f.left + f.width / 2);
+    const dy = (s.top + s.height / 2) - (f.top + f.height / 2);
 
-    gsap.set(fly, { xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1, opacity: 1 });
-    gsap.set(star, { strokeDasharray: len, strokeDashoffset: reduce ? 0 : len, fillOpacity: reduce ? 1 : 0 });
-
-    // Reduced motion: skip the big movement, just reveal in place quickly.
     if (reduce) {
-      clearTimeout(failsafe);
-      gsap.to(text, { duration: 0.01, onComplete: () => { text.classList.add("is-revealed"); } });
-      const t = gsap.delayedCall(0.6, finish);
+      gsap.set(screen, { opacity: 0 });
+      text.classList.add("is-revealed");
+      const t = gsap.delayedCall(0.4, () => { clearTimeout(failsafe); finish(); });
       return () => { t.kill(); document.body.style.overflow = prevOverflow; delete document.documentElement.dataset.introLock; window.__lenis?.start(); };
     }
 
     const tl = gsap.timeline({ onComplete: () => { clearTimeout(failsafe); finish(); } });
-    tl.to(star, { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" })       // trace
-      .to(star, { fillOpacity: 1, duration: 0.28, ease: "power1.out" })              // fill
-      .to(fly, { y: dyDown, duration: 0.5, ease: "power3.inOut" }, "+=0.05")         // drop
-      .to(fly, { x: dxRight, scale, duration: 0.6, ease: "power3.inOut" })           // slide to slot
-      .call(() => { text.classList.add("is-revealed"); }, undefined, "-=0.12");      // wordmark reveal
+    tl.to(star, { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" })       // 1 trace
+      .to(star, { fillOpacity: 1, duration: 0.3, ease: "power1.out" })               // 2 fill
+      .to(screen, { opacity: 0, duration: 0.6, ease: "power2.inOut" }, "+=0.1")      // 3 screen opens
+      .to(fly, { y: dy, duration: 0.55, ease: "power3.inOut" }, "-=0.15")            // 4 down to middle-bottom
+      .to(fly, { x: dx, duration: 0.6, ease: "power3.inOut" }, "+=0.05")             // 5 right to the slot
+      .call(() => { text.classList.add("is-revealed"); }, undefined, "-=0.1");       // 6 text slides in
 
     return () => {
       clearTimeout(failsafe);
@@ -159,6 +162,7 @@ export default function HomeIntro() {
 
   return (
     <section className="home-intro" aria-label="finbarstudio">
+      {!done && <div ref={screenRef} className="intro-screen" aria-hidden="true" />}
       {!done && (
         <div ref={flyRef} className="intro-fly" aria-hidden="true">
           <svg viewBox="0 0 100 100" className="intro-fly-star">
