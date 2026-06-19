@@ -10,15 +10,22 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import BrandStar from "./BrandStar";
+
+let registered = false;
 
 export default function SiteFooter() {
   // Deterministic initial year (matches SSR), then corrected on the client.
   const [year, setYear] = useState(2026);
   useEffect(() => setYear(new Date().getFullYear()), []);
 
-  // Fit the giant wordmark to the container width (minus its gutters) on one line.
+  const footerRef = useRef<HTMLElement>(null);
+  const ruleRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
+
+  // Fit the giant wordmark to the container width (minus its gutters) on one line.
   useLayoutEffect(() => {
     const el = markRef.current;
     if (!el) return;
@@ -38,9 +45,43 @@ export default function SiteFooter() {
     return () => ro.disconnect();
   }, []);
 
+  // Scroll-driven reveals (GSAP ScrollTrigger): the rule draws left→right as the
+  // footer enters; the wordmark rises in from the bottom as you reach the bottom.
+  useLayoutEffect(() => {
+    const footer = footerRef.current;
+    const rule = ruleRef.current;
+    const mark = markRef.current;
+    if (!footer || !rule || !mark) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!registered) { gsap.registerPlugin(ScrollTrigger); registered = true; }
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        rule,
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          ease: "none",
+          scrollTrigger: { trigger: footer, start: "top 92%", end: "top 45%", scrub: true },
+        },
+      );
+      gsap.fromTo(
+        mark,
+        { yPercent: 120 },
+        {
+          yPercent: 0,
+          ease: "none",
+          scrollTrigger: { trigger: mark, start: "top bottom", end: "bottom bottom", scrub: true },
+        },
+      );
+    }, footer);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <footer className="site-footer" aria-label="Footer">
-      <div className="site-footer-rule" aria-hidden="true" />
+    <footer className="site-footer" aria-label="Footer" ref={footerRef}>
+      <div className="site-footer-rule" aria-hidden="true" ref={ruleRef} />
 
       <div className="site-footer-info">
         <div className="sf-cluster sf-contact">

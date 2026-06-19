@@ -22,10 +22,6 @@ const TRACE_MS = 2000;
 const FILL_MS = 450;
 const FLY_MS = 850;
 
-// The star as a single continuous path (one start point → closed outline), so
-// the stroke-dash trace is reliable (pathLength on a <polygon> is not).
-const STAR_PATH = `M${STAR_POINTS.replace(/ /g, "L")}Z`;
-
 export default function HomeIntro() {
   const lockupRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLSpanElement>(null);
@@ -141,14 +137,10 @@ export default function HomeIntro() {
           style={flyTransform ? { transform: flyTransform } : undefined}
         >
           <svg viewBox="0 0 100 100" className="intro-fly-star">
-            <path
-              d={STAR_PATH}
-              pathLength={100}
-              fill="var(--pink)"
-              stroke="var(--pink)"
+            <polygon
+              points={STAR_POINTS}
+              pathLength={1}
               strokeWidth={1}
-              strokeLinejoin="round"
-              strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
           </svg>

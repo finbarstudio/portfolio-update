@@ -3210,23 +3210,25 @@ body:has(.sb-root) {
   pointer-events: none;
 }
 .intro-fly-star { width: 100%; height: auto; display: block; overflow: visible; }
-/* The star is ONE continuous path, normalised to pathLength=100 (set on the
-   element). We trim it with a single dash the length of the whole path and
-   animate the offset 100 → 0, so one clean line draws the entire outline. */
-.intro-fly-star path {
+/* Same trim mechanic as the thumbnail loader (.star-loader-draw): a single
+   <polygon> normalised to pathLength=1, one dash the length of the whole
+   outline, offset 1 → 0 so one clean line draws the entire star. */
+.intro-fly-star polygon {
   fill: var(--pink);
   fill-opacity: 0;
   stroke: var(--pink);
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: star-draw 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: intro-star-draw 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   transition: fill-opacity 0.45s var(--ease);
 }
-@keyframes star-draw { to { stroke-dashoffset: 0; } }
-.intro-fly.is-fill .intro-fly-star path,
-.intro-fly.is-fly .intro-fly-star path { fill-opacity: 1; }
+@keyframes intro-star-draw { to { stroke-dashoffset: 0; } }
+.intro-fly.is-fill .intro-fly-star polygon,
+.intro-fly.is-fly .intro-fly-star polygon { fill-opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  .intro-fly-star path { animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
+  .intro-fly-star polygon { animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
   .intro-fly { transition: none; }
 }
 
@@ -3337,35 +3339,16 @@ body:has(.sb-root) {
   flex-direction: column;
   overflow: hidden;          /* clips the wordmark along the bottom */
   color: var(--ink);         /* one uniform colour for everything inside */
-  padding-top: 44px;         /* sits a touch below the nav */
+  /* Clear the (overlapping) fixed nav and leave the same top inset the nav has,
+     so the rule sits at a matching rhythm below the nav items. */
+  padding-top: calc(var(--menubar-h) + 16px);
 }
 .site-footer-rule {
   height: 1px;
   background: var(--ink);
   margin: 0 clamp(20px, 3vw, 40px);
-}
-/* Scroll-driven reveals: the rule draws left→right as the footer enters, and the
-   wordmark rises in from the bottom as you reach the very bottom. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .site-footer-rule {
-      transform: scaleX(0);
-      transform-origin: left;
-      animation: footer-rule-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 18%;
-    }
-    .site-footer-mark-inner {
-      animation: footer-mark-rise linear both;
-      animation-timeline: view();
-      animation-range: entry 10% entry 100%;
-    }
-  }
-}
-@keyframes footer-rule-draw { to { transform: scaleX(1); } }
-@keyframes footer-mark-rise {
-  from { transform: translateY(115%); }
-  to   { transform: translateY(0); }
+  /* GSAP draws this left→right on scroll (see SiteFooter). */
+  transform-origin: left;
 }
 .site-footer-info {
   margin-top: auto;          /* push the info row + wordmark to the bottom */
@@ -3410,9 +3393,8 @@ body:has(.sb-root) {
 
 .site-footer-mark {
   width: 100%;
-  /* Slightly tighter than the info gutters so the wordmark's optical left edge
-     lines up with the info text above it; matching (small) bottom padding. */
-  padding: 0 clamp(14px, 2vw, 28px) clamp(12px, 1.4vw, 20px);
+  /* Same gutters as the rule + info above, so every footer edge lines up. */
+  padding: 0 clamp(20px, 3vw, 40px) clamp(12px, 1.4vw, 20px);
   line-height: 0.82;
 }
 .site-footer-mark-inner {
@@ -3469,7 +3451,7 @@ body:has(.sb-root) {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   min-width: 0;
 }
 /* Social icons, top right. */
@@ -3491,6 +3473,10 @@ body:has(.sb-root) {
 }
 .top-nav-social-item:hover { color: var(--pink); }
 .top-nav-social-item svg { width: 100%; height: 100%; display: block; }
+/* Mobile: keep the pills on one row; the socials live in the footer instead. */
+@media (max-width: 767px) {
+  .top-nav-social { display: none; }
+}
 /* The .tag-default hover is scoped to anchors; mirror it for this button. */
 @media (hover: hover) {
   .intro-menu-btn:hover { color: var(--pink); border-color: var(--pink); }
