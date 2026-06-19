@@ -3531,10 +3531,10 @@ body:has(.sb-root) {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-/* Desktop: 5 columns — email, phone, London, Brisbane, copyright. */
+/* Desktop: 4 columns — AUS/BNE, ENG/LON, contact (hiring/email/phone), copyright. */
 @media (min-width: 768px) {
   .site-footer-info {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
   }
 }
@@ -3549,15 +3549,18 @@ body:has(.sb-root) {
 @media (min-width: 768px) {
   .sf-col-end { align-items: flex-end; text-align: right; }
 }
-/* Mobile 2-col grid: the Hiring/email column spans both columns. */
-.sf-col-wide { grid-column: 1 / -1; }
+/* Mobile: the contact block (hiring + email + phone, stacked tight) spans both
+   columns and drops to the very bottom of the info, just above the asterisk. */
+.sf-contact { grid-column: 1 / -1; order: 1; }
 @media (min-width: 768px) {
-  .sf-col-wide { grid-column: auto; }
+  .sf-contact { grid-column: auto; order: 0; }
 }
 .sf-label { color: var(--ink); }          /* hiring / build-by — ink */
+/* Cheeky aside next to ENG/LON. */
+.sf-note { color: var(--ink-soft); font-size: 0.82em; }
 .sf-value { color: var(--pink); }          /* email, phone, locations, copyright — pink */
 /* Location code + its little flag, on one row. */
-.sf-loc { display: inline-flex; align-items: center; gap: 0.45em; }
+.sf-loc { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.4em 0.45em; }
 
 .site-footer-mark {
   width: 100%;

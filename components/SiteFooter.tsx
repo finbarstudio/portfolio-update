@@ -125,19 +125,21 @@ export default function SiteFooter() {
           <FooterClock />
         </div>
         <div className="sf-col">
-          <span className="sf-loc"><span className="sf-label">ENG/LON</span><EngFlag /></span>
+          <span className="sf-loc">
+            <span className="sf-label">ENG/LON</span>
+            <EngFlag />
+            <span className="sf-note">(it’s coming home)</span>
+          </span>
           <LiveTime tz="Europe/London" />
         </div>
-        <div className="sf-col sf-col-wide">
+        <div className="sf-col sf-contact">
           <span className="sf-label">Hiring or have a project?</span>
           <a href="mailto:finbar@finbar.studio" className="sf-value u-underline">finbar@finbar.studio</a>
-        </div>
-        <div className="sf-col">
           <a href="tel:+61412796630" className="sf-value u-underline tabular-nums">+61 412 796 630</a>
         </div>
         <div className="sf-col sf-col-end">
           <FooterCopyright year={year} />
-          <span className="sf-value">Design and build by finbarstudio</span>
+          <span className="sf-value">Design &amp; build finbarstudio</span>
         </div>
       </div>
 
