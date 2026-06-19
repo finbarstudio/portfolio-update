@@ -5,6 +5,7 @@ import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HomeIntro from "@/components/HomeIntro";
+import InlineIcon from "@/components/InlineIcon";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -49,36 +50,28 @@ function HomeJsonLd() {
 }
 
 /* ─── Disciplines: a big-type wall with dingbats set inline in the type ──────
-   Glyphs are drawn from the Noto Sans Symbols 2 dingbat font (OFL, loaded in
-   layout.tsx as --font-dingbat) — quirky little marks between each word. */
-function Ding({ char }: { char: string }) {
-  return (
-    <span className="home-disc-icon" aria-hidden="true">
-      {char}
-    </span>
-  );
-}
-
+   Glyphs come from the brand icon batch (Noto Sans Symbols 2, --font-dingbat);
+   each reels through the batch on hover (see InlineIcon). */
 function Disciplines() {
   return (
     <section className="home-disciplines px-5 md:px-10" aria-label="What I do">
       <h2 className="home-disc" aria-label="Brand, digital, print, social, web, editorial and whatever else your heart desires">
         <span aria-hidden="true">Brand</span>
-        <Ding char="✶" />
+        <InlineIcon char="⦿" className="home-disc-icon" />
         <span aria-hidden="true">Digital</span>
-        <Ding char="❧" />
+        <InlineIcon char="🖧" className="home-disc-icon" />
         <span aria-hidden="true">Print</span>
-        <Ding char="☞" />
+        <InlineIcon char="📦" className="home-disc-icon" />
         <span aria-hidden="true">Social</span>
-        <Ding char="❄" />
+        <InlineIcon char="👪" className="home-disc-icon" />
         <span aria-hidden="true">Web</span>
-        <Ding char="✺" />
+        <InlineIcon char="⮔" className="home-disc-icon" />
         <span aria-hidden="true">Editorial</span>
         <span aria-hidden="true">
           {" "}
           <span className="home-disc-pink">and</span> whatever else your heart
         </span>
-        <Ding char="❤" />
+        <InlineIcon char="♡" className="home-disc-icon" />
         <span aria-hidden="true">desires</span>
       </h2>
     </section>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import Reveal from "@/components/Reveal";
+import InlineIcon from "@/components/InlineIcon";
 import { projects } from "@/content/projects";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -47,15 +48,6 @@ const CLIENTS = [...projects]
   .sort((a, b) => a.rank - b.rank)
   .map((p) => CLIENT_NAME[p.slug] ?? p.name);
 
-/* Inline dingbat, set in the same Noto Sans Symbols 2 face as the home wall. */
-function Ding({ char }: { char: string }) {
-  return (
-    <span className="home-disc-icon" aria-hidden="true">
-      {char}
-    </span>
-  );
-}
-
 export const metadata: Metadata = {
   title: { absolute: "About & Contact | Finbar Skitini, Brisbane Graphic Designer" },
   description:
@@ -90,14 +82,14 @@ export default function AboutPage() {
           aria-label="Nice to meet you, I'm Finbar. One day I woke up and found my feet in design and I haven't moved since."
         >
           <span aria-hidden="true">Nice to meet you</span>
-          <Ding char="✶" />
+          <InlineIcon char="👪" className="home-disc-icon" />
           <span aria-hidden="true">I&rsquo;m</span>{" "}
           <span className="home-disc-pink" aria-hidden="true">Finbar</span>
-          <Ding char="❧" />
+          <InlineIcon char="⦿" className="home-disc-icon" />
           <span aria-hidden="true">one day I woke up and found my feet in design</span>
-          <Ding char="☞" />
+          <InlineIcon char="✎" className="home-disc-icon" />
           <span aria-hidden="true">and I haven&rsquo;t moved since</span>
-          <Ding char="❤" />
+          <InlineIcon char="♡" className="home-disc-icon" />
         </h1>
       </section>
 

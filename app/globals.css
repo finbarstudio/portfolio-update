@@ -3271,7 +3271,7 @@ body:has(.sb-root) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.01em;
-  line-height: 1.18;
+  line-height: 1.04;
   font-size: clamp(1.6rem, 5.5vw, 4.5rem);
   color: var(--ink);
 }
@@ -3315,7 +3315,9 @@ body:has(.sb-root) {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 0.28em 0.36em;
+  gap: 0.3em 0.4em;
+  /* Smaller than the disciplines wall so the pills flow inline over ~3 rows. */
+  font-size: clamp(1.2rem, 3vw, 2.3rem);
 }
 .home-cap-pill {
   display: inline-flex;
@@ -3377,6 +3379,8 @@ body:has(.sb-root) {
   /* Clear the (overlapping) fixed nav and leave the same top inset the nav has,
      so the rule sits at a matching rhythm below the nav items. */
   padding-top: calc(var(--menubar-h) + 16px);
+  /* Bottom padding the masked wordmark sits beneath. */
+  padding-bottom: clamp(18px, 2.6vh, 44px);
 }
 .site-footer-rule {
   height: 1px;
@@ -3429,9 +3433,13 @@ body:has(.sb-root) {
 .site-footer-mark {
   width: 100%;
   /* Same gutters as the rule + info above, so every footer edge lines up. */
-  padding: 0 clamp(20px, 3vw, 40px) clamp(12px, 1.4vw, 20px);
+  padding: 0 clamp(20px, 3vw, 40px);
   line-height: 0.82;
+  overflow: hidden;          /* mask the wordmark's bottom */
 }
+/* Pull the container shorter than the wordmark so its bottom is clipped — the
+   logo reads as sitting beneath the footer's bottom padding. */
+.site-footer-mark-inner { margin-bottom: -0.13em; }
 .site-footer-mark-inner {
   display: inline-flex;
   align-items: baseline;
