@@ -172,7 +172,7 @@ export default function HomeIntro() {
           ref={slotRef}
           aria-hidden="true"
         >
-          {"❘"}
+          {"✳"}
         </span>
       </div>
     </section>

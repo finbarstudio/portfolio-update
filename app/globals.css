@@ -3303,8 +3303,9 @@ body:has(.sb-root) {
 .brand-wordmark-mark {
   font-family: var(--font-dingbat);
   color: var(--pink);
-  font-size: 0.5em;          /* ≈ the x-height of the Space Mono text */
+  font-size: 0.62em;         /* ≈ the x-height of the Space Mono text */
   line-height: 1;
+  align-self: center;        /* centre the asterisk on the wordmark */
 }
 
 /* "What I do" — category names as big inline pill-bubbles, set at the
