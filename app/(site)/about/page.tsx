@@ -99,12 +99,12 @@ export default function AboutPage() {
       {/* ── Four columns: services / clients / bio / mission ──── */}
       <section
         id="contact"
-        className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12 border-t border-line pt-10 md:pt-12"
+        className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-12 pb-4"
         aria-label="Services, clients and about"
       >
         <Reveal as="div">
-          <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "var(--text-body)" }}>Services</h2>
-          <ul className="text-pink font-sans leading-snug" style={{ fontSize: "var(--text-body)" }}>
+          <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>Services</h2>
+          <ul className="text-pink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>
             {SERVICES.map((s) => (
               <li key={s}>{s}</li>
             ))}
@@ -112,8 +112,8 @@ export default function AboutPage() {
         </Reveal>
 
         <Reveal as="div">
-          <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "var(--text-body)" }}>Clients</h2>
-          <ul className="text-pink font-sans leading-snug" style={{ fontSize: "var(--text-body)" }}>
+          <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>Clients</h2>
+          <ul className="text-pink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>
             {CLIENTS.map((c) => (
               <li key={c}>{c}</li>
             ))}
@@ -123,22 +123,11 @@ export default function AboutPage() {
           </ul>
         </Reveal>
 
-        <Reveal as="div">
-          <h2 className="mono-label text-ink-soft mb-4">Bio</h2>
-          <div className="space-y-3 text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
-            <p>
-              BA (Hons), Brighton &amp; Ravensbourne University (admittedly, I don&rsquo;t think they
-              mean much).
-            </p>
-            <p>I explore design with my clients.</p>
-          </div>
-        </Reveal>
-
-        <Reveal as="div">
-          <h2 className="mono-label text-ink-soft mb-4">Mission</h2>
-          <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
-            To bring high-end studio outcomes to a much wider audience. Because we all want to look
-            good, right?!
+        <Reveal as="div" className="md:col-span-2">
+          <p className="text-ink font-sans leading-snug" style={{ fontSize: "clamp(1.5rem, 2.4vw, 2.4rem)" }}>
+            BA (Hons), Brighton &amp; Ravensbourne University (admittedly I don&rsquo;t think they mean
+            much). I explore design with my clients. My mission is to bring high-end studio outcomes
+            to a much wider audience, because we all want to look good right?!
           </p>
         </Reveal>
       </section>
