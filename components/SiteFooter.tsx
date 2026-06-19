@@ -13,6 +13,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import BrandWordmark from "./BrandWordmark";
 import FooterCopyright from "./FooterCopyright";
+import FooterClock from "./FooterClock";
+import LiveTime from "./LiveTime";
 
 export default function SiteFooter() {
   // Deterministic initial year (matches SSR), then corrected on the client.
@@ -116,17 +118,18 @@ export default function SiteFooter() {
 
       <div className="site-footer-info">
         <div className="sf-col">
+          <FooterClock />
+        </div>
+        <div className="sf-col">
+          <span className="sf-value">UK/LON</span>
+          <LiveTime tz="Europe/London" />
+        </div>
+        <div className="sf-col">
           <span className="sf-label">Hiring or have a project?</span>
           <a href="mailto:finbar@finbar.studio" className="sf-value u-underline">finbar@finbar.studio</a>
         </div>
         <div className="sf-col">
           <a href="tel:+61412796630" className="sf-value u-underline tabular-nums">+61 412 796 630</a>
-        </div>
-        <div className="sf-col">
-          <span className="sf-value">London, UK</span>
-        </div>
-        <div className="sf-col">
-          <span className="sf-value">Brisbane, QLD</span>
         </div>
         <div className="sf-col sf-col-end">
           <span className="sf-label">Design and build by finbarstudio</span>

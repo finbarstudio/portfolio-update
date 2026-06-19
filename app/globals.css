@@ -3367,6 +3367,36 @@ body:has(.sb-root) {
   .sf-copyright-inner { transition: none; transform: translateY(0); }
 }
 
+/* AUS/BNE live clock — mirror of the copyright but bottom-LEFT, docking into the
+   footer's Brisbane column. Two stacked pink lines (location code + 24h time). */
+.sf-clock { position: relative; display: inline-block; }
+.sf-clock-ph { visibility: hidden; display: flex; flex-direction: column; }
+.sf-clock-pin {
+  position: fixed;
+  left: clamp(20px, 3vw, 40px);
+  bottom: 16px;
+  z-index: 45;
+  overflow: hidden;            /* mask for the slide-up reveal */
+  display: inline-block;
+  pointer-events: none;
+}
+.sf-clock-pin.is-docked {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: auto;
+}
+.sf-clock-inner {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(118%);     /* hidden beneath the mask until revealed */
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sf-clock-pin.is-shown .sf-clock-inner { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .sf-clock-inner { transition: none; transform: translateY(0); }
+}
+
 /* ── Brand wordmark token ─────────────────────────────────────────
    The canonical logo, used everywhere: FINBARSTUDIO in Space Mono caps with a
    pink ❘ (U+2758, Noto Sans Symbols 2) on the end, no space. */

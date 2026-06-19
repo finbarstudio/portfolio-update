@@ -123,7 +123,6 @@ export default function AboutPage() {
         aria-label="Services, clients and about"
       >
         <Reveal as="div">
-          <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>Services</h2>
           <div className="flex flex-col gap-3">
             {SERVICE_GROUPS.map((g) => (
               <div key={g.label}>
@@ -139,7 +138,7 @@ export default function AboutPage() {
         </Reveal>
 
         <Reveal as="div">
-          <h2 className="font-sans font-bold text-pink mb-1" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>Clients</h2>
+          <p className="font-mono uppercase text-ink-soft mb-0.5" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>Clients</p>
           <ul className="text-pink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>
             {CLIENTS.map((c) => (
               <li key={c}>{c}</li>
