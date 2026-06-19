@@ -50,10 +50,10 @@ export default function SiteFooter() {
         if (Math.abs(measured - avail) <= 0.5) break;
         size = size * (avail / measured);
       }
-      // Slight overshoot so the edges kiss the gutters — covers the -0.09em
+      // Slight overshoot so the edges kiss the gutters — covers the -0.06em
       // left-bearing pull (see .site-footer-mark-inner) so the asterisk still
       // reaches the right edge.
-      el.style.fontSize = `${Math.max(20, size * 1.012)}px`;
+      el.style.fontSize = `${Math.max(20, size * 1.009)}px`;
     };
     fit();
     requestAnimationFrame(fit);

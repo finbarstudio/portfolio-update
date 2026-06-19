@@ -82,7 +82,7 @@ function SelectedWork() {
   const picks = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean) as typeof projects;
   let i = 0;
   return (
-    <Reveal section as="section" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
+    <Reveal section as="section" id="top-work" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
       <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-28">
         {picks.map((project) => (
           <ProjectCard key={project.slug} project={project} index={i++} />

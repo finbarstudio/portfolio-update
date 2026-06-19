@@ -20,14 +20,11 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ASTERISK_POINTS } from "./brand-asterisk";
+import { ASTERISK_POINTS, ASTERISK_PERIMETER } from "./brand-asterisk";
+import { scrollToTopProject } from "@/lib/scroll";
 
 const MOBILE_QUERY = "(max-width: 767px)";
-
-// Module-level flag: the preloader plays on every full page LOAD (this resets to
-// false on reload) but is skipped on client-side navigation back to home (the
-// module stays alive). No sessionStorage — that permanently blocked replays.
-let introPlayed = false;
+const PLAYED_KEY = "finbar-intro-played";
 
 export default function HomeIntro() {
   const lockupRef = useRef<HTMLAnchorElement>(null);
@@ -87,12 +84,16 @@ export default function HomeIntro() {
     };
   }, []);
 
-  // Preloader choreography — desktop, once per session. Runs AFTER the fit effect
-  // above (same commit, in order), so the slot is already laid out and we can
-  // measure it synchronously.
+  // Preloader choreography — desktop, once per browser session. Runs AFTER the fit
+  // effect above (same commit, in order), so the slot is already laid out and we
+  // measure it synchronously. sessionStorage gate: plays on the first visit of the
+  // session, and does NOT replay on refresh (the browser restores your scroll
+  // position; replaying the intro there would be jarring).
   useLayoutEffect(() => {
     if (window.matchMedia(MOBILE_QUERY).matches) { setDone(true); return; }
-    if (introPlayed) { setDone(true); return; }
+    let played = false;
+    try { played = !!sessionStorage.getItem(PLAYED_KEY); } catch { /* ignore */ }
+    if (played) { setDone(true); return; }
 
     const fly = flyRef.current, star = starRef.current, slot = slotRef.current,
       text = textRef.current, screen = screenRef.current;
@@ -108,7 +109,7 @@ export default function HomeIntro() {
     const finish = () => {
       if (finished) return;
       finished = true;
-      introPlayed = true;
+      try { sessionStorage.setItem(PLAYED_KEY, "1"); } catch { /* ignore */ }
       text.classList.add("is-revealed");
       setDone(true);
       document.body.style.overflow = prevOverflow;
@@ -127,11 +128,11 @@ export default function HomeIntro() {
       fly.style.height = `${sRect0.width}px`;
     }
 
-    // Normalised pathLength=1 (set on the polygon) — dasharray 1 == the full
-    // perimeter, so the trace always completes 100% (getTotalLength under-measures
-    // polygon perimeters in some browsers, leaving the outline a few % short).
+    // Exact polygon perimeter (viewBox units) as the dash length — smooth trace
+    // that completes fully (getTotalLength under-measured, leaving it short).
+    const dash = ASTERISK_PERIMETER;
     gsap.set(fly, { xPercent: -50, yPercent: -50, x: 0, y: 0, opacity: 1 });
-    gsap.set(star, { strokeDasharray: 1, strokeDashoffset: reduce ? 0 : 1, fillOpacity: reduce ? 1 : 0 });
+    gsap.set(star, { strokeDasharray: dash, strokeDashoffset: reduce ? 0 : dash, fillOpacity: reduce ? 1 : 0 });
     gsap.set(screen, { opacity: 1 });
 
     // Translation deltas (fly centre → slot centre), measured after sizing.
@@ -170,7 +171,7 @@ export default function HomeIntro() {
       {!done && (
         <div ref={flyRef} className="intro-fly" aria-hidden="true">
           <svg viewBox="0 0 100 100" className="intro-fly-star">
-            <polygon ref={starRef} points={ASTERISK_POINTS} pathLength={1} vectorEffect="non-scaling-stroke" />
+            <polygon ref={starRef} points={ASTERISK_POINTS} vectorEffect="non-scaling-stroke" />
           </svg>
         </div>
       )}
@@ -179,12 +180,11 @@ export default function HomeIntro() {
         href="/"
         className="home-intro-mark brand-wordmark"
         ref={lockupRef}
-        aria-label="Back to top"
+        aria-label="Back to work"
         onClick={(e) => {
-          // The logo lives only on home — smooth-scroll to the top rather than navigate.
+          // The logo lives only on home — smooth-scroll up to the work, not navigate.
           e.preventDefault();
-          if (window.__lenis) window.__lenis.scrollTo(0, { duration: 1.1 });
-          else window.scrollTo({ top: 0, behavior: "smooth" });
+          scrollToTopProject();
         }}
       >
         <span className={`home-intro-text ${done ? "is-revealed" : ""}`} ref={textRef} aria-hidden="true">FINBARSTUDIO</span>

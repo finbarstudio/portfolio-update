@@ -3519,7 +3519,7 @@ body:has(.sb-root) {
   /* Tighter side gutters than the content above (the wordmark is meant to read
      large, near the edges). Bottom padding is smaller than the sides but still
      clears the rounded-cap overshoot via the padding-box clip. */
-  padding: 0 clamp(14px, 2.2vw, 30px) clamp(8px, 1.2vw, 16px);
+  padding: 0 clamp(16px, 2.6vw, 34px) clamp(8px, 1.2vw, 16px);
   line-height: 0.82;
   overflow: hidden;          /* masks the slide-up reveal */
 }
@@ -3531,7 +3531,7 @@ body:has(.sb-root) {
   font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
   /* Pull left by Space Mono's cap side-bearing so the "F" ink kisses the left
      gutter (the JS fit pushes the asterisk to the right gutter to match). */
-  margin-left: -0.09em;
+  margin-left: -0.06em;
 }
 
 /* Reveal at the very bottom (sentinel + observer flips is-revealed). JS arms the

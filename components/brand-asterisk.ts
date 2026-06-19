@@ -27,3 +27,20 @@ function buildAsterisk(): string {
 }
 
 export const ASTERISK_POINTS = buildAsterisk();
+
+/**
+ * Exact perimeter of the polygon in viewBox (0–100) units, including the closing
+ * edge. Used as the stroke-dasharray for the preloader trace — getTotalLength()
+ * under-measures polygons (it can omit the closing segment), which left the
+ * outline a few % short; this is exact, so the trace draws smoothly and finishes.
+ */
+export const ASTERISK_PERIMETER = (() => {
+  const coords = ASTERISK_POINTS.trim().split(/\s+/).map((p) => p.split(",").map(Number));
+  let len = 0;
+  for (let i = 0; i < coords.length; i++) {
+    const [x1, y1] = coords[i];
+    const [x2, y2] = coords[(i + 1) % coords.length];
+    len += Math.hypot(x2 - x1, y2 - y1);
+  }
+  return len;
+})();
