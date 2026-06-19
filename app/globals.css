@@ -3263,6 +3263,16 @@ body:has(.sb-root) {
   align-items: center;
   padding-block: clamp(64px, 12vh, 180px);
 }
+/* Mobile: the home hero fills the viewport (minus the nav) so the first featured
+   project doesn't peek at the bottom of the first screen. */
+@media (max-width: 767px) {
+  #hero.home-disciplines {
+    /* dvh tracks the actual (dynamic) viewport, so the hero fills whatever is
+       visible at load — svh underfills and lets the first project peek. */
+    min-height: calc(100dvh - var(--menubar-h));
+    padding-block: clamp(40px, 8vh, 96px);
+  }
+}
 
 /* The intro wordmark + the disciplines wall stay pinned to the full viewport
    width, so they DON'T react to the nav reflow (the main's --sidebar-w margin).
