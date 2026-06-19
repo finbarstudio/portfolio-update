@@ -3347,12 +3347,14 @@ body:has(.sb-root) {
   display: inline-block;
   pointer-events: none;
 }
-/* Docked: sit in the footer credit slot (over the placeholder). */
+/* Docked: sit in the footer credit slot (over the placeholder). Bottom-anchored
+   so the docked bottom edge matches the floating pin's (bottom:16) at the dock
+   moment — no jump. */
 .sf-copyright-pin.is-docked {
   position: absolute;
-  top: 0;
+  bottom: 0;
   right: 0;
-  bottom: auto;
+  top: auto;
 }
 .sf-copyright-inner {
   display: inline-block;
@@ -3380,9 +3382,9 @@ body:has(.sb-root) {
 }
 .sf-clock-pin.is-docked {
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
-  bottom: auto;
+  top: auto;
 }
 .sf-clock-inner {
   display: flex;
@@ -3558,21 +3560,19 @@ body:has(.sb-root) {
 /* Copyright column is right-aligned (every size — so it sits bottom-right, where
    its sticky pin docks). */
 .sf-col-end { align-items: flex-end; text-align: right; }
-/* Mobile layout (2-col grid): ENG/LON + contacts span full width on top, then the
-   two sticky-docking blocks share the bottom row — AUS clock bottom-left,
-   copyright bottom-right — so the fixed bottom-corner pins slot straight into
-   their slots instead of jumping on the last bit of scroll. */
-.sf-col-eng { grid-column: 1 / -1; order: 1; }
-.sf-contact { grid-column: 1 / -1; order: 2; }
-.sf-col-aus { order: 3; }
+/* Mobile 2×2 grid. Left column: AUS/BNE (top) over ENG/LON (bottom), left-aligned.
+   Right column: hiring+contact (top) over copyright+build (bottom), right-aligned.
+   Order flows the items AUS, contact, ENG, copyright into the row-major grid. */
+.sf-col-aus { order: 1; }
+.sf-contact { order: 2; align-items: flex-end; text-align: right; }
+.sf-col-eng { order: 3; }
 .sf-col-end { order: 4; }
 @media (min-width: 768px) {
-  .sf-col-eng,
-  .sf-contact { grid-column: auto; }
-  .sf-col-eng,
-  .sf-contact,
   .sf-col-aus,
+  .sf-contact,
+  .sf-col-eng,
   .sf-col-end { order: 0; }
+  .sf-contact { align-items: flex-start; text-align: left; }
 }
 .sf-label { color: var(--ink); }          /* hiring / build-by — ink */
 /* Cheeky aside next to ENG/LON. */
