@@ -1,49 +1,35 @@
 /**
- * Tiny flag marks in the site palette — transparent fill, 1px pink line-art.
- * Sit beside the AUS/BNE and ENG/LON footer location codes. ~1em tall.
+ * Tiny flag marks beside the AUS/BNE and ENG/LON footer location codes.
+ * Artwork from /public/{Aus,Eng} Flag.svg, recoloured to the site pink
+ * (var(--pink)) on a transparent field. ~1em tall.
  */
 
-const wrap: React.CSSProperties = {
-  width: "1.45em",
-  height: "0.97em",
+const flagStyle: React.CSSProperties = {
+  height: "0.9em",
+  width: "auto",
   display: "inline-block",
-  verticalAlign: "-0.1em",
+  verticalAlign: "-0.08em",
   flex: "0 0 auto",
 };
 
-const stroke = {
-  fill: "none",
-  stroke: "var(--pink)",
-  strokeWidth: 1,
-  vectorEffect: "non-scaling-stroke" as const,
-};
-
-/** Australia — pink outline + Union-Jack canton lines + Commonwealth star. */
+/** Australia — pink flag artwork on transparent. */
 export function AusFlag() {
   return (
-    <svg viewBox="0 0 30 20" style={wrap} aria-hidden="true" focusable="false">
-      <g {...stroke}>
-        <rect x="0.5" y="0.5" width="29" height="19" />
-        <line x1="0" y1="0" x2="15" y2="10" />
-        <line x1="15" y1="0" x2="0" y2="10" />
-        <line x1="7.5" y1="0" x2="7.5" y2="10" />
-        <line x1="0" y1="5" x2="15" y2="5" />
-        <circle cx="7.5" cy="15" r="1.7" />
-        <circle cx="23" cy="11" r="1.3" />
-      </g>
+    <svg viewBox="0 0 1280 640" style={flagStyle} fill="var(--pink)" aria-hidden="true" focusable="false">
+      <polygon points="379 106.7 426.7 106.7 640 0 592.3 0 379 106.7" />
+      <polygon points="373.3 0 373.3 97.5 568.5 0 373.3 0" />
+      <polygon points="141.8 106.7 0 35.8 0 23.8 165.6 106.7 213.3 106.7 0 0 0 0 0 106.7 0 106.7 141.8 106.7" />
+      <path d="M692,0h-52v35.8l-141.8,70.9h141.8v21.3h-288V0h-64v128H0v64h288v128h0c0,0-21.3,0-21.3,0h0v-97.6l-195.1,97.5h-23.8l213.3-106.7h-47.7L0,320v-35.8l141.8-70.9H0v130.8h0v295.9h1280V0h-588ZM361.7,566.5l-41.7-43.8-41.7,43.8,8.3-59.9-60.2-5.2,52-30.9-33.5-50.4,56.5,21.4,18.5-57.6,18.5,57.6,56.5-21.4-33.5,50.4,52,30.9-60.2,5.2,8.3,59.9ZM640,213.3h-141.8l141.8,70.9v11.9l-165.6-82.8h-47.7l213.3,106.7h-71.5l-195.1-97.5v97.5h0c0,0-21.3,0-21.3,0h0v-128.1h288v21.3ZM924.3,78.2l26.9,10.2,8.8-27.4,8.8,27.4,26.9-10.2-15.9,24,24.8,14.7-28.7,2.5,3.9,28.5-19.8-20.9-19.8,20.9,3.9-28.5-28.7-2.5,24.8-14.7-15.9-24ZM819.8,321.2l-19.8-20.9-19.8,20.9,3.9-28.5-28.7-2.5,24.8-14.7-15.9-24,26.9,10.2,8.8-27.4,8.8,27.4,26.9-10.2-15.9,24,24.8,14.7-28.7,2.5,3.9,28.5ZM979.8,574.5l-19.8-20.9-19.8,20.9,3.9-28.5-28.7-2.5,24.8-14.7-15.9-24,26.9,10.2,8.8-27.4,8.8,27.4,26.9-10.2-15.9,24,24.8,14.7-28.7,2.5,3.9,28.5ZM1039.7,368.2l-15.7-9.7-15.7,9.7,4.4-17.9-14.1-11.9,18.4-1.3,7-17.1,7,17.1,18.4,1.3-14.1,11.9,4.4,17.9ZM1122.1,278.5l-19.8-20.9-19.8,20.9,3.9-28.5-28.7-2.5,24.8-14.7-15.9-24,26.9,10.2,8.8-27.4,8.8,27.4,26.9-10.2-15.9,24,24.8,14.7-28.7,2.5,3.9,28.5Z" />
+      <polygon points="266.7 0 71.5 0 266.7 97.5 266.7 0" />
     </svg>
   );
 }
 
-/** England — St George's cross: pink outline + cross lines. */
+/** England — St George's cross in pink on transparent. */
 export function EngFlag() {
   return (
-    <svg viewBox="0 0 30 20" style={wrap} aria-hidden="true" focusable="false">
-      <g {...stroke}>
-        <rect x="0.5" y="0.5" width="29" height="19" />
-        <line x1="15" y1="0" x2="15" y2="20" />
-        <line x1="0" y1="10" x2="30" y2="10" />
-      </g>
+    <svg viewBox="0 0 800 480" style={flagStyle} fill="var(--pink)" aria-hidden="true" focusable="false">
+      <polygon points="800 192 800 288 448 288 448 480 352 480 352 288 0 288 0 192 352 192 352 0 448 0 448 192 800 192" />
     </svg>
   );
 }
