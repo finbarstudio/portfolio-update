@@ -55,7 +55,7 @@ export const LERP_CAMERA = 0.03;              // live camera easing (unused when
    `offsetForFocus`). Perfect-loop: yaw(0) === yaw(numMedia). */
 export const TURNTABLE_AMP = 0.16;            // ~9° peak yaw
 export const CYCLE_SPEED = 0.28;              // loop "items" per second (export timing)
-export const STATE_LERP = 0.05;               // hover/preset blend easing (live)
+export const STATE_LERP = 0.022;              // hover blend easing — slow, feather-soft (~1.5s)
 
 /** Yaw offset (radians) added on top of the base pose for the turntable, given a
  *  continuous carousel `offset`. Front-on at the quarter points; turned at the

@@ -31,10 +31,25 @@ export default function HomeIntro() {
   const [phase, setPhase] = useState<Phase>("trace");
   const [flyTransform, setFlyTransform] = useState<string | null>(null);
 
+  // Play the preloader once per browser session — on later home visits the
+  // wordmark is just there. Runs before paint so there's no flash.
+  const playedRef = useRef(false);
+  useLayoutEffect(() => {
+    try {
+      if (sessionStorage.getItem("finbar-intro-played")) {
+        playedRef.current = true;
+        setPhase("done");
+      } else {
+        sessionStorage.setItem("finbar-intro-played", "1");
+      }
+    } catch { /* sessionStorage unavailable — just play */ }
+  }, []);
+
   // Draw the star outline with GSAP: measure the real perimeter (getTotalLength,
   // works on <polygon>), hide it as one dash, then tween the offset to 0 so a
   // single clean 1px line traces the whole star. Bulletproof — no pathLength.
   useLayoutEffect(() => {
+    if (playedRef.current) return;
     const p = starRef.current;
     if (!p) return;
     const len = p.getTotalLength();
@@ -105,6 +120,7 @@ export default function HomeIntro() {
   }, []);
 
   useEffect(() => {
+    if (playedRef.current) return;   // already played this session — no preloader
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     // Tell Lenis to hold still while the preloader plays (it may mount after us).

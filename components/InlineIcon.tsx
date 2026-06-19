@@ -27,11 +27,12 @@ export default function InlineIcon({ char, className }: { char?: string; classNa
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     timers.current.forEach(clearTimeout);
     timers.current = [];
-    const steps = 13;
+    const steps = 16;
     let t = 0;
     for (let i = 0; i < steps; i++) {
-      // Delay grows toward the end (ease-out) so the flick slows into the return.
-      t += 34 + 110 * Math.pow(i / steps, 2.4);
+      // Delay grows steeply toward the end so the flick dramatically slows as it
+      // settles back to its own glyph (fast spin → long, lingering final frames).
+      t += 26 + 300 * Math.pow(i / steps, 4);
       const last = i === steps - 1;
       const glyph = last ? base : ICON_BATCH[Math.floor(Math.random() * ICON_BATCH.length)];
       timers.current.push(window.setTimeout(() => { el.textContent = glyph; }, t));

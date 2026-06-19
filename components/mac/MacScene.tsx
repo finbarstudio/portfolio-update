@@ -231,7 +231,7 @@ function MacShow({
       const target = pose != null ? pose : poseTargetFor(presetOverride, hovered);
       // Asymmetric: ease IN normally, settle OUT (un-hover) more gently so a
       // mid-animation release is a shallow, slow return rather than a sharp one.
-      const k = target < hoverProgressRef.current ? STATE_LERP * 0.55 : STATE_LERP;
+      const k = target < hoverProgressRef.current ? STATE_LERP * 0.72 : STATE_LERP;
       hoverProgressRef.current += (target - hoverProgressRef.current) * k;
       // Keep the demand loop running through the WHOLE blend (incl. the un-hover
       // ease-out) so it doesn't render in sparse idle frames and look glitchy.

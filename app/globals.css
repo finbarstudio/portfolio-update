@@ -1101,10 +1101,10 @@
       display: grid;
       grid-template-rows: 0fr;
       opacity: 0;
-      /* Slow grow so a featured card's thumbnail eases down (steals space)
-         gradually enough for the WebGL mockup to refit smoothly. */
-      transition: grid-template-rows 320ms var(--ease),
-                  opacity var(--dur-fast) var(--ease);
+      /* Slow, feather-soft grow so the thumbnail eases down (steals space) in
+         step with the 3D blend + pink reveal. */
+      transition: grid-template-rows 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .hover-reveal > * { overflow: hidden; min-height: 0; }
     .group:hover .hover-reveal,
@@ -1262,9 +1262,9 @@
   .card-rev {
     position: absolute; inset: 0; border-radius: 14px;
     transform: scale(0); transform-origin: center;
-    /* Un-hover (leave): a slow, shallow settle so a mid-animation release isn't
-       sharp — matches the 3D thumbnails' gentle ease-out. */
-    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    /* Slow, feather-soft settle on leave (~1.6s) so a mid-animation release
+       floats back gently — matches the 3D thumbnails. */
+    transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
   }
   .card-rev.c1 { background: var(--pink); }
@@ -1277,7 +1277,7 @@
     .group:hover .card-rev,
     .group:focus-within .card-rev {
       transform: scale(1);
-      transition: transform 0.34s var(--ease);   /* quicker on the way in */
+      transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);   /* slow, soft on the way in */
     }
   }
 
@@ -3289,8 +3289,14 @@ body:has(.sb-root) {
   line-height: 1;
   margin: 0 0.32em;
   color: var(--pink);
-  display: inline-block;
+  /* Fixed-width centred slot: glyphs vary in width as they reel, but the layout
+     width stays put so a wide one never bumps a word to the next line. */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 1.25em;
   vertical-align: middle;
+  overflow: visible;
 }
 
 /* In-type accent word (e.g. "and") picked out in the brand pink. */
