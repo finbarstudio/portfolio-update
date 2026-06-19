@@ -21,7 +21,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ASTERISK_POINTS, ASTERISK_PERIMETER } from "./brand-asterisk";
-import { scrollToTopProject } from "@/lib/scroll";
+import { scrollToHero } from "@/lib/scroll";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 const PLAYED_KEY = "finbar-intro-played";
@@ -180,11 +180,11 @@ export default function HomeIntro() {
         href="/"
         className="home-intro-mark brand-wordmark"
         ref={lockupRef}
-        aria-label="Back to work"
+        aria-label="Back to top of the hero"
         onClick={(e) => {
-          // The logo lives only on home — smooth-scroll up to the work, not navigate.
+          // The logo lives only on home — smooth-scroll up to the hero, not navigate.
           e.preventDefault();
-          scrollToTopProject();
+          scrollToHero();
         }}
       >
         <span className={`home-intro-text ${done ? "is-revealed" : ""}`} ref={textRef} aria-hidden="true">FINBARSTUDIO</span>

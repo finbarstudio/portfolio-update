@@ -1,14 +1,15 @@
 /**
- * Shared smooth-scroll helpers for the home page logo + "Home" nav item.
+ * Shared smooth-scroll helper for the home page logo.
  *
- * "Top project" = the Selected Work section (id="top-work") — clicking the logo
- * or Home takes you up to the work, NOT all the way back to the intro screen.
+ * Target = the disciplines hero (id="hero", the big "Brand ⦿ Digital…" text),
+ * which sits just below the intro screen and above the projects — so clicking
+ * the logo lifts you to the start of the hero, not all the way to the intro.
  */
 
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-export function scrollToTopProject() {
-  const target = document.getElementById("top-work");
+export function scrollToHero() {
+  const target = document.getElementById("hero");
   const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--menubar-h")) || 56;
   const lenis = typeof window !== "undefined" ? window.__lenis : undefined;
 

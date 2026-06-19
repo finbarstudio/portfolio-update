@@ -7,14 +7,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
-import { scrollToTopProject } from "@/lib/scroll";
 
 const SANDBOX_HREF = "https://sandbox.finbar.studio";
 
 const PROJECT_COUNT = projects.length;
 
 const items = [
-  { label: "Home", href: "/" },
   { label: "Work", href: "/work" },
   { label: "About", href: "/about" },
 ];
@@ -73,13 +71,6 @@ export default function TopNav() {
             href={it.href}
             aria-current={isActive(it.href) ? "page" : undefined}
             className={`tag ${isActive(it.href) ? "tag-pink" : "tag-default"}`}
-            onClick={(e) => {
-              // "Home" while already home: smooth-scroll up to the work, not a no-op nav.
-              if (it.href === "/" && pathname === "/") {
-                e.preventDefault();
-                scrollToTopProject();
-              }
-            }}
           >
             {it.label}
             {it.href === "/work" && (

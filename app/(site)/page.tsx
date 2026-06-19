@@ -55,7 +55,7 @@ function HomeJsonLd() {
    each reels through the batch on hover (see InlineIcon). */
 function Disciplines() {
   return (
-    <section className="home-disciplines px-5 md:px-10" aria-label="What I do">
+    <section id="hero" className="home-disciplines px-5 md:px-10" aria-label="What I do">
       <MaskReveal as="h2" className="home-disc" aria-label="Brand, digital, print, social, web, editorial and whatever else your heart desires">
         {"Brand "}
         <InlineIcon char="⦿" className="home-disc-icon" />
