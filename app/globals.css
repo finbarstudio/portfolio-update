@@ -3286,33 +3286,47 @@ body:has(.sb-root) {
    (see MaskReveal). */
 .mr-mask {
   display: inline-flex;
-  overflow: hidden;
   vertical-align: bottom;
+  /* Vertical-only mask: clipped along the bottom so words/icons reveal as they
+     rise, but left/right are open (negative insets) so wide icon glyphs and the
+     hover reel are never cropped sideways. */
+  clip-path: inset(-30% -60% 0 -60%);
 }
-/* Icons rise too but must not be clipped (wide glyphs + the hover reel). */
-.mr-mask-open { overflow: visible; }
 .mr-inner {
   display: inline-flex;
   will-change: transform;
 }
 
-/* Persistent bottom-right copyright; hands off to the footer credit (see
-   StickyCredit). Right-aligned to the page gutter. */
-.sticky-credit {
+/* Copyright (FooterCopyright): one notice, pinned bottom-right while scrolling,
+   docking into its footer slot at the bottom. A hidden placeholder reserves the
+   line in the footer credit. */
+.sf-copyright { position: relative; display: inline-block; }
+.sf-copyright-ph { visibility: hidden; display: block; }   /* reserves the line */
+.sf-copyright-pin {
   position: fixed;
   right: clamp(20px, 3vw, 40px);
-  bottom: 14px;
+  bottom: 16px;
   z-index: 45;
-  font-family: var(--font-mono);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 11px;
-  color: var(--ink);
+  overflow: hidden;            /* mask for the slide-up reveal */
+  display: inline-block;
   pointer-events: none;
-  transition: opacity 0.4s var(--ease);
 }
-.sticky-credit.is-hidden { opacity: 0; }
+/* Docked: sit in the footer credit slot (over the placeholder). */
+.sf-copyright-pin.is-docked {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: auto;
+}
+.sf-copyright-inner {
+  display: inline-block;
+  transform: translateY(118%);     /* hidden beneath the mask until revealed */
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sf-copyright-pin.is-shown .sf-copyright-inner { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .sf-copyright-inner { transition: none; transform: translateY(0); }
+}
 
 /* ── Brand wordmark token ─────────────────────────────────────────
    The canonical logo, used everywhere: FINBARSTUDIO in Space Mono caps with a
@@ -3471,6 +3485,20 @@ body:has(.sb-root) {
   width: max-content;
   white-space: nowrap;
   font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
+}
+
+/* Reveal at the very bottom (sentinel + observer flips is-revealed). JS arms the
+   hidden start state, so without JS the footer just shows. */
+.site-footer-sentinel { width: 100%; height: 1px; flex: 0 0 auto; }
+.site-footer.is-armed .site-footer-rule { transform: scaleX(0); }
+.site-footer.is-armed .site-footer-mark-inner { transform: translateY(120%); }
+.site-footer.is-armed.is-revealed .site-footer-rule {
+  transform: scaleX(1);
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+.site-footer.is-armed.is-revealed .site-footer-mark-inner {
+  transform: translateY(0);
+  transition: transform 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.45s;
 }
 
 /* Selected work: no top rule (HR). */

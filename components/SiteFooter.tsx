@@ -10,11 +10,8 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import BrandWordmark from "./BrandWordmark";
-
-let registered = false;
+import FooterCopyright from "./FooterCopyright";
 
 export default function SiteFooter() {
   // Deterministic initial year (matches SSR), then corrected on the client.
@@ -22,8 +19,10 @@ export default function SiteFooter() {
   useEffect(() => setYear(new Date().getFullYear()), []);
 
   const footerRef = useRef<HTMLElement>(null);
-  const ruleRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
+  const [armed, setArmed] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   // Fit the giant wordmark to the container width (minus its gutters) on one
   // line, with a correction pass so its edges land exactly on the page margins.
@@ -52,43 +51,33 @@ export default function SiteFooter() {
     return () => ro.disconnect();
   }, []);
 
-  // Reveal only once you reach the very bottom (not scrubbed as you scroll, which
-  // muted the effect): a triggered, eased timeline with a slight delay — the rule
-  // draws left→right (smooth ease toward the end) and the wordmark rises in.
+  // Reveal only once you reach the very bottom — a bottom sentinel + observer
+  // (robust, unlike a scroll-position trigger) flips a class; the CSS transitions
+  // (eased, delayed) draw the rule left→right and rise the wordmark in.
   useLayoutEffect(() => {
     const footer = footerRef.current;
-    const rule = ruleRef.current;
-    const mark = markRef.current;
-    if (!footer || !rule || !mark) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (!registered) { gsap.registerPlugin(ScrollTrigger); registered = true; }
-
-    const ctx = gsap.context(() => {
-      gsap.set(rule, { scaleX: 0 });
-      gsap.set(mark, { yPercent: 120 });
-      const tl = gsap.timeline({
-        delay: 0.35,
-        scrollTrigger: {
-          trigger: footer,
-          // Fire only right at the very bottom (not early when scrolling slowly).
-          start: "bottom bottom",
-          toggleActions: "play none none reverse",
-        },
-      });
-      tl.to(rule, { scaleX: 1, duration: 1.0, ease: "power3.out" })
-        .to(mark, { yPercent: 0, duration: 1.15, ease: "power3.out" }, "-=0.72");
-    }, footer);
-
-    // Layout settles (fonts/fit) after mount — make sure trigger positions are right.
-    const refresh = () => ScrollTrigger.refresh();
-    document.fonts?.ready.then(refresh).catch(() => {});
-    const t = setTimeout(refresh, 400);
-    return () => { clearTimeout(t); ctx.revert(); };
+    const sentinel = sentinelRef.current;
+    if (!footer || !sentinel) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setRevealed(true);
+      return;
+    }
+    setArmed(true); // hide the rule + wordmark, ready to reveal
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setRevealed(true); },
+      { rootMargin: "0px 0px -8px 0px" },
+    );
+    io.observe(sentinel);
+    return () => io.disconnect();
   }, []);
 
   return (
-    <footer className="site-footer" aria-label="Footer" ref={footerRef}>
-      <div className="site-footer-rule" aria-hidden="true" ref={ruleRef} />
+    <footer
+      className={`site-footer ${armed ? "is-armed" : ""} ${revealed ? "is-revealed" : ""}`}
+      aria-label="Footer"
+      ref={footerRef}
+    >
+      <div className="site-footer-rule" aria-hidden="true" />
 
       <div className="site-footer-info">
         <div className="sf-cluster sf-contact">
@@ -103,7 +92,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="sf-cluster sf-credit">
-          <span>© {year} finbarstudio</span>
+          <FooterCopyright year={year} />
           <span className="sf-muted">Design and build by finbarstudio</span>
         </div>
       </div>
@@ -111,6 +100,7 @@ export default function SiteFooter() {
       <div className="site-footer-mark" aria-label="finbarstudio">
         <BrandWordmark ref={markRef} className="site-footer-mark-inner" />
       </div>
+      <div className="site-footer-sentinel" aria-hidden="true" ref={sentinelRef} />
     </footer>
   );
 }

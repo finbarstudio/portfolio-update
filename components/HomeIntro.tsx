@@ -30,9 +30,9 @@ export default function HomeIntro() {
       if (sessionStorage.getItem("finbar-intro-played")) {
         playedRef.current = true;
         setDone(true);
-      } else {
-        sessionStorage.setItem("finbar-intro-played", "1");
       }
+      // Note: the "played" flag is set in finish() (not here) so a remount —
+      // e.g. React Strict Mode's double-invoke in dev — doesn't skip the run.
     } catch { /* sessionStorage unavailable — just play */ }
   }, []);
 
@@ -97,6 +97,7 @@ export default function HomeIntro() {
     const finish = () => {
       if (finished) return;
       finished = true;
+      try { sessionStorage.setItem("finbar-intro-played", "1"); } catch { /* ignore */ }
       setDone(true);
       document.body.style.overflow = prevOverflow;
       delete document.documentElement.dataset.introLock;
