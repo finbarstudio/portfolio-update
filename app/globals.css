@@ -3626,7 +3626,7 @@ body:has(.sb-root) {
   display: inline-block;
   vertical-align: baseline;
   position: relative;
-  top: -0.42em;
+  top: -0.16em;
 }
 /* The Sandbox pill nests a circular bubble in its rounded end. Tighten the right
    padding so the gap around the bubble matches the pill's vertical padding. */
@@ -3642,16 +3642,19 @@ body:has(.sb-root) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.55em;
-  height: 1.55em;
+  width: 1.3em;
+  height: 1.3em;
   border-radius: 50%;
   background: var(--ink);
   color: var(--bg);
   margin-left: 0.45em;
+  /* Negative block margin so the circle never makes the pill taller than its
+     siblings — the text line height drives the pill height, not the bubble. */
+  margin-block: -0.3em;
   flex: 0 0 auto;
   transition: background var(--dur-fast) var(--ease);
 }
-.nav-ext-bubble svg { width: 0.84em; height: 0.84em; display: block; }
+.nav-ext-bubble svg { width: 0.8em; height: 0.8em; display: block; }
 a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* The .tag-default hover is scoped to anchors; mirror it for this button. */
 @media (hover: hover) {
