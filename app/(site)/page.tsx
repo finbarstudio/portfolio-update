@@ -66,7 +66,7 @@ function Disciplines() {
         {" Social "}
         <InlineIcon char="👪" className="home-disc-icon" />
         {" Web "}
-        <InlineIcon char="⮔" className="home-disc-icon" />
+        <InlineIcon char="🏄" className="home-disc-icon" />
         {" Editorial "}
         <span className="home-disc-pink">and</span>
         {" whatever else your heart "}

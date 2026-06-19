@@ -49,10 +49,10 @@ function PhoneIcon() {
 }
 
 const socials = [
-  { label: "Instagram", href: "https://instagram.com/finbar.studio", icon: <SiInstagram size="100%" aria-hidden="true" /> },
-  { label: "X", href: "https://x.com/finbarstudio", icon: <SiX size="100%" aria-hidden="true" /> },
-  { label: "LinkedIn", href: "https://linkedin.com/in/finbarskitini", icon: <LinkedInIcon /> },
-  { label: "Are.na", href: "https://are.na/finbar-studio", icon: <ArenaIcon /> },
+  { label: "Instagram", cls: "is-ig", href: "https://instagram.com/finbar.studio", icon: <SiInstagram size="100%" aria-hidden="true" /> },
+  { label: "X", cls: "is-x", href: "https://x.com/finbarstudio", icon: <SiX size="100%" aria-hidden="true" /> },
+  { label: "LinkedIn", cls: "is-li", href: "https://linkedin.com/in/finbarskitini", icon: <LinkedInIcon /> },
+  { label: "Are.na", cls: "is-arena", href: "https://are.na/finbar-studio", icon: <ArenaIcon /> },
 ];
 
 export default function TopNav() {
@@ -103,7 +103,7 @@ export default function TopNav() {
             rel="noopener noreferrer"
             aria-label={s.label}
             title={s.label}
-            className={`top-nav-social-item ${s.label === "Are.na" ? "is-arena" : ""}`}
+            className={`top-nav-social-item ${s.cls}`}
           >
             {s.icon}
           </a>

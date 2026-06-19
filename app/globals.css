@@ -3657,9 +3657,12 @@ body:has(.sb-root) {
 }
 .top-nav-social-item:hover { color: var(--pink); }
 .top-nav-social-item svg { height: 14px; width: auto; display: block; }
-/* Are.na's mark is wide + busy; trim its height a touch so its visual mass
-   matches the square icons rather than dominating. */
-.top-nav-social-item.is-arena svg { height: 11px; }
+/* Per-icon optical tuning: the solid brand glyphs read heavier than the outline
+   mail/phone, so trim them down. */
+.top-nav-social-item.is-ig svg { height: 13px; }      /* Instagram, slightly down */
+.top-nav-social-item.is-x svg { height: 12px; }       /* X, down a bit */
+.top-nav-social-item.is-li svg { height: 12px; }      /* LinkedIn, down a bit */
+.top-nav-social-item.is-arena svg { height: 11px; }   /* Are.na, wide + busy */
 /* Mobile: keep the pills on one row; the socials live in the footer instead. */
 @media (max-width: 767px) {
   .top-nav-social { display: none; }
