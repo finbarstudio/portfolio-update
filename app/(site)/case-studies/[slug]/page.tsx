@@ -318,7 +318,7 @@ function FooterMeta({ project }: { project: Project }) {
             <p className="mono-label text-ink-soft mb-3">
               {project.liveUrl && project.companyUrl ? "LINKS" : project.liveUrl ? "LIVE SITE" : "COMPANY"}
             </p>
-            <div className="flex flex-col items-start gap-1.5">
+            <div className="flex flex-col items-center md:items-start gap-1.5">
               {project.liveUrl && (
                 <a
                   href={project.liveUrl}

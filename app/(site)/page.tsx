@@ -70,7 +70,7 @@ function Disciplines() {
         {" Editorial "}
         <span className="home-disc-pink">and</span>
         {" whatever else your heart "}
-        <InlineIcon char="♡" className="home-disc-icon" />
+        <InlineIcon char="🂱" className="home-disc-icon" />
         {" desires"}
       </MaskReveal>
     </section>

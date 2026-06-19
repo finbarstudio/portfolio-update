@@ -3549,6 +3549,11 @@ body:has(.sb-root) {
 @media (min-width: 768px) {
   .sf-col-end { align-items: flex-end; text-align: right; }
 }
+/* Mobile 2-col grid: the Hiring/email column spans both columns. */
+.sf-col-wide { grid-column: 1 / -1; }
+@media (min-width: 768px) {
+  .sf-col-wide { grid-column: auto; }
+}
 .sf-label { color: var(--ink); }          /* hiring / build-by — ink */
 .sf-value { color: var(--pink); }          /* email, phone, locations, copyright — pink */
 /* Location code + its little flag, on one row. */
@@ -3562,6 +3567,19 @@ body:has(.sb-root) {
   padding: 0 clamp(16px, 2.6vw, 34px) clamp(8px, 1.2vw, 16px);
   line-height: 0.82;
   overflow: hidden;          /* masks the slide-up reveal */
+}
+
+/* Mobile: drop the giant wordmark for a big full-bleed pink asterisk. */
+.site-footer-asterisk { display: none; }
+@media (max-width: 767px) {
+  .site-footer-mark { display: none; }
+  .site-footer-asterisk {
+    display: block;
+    width: 100%;
+    margin-top: clamp(28px, 7vh, 72px);
+    line-height: 0;
+  }
+  .site-footer-asterisk svg { width: 100%; height: auto; display: block; }
 }
 .site-footer-mark-inner {
   display: inline-flex;

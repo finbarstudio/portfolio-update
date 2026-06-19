@@ -109,7 +109,11 @@ export default function AboutPage() {
           {" I’m "}
           <span className="home-disc-pink">Finbar</span>
           <InlineIcon char="⦿" className="home-disc-icon" />
-          {" one day I woke up and found my feet in design "}
+          {" one day I woke up "}
+          <InlineIcon char="☀" className="home-disc-icon" />
+          {" and found my feet "}
+          <InlineIcon char="👣" className="home-disc-icon" />
+          {" in design "}
           <InlineIcon char="✎" className="home-disc-icon" />
           {" and I haven’t moved since "}
           <InlineIcon char="♡" className="home-disc-icon" />

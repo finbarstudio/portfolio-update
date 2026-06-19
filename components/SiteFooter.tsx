@@ -16,6 +16,7 @@ import FooterCopyright from "./FooterCopyright";
 import FooterClock from "./FooterClock";
 import LiveTime from "./LiveTime";
 import { EngFlag } from "./Flags";
+import { ASTERISK_POINTS } from "./brand-asterisk";
 
 export default function SiteFooter() {
   // Deterministic initial year (matches SSR), then corrected on the client.
@@ -127,7 +128,7 @@ export default function SiteFooter() {
           <span className="sf-loc"><span className="sf-label">ENG/LON</span><EngFlag /></span>
           <LiveTime tz="Europe/London" />
         </div>
-        <div className="sf-col">
+        <div className="sf-col sf-col-wide">
           <span className="sf-label">Hiring or have a project?</span>
           <a href="mailto:finbar@finbar.studio" className="sf-value u-underline">finbar@finbar.studio</a>
         </div>
@@ -142,6 +143,12 @@ export default function SiteFooter() {
 
       <div className="site-footer-mark" aria-label="finbarstudio">
         <BrandWordmark ref={markRef} className="site-footer-mark-inner" />
+      </div>
+      {/* Mobile-only: a big full-bleed pink asterisk in place of the wordmark. */}
+      <div className="site-footer-asterisk" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+          <polygon points={ASTERISK_POINTS} fill="var(--pink)" />
+        </svg>
       </div>
     </footer>
   );
