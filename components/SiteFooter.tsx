@@ -115,20 +115,22 @@ export default function SiteFooter() {
       <div className="site-footer-rule" aria-hidden="true" />
 
       <div className="site-footer-info">
-        <div className="sf-cluster sf-contact">
-          <span className="sf-heading">Hiring or have a project?</span>
-          <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>
-          <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>
+        <div className="sf-col">
+          <span className="sf-label">Hiring or have a project?</span>
+          <a href="mailto:finbar@finbar.studio" className="sf-value u-underline">finbar@finbar.studio</a>
         </div>
-
-        <div className="sf-cluster sf-locations">
-          <span>Brisbane, QLD</span>
-          <span>London, UK</span>
+        <div className="sf-col">
+          <a href="tel:+61412796630" className="sf-value u-underline tabular-nums">+61 412 796 630</a>
         </div>
-
-        <div className="sf-cluster sf-credit">
+        <div className="sf-col">
+          <span className="sf-value">London, UK</span>
+        </div>
+        <div className="sf-col">
+          <span className="sf-value">Brisbane, QLD</span>
+        </div>
+        <div className="sf-col sf-col-end">
+          <span className="sf-label">Design and build by finbarstudio</span>
           <FooterCopyright year={year} />
-          <span className="sf-muted">Design and build by finbarstudio</span>
         </div>
       </div>
 
