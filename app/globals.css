@@ -3337,12 +3337,35 @@ body:has(.sb-root) {
   flex-direction: column;
   overflow: hidden;          /* clips the wordmark along the bottom */
   color: var(--ink);         /* one uniform colour for everything inside */
-  padding-top: 64px;         /* ~one nav-bar down, so overlapping nav looks padded */
+  padding-top: 44px;         /* sits a touch below the nav */
 }
 .site-footer-rule {
   height: 1px;
   background: var(--ink);
   margin: 0 clamp(20px, 3vw, 40px);
+}
+/* Scroll-driven reveals: the rule draws left→right as the footer enters, and the
+   wordmark rises in from the bottom as you reach the very bottom. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .site-footer-rule {
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: footer-rule-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 18%;
+    }
+    .site-footer-mark-inner {
+      animation: footer-mark-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 100%;
+    }
+  }
+}
+@keyframes footer-rule-draw { to { transform: scaleX(1); } }
+@keyframes footer-mark-rise {
+  from { transform: translateY(115%); }
+  to   { transform: translateY(0); }
 }
 .site-footer-info {
   margin-top: auto;          /* push the info row + wordmark to the bottom */
