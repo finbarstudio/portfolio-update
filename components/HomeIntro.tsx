@@ -172,7 +172,7 @@ export default function HomeIntro() {
           ref={slotRef}
           aria-hidden="true"
         >
-          {"✳"}
+          {String.fromCodePoint(0x1f7be)}
         </span>
       </div>
     </section>
