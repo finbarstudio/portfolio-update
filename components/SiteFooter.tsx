@@ -82,9 +82,11 @@ export default function SiteFooter() {
     let revealedLocal = false;
     const check = () => {
       if (revealedLocal) return;
-      // Fire when the footer's top has risen past the middle of the viewport
-      // (i.e. the footer fills the lower half — you've reached the bottom).
-      if (footer.getBoundingClientRect().top < window.innerHeight * 0.5) {
+      // Fire only once you're near the actual bottom — the wordmark lives at the
+      // foot of the footer, so trigger on remaining-scroll-to-bottom, not on the
+      // footer's top (which crosses mid-screen way too early, around the HR).
+      const remaining = footer.getBoundingClientRect().bottom - window.innerHeight;
+      if (remaining < window.innerHeight * 0.22) {
         revealedLocal = true;
         setRevealed(true);
       }
