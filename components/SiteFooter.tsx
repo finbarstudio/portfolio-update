@@ -79,7 +79,10 @@ export default function SiteFooter() {
         {
           yPercent: 0,
           ease: "none",
-          scrollTrigger: { trigger: mark, start: "top bottom", end: "bottom bottom", scrub: true },
+          // Trigger on the footer with a reachable range (the old mark range sat
+          // at the very end of scroll, so it never rose). Rises as you near the
+          // bottom and finishes when the footer is fully scrolled.
+          scrollTrigger: { trigger: footer, start: "top 40%", end: "bottom bottom", scrub: true },
         },
       );
     }, footer);

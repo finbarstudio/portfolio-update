@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
 import { STAR_POINTS } from "./brand-star";
 
 type Phase = "trace" | "fill" | "fly" | "done";
@@ -26,11 +27,30 @@ export default function HomeIntro() {
   const lockupRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLSpanElement>(null);
   const flyRef = useRef<HTMLDivElement>(null);
+  const starRef = useRef<SVGPolygonElement>(null);
   const [phase, setPhase] = useState<Phase>("trace");
   const [flyTransform, setFlyTransform] = useState<string | null>(null);
 
-  // The star trims itself in pure CSS (one path, pathLength=100, dash 100→0) —
-  // see .intro-fly-star path in globals.css. No JS getTotalLength needed.
+  // Draw the star outline with GSAP: measure the real perimeter (getTotalLength,
+  // works on <polygon>), hide it as one dash, then tween the offset to 0 so a
+  // single clean 1px line traces the whole star. Bulletproof — no pathLength.
+  useLayoutEffect(() => {
+    const p = starRef.current;
+    if (!p) return;
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = `${len}`;
+    p.style.strokeDashoffset = `${len}`;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      p.style.strokeDashoffset = "0";
+      return;
+    }
+    const tween = gsap.to(p, {
+      strokeDashoffset: 0,
+      duration: TRACE_MS / 1000,
+      ease: "power2.inOut",
+    });
+    return () => { tween.kill(); };
+  }, []);
 
   // Fit the wordmark to the available width, then drive a scroll-linked morph:
   // as you scroll through the first screen it shrinks and rises from the bottom
@@ -139,7 +159,7 @@ export default function HomeIntro() {
           {/* Preloader star: a crisp 1px outline that trims itself on (see
               .intro-fly-star in globals). */}
           <svg viewBox="0 0 100 100" className="intro-fly-star">
-            <polygon points={STAR_POINTS} pathLength={1} vectorEffect="non-scaling-stroke" />
+            <polygon ref={starRef} points={STAR_POINTS} vectorEffect="non-scaling-stroke" />
           </svg>
         </div>
       )}

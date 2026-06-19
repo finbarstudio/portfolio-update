@@ -3220,16 +3220,12 @@ body:has(.sb-root) {
   stroke-width: 1;
   stroke-linejoin: miter;
   stroke-linecap: butt;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: intro-star-draw 1.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  /* dash + offset set by JS; GSAP tweens the offset to draw it (see HomeIntro). */
   transition: fill-opacity 0.45s var(--ease);
 }
-@keyframes intro-star-draw { to { stroke-dashoffset: 0; } }
 .intro-fly.is-fill .intro-fly-star polygon,
 .intro-fly.is-fly .intro-fly-star polygon { fill-opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  .intro-fly-star polygon { animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
   .intro-fly { transition: none; }
 }
 
