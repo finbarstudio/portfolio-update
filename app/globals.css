@@ -3302,6 +3302,36 @@ body:has(.sb-root) {
 /* In-type accent word (e.g. "and") picked out in the brand pink. */
 .home-disc-pink { color: var(--pink); }
 
+/* Word-by-word reveal: each word/icon sits in a mask and slides up into view
+   (see MaskReveal). */
+.mr-mask {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.mr-inner {
+  display: inline-flex;
+  will-change: transform;
+}
+
+/* Persistent bottom-right copyright; hands off to the footer credit (see
+   StickyCredit). Right-aligned to the page gutter. */
+.sticky-credit {
+  position: fixed;
+  right: clamp(20px, 3vw, 40px);
+  bottom: 14px;
+  z-index: 45;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+  color: var(--ink);
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+}
+.sticky-credit.is-hidden { opacity: 0; }
+
 /* ── Brand wordmark token ─────────────────────────────────────────
    The canonical logo, used everywhere: FINBARSTUDIO in Space Mono caps with a
    pink ❘ (U+2758, Noto Sans Symbols 2) on the end, no space. */
@@ -3448,9 +3478,9 @@ body:has(.sb-root) {
   line-height: 0.82;
   overflow: hidden;          /* mask the wordmark's bottom */
 }
-/* Pull the container shorter than the wordmark so its bottom is clipped — the
-   logo reads as sitting beneath the footer's bottom padding. */
-.site-footer-mark-inner { margin-bottom: -0.13em; }
+/* Pull the container slightly shorter than the wordmark so it clips the empty
+   descender band (not the cap bottoms) — masks the logo beneath the padding. */
+.site-footer-mark-inner { margin-bottom: -0.05em; }
 .site-footer-mark-inner {
   display: inline-flex;
   align-items: baseline;

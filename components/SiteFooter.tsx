@@ -52,9 +52,9 @@ export default function SiteFooter() {
     return () => ro.disconnect();
   }, []);
 
-  // Scroll-driven reveals via GSAP ScrollTrigger (scrub = tied to scroll speed):
-  // the rule draws left→right as the footer enters; the wordmark rises in from
-  // the bottom as you reach the very bottom.
+  // Reveal only once you reach the very bottom (not scrubbed as you scroll, which
+  // muted the effect): a triggered, eased timeline with a slight delay — the rule
+  // draws left→right (smooth ease toward the end) and the wordmark rises in.
   useLayoutEffect(() => {
     const footer = footerRef.current;
     const rule = ruleRef.current;
@@ -64,27 +64,19 @@ export default function SiteFooter() {
     if (!registered) { gsap.registerPlugin(ScrollTrigger); registered = true; }
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        rule,
-        { scaleX: 0 },
-        {
-          scaleX: 1,
-          ease: "none",
-          scrollTrigger: { trigger: footer, start: "top 70%", end: "top 20%", scrub: true },
+      gsap.set(rule, { scaleX: 0 });
+      gsap.set(mark, { yPercent: 120 });
+      const tl = gsap.timeline({
+        delay: 0.15,
+        scrollTrigger: {
+          trigger: footer,
+          // Fires just before the absolute bottom, so it plays when you arrive.
+          start: "bottom bottom+=90",
+          toggleActions: "play none none reverse",
         },
-      );
-      gsap.fromTo(
-        mark,
-        { yPercent: 120 },
-        {
-          yPercent: 0,
-          ease: "none",
-          // Trigger on the footer with a reachable range (the old mark range sat
-          // at the very end of scroll, so it never rose). Rises as you near the
-          // bottom and finishes when the footer is fully scrolled.
-          scrollTrigger: { trigger: footer, start: "top 40%", end: "bottom bottom", scrub: true },
-        },
-      );
+      });
+      tl.to(rule, { scaleX: 1, duration: 1.0, ease: "power3.out" })
+        .to(mark, { yPercent: 0, duration: 1.15, ease: "power3.out" }, "-=0.72");
     }, footer);
 
     // Layout settles (fonts/fit) after mount — make sure trigger positions are right.
@@ -111,7 +103,8 @@ export default function SiteFooter() {
         </div>
 
         <div className="sf-cluster sf-credit">
-          <span>© {year} finbar studio</span>
+          <span>© {year} finbarstudio</span>
+          <span className="sf-muted">Design and build by finbarstudio</span>
         </div>
       </div>
 

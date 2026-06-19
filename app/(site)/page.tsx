@@ -6,6 +6,7 @@ import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HomeIntro from "@/components/HomeIntro";
 import InlineIcon from "@/components/InlineIcon";
+import MaskReveal from "@/components/MaskReveal";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -55,25 +56,23 @@ function HomeJsonLd() {
 function Disciplines() {
   return (
     <section className="home-disciplines px-5 md:px-10" aria-label="What I do">
-      <h2 className="home-disc" aria-label="Brand, digital, print, social, web, editorial and whatever else your heart desires">
-        <span aria-hidden="true">Brand</span>
+      <MaskReveal as="h2" className="home-disc" aria-label="Brand, digital, print, social, web, editorial and whatever else your heart desires">
+        {"Brand "}
         <InlineIcon char="⦿" className="home-disc-icon" />
-        <span aria-hidden="true">Digital</span>
+        {" Digital "}
         <InlineIcon char="🖧" className="home-disc-icon" />
-        <span aria-hidden="true">Print</span>
+        {" Print "}
         <InlineIcon char="📦" className="home-disc-icon" />
-        <span aria-hidden="true">Social</span>
+        {" Social "}
         <InlineIcon char="👪" className="home-disc-icon" />
-        <span aria-hidden="true">Web</span>
+        {" Web "}
         <InlineIcon char="⮔" className="home-disc-icon" />
-        <span aria-hidden="true">Editorial</span>
-        <span aria-hidden="true">
-          {" "}
-          <span className="home-disc-pink">and</span> whatever else your heart
-        </span>
+        {" Editorial "}
+        <span className="home-disc-pink">and</span>
+        {" whatever else your heart "}
         <InlineIcon char="♡" className="home-disc-icon" />
-        <span aria-hidden="true">desires</span>
-      </h2>
+        {" desires"}
+      </MaskReveal>
     </section>
   );
 }

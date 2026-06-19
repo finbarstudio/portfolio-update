@@ -3,6 +3,7 @@ import Link from "next/link";
 import Script from "next/script";
 import Reveal from "@/components/Reveal";
 import InlineIcon from "@/components/InlineIcon";
+import MaskReveal from "@/components/MaskReveal";
 import { projects } from "@/content/projects";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -77,20 +78,21 @@ export default function AboutPage() {
         className="min-h-[70svh] flex items-center py-16 md:py-24"
         aria-label="Introduction"
       >
-        <h1
+        <MaskReveal
+          as="h1"
           className="home-disc"
           aria-label="Nice to meet you, I'm Finbar. One day I woke up and found my feet in design and I haven't moved since."
         >
-          <span aria-hidden="true">Nice to meet you</span>
+          {"Nice to meet you "}
           <InlineIcon char="👪" className="home-disc-icon" />
-          <span aria-hidden="true">I&rsquo;m</span>{" "}
-          <span className="home-disc-pink" aria-hidden="true">Finbar</span>
+          {" I’m "}
+          <span className="home-disc-pink">Finbar</span>
           <InlineIcon char="⦿" className="home-disc-icon" />
-          <span aria-hidden="true">one day I woke up and found my feet in design</span>
+          {" one day I woke up and found my feet in design "}
           <InlineIcon char="✎" className="home-disc-icon" />
-          <span aria-hidden="true">and I haven&rsquo;t moved since</span>
+          {" and I haven’t moved since "}
           <InlineIcon char="♡" className="home-disc-icon" />
-        </h1>
+        </MaskReveal>
       </section>
 
       {/* ── Four columns: services / clients / bio / mission ──── */}

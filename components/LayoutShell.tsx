@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import TopNav from "./TopNav";
 import SmoothScroll from "./SmoothScroll";
 import SiteFooter from "./SiteFooter";
+import StickyCredit from "./StickyCredit";
 import "lenis/dist/lenis.css";
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
@@ -47,6 +48,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         {children}
         <SiteFooter />
       </main>
+      <StickyCredit />
     </>
   );
 }
