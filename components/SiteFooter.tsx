@@ -37,16 +37,25 @@ export default function SiteFooter() {
       const cs = getComputedStyle(parent);
       const avail = parent.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       if (avail <= 0) return;
+      // First estimate from a 100px reference, then iterate the ratio to converge
+      // on a size whose scrollWidth fills the row exactly (sub-pixel rounding +
+      // the asterisk's non-linear width make one pass insufficient on some widths).
       el.style.fontSize = "100px";
-      const natural = el.scrollWidth;
+      let natural = el.scrollWidth;
       if (natural <= 0) return;
-      const size = (avail / natural) * 100;
-      el.style.fontSize = `${Math.max(20, size)}px`;
-      // Correction pass + 0.3% overshoot so the wordmark always fills edge-to-edge.
-      const measured = el.scrollWidth;
-      if (measured > 0) el.style.fontSize = `${Math.max(20, size * (avail / measured) * 1.003)}px`;
+      let size = (avail / natural) * 100;
+      for (let i = 0; i < 4; i++) {
+        el.style.fontSize = `${Math.max(20, size)}px`;
+        const measured = el.scrollWidth;
+        if (measured <= 0) break;
+        if (Math.abs(measured - avail) <= 0.5) break;
+        size = size * (avail / measured);
+      }
+      // Tiny overshoot so the edges always kiss the page margins (never short).
+      el.style.fontSize = `${Math.max(20, size * 1.004)}px`;
     };
     fit();
+    requestAnimationFrame(fit);
     document.fonts?.ready.then(fit).catch(() => {});
     const ro = new ResizeObserver(fit);
     if (el.parentElement) ro.observe(el.parentElement);

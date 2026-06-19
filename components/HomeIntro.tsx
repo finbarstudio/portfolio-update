@@ -3,18 +3,24 @@
 /**
  * HomeIntro — the opening screen + preloader sequence.
  *
- * The brand asterisk outline traces itself in the centre of a blank brand-bg
+ * DESKTOP: the brand asterisk outline traces itself in the centre of a blank
  * screen, fills pink, drops to the centre-bottom (the wordmark line), slides
- * right into its slot, and FINBARSTUDIO mask-reveals to its left. Then the
- * wordmark is the resting logo, which scroll-shrinks up into the nav.
+ * right into its slot, and FINBARSTUDIO mask-reveals to its left. The resting
+ * wordmark then scroll-shrinks up into the nav as you scroll the first screen.
+ *
+ * MOBILE: no preloader, no scroll-morph — the wordmark is a small static logo
+ * pinned top-right (clear of the left-aligned nav), and the page content starts
+ * immediately beneath the nav. (CSS handles the static placement.)
  *
  * Plays once per browser session.
  */
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ASTERISK_POINTS } from "./brand-asterisk";
+
+const MOBILE_QUERY = "(max-width: 767px)";
 
 export default function HomeIntro() {
   const lockupRef = useRef<HTMLAnchorElement>(null);
@@ -24,22 +30,25 @@ export default function HomeIntro() {
   const starRef = useRef<SVGPolygonElement>(null);
   const [done, setDone] = useState(false);
 
-  // Play once per session — on later home visits the wordmark is just there.
-  const playedRef = useRef(false);
+  // Whether to skip the whole intro (already played this session, or mobile).
+  const skipRef = useRef(false);
   useLayoutEffect(() => {
-    try {
-      if (sessionStorage.getItem("finbar-intro-played")) {
-        playedRef.current = true;
-        setDone(true);
-      }
-      // Note: the "played" flag is set in finish() (not here) so a remount —
-      // e.g. React Strict Mode's double-invoke in dev — doesn't skip the run.
-    } catch { /* sessionStorage unavailable — just play */ }
+    const mobile = window.matchMedia(MOBILE_QUERY).matches;
+    let played = false;
+    try { played = !!sessionStorage.getItem("finbar-intro-played"); } catch { /* ignore */ }
+    // On mobile the wordmark is just a static corner logo — no preloader, ever.
+    if (mobile || played) {
+      skipRef.current = true;
+      setDone(true);
+    }
+    // The "played" flag is set in finish() (not here) so a Strict-Mode remount
+    // in dev doesn't skip the real run.
   }, []);
 
-  // Fit the wordmark to the available width, then drive the scroll-linked morph:
-  // as you scroll the first screen it shrinks and rises into the centre of the nav.
+  // Desktop only: fit the wordmark to the screen width, then drive the
+  // scroll-linked morph (shrink + rise into the centre of the nav).
   useLayoutEffect(() => {
+    if (skipRef.current) return;
     const el = lockupRef.current;
     if (!el) return;
     let bigFont = 0;
@@ -72,6 +81,7 @@ export default function HomeIntro() {
     };
     fit();
     apply();
+    document.fonts?.ready.then(() => { fit(); apply(); }).catch(() => {});
     const onScroll = () => apply();
     const onResize = () => { fit(); apply(); };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -82,9 +92,11 @@ export default function HomeIntro() {
     };
   }, []);
 
-  // The preloader choreography (GSAP timeline).
+  // Desktop only: the preloader choreography (GSAP timeline). The wordmark-fit
+  // effect above runs first (same commit, synchronous), so the slot is already
+  // sized + positioned — we measure it directly, no rAF gymnastics.
   useLayoutEffect(() => {
-    if (playedRef.current) return;
+    if (skipRef.current) return;
     const fly = flyRef.current, star = starRef.current, slot = slotRef.current, text = textRef.current;
     if (!fly || !star || !slot || !text) return;
 
@@ -98,50 +110,47 @@ export default function HomeIntro() {
     const finish = () => {
       if (finished) return;
       finished = true;
-      text.classList.add("is-revealed"); // failsafe: ensure text is visible
+      text.classList.add("is-revealed");
       try { sessionStorage.setItem("finbar-intro-played", "1"); } catch { /* ignore */ }
       setDone(true);
       document.body.style.overflow = prevOverflow;
       delete document.documentElement.dataset.introLock;
       window.__lenis?.start();
     };
-    // Failsafe: never leave scroll locked if the GSAP ticker stalls (e.g. the
-    // tab loads in the background and rAF is throttled).
-    const failsafe = setTimeout(finish, 5000);
+    // Failsafe: never leave scroll locked if the ticker stalls (background tab).
+    const failsafe = setTimeout(finish, 6000);
 
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    // Measure synchronously — the layout from the fit effect is already applied.
+    const len = star.getTotalLength() || 0;
+    const f = fly.getBoundingClientRect();
+    const s = slot.getBoundingClientRect();
+    const dyDown = (s.top + s.height / 2) - (f.top + f.height / 2);
+    const dxRight = (s.left + s.width / 2) - (f.left + f.width / 2);
+    const scale = f.height ? s.height / f.height : 0.12;
+
     gsap.set(fly, { xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1, opacity: 1 });
+    gsap.set(star, { strokeDasharray: len, strokeDashoffset: reduce ? 0 : len, fillOpacity: reduce ? 1 : 0 });
 
-    if (reduce) { text.classList.add("is-revealed"); clearTimeout(failsafe); finish(); return; }
+    // Reduced motion: skip the big movement, just reveal in place quickly.
+    if (reduce) {
+      clearTimeout(failsafe);
+      gsap.to(text, { duration: 0.01, onComplete: () => { text.classList.add("is-revealed"); } });
+      const t = gsap.delayedCall(0.6, finish);
+      return () => { t.kill(); document.body.style.overflow = prevOverflow; delete document.documentElement.dataset.introLock; window.__lenis?.start(); };
+    }
 
-    let tl: gsap.core.Timeline | undefined;
-    let cancelled = false;
-    // Two rAF frames: first lets the fixed elements settle layout, second measures.
-    const raf = requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (cancelled) return;
-      // getTotalLength() needs the SVG to be in a laid-out document.
-      const len = star.getTotalLength() || 0;
-      gsap.set(star, { strokeDasharray: len, strokeDashoffset: len, fillOpacity: 0 });
-
-      const f = fly.getBoundingClientRect();
-      const s = slot.getBoundingClientRect();
-      const dyDown = (s.top + s.height / 2) - (f.top + f.height / 2);
-      const dxRight = (s.left + s.width / 2) - (f.left + f.width / 2);
-      const scale = f.height ? s.height / f.height : 0.12;
-
-      tl = gsap.timeline({ onComplete: () => { clearTimeout(failsafe); finish(); } });
-      tl.to(star, { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" })         // trace
-        .to(star, { fillOpacity: 1, duration: 0.28, ease: "power1.out" })                // fill
-        .to(fly, { y: dyDown, duration: 0.5, ease: "power3.inOut" }, "+=0.05")           // drop
-        .to(fly, { x: dxRight, scale, duration: 0.6, ease: "power3.inOut" })             // slide to slot
-        .call(() => { text.classList.add("is-revealed"); }, undefined, "-=0.12");        // wordmark reveal
-    }));
+    const tl = gsap.timeline({ onComplete: () => { clearTimeout(failsafe); finish(); } });
+    tl.to(star, { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" })       // trace
+      .to(star, { fillOpacity: 1, duration: 0.28, ease: "power1.out" })              // fill
+      .to(fly, { y: dyDown, duration: 0.5, ease: "power3.inOut" }, "+=0.05")         // drop
+      .to(fly, { x: dxRight, scale, duration: 0.6, ease: "power3.inOut" })           // slide to slot
+      .call(() => { text.classList.add("is-revealed"); }, undefined, "-=0.12");      // wordmark reveal
 
     return () => {
-      cancelled = true;
       clearTimeout(failsafe);
-      cancelAnimationFrame(raf);
-      tl?.kill();
+      tl.kill();
       document.body.style.overflow = prevOverflow;
       delete document.documentElement.dataset.introLock;
       window.__lenis?.start();

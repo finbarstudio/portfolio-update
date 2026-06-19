@@ -3193,6 +3193,26 @@ body:has(.sb-root) {
 .home-intro-slot.is-shown { opacity: 1; }
 .home-intro-slot-star { width: 1em; height: 1em; display: block; }
 
+/* Mobile: no full-screen intro and no scroll-morph — the page content starts
+   right under the nav, and the brand mark is a small static asterisk pinned in
+   the top-right corner (clear of the left-aligned nav pills). */
+@media (max-width: 767px) {
+  .home-intro { min-height: 0; padding: 0; }
+  .home-intro-mark {
+    position: fixed;
+    inset: 0 16px auto auto;   /* top:0  right:16px */
+    left: auto;
+    height: var(--menubar-h);
+    transform: none;
+    align-items: center;
+    will-change: auto;
+    z-index: 60;
+  }
+  .home-intro-text { display: none; }       /* mark-only on mobile */
+  .home-intro-slot { opacity: 1; }
+  .home-intro-slot-star { width: 24px; height: 24px; }
+}
+
 /* The flying asterisk: traces centre-screen, then GSAP drives it to the slot. */
 .intro-fly {
   position: fixed;
