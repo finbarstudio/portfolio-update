@@ -3360,7 +3360,7 @@ body:has(.sb-root) {
   display: inline-block;
   color: var(--ink);               /* copyright is the ink top-line, floating + docked */
   transform: translateY(118%);     /* hidden beneath the mask until revealed */
-  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .sf-copyright-pin.is-shown .sf-copyright-inner { transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {
@@ -3390,7 +3390,7 @@ body:has(.sb-root) {
   display: flex;
   flex-direction: column;
   transform: translateY(118%);     /* hidden beneath the mask until revealed */
-  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .sf-clock-pin.is-shown .sf-clock-inner { transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {

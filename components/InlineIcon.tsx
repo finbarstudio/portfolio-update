@@ -44,9 +44,10 @@ export default function InlineIcon({ char, className }: { char?: string; classNa
       ref={ref}
       className={className}
       onMouseEnter={reel}
-      onClick={reel}            /* tap to reel on touch devices */
+      onPointerDown={reel}      /* fires immediately on tap (touch) — click can be
+                                   swallowed by the smooth-scroll gesture handler */
       aria-hidden="true"
-      style={{ cursor: "pointer" }}
+      style={{ cursor: "pointer", touchAction: "manipulation" }}
     >
       {base}
     </span>

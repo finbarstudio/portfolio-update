@@ -19,6 +19,7 @@ export default function FooterClock() {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [shown, setShown] = useState(false);
   const [docked, setDocked] = useState(false);
+  const [hiding, setHiding] = useState(false);
   const time = useClock("Australia/Brisbane");
 
   // Reveal gate: home shows it only after the intro logo scrolls up; else always.
@@ -35,15 +36,25 @@ export default function FooterClock() {
     };
   }, [pathname]);
 
-  // Dock seamlessly when the slot rises to the pin's resting line (bottom:16px).
+  // Dock when the slot rises to the pin's resting line (bottom:16px). The fixed→
+  // in-flow position switch can micro-jump (mobile chrome resize at the scroll
+  // end), so we MASK it: reverse the reveal (slide back behind the mask), switch
+  // position while hidden, then re-reveal in place — no visible glitch.
   useEffect(() => {
     const el = anchorRef.current;
     if (!el) return;
     const ph = el.querySelector<HTMLElement>(".sf-clock-ph");
     if (!ph) return;
     const PIN_BOTTOM = 16;
+    let dockedNow = false;
+    let timer = 0;
     const check = () => {
-      setDocked(ph.getBoundingClientRect().bottom <= window.innerHeight - PIN_BOTTOM + 0.5);
+      const shouldDock = ph.getBoundingClientRect().bottom <= window.innerHeight - PIN_BOTTOM + 0.5;
+      if (shouldDock === dockedNow) return;
+      dockedNow = shouldDock;
+      setHiding(true);
+      clearTimeout(timer);
+      timer = window.setTimeout(() => { setDocked(shouldDock); setHiding(false); }, 300);
     };
     check();
     const lenis = window.__lenis;
@@ -51,6 +62,7 @@ export default function FooterClock() {
     window.addEventListener("resize", check);
     lenis?.on?.("scroll", check);
     return () => {
+      clearTimeout(timer);
       window.removeEventListener("scroll", check);
       window.removeEventListener("resize", check);
       lenis?.off?.("scroll", check);
@@ -64,7 +76,7 @@ export default function FooterClock() {
         <span className="sf-value">AUS/BNE</span>
         <span className="sf-value tabular-nums">{time || " "}</span>
       </span>
-      <span className={`sf-clock-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
+      <span className={`sf-clock-pin ${shown && !hiding ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
         <span className="sf-clock-inner">
           <span className="sf-loc"><span className="sf-label">AUS/BNE</span><AusFlag /></span>
           <span className="sf-value tabular-nums" suppressHydrationWarning>{time || " "}</span>
