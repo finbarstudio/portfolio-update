@@ -3194,23 +3194,11 @@ body:has(.sb-root) {
 .home-intro-slot-star { width: 1em; height: 1em; display: block; }
 
 /* Mobile: no full-screen intro and no scroll-morph — the page content starts
-   right under the nav, and the brand mark is a small static asterisk pinned in
-   the top-right corner (clear of the left-aligned nav pills). */
+   right under the nav. The scroll-morph lockup is hidden entirely; the static
+   NavLogo (rendered with .is-home) provides the logo in the nav instead. */
 @media (max-width: 767px) {
   .home-intro { min-height: 0; padding: 0; }
-  .home-intro-mark {
-    position: fixed;
-    inset: 0 16px auto auto;   /* top:0  right:16px */
-    left: auto;
-    height: var(--menubar-h);
-    transform: none;
-    align-items: center;
-    will-change: auto;
-    z-index: 60;
-  }
-  .home-intro-text { display: none; }       /* mark-only on mobile */
-  .home-intro-slot { opacity: 1; }
-  .home-intro-slot-star { width: 24px; height: 24px; }
+  .home-intro-mark { display: none; }
 }
 
 /* The opaque intro screen — covers everything during the trace + fill, then
@@ -3422,6 +3410,8 @@ body:has(.sb-root) {
   color: var(--ink);
   line-height: 1;
 }
+/* On home, desktop shows HomeIntro's animated lockup — hide the static one. */
+.nav-logo.is-home { display: none; }
 @media (max-width: 767px) {
   .nav-logo {
     left: auto;
@@ -3429,6 +3419,8 @@ body:has(.sb-root) {
     transform: none;
     font-size: 13px;
   }
+  /* Mobile home: HomeIntro's lockup is hidden, so show the static nav logo. */
+  .nav-logo.is-home { display: inline-flex; }
 }
 .brand-wordmark-mark {
   color: var(--pink);
@@ -3551,7 +3543,7 @@ body:has(.sb-root) {
   display: flex;
   flex-direction: column;
   align-items: flex-start;   /* left-aligned; underlines span only their text */
-  gap: 0.35rem;
+  gap: 0;                    /* tight, line-height-only spacing (matches the clock) */
 }
 /* Last column (copyright) is right-aligned at the 5-col layout. */
 @media (min-width: 768px) {
@@ -3559,6 +3551,8 @@ body:has(.sb-root) {
 }
 .sf-label { color: var(--ink); }          /* hiring / build-by — ink */
 .sf-value { color: var(--pink); }          /* email, phone, locations, copyright — pink */
+/* Location code + its little flag, on one row. */
+.sf-loc { display: inline-flex; align-items: center; gap: 0.45em; }
 
 .site-footer-mark {
   width: 100%;

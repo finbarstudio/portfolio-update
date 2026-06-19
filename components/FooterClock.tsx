@@ -12,6 +12,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useClock } from "./LiveTime";
+import { AusFlag } from "./Flags";
 
 export default function FooterClock() {
   const pathname = usePathname();
@@ -65,7 +66,7 @@ export default function FooterClock() {
       </span>
       <span className={`sf-clock-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
         <span className="sf-clock-inner">
-          <span className="sf-label">AUS/BNE</span>
+          <span className="sf-loc"><span className="sf-label">AUS/BNE</span><AusFlag /></span>
           <span className="sf-value tabular-nums" suppressHydrationWarning>{time || " "}</span>
         </span>
       </span>

@@ -35,9 +35,10 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       {/* Film grain — retro texture over everything (never blocks pointers). */}
       <div className="grain-overlay" aria-hidden="true" />
       <TopNav />
-      {/* The home page renders the animated HomeIntro lockup; every other page
-          gets the persistent resting logo. */}
-      {pathname !== "/" && <NavLogo />}
+      {/* Persistent resting logo. On desktop home it's hidden (HomeIntro's
+          animated lockup shows instead); on mobile home + every other page it's
+          the static nav logo. Visibility handled in CSS via .is-home. */}
+      <NavLogo onHome={pathname === "/"} />
       <main
         className="min-w-0"
         style={{

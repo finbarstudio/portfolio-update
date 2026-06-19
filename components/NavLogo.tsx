@@ -1,26 +1,36 @@
 "use client";
 
 /**
- * NavLogo — the persistent finbar✶studio wordmark shown on every page EXCEPT
- * home (home renders the animated HomeIntro lockup instead). It sits where the
- * home logo comes to rest — centred in the nav on desktop, top-right on mobile.
+ * NavLogo — the persistent finbar✶studio wordmark in the nav.
  *
- * Clicking it returns to home AND lands at the top of the hero text: it sets a
- * one-shot flag that HomeIntro reads on arrival to smooth-scroll to #hero.
+ * Visibility (CSS, via the .is-home modifier):
+ *   - desktop home: hidden (HomeIntro's animated lockup shows instead)
+ *   - mobile home + every other page: shown (static logo in the nav)
+ *
+ * Click behaviour:
+ *   - on home: smooth-scroll to the top of the hero text (#hero)
+ *   - elsewhere: navigate home, setting a one-shot flag so HomeIntro scrolls to
+ *     the hero on arrival
  */
 
 import Link from "next/link";
 import BrandWordmark from "./BrandWordmark";
+import { scrollToHero } from "@/lib/scroll";
 
 export const GOTO_HERO_KEY = "finbar-goto-hero";
 
-export default function NavLogo() {
+export default function NavLogo({ onHome = false }: { onHome?: boolean }) {
   return (
     <Link
       href="/"
-      className="nav-logo"
+      className={`nav-logo ${onHome ? "is-home" : ""}`}
       aria-label="finbarstudio — home"
-      onClick={() => {
+      onClick={(e) => {
+        if (onHome) {
+          e.preventDefault();
+          scrollToHero();
+          return;
+        }
         try { sessionStorage.setItem(GOTO_HERO_KEY, "1"); } catch { /* ignore */ }
       }}
     >

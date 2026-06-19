@@ -15,6 +15,7 @@ import BrandWordmark from "./BrandWordmark";
 import FooterCopyright from "./FooterCopyright";
 import FooterClock from "./FooterClock";
 import LiveTime from "./LiveTime";
+import { EngFlag } from "./Flags";
 
 export default function SiteFooter() {
   // Deterministic initial year (matches SSR), then corrected on the client.
@@ -123,7 +124,7 @@ export default function SiteFooter() {
           <FooterClock />
         </div>
         <div className="sf-col">
-          <span className="sf-label">UK/LON</span>
+          <span className="sf-loc"><span className="sf-label">ENG/LON</span><EngFlag /></span>
           <LiveTime tz="Europe/London" />
         </div>
         <div className="sf-col">
