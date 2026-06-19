@@ -3646,8 +3646,9 @@ body:has(.sb-root) {
   flex: 0 0 auto;
 }
 .top-nav-social-item {
-  width: 12px;
-  height: 12px;
+  /* Normalise by HEIGHT (not a fixed square) so non-square marks — the wide
+     Are.na logo especially — read at the same optical size as the rest. */
+  height: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3655,7 +3656,10 @@ body:has(.sb-root) {
   transition: color var(--dur-fast) var(--ease);
 }
 .top-nav-social-item:hover { color: var(--pink); }
-.top-nav-social-item svg { width: 100%; height: 100%; display: block; }
+.top-nav-social-item svg { height: 14px; width: auto; display: block; }
+/* Are.na's mark is wide + busy; trim its height a touch so its visual mass
+   matches the square icons rather than dominating. */
+.top-nav-social-item.is-arena svg { height: 11px; }
 /* Mobile: keep the pills on one row; the socials live in the footer instead. */
 @media (max-width: 767px) {
   .top-nav-social { display: none; }

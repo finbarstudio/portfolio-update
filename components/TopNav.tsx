@@ -103,7 +103,7 @@ export default function TopNav() {
             rel="noopener noreferrer"
             aria-label={s.label}
             title={s.label}
-            className="top-nav-social-item"
+            className={`top-nav-social-item ${s.label === "Are.na" ? "is-arena" : ""}`}
           >
             {s.icon}
           </a>
