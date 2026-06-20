@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import StartingEleven from "@/components/StartingEleven";
 import EnglandHero from "@/components/EnglandHero";
 import LiveMatch from "@/components/LiveMatch";
+import GroupTable from "@/components/GroupTable";
 import Reveal from "@/components/Reveal";
 import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
@@ -100,31 +101,10 @@ export default function WorldCupPage() {
 
         {/* Scrolling column */}
         <div className="wc-split-scroll">
-          {/* Group table */}
+          {/* Group table — live from FotMob, static fallback */}
           <Reveal as="section" className="wc-block" aria-label="Group table">
             <p className="mono-label text-ink-soft mb-4">{wc.group} table</p>
-            <table className="wc-table">
-              <thead>
-                <tr>
-                  <th className="wc-th-team">Team</th>
-                  <th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th>
-                </tr>
-              </thead>
-              <tbody>
-                {wc.table.map((t, i) => (
-                  <tr key={t.code} className={t.england ? "is-england" : ""}>
-                    <td className="wc-td-team">
-                      <span className="wc-pos">{i + 1}</span>
-                      <span className="wc-flag"><CountryFlag code={t.code} /></span>
-                      {t.team}
-                    </td>
-                    <td>{t.p}</td><td>{t.w}</td><td>{t.d}</td><td>{t.l}</td>
-                    <td className="tabular-nums">{t.gd}</td>
-                    <td className="wc-td-pts text-pink">{t.pts}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <GroupTable />
           </Reveal>
 
           {/* Golden boot */}
