@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import StartingEleven from "@/components/StartingEleven";
 import EnglandHero from "@/components/EnglandHero";
+import EnglandLions from "@/components/EnglandLions";
 import Reveal from "@/components/Reveal";
 import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
@@ -54,6 +55,7 @@ export default function WorldCupPage() {
       <div className="wc-split">
         {/* Sticky predicted XI + the rest of the squad */}
         <aside className="wc-split-xi" aria-label="Probable eleven and squad">
+          <EnglandLions />
           <p className="mono-label text-ink-soft mb-1">Probable XI</p>
           <p className="mono-label text-pink mb-5">{wc.formation}</p>
           <StartingEleven />

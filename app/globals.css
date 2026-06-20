@@ -3891,6 +3891,31 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   .wc-split-xi { position: sticky; top: clamp(20px, 4vh, 40px); align-self: start; }
 }
 .wc-split-scroll { min-width: 0; }
+/* Three-lions crest as looping line-art above the probable XI. Each path's
+   stroke-dash draws/erases on a shared cycle, spread by per-path delay (set
+   inline) so it's always sketching and never blank. */
+.wc-lions {
+  display: block;
+  width: auto;
+  height: clamp(180px, 26vh, 300px);
+  margin: 0 0 clamp(24px, 3.5vh, 40px);
+  overflow: visible;
+}
+.wc-lions path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: wc-lions-cycle 9s linear infinite;
+}
+@keyframes wc-lions-cycle {
+  0% { stroke-dashoffset: 1; }
+  8% { stroke-dashoffset: 0; }
+  80% { stroke-dashoffset: 0; }
+  90% { stroke-dashoffset: 1; }
+  100% { stroke-dashoffset: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wc-lions path { animation: none; stroke-dashoffset: 0; }
+}
 /* Both columns start level: drop the leading block's top rule/gap. */
 .wc-split-scroll .wc-block:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
 /* Recent results */
