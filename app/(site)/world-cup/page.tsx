@@ -48,11 +48,15 @@ export default function WorldCupPage() {
         <p className="mono-label text-ink-soft mb-3 wc-comp">{wc.competition} · {wc.group}</p>
         <div className="wc-hero-title-wrap">
           <h1 className="wc-hero-title">England</h1>
-          {/* Basic St George's cross drawn 1px over the wordmark: starts 2s after
-              load, completes over 3s (CSS stroke-dash animation). */}
-          <svg className="wc-stgeorge" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M50 0 V100" pathLength={1} />
-            <path d="M0 50 H100" pathLength={1} />
+          {/* St George's flag drawn over the wordmark: border, then the vertical
+              bar, then the horizontal bar trim-draw in on load (staggered CSS
+              stroke-dash animation). */}
+          <svg className="wc-stgeorge" viewBox="0 0 500 300" preserveAspectRatio="none" aria-hidden="true">
+            <g fill="none" stroke="var(--pink)">
+              <rect className="wc-flag-border" x="2" y="2" width="496" height="296" pathLength={1} />
+              <line className="wc-flag-vert" x1="250" y1="0" x2="250" y2="300" strokeLinecap="square" pathLength={1} />
+              <line className="wc-flag-horiz" x1="0" y1="150" x2="500" y2="150" strokeLinecap="square" pathLength={1} />
+            </g>
           </svg>
         </div>
       </section>
