@@ -126,7 +126,7 @@ export default function HomePage() {
           wordmark, so the semantic H1 is visually hidden but carries the key
           phrase for search + screen readers. */}
       <h1 className="sr-only">
-        finbar✶studio — Brisbane graphic design &amp; web design studio
+        finbar✶studio. Brisbane graphic design &amp; web design studio
       </h1>
       <HomeIntro />
       <Disciplines />

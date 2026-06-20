@@ -394,6 +394,11 @@ export const projects: Project[] = [
     name: "Joe Devine",
     tier: "full",
     rank: 7,
+    seo: {
+      title: "Joe Devine: Single Artwork & Art Direction | Finbar Studio",
+      description:
+        "Art direction, cover artwork and photography for five instrumental singles by a London guitarist stepping out from session work into solo releases.",
+    },
     date: "2023",
     categories: ["Art Direction", "Cover Artwork", "Photography"],
     skills: [
@@ -479,6 +484,11 @@ export const projects: Project[] = [
     name: "Compass Capability",
     tier: "full",
     rank: 14,
+    seo: {
+      title: "Compass Capability: Brand Identity & Guidelines | Finbar Studio",
+      description:
+        "Brand identity and guidelines, from concept through rollout, for a consulting firm working with industry on capability and workforce solutions.",
+    },
     date: "2024",
     categories: ["Brand Identity", "Brand Guidelines"],
     skills: [
@@ -678,6 +688,11 @@ export const projects: Project[] = [
     name: "Copper Company",
     tier: "full",
     rank: 9,
+    seo: {
+      title: "Copper Company: Rum Brand & Packaging Design | Finbar Studio",
+      description:
+        "Brand identity and packaging for a rum label: monogram logo, bottle design and guidelines, taken from concept to launch.",
+    },
     date: "2023",
     categories: ["Brand Identity", "Packaging Design"],
     skills: [
@@ -766,6 +781,11 @@ export const projects: Project[] = [
     name: "Lows Design and Build",
     tier: "full",
     rank: 8,
+    seo: {
+      title: "Lows Design and Build: Branding & Web Design | Finbar Studio",
+      description:
+        "Branding and web design for a family-run design and build company in London. Logo, website, vehicle wrap and a Bromley FC sponsorship.",
+    },
     date: "2023",
     categories: ["Brand Identity", "Web Design", "Environmental Graphics"],
     skills: [
@@ -847,6 +867,11 @@ export const projects: Project[] = [
     name: "Momentum Mentoring",
     tier: "gallery",
     rank: 10,
+    seo: {
+      title: "Momentum Mentoring: NDIS Brand & Website | Finbar Studio",
+      description:
+        "Brand identity and website for an NDIS mentoring provider, built to feel warm and human rather than clinical.",
+    },
     date: "2024",
     categories: ["Brand Identity", "Web Design", "NDIS"],
     skills: ["Brand Identity", "Web Design", "Framer Development"],
@@ -893,6 +918,11 @@ export const projects: Project[] = [
     name: "TasWater",
     tier: "gallery",
     rank: 12,
+    seo: {
+      title: "TasWater: Infographic & Information Design | Finbar Studio",
+      description:
+        "Two infographic and information design projects for TasWater, Tasmania's statewide water and sewerage corporation. On brand and leadership approved.",
+    },
     date: "2023",
     categories: ["Infographic Design", "Information Design"],
     skills: ["Infographic Design", "Information Design", "Brand-Compliant Design"],
@@ -933,6 +963,11 @@ export const projects: Project[] = [
     name: "The London Home Show",
     tier: "gallery",
     rank: 11,
+    seo: {
+      title: "The London Home Show: Event Design | Finbar Studio",
+      description:
+        "Print and digital event design for the UK's first affordable homes exhibition: flags, banners, stage graphics, brochures and booklets.",
+    },
     date: "2022",
     categories: ["Event Design", "Print & Digital"],
     skills: ["Event Design", "Print Design", "Digital Campaign"],
@@ -1036,6 +1071,11 @@ export const projects: Project[] = [
     name: "Packer & Associates",
     tier: "gallery",
     rank: 2,
+    seo: {
+      title: "Packer & Associates: Publication & Brand Design | Finbar Studio",
+      description:
+        "An ongoing design and communications contract covering website management, the capability statement, and social and editorial content.",
+    },
     date: "2023",
     categories: ["Publication Design", "Print Collateral"],
     skills: [
@@ -1113,6 +1153,11 @@ export const projects: Project[] = [
     name: "Palms Motel",
     tier: "full",
     rank: 5,
+    seo: {
+      title: "Palms Motel: AI Art Direction & Social Series | Finbar Studio",
+      description:
+        "A personal project. A fictional 1970s Palm Springs motel built as an AI image world and run as a TikTok slideshow series.",
+    },
     isHobby: true,
     tiktok: "palmsmotel",
     date: "2024",

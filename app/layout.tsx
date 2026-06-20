@@ -82,7 +82,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Finbar Studio | Brisbane Graphic & Web Design",
     description:
-      "Brisbane graphic design and web design — brand identity, websites, editorial and motion.",
+      "Brisbane graphic design and web design. Brand identity, websites, editorial and motion.",
     creator: "@finbarstudio",
   },
   robots: {
@@ -213,7 +213,7 @@ const serviceJsonLd = {
   name: "finbar✶studio",
   alternateName: "Finbar Studio",
   description:
-    "Brisbane graphic design and web design studio — brand identity, websites, editorial and motion for businesses across Australia and the UK.",
+    "Brisbane graphic design and web design studio. Brand identity, websites, editorial and motion for businesses across Australia and the UK.",
   url: SITE_URL,
   image: `${SITE_URL}/opengraph-image`,
   email: "finbar@finbar.studio",
