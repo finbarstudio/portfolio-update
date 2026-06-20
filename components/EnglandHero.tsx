@@ -22,30 +22,61 @@ export default function EnglandHero() {
   const innerRef = useRef<HTMLSpanElement>(null);
   const wordRef = useRef<HTMLSpanElement>(null);
   const bangsRef = useRef<HTMLSpanElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [bangs, setBangs] = useState(8);
   const mouseX = useRef(0);
   const targetX = useRef(0);
   const raf = useRef(0);
 
-  // Size the font so ENGLAND spans the padded content width (the wrap sits inside
-  // the page padding), then fill the second line with enough "!" to span it too.
-  // Incremental (nudge current size toward target) so it's a no-op once exact —
-  // a ResizeObserver re-runs it when the webfont swaps in or the column resizes,
-  // and it self-stabilises without flicker.
+  // Full-bleed the hero to the viewport (keeping the page padding), then size +
+  // offset ENGLAND by its measured INK bounds (not the advance box) so the
+  // visible glyphs touch the padding on both sides. Canvas measureText gives the
+  // ink box + side bearings; we fit ink-width to the column and pull the word
+  // left by its leading bearing. A ResizeObserver re-runs it on font swap/resize.
   const fit = useCallback(() => {
     const wrap = wrapRef.current, h1 = h1Ref.current, word = wordRef.current, bg = bangsRef.current;
     if (!wrap || !h1 || !word || !bg) return;
-    const target = wrap.clientWidth;
-    if (!target) return;
-    const cur = parseFloat(getComputedStyle(h1).fontSize) || 100;
-    const wpx = word.getBoundingClientRect().width;
-    if (wpx > 0 && Math.abs(wpx - target) > 0.5) {
-      h1.style.fontSize = `${(cur * target) / wpx}px`;
-    }
-    const per = bg.getBoundingClientRect().width / Math.max(1, bangs);
-    if (per > 0) {
-      const n = Math.max(1, Math.floor(target / per));
+    const pageEl = wrap.closest(".wc-page") as HTMLElement | null;
+    const pad = pageEl ? parseFloat(getComputedStyle(pageEl).paddingLeft) || 0 : 0;
+    const vw = document.documentElement.clientWidth;
+    // Break out to the full viewport width, re-apply the page padding inside.
+    wrap.style.marginLeft = "0px";
+    wrap.style.paddingLeft = "0px";
+    wrap.style.paddingRight = "0px";
+    wrap.style.width = "auto";
+    wrap.style.boxSizing = "border-box";
+    const nat = wrap.getBoundingClientRect().left;
+    wrap.style.marginLeft = `${-nat}px`;
+    wrap.style.paddingLeft = `${pad}px`;
+    wrap.style.paddingRight = `${pad}px`;
+    wrap.style.width = `${vw}px`;
+    const target = vw - pad * 2;
+    if (target <= 0) return;
+
+    const ctx = (canvasRef.current ??= document.createElement("canvas")).getContext("2d");
+    if (!ctx) return;
+    const hasLS = "letterSpacing" in ctx;
+    const measure = (text: string, px: number) => {
+      ctx.font = `250 ${px}px Archivo, sans-serif`;
+      if (hasLS) (ctx as CanvasRenderingContext2D).letterSpacing = `${-0.03 * px}px`;
+      const m = ctx.measureText(text);
+      return { ink: m.actualBoundingBoxRight + m.actualBoundingBoxLeft, lead: -m.actualBoundingBoxLeft, adv: m.width };
+    };
+
+    // Fit ENGLAND so its INK width == the column.
+    const probe = measure(WORD, 200);
+    if (probe.ink <= 0) return;
+    const fs = (200 * target) / probe.ink;
+    h1.style.fontSize = `${fs}px`;
+    const w = measure(WORD, fs);
+    word.style.marginLeft = `${-w.lead}px`;   // pull the E's ink to the left padding
+
+    // Fill the second line with "!" so its ink spans the column too.
+    const oneAdv = measure("!!!!!!!!!!", fs).adv / 10;   // per-bang advance at this size
+    if (oneAdv > 0) {
+      const n = Math.max(1, Math.floor(target / oneAdv));
       if (n !== bangs) setBangs(n);
+      bg.style.marginLeft = `${-measure("!".repeat(n), fs).lead}px`;
     }
   }, [bangs]);
 
