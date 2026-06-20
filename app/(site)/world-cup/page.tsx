@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import StartingEleven from "@/components/StartingEleven";
+import EnglandHero from "@/components/EnglandHero";
 import Reveal from "@/components/Reveal";
 import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
@@ -43,22 +44,10 @@ export default function WorldCupPage() {
 
   return (
     <article className="wc-page px-5 md:px-10 pt-10 md:pt-16 pb-24">
-      {/* ── Hero (full width, spans both columns) ────────────────────── */}
+      {/* ── Hero (full-bleed ENGLAND wordmark) ───────────────────────── */}
       <section className="wc-hero" aria-label="England">
         <p className="mono-label text-ink-soft mb-3 wc-comp">{wc.competition} · {wc.group}</p>
-        <div className="wc-hero-title-wrap">
-          <h1 className="wc-hero-title">England</h1>
-          {/* St George's flag drawn over the wordmark: border, then the vertical
-              bar, then the horizontal bar trim-draw in on load (staggered CSS
-              stroke-dash animation). */}
-          <svg className="wc-stgeorge" viewBox="0 0 500 300" aria-hidden="true">
-            <g fill="none" stroke="var(--pink)">
-              <rect className="wc-flag-border" x="2" y="2" width="496" height="296" strokeWidth="4" pathLength={1} />
-              <line className="wc-flag-vert" x1="250" y1="0" x2="250" y2="300" strokeWidth="60" strokeLinecap="square" pathLength={1} />
-              <line className="wc-flag-horiz" x1="0" y1="150" x2="500" y2="150" strokeWidth="60" strokeLinecap="square" pathLength={1} />
-            </g>
-          </svg>
-        </div>
+        <EnglandHero />
       </section>
 
       {/* ── Sticky XI + squad (left) · scrolling detail (right) ───────── */}

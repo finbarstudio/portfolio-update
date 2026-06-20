@@ -3815,10 +3815,13 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding-top: clamp(20px, 3vh, 32px);
   border-top: 1px solid var(--line);
 }
-/* Hero — full-width ENGLAND wordmark spanning both columns, with a basic
-   St George's cross drawn 1px over the top of it. */
-.wc-hero { margin-bottom: clamp(32px, 5vh, 56px); }
-.wc-hero-title-wrap { position: relative; display: inline-block; max-width: 100%; }
+/* Hero — full-bleed ENGLAND wordmark, sized by JS to span exactly 100vw. */
+.wc-hero { margin-bottom: clamp(28px, 4vh, 52px); }
+.wc-hero-title-wrap {
+  position: relative;
+  width: 100vw;                    /* JS pins exact left + width to the viewport */
+  overflow: hidden;
+}
 .wc-hero-title {
   margin: 0;
   font-family: var(--font-mono);
@@ -3828,7 +3831,14 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   line-height: 0.82;
   white-space: nowrap;
   color: var(--ink);
-  font-size: clamp(2.6rem, 20vw, 17rem);
+  font-size: 13vw;       /* fallback before JS fits it to 100vw */
+  cursor: default;
+}
+.wc-hero-inner { display: inline-block; }
+.wc-hero-letter {
+  display: inline-block;
+  transition: transform 0.18s ease;
+  transform-origin: 50% 85%;
 }
 /* The flag stretches to the wordmark box. Non-scaling stroke keeps the bars a
    consistent thickness regardless of the stretch; widths clamp down on mobile.
@@ -3851,32 +3861,19 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
 }
-/* Loops forever on a shared 6s cycle: border → vertical → horizontal draw in
-   (staggered), hold, then wipe back out before the next pass. The stagger is
-   baked into each keyframe set so it stays in sync every loop. */
-.wc-flag-border { animation: wc-flag-border-loop 6s ease-in-out infinite; }
-.wc-flag-vert  { animation: wc-flag-vert-loop 6s ease-in-out infinite; }
-.wc-flag-horiz { animation: wc-flag-horiz-loop 6s ease-in-out infinite; }
-@keyframes wc-flag-border-loop {
-  0% { stroke-dashoffset: 1; }
-  20% { stroke-dashoffset: 0; }
-  66.67% { stroke-dashoffset: 0; }
-  86.67% { stroke-dashoffset: 1; }
-  100% { stroke-dashoffset: 1; }
-}
-@keyframes wc-flag-vert-loop {
-  0%, 13.33% { stroke-dashoffset: 1; }
-  30% { stroke-dashoffset: 0; }
-  66.67% { stroke-dashoffset: 0; }
-  86.67% { stroke-dashoffset: 1; }
-  100% { stroke-dashoffset: 1; }
-}
-@keyframes wc-flag-horiz-loop {
-  0%, 23.33% { stroke-dashoffset: 1; }
-  40% { stroke-dashoffset: 0; }
-  66.67% { stroke-dashoffset: 0; }
-  86.67% { stroke-dashoffset: 1; }
-  100% { stroke-dashoffset: 1; }
+/* Loops forever. One draw/hold/erase cycle, but the cross runs HALF a cycle out
+   of phase with the border outline (negative delay) so as one wipes out the
+   other is drawing in — there's never a frame with nothing on screen. The two
+   cross bars are nudged slightly apart from each other too. */
+.wc-flag-border { animation: wc-flag-cycle 6s ease-in-out infinite; }
+.wc-flag-vert  { animation: wc-flag-cycle 6s ease-in-out -3s infinite; }
+.wc-flag-horiz { animation: wc-flag-cycle 6s ease-in-out -2.7s infinite; }
+@keyframes wc-flag-cycle {
+  0% { stroke-dashoffset: 1; }   /* hidden */
+  12% { stroke-dashoffset: 0; }  /* drawn */
+  60% { stroke-dashoffset: 0; }  /* hold */
+  72% { stroke-dashoffset: 1; }  /* wiped out */
+  100% { stroke-dashoffset: 1; } /* stays hidden until next pass */
 }
 @media (prefers-reduced-motion: reduce) {
   .wc-stgeorge rect, .wc-stgeorge line { animation: none; stroke-dashoffset: 0; }
@@ -4002,10 +3999,10 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   margin-top: 0.5rem;
 }
 .wc-pitch-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
-/* Pitch draws itself in when the section scrolls into view. */
-.wc-pitch-lines g > * { stroke-dasharray: 1; stroke-dashoffset: 1; }
-.wc-pitch.is-in .wc-pitch-lines g > * { animation: wc-draw 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
-@keyframes wc-draw { to { stroke-dashoffset: 0; } }
+/* Pitch + players are scroll-scrubbed by GSAP (see StartingEleven.tsx). Base
+   state here is the drawn/visible end state so it's never stuck hidden without
+   JS; GSAP sets the from-state and ties progress to scroll. */
+.wc-pitch-lines g > * { stroke-dasharray: 1; stroke-dashoffset: 0; }
 
 .wc-player {
   position: absolute;
@@ -4015,35 +4012,6 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   align-items: center;
   gap: 0.1rem;
   pointer-events: none;
-}
-/* Cascade each player in after the pitch: icon pops, then number+name, then club.
-   Staggered across the XI via --i. */
-.wc-player-icon,
-.wc-player-meta,
-.wc-player-club { opacity: 0; }
-.wc-pitch.is-in .wc-player-icon {
-  animation: wc-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  animation-delay: calc(0.55s + var(--i) * 0.09s);
-}
-.wc-pitch.is-in .wc-player-meta {
-  animation: wc-rise 0.4s ease forwards;
-  animation-delay: calc(0.55s + var(--i) * 0.09s + 0.2s);
-}
-.wc-pitch.is-in .wc-player-club {
-  animation: wc-rise 0.4s ease forwards;
-  animation-delay: calc(0.55s + var(--i) * 0.09s + 0.32s);
-}
-@keyframes wc-pop {
-  from { opacity: 0; transform: scale(0.4); }
-  to { opacity: 1; transform: scale(1); }
-}
-@keyframes wc-rise {
-  from { opacity: 0; transform: translateY(0.45em); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .wc-pitch-lines g > *,
-  .wc-player-icon, .wc-player-meta, .wc-player-club { animation: none; opacity: 1; stroke-dashoffset: 0; }
 }
 .wc-player-icon {
   font-family: var(--font-dingbat), var(--font-mono);
