@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
+import FootballIcon from "./FootballIcon";
 
 const SANDBOX_HREF = "https://sandbox.finbar.studio";
 
@@ -79,7 +80,8 @@ export default function TopNav() {
           </Link>
         ))}
         <a href={SANDBOX_HREF} target="_blank" rel="noopener noreferrer" className="tag tag-default tag-ext">
-          Sandbox
+          <span className="nav-label-full">Sandbox</span>
+          <span className="nav-label-short" aria-hidden="true">SB</span>
           <span className="nav-ext-bubble" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="100%" height="100%">
               <path d="M8 16L16 8M9.5 8H16v6.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -91,10 +93,9 @@ export default function TopNav() {
           aria-current={isActive("/world-cup") ? "page" : undefined}
           className={`tag tag-ext ${isActive("/world-cup") ? "tag-pink" : "tag-default"}`}
         >
-          It’s coming home
-          <span className="nav-ext-bubble" aria-hidden="true">
-            <span className="nav-ext-glyph">{"⚽︎"}</span>
-          </span>
+          <span className="nav-label-full">It’s coming home</span>
+          <span className="nav-label-short" aria-hidden="true">WC26</span>
+          <span className="nav-football" aria-hidden="true"><FootballIcon /></span>
         </Link>
       </nav>
 
