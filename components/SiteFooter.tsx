@@ -124,18 +124,22 @@ export default function SiteFooter() {
         <div className="sf-col sf-col-aus">
           <FooterClock />
         </div>
-        <div className="sf-col sf-col-eng">
-          <span className="sf-loc">
-            <span className="sf-label">ENG/LON</span>
-            <EngFlag />
-            <span className="sf-note">(it’s coming home)</span>
-          </span>
-          <LiveTime tz="Europe/London" />
+        <div className="sf-col sf-col-eng sf-reveal">
+          <div className="sf-reveal-inner">
+            <span className="sf-loc">
+              <span className="sf-label">ENG/LON</span>
+              <EngFlag />
+              <span className="sf-note">(it’s coming home)</span>
+            </span>
+            <LiveTime tz="Europe/London" />
+          </div>
         </div>
-        <div className="sf-col sf-contact">
-          <span className="sf-label">Hiring or have a project?</span>
-          <a href="mailto:finbar@finbar.studio" className="sf-value u-underline">finbar@finbar.studio</a>
-          <a href="tel:+61412796630" className="sf-value u-underline tabular-nums">+61 412 796 630</a>
+        <div className="sf-col sf-contact sf-reveal">
+          <div className="sf-reveal-inner">
+            <span className="sf-label">Hiring or have a project?</span>
+            <a href="mailto:finbar@finbar.studio" className="sf-value u-underline">finbar@finbar.studio</a>
+            <a href="tel:+61412796630" className="sf-value u-underline tabular-nums">+61 412 796 630</a>
+          </div>
         </div>
         <div className="sf-col sf-col-end">
           <FooterCopyright year={year} />

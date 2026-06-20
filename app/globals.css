@@ -3634,6 +3634,24 @@ body:has(.sb-root) {
   transition: transform 1.15s cubic-bezier(0.16, 1, 0.3, 1) 1.0s;
 }
 
+/* Mask-reveal entrance for the two STATIC footer pieces (ENG/LON + hiring/contact)
+   — desktop only; the sticky clock + copyright just slot in. Mirrors the wordmark
+   reveal: hidden below the mask when armed, slides up when the footer reveals. */
+.sf-reveal-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;   /* match the column (left, or right on mobile contact) */
+  gap: 0;
+}
+@media (min-width: 768px) {
+  .sf-reveal { overflow: hidden; }
+  .site-footer.is-armed .sf-reveal-inner { transform: translateY(115%); }
+  .site-footer.is-armed.is-revealed .sf-reveal-inner {
+    transform: translateY(0);
+    transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+  }
+}
+
 /* Selected work: no top rule (HR). */
 .home-section.no-rule::before { content: none; }
 

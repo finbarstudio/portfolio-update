@@ -52,9 +52,15 @@ export default function FooterCopyright({ year }: { year: number }) {
       const shouldDock = ph.getBoundingClientRect().bottom <= window.innerHeight - PIN_BOTTOM + 0.5;
       if (shouldDock === dockedNow) return;
       dockedNow = shouldDock;
-      setHiding(true);
-      clearTimeout(timer);
-      timer = window.setTimeout(() => { setDocked(shouldDock); setHiding(false); }, 300);
+      // Desktop slots in cleanly, so switch instantly. Only mobile needs the
+      // mask trick (where the chrome-resize micro-jump happens).
+      if (window.matchMedia("(max-width: 767px)").matches) {
+        setHiding(true);
+        clearTimeout(timer);
+        timer = window.setTimeout(() => { setDocked(shouldDock); setHiding(false); }, 300);
+      } else {
+        setDocked(shouldDock);
+      }
     };
     check();
     const lenis = window.__lenis;
