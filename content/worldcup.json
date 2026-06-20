@@ -104,7 +104,7 @@
     "venue": "TBC",
     "kickoff": "2026-06-23T20:00:00Z"
   },
-  "formation": "4-3-3",
+  "formation": "4-2-3-1",
   "lineup": [
     {
       "name": "Pickford",
@@ -115,8 +115,8 @@
       "badge": "everton"
     },
     {
-      "name": "Walker",
-      "num": 2,
+      "name": "O’Reilly",
+      "num": 3,
       "club": "Man City",
       "x": 16,
       "y": 72,
@@ -127,31 +127,47 @@
       "num": 5,
       "club": "Man City",
       "x": 38,
-      "y": 74,
+      "y": 75,
       "badge": "manchester-city"
     },
     {
-      "name": "Guéhi",
-      "num": 6,
-      "club": "Crystal Palace",
+      "name": "Konsa",
+      "num": 14,
+      "club": "Aston Villa",
       "x": 62,
-      "y": 74,
-      "badge": "crystal-palace"
+      "y": 75,
+      "badge": "aston-villa"
     },
     {
-      "name": "Lewis",
-      "num": 3,
-      "club": "Man City",
+      "name": "James",
+      "num": 2,
+      "club": "Chelsea",
       "x": 84,
       "y": 72,
-      "badge": "manchester-city"
+      "badge": "chelsea"
     },
     {
       "name": "Rice",
       "num": 4,
       "club": "Arsenal",
-      "x": 30,
-      "y": 52,
+      "x": 38,
+      "y": 54,
+      "badge": "arsenal"
+    },
+    {
+      "name": "Anderson",
+      "num": 8,
+      "club": "Nott’m Forest",
+      "x": 62,
+      "y": 54,
+      "badge": "nottingham-forest"
+    },
+    {
+      "name": "Madueke",
+      "num": 7,
+      "club": "Arsenal",
+      "x": 82,
+      "y": 32,
       "badge": "arsenal"
     },
     {
@@ -159,57 +175,41 @@
       "num": 10,
       "club": "Real Madrid",
       "x": 50,
-      "y": 50,
+      "y": 36,
       "badge": "real-madrid"
     },
     {
-      "name": "Wharton",
-      "num": 20,
-      "club": "Crystal Palace",
-      "x": 70,
-      "y": 52,
-      "badge": "crystal-palace"
-    },
-    {
-      "name": "Saka",
-      "num": 7,
-      "club": "Arsenal",
-      "x": 22,
-      "y": 26,
-      "badge": "arsenal"
+      "name": "Gordon",
+      "num": 17,
+      "club": "Newcastle",
+      "x": 18,
+      "y": 32,
+      "badge": "newcastle"
     },
     {
       "name": "Kane",
       "num": 9,
       "club": "Bayern",
       "x": 50,
-      "y": 22,
+      "y": 16,
       "badge": "bayern"
-    },
-    {
-      "name": "Gordon",
-      "num": 17,
-      "club": "Newcastle",
-      "x": 78,
-      "y": 26,
-      "badge": "newcastle"
     }
   ],
   "squad": [
     { "num": 13, "name": "Dean Henderson", "club": "Crystal Palace", "badge": "crystal-palace", "pos": "GK" },
     { "num": 23, "name": "James Trafford", "club": "Man City", "badge": "manchester-city", "pos": "GK" },
     { "num": 12, "name": "Trent Alexander-Arnold", "club": "Real Madrid", "badge": "real-madrid", "pos": "DEF" },
-    { "num": 14, "name": "Ezri Konsa", "club": "Aston Villa", "badge": "aston-villa", "pos": "DEF" },
+    { "num": 6, "name": "Marc Guéhi", "club": "Crystal Palace", "badge": "crystal-palace", "pos": "DEF" },
     { "num": 15, "name": "Levi Colwill", "club": "Chelsea", "badge": "chelsea", "pos": "DEF" },
     { "num": 16, "name": "Jarrad Branthwaite", "club": "Everton", "badge": "everton", "pos": "DEF" },
-    { "num": 22, "name": "Reece James", "club": "Chelsea", "badge": "chelsea", "pos": "DEF" },
-    { "num": 8, "name": "Kobbie Mainoo", "club": "Man United", "badge": "manchester-united", "pos": "MID" },
+    { "num": 20, "name": "Adam Wharton", "club": "Crystal Palace", "badge": "crystal-palace", "pos": "MID" },
+    { "num": 22, "name": "Kobbie Mainoo", "club": "Man United", "badge": "manchester-united", "pos": "MID" },
     { "num": 19, "name": "Morgan Rogers", "club": "Aston Villa", "badge": "aston-villa", "pos": "MID" },
     { "num": 21, "name": "Cole Palmer", "club": "Chelsea", "badge": "chelsea", "pos": "MID" },
     { "num": 24, "name": "Conor Gallagher", "club": "Atlético", "badge": "atletico-madrid", "pos": "MID" },
+    { "num": 11, "name": "Bukayo Saka", "club": "Arsenal", "badge": "arsenal", "pos": "FWD" },
     { "num": 18, "name": "Eberechi Eze", "club": "Arsenal", "badge": "arsenal", "pos": "FWD" },
     { "num": 25, "name": "Marcus Rashford", "club": "Aston Villa", "badge": "aston-villa", "pos": "FWD" },
-    { "num": 26, "name": "Ollie Watkins", "club": "Aston Villa", "badge": "aston-villa", "pos": "FWD" },
-    { "num": 11, "name": "Jarrod Bowen", "club": "West Ham", "badge": "west-ham", "pos": "FWD" }
+    { "num": 26, "name": "Ollie Watkins", "club": "Aston Villa", "badge": "aston-villa", "pos": "FWD" }
   ]
 }
