@@ -1,86 +1,72 @@
 "use client";
 
 /**
- * EnglandHero — the full-bleed ENGLAND!!!!! wordmark (Archivo variable), sized by
- * JS to span exactly 100vw. Letters' weight reacts to the cursor: nearest letters
- * thicken toward 900, easing back to 250 with distance (smooth lerp). The looping
- * St George's flag + three-lions crest sit paired over the type.
+ * EnglandHero — the ENGLAND!!!!! wordmark (Archivo variable). Letters' weight
+ * reacts to the cursor: nearest letters thicken toward 900, easing back to 250
+ * with distance (smooth lerp). The word and the exclamations are separate groups
+ * with a <wbr> between, so on narrow screens it wraps to two lines rather than
+ * overflowing. The looping St George's flag + three-lions crest sit paired over
+ * the type.
  */
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import EnglandLions from "@/components/EnglandLions";
 
-const TEXT = "ENGLAND!!!!!";
+const WORD = "ENGLAND";
+const BANGS = "!!!!!";
 const RADIUS = 500;     // px of cursor influence
 const REST = 250;       // resting weight
 const MAX_ADD = 650;    // peak added weight at the cursor (-> 900)
 
 export default function EnglandHero() {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const h1Ref = useRef<HTMLHeadingElement>(null);
   const innerRef = useRef<HTMLSpanElement>(null);
   const mouseX = useRef(0);
   const targetX = useRef(0);
   const raf = useRef(0);
 
-  // Full-bleed the wrap to the viewport edges (the page isn't centred) and fit
-  // the wordmark to exactly that width.
-  const fit = useCallback(() => {
-    const wrap = wrapRef.current, h1 = h1Ref.current, inner = innerRef.current;
-    if (!wrap || !h1 || !inner) return;
-    const vw = document.documentElement.clientWidth;
-    wrap.style.marginLeft = "0px";
-    wrap.style.width = "auto";
-    const left = wrap.getBoundingClientRect().left;
-    wrap.style.marginLeft = `${-left}px`;
-    wrap.style.width = `${vw}px`;
-    h1.style.fontSize = "100px";
-    const contentW = inner.getBoundingClientRect().width;
-    if (contentW > 0) h1.style.fontSize = `${(100 * vw) / contentW}px`;
-  }, []);
-
   useEffect(() => {
     mouseX.current = targetX.current = window.innerWidth / 2;
-    fit();
-    const onResize = () => fit();
-    window.addEventListener("resize", onResize);
-    document.fonts?.ready?.then(fit).catch(() => {});
-
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const onMove = (e: MouseEvent) => { targetX.current = e.clientX; };
     if (!reduce) window.addEventListener("mousemove", onMove, { passive: true });
 
     const tick = () => {
       mouseX.current += (targetX.current - mouseX.current) * 0.08;
-      const cs = innerRef.current?.children;
-      if (cs) {
-        for (let i = 0; i < cs.length; i++) {
-          const el = cs[i] as HTMLElement;
+      const letters = innerRef.current?.querySelectorAll<HTMLElement>(".wc-hero-letter");
+      if (letters) {
+        letters.forEach((el) => {
           const r = el.getBoundingClientRect();
           const x = r.left + r.width / 2;
           let inf = Math.max(0, 1 - Math.abs(mouseX.current - x) / RADIUS);
           inf = inf * inf * inf; // smooth falloff
           el.style.fontVariationSettings = `"wght" ${Math.round(REST + inf * MAX_ADD)}`;
-        }
+        });
       }
       raf.current = requestAnimationFrame(tick);
     };
     if (!reduce) raf.current = requestAnimationFrame(tick);
 
     return () => {
-      window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMove);
       if (raf.current) cancelAnimationFrame(raf.current);
     };
-  }, [fit]);
+  }, []);
 
   return (
-    <div className="wc-hero-title-wrap" ref={wrapRef}>
-      <h1 className="wc-hero-title" aria-label="England" ref={h1Ref}>
+    <div className="wc-hero-title-wrap">
+      <h1 className="wc-hero-title" aria-label="England">
         <span className="wc-hero-inner" ref={innerRef} aria-hidden="true">
-          {Array.from(TEXT).map((c, i) => (
-            <span className="wc-hero-letter" key={i}>{c}</span>
-          ))}
+          <span className="wc-hero-grp">
+            {Array.from(WORD).map((c, i) => (
+              <span className="wc-hero-letter" key={`w${i}`}>{c}</span>
+            ))}
+          </span>
+          <wbr />
+          <span className="wc-hero-grp">
+            {Array.from(BANGS).map((c, i) => (
+              <span className="wc-hero-letter" key={`b${i}`}>{c}</span>
+            ))}
+          </span>
         </span>
       </h1>
       {/* Looping St George's flag + three-lions crest, paired over the wordmark. */}
