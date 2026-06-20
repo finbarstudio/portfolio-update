@@ -3822,7 +3822,9 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 
 /* ── World Cup page ───────────────────────────────────────────────── */
-.wc-page { max-width: 1320px; }
+/* Full-width page (padding only), so the content spans the viewport like the
+   hero rather than capping at a column. */
+.wc-page { max-width: none; width: 100%; }
 .wc-block {
   margin-top: clamp(40px, 7vh, 88px);
   padding-top: clamp(20px, 3vh, 32px);
@@ -3866,13 +3868,13 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   pointer-events: none;
 }
 .wc-hero-marks .wc-stgeorge {
-  height: clamp(96px, 12vw, 168px);
+  height: clamp(130px, 17vw, 250px);
   width: auto;
   aspect-ratio: 5 / 3;
   overflow: visible;
 }
 .wc-hero-marks .wc-lions {
-  height: clamp(116px, 15vw, 205px);
+  height: clamp(168px, 22vw, 320px);
   width: auto;
   margin: 0;
 }
