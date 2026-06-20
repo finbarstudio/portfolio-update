@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo_Narrow, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
+import { Archivo_Narrow, Archivo, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -10,6 +10,14 @@ const archivoNarrow = Archivo_Narrow({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Archivo (variable weight) — the World Cup ENGLAND wordmark; weight reacts to
+// the cursor via font-variation-settings.
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -197,7 +205,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={`${archivoNarrow.variable} ${spaceMono.variable} ${notoSymbols.variable}`}
+      className={`${archivoNarrow.variable} ${archivo.variable} ${spaceMono.variable} ${notoSymbols.variable}`}
     >
       <body className="bg-bg text-ink font-sans antialiased min-h-screen">
         {/* Bookmania (Adobe Fonts / Typekit) — H1 display serif */}

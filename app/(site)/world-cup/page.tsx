@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import StartingEleven from "@/components/StartingEleven";
 import EnglandHero from "@/components/EnglandHero";
-import EnglandLions from "@/components/EnglandLions";
 import Reveal from "@/components/Reveal";
 import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
@@ -18,6 +17,12 @@ function fmt(iso: string, tz: string) {
   const day = new Intl.DateTimeFormat("en-GB", { timeZone: tz, weekday: "short", day: "numeric", month: "short" }).format(d);
   const time = new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
   return `${day} · ${time}`.toUpperCase();
+}
+
+/** Full match date (London), e.g. "TUESDAY 23 JUNE". */
+function matchDate(iso: string) {
+  return new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", weekday: "long", day: "numeric", month: "long" })
+    .format(new Date(iso)).toUpperCase();
 }
 
 /** Short kickoff time (London) for upcoming fixtures in the table. */
@@ -55,7 +60,6 @@ export default function WorldCupPage() {
       <div className="wc-split">
         {/* Sticky predicted XI + the rest of the squad */}
         <aside className="wc-split-xi" aria-label="Probable eleven and squad">
-          <EnglandLions />
           <p className="mono-label text-ink-soft mb-1">Probable XI</p>
           <p className="mono-label text-pink mb-5">{wc.formation}</p>
           <StartingEleven />
@@ -120,7 +124,7 @@ export default function WorldCupPage() {
               {" "}<span className="text-ink-soft">vs</span>{" "}
               <span className="wc-next-team">{k.opponent} <CountryFlag code={k.code} /></span>
             </p>
-            <p className="wc-venue mono-label text-ink-soft">{k.venue}</p>
+            <p className="wc-venue mono-label text-ink-soft">{matchDate(k.kickoff)}</p>
             <div className="wc-kickoffs">
               <div className="wc-kick">
                 <span className="sf-label">ENG/LON</span>
