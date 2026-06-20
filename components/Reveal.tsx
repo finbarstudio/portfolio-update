@@ -69,7 +69,7 @@ export default function Reveal({
             : {
                 // Replays both ways: plays in on the way down, reverses out the top
                 // on the way up, and re-plays when you scroll back into it.
-                scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "restart none restart reverse" },
+                scrollTrigger: { trigger: el, start: "top 78%", toggleActions: "restart none restart reverse" },
               }
         );
         tl.fromTo(
@@ -90,7 +90,7 @@ export default function Reveal({
       const to: gsap.TweenVars = { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", delay };
       if (!immediate && !inViewOnLoad) {
         // Replay on re-scroll: reverse out on scroll-up, play again on re-entry.
-        to.scrollTrigger = { trigger: el, start: "top 88%", toggleActions: "play none none reverse" };
+        to.scrollTrigger = { trigger: el, start: "top 78%", toggleActions: "play none none reverse" };
       }
       gsap.fromTo(el, { opacity: 0, y }, to);
     }, ref);

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import FootballIcon from "@/components/FootballIcon";
 import StartingEleven from "@/components/StartingEleven";
 import Reveal from "@/components/Reveal";
 import MaskReveal from "@/components/MaskReveal";
@@ -11,8 +10,6 @@ export const metadata: Metadata = {
   description: "A little corner of the studio for the football. England at the FIFA World Cup 2026.",
   robots: { index: false, follow: false },
 };
-
-const ORDINAL = ["0th", "1st", "2nd", "3rd", "4th"];
 
 /** Deterministic (timezone-pinned) date+time, e.g. "WED 24 JUN · 05:00". */
 function fmt(iso: string, tz: string) {
@@ -32,55 +29,57 @@ type Fixture = {
   date: string; opponent: string; code: string;
   score?: string; result?: string; kickoff?: string; status: string;
 };
+type Squad = { num: number; name: string; club: string; pos: string };
+
+const POS_ORDER = ["GK", "DEF", "MID", "FWD"];
+const POS_LABEL: Record<string, string> = { GK: "Goalkeepers", DEF: "Defenders", MID: "Midfielders", FWD: "Forwards" };
 
 export default function WorldCupPage() {
   const k = wc.next;
   const fixtures = wc.fixtures as Fixture[];
+  const squad = (wc.squad as Squad[]) ?? [];
+  const squadByPos = POS_ORDER
+    .map((pos) => ({ pos, players: squad.filter((p) => p.pos === pos) }))
+    .filter((g) => g.players.length > 0);
+
   return (
     <article className="wc-page px-5 md:px-10 pt-10 md:pt-16 pb-24">
-      {/* ── Hero + standings (one full-width band) ───────────────────── */}
-      <section className="wc-hero-grid" aria-label="C’mon England — where they stand">
-        <div className="wc-hero-head">
-          <p className="mono-label text-ink-soft mb-3 wc-comp">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="wc-comp-badge" src="/world-cup-2026.png" alt="FIFA World Cup 2026" width={28} height={28} />
-            {wc.competition} · {wc.group}
-          </p>
-          <MaskReveal as="h1" className="home-disc wc-heading" aria-label="C’mon England">
-            {"C’mon "}
-            <span className="home-disc-pink">England</span>
-            {" "}
-            <span className="wc-ball" aria-hidden="true"><FootballIcon /></span>
-          </MaskReveal>
-        </div>
-
-        <Reveal as="div" className="wc-stats" aria-label="Where they stand">
-          <div className="wc-stat">
-            <span className="wc-stat-num text-pink">{ORDINAL[wc.position] ?? `${wc.position}th`}</span>
-            <span className="mono-label text-ink-soft">in {wc.group}</span>
-          </div>
-          <div className="wc-stat">
-            <span className="wc-stat-num text-pink">{wc.points}</span>
-            <span className="mono-label text-ink-soft">points</span>
-          </div>
-          <div className="wc-stat">
-            <span className="wc-stat-num text-pink">{wc.won}–{wc.drawn}–{wc.lost}</span>
-            <span className="mono-label text-ink-soft">W · D · L ({wc.played} played)</span>
-          </div>
-          <div className="wc-stat">
-            <span className="wc-stat-num text-pink">{wc.goalDiff}</span>
-            <span className="mono-label text-ink-soft">goal difference</span>
-          </div>
-        </Reveal>
+      {/* ── Hero (full width) ────────────────────────────────────────── */}
+      <section className="wc-hero" aria-label="C’mon England">
+        <p className="mono-label text-ink-soft mb-3 wc-comp">{wc.competition} · {wc.group}</p>
+        <MaskReveal as="h1" className="home-disc wc-heading" aria-label="C’mon England">
+          {"C’mon "}
+          <span className="home-disc-pink">England</span>
+        </MaskReveal>
       </section>
 
-      {/* ── Sticky XI (left) + scrolling detail (right) ──────────────── */}
+      {/* ── Sticky XI + squad (left) · scrolling detail (right) ───────── */}
       <div className="wc-split">
-        {/* Sticky predicted XI */}
-        <aside className="wc-split-xi" aria-label="Probable eleven">
+        {/* Sticky predicted XI + the rest of the squad */}
+        <aside className="wc-split-xi" aria-label="Probable eleven and squad">
           <p className="mono-label text-ink-soft mb-1">Probable XI</p>
           <p className="mono-label text-pink mb-5">{wc.formation}</p>
           <StartingEleven />
+
+          {squadByPos.length > 0 && (
+            <div className="wc-squad">
+              <p className="mono-label text-ink-soft mb-4">The rest of the squad</p>
+              {squadByPos.map((g) => (
+                <div className="wc-squad-group" key={g.pos}>
+                  <p className="wc-squad-pos mono-label">{POS_LABEL[g.pos]}</p>
+                  <ul>
+                    {g.players.map((p) => (
+                      <li className="wc-squad-row" key={p.name}>
+                        <span className="wc-squad-num">{p.num}</span>
+                        <span className="wc-squad-name">{p.name}</span>
+                        <span className="wc-squad-club">{p.club}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
         </aside>
 
         {/* Scrolling column */}
@@ -116,12 +115,13 @@ export default function WorldCupPage() {
           <Reveal as="section" className="wc-block" aria-label="Golden boot race">
             <p className="mono-label text-ink-soft mb-4">Golden boot watch</p>
             <ul className="wc-scorers">
-              {wc.scorerRace.map((s) => (
-                <li key={s.name} className={`wc-scorer-row ${s.england ? "is-england" : "is-other"}`}>
-                  <span className="wc-scorer-goals">{s.goals}</span>
-                  <span className="mono-label wc-scorer-unit">{s.goals === 1 ? "goal" : "goals"}</span>
+              {wc.scorerRace.map((s, i) => (
+                <li key={s.name} className={`wc-scorer-row ${s.england ? "is-england" : ""}`}>
+                  <span className="wc-pos">{i + 1}</span>
                   <span className="wc-flag"><CountryFlag code={s.code} /></span>
                   <span className="wc-scorer-name">{s.name}</span>
+                  <span className="wc-scorer-goals text-pink">{s.goals}</span>
+                  <span className="wc-scorer-unit mono-label">{s.goals === 1 ? "goal" : "goals"}</span>
                 </li>
               ))}
             </ul>
@@ -160,7 +160,9 @@ export default function WorldCupPage() {
           <Reveal as="section" className="wc-block" aria-label="Next match">
             <p className="mono-label text-ink-soft mb-4">Next match</p>
             <p className="wc-next-match">
-              <CountryFlag code="ENG" /> England <span className="text-ink-soft">vs</span> {k.opponent} <CountryFlag code={k.code} />
+              <span className="wc-next-team"><CountryFlag code="ENG" /> England</span>
+              {" "}<span className="text-ink-soft">vs</span>{" "}
+              <span className="wc-next-team">{k.opponent} <CountryFlag code={k.code} /></span>
             </p>
             <p className="wc-venue mono-label text-ink-soft">{k.venue}</p>
             <div className="wc-kickoffs">
