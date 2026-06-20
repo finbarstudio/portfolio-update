@@ -14,6 +14,7 @@ import { useRef } from "react";
 export const ICON_BATCH = [
   "⦿", "✱", "❉", "♡", "👪", "🖄", "⮔", "🚭", "📦", "🞋",
   "🖧", "🗑", "🗺", "⛖", "🮲🮳", "🅮", "✎", "✈", "☣", "✌", "🏄", "🂱",
+  "⛐", "🪰", "🕱", "🛺",
 ];
 
 export default function InlineIcon({ char, className }: { char?: string; className?: string }) {
