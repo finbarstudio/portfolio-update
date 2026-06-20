@@ -19,7 +19,6 @@ export default function FooterCopyright({ year }: { year: number }) {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [shown, setShown] = useState(false);
   const [docked, setDocked] = useState(false);
-  const [hiding, setHiding] = useState(false);
 
   // Reveal gate: home shows it only after the intro logo scrolls up into the
   // nav; every other page shows it from the start.
@@ -36,31 +35,18 @@ export default function FooterCopyright({ year }: { year: number }) {
     };
   }, [pathname]);
 
-  // Dock when the slot rises to the pin's resting line (bottom:16px). The fixed→
-  // in-flow switch can micro-jump (mobile chrome resize at the scroll end), so we
-  // MASK it: reverse the reveal (slide back behind the mask), switch position
-  // while hidden, then re-reveal in place — no visible glitch.
+  // Flip `docked` when the slot reaches the pin's resting line (bottom:16px).
+  // Desktop: the pin switches to in-flow (CSS) — slots cleanly into the slot.
+  // Mobile: the real © is ALWAYS in the footer; `docked` just slides the floating
+  // pin away behind its mask (no position switch → no jump).
   useEffect(() => {
     const el = anchorRef.current;
     if (!el) return;
     const ph = el.querySelector<HTMLElement>(".sf-copyright-ph");
     if (!ph) return;
     const PIN_BOTTOM = 16; // matches .sf-copyright-pin bottom
-    let dockedNow = false;
-    let timer = 0;
     const check = () => {
-      const shouldDock = ph.getBoundingClientRect().bottom <= window.innerHeight - PIN_BOTTOM + 0.5;
-      if (shouldDock === dockedNow) return;
-      dockedNow = shouldDock;
-      // Desktop slots in cleanly, so switch instantly. Only mobile needs the
-      // mask trick (where the chrome-resize micro-jump happens).
-      if (window.matchMedia("(max-width: 767px)").matches) {
-        setHiding(true);
-        clearTimeout(timer);
-        timer = window.setTimeout(() => { setDocked(shouldDock); setHiding(false); }, 300);
-      } else {
-        setDocked(shouldDock);
-      }
+      setDocked(ph.getBoundingClientRect().bottom <= window.innerHeight - PIN_BOTTOM + 0.5);
     };
     check();
     const lenis = window.__lenis;
@@ -68,7 +54,6 @@ export default function FooterCopyright({ year }: { year: number }) {
     window.addEventListener("resize", check);
     lenis?.on?.("scroll", check);
     return () => {
-      clearTimeout(timer);
       window.removeEventListener("scroll", check);
       window.removeEventListener("resize", check);
       lenis?.off?.("scroll", check);
@@ -79,7 +64,7 @@ export default function FooterCopyright({ year }: { year: number }) {
     <span className="sf-copyright" ref={anchorRef}>
       {/* Reserves the line in the footer credit so "design and build" sits below. */}
       <span className="sf-copyright-ph" aria-hidden="true">© {year} finbarstudio</span>
-      <span className={`sf-copyright-pin ${shown && !hiding ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
+      <span className={`sf-copyright-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
         <span className="sf-copyright-inner">© {year} finbarstudio</span>
       </span>
     </span>

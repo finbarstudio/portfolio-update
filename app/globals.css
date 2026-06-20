@@ -3347,14 +3347,16 @@ body:has(.sb-root) {
   display: inline-block;
   pointer-events: none;
 }
-/* Docked: sit in the footer credit slot (over the placeholder). Bottom-anchored
-   so the docked bottom edge matches the floating pin's (bottom:16) at the dock
-   moment — no jump. */
-.sf-copyright-pin.is-docked {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  top: auto;
+/* Desktop docks into the footer slot (over the hidden placeholder). On mobile we
+   DON'T position-switch — the real © is shown in the footer and the floating pin
+   just slides away (see the mobile block below). */
+@media (min-width: 768px) {
+  .sf-copyright-pin.is-docked {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    top: auto;
+  }
 }
 .sf-copyright-inner {
   display: inline-block;
@@ -3380,11 +3382,21 @@ body:has(.sb-root) {
   display: inline-block;
   pointer-events: none;
 }
-.sf-clock-pin.is-docked {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  top: auto;
+@media (min-width: 768px) {
+  .sf-clock-pin.is-docked {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    top: auto;
+  }
+}
+/* Mobile: the real footer text is always shown; the floating pins just slide
+   away behind their masks when you reach the footer (no position switch, no jump). */
+@media (max-width: 767px) {
+  .sf-clock-ph,
+  .sf-copyright-ph { visibility: visible; }
+  .sf-clock-pin.is-docked .sf-clock-inner,
+  .sf-copyright-pin.is-docked .sf-copyright-inner { transform: translateY(118%); }
 }
 .sf-clock-inner {
   display: flex;
