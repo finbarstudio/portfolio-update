@@ -45,3 +45,6 @@ public/images/tmyr/1080x1920 IG Reels/_av1_originals/
 
 # Local-only design system reference (copied into new projects, not shipped)
 /styling.md
+
+# soccerdata / FBref scraper cache
+downloaded_files/
