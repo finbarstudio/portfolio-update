@@ -9,13 +9,25 @@
   "lost": 0,
   "points": 4,
   "goalDiff": "+2",
-  "topScorer": { "name": "Harry Kane", "goals": 3 },
+  "scorerRace": [
+    { "name": "K. Mbappé", "code": "FRA", "goals": 4 },
+    { "name": "Harry Kane", "code": "ENG", "goals": 3, "england": true },
+    { "name": "J. Álvarez", "code": "ARG", "goals": 3 },
+    { "name": "V. Júnior", "code": "BRA", "goals": 2 }
+  ],
+  "table": [
+    { "team": "England", "code": "ENG", "p": 2, "w": 1, "d": 1, "l": 0, "gd": "+2", "pts": 4, "england": true },
+    { "team": "Senegal", "code": "SEN", "p": 2, "w": 1, "d": 1, "l": 0, "gd": "+1", "pts": 4 },
+    { "team": "Serbia", "code": "SRB", "p": 2, "w": 1, "d": 0, "l": 1, "gd": "0", "pts": 3 },
+    { "team": "Greece", "code": "GRE", "p": 2, "w": 0, "d": 0, "l": 2, "gd": "-3", "pts": 0 }
+  ],
   "recent": [
-    { "date": "12 Jun", "opponent": "Serbia", "score": "2–0", "result": "W" },
-    { "date": "18 Jun", "opponent": "Senegal", "score": "1–1", "result": "D" }
+    { "date": "12 Jun", "opponent": "Serbia", "code": "SRB", "score": "2–0", "result": "W" },
+    { "date": "18 Jun", "opponent": "Senegal", "code": "SEN", "score": "1–1", "result": "D" }
   ],
   "next": {
     "opponent": "Greece",
+    "code": "GRE",
     "venue": "MetLife Stadium, New Jersey",
     "kickoff": "2026-06-24T19:00:00Z"
   },

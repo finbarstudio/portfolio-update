@@ -4,6 +4,7 @@ import FootballIcon from "@/components/FootballIcon";
 import StartingEleven from "@/components/StartingEleven";
 import Reveal from "@/components/Reveal";
 import MaskReveal from "@/components/MaskReveal";
+import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
 
 export const metadata: Metadata = {
@@ -60,12 +61,45 @@ export default function WorldCupPage() {
         </div>
       </Reveal>
 
-      {/* Top scorer */}
-      <Reveal as="section" className="wc-block" aria-label="Top scorer">
+      {/* Group table */}
+      <Reveal as="section" className="wc-block" aria-label="Group table">
+        <p className="mono-label text-ink-soft mb-4">{wc.group} table</p>
+        <table className="wc-table">
+          <thead>
+            <tr>
+              <th className="wc-th-team">Team</th>
+              <th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {wc.table.map((t, i) => (
+              <tr key={t.code} className={t.england ? "is-england" : ""}>
+                <td className="wc-td-team">
+                  <span className="wc-pos">{i + 1}</span>
+                  <span className="wc-flag"><CountryFlag code={t.code} /></span>
+                  {t.team}
+                </td>
+                <td>{t.p}</td><td>{t.w}</td><td>{t.d}</td><td>{t.l}</td>
+                <td className="tabular-nums">{t.gd}</td>
+                <td className="wc-td-pts text-pink">{t.pts}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Reveal>
+
+      {/* Golden boot */}
+      <Reveal as="section" className="wc-block" aria-label="Golden boot race">
         <p className="mono-label text-ink-soft mb-4">Golden boot watch</p>
-        <p className="wc-scorer">
-          <span className="text-pink">{wc.topScorer.goals}</span> goals · {wc.topScorer.name}
-        </p>
+        <ul className="wc-scorers">
+          {wc.scorerRace.map((s) => (
+            <li key={s.name} className={`wc-scorer-row ${s.england ? "is-england" : "is-other"}`}>
+              <span className="wc-scorer-goals">{s.goals}</span>
+              <span className="wc-flag"><CountryFlag code={s.code} /></span>
+              <span className="wc-scorer-name">{s.name}</span>
+            </li>
+          ))}
+        </ul>
       </Reveal>
 
       {/* Recent */}
@@ -75,7 +109,11 @@ export default function WorldCupPage() {
           {wc.recent.map((m) => (
             <li key={m.opponent} className="wc-result">
               <span className="wc-result-date mono-label text-ink-soft">{m.date}</span>
-              <span className="wc-result-match">England <span className="text-pink tabular-nums">{m.score}</span> {m.opponent}</span>
+              <span className="wc-result-match">
+                <span className="wc-flag"><CountryFlag code="ENG" /></span> England
+                <span className="text-pink tabular-nums"> {m.score} </span>
+                {m.opponent} <span className="wc-flag"><CountryFlag code={m.code} /></span>
+              </span>
               <span className={`wc-result-badge wc-${m.result}`}>{m.result}</span>
             </li>
           ))}

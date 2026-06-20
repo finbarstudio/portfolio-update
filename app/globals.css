@@ -3920,3 +3920,54 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   color: var(--ink-soft);
   white-space: nowrap;
 }
+
+/* World Cup — group table, golden boot race, inline flags */
+.wc-flag { display: inline-flex; align-items: center; }
+.wc-code {
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 0.3em;
+  line-height: 1.4;
+}
+.wc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 2.2vw, 1.05rem);
+}
+.wc-table th {
+  text-align: right;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  font-weight: 400;
+  padding: 0 0 0.6rem 1.5em;
+}
+.wc-table th.wc-th-team { text-align: left; width: 100%; padding-left: 0; }
+.wc-table td { text-align: right; padding: 0.55rem 0 0.55rem 1.5em; border-top: 1px solid var(--line); white-space: nowrap; }
+.wc-td-team { text-align: left; width: 100%; padding-left: 0; display: flex; align-items: center; gap: 0.5em; }
+.wc-pos { color: var(--ink-soft); width: 1.2em; flex: 0 0 auto; }
+.wc-table tr.is-england td { color: var(--pink); }
+.wc-table tr.is-england .wc-pos { color: var(--pink); }
+.wc-td-pts { font-weight: 700; }
+/* Golden boot race */
+.wc-scorers { display: flex; flex-direction: column; }
+.wc-scorer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  padding: 0.55rem 0;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  font-size: clamp(0.95rem, 2.4vw, 1.3rem);
+}
+.wc-scorer-goals { font-weight: 700; min-width: 1.4em; }
+.wc-scorer-row.is-england { color: var(--pink); }
+.wc-scorer-row.is-england .wc-scorer-goals { color: var(--pink); }
+.wc-scorer-row.is-other { color: var(--ink-soft); opacity: 0.6; }
