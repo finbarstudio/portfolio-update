@@ -1,101 +1,93 @@
 {
-  "_note": "EDITABLE. Regenerate with `python scripts/fetch_worldcup.py` (soccerData/FBref). Static site, so this is read at build time — values are placeholders until the script is run. kickoff is a UTC instant.",
   "competition": "FIFA World Cup 2026",
-  "group": "Group K",
+  "group": "Group L",
   "position": 1,
-  "played": 2,
+  "played": 1,
   "won": 1,
-  "drawn": 1,
+  "drawn": 0,
   "lost": 0,
-  "points": 4,
+  "points": 3,
   "goalDiff": "+2",
   "scorerRace": [
     {
-      "name": "K. Mbappé",
-      "code": "FRA",
-      "goals": 4
-    },
-    {
-      "name": "Harry Kane",
-      "code": "ENG",
-      "goals": 3,
-      "england": true
-    },
-    {
-      "name": "J. Álvarez",
+      "name": "Lionel Messi",
       "code": "ARG",
       "goals": 3
     },
     {
-      "name": "V. Júnior",
-      "code": "BRA",
+      "name": "Jonathan David",
+      "code": "CAN",
+      "goals": 3
+    },
+    {
+      "name": "Cyle Larin",
+      "code": "CAN",
       "goals": 2
+    },
+    {
+      "name": "Harry Kane",
+      "code": "ENG",
+      "goals": 2,
+      "england": true
     }
   ],
   "table": [
     {
       "team": "England",
       "code": "ENG",
-      "p": 2,
+      "p": 1,
       "w": 1,
-      "d": 1,
+      "d": 0,
       "l": 0,
       "gd": "+2",
-      "pts": 4,
+      "pts": 3,
       "england": true
     },
     {
-      "team": "Senegal",
-      "code": "SEN",
-      "p": 2,
-      "w": 1,
-      "d": 1,
-      "l": 0,
-      "gd": "+1",
-      "pts": 4
-    },
-    {
-      "team": "Serbia",
-      "code": "SRB",
-      "p": 2,
+      "team": "Ghana",
+      "code": "GHA",
+      "p": 1,
       "w": 1,
       "d": 0,
-      "l": 1,
-      "gd": "0",
+      "l": 0,
+      "gd": "+1",
       "pts": 3
     },
     {
-      "team": "Greece",
-      "code": "GRE",
-      "p": 2,
+      "team": "Panama",
+      "code": "PAN",
+      "p": 1,
       "w": 0,
       "d": 0,
-      "l": 2,
-      "gd": "-3",
+      "l": 1,
+      "gd": "-1",
+      "pts": 0
+    },
+    {
+      "team": "Croatia",
+      "code": "CRO",
+      "p": 1,
+      "w": 0,
+      "d": 0,
+      "l": 1,
+      "gd": "-2",
       "pts": 0
     }
   ],
   "recent": [
     {
-      "date": "12 Jun",
-      "opponent": "Serbia",
-      "code": "SRB",
-      "score": "2–0",
+      "date": "17 Jun",
+      "opponent": "Croatia",
+      "code": "CRO",
+      "score": "4–2",
       "result": "W"
-    },
-    {
-      "date": "18 Jun",
-      "opponent": "Senegal",
-      "code": "SEN",
-      "score": "1–1",
-      "result": "D"
     }
   ],
   "next": {
-    "opponent": "Greece",
-    "code": "GRE",
-    "venue": "MetLife Stadium, New Jersey",
-    "kickoff": "2026-06-24T19:00:00Z"
+    "opponent": "Ghana",
+    "code": "GHA",
+    "venue": "TBC",
+    "kickoff": "2026-06-23T20:00:00Z"
   },
   "formation": "4-3-3",
   "lineup": [
