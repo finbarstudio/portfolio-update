@@ -104,77 +104,88 @@
       "num": 1,
       "club": "Everton",
       "x": 50,
-      "y": 92
+      "y": 92,
+      "badge": "everton"
     },
     {
       "name": "Walker",
       "num": 2,
       "club": "Man City",
       "x": 16,
-      "y": 72
+      "y": 72,
+      "badge": "manchester-city"
     },
     {
       "name": "Stones",
       "num": 5,
       "club": "Man City",
       "x": 38,
-      "y": 74
+      "y": 74,
+      "badge": "manchester-city"
     },
     {
       "name": "Guéhi",
       "num": 6,
       "club": "Crystal Palace",
       "x": 62,
-      "y": 74
+      "y": 74,
+      "badge": "crystal-palace"
     },
     {
       "name": "Lewis",
       "num": 3,
       "club": "Man City",
       "x": 84,
-      "y": 72
+      "y": 72,
+      "badge": "manchester-city"
     },
     {
       "name": "Rice",
       "num": 4,
       "club": "Arsenal",
       "x": 30,
-      "y": 52
+      "y": 52,
+      "badge": "arsenal"
     },
     {
       "name": "Bellingham",
       "num": 10,
       "club": "Real Madrid",
       "x": 50,
-      "y": 50
+      "y": 50,
+      "badge": "real-madrid"
     },
     {
       "name": "Foden",
       "num": 11,
       "club": "Man City",
       "x": 70,
-      "y": 52
+      "y": 52,
+      "badge": "manchester-city"
     },
     {
       "name": "Saka",
       "num": 7,
       "club": "Arsenal",
       "x": 22,
-      "y": 26
+      "y": 26,
+      "badge": "arsenal"
     },
     {
       "name": "Kane",
       "num": 9,
       "club": "Bayern",
       "x": 50,
-      "y": 22
+      "y": 22,
+      "badge": "bayern"
     },
     {
       "name": "Gordon",
       "num": 17,
       "club": "Newcastle",
       "x": 78,
-      "y": 26
+      "y": 26,
+      "badge": "newcastle"
     }
   ]
 }

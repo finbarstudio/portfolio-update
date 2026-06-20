@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { EngFlag, GreeceFlag } from "@/components/Flags";
 import FootballIcon from "@/components/FootballIcon";
 import StartingEleven from "@/components/StartingEleven";
 import Reveal from "@/components/Reveal";
@@ -28,7 +27,8 @@ export default function WorldCupPage() {
   return (
     <article className="px-5 md:px-10 pt-10 md:pt-16 pb-20 max-w-5xl">
       <p className="mono-label text-ink-soft mb-3 wc-comp">
-        <span className="wc-line-ball" aria-hidden="true"><FootballIcon /></span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="wc-comp-badge" src="/world-cup-2026.png" alt="FIFA World Cup 2026" width={28} height={28} />
         {wc.competition} · {wc.group}
       </p>
       <MaskReveal as="h1" className="home-disc wc-heading" aria-label="C’mon England">
@@ -124,7 +124,7 @@ export default function WorldCupPage() {
       <Reveal as="section" className="wc-block" aria-label="Next match">
         <p className="mono-label text-ink-soft mb-4">Next match</p>
         <p className="wc-next-match">
-          <EngFlag /> England <span className="text-ink-soft">vs</span> {k.opponent} <GreeceFlag />
+          <CountryFlag code="ENG" /> England <span className="text-ink-soft">vs</span> {k.opponent} <CountryFlag code={k.code} />
         </p>
         <p className="wc-venue mono-label text-ink-soft">{k.venue}</p>
         <div className="wc-kickoffs">

@@ -35,18 +35,16 @@ export default function FooterClock() {
     };
   }, [pathname]);
 
-  // Flip `docked` when the slot reaches the pin's resting line (bottom:16px).
-  // Desktop: the pin switches to in-flow (CSS) — slots cleanly into the slot.
-  // Mobile: the real text is ALWAYS in the footer; `docked` just slides the
-  // floating pin away behind its mask (no position switch → no jump).
+  // Dock (mobile: slide the floating pin away; desktop: switch in-flow) as soon as
+  // the footer's HR line scrolls into view — the footer has its own copy, so the
+  // floater should clear out the moment you reach the footer.
   useEffect(() => {
     const el = anchorRef.current;
     if (!el) return;
-    const ph = el.querySelector<HTMLElement>(".sf-clock-ph");
-    if (!ph) return;
-    const PIN_BOTTOM = 16;
+    const rule = el.closest(".site-footer")?.querySelector<HTMLElement>(".site-footer-rule");
+    if (!rule) return;
     const check = () => {
-      setDocked(ph.getBoundingClientRect().bottom <= window.innerHeight - PIN_BOTTOM + 0.5);
+      setDocked(rule.getBoundingClientRect().top <= window.innerHeight);
     };
     check();
     const lenis = window.__lenis;
@@ -64,7 +62,7 @@ export default function FooterClock() {
     <span className="sf-clock" ref={anchorRef}>
       {/* Reserves the two lines in the Brisbane column so the layout holds. */}
       <span className="sf-clock-ph" aria-hidden="true">
-        <span className="sf-value">AUS/BNE</span>
+        <span className="sf-loc"><span className="sf-label">AUS/BNE</span><AusFlag /></span>
         <span className="sf-value tabular-nums">{time || " "}</span>
       </span>
       <span className={`sf-clock-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>

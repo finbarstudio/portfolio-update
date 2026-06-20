@@ -11,7 +11,7 @@
 import { useEffect, useRef, useState } from "react";
 import wc from "@/content/worldcup.json";
 
-type Player = { name: string; num: number; club: string; x: number; y: number };
+type Player = { name: string; num: number; club: string; badge: string; x: number; y: number };
 
 export default function StartingEleven() {
   const ref = useRef<HTMLDivElement>(null);
@@ -52,8 +52,9 @@ export default function StartingEleven() {
           <span className="wc-player-meta">
             <span className="wc-player-num">{p.num}</span>
             <span className="wc-player-name">{p.name}</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="wc-player-badge" src={`/badges/${p.badge}.png`} alt={p.club} width={16} height={16} />
           </span>
-          <span className="wc-player-club">{p.club}</span>
         </span>
       ))}
     </div>

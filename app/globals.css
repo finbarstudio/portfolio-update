@@ -3888,7 +3888,19 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 .wc-next-match { display: flex; align-items: center; gap: 0.4em; flex-wrap: wrap; }
 .wc-comp { display: inline-flex; align-items: center; gap: 0.5em; }
-.wc-line-ball { display: inline-flex; width: 1.1em; height: 1.1em; color: var(--pink); }
+.wc-comp-badge { width: 1.8em; height: 1.8em; object-fit: contain; flex: 0 0 auto; }
+/* Colour country flags (WC page only — the footer keeps its pink line flags). */
+.wc-flag-img {
+  height: 0.85em;
+  width: auto;
+  display: inline-block;
+  vertical-align: -0.08em;
+  border-radius: 1.5px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  flex: 0 0 auto;
+}
+/* Club badge beside each player in the XI. */
+.wc-player-badge { width: 1.25em; height: 1.25em; object-fit: contain; flex: 0 0 auto; }
 .wc-pitch {
   position: relative;
   width: 100%;

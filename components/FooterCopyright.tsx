@@ -35,18 +35,15 @@ export default function FooterCopyright({ year }: { year: number }) {
     };
   }, [pathname]);
 
-  // Flip `docked` when the slot reaches the pin's resting line (bottom:16px).
-  // Desktop: the pin switches to in-flow (CSS) — slots cleanly into the slot.
-  // Mobile: the real © is ALWAYS in the footer; `docked` just slides the floating
-  // pin away behind its mask (no position switch → no jump).
+  // Dock (mobile: slide away; desktop: switch in-flow) as soon as the footer's HR
+  // line scrolls into view — the floater clears out the moment you reach the footer.
   useEffect(() => {
     const el = anchorRef.current;
     if (!el) return;
-    const ph = el.querySelector<HTMLElement>(".sf-copyright-ph");
-    if (!ph) return;
-    const PIN_BOTTOM = 16; // matches .sf-copyright-pin bottom
+    const rule = el.closest(".site-footer")?.querySelector<HTMLElement>(".site-footer-rule");
+    if (!rule) return;
     const check = () => {
-      setDocked(ph.getBoundingClientRect().bottom <= window.innerHeight - PIN_BOTTOM + 0.5);
+      setDocked(rule.getBoundingClientRect().top <= window.innerHeight);
     };
     check();
     const lenis = window.__lenis;
