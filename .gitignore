@@ -48,3 +48,6 @@ public/images/tmyr/1080x1920 IG Reels/_av1_originals/
 
 # soccerdata / FBref scraper cache
 downloaded_files/
+
+# Local crest working files (OG/edit sources + PSD); generated output lives in public/crests
+Football Crests/

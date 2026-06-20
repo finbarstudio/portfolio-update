@@ -3395,7 +3395,11 @@ body:has(.sb-root) {
 @media (max-width: 767px) {
   .sf-clock-ph,
   .sf-copyright-ph { visibility: visible; }
+  /* Higher specificity than .is-shown so the masked slide-away wins when the pin
+     is both shown AND docked (otherwise it never disappears). */
+  .sf-clock-pin.is-shown.is-docked .sf-clock-inner,
   .sf-clock-pin.is-docked .sf-clock-inner,
+  .sf-copyright-pin.is-shown.is-docked .sf-copyright-inner,
   .sf-copyright-pin.is-docked .sf-copyright-inner { transform: translateY(118%); }
 }
 .sf-clock-inner {
@@ -3782,10 +3786,12 @@ body:has(.sb-root) {
    negative block margin keeps it from growing the pill past its siblings. */
 .nav-football {
   display: inline-flex;
-  width: 1.9em;
-  height: 1.9em;
-  margin-left: 0.35em;
-  margin-block: -0.5em;
+  align-items: center;
+  justify-content: center;
+  width: 1.3em;
+  height: 1.3em;
+  margin-left: 0.45em;
+  margin-block: -0.3em;
   color: currentColor;
   flex: 0 0 auto;
 }
@@ -3815,13 +3821,54 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding-top: clamp(20px, 3vh, 32px);
   border-top: 1px solid var(--line);
 }
+.wc-page { max-width: 1180px; }
+/* Hero band: "C'mon England" on the left, the 2x2 standings grid on the right. */
+.wc-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .wc-hero-grid { grid-template-columns: 1.15fr 1fr; }
+}
+.wc-hero-head { min-width: 0; }
 .wc-stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.8rem 1.5rem;
+  gap: clamp(1.4rem, 3vw, 2.4rem) clamp(1.4rem, 3vw, 2.4rem);
 }
-@media (min-width: 768px) { .wc-stats { grid-template-columns: repeat(4, 1fr); } }
-.wc-stat { display: flex; flex-direction: column; gap: 0.5rem; }
+.wc-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-left: 1.1rem;
+  border-left: 2px solid var(--line);
+}
+
+/* Split: sticky probable XI (left) while the detail column scrolls (right). */
+.wc-split {
+  margin-top: clamp(48px, 9vh, 110px);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(40px, 6vw, 72px);
+}
+@media (min-width: 1024px) {
+  .wc-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); align-items: start; }
+  .wc-split-xi {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(20px, 4vh, 48px);
+  }
+}
+.wc-split-scroll { min-width: 0; }
+/* In the scroll column the first block needs no top rule/gap (the column already
+   sits beside the XI). */
+.wc-split-scroll .wc-block:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
 .wc-stat-num {
   font-family: var(--font-mono);
   font-weight: 700;
@@ -3856,6 +3903,17 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .wc-result-badge.wc-W { color: var(--pink); border-color: var(--pink); }
 .wc-result-badge.wc-D { color: var(--ink-soft); }
 .wc-result-badge.wc-L { color: var(--ink-soft); }
+/* Upcoming fixtures: dimmed line, kickoff time pill instead of a result badge. */
+.wc-result.is-upcoming { opacity: 0.62; }
+.wc-result-badge.wc-next-tag {
+  width: auto;
+  border-radius: 999px;
+  padding: 0 0.7em;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  border-color: var(--line);
+}
 /* Next match */
 .wc-next-match {
   font-family: var(--font-mono);
@@ -3901,6 +3959,14 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   display: inline-block;
   vertical-align: -0.08em;
   border-radius: 1.5px;
+  flex: 0 0 auto;
+}
+/* Single-colour pink national crest (already brand pink — no tint filter). */
+.wc-crest-img {
+  height: 1.15em;
+  width: auto;
+  display: inline-block;
+  vertical-align: -0.22em;
   flex: 0 0 auto;
 }
 /* Club badge beside each player in the XI. */
@@ -3962,14 +4028,18 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   font-size: clamp(18px, 5vw, 30px);
   line-height: 1;
 }
+/* Two rows: name on top, then number + club badge on the line below. Keeps the
+   marker readable on mobile where a single inline row was cramped. */
 .wc-player-meta {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.35em;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.18em;
   font-family: var(--font-mono);
   text-transform: uppercase;
   white-space: nowrap;
 }
+.wc-player-sub { display: inline-flex; align-items: center; gap: 0.3em; }
 .wc-player-num { color: var(--pink); font-weight: 700; font-size: 10px; }
 .wc-player-name { color: var(--ink); font-size: 10px; letter-spacing: 0.03em; }
 .wc-player-club {
@@ -4027,7 +4097,8 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   text-transform: uppercase;
   font-size: clamp(0.95rem, 2.4vw, 1.3rem);
 }
-.wc-scorer-goals { font-weight: 700; min-width: 1.4em; }
+.wc-scorer-goals { font-weight: 700; min-width: 1.4em; font-size: 1.15em; }
+.wc-scorer-unit { color: var(--ink-soft); margin-left: -0.15em; }
 .wc-scorer-row.is-england { color: var(--pink); }
 .wc-scorer-row.is-england .wc-scorer-goals { color: var(--pink); }
 .wc-scorer-row.is-other { color: var(--ink-soft); opacity: 0.6; }

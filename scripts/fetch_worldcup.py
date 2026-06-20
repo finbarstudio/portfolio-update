@@ -91,7 +91,7 @@ def main() -> None:
     # --- Matches: recent (finished) + next (scheduled) -------------------
     matches = api("/competitions/WC/matches")["matches"]
     eng_matches = [m for m in matches if TEAM in (m["homeTeam"]["name"], m["awayTeam"]["name"])]
-    recent, nxt = [], None
+    fixtures, nxt = [], None
     for m in eng_matches:
         home, away = m["homeTeam"], m["awayTeam"]
         opp = away if home["name"] == TEAM else home
@@ -99,13 +99,19 @@ def main() -> None:
         if m["status"] == "FINISHED":
             ft = m["score"]["fullTime"]
             eg, og = (ft["home"], ft["away"]) if home["name"] == TEAM else (ft["away"], ft["home"])
-            recent.append({
+            fixtures.append({
                 "date": short_date(m["utcDate"]), "opponent": opp["name"], "code": opp["tla"],
                 "score": f"{eg}–{og}", "result": "W" if eg > og else "L" if eg < og else "D",
+                "status": "played",
             })
-        elif nxt is None and m["status"] in ("TIMED", "SCHEDULED"):
-            nxt = {"opponent": opp["name"], "code": opp["tla"],
-                   "venue": m.get("venue") or "TBC", "kickoff": m["utcDate"]}
+        elif m["status"] in ("TIMED", "SCHEDULED"):
+            fixtures.append({
+                "date": short_date(m["utcDate"]), "opponent": opp["name"], "code": opp["tla"],
+                "kickoff": m["utcDate"], "status": "upcoming",
+            })
+            if nxt is None:
+                nxt = {"opponent": opp["name"], "code": opp["tla"],
+                       "venue": m.get("venue") or "TBC", "kickoff": m["utcDate"]}
 
     # --- Download flags (national crests) --------------------------------
     FLAGS.mkdir(parents=True, exist_ok=True)
@@ -125,14 +131,18 @@ def main() -> None:
         "played": eng_row["playedGames"], "won": eng_row["won"],
         "drawn": eng_row["draw"], "lost": eng_row["lost"],
         "points": eng_row["points"], "goalDiff": gd(eng_row["goalDifference"]),
-        "scorerRace": race, "table": table, "recent": recent[-3:],
+        "scorerRace": race, "table": table,
+        # Last few finished + the upcoming fixtures, in chronological order.
+        "fixtures": [f for f in fixtures if f["status"] == "played"][-3:]
+                    + [f for f in fixtures if f["status"] == "upcoming"][:2],
     })
+    data.pop("recent", None)
     if nxt:
         data["next"] = nxt
     data.pop("_note", None)
 
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
-    print(f"Wrote {OUT}  (group {group['group']}, {len(table)} teams, {len(race)} scorers, {len(recent)} results, flags: {len(crests)})")
+    print(f"Wrote {OUT}  (group {group['group']}, {len(table)} teams, {len(race)} scorers, {len(fixtures)} fixtures, flags: {len(crests)})")
 
 
 if __name__ == "__main__":

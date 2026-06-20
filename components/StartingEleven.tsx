@@ -50,10 +50,12 @@ export default function StartingEleven() {
         >
           <span className="wc-player-icon" aria-hidden="true">{"\u{1F6B9}"}</span>
           <span className="wc-player-meta">
-            <span className="wc-player-num">{p.num}</span>
             <span className="wc-player-name">{p.name}</span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="wc-player-badge wc-brand-tint" src={`/badges/${p.badge}.png`} alt={p.club} width={16} height={16} />
+            <span className="wc-player-sub">
+              <span className="wc-player-num">{p.num}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="wc-player-badge wc-brand-tint" src={`/badges/${p.badge}.png`} alt={p.club} width={16} height={16} />
+            </span>
           </span>
         </span>
       ))}

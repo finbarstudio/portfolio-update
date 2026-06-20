@@ -74,13 +74,28 @@
       "pts": 0
     }
   ],
-  "recent": [
+  "fixtures": [
     {
       "date": "17 Jun",
       "opponent": "Croatia",
       "code": "CRO",
       "score": "4–2",
-      "result": "W"
+      "result": "W",
+      "status": "played"
+    },
+    {
+      "date": "23 Jun",
+      "opponent": "Ghana",
+      "code": "GHA",
+      "kickoff": "2026-06-23T20:00:00Z",
+      "status": "upcoming"
+    },
+    {
+      "date": "28 Jun",
+      "opponent": "Panama",
+      "code": "PAN",
+      "kickoff": "2026-06-28T19:00:00Z",
+      "status": "upcoming"
     }
   ],
   "next": {
