@@ -52,7 +52,6 @@ export default function WorldCupPage() {
     <article className="wc-page px-5 md:px-10 pt-10 md:pt-16 pb-24">
       {/* ── Hero (full-bleed ENGLAND wordmark) ───────────────────────── */}
       <section className="wc-hero" aria-label="England">
-        <p className="mono-label text-ink-soft mb-3 wc-comp">{wc.competition} · {wc.group}</p>
         <EnglandHero />
       </section>
 

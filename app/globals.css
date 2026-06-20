@@ -3828,34 +3828,30 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding-top: clamp(20px, 3vh, 32px);
   border-top: 1px solid var(--line);
 }
-/* Hero — big ENGLAND wordmark, contained in the page (not full-bleed). The word
-   and the exclamations are nowrap groups with a <wbr> between, so it wraps to two
-   lines on narrow screens rather than overflowing. */
+/* Hero — ENGLAND wordmark JS-sized to span the padded content width (it sits
+   inside the page padding like everything else). The exclamations sit on the
+   next line (wbr break), filled with enough "!" to span the same width. */
 .wc-hero { margin-bottom: clamp(28px, 4vh, 52px); }
 .wc-hero-title-wrap {
   position: relative;
-  display: inline-block;   /* shrink to the text so the marks centre over it */
-  max-width: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 .wc-hero-title {
   margin: 0;
   font-family: var(--font-archivo), sans-serif;
   text-transform: uppercase;
   letter-spacing: -0.03em;
-  line-height: 0.86;
+  line-height: 0.82;
   color: var(--ink);
   cursor: default;
-  font-size: clamp(3rem, 11vw, 9rem);
+  font-size: 18vw;         /* fallback before JS fits ENGLAND to the column */
 }
 .wc-hero-inner { display: inline; }
 .wc-hero-grp { white-space: nowrap; }   /* keep each group whole; break only at the wbr */
 .wc-hero-letter {
   display: inline-block;
   font-variation-settings: "wght" 250;   /* JS varies this toward the cursor */
-}
-/* Narrow screens: size up so it deliberately wraps ENGLAND / !!!!! onto two lines. */
-@media (max-width: 600px) {
-  .wc-hero-title { font-size: clamp(3.75rem, 19vw, 6rem); }
 }
 /* St George's flag + three-lions crest paired and centred over the wordmark. */
 .wc-hero-marks {
