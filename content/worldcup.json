@@ -21,16 +21,16 @@
   },
   "formation": "4-3-3",
   "lineup": [
-    { "name": "Pickford", "x": 50, "y": 92 },
-    { "name": "Walker", "x": 16, "y": 72 },
-    { "name": "Stones", "x": 38, "y": 74 },
-    { "name": "Guéhi", "x": 62, "y": 74 },
-    { "name": "Lewis", "x": 84, "y": 72 },
-    { "name": "Rice", "x": 30, "y": 52 },
-    { "name": "Bellingham", "x": 50, "y": 50 },
-    { "name": "Foden", "x": 70, "y": 52 },
-    { "name": "Saka", "x": 22, "y": 26 },
-    { "name": "Kane", "x": 50, "y": 22 },
-    { "name": "Gordon", "x": 78, "y": 26 }
+    { "name": "Pickford", "num": 1, "club": "Everton", "x": 50, "y": 92 },
+    { "name": "Walker", "num": 2, "club": "Man City", "x": 16, "y": 72 },
+    { "name": "Stones", "num": 5, "club": "Man City", "x": 38, "y": 74 },
+    { "name": "Guéhi", "num": 6, "club": "Crystal Palace", "x": 62, "y": 74 },
+    { "name": "Lewis", "num": 3, "club": "Man City", "x": 84, "y": 72 },
+    { "name": "Rice", "num": 4, "club": "Arsenal", "x": 30, "y": 52 },
+    { "name": "Bellingham", "num": 10, "club": "Real Madrid", "x": 50, "y": 50 },
+    { "name": "Foden", "num": 11, "club": "Man City", "x": 70, "y": 52 },
+    { "name": "Saka", "num": 7, "club": "Arsenal", "x": 22, "y": 26 },
+    { "name": "Kane", "num": 9, "club": "Bayern", "x": 50, "y": 22 },
+    { "name": "Gordon", "num": 17, "club": "Newcastle", "x": 78, "y": 26 }
   ]
 }

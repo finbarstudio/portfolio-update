@@ -3,6 +3,7 @@ import { EngFlag, GreeceFlag } from "@/components/Flags";
 import FootballIcon from "@/components/FootballIcon";
 import StartingEleven from "@/components/StartingEleven";
 import Reveal from "@/components/Reveal";
+import MaskReveal from "@/components/MaskReveal";
 import wc from "@/content/worldcup.json";
 
 export const metadata: Metadata = {
@@ -25,15 +26,16 @@ export default function WorldCupPage() {
   const k = wc.next;
   return (
     <article className="px-5 md:px-10 pt-10 md:pt-16 pb-20 max-w-5xl">
-      <Reveal as="div">
-        <p className="mono-label text-ink-soft mb-3">{wc.competition} · {wc.group}</p>
-        <h1 className="home-disc wc-heading">
-          {"C’mon "}
-          <span className="home-disc-pink">England</span>
-          {" "}
-          <span className="wc-ball" aria-hidden="true"><FootballIcon /></span>
-        </h1>
-      </Reveal>
+      <p className="mono-label text-ink-soft mb-3 wc-comp">
+        <span className="wc-line-ball" aria-hidden="true"><FootballIcon /></span>
+        {wc.competition} · {wc.group}
+      </p>
+      <MaskReveal as="h1" className="home-disc wc-heading" aria-label="C’mon England">
+        {"C’mon "}
+        <span className="home-disc-pink">England</span>
+        {" "}
+        <span className="wc-ball" aria-hidden="true"><FootballIcon /></span>
+      </MaskReveal>
 
       {/* Standings */}
       <Reveal as="section" className="wc-block" aria-label="Group standings">
@@ -89,12 +91,12 @@ export default function WorldCupPage() {
         <p className="wc-venue mono-label text-ink-soft">{k.venue}</p>
         <div className="wc-kickoffs">
           <div className="wc-kick">
-            <span className="sf-label">AUS/BNE</span>
-            <span className="sf-value tabular-nums">{fmt(k.kickoff, "Australia/Brisbane")}</span>
-          </div>
-          <div className="wc-kick">
             <span className="sf-label">ENG/LON</span>
             <span className="sf-value tabular-nums">{fmt(k.kickoff, "Europe/London")}</span>
+          </div>
+          <div className="wc-kick">
+            <span className="sf-label">AUS/BNE</span>
+            <span className="sf-value tabular-nums">{fmt(k.kickoff, "Australia/Brisbane")}</span>
           </div>
         </div>
       </Reveal>

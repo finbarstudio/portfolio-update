@@ -3877,11 +3877,13 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   line-height: 1;
 }
 .wc-next-match { display: flex; align-items: center; gap: 0.4em; flex-wrap: wrap; }
+.wc-comp { display: inline-flex; align-items: center; gap: 0.5em; }
+.wc-line-ball { display: inline-flex; width: 1.1em; height: 1.1em; color: var(--pink); }
 .wc-pitch {
   position: relative;
   width: 100%;
-  max-width: 440px;
-  aspect-ratio: 68 / 105;
+  max-width: 520px;
+  aspect-ratio: 68 / 56;   /* one half of the pitch */
   margin-top: 0.5rem;
 }
 .wc-pitch-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -3891,20 +3893,30 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.15rem;
+  gap: 0.1rem;
   pointer-events: none;
 }
 .wc-player-icon {
   font-family: var(--font-dingbat), var(--font-mono);
   color: var(--pink);
-  font-size: clamp(17px, 4.8vw, 28px);
+  font-size: clamp(18px, 5vw, 30px);
   line-height: 1;
 }
-.wc-player-name {
+.wc-player-meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
   font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
-  color: var(--ink);
+}
+.wc-player-num { color: var(--pink); font-weight: 700; font-size: 10px; }
+.wc-player-name { color: var(--ink); font-size: 10px; letter-spacing: 0.03em; }
+.wc-player-club {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
 }
