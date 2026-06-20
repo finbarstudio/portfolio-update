@@ -117,6 +117,27 @@ export default function WorldCupPage() {
             </table>
           </Reveal>
 
+          {/* Next match — kept high on the page, right under the table */}
+          <Reveal as="section" className="wc-block" aria-label="Next match">
+            <p className="mono-label text-ink-soft mb-4">Next match</p>
+            <p className="wc-next-match">
+              <span className="wc-next-team"><CountryFlag code="ENG" /> England</span>
+              {" "}<span className="text-ink-soft">vs</span>{" "}
+              <span className="wc-next-team">{k.opponent} <CountryFlag code={k.code} /></span>
+            </p>
+            <p className="wc-venue mono-label text-ink-soft">{k.venue}</p>
+            <div className="wc-kickoffs">
+              <div className="wc-kick">
+                <span className="sf-label">ENG/LON</span>
+                <span className="sf-value tabular-nums">{fmt(k.kickoff, "Europe/London")}</span>
+              </div>
+              <div className="wc-kick">
+                <span className="sf-label">AUS/BNE</span>
+                <span className="sf-value tabular-nums">{fmt(k.kickoff, "Australia/Brisbane")}</span>
+              </div>
+            </div>
+          </Reveal>
+
           {/* Golden boot */}
           <Reveal as="section" className="wc-block" aria-label="Golden boot race">
             <p className="mono-label text-ink-soft mb-4">Golden boot watch</p>
@@ -160,27 +181,6 @@ export default function WorldCupPage() {
                 );
               })}
             </ul>
-          </Reveal>
-
-          {/* Next match */}
-          <Reveal as="section" className="wc-block" aria-label="Next match">
-            <p className="mono-label text-ink-soft mb-4">Next match</p>
-            <p className="wc-next-match">
-              <span className="wc-next-team"><CountryFlag code="ENG" /> England</span>
-              {" "}<span className="text-ink-soft">vs</span>{" "}
-              <span className="wc-next-team">{k.opponent} <CountryFlag code={k.code} /></span>
-            </p>
-            <p className="wc-venue mono-label text-ink-soft">{k.venue}</p>
-            <div className="wc-kickoffs">
-              <div className="wc-kick">
-                <span className="sf-label">ENG/LON</span>
-                <span className="sf-value tabular-nums">{fmt(k.kickoff, "Europe/London")}</span>
-              </div>
-              <div className="wc-kick">
-                <span className="sf-label">AUS/BNE</span>
-                <span className="sf-value tabular-nums">{fmt(k.kickoff, "Australia/Brisbane")}</span>
-              </div>
-            </div>
           </Reveal>
         </div>
       </div>

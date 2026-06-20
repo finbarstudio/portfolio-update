@@ -4074,7 +4074,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 .wc-table th.wc-th-team { text-align: left; width: 100%; padding-left: 0; }
 .wc-table td { text-align: right; padding: 0.55rem 0 0.55rem 1.5em; border-top: 1px solid var(--line); white-space: nowrap; }
-.wc-td-team { text-align: left; width: 100%; padding-left: 0; display: flex; align-items: center; gap: 0.5em; }
+.wc-table td.wc-td-team { text-align: left; width: 100%; padding-left: 0; display: flex; align-items: center; gap: 0.5em; }
 .wc-pos { color: var(--ink-soft); width: 1.2em; flex: 0 0 auto; }
 .wc-table tr.is-england td { color: var(--pink); }
 .wc-table tr.is-england .wc-pos { color: var(--pink); }
