@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import StartingEleven from "@/components/StartingEleven";
 import Reveal from "@/components/Reveal";
-import MaskReveal from "@/components/MaskReveal";
 import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
 
@@ -44,13 +43,18 @@ export default function WorldCupPage() {
 
   return (
     <article className="wc-page px-5 md:px-10 pt-10 md:pt-16 pb-24">
-      {/* ── Hero (full width) ────────────────────────────────────────── */}
-      <section className="wc-hero" aria-label="C’mon England">
+      {/* ── Hero (full width, spans both columns) ────────────────────── */}
+      <section className="wc-hero" aria-label="England">
         <p className="mono-label text-ink-soft mb-3 wc-comp">{wc.competition} · {wc.group}</p>
-        <MaskReveal as="h1" className="home-disc wc-heading" aria-label="C’mon England">
-          {"C’mon "}
-          <span className="home-disc-pink">England</span>
-        </MaskReveal>
+        <div className="wc-hero-title-wrap">
+          <h1 className="wc-hero-title">England</h1>
+          {/* Basic St George's cross drawn 1px over the wordmark: starts 2s after
+              load, completes over 3s (CSS stroke-dash animation). */}
+          <svg className="wc-stgeorge" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M50 0 V100" pathLength={1} />
+            <path d="M0 50 H100" pathLength={1} />
+          </svg>
+        </div>
       </section>
 
       {/* ── Sticky XI + squad (left) · scrolling detail (right) ───────── */}
