@@ -3,6 +3,8 @@ import StartingEleven from "@/components/StartingEleven";
 import EnglandHero from "@/components/EnglandHero";
 import LiveMatch from "@/components/LiveMatch";
 import GroupTable from "@/components/GroupTable";
+import GoldenBoot from "@/components/GoldenBoot";
+import FixturesList from "@/components/FixturesList";
 import Reveal from "@/components/Reveal";
 import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
@@ -21,16 +23,6 @@ function fmt(iso: string, tz: string) {
   return `${day} · ${time}`.toUpperCase();
 }
 
-/** Short kickoff time (London) for upcoming fixtures in the table. */
-function fmtShort(iso: string) {
-  const d = new Date(iso);
-  return new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
-}
-
-type Fixture = {
-  date: string; opponent: string; code: string;
-  score?: string; result?: string; kickoff?: string; status: string;
-};
 type Squad = { num: number; name: string; club: string; badge: string; pos: string };
 
 const POS_ORDER = ["GK", "DEF", "MID", "FWD"];
@@ -38,7 +30,6 @@ const POS_LABEL: Record<string, string> = { GK: "Goalkeepers", DEF: "Defenders",
 
 export default function WorldCupPage() {
   const k = wc.next;
-  const fixtures = wc.fixtures as Fixture[];
   const squad = (wc.squad as Squad[]) ?? [];
   const squadByPos = POS_ORDER
     .map((pos) => ({ pos, players: squad.filter((p) => p.pos === pos) }))
@@ -107,49 +98,16 @@ export default function WorldCupPage() {
             <GroupTable />
           </Reveal>
 
-          {/* Golden boot */}
+          {/* Golden boot — live from FotMob, static fallback */}
           <Reveal as="section" className="wc-block" aria-label="Golden boot race">
             <p className="mono-label text-ink-soft mb-4">Golden boot watch</p>
-            <ul className="wc-scorers">
-              {wc.scorerRace.map((s, i) => (
-                <li key={s.name} className={`wc-scorer-row ${s.england ? "is-england" : ""}`}>
-                  <span className="wc-pos">{i + 1}</span>
-                  <span className="wc-flag"><CountryFlag code={s.code} /></span>
-                  <span className="wc-scorer-name">{s.name}</span>
-                  <span className="wc-scorer-goals text-pink">{s.goals}</span>
-                  <span className="wc-scorer-unit mono-label">{s.goals === 1 ? "goal" : "goals"}</span>
-                </li>
-              ))}
-            </ul>
+            <GoldenBoot />
           </Reveal>
 
-          {/* Fixtures — results + upcoming in one table */}
+          {/* Results + upcoming — live from FotMob, static fallback */}
           <Reveal as="section" className="wc-block" aria-label="Results and fixtures">
             <p className="mono-label text-ink-soft mb-4">Results &amp; fixtures</p>
-            <ul className="wc-results">
-              {fixtures.map((m) => {
-                const upcoming = m.status === "upcoming";
-                return (
-                  <li key={m.date + m.code} className={`wc-result ${upcoming ? "is-upcoming" : ""}`}>
-                    <span className="wc-result-date mono-label text-ink-soft">{m.date}</span>
-                    <span className="wc-result-match">
-                      <span className="wc-flag"><CountryFlag code="ENG" /></span> England
-                      {upcoming ? (
-                        <span className="text-ink-soft"> vs </span>
-                      ) : (
-                        <span className="text-pink tabular-nums"> {m.score} </span>
-                      )}
-                      {m.opponent} <span className="wc-flag"><CountryFlag code={m.code} /></span>
-                    </span>
-                    {upcoming ? (
-                      <span className="wc-result-badge wc-next-tag mono-label">{m.kickoff ? fmtShort(m.kickoff) : "TBC"}</span>
-                    ) : (
-                      <span className={`wc-result-badge wc-${m.result}`}>{m.result}</span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+            <FixturesList />
           </Reveal>
         </div>
       </div>
