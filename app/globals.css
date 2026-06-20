@@ -3753,3 +3753,80 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 @media (hover: hover) {
   .intro-menu-btn:hover { color: var(--pink); border-color: var(--pink); }
 }
+
+/* ── World Cup page ───────────────────────────────────────────────── */
+.wc-heading { text-align: left; }
+.wc-ball {
+  display: inline-flex;
+  width: 0.8em;
+  height: 0.8em;
+  color: var(--pink);
+  vertical-align: -0.04em;
+}
+.wc-block {
+  margin-top: clamp(40px, 7vh, 88px);
+  padding-top: clamp(20px, 3vh, 32px);
+  border-top: 1px solid var(--line);
+}
+.wc-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.8rem 1.5rem;
+}
+@media (min-width: 768px) { .wc-stats { grid-template-columns: repeat(4, 1fr); } }
+.wc-stat { display: flex; flex-direction: column; gap: 0.5rem; }
+.wc-stat-num {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 0.9;
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+}
+/* Recent results */
+.wc-results { display: flex; flex-direction: column; }
+.wc-result {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+}
+.wc-result-date { flex: 0 0 4.5em; }
+.wc-result-match { flex: 1 1 auto; }
+.wc-result-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-size: 0.7em;
+  font-weight: 700;
+}
+.wc-result-badge.wc-W { color: var(--pink); border-color: var(--pink); }
+.wc-result-badge.wc-D { color: var(--ink-soft); }
+.wc-result-badge.wc-L { color: var(--ink-soft); }
+/* Next match */
+.wc-next-match {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: clamp(1.6rem, 5vw, 3rem);
+  line-height: 1;
+}
+.wc-venue { margin-top: 0.6rem; }
+.wc-kickoffs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 3rem;
+  margin-top: 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.wc-kick { display: flex; flex-direction: column; gap: 0; align-items: flex-start; }
