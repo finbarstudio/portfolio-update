@@ -4161,7 +4161,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-.wc-squad-name { flex: 1 1 auto; }
+.wc-squad-name { flex: 1 1 auto; min-width: 0; }
 .wc-squad-badge { width: 1.1em; height: 1.1em; object-fit: contain; flex: 0 0 auto; align-self: center; }
 .wc-squad-club {
   color: var(--ink-soft);
@@ -4169,6 +4169,6 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-align: right;
-  width: 7.5em;
+  white-space: nowrap;   /* club stays on one line */
   flex: 0 0 auto;
 }
