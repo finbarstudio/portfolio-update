@@ -10,20 +10,86 @@
   "points": 4,
   "goalDiff": "+2",
   "scorerRace": [
-    { "name": "K. Mbappé", "code": "FRA", "goals": 4 },
-    { "name": "Harry Kane", "code": "ENG", "goals": 3, "england": true },
-    { "name": "J. Álvarez", "code": "ARG", "goals": 3 },
-    { "name": "V. Júnior", "code": "BRA", "goals": 2 }
+    {
+      "name": "K. Mbappé",
+      "code": "FRA",
+      "goals": 4
+    },
+    {
+      "name": "Harry Kane",
+      "code": "ENG",
+      "goals": 3,
+      "england": true
+    },
+    {
+      "name": "J. Álvarez",
+      "code": "ARG",
+      "goals": 3
+    },
+    {
+      "name": "V. Júnior",
+      "code": "BRA",
+      "goals": 2
+    }
   ],
   "table": [
-    { "team": "England", "code": "ENG", "p": 2, "w": 1, "d": 1, "l": 0, "gd": "+2", "pts": 4, "england": true },
-    { "team": "Senegal", "code": "SEN", "p": 2, "w": 1, "d": 1, "l": 0, "gd": "+1", "pts": 4 },
-    { "team": "Serbia", "code": "SRB", "p": 2, "w": 1, "d": 0, "l": 1, "gd": "0", "pts": 3 },
-    { "team": "Greece", "code": "GRE", "p": 2, "w": 0, "d": 0, "l": 2, "gd": "-3", "pts": 0 }
+    {
+      "team": "England",
+      "code": "ENG",
+      "p": 2,
+      "w": 1,
+      "d": 1,
+      "l": 0,
+      "gd": "+2",
+      "pts": 4,
+      "england": true
+    },
+    {
+      "team": "Senegal",
+      "code": "SEN",
+      "p": 2,
+      "w": 1,
+      "d": 1,
+      "l": 0,
+      "gd": "+1",
+      "pts": 4
+    },
+    {
+      "team": "Serbia",
+      "code": "SRB",
+      "p": 2,
+      "w": 1,
+      "d": 0,
+      "l": 1,
+      "gd": "0",
+      "pts": 3
+    },
+    {
+      "team": "Greece",
+      "code": "GRE",
+      "p": 2,
+      "w": 0,
+      "d": 0,
+      "l": 2,
+      "gd": "-3",
+      "pts": 0
+    }
   ],
   "recent": [
-    { "date": "12 Jun", "opponent": "Serbia", "code": "SRB", "score": "2–0", "result": "W" },
-    { "date": "18 Jun", "opponent": "Senegal", "code": "SEN", "score": "1–1", "result": "D" }
+    {
+      "date": "12 Jun",
+      "opponent": "Serbia",
+      "code": "SRB",
+      "score": "2–0",
+      "result": "W"
+    },
+    {
+      "date": "18 Jun",
+      "opponent": "Senegal",
+      "code": "SEN",
+      "score": "1–1",
+      "result": "D"
+    }
   ],
   "next": {
     "opponent": "Greece",
@@ -33,16 +99,82 @@
   },
   "formation": "4-3-3",
   "lineup": [
-    { "name": "Pickford", "num": 1, "club": "Everton", "x": 50, "y": 92 },
-    { "name": "Walker", "num": 2, "club": "Man City", "x": 16, "y": 72 },
-    { "name": "Stones", "num": 5, "club": "Man City", "x": 38, "y": 74 },
-    { "name": "Guéhi", "num": 6, "club": "Crystal Palace", "x": 62, "y": 74 },
-    { "name": "Lewis", "num": 3, "club": "Man City", "x": 84, "y": 72 },
-    { "name": "Rice", "num": 4, "club": "Arsenal", "x": 30, "y": 52 },
-    { "name": "Bellingham", "num": 10, "club": "Real Madrid", "x": 50, "y": 50 },
-    { "name": "Foden", "num": 11, "club": "Man City", "x": 70, "y": 52 },
-    { "name": "Saka", "num": 7, "club": "Arsenal", "x": 22, "y": 26 },
-    { "name": "Kane", "num": 9, "club": "Bayern", "x": 50, "y": 22 },
-    { "name": "Gordon", "num": 17, "club": "Newcastle", "x": 78, "y": 26 }
+    {
+      "name": "Pickford",
+      "num": 1,
+      "club": "Everton",
+      "x": 50,
+      "y": 92
+    },
+    {
+      "name": "Walker",
+      "num": 2,
+      "club": "Man City",
+      "x": 16,
+      "y": 72
+    },
+    {
+      "name": "Stones",
+      "num": 5,
+      "club": "Man City",
+      "x": 38,
+      "y": 74
+    },
+    {
+      "name": "Guéhi",
+      "num": 6,
+      "club": "Crystal Palace",
+      "x": 62,
+      "y": 74
+    },
+    {
+      "name": "Lewis",
+      "num": 3,
+      "club": "Man City",
+      "x": 84,
+      "y": 72
+    },
+    {
+      "name": "Rice",
+      "num": 4,
+      "club": "Arsenal",
+      "x": 30,
+      "y": 52
+    },
+    {
+      "name": "Bellingham",
+      "num": 10,
+      "club": "Real Madrid",
+      "x": 50,
+      "y": 50
+    },
+    {
+      "name": "Foden",
+      "num": 11,
+      "club": "Man City",
+      "x": 70,
+      "y": 52
+    },
+    {
+      "name": "Saka",
+      "num": 7,
+      "club": "Arsenal",
+      "x": 22,
+      "y": 26
+    },
+    {
+      "name": "Kane",
+      "num": 9,
+      "club": "Bayern",
+      "x": 50,
+      "y": 22
+    },
+    {
+      "name": "Gordon",
+      "num": 17,
+      "club": "Newcastle",
+      "x": 78,
+      "y": 26
+    }
   ]
 }
