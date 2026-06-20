@@ -4099,10 +4099,13 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   font-variant-numeric: tabular-nums;
 }
 .wc-squad-name { flex: 1 1 auto; }
+.wc-squad-badge { width: 1.1em; height: 1.1em; object-fit: contain; flex: 0 0 auto; align-self: center; }
 .wc-squad-club {
   color: var(--ink-soft);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-align: right;
+  width: 7.5em;
+  flex: 0 0 auto;
 }

@@ -29,7 +29,7 @@ type Fixture = {
   date: string; opponent: string; code: string;
   score?: string; result?: string; kickoff?: string; status: string;
 };
-type Squad = { num: number; name: string; club: string; pos: string };
+type Squad = { num: number; name: string; club: string; badge: string; pos: string };
 
 const POS_ORDER = ["GK", "DEF", "MID", "FWD"];
 const POS_LABEL: Record<string, string> = { GK: "Goalkeepers", DEF: "Defenders", MID: "Midfielders", FWD: "Forwards" };
@@ -72,6 +72,8 @@ export default function WorldCupPage() {
                       <li className="wc-squad-row" key={p.name}>
                         <span className="wc-squad-num">{p.num}</span>
                         <span className="wc-squad-name">{p.name}</span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img className="wc-squad-badge" src={`/badges/${p.badge}.svg`} alt={p.club} width={16} height={16} />
                         <span className="wc-squad-club">{p.club}</span>
                       </li>
                     ))}

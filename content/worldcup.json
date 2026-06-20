@@ -196,20 +196,20 @@
     }
   ],
   "squad": [
-    { "num": 13, "name": "Dean Henderson", "club": "Crystal Palace", "pos": "GK" },
-    { "num": 23, "name": "James Trafford", "club": "Man City", "pos": "GK" },
-    { "num": 12, "name": "Trent Alexander-Arnold", "club": "Real Madrid", "pos": "DEF" },
-    { "num": 14, "name": "Ezri Konsa", "club": "Aston Villa", "pos": "DEF" },
-    { "num": 15, "name": "Levi Colwill", "club": "Chelsea", "pos": "DEF" },
-    { "num": 16, "name": "Jarrad Branthwaite", "club": "Everton", "pos": "DEF" },
-    { "num": 22, "name": "Reece James", "club": "Chelsea", "pos": "DEF" },
-    { "num": 8, "name": "Kobbie Mainoo", "club": "Man United", "pos": "MID" },
-    { "num": 19, "name": "Morgan Rogers", "club": "Aston Villa", "pos": "MID" },
-    { "num": 21, "name": "Cole Palmer", "club": "Chelsea", "pos": "MID" },
-    { "num": 24, "name": "Conor Gallagher", "club": "Atlético", "pos": "MID" },
-    { "num": 18, "name": "Eberechi Eze", "club": "Arsenal", "pos": "FWD" },
-    { "num": 25, "name": "Marcus Rashford", "club": "Aston Villa", "pos": "FWD" },
-    { "num": 26, "name": "Ollie Watkins", "club": "Aston Villa", "pos": "FWD" },
-    { "num": 11, "name": "Jarrod Bowen", "club": "West Ham", "pos": "FWD" }
+    { "num": 13, "name": "Dean Henderson", "club": "Crystal Palace", "badge": "crystal-palace", "pos": "GK" },
+    { "num": 23, "name": "James Trafford", "club": "Man City", "badge": "manchester-city", "pos": "GK" },
+    { "num": 12, "name": "Trent Alexander-Arnold", "club": "Real Madrid", "badge": "real-madrid", "pos": "DEF" },
+    { "num": 14, "name": "Ezri Konsa", "club": "Aston Villa", "badge": "aston-villa", "pos": "DEF" },
+    { "num": 15, "name": "Levi Colwill", "club": "Chelsea", "badge": "chelsea", "pos": "DEF" },
+    { "num": 16, "name": "Jarrad Branthwaite", "club": "Everton", "badge": "everton", "pos": "DEF" },
+    { "num": 22, "name": "Reece James", "club": "Chelsea", "badge": "chelsea", "pos": "DEF" },
+    { "num": 8, "name": "Kobbie Mainoo", "club": "Man United", "badge": "manchester-united", "pos": "MID" },
+    { "num": 19, "name": "Morgan Rogers", "club": "Aston Villa", "badge": "aston-villa", "pos": "MID" },
+    { "num": 21, "name": "Cole Palmer", "club": "Chelsea", "badge": "chelsea", "pos": "MID" },
+    { "num": 24, "name": "Conor Gallagher", "club": "Atlético", "badge": "atletico-madrid", "pos": "MID" },
+    { "num": 18, "name": "Eberechi Eze", "club": "Arsenal", "badge": "arsenal", "pos": "FWD" },
+    { "num": 25, "name": "Marcus Rashford", "club": "Aston Villa", "badge": "aston-villa", "pos": "FWD" },
+    { "num": 26, "name": "Ollie Watkins", "club": "Aston Villa", "badge": "aston-villa", "pos": "FWD" },
+    { "num": 11, "name": "Jarrod Bowen", "club": "West Ham", "badge": "west-ham", "pos": "FWD" }
   ]
 }
