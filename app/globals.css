@@ -3350,7 +3350,7 @@ body:has(.sb-root) {
 /* Desktop docks into the footer slot (over the hidden placeholder). On mobile we
    DON'T position-switch — the real © is shown in the footer and the floating pin
    just slides away (see the mobile block below). */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .sf-copyright-pin.is-docked {
     position: absolute;
     bottom: 0;
@@ -3362,7 +3362,7 @@ body:has(.sb-root) {
   display: inline-block;
   color: var(--ink);               /* copyright is the ink top-line, floating + docked */
   transform: translateY(118%);     /* hidden beneath the mask until revealed */
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .sf-copyright-pin.is-shown .sf-copyright-inner { transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {
@@ -3382,7 +3382,7 @@ body:has(.sb-root) {
   display: inline-block;
   pointer-events: none;
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .sf-clock-pin.is-docked {
     position: absolute;
     bottom: 0;
@@ -3390,9 +3390,10 @@ body:has(.sb-root) {
     top: auto;
   }
 }
-/* Mobile: the real footer text is always shown; the floating pins just slide
-   away behind their masks when you reach the footer (no position switch, no jump). */
-@media (max-width: 767px) {
+/* Tablet + mobile: the real footer text is always shown; the floating pins do a
+   gradual masked swipe DOWN behind their masks when you reach the footer (no
+   position switch, no jump — they slide out of view over 0.6s). */
+@media (max-width: 1023px) {
   .sf-clock-ph,
   .sf-copyright-ph { visibility: visible; }
   /* Higher specificity than .is-shown so the masked slide-away wins when the pin
@@ -3406,7 +3407,7 @@ body:has(.sb-root) {
   display: flex;
   flex-direction: column;
   transform: translateY(118%);     /* hidden beneath the mask until revealed */
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .sf-clock-pin.is-shown .sf-clock-inner { transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {
