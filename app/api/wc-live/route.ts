@@ -1,55 +1,70 @@
 import { NextResponse } from "next/server";
 
 /**
- * Live World Cup match proxy. The football-data.org key can't go in the browser
- * (and the API has no CORS), so the client polls this route. The upstream fetch
- * is cached 30s so visitor polling never trips the rate limit. Returns any
- * in-play matches plus the next scheduled one; degrades to {ok:false} with empty
- * data when no key is set or the upstream fails (the UI then falls back to the
- * static England fixture).
+ * Live World Cup match feed, sourced from FotMob's public JSON API (the one their
+ * own site calls). The client can't hit it directly (no CORS), so this server
+ * route proxies it, cached 30s so visitor polling stays light. Returns any
+ * in-play WC match with its live score + minute, plus the next scheduled WC
+ * match. Degrades to {ok:false} so the UI falls back to the static fixture.
+ *
+ * Note: this is FotMob's unofficial API. No key needed; kept low-volume + cached.
  */
 
 export const dynamic = "force-dynamic";
 
-const BASE = "https://api.football-data.org/v4";
-const LIVE = new Set(["IN_PLAY", "PAUSED"]);
-const UPCOMING = new Set(["TIMED", "SCHEDULED"]);
+const LOGO = (id: number) => `https://images.fotmob.com/image_resources/logo/teamlogo/${id}.png`;
+const isWC = (name: string, primaryId?: number) => primaryId === 77 || /world cup/i.test(name);
 
-type RawTeam = { name?: string; shortName?: string; tla?: string; crest?: string };
-type RawMatch = {
-  id: number; utcDate: string; status: string;
-  homeTeam?: RawTeam; awayTeam?: RawTeam;
-  score?: { fullTime?: { home: number | null; away: number | null } };
+type FmTeam = { id: number; name: string; longName?: string; score?: number };
+type FmMatch = {
+  id: number;
+  home: FmTeam; away: FmTeam;
+  status: { utcTime: string; started?: boolean; finished?: boolean; cancelled?: boolean; ongoing?: boolean; liveTime?: { short?: string } };
 };
+type FmLeague = { name: string; primaryId?: number; matches: FmMatch[] };
 
-function slim(m: RawMatch) {
-  const team = (t?: RawTeam) => ({ name: t?.shortName || t?.name || "TBC", tla: t?.tla ?? "", crest: t?.crest ?? "" });
+function team(t: FmTeam) {
+  return { name: t.name || t.longName || "TBC", crest: LOGO(t.id) };
+}
+function shape(m: FmMatch) {
   return {
     id: m.id,
-    utcDate: m.utcDate,
-    status: m.status,
-    home: team(m.homeTeam),
-    away: team(m.awayTeam),
-    score: { home: m.score?.fullTime?.home ?? null, away: m.score?.fullTime?.away ?? null },
+    utcTime: m.status.utcTime,
+    ongoing: !!m.status.ongoing,
+    minute: (m.status.liveTime?.short || "").replace(/[‎‏]/g, ""),
+    home: { ...team(m.home), score: m.home.score ?? null },
+    away: { ...team(m.away), score: m.away.score ?? null },
   };
 }
 
+async function matchesFor(date: string): Promise<FmMatch[]> {
+  const res = await fetch(`https://www.fotmob.com/api/data/matches?date=${date}`, {
+    headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+    next: { revalidate: 30 },
+  });
+  if (!res.ok) return [];
+  const data = (await res.json()) as { leagues?: FmLeague[] };
+  return (data.leagues ?? [])
+    .filter((l) => isWC(l.name, l.primaryId))
+    .flatMap((l) => l.matches ?? []);
+}
+
+function ymd(d: Date) {
+  return `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`;
+}
+
 export async function GET() {
-  const key = process.env.FOOTBALL_DATA_KEY;
-  if (!key) return NextResponse.json({ ok: false, live: [], next: null });
   try {
-    const res = await fetch(`${BASE}/competitions/WC/matches`, {
-      headers: { "X-Auth-Token": key },
-      next: { revalidate: 30 },
-    });
-    if (!res.ok) return NextResponse.json({ ok: false, live: [], next: null });
-    const data = (await res.json()) as { matches?: RawMatch[] };
-    const matches = data.matches ?? [];
-    const live = matches.filter((m) => LIVE.has(m.status)).map(slim);
-    const next = matches
-      .filter((m) => UPCOMING.has(m.status))
-      .sort((a, b) => +new Date(a.utcDate) - +new Date(b.utcDate))
-      .map(slim)[0] ?? null;
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 86400000);
+    const wc = [...(await matchesFor(ymd(today))), ...(await matchesFor(ymd(tomorrow)))];
+    if (wc.length === 0) return NextResponse.json({ ok: false, live: [], next: null });
+
+    const live = wc.filter((m) => m.status.ongoing).map(shape);
+    const next = wc
+      .filter((m) => !m.status.started && !m.status.cancelled)
+      .sort((a, b) => +new Date(a.status.utcTime) - +new Date(b.status.utcTime))
+      .map(shape)[0] ?? null;
     return NextResponse.json({ ok: true, live, next });
   } catch {
     return NextResponse.json({ ok: false, live: [], next: null });

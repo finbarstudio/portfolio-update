@@ -9,8 +9,8 @@
 
 import { useEffect, useState } from "react";
 
-type Team = { name: string; tla: string; crest: string };
-type Match = { id: number; utcDate: string; status: string; home: Team; away: Team; score: { home: number | null; away: number | null } };
+type Team = { name: string; crest: string; score?: number | null };
+type Match = { id: number; utcTime: string; ongoing: boolean; minute: string; home: Team; away: Team };
 type Feed = { ok: boolean; live: Match[]; next: Match | null };
 
 type Fallback = { opponent: string; code: string; kickoff: string };
@@ -56,17 +56,17 @@ export default function LiveMatch({ fallback }: { fallback: Fallback }) {
         <p className="mono-label wc-live-label">● Live now</p>
         <p className="wc-fix-teams">
           <span className="wc-fix-side"><Crest url={liveMatch.home.crest} alt={liveMatch.home.name} /> {liveMatch.home.name}</span>
-          <span className="wc-fix-score text-pink tabular-nums">{liveMatch.score.home ?? 0}–{liveMatch.score.away ?? 0}</span>
+          <span className="wc-fix-score text-pink tabular-nums">{liveMatch.home.score ?? 0}–{liveMatch.away.score ?? 0}</span>
           <span className="wc-fix-side">{liveMatch.away.name} <Crest url={liveMatch.away.crest} alt={liveMatch.away.name} /></span>
         </p>
-        <p className="wc-venue mono-label text-ink-soft">{liveMatch.status === "PAUSED" ? "Half time" : "In play"}</p>
+        <p className="wc-venue mono-label text-ink-soft">{liveMatch.minute || "In play"}</p>
       </div>
     );
   }
 
   // 2) Next World Cup match (any nations).
   if (nextMatch) {
-    const t = times(nextMatch.utcDate);
+    const t = times(nextMatch.utcTime);
     return (
       <div className="wc-fix-card">
         <p className="mono-label text-ink-soft">No game live · Next up</p>
