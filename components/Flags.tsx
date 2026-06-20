@@ -33,3 +33,23 @@ export function EngFlag() {
     </svg>
   );
 }
+
+/** Greece — 9 stripes + canton cross, blue parts rendered in pink on transparent. */
+export function GreeceFlag() {
+  return (
+    <svg viewBox="0 0 27 18" style={flagStyle} fill="var(--pink)" aria-hidden="true" focusable="false">
+      {/* canton corners (around the white cross) */}
+      <rect x="0" y="0" width="4" height="4" />
+      <rect x="6" y="0" width="4" height="4" />
+      <rect x="0" y="6" width="4" height="4" />
+      <rect x="6" y="6" width="4" height="4" />
+      {/* stripes to the right of the canton */}
+      <rect x="10" y="0" width="17" height="2" />
+      <rect x="10" y="4" width="17" height="2" />
+      <rect x="10" y="8" width="17" height="2" />
+      {/* full-width stripes below the canton */}
+      <rect x="0" y="12" width="27" height="2" />
+      <rect x="0" y="16" width="27" height="2" />
+    </svg>
+  );
+}

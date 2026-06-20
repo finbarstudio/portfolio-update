@@ -3855,3 +3855,44 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   text-transform: uppercase;
 }
 .wc-kick { display: flex; flex-direction: column; gap: 0; align-items: flex-start; }
+
+/* World Cup — top scorer + starting XI pitch */
+.wc-scorer {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(1.3rem, 4vw, 2.2rem);
+  line-height: 1;
+}
+.wc-next-match { display: flex; align-items: center; gap: 0.4em; flex-wrap: wrap; }
+.wc-pitch {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 68 / 105;
+  margin-top: 0.5rem;
+}
+.wc-pitch-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wc-player {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  pointer-events: none;
+}
+.wc-player-icon {
+  font-family: var(--font-dingbat), var(--font-mono);
+  color: var(--pink);
+  font-size: clamp(17px, 4.8vw, 28px);
+  line-height: 1;
+}
+.wc-player-name {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+}

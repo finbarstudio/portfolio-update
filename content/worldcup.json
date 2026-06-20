@@ -1,0 +1,36 @@
+{
+  "_note": "EDITABLE. Regenerate with `python scripts/fetch_worldcup.py` (soccerData/FBref). Static site, so this is read at build time — values are placeholders until the script is run. kickoff is a UTC instant.",
+  "competition": "FIFA World Cup 2026",
+  "group": "Group K",
+  "position": 1,
+  "played": 2,
+  "won": 1,
+  "drawn": 1,
+  "lost": 0,
+  "points": 4,
+  "goalDiff": "+2",
+  "topScorer": { "name": "Harry Kane", "goals": 3 },
+  "recent": [
+    { "date": "12 Jun", "opponent": "Serbia", "score": "2–0", "result": "W" },
+    { "date": "18 Jun", "opponent": "Senegal", "score": "1–1", "result": "D" }
+  ],
+  "next": {
+    "opponent": "Greece",
+    "venue": "MetLife Stadium, New Jersey",
+    "kickoff": "2026-06-24T19:00:00Z"
+  },
+  "formation": "4-3-3",
+  "lineup": [
+    { "name": "Pickford", "x": 50, "y": 92 },
+    { "name": "Walker", "x": 16, "y": 72 },
+    { "name": "Stones", "x": 38, "y": 74 },
+    { "name": "Guéhi", "x": 62, "y": 74 },
+    { "name": "Lewis", "x": 84, "y": 72 },
+    { "name": "Rice", "x": 30, "y": 52 },
+    { "name": "Bellingham", "x": 50, "y": 50 },
+    { "name": "Foden", "x": 70, "y": 52 },
+    { "name": "Saka", "x": 22, "y": 26 },
+    { "name": "Kane", "x": 50, "y": 22 },
+    { "name": "Gordon", "x": 78, "y": 26 }
+  ]
+}
