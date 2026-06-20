@@ -1,35 +1,35 @@
 import { ImageResponse } from "next/og";
-import { STAR_POINTS } from "@/components/brand-star";
+import { ASTERISK_POINTS } from "@/components/brand-asterisk";
 
 /**
  * Site-wide social share card (Open Graph + Twitter).
  *
  * Next.js auto-emits this as the `og:image` / `twitter:image` for every route
- * that doesn't set its own (home, about, contact). Case studies override it
- * with their hero image in `generateMetadata`. Generated once at build time as
- * a static 1200×630 PNG — Swiss/type-driven to match the site itself.
+ * that doesn't set its own (home, about). Case studies override it with their
+ * hero image in `generateMetadata`. Generated at build time as a 1200×630 PNG —
+ * Swiss/type-driven to match the site, on the cream brand ground.
  *
- * Note: the brand star is drawn as an inline SVG polygon (not the ✶ glyph)
- * because next/og's bundled font has no glyph for U+2726. It's drawn as a SOLID
- * six-pointed star to match the filled ✶ in the site wordmark.
+ * The brand asterisk is drawn as an inline SVG polygon (next/og's bundled font
+ * has no glyph for it), matching the mark in the site wordmark.
  */
 
 export const alt =
-  "finbar✶studio, Brisbane graphic designer. Brand identity, editorial, web and motion.";
+  "finbar✶studio — Brisbane graphic & web design. Brand identity, editorial, web and motion.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Brand tokens (kept in sync with app/globals.css).
-const INK = "#141414";
-const INK_SOFT = "#6B6B6B";
-const PINK = "#FF1F8F";
+// Brand tokens (kept in sync with app/globals.css @theme).
+const BG = "#F6EFE1";
+const INK = "#211E1A";
+const INK_SOFT = "#6F6A60";
+const PINK = "#E8718B";
 
-// Solid six-pointed star (U+2726 ✶), shared with the favicon/loader so the
-// mark is identical everywhere. See @/components/brand-star.
-function Star({ size: s, color = PINK }: { size: number; color?: string }) {
+// The brand asterisk, shared with the favicon/app icons so the mark is identical
+// everywhere. See @/components/brand-asterisk.
+function Mark({ size: s, color = PINK }: { size: number; color?: string }) {
   return (
     <svg width={s} height={s} viewBox="0 0 100 100">
-      <polygon points={STAR_POINTS} fill={color} />
+      <polygon points={ASTERISK_POINTS} fill={color} />
     </svg>
   );
 }
@@ -41,7 +41,7 @@ export default function OpengraphImage() {
         style={{
           width: "100%",
           height: "100%",
-          background: "transparent",
+          background: BG,
           color: INK,
           display: "flex",
           flexDirection: "column",
@@ -62,7 +62,7 @@ export default function OpengraphImage() {
         >
           finbar
           <div style={{ display: "flex", margin: "0 4px" }}>
-            <Star size={26} />
+            <Mark size={24} />
           </div>
           studio
         </div>
@@ -73,16 +73,16 @@ export default function OpengraphImage() {
             style={{
               display: "flex",
               flexWrap: "wrap",
-              fontSize: 82,
+              fontSize: 80,
               fontWeight: 700,
               lineHeight: 1.04,
               letterSpacing: "-0.02em",
-              maxWidth: 1000,
+              maxWidth: 1040,
             }}
           >
             <span>Brisbane</span>
-            <span style={{ color: PINK, padding: "0 20px" }}>graphic</span>
-            <span>designer</span>
+            <span style={{ color: PINK, padding: "0 20px" }}>graphic&nbsp;&amp;&nbsp;web</span>
+            <span>design</span>
           </div>
           <div
             style={{
@@ -93,7 +93,7 @@ export default function OpengraphImage() {
               letterSpacing: "0.01em",
             }}
           >
-            Brand identity, editorial, web &amp; motion
+            Brand identity, websites, editorial &amp; motion
           </div>
         </div>
 

@@ -43,22 +43,26 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Finbar Studio | Brisbane Graphic Designer",
+    default: "Finbar Studio | Brisbane Graphic & Web Design",
     template: "%s | Finbar Studio",
   },
   description:
-    "Brisbane graphic designer working in brand identity, editorial, web and motion. See selected projects for businesses across Australia and the UK.",
+    "Brisbane graphic design and web design studio working in brand identity, websites, editorial and motion. Selected projects for businesses across Australia and the UK.",
   applicationName: "finbar✶studio",
   authors: [{ name: "Finbar Skitini", url: SITE_URL }],
   creator: "Finbar Skitini",
   publisher: "Finbar Skitini",
   keywords: [
+    "Brisbane web design",
+    "web design Brisbane",
+    "Brisbane web designer",
+    "website design Brisbane",
+    "Brisbane graphic design",
     "Brisbane graphic designer",
     "graphic designer Brisbane",
     "brand identity designer Brisbane",
     "logo designer Brisbane",
     "freelance graphic designer Brisbane",
-    "web designer Brisbane",
     "creative studio Brisbane",
     "editorial design",
     "motion graphics",
@@ -66,9 +70,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Studio | Brisbane Graphic Designer",
+    title: "Finbar Studio | Brisbane Graphic & Web Design",
     description:
-      "Brisbane graphic designer working in brand identity, editorial, web and motion for businesses across Australia and the UK.",
+      "Brisbane graphic design and web design studio working in brand identity, websites, editorial and motion for businesses across Australia and the UK.",
     url: SITE_URL,
     siteName: "finbar✶studio",
     locale: "en_AU",
@@ -76,9 +80,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Finbar Studio | Brisbane Graphic Designer",
+    title: "Finbar Studio | Brisbane Graphic & Web Design",
     description:
-      "Brisbane graphic designer working in brand identity, editorial, web and motion.",
+      "Brisbane graphic design and web design — brand identity, websites, editorial and motion.",
     creator: "@finbarstudio",
   },
   robots: {
@@ -199,6 +203,66 @@ const websiteJsonLd = {
   about: { "@id": PERSON_ID },
 };
 
+// The studio as a hireable service — anchors "Brisbane web design" / "Brisbane
+// graphic design" local intent. ProfessionalService (a LocalBusiness subtype)
+// with the area served + a catalogue of services, provided by the one Person.
+const serviceJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": `${SITE_URL}/#studio`,
+  name: "finbar✶studio",
+  alternateName: "Finbar Studio",
+  description:
+    "Brisbane graphic design and web design studio — brand identity, websites, editorial and motion for businesses across Australia and the UK.",
+  url: SITE_URL,
+  image: `${SITE_URL}/opengraph-image`,
+  email: "finbar@finbar.studio",
+  telephone: "+61412796630",
+  priceRange: "$$",
+  founder: { "@id": PERSON_ID },
+  provider: { "@id": PERSON_ID },
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Brisbane",
+    addressRegion: "QLD",
+    addressCountry: "AU",
+  },
+  areaServed: [
+    { "@type": "City", name: "Brisbane" },
+    { "@type": "State", name: "Queensland" },
+    { "@type": "Country", name: "Australia" },
+    { "@type": "Country", name: "United Kingdom" },
+  ],
+  knowsLanguage: ["en-AU", "en-GB"],
+  sameAs: [
+    "https://linkedin.com/in/finbarskitini",
+    "https://x.com/finbarstudio",
+    "https://instagram.com/finbar.studio",
+    "https://are.na/finbar-studio",
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Design services",
+    itemListElement: [
+      "Web Design",
+      "Website Design & Development",
+      "Graphic Design",
+      "Brand Identity & Logo Design",
+      "Editorial & Publication Design",
+      "Motion Graphics",
+      "Creative Direction",
+    ].map((name) => ({
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name,
+        areaServed: { "@type": "City", name: "Brisbane" },
+        provider: { "@id": PERSON_ID },
+      },
+    })),
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -226,6 +290,13 @@ export default function RootLayout({
           strategy="beforeInteractive"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+        <Script
+          id="ld-studio"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
         />
       </body>
     </html>

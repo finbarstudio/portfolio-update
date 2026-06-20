@@ -12,12 +12,12 @@ const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
   description:
-    "Finbar Skitini is a Brisbane graphic designer working in brand identity, editorial, web and motion for businesses across Australia and the UK.",
+    "Finbar Skitini is a Brisbane graphic designer and web designer working in brand identity, websites, editorial and motion for businesses across Australia and the UK.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Studio | Brisbane Graphic Designer",
+    title: "Finbar Studio | Brisbane Graphic & Web Design",
     description:
-      "Independent design studio in Brisbane. Brand identity, editorial, web and motion. Available for select freelance projects and permanent roles.",
+      "Independent graphic design and web design studio in Brisbane. Brand identity, websites, editorial and motion. Available for select freelance projects and permanent roles.",
     url: SITE_URL,
     type: "website",
   },
@@ -32,9 +32,9 @@ function HomeJsonLd() {
     "@type": "WebPage",
     "@id": `${SITE_URL}/#webpage`,
     url: SITE_URL,
-    name: "Finbar Studio, Brisbane Graphic Designer",
+    name: "Finbar Studio, Brisbane Graphic & Web Design",
     description:
-      "Independent design studio in Brisbane working in brand identity, editorial, web and motion.",
+      "Independent graphic design and web design studio in Brisbane working in brand identity, websites, editorial and motion.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#person` },
     primaryImageOfPage: `${SITE_URL}/opengraph-image`,
@@ -122,6 +122,12 @@ export default function HomePage() {
   return (
     <>
       <HomeJsonLd />
+      {/* Single page H1 — the design expresses the brand as the FINBARSTUDIO
+          wordmark, so the semantic H1 is visually hidden but carries the key
+          phrase for search + screen readers. */}
+      <h1 className="sr-only">
+        finbar✶studio — Brisbane graphic design &amp; web design studio
+      </h1>
       <HomeIntro />
       <Disciplines />
       {/* Past this point the auto-hidden nav slides in (see LayoutShell). */}
