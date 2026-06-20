@@ -95,13 +95,13 @@ function SelectedWork() {
 /* ─── What I do: category names as big inline pill-bubbles ──────
    Same size/layout as the disciplines wall (.home-disc), but each word set in a
    nav-style bubble, wrapping inline like a paragraph. */
-const CAP_PILLS = [
-  { name: "Brand identity", filter: "brand" },
-  { name: "Editorial & print", filter: "editorial" },
-  { name: "Web & UI design", filter: "web" },
-  { name: "Creative direction", filter: "art" },
-  { name: "Motion graphics", filter: "motion" },
-  { name: "Social campaigns", filter: "motion" },
+const CAP_PILLS: { name: string; href: string }[] = [
+  { name: "Graphic design", href: "/graphic-design" },
+  { name: "Brand identity", href: "/work?filter=brand" },
+  { name: "Editorial & print", href: "/work?filter=editorial" },
+  { name: "Web design", href: "/web-design" },
+  { name: "Creative direction", href: "/work?filter=art" },
+  { name: "Motion graphics", href: "/work?filter=motion" },
 ];
 
 function Capabilities() {
@@ -109,7 +109,7 @@ function Capabilities() {
     <section className="home-disciplines px-5 md:px-10" aria-label="Services">
       <div className="home-disc home-cap-wrap">
         {CAP_PILLS.map((c) => (
-          <Link key={c.name} href={`/work?filter=${c.filter}`} className="home-cap-pill">
+          <Link key={c.name} href={c.href} className="home-cap-pill">
             {c.name}
           </Link>
         ))}
