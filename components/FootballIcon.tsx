@@ -1,6 +1,6 @@
 /**
- * FootballIcon — a minimal soccer-ball mark (circle + centre pentagon + seams),
- * drawn in currentColor so it adapts to context (the nav bubble, headings, etc.).
+ * FootballIcon — tabler "ball-football" (stroke, currentColor) so it adapts to
+ * context (nav tab, headings, etc.).
  */
 export default function FootballIcon({ className }: { className?: string }) {
   return (
@@ -12,13 +12,13 @@ export default function FootballIcon({ className }: { className?: string }) {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
-      strokeLinejoin="round"
       strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
-      <circle cx="12" cy="12" r="9" />
-      <polygon points="12,7.4 15.5,9.9 14.2,14.1 9.8,14.1 8.5,9.9" fill="currentColor" stroke="none" />
-      <path d="M12 7.4V3M15.5 9.9L20.7 8.3M14.2 14.1L17.6 18.6M9.8 14.1L6.4 18.6M8.5 9.9L3.3 8.3" />
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+      <path d="M12 7l4.76 3.45l-1.76 5.55h-6l-1.76 -5.55l4.76 -3.45" />
+      <path d="M12 7v-4m3 13l2.5 3m-.74 -8.55l3.74 -1.45m-11.44 7.05l-2.56 2.95m.74 -8.55l-3.74 -1.45" />
     </svg>
   );
 }

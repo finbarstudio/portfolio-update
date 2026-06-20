@@ -5,5 +5,5 @@
  */
 export default function CountryFlag({ code }: { code: string }) {
   // eslint-disable-next-line @next/next/no-img-element
-  return <img className="wc-flag-img" src={`/flags/${code.toLowerCase()}.svg`} alt={code} width={21} height={14} />;
+  return <img className="wc-flag-img wc-brand-tint" src={`/flags/${code.toLowerCase()}.svg`} alt={code} width={21} height={14} />;
 }

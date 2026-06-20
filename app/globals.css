@@ -3889,14 +3889,18 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .wc-next-match { display: flex; align-items: center; gap: 0.4em; flex-wrap: wrap; }
 .wc-comp { display: inline-flex; align-items: center; gap: 0.5em; }
 .wc-comp-badge { width: 1.8em; height: 1.8em; object-fit: contain; flex: 0 0 auto; }
-/* Colour country flags (WC page only — the footer keeps its pink line flags). */
+/* Brand pink-tint for the flags + badges (monochrome toward the site pink). It's
+   a tint, not a redraw — detailed crests can't become footer-style line-art. */
+.wc-brand-tint {
+  filter: grayscale(1) brightness(0.95) sepia(1) hue-rotate(295deg) saturate(2.6);
+}
+/* Country flags (WC page only — the footer keeps its pink line flags). */
 .wc-flag-img {
   height: 0.85em;
   width: auto;
   display: inline-block;
   vertical-align: -0.08em;
   border-radius: 1.5px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
   flex: 0 0 auto;
 }
 /* Club badge beside each player in the XI. */
