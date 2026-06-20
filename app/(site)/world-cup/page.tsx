@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import StartingEleven from "@/components/StartingEleven";
 import EnglandHero from "@/components/EnglandHero";
+import LiveMatch from "@/components/LiveMatch";
 import Reveal from "@/components/Reveal";
 import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
@@ -17,12 +18,6 @@ function fmt(iso: string, tz: string) {
   const day = new Intl.DateTimeFormat("en-GB", { timeZone: tz, weekday: "short", day: "numeric", month: "short" }).format(d);
   const time = new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
   return `${day} · ${time}`.toUpperCase();
-}
-
-/** Full match date (London), e.g. "TUESDAY 23 JUNE". */
-function matchDate(iso: string) {
-  return new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", weekday: "long", day: "numeric", month: "long" })
-    .format(new Date(iso)).toUpperCase();
 }
 
 /** Short kickoff time (London) for upcoming fixtures in the table. */
@@ -53,6 +48,23 @@ export default function WorldCupPage() {
       {/* ── Hero (full-bleed ENGLAND wordmark) ───────────────────────── */}
       <section className="wc-hero" aria-label="England">
         <EnglandHero />
+      </section>
+
+      {/* ── Two-up: England's next match · live game (or next up) ─────── */}
+      <section className="wc-fixtures-2col" aria-label="Next match and live game">
+        <div className="wc-fix-card">
+          <p className="mono-label text-ink-soft">England · Next match</p>
+          <p className="wc-fix-teams">
+            <span className="wc-fix-side"><CountryFlag code="ENG" /> England</span>
+            <span className="text-ink-soft wc-fix-vs">vs</span>
+            <span className="wc-fix-side">{k.opponent} <CountryFlag code={k.code} /></span>
+          </p>
+          <div className="wc-fix-times">
+            <div className="wc-kick"><span className="sf-label">ENG/LON</span><span className="sf-value tabular-nums">{fmt(k.kickoff, "Europe/London")}</span></div>
+            <div className="wc-kick"><span className="sf-label">AUS/BNE</span><span className="sf-value tabular-nums">{fmt(k.kickoff, "Australia/Brisbane")}</span></div>
+          </div>
+        </div>
+        <LiveMatch fallback={{ opponent: k.opponent, code: k.code, kickoff: k.kickoff }} />
       </section>
 
       {/* ── Sticky XI + squad (left) · scrolling detail (right) ───────── */}
@@ -113,27 +125,6 @@ export default function WorldCupPage() {
                 ))}
               </tbody>
             </table>
-          </Reveal>
-
-          {/* Next match — kept high on the page, right under the table */}
-          <Reveal as="section" className="wc-block" aria-label="Next match">
-            <p className="mono-label text-ink-soft mb-4">Next match</p>
-            <p className="wc-next-match">
-              <span className="wc-next-team"><CountryFlag code="ENG" /> England</span>
-              {" "}<span className="text-ink-soft">vs</span>{" "}
-              <span className="wc-next-team">{k.opponent} <CountryFlag code={k.code} /></span>
-            </p>
-            <p className="wc-venue mono-label text-ink-soft">{matchDate(k.kickoff)}</p>
-            <div className="wc-kickoffs">
-              <div className="wc-kick">
-                <span className="sf-label">ENG/LON</span>
-                <span className="sf-value tabular-nums">{fmt(k.kickoff, "Europe/London")}</span>
-              </div>
-              <div className="wc-kick">
-                <span className="sf-label">AUS/BNE</span>
-                <span className="sf-value tabular-nums">{fmt(k.kickoff, "Australia/Brisbane")}</span>
-              </div>
-            </div>
           </Reveal>
 
           {/* Golden boot */}

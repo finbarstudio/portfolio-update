@@ -3901,6 +3901,51 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   .wc-stgeorge rect, .wc-stgeorge line { animation: none; stroke-dashoffset: 0; }
 }
 
+/* Two-up fixtures band under the hero: England's next match + the live/next
+   game. Stacks on mobile. */
+.wc-fixtures-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(16px, 2vw, 28px);
+  margin-bottom: clamp(40px, 7vh, 88px);
+}
+@media (min-width: 768px) { .wc-fixtures-2col { grid-template-columns: 1fr 1fr; } }
+.wc-fix-card {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: clamp(18px, 2.4vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.wc-fix-card.is-live { border-color: var(--pink); }
+.wc-live-label { color: var(--pink); }
+.wc-fix-teams {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: clamp(1.3rem, 2.6vw, 2rem);
+  line-height: 1.05;
+}
+.wc-fix-side { display: inline-flex; align-items: center; gap: 0.35em; white-space: nowrap; }
+.wc-fix-vs { font-weight: 400; font-size: 0.7em; }
+.wc-fix-score { margin: 0 0.1em; }
+.wc-fix-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2.5rem;
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 /* Split: sticky probable XI + squad (left) while the detail column scrolls
    (right). The XI is top-aligned so its label lines up with the group table. */
 .wc-split {

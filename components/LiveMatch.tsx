@@ -1,0 +1,98 @@
+"use client";
+
+/**
+ * LiveMatch — the right column of the fixtures band. Polls /api/wc-live every 45s.
+ * Shows an in-play match with its live score if one is running; otherwise the
+ * next scheduled World Cup match; otherwise falls back to England's next fixture
+ * (passed in from the static data). Kickoff shown in London and Brisbane time.
+ */
+
+import { useEffect, useState } from "react";
+
+type Team = { name: string; tla: string; crest: string };
+type Match = { id: number; utcDate: string; status: string; home: Team; away: Team; score: { home: number | null; away: number | null } };
+type Feed = { ok: boolean; live: Match[]; next: Match | null };
+
+type Fallback = { opponent: string; code: string; kickoff: string };
+
+function times(iso: string) {
+  const d = new Date(iso);
+  const f = (tz: string) =>
+    new Intl.DateTimeFormat("en-GB", { timeZone: tz, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false })
+      .format(d).toUpperCase();
+  return { lon: f("Europe/London"), bne: f("Australia/Brisbane") };
+}
+
+function Crest({ url, alt }: { url: string; alt: string }) {
+  if (!url) return null;
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img className="wc-flag-img wc-brand-tint" src={url} alt={alt} width={22} height={15} />;
+}
+
+export default function LiveMatch({ fallback }: { fallback: Fallback }) {
+  const [feed, setFeed] = useState<Feed | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      try {
+        const r = await fetch("/api/wc-live", { cache: "no-store" });
+        const j = (await r.json()) as Feed;
+        if (alive) setFeed(j);
+      } catch { /* keep last */ }
+    };
+    load();
+    const id = setInterval(load, 45000);
+    return () => { alive = false; clearInterval(id); };
+  }, []);
+
+  const liveMatch = feed?.live?.[0];
+  const nextMatch = feed?.next;
+
+  // 1) A live game with score.
+  if (liveMatch) {
+    return (
+      <div className="wc-fix-card is-live">
+        <p className="mono-label wc-live-label">● Live now</p>
+        <p className="wc-fix-teams">
+          <span className="wc-fix-side"><Crest url={liveMatch.home.crest} alt={liveMatch.home.name} /> {liveMatch.home.name}</span>
+          <span className="wc-fix-score text-pink tabular-nums">{liveMatch.score.home ?? 0}–{liveMatch.score.away ?? 0}</span>
+          <span className="wc-fix-side">{liveMatch.away.name} <Crest url={liveMatch.away.crest} alt={liveMatch.away.name} /></span>
+        </p>
+        <p className="wc-venue mono-label text-ink-soft">{liveMatch.status === "PAUSED" ? "Half time" : "In play"}</p>
+      </div>
+    );
+  }
+
+  // 2) Next World Cup match (any nations).
+  if (nextMatch) {
+    const t = times(nextMatch.utcDate);
+    return (
+      <div className="wc-fix-card">
+        <p className="mono-label text-ink-soft">No game live · Next up</p>
+        <p className="wc-fix-teams">
+          <span className="wc-fix-side"><Crest url={nextMatch.home.crest} alt={nextMatch.home.name} /> {nextMatch.home.name}</span>
+          <span className="text-ink-soft wc-fix-vs">vs</span>
+          <span className="wc-fix-side">{nextMatch.away.name} <Crest url={nextMatch.away.crest} alt={nextMatch.away.name} /></span>
+        </p>
+        <div className="wc-fix-times">
+          <div className="wc-kick"><span className="sf-label">ENG/LON</span><span className="sf-value tabular-nums">{t.lon}</span></div>
+          <div className="wc-kick"><span className="sf-label">AUS/BNE</span><span className="sf-value tabular-nums">{t.bne}</span></div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3) Fallback: England's next fixture from the static data.
+  const t = times(fallback.kickoff);
+  return (
+    <div className="wc-fix-card">
+      <p className="mono-label text-ink-soft">No game live · Next up</p>
+      <p className="wc-fix-teams">England <span className="text-ink-soft wc-fix-vs">vs</span> {fallback.opponent}</p>
+      <div className="wc-fix-times">
+        <div className="wc-kick"><span className="sf-label">ENG/LON</span><span className="sf-value tabular-nums">{t.lon}</span></div>
+        <div className="wc-kick"><span className="sf-label">AUS/BNE</span><span className="sf-value tabular-nums">{t.bne}</span></div>
+      </div>
+    </div>
+  );
+}
