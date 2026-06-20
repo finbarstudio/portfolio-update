@@ -93,8 +93,8 @@ export default function WorldCupPage() {
         {/* Scrolling column */}
         <div className="wc-split-scroll">
           {/* Group table — live from FotMob, static fallback */}
-          <Reveal as="section" className="wc-block" aria-label="Group table">
-            <p className="mono-label text-ink-soft mb-4">{wc.group} table</p>
+          <Reveal as="section" className="wc-block" aria-label="Group tables">
+            <p className="mono-label text-ink-soft mb-4">Group tables</p>
             <GroupTable />
           </Reveal>
 

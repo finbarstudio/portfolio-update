@@ -4168,6 +4168,18 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding: 0 0.3em;
   line-height: 1.4;
 }
+/* Group tabs above the table — compact pills, one per group. */
+.wc-grp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+.wc-grp-tabs .tag {
+  min-width: 2.2em;
+  justify-content: center;
+  cursor: pointer;
+}
 .wc-table {
   width: 100%;
   border-collapse: collapse;

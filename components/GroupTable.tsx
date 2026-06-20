@@ -1,45 +1,47 @@
 "use client";
 
 /**
- * GroupTable — England's World Cup group standings. Fetches the live table from
- * /api/wc-table (FotMob) on mount and refreshes every 60s; falls back to the
- * static table in worldcup.json if the feed is unavailable. Markup matches the
- * rest of the page: England's group teams keep their pink crest, anything else
- * uses the FotMob badge (tinted).
+ * GroupTable — World Cup group standings with a tab per group. Fetches all
+ * groups live from /api/wc-table (FotMob), defaulting to England's group, and
+ * refreshes every 60s. Falls back to England's static group from worldcup.json
+ * when the feed is unavailable (a single tab). Team crests use the FotMob badge
+ * (tinted) live, the pink crest for the static fallback.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
 
-type LiveRow = { name: string; id: number; played: number; wins: number; draws: number; losses: number; gd: number; pts: number };
-type Row = { name: string; code?: string; badge?: string; p: number; w: number; d: number; l: number; gd: string; pts: number; england: boolean };
+type Team = { name: string; id?: number; code?: string; p: number; w: number; d: number; l: number; gd: string; pts: number; england: boolean };
+type Group = { letter: string; teams: Team[] };
 
-const NAME_TO_CODE: Record<string, string> = { England: "ENG", Ghana: "GHA", Panama: "PAN", Croatia: "CRO" };
 const badge = (id: number) => `https://images.fotmob.com/image_resources/logo/teamlogo/${id}.png`;
 const gdStr = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
-const STATIC: Row[] = (wc.table as { team: string; code: string; p: number; w: number; d: number; l: number; gd: string; pts: number; england?: boolean }[])
-  .map((t) => ({ name: t.team, code: t.code, p: t.p, w: t.w, d: t.d, l: t.l, gd: t.gd, pts: t.pts, england: !!t.england }));
+// Fallback: England's group only (single tab), with pink crests.
+const STATIC_GROUPS: Group[] = [{
+  letter: (wc.group as string).replace(/group/i, "").trim() || "L",
+  teams: (wc.table as { team: string; code: string; p: number; w: number; d: number; l: number; gd: string; pts: number; england?: boolean }[])
+    .map((t) => ({ name: t.team, code: t.code, p: t.p, w: t.w, d: t.d, l: t.l, gd: t.gd, pts: t.pts, england: !!t.england })),
+}];
 
 export default function GroupTable() {
-  const [rows, setRows] = useState<Row[]>(STATIC);
+  const [groups, setGroups] = useState<Group[]>(STATIC_GROUPS);
+  const [active, setActive] = useState(0);
+  const touched = useRef(false);
 
   useEffect(() => {
     let alive = true;
     const load = async () => {
       try {
         const r = await fetch("/api/wc-table", { cache: "no-store" });
-        const j = (await r.json()) as { ok: boolean; rows: LiveRow[] };
-        if (alive && j.ok && j.rows.length) {
-          setRows(j.rows.map((x) => ({
-            name: x.name,
-            code: NAME_TO_CODE[x.name],
-            badge: badge(x.id),
-            p: x.played, w: x.wins, d: x.draws, l: x.losses,
-            gd: gdStr(x.gd), pts: x.pts,
-            england: x.name === "England",
+        const j = (await r.json()) as { ok: boolean; defaultIndex: number; groups: { letter: string; teams: { name: string; id: number; p: number; w: number; d: number; l: number; gd: number; pts: number }[] }[] };
+        if (alive && j.ok && j.groups.length) {
+          setGroups(j.groups.map((g) => ({
+            letter: g.letter,
+            teams: g.teams.map((t) => ({ name: t.name, id: t.id, p: t.p, w: t.w, d: t.d, l: t.l, gd: gdStr(t.gd), pts: t.pts, england: t.name === "England" })),
           })));
+          if (!touched.current) setActive(j.defaultIndex);
         }
       } catch { /* keep current */ }
     };
@@ -48,35 +50,55 @@ export default function GroupTable() {
     return () => { alive = false; clearInterval(id); };
   }, []);
 
+  const group = groups[Math.min(active, groups.length - 1)];
+
   return (
-    <table className="wc-table">
-      <thead>
-        <tr>
-          <th className="wc-th-team">Team</th>
-          <th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((t, i) => (
-          <tr key={t.name} className={t.england ? "is-england" : ""}>
-            <td className="wc-td-team">
-              <span className="wc-pos">{i + 1}</span>
-              <span className="wc-flag">
-                {t.code ? (
-                  <CountryFlag code={t.code} />
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img className="wc-flag-img wc-brand-tint" src={t.badge} alt={t.name} width={21} height={14} />
-                )}
-              </span>
-              {t.name}
-            </td>
-            <td>{t.p}</td><td>{t.w}</td><td>{t.d}</td><td>{t.l}</td>
-            <td className="tabular-nums">{t.gd}</td>
-            <td className="wc-td-pts text-pink">{t.pts}</td>
+    <div>
+      {groups.length > 1 && (
+        <div className="wc-grp-tabs" role="tablist" aria-label="Groups">
+          {groups.map((g, i) => (
+            <button
+              key={g.letter}
+              type="button"
+              role="tab"
+              aria-selected={i === active}
+              className={`tag ${i === active ? "tag-pink" : "tag-default"}`}
+              onClick={() => { touched.current = true; setActive(i); }}
+            >
+              {g.letter}
+            </button>
+          ))}
+        </div>
+      )}
+      <table className="wc-table">
+        <thead>
+          <tr>
+            <th className="wc-th-team">Group {group.letter}</th>
+            <th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {group.teams.map((t, i) => (
+            <tr key={t.name} className={t.england ? "is-england" : ""}>
+              <td className="wc-td-team">
+                <span className="wc-pos">{i + 1}</span>
+                <span className="wc-flag">
+                  {t.code ? (
+                    <CountryFlag code={t.code} />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img className="wc-flag-img wc-brand-tint" src={badge(t.id!)} alt={t.name} width={21} height={14} />
+                  )}
+                </span>
+                {t.name}
+              </td>
+              <td>{t.p}</td><td>{t.w}</td><td>{t.d}</td><td>{t.l}</td>
+              <td className="tabular-nums">{t.gd}</td>
+              <td className="wc-td-pts text-pink">{t.pts}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

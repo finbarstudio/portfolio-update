@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
 /**
- * Live World Cup group table for England's group, from FotMob's public league
- * feed. Server-proxied (no CORS/key), cached 2 min since standings move slowly.
- * Returns the rows for whichever group contains England; {ok:false} on failure
- * so the UI falls back to the static table in worldcup.json.
+ * Live World Cup group tables (all groups) from FotMob's public league feed.
+ * Server-proxied (no CORS/key), cached 2 min. Returns every lettered group with
+ * its standings, and the index of the group containing England (the default
+ * tab). {ok:false} on failure so the UI falls back to the static table.
  */
 
 export const dynamic = "force-dynamic";
@@ -20,26 +20,22 @@ export async function GET() {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
       next: { revalidate: 120 },
     });
-    if (!res.ok) return NextResponse.json({ ok: false, rows: [] });
+    if (!res.ok) return NextResponse.json({ ok: false, groups: [], defaultIndex: 0 });
     const d = await res.json();
-    const groups: { table?: { all?: FmRow[] } }[] = d?.table?.[0]?.data?.tables ?? [];
-    let rows: FmRow[] = [];
-    for (const g of groups) {
-      const all = g?.table?.all ?? [];
-      if (all.some((r) => r.name === "England")) { rows = all; break; }
-    }
-    const out = rows.map((r) => ({
-      name: r.name,
-      id: r.id,
-      played: r.played,
-      wins: r.wins,
-      draws: r.draws,
-      losses: r.losses,
-      gd: r.goalConDiff,
-      pts: r.pts,
-    }));
-    return NextResponse.json({ ok: out.length > 0, rows: out });
+    const raw: { leagueName?: string; table?: { all?: FmRow[] } }[] = d?.table?.[0]?.data?.tables ?? [];
+
+    const groups = raw
+      .filter((g) => /^Grp\./i.test(g.leagueName ?? ""))
+      .map((g) => ({
+        letter: (g.leagueName ?? "").replace(/grp\.?/i, "").trim(),
+        teams: (g.table?.all ?? []).map((r) => ({
+          name: r.name, id: r.id, p: r.played, w: r.wins, d: r.draws, l: r.losses, gd: r.goalConDiff, pts: r.pts,
+        })),
+      }));
+
+    const defaultIndex = Math.max(0, groups.findIndex((g) => g.teams.some((t) => t.name === "England")));
+    return NextResponse.json({ ok: groups.length > 0, groups, defaultIndex });
   } catch {
-    return NextResponse.json({ ok: false, rows: [] });
+    return NextResponse.json({ ok: false, groups: [], defaultIndex: 0 });
   }
 }
