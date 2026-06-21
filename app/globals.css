@@ -4119,7 +4119,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .wc-pitch {
   position: relative;
   width: 100%;
-  max-width: 520px;
+  max-width: 720px;   /* fill the half-width column rather than cap at 520 */
   aspect-ratio: 68 / 56;   /* one half of the pitch */
   margin-top: 0.5rem;
 }
