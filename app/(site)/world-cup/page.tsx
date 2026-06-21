@@ -90,8 +90,14 @@ export default function WorldCupPage() {
           )}
         </aside>
 
-        {/* Scrolling column */}
+        {/* Right column — sticky alongside the XI */}
         <div className="wc-split-scroll">
+          {/* Results + upcoming — live from FotMob, static fallback */}
+          <Reveal as="section" className="wc-block" aria-label="Results and fixtures">
+            <p className="mono-label text-ink-soft mb-4">Results &amp; fixtures</p>
+            <FixturesList />
+          </Reveal>
+
           {/* Group table — live from FotMob, static fallback */}
           <Reveal as="section" className="wc-block" aria-label="Group tables">
             <p className="mono-label text-ink-soft mb-4">Group tables</p>
@@ -102,12 +108,6 @@ export default function WorldCupPage() {
           <Reveal as="section" className="wc-block" aria-label="Golden boot race">
             <p className="mono-label text-ink-soft mb-4">Golden boot watch</p>
             <GoldenBoot />
-          </Reveal>
-
-          {/* Results + upcoming — live from FotMob, static fallback */}
-          <Reveal as="section" className="wc-block" aria-label="Results and fixtures">
-            <p className="mono-label text-ink-soft mb-4">Results &amp; fixtures</p>
-            <FixturesList />
           </Reveal>
         </div>
       </div>

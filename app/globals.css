@@ -3955,7 +3955,10 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 @media (min-width: 1024px) {
   .wc-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
-  .wc-split-xi { position: sticky; top: clamp(20px, 4vh, 40px); align-self: start; }
+  /* Both columns stick: they travel down together and release at the bottom of
+     the taller (left) column. */
+  .wc-split-xi,
+  .wc-split-scroll { position: sticky; top: clamp(20px, 4vh, 40px); align-self: start; }
 }
 .wc-split-scroll { min-width: 0; }
 /* Three-lions crest as looping line-art above the probable XI. Each path's
