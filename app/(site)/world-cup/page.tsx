@@ -42,56 +42,56 @@ export default function WorldCupPage() {
         <EnglandHero />
       </section>
 
-      {/* ── Two-up: England's next match · live game (or next up) ─────── */}
-      <section className="wc-fixtures-2col" aria-label="Next match and live game">
-        <div className="wc-fix-card">
-          <p className="mono-label text-ink-soft">England · Next match</p>
-          <p className="wc-fix-teams">
-            <span className="wc-fix-side"><CountryFlag code="ENG" /> England</span>
-            <span className="text-ink-soft wc-fix-vs">vs</span>
-            <span className="wc-fix-side">{k.opponent} <CountryFlag code={k.code} /></span>
-          </p>
-          <div className="wc-fix-times">
-            <div className="wc-kick"><span className="sf-label">ENG/LON</span><span className="sf-value tabular-nums">{fmt(k.kickoff, "Europe/London")}</span></div>
-            <div className="wc-kick"><span className="sf-label">AUS/BNE</span><span className="sf-value tabular-nums">{fmt(k.kickoff, "Australia/Brisbane")}</span></div>
-          </div>
-        </div>
-        <LiveMatch fallback={{ opponent: k.opponent, code: k.code, kickoff: k.kickoff }} />
-      </section>
-
-      {/* ── Sticky XI + squad (left) · scrolling detail (right) ───────── */}
+      {/* ── Sticky split: England + XI/squad (left) · live + detail (right) ── */}
       <div className="wc-split">
-        {/* Sticky predicted XI + the rest of the squad */}
-        <aside className="wc-split-xi" aria-label="Probable eleven and squad">
-          <p className="mono-label text-ink-soft mb-1">Probable XI</p>
-          <p className="mono-label text-pink mb-5">{wc.formation}</p>
-          <StartingEleven />
-
-          {squadByPos.length > 0 && (
-            <div className="wc-squad">
-              <p className="mono-label text-ink-soft mb-4">The rest of the squad</p>
-              {squadByPos.map((g) => (
-                <div className="wc-squad-group" key={g.pos}>
-                  <p className="wc-squad-pos mono-label">{POS_LABEL[g.pos]}</p>
-                  <ul>
-                    {g.players.map((p) => (
-                      <li className="wc-squad-row" key={p.name}>
-                        <span className="wc-squad-num">{p.num}</span>
-                        <span className="wc-squad-name">{p.name}</span>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img className="wc-squad-badge" src={`/badges/${p.badge}.svg`} alt={p.club} width={16} height={16} />
-                        <span className="wc-squad-club">{p.club}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+        {/* Left: England's next match, then the probable XI + squad */}
+        <aside className="wc-split-xi" aria-label="England, probable eleven and squad">
+          <div className="wc-fix-card">
+            <p className="mono-label text-ink-soft">England · Next match</p>
+            <p className="wc-fix-teams">
+              <span className="wc-fix-side"><CountryFlag code="ENG" /> England</span>
+              <span className="text-ink-soft wc-fix-vs">vs</span>
+              <span className="wc-fix-side">{k.opponent} <CountryFlag code={k.code} /></span>
+            </p>
+            <div className="wc-fix-times">
+              <div className="wc-kick"><span className="sf-label">ENG/LON</span><span className="sf-value tabular-nums">{fmt(k.kickoff, "Europe/London")}</span></div>
+              <div className="wc-kick"><span className="sf-label">AUS/BNE</span><span className="sf-value tabular-nums">{fmt(k.kickoff, "Australia/Brisbane")}</span></div>
             </div>
-          )}
+          </div>
+
+          <div className="wc-block">
+            <p className="mono-label text-ink-soft mb-1">Probable XI</p>
+            <p className="mono-label text-pink mb-5">{wc.formation}</p>
+            <StartingEleven />
+
+            {squadByPos.length > 0 && (
+              <div className="wc-squad">
+                <p className="mono-label text-ink-soft mb-4">The rest of the squad</p>
+                {squadByPos.map((g) => (
+                  <div className="wc-squad-group" key={g.pos}>
+                    <p className="wc-squad-pos mono-label">{POS_LABEL[g.pos]}</p>
+                    <ul>
+                      {g.players.map((p) => (
+                        <li className="wc-squad-row" key={p.name}>
+                          <span className="wc-squad-num">{p.num}</span>
+                          <span className="wc-squad-name">{p.name}</span>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img className="wc-squad-badge" src={`/badges/${p.badge}.svg`} alt={p.club} width={16} height={16} />
+                          <span className="wc-squad-club">{p.club}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </aside>
 
-        {/* Right column — sticky alongside the XI */}
+        {/* Right: live game + today, then results, tables, golden boot */}
         <div className="wc-split-scroll">
+          <LiveMatch fallback={{ opponent: k.opponent, code: k.code, kickoff: k.kickoff }} />
+
           {/* Results + upcoming — live from FotMob, static fallback */}
           <Reveal as="section" className="wc-block" aria-label="Results and fixtures">
             <p className="mono-label text-ink-soft mb-4">Results &amp; fixtures</p>
