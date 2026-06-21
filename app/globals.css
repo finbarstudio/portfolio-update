@@ -3932,6 +3932,25 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   font-size: clamp(1.3rem, 2.6vw, 2rem);
   line-height: 1.05;
 }
+.wc-fix-col { display: flex; flex-direction: column; gap: clamp(14px, 1.8vw, 22px); }
+/* Brief list of today's WC games under the live/next card. */
+.wc-today { font-family: var(--font-mono); }
+.wc-today ul { display: flex; flex-direction: column; }
+.wc-today-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.42rem 0;
+  border-top: 1px solid var(--line);
+  font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.wc-today-mid { color: var(--ink-soft); padding: 0 0.15em; }
+.wc-today-meta { color: var(--ink-soft); font-size: 11px; flex: 0 0 auto; }
+.wc-today-row.is-live .wc-today-mid,
+.wc-today-row.is-live .wc-today-meta { color: var(--pink); }
 .wc-fix-side { display: inline-flex; align-items: center; gap: 0.35em; white-space: nowrap; }
 .wc-fix-vs { font-weight: 400; font-size: 0.7em; }
 .wc-fix-score { margin: 0 0.1em; }
