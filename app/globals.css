@@ -3824,7 +3824,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* ── World Cup page ───────────────────────────────────────────────── */
 /* Full-width page (padding only), so the content spans the viewport like the
    hero rather than capping at a column. */
-.wc-page { max-width: none; width: 100%; }
+.wc-page { max-width: none; width: 100%; --wc-split-gap: clamp(28px, 4vw, 64px); }
 .wc-block {
   margin-top: clamp(40px, 7vh, 88px);
   padding-top: clamp(20px, 3vh, 32px);
@@ -3906,10 +3906,12 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .wc-fixtures-2col {
   display: grid;
   grid-template-columns: 1fr;
-  gap: clamp(16px, 2vw, 28px);
+  gap: var(--wc-split-gap);
   margin-bottom: clamp(40px, 7vh, 88px);
 }
-@media (min-width: 768px) { .wc-fixtures-2col { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1024px) {
+  .wc-fixtures-2col { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+}
 .wc-fix-card {
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -3935,20 +3937,31 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .wc-fix-col { display: flex; flex-direction: column; gap: clamp(14px, 1.8vw, 22px); }
 /* Brief list of today's WC games under the live/next card. */
 .wc-today { font-family: var(--font-mono); }
-.wc-today ul { display: flex; flex-direction: column; }
+.wc-today ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+/* Same row token as the group table / golden boot: flush, bordered, same size. */
 .wc-today-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.42rem 0;
+  padding: 0.55rem 0;
   border-top: 1px solid var(--line);
-  font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+  font-size: clamp(0.85rem, 2.2vw, 1.05rem);
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
 .wc-today-mid { color: var(--ink-soft); padding: 0 0.15em; }
-.wc-today-meta { color: var(--ink-soft); font-size: 11px; flex: 0 0 auto; }
+.wc-today-meta {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05em;
+  color: var(--ink-soft);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
 .wc-today-row.is-live .wc-today-mid,
 .wc-today-row.is-live .wc-today-meta { color: var(--pink); }
 .wc-fix-side { display: inline-flex; align-items: center; gap: 0.35em; white-space: nowrap; }
@@ -3970,7 +3983,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .wc-split {
   display: grid;
   grid-template-columns: 1fr;
-  gap: clamp(40px, 5vw, 80px);
+  gap: var(--wc-split-gap);
 }
 @media (min-width: 1024px) {
   .wc-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }

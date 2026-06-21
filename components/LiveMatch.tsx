@@ -23,8 +23,8 @@ function times(iso: string) {
       .format(d).toUpperCase();
   return { lon: f("Europe/London"), bne: f("Australia/Brisbane") };
 }
-const shortTime = (iso: string) =>
-  new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
+const hhmm = (iso: string, tz: string) =>
+  new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
 
 function Crest({ url, alt }: { url: string; alt: string }) {
   if (!url) return null;
@@ -108,8 +108,17 @@ export default function LiveMatch({ fallback }: { fallback: Fallback }) {
                 <span className="wc-today-match tabular-nums">
                   {m.home} <span className="wc-today-mid">{m.score ? `${m.score.h}–${m.score.a}` : "v"}</span> {m.away}
                 </span>
-                <span className="wc-today-meta">
-                  {m.ongoing ? "LIVE" : m.finished ? "FT" : shortTime(m.utcTime)}
+                <span className="wc-today-meta tabular-nums">
+                  {m.ongoing ? (
+                    <span>LIVE</span>
+                  ) : m.finished ? (
+                    <span>FT</span>
+                  ) : (
+                    <>
+                      <span>LON {hhmm(m.utcTime, "Europe/London")}</span>
+                      <span>BNE {hhmm(m.utcTime, "Australia/Brisbane")}</span>
+                    </>
+                  )}
                 </span>
               </li>
             ))}
