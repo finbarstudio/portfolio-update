@@ -4402,8 +4402,9 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .contact-section { margin: 0.4rem 0 0; }
 /* Socials as pills (site tag token), not a table. */
 .contact-socials { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-/* Basic "say hi" form — pushed to the bottom of the drawer. */
-.contact-form { display: flex; flex-direction: column; gap: 0.6rem; margin-top: auto; }
+/* SAY HI title + form grouped and pushed to the bottom of the drawer. */
+.contact-bottom { display: flex; flex-direction: column; gap: 0.6rem; margin-top: auto; }
+.contact-form { display: flex; flex-direction: column; gap: 0.6rem; }
 .contact-input {
   width: 100%;
   padding: 0.7em 0.85em;

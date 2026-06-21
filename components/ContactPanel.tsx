@@ -102,9 +102,9 @@ export default function ContactPanel() {
           ))}
         </div>
 
-        <p className="contact-title contact-reveal" style={rv(3)}>Say hi</p>
-
-        <form className="contact-form contact-reveal" style={rv(4)} onSubmit={onSubmit}>
+        <div className="contact-bottom contact-reveal" style={rv(3)}>
+          <p className="contact-title">Say hi</p>
+          <form className="contact-form" onSubmit={onSubmit}>
           {status === "sent" ? (
             <p className="contact-sent">Thanks — I’ll be in touch.</p>
           ) : (
@@ -119,6 +119,7 @@ export default function ContactPanel() {
             </>
           )}
         </form>
+        </div>
       </aside>
     </div>
   );
