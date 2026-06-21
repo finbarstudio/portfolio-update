@@ -3754,7 +3754,7 @@ body:has(.sb-root) {
   background: none;
   cursor: pointer;
   font-family: var(--font-dingbat), system-ui, sans-serif;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1;
 }
 /* Per-icon optical tuning: the solid brand glyphs read heavier than the outline
