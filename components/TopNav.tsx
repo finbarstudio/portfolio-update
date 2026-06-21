@@ -100,10 +100,22 @@ export default function TopNav() {
       </nav>
 
       <div className="top-nav-social">
-        <a href="mailto:finbar@finbar.studio" aria-label="Email" title="Email" className="top-nav-social-item">
+        <a
+          href="mailto:finbar@finbar.studio"
+          aria-label="Contact"
+          title="Get in touch"
+          className="top-nav-social-item"
+          onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent("contact:open")); }}
+        >
           <MailIcon />
         </a>
-        <a href="tel:+61412796630" aria-label="Phone" title="Phone" className="top-nav-social-item">
+        <a
+          href="tel:+61412796630"
+          aria-label="Contact"
+          title="Get in touch"
+          className="top-nav-social-item"
+          onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent("contact:open")); }}
+        >
           <PhoneIcon />
         </a>
         {socials.map((s) => (

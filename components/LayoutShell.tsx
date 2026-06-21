@@ -11,6 +11,7 @@ import TopNav from "./TopNav";
 import NavLogo from "./NavLogo";
 import SmoothScroll from "./SmoothScroll";
 import SiteFooter from "./SiteFooter";
+import ContactPanel from "./ContactPanel";
 import "lenis/dist/lenis.css";
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
@@ -52,6 +53,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         {children}
         <SiteFooter />
       </main>
+      <ContactPanel />
     </>
   );
 }
