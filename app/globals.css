@@ -4334,7 +4334,11 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding: 0;
   background: color-mix(in srgb, var(--ink) 38%, transparent);
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
+  /* No delay. The backdrop covers ~70% of the viewport vs the drawer's ~30%,
+     so a linear sweep over a longer duration keeps its dark edge from racing
+     ahead — it reaches the drawer's seam just as the drawer finishes (0.9s),
+     then fills the last sliver (hidden behind the drawer) by 1.3s. */
+  transition: clip-path 1.3s linear;
   cursor: pointer;
 }
 .contact-panel.is-open .contact-backdrop { clip-path: inset(0 0 0 0); }
@@ -4399,19 +4403,21 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* Email + phone share one token (mono, regular weight) — like the footer. */
 /* Email + phone beside a 2×2 pill grid, socials pinned right. */
 .contact-details { display: flex; align-items: center; gap: 0.75rem; }
-.contact-primary { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; overflow: hidden; }
-.contact-primary .contact-link { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.contact-primary { display: flex; flex-direction: column; gap: 0.1rem; flex: 1 1 auto; min-width: 0; }
+.contact-primary .contact-link { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .contact-link {
   font-family: var(--font-mono);
-  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  font-size: clamp(0.74rem, 1.8vw, 0.84rem);
   font-weight: 400;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
   color: var(--pink);
 }
 .contact-link:hover { opacity: 0.7; }
 .contact-section { margin: 0.4rem 0 0; }
 /* Socials: 2×2 grid of pills, aligned right. */
-.contact-socials { display: grid; grid-template-columns: repeat(2, auto); gap: 0.3rem; justify-content: end; flex-shrink: 0; }
+/* Socials: pills packed tight (hug their text), wrapping right-aligned. */
+.contact-socials { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: flex-end; align-content: flex-start; flex: 0 0 auto; max-width: 150px; }
+.contact-socials .tag { padding: 0.4em 0.5em; white-space: nowrap; }
 /* SAY HI title + form grouped and pushed to the bottom of the drawer. */
 .contact-bottom { display: flex; flex-direction: column; gap: 0.6rem; margin-top: auto; }
 .contact-form { display: flex; flex-direction: column; gap: 0.6rem; }
