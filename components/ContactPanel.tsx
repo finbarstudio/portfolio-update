@@ -2,12 +2,13 @@
 
 /**
  * ContactPanel — right-side drawer opened by the nav's 🫂 button (it dispatches a
- * "contact:open" event). Holds the "hiring or project" line, email + phone (same
- * token), the socials as pills, and a basic "Say hi" form.
+ * "contact:open" event). The whole thing reveals as one sweep from the right: the
+ * cream drawer first, then the darker overlay across the rest of the page (a
+ * single clip-path wipe). Inside, each item mask-reveals with a stagger. Titles
+ * use the home hero's big display type. Basic "Say hi" form at the foot.
  *
- * Form delivery: set NEXT_PUBLIC_WEB3FORMS_KEY to a Web3Forms access key
- * (free, web3forms.com — it emails you each submission). Without it the form
- * falls back to opening a pre-filled email.
+ * Form delivery: set NEXT_PUBLIC_WEB3FORMS_KEY to a Web3Forms access key (free —
+ * it emails you each submission). Without it the form opens a pre-filled email.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -76,23 +77,24 @@ export default function ContactPanel() {
     }
   }, []);
 
+  const rv = (i: number) => ({ "--i": i } as React.CSSProperties);
+
   return (
     <div className={`contact-panel ${open ? "is-open" : ""}`} aria-hidden={!open}>
       <button className="contact-backdrop" aria-label="Close contact" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
       <aside className="contact-drawer" role="dialog" aria-modal="true" aria-label="Get in touch">
         <button ref={closeRef} className="contact-close" aria-label="Close" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)}>
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 5l14 14M19 5L5 19" /></svg>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 5l14 14M19 5L5 19" /></svg>
         </button>
 
-        <p className="mono-label text-ink-soft contact-eyebrow">Hiring or have a project?</p>
+        <h2 className="contact-title contact-reveal" style={rv(0)}>Hiring or have a project?</h2>
 
-        <div className="contact-primary">
+        <div className="contact-primary contact-reveal" style={rv(1)}>
           <a href={`mailto:${EMAIL}`} className="contact-link u-underline">{EMAIL}</a>
           <a href={`tel:${PHONE}`} className="contact-link u-underline tabular-nums">{PHONE_DISPLAY}</a>
         </div>
 
-        <p className="mono-label text-ink-soft contact-section">Elsewhere</p>
-        <div className="contact-socials">
+        <div className="contact-socials contact-reveal" style={rv(2)}>
           {SOCIALS.map((s) => (
             <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={open ? 0 : -1} className="tag tag-default">
               {s.label}
@@ -100,8 +102,9 @@ export default function ContactPanel() {
           ))}
         </div>
 
-        <form className="contact-form" onSubmit={onSubmit}>
-          <p className="mono-label text-ink-soft contact-section">Say hi</p>
+        <p className="contact-title contact-reveal" style={rv(3)}>Say hi</p>
+
+        <form className="contact-form contact-reveal" style={rv(4)} onSubmit={onSubmit}>
           {status === "sent" ? (
             <p className="contact-sent">Thanks — I’ll be in touch.</p>
           ) : (

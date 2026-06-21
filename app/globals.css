@@ -4316,59 +4316,78 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 
 /* ── Contact panel (right-side drawer) ────────────────────────────── */
-.contact-panel { position: fixed; inset: 0; z-index: 300; pointer-events: none; }
-.contact-panel.is-open { pointer-events: auto; }
+/* The whole panel reveals as ONE clip-path sweep from the right edge: the cream
+   drawer (right) appears first, then the darker overlay continues across the rest
+   of the page. */
+.contact-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.contact-panel.is-open { pointer-events: auto; clip-path: inset(0 0 0 0); }
 .contact-backdrop {
   position: absolute;
   inset: 0;
   border: 0;
   padding: 0;
-  background: color-mix(in srgb, var(--ink) 32%, transparent);
-  opacity: 0;
-  transition: opacity 0.35s ease;
+  background: color-mix(in srgb, var(--ink) 38%, transparent);
   cursor: pointer;
 }
-.contact-panel.is-open .contact-backdrop { opacity: 1; }
 .contact-drawer {
   position: absolute;
   top: 0;
   right: 0;
   height: 100%;
-  width: min(420px, 92vw);
+  width: min(440px, 92vw);
   background: var(--bg);
   color: var(--ink);
   border-left: 1px solid var(--line);
   box-shadow: -24px 0 70px rgba(0, 0, 0, 0.10);
-  transform: translateX(100%);
-  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  gap: clamp(18px, 2.6vh, 30px);
+  gap: clamp(16px, 2.4vh, 26px);
   padding: clamp(28px, 5vw, 48px);
   overflow-y: auto;
 }
-.contact-panel.is-open .contact-drawer { transform: translateX(0); }
-@media (prefers-reduced-motion: reduce) {
-  .contact-backdrop, .contact-drawer { transition: none; }
-}
+/* Bare, small close — no container. */
 .contact-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 2em;
-  height: 2em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--ink);
+  top: 18px;
+  right: 18px;
+  border: 0;
+  padding: 4px;
+  background: none;
+  color: var(--ink-soft);
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  line-height: 0;
+  transition: color var(--dur-fast) var(--ease);
 }
-.contact-close:hover { background: var(--ink); color: var(--bg); }
-.contact-eyebrow { margin: 0; padding-right: 2.5em; }
+.contact-close:hover { color: var(--pink); }
+/* Section titles in the home hero's big display type. */
+.contact-title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.02;
+  font-size: clamp(1.9rem, 5.2vw, 2.7rem);
+  color: var(--ink);
+  padding-right: 0.6em;
+}
+/* Each item mask-reveals (top-down wipe), staggered after the sweep. */
+.contact-reveal {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(0.28s + var(--i, 0) * 0.07s);
+}
+.contact-panel.is-open .contact-reveal { clip-path: inset(0 0 0 0); }
+@media (prefers-reduced-motion: reduce) {
+  .contact-panel, .contact-reveal { transition: none; }
+}
 /* Email + phone share one token (mono, regular weight) — like the footer. */
 .contact-primary { display: flex; flex-direction: column; gap: 0.35rem; }
 .contact-link {
