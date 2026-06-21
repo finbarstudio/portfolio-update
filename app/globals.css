@@ -4397,7 +4397,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   .contact-backdrop, .contact-drawer, .contact-reveal { transition: none; }
 }
 /* Email + phone share one token (mono, regular weight) — like the footer. */
-.contact-primary { display: flex; flex-direction: column; gap: 0.35rem; }
+.contact-primary { display: flex; flex-direction: column; gap: 0.1rem; }
 .contact-link {
   font-family: var(--font-mono);
   font-size: clamp(1rem, 2.4vw, 1.2rem);
