@@ -95,17 +95,18 @@ export default function ContactPanel() {
 
         <h2 className="contact-title contact-reveal" style={rv(0)}>Hiring or have a project?</h2>
 
-        <div className="contact-primary contact-reveal" style={rv(1)}>
-          <a href={`mailto:${EMAIL}`} className="contact-link u-underline">{EMAIL}</a>
-          <a href={`tel:${PHONE}`} className="contact-link u-underline tabular-nums">{PHONE_DISPLAY}</a>
-        </div>
-
-        <div className="contact-socials contact-reveal" style={rv(2)}>
-          {SOCIALS.map((s) => (
-            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={open ? 0 : -1} className="tag tag-default">
-              {s.label}
-            </a>
-          ))}
+        <div className="contact-details contact-reveal" style={rv(1)}>
+          <div className="contact-primary">
+            <a href={`mailto:${EMAIL}`} className="contact-link u-underline">{EMAIL}</a>
+            <a href={`tel:${PHONE}`} className="contact-link u-underline tabular-nums">{PHONE_DISPLAY}</a>
+          </div>
+          <div className="contact-socials">
+            {SOCIALS.map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={open ? 0 : -1} className="tag tag-default">
+                {s.label}
+              </a>
+            ))}
+          </div>
         </div>
 
         <div className="contact-bottom contact-reveal" style={rv(3)}>
