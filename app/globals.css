@@ -4324,18 +4324,21 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   inset: 0;
   z-index: 300;
   pointer-events: none;
-  clip-path: inset(0 0 0 100%);
-  transition: clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.contact-panel.is-open { pointer-events: auto; clip-path: inset(0 0 0 0); }
+.contact-panel.is-open { pointer-events: auto; }
+/* Backdrop wipes in from the left to meet the drawer in the middle. */
 .contact-backdrop {
   position: absolute;
   inset: 0;
   border: 0;
   padding: 0;
   background: color-mix(in srgb, var(--ink) 38%, transparent);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
+.contact-panel.is-open .contact-backdrop { clip-path: inset(0 0 0 0); }
+/* Drawer wipes in from the right. */
 .contact-drawer {
   position: absolute;
   top: 0;
@@ -4351,7 +4354,10 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   gap: clamp(16px, 2.4vh, 26px);
   padding: clamp(28px, 5vw, 48px);
   overflow-y: auto;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.contact-panel.is-open .contact-drawer { clip-path: inset(0 0 0 0); }
 /* Bare, small close — no container. */
 .contact-close {
   position: absolute;
@@ -4388,7 +4394,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 .contact-panel.is-open .contact-reveal { clip-path: inset(0 0 0 0); }
 @media (prefers-reduced-motion: reduce) {
-  .contact-panel, .contact-reveal { transition: none; }
+  .contact-backdrop, .contact-drawer, .contact-reveal { transition: none; }
 }
 /* Email + phone share one token (mono, regular weight) — like the footer. */
 .contact-primary { display: flex; flex-direction: column; gap: 0.35rem; }
