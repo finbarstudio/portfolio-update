@@ -4334,7 +4334,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding: 0;
   background: color-mix(in srgb, var(--ink) 38%, transparent);
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: clip-path 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
   cursor: pointer;
 }
 .contact-panel.is-open .contact-backdrop { clip-path: inset(0 0 0 0); }
