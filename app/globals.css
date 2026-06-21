@@ -3754,7 +3754,7 @@ body:has(.sb-root) {
   background: none;
   cursor: pointer;
   font-family: var(--font-dingbat), system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
 }
 /* Per-icon optical tuning: the solid brand glyphs read heavier than the outline
@@ -4325,7 +4325,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   z-index: 300;
   pointer-events: none;
   clip-path: inset(0 0 0 100%);
-  transition: clip-path 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .contact-panel.is-open { pointer-events: auto; clip-path: inset(0 0 0 0); }
 .contact-backdrop {
@@ -4377,6 +4377,8 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   font-size: clamp(1.9rem, 5.2vw, 2.7rem);
   color: var(--ink);
   padding-right: 0.6em;
+  text-align: justify;
+  text-align-last: left;
 }
 /* Each item mask-reveals (top-down wipe), staggered after the sweep. */
 .contact-reveal {
@@ -4400,8 +4402,8 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .contact-section { margin: 0.4rem 0 0; }
 /* Socials as pills (site tag token), not a table. */
 .contact-socials { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-/* Basic "say hi" form. */
-.contact-form { display: flex; flex-direction: column; gap: 0.6rem; }
+/* Basic "say hi" form — pushed to the bottom of the drawer. */
+.contact-form { display: flex; flex-direction: column; gap: 0.6rem; margin-top: auto; }
 .contact-input {
   width: 100%;
   padding: 0.7em 0.85em;
