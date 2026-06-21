@@ -68,9 +68,15 @@ export default function ContactPanel() {
             name, email, message,
           }),
         });
-        setStatus(res.ok ? "sent" : "error");
-        if (res.ok) form.reset();
-      } catch { setStatus("error"); }
+        const json = await res.json().catch(() => ({}));
+        if (res.ok && json.success !== false) {
+          setStatus("sent");
+          form.reset();
+        } else {
+          console.error("Web3Forms error:", json);
+          setStatus("error");
+        }
+      } catch (err) { console.error("Web3Forms fetch error:", err); setStatus("error"); }
     } else {
       const body = `Hi Finbar,%0D%0A%0D%0A${encodeURIComponent(message)}%0D%0A%0D%0A${encodeURIComponent(name)}%0D%0A${encodeURIComponent(email)}`;
       window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(`Say hi from ${name || "the site"}`)}&body=${body}`;
