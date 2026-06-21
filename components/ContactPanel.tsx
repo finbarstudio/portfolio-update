@@ -1,15 +1,13 @@
 "use client";
 
 /**
- * ContactPanel — a right-side drawer opened by the nav's email/phone buttons
- * (they dispatch a "contact:open" event). Holds the "hiring or project" line,
- * email + phone, the socials, and a "Chat with me" bubble that launches the live
- * chat (Tawk.to) if configured, falling back to email otherwise.
+ * ContactPanel — right-side drawer opened by the nav's 🫂 button (it dispatches a
+ * "contact:open" event). Holds the "hiring or project" line, email + phone (same
+ * token), the socials as pills, and a basic "Say hi" form.
  *
- * Live chat: set NEXT_PUBLIC_TAWK_SRC to your Tawk.to embed URL
- * (https://embed.tawk.to/<propertyId>/<widgetId>). The Tawk app on your phone
- * then pushes a notification, and Tawk emails you on a new conversation. The
- * default Tawk launcher is hidden — this bubble opens the chat instead.
+ * Form delivery: set NEXT_PUBLIC_WEB3FORMS_KEY to a Web3Forms access key
+ * (free, web3forms.com — it emails you each submission). Without it the form
+ * falls back to opening a pre-filled email.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -17,39 +15,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const EMAIL = "finbar@finbar.studio";
 const PHONE = "+61412796630";
 const PHONE_DISPLAY = "+61 412 796 630";
-const TAWK_SRC = process.env.NEXT_PUBLIC_TAWK_SRC;
+const W3F_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY;
 
 const SOCIALS = [
-  { label: "Instagram", handle: "@finbar.studio", href: "https://instagram.com/finbar.studio" },
-  { label: "X", handle: "@finbarstudio", href: "https://x.com/finbarstudio" },
-  { label: "LinkedIn", handle: "finbarskitini", href: "https://linkedin.com/in/finbarskitini" },
-  { label: "Are.na", handle: "finbar-studio", href: "https://are.na/finbar-studio" },
+  { label: "Instagram", href: "https://instagram.com/finbar.studio" },
+  { label: "X", href: "https://x.com/finbarstudio" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/finbarskitini" },
+  { label: "Are.na", href: "https://are.na/finbar-studio" },
 ];
 
-type TawkApi = { maximize?: () => void; hideWidget?: () => void; onLoad?: () => void };
-declare global {
-  interface Window { Tawk_API?: TawkApi; Tawk_LoadStart?: Date; }
-}
-
-let tawkLoading = false;
-function ensureTawk(): boolean {
-  if (!TAWK_SRC) return false;
-  if (tawkLoading || document.getElementById("tawk-embed")) return true;
-  tawkLoading = true;
-  window.Tawk_API = window.Tawk_API || {};
-  window.Tawk_API.onLoad = () => { window.Tawk_API?.hideWidget?.(); };
-  const s = document.createElement("script");
-  s.id = "tawk-embed";
-  s.async = true;
-  s.src = TAWK_SRC;
-  s.charset = "UTF-8";
-  s.setAttribute("crossorigin", "*");
-  document.head.appendChild(s);
-  return true;
-}
+type Status = "idle" | "sending" | "sent" | "error";
 
 export default function ContactPanel() {
   const [open, setOpen] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -67,17 +46,33 @@ export default function ContactPanel() {
     return () => { window.removeEventListener("keydown", onKey); window.__lenis?.start(); };
   }, [open]);
 
-  const openChat = useCallback(() => {
-    if (ensureTawk()) {
-      // Tawk may still be loading; retry maximize briefly.
-      let n = 0;
-      const tick = () => {
-        if (window.Tawk_API?.maximize) { window.Tawk_API.maximize(); }
-        else if (n++ < 20) setTimeout(tick, 150);
-      };
-      tick();
+  const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const name = String(data.get("name") || "");
+    const email = String(data.get("email") || "");
+    const message = String(data.get("message") || "");
+
+    if (W3F_KEY) {
+      setStatus("sending");
+      try {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({
+            access_key: W3F_KEY,
+            subject: `Say hi from ${name || "the site"}`,
+            from_name: name || "finbar.studio",
+            name, email, message,
+          }),
+        });
+        setStatus(res.ok ? "sent" : "error");
+        if (res.ok) form.reset();
+      } catch { setStatus("error"); }
     } else {
-      window.location.href = `mailto:${EMAIL}?subject=Hello%20Finbar`;
+      const body = `Hi Finbar,%0D%0A%0D%0A${encodeURIComponent(message)}%0D%0A%0D%0A${encodeURIComponent(name)}%0D%0A${encodeURIComponent(email)}`;
+      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(`Say hi from ${name || "the site"}`)}&body=${body}`;
     }
   }, []);
 
@@ -92,26 +87,35 @@ export default function ContactPanel() {
         <p className="mono-label text-ink-soft contact-eyebrow">Hiring or have a project?</p>
 
         <div className="contact-primary">
-          <a href={`mailto:${EMAIL}`} className="contact-email">{EMAIL}</a>
-          <a href={`tel:${PHONE}`} className="contact-phone tabular-nums">{PHONE_DISPLAY}</a>
+          <a href={`mailto:${EMAIL}`} className="contact-link u-underline">{EMAIL}</a>
+          <a href={`tel:${PHONE}`} className="contact-link u-underline tabular-nums">{PHONE_DISPLAY}</a>
         </div>
 
         <p className="mono-label text-ink-soft contact-section">Elsewhere</p>
-        <ul className="contact-socials">
+        <div className="contact-socials">
           {SOCIALS.map((s) => (
-            <li key={s.label}>
-              <a href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={open ? 0 : -1}>
-                <span className="contact-social-label">{s.label}</span>
-                <span className="contact-social-handle text-ink-soft">{s.handle}</span>
-              </a>
-            </li>
+            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={open ? 0 : -1} className="tag tag-default">
+              {s.label}
+            </a>
           ))}
-        </ul>
+        </div>
 
-        <button className="contact-chat" tabIndex={open ? 0 : -1} onClick={openChat}>
-          <span className="contact-chat-dot" aria-hidden="true" />
-          Chat with me
-        </button>
+        <form className="contact-form" onSubmit={onSubmit}>
+          <p className="mono-label text-ink-soft contact-section">Say hi</p>
+          {status === "sent" ? (
+            <p className="contact-sent">Thanks — I’ll be in touch.</p>
+          ) : (
+            <>
+              <input className="contact-input" name="name" type="text" placeholder="Name" autoComplete="name" tabIndex={open ? 0 : -1} required />
+              <input className="contact-input" name="email" type="email" placeholder="Email" autoComplete="email" tabIndex={open ? 0 : -1} required />
+              <textarea className="contact-input contact-textarea" name="message" placeholder="Say hi…" rows={3} tabIndex={open ? 0 : -1} required />
+              {status === "error" && <p className="contact-err">Something went wrong. Try email instead.</p>}
+              <button type="submit" className="contact-chat" tabIndex={open ? 0 : -1} disabled={status === "sending"}>
+                {status === "sending" ? "Sending…" : "Send"}
+              </button>
+            </>
+          )}
+        </form>
       </aside>
     </div>
   );

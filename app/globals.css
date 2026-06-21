@@ -3745,6 +3745,18 @@ body:has(.sb-root) {
 }
 .top-nav-social-item:hover { color: var(--pink); }
 .top-nav-social-item svg { height: 14px; width: auto; display: block; }
+/* The 🫂 contact glyph (Noto Sans Symbols 2). Button reset + sized to sit with
+   the social marks. */
+.top-nav-hug {
+  height: auto;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-dingbat), system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1;
+}
 /* Per-icon optical tuning: the solid brand glyphs read heavier than the outline
    mail/phone, so trim them down. */
 .top-nav-social-item.is-ig svg { height: 13px; }      /* Instagram, slightly down */
@@ -4357,46 +4369,41 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 .contact-close:hover { background: var(--ink); color: var(--bg); }
 .contact-eyebrow { margin: 0; padding-right: 2.5em; }
-.contact-primary { display: flex; flex-direction: column; gap: 0.3rem; }
-.contact-email {
+/* Email + phone share one token (mono, regular weight) — like the footer. */
+.contact-primary { display: flex; flex-direction: column; gap: 0.35rem; }
+.contact-link {
   font-family: var(--font-mono);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  font-size: clamp(1.3rem, 4vw, 1.9rem);
-  line-height: 1.05;
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  letter-spacing: 0.01em;
   color: var(--ink);
-  word-break: break-word;
 }
-.contact-email:hover { color: var(--pink); }
-.contact-phone {
-  font-family: var(--font-mono);
-  font-size: clamp(1rem, 2.6vw, 1.2rem);
-  color: var(--ink-soft);
-}
-.contact-phone:hover { color: var(--pink); }
-.contact-section { margin: 0.4rem 0 -0.4rem; }
-.contact-socials { display: flex; flex-direction: column; }
-.contact-socials li { border-top: 1px solid var(--line); }
-.contact-socials li:last-child { border-bottom: 1px solid var(--line); }
-.contact-socials a {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.7rem 0;
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+.contact-link:hover { color: var(--pink); }
+.contact-section { margin: 0.4rem 0 0; }
+/* Socials as pills (site tag token), not a table. */
+.contact-socials { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+/* Basic "say hi" form. */
+.contact-form { display: flex; flex-direction: column; gap: 0.6rem; }
+.contact-input {
+  width: 100%;
+  padding: 0.7em 0.85em;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans, inherit);
   font-size: 0.95rem;
 }
-.contact-socials a:hover .contact-social-label { color: var(--pink); }
-.contact-social-handle { font-size: 11px; letter-spacing: 0.04em; }
+.contact-input::placeholder { color: var(--ink-soft); }
+.contact-input:focus { outline: none; border-color: var(--pink); }
+.contact-textarea { resize: vertical; min-height: 4.5em; }
+.contact-sent { font-family: var(--font-mono); color: var(--ink); font-size: 0.95rem; }
+.contact-err { font-family: var(--font-mono); color: var(--pink); font-size: 11px; letter-spacing: 0.02em; }
 .contact-chat {
-  margin-top: auto;
+  margin-top: 0.2rem;
+  width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6em;
   padding: 0.95em 1.4em;
   border: 0;
   border-radius: 999px;
@@ -4411,17 +4418,4 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   transition: transform var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease);
 }
 .contact-chat:hover { filter: brightness(1.05); transform: translateY(-1px); }
-.contact-chat-dot {
-  width: 0.6em;
-  height: 0.6em;
-  border-radius: 50%;
-  background: var(--bg);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--bg) 70%, transparent);
-  animation: contact-pulse 1.8s ease-out infinite;
-}
-@keyframes contact-pulse {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--bg) 60%, transparent); }
-  70% { box-shadow: 0 0 0 0.5em transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
-}
-@media (prefers-reduced-motion: reduce) { .contact-chat-dot { animation: none; } }
+.contact-chat:disabled { opacity: 0.6; cursor: default; transform: none; }

@@ -33,21 +33,6 @@ function LinkedInIcon() {
     </svg>
   );
 }
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" width="100%" height="100%">
-      <rect x="3" y="5" width="18" height="14" rx="1.5" />
-      <path d="M3.5 6.5l8.5 7 8.5-7" />
-    </svg>
-  );
-}
-function PhoneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="100%" height="100%">
-      <path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C9.6 21 3 14.4 3 6c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.3 1l-2.1 2.2z" />
-    </svg>
-  );
-}
 
 const socials = [
   { label: "Instagram", cls: "is-ig", href: "https://instagram.com/finbar.studio", icon: <SiInstagram size="100%" aria-hidden="true" /> },
@@ -100,24 +85,15 @@ export default function TopNav() {
       </nav>
 
       <div className="top-nav-social">
-        <a
-          href="mailto:finbar@finbar.studio"
-          aria-label="Contact"
+        <button
+          type="button"
+          aria-label="Get in touch"
           title="Get in touch"
-          className="top-nav-social-item"
-          onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent("contact:open")); }}
+          className="top-nav-social-item top-nav-hug"
+          onClick={() => window.dispatchEvent(new CustomEvent("contact:open"))}
         >
-          <MailIcon />
-        </a>
-        <a
-          href="tel:+61412796630"
-          aria-label="Contact"
-          title="Get in touch"
-          className="top-nav-social-item"
-          onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent("contact:open")); }}
-        >
-          <PhoneIcon />
-        </a>
+          <span aria-hidden="true">{"\u{1FAC2}"}</span>
+        </button>
         {socials.map((s) => (
           <a
             key={s.href}
