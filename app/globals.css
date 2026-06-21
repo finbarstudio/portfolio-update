@@ -4324,9 +4324,15 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   inset: 0;
   z-index: 300;
   pointer-events: none;
+  --contact-drawer-w: min(440px, 92vw);
+  --contact-reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --contact-reveal-dur: 0.9s;
 }
 .contact-panel.is-open { pointer-events: auto; }
-/* Backdrop wipes in from the left to meet the drawer in the middle. */
+/* Backdrop wipes in from the left to meet the drawer in the middle. It only
+   needs to reach the drawer's left edge — the strip behind the drawer is
+   hidden — so the dark edge and the drawer's edge travel to the same seam on
+   the SAME duration/easing and arrive together (no side lags). */
 .contact-backdrop {
   position: absolute;
   inset: 0;
@@ -4334,21 +4340,17 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding: 0;
   background: color-mix(in srgb, var(--ink) 38%, transparent);
   clip-path: inset(0 100% 0 0);
-  /* No delay. The backdrop covers ~70% of the viewport vs the drawer's ~30%,
-     so a linear sweep over a longer duration keeps its dark edge from racing
-     ahead — it reaches the drawer's seam just as the drawer finishes (0.9s),
-     then fills the last sliver (hidden behind the drawer) by 1.3s. */
-  transition: clip-path 1.3s linear;
+  transition: clip-path var(--contact-reveal-dur) var(--contact-reveal-ease);
   cursor: pointer;
 }
-.contact-panel.is-open .contact-backdrop { clip-path: inset(0 0 0 0); }
+.contact-panel.is-open .contact-backdrop { clip-path: inset(0 var(--contact-drawer-w) 0 0); }
 /* Drawer wipes in from the right. */
 .contact-drawer {
   position: absolute;
   top: 0;
   right: 0;
   height: 100%;
-  width: min(440px, 92vw);
+  width: var(--contact-drawer-w);
   background: var(--bg);
   color: var(--ink);
   border-left: 1px solid var(--line);
@@ -4359,7 +4361,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding: clamp(28px, 5vw, 48px);
   overflow-y: auto;
   clip-path: inset(0 0 0 100%);
-  transition: clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: clip-path var(--contact-reveal-dur) var(--contact-reveal-ease);
 }
 .contact-panel.is-open .contact-drawer { clip-path: inset(0 0 0 0); }
 /* Bare, small close — no container. */
