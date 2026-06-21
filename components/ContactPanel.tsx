@@ -109,7 +109,7 @@ export default function ContactPanel() {
         </div>
 
         <div className="contact-bottom contact-reveal" style={rv(3)}>
-          <p className="contact-title">Say hi</p>
+          <p className="contact-title">Say hi, I promise I'll get back to you</p>
           <form className="contact-form" onSubmit={onSubmit}>
           {status === "sent" ? (
             <p className="contact-sent">Thanks — I’ll be in touch.</p>
@@ -119,7 +119,7 @@ export default function ContactPanel() {
               <input className="contact-input" name="email" type="email" placeholder="Email" autoComplete="email" tabIndex={open ? 0 : -1} required />
               <textarea className="contact-input contact-textarea" name="message" placeholder="Say hi…" rows={3} tabIndex={open ? 0 : -1} required />
               {status === "error" && <p className="contact-err">Something went wrong. Try email instead.</p>}
-              <button type="submit" className="contact-chat" tabIndex={open ? 0 : -1} disabled={status === "sending"}>
+              <button type="submit" className="tag tag-pink contact-chat" tabIndex={open ? 0 : -1} disabled={status === "sending"}>
                 {status === "sending" ? "Sending…" : "Send"}
               </button>
             </>
