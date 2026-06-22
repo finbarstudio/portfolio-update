@@ -49,6 +49,54 @@ const PROJECTS: Item[] = [
   { slug: "castile-street", title: "Castile Street", location: "Indooroopilly", categories: ["Lindon designed"] },
 ];
 
+// One gallery cell. Holds a shimmer skeleton until its image decodes, then
+// cross-fades the photo in — so tiles never pop in as they lazy-load on scroll.
+function GridTile({ p, eager }: { p: Item; eager: boolean }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <a
+      href="#"
+      data-cursor="View Project"
+      className="group relative aspect-[4/3] overflow-hidden bg-[var(--ink)] cursor-none"
+    >
+      <div
+        aria-hidden
+        className={`ld-skeleton absolute inset-0 transition-opacity duration-500 ${
+          loaded ? "opacity-0" : "opacity-100"
+        }`}
+      />
+      <Image
+        src={`/lindon/portfolio/${p.slug}.jpg`}
+        alt={`${p.title} — Lindon Homes`}
+        fill
+        quality={82}
+        priority={eager}
+        onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
+        className={`object-cover [transition:opacity_0.6s_ease-out,transform_1.2s_ease-out] group-hover:scale-[1.04] ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+        sizes="(min-width: 768px) 33vw, 50vw"
+      />
+      {/* Award laurel — bottom right */}
+      {p.award !== undefined && (
+        <div className="absolute bottom-3 right-3">
+          <ProjectLaurel mark={p.award} fill="white" className="w-8" />
+        </div>
+      )}
+      {/* Secondary header caption — Violet Sans (serif) */}
+      <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        <h3 className="violet text-white text-sm" style={{ letterSpacing: "0.1em" }}>
+          {p.title.toUpperCase()}
+        </h3>
+        <p className="text-white/80 text-xs font-light tracking-wide mt-0.5">
+          {p.location}
+        </p>
+      </div>
+    </a>
+  );
+}
+
 export default function PortfolioGrid() {
   const [active, setActive] = useState<string>("All");
 
@@ -84,41 +132,10 @@ export default function PortfolioGrid() {
 
       {/* Grid — white gaps (match the page bg) */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-white">
+        {/* Eager-load the first two rows (3-up desktop / 2-up mobile); the rest
+            stay lazy but reveal over a skeleton so nothing pops in. */}
         {filtered.map((p, i) => (
-          <a
-            key={p.slug}
-            href="#"
-            data-cursor="View Project"
-            className="group relative aspect-[4/3] overflow-hidden bg-[var(--ink)] cursor-none"
-          >
-            {/* Eager-load the first two rows (3-up desktop / 2-up mobile) via
-                priority so they're preloaded the moment the gallery opens, with
-                no lazy pop-in. The rest stay lazy. */}
-            <Image
-              src={`/lindon/portfolio/${p.slug}.jpg`}
-              alt={`${p.title} — Lindon Homes`}
-              fill
-              quality={82}
-              priority={i < 6}
-              className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]"
-              sizes="(min-width: 768px) 33vw, 50vw"
-            />
-            {/* Award laurel — bottom right */}
-            {p.award !== undefined && (
-              <div className="absolute bottom-3 right-3">
-                <ProjectLaurel mark={p.award} fill="white" className="w-8" />
-              </div>
-            )}
-            {/* Secondary header caption — Violet Sans (serif) */}
-            <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-              <h3 className="violet text-white text-sm" style={{ letterSpacing: "0.1em" }}>
-                {p.title.toUpperCase()}
-              </h3>
-              <p className="text-white/80 text-xs font-light tracking-wide mt-0.5">
-                {p.location}
-              </p>
-            </div>
-          </a>
+          <GridTile key={p.slug} p={p} eager={i < 6} />
         ))}
 
         {/* Contact CTA — white, "GET IN TOUCH", Violet Sans, flashing square on hover */}

@@ -142,6 +142,31 @@
   }
 }
 
+/* ── Image skeleton — shimmer placeholder behind gallery tiles while they
+      decode, so nothing pops in as it lazy-loads on scroll. ── */
+
+.lindon-site .ld-skeleton {
+  background-color: color-mix(in srgb, var(--ink) 86%, #ffffff);
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: ld-shimmer 1.5s linear infinite;
+}
+@keyframes ld-shimmer {
+  0% { background-position: 220% 0; }
+  100% { background-position: -220% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lindon-site .ld-skeleton {
+    animation: none;
+  }
+}
+
 /* ── Lenis smooth scroll (global helper classes; only active on demo pages) ── */
 
 html.lenis,
