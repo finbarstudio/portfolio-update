@@ -137,23 +137,24 @@ export default function LindonPage() {
         </div>
         <div className="md:col-span-7">
           <p className="text-ink" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)", lineHeight: 1.55 }}>
-            Three pages to show the direction. A home page that opens on the architecture, a gallery
-            made for getting lost in the portfolio, and a contact page that makes reaching out feel
-            easy. I wrote every line from scratch, custom code, no template, and it didn&rsquo;t take
-            long. That matters, because it means the thing bends whatever way we want it to. This is
-            only one version. A site like yours could go a dozen directions.
+            Three pages, enough to show the direction. A home page that opens on the architecture, a
+            portfolio you can get lost scrolling, and an about page with room for the family story. I
+            wrote every line from scratch, custom code, no template, and it didn&rsquo;t take long.
+            That&rsquo;s the point really, because it means the site bends whichever way we want it
+            to. This is one version. A site like yours could go a dozen directions.
           </p>
           <div className="lindon-demo-card mt-8">
             <div className="flex flex-wrap gap-2 mb-5">
               <span className="tag tag-default">Home</span>
-              <span className="tag tag-default">Gallery</span>
-              <span className="tag tag-default">Contact</span>
+              <span className="tag tag-default">Portfolio</span>
+              <span className="tag tag-default">About Us</span>
             </div>
             <Link href={DEMO_HREF} className="lindon-cta lindon-cta-pink">
               View the live demo &rarr;
             </Link>
             <p className="text-ink-soft mt-5" style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>
-              Open it on desktop and have a click around.
+              Open it on desktop and have a click around. The full nav is there, but only Home,
+              Portfolio and About Us are built so far, so those are the links that work.
             </p>
           </div>
         </div>
