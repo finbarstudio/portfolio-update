@@ -27,6 +27,7 @@ export default function EnglandHero() {
   const mouseX = useRef(0);
   const targetX = useRef(0);
   const raf = useRef(0);
+  const lastW = useRef(0);
 
   // Full-bleed the hero to the viewport (keeping the page padding), then size +
   // offset ENGLAND by its measured INK bounds (not the advance box) so the
@@ -82,19 +83,34 @@ export default function EnglandHero() {
 
   useEffect(() => {
     fit();
-    const ro = new ResizeObserver(() => fit());
+    lastW.current = document.documentElement.clientWidth;
+    // Only re-fit when the viewport WIDTH actually changes. On mobile, scrolling
+    // shows/hides the URL bar, which fires resize for a height-only change — and
+    // re-running the fit there made ENGLAND jitter left/right. Width-gate it.
+    const onResize = () => {
+      const w = document.documentElement.clientWidth;
+      if (w === lastW.current) return;
+      lastW.current = w;
+      fit();
+    };
+    const ro = new ResizeObserver(onResize);
     if (wrapRef.current) ro.observe(wrapRef.current);
     if (wordRef.current) ro.observe(wordRef.current);
-    window.addEventListener("resize", fit);
-    document.fonts?.ready?.then(fit).catch(() => {});
-    return () => { ro.disconnect(); window.removeEventListener("resize", fit); };
+    window.addEventListener("resize", onResize);
+    document.fonts?.ready?.then(() => fit()).catch(() => {});
+    return () => { ro.disconnect(); window.removeEventListener("resize", onResize); };
   }, [fit]);
 
   useEffect(() => {
-    mouseX.current = targetX.current = window.innerWidth / 2;
+    // Cursor-reactive weight is a pointer affordance only. On touch devices the
+    // synthesised mousemove (and tap) made the letters' weight — and so the
+    // word's width — jump, glitching it left/right. Skip it without a fine pointer.
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduce) return;
+    mouseX.current = targetX.current = window.innerWidth / 2;
     const onMove = (e: MouseEvent) => { targetX.current = e.clientX; };
-    if (!reduce) window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mousemove", onMove, { passive: true });
     const tick = () => {
       mouseX.current += (targetX.current - mouseX.current) * 0.08;
       const letters = innerRef.current?.querySelectorAll<HTMLElement>(".wc-hero-letter");
@@ -109,7 +125,7 @@ export default function EnglandHero() {
       }
       raf.current = requestAnimationFrame(tick);
     };
-    if (!reduce) raf.current = requestAnimationFrame(tick);
+    raf.current = requestAnimationFrame(tick);
     return () => {
       window.removeEventListener("mousemove", onMove);
       if (raf.current) cancelAnimationFrame(raf.current);

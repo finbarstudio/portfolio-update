@@ -3890,10 +3890,20 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   width: auto;
   margin: 0;
 }
+/* On phones ENGLAND is far shorter (it fits the narrow column), so the crest's
+   170px+ floor overflowed the title box and got clipped top/bottom by the
+   wrap's overflow:hidden. Scale the marks down so they sit inside the type. */
+@media (max-width: 640px) {
+  .wc-hero-marks .wc-stgeorge { height: clamp(74px, 20vw, 118px); }
+  .wc-hero-marks .wc-lions { height: clamp(94px, 26vw, 150px); }
+}
 .wc-stgeorge rect,
 .wc-stgeorge line {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
+  /* iOS Safari often won't repaint a stroke-dashoffset animation unless the
+     element is promoted; this nudges it onto its own layer. */
+  will-change: stroke-dashoffset;
 }
 /* Loops forever. One draw/hold/erase cycle, but the cross runs HALF a cycle out
    of phase with the border outline (negative delay) so as one wipes out the
@@ -4017,6 +4027,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: wc-lions-cycle 9s linear infinite;
+  will-change: stroke-dashoffset;
 }
 @keyframes wc-lions-cycle {
   0% { stroke-dashoffset: 1; }
