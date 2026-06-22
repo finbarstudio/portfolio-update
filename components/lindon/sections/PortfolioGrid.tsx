@@ -84,18 +84,22 @@ export default function PortfolioGrid() {
 
       {/* Grid — white gaps (match the page bg) */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-white">
-        {filtered.map((p) => (
+        {filtered.map((p, i) => (
           <a
             key={p.slug}
             href="#"
             data-cursor="View Project"
             className="group relative aspect-[4/3] overflow-hidden bg-[var(--ink)] cursor-none"
           >
+            {/* Eager-load the first two rows (3-up desktop / 2-up mobile) via
+                priority so they're preloaded the moment the gallery opens, with
+                no lazy pop-in. The rest stay lazy. */}
             <Image
               src={`/lindon/portfolio/${p.slug}.jpg`}
               alt={`${p.title} — Lindon Homes`}
               fill
               quality={82}
+              priority={i < 6}
               className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]"
               sizes="(min-width: 768px) 33vw, 50vw"
             />
