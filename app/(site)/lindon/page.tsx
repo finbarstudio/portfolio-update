@@ -23,11 +23,6 @@ const STATS = [
     note: 'You rank second for "luxury home builders brisbane" and the terms around it. Most builders would kill for that.',
   },
   {
-    value: "80%",
-    label: "On a phone",
-    note: "Four out of five people reach you on mobile, where the current site has the most ground to make up.",
-  },
-  {
     value: "26s",
     label: "Then gone",
     note: "The average visit lasts twenty-six seconds, at one and a half pages. People glance and leave before a home lands.",
@@ -107,7 +102,7 @@ export default function LindonPage() {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
           {STATS.map((s) => (
             <div key={s.label} className="border-t border-line pt-5">
               <p className="text-pink font-mono leading-none" style={{ fontSize: "clamp(2.8rem, 6vw, 4.5rem)" }}>
@@ -119,18 +114,17 @@ export default function LindonPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-8 mt-12">
-          <div className="md:col-span-6 lindon-callout">
-            <p style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.3rem)", lineHeight: 1.5 }}>
-              Eight in ten of your visitors are on a phone. I didn&rsquo;t treat that as an
-              afterthought. This page and the demo were made to feel right on a phone, not shrunk
-              down to fit one. Open it on yours and you&rsquo;ll see what I mean.
-            </p>
-          </div>
-          <div className="md:col-span-6 flex md:items-center">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-6 mt-12">
+          <div className="md:col-span-8 flex md:items-center">
             <p className="text-ink" style={{ fontSize: "clamp(1.15rem, 1.9vw, 1.6rem)", lineHeight: 1.4 }}>
               You&rsquo;re spending real money, in ranking and reputation, to get people through the
               door. The site is where it leaks out the back.
+            </p>
+          </div>
+          <div className="md:col-span-4 flex md:items-center">
+            <p className="text-ink-soft" style={{ fontSize: "0.9rem", lineHeight: 1.6 }}>
+              And most of them land on a phone, so when we build the real thing, mobile gets
+              designed properly rather than bolted on at the end.
             </p>
           </div>
         </div>
@@ -159,8 +153,7 @@ export default function LindonPage() {
               View the live demo &rarr;
             </Link>
             <p className="text-ink-soft mt-5" style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>
-              It holds up properly on a phone, not just squeezed onto one, so open it there. Or have a
-              look on desktop.
+              Open it on desktop and have a click around.
             </p>
           </div>
         </div>
