@@ -31,6 +31,15 @@ export default function SmoothScroll({
     lenisRef.current = lenis;
     window.__lenis = lenis;
 
+    // Land every page at the top. Arriving from the /lindon pitch is a
+    // cross-route-group client navigation, and neither Next's auto-scroll nor
+    // Lenis resets the position across it — so without this the demo opens
+    // wherever the pitch was scrolled to (mid-page). Reset the native scroll
+    // and the fresh Lenis instance to the top before anything measures layout.
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+    lenis.scrollTo(0, { immediate: true });
+
     // Only the home page locks scroll for its intro. Everywhere else scrolls
     // straight away (otherwise the page can never be unlocked).
     const unlock = () => {
@@ -40,6 +49,9 @@ export default function SmoothScroll({
     if (pathname === "/lindon/site") {
       lenis.stop();
       window.addEventListener("lindon:intro-done", unlock);
+    } else {
+      // Non-home pages: refresh triggers once layout has settled at the top.
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     }
 
     // Keep ScrollTrigger in sync with Lenis

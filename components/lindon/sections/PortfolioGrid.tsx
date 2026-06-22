@@ -92,7 +92,7 @@ export default function PortfolioGrid() {
             className="group relative aspect-[4/3] overflow-hidden bg-[var(--ink)] cursor-none"
           >
             <Image
-              src={`/portfolio/${p.slug}.jpg`}
+              src={`/lindon/portfolio/${p.slug}.jpg`}
               alt={`${p.title} — Lindon Homes`}
               fill
               quality={82}
@@ -123,7 +123,7 @@ export default function PortfolioGrid() {
           className="group relative aspect-[4/3] bg-white flex items-center justify-center gap-3 cursor-pointer"
         >
           <span
-            className="w-2 h-2 bg-[var(--black)] opacity-0 group-hover:opacity-100 group-hover:animate-[blink_0.6s_steps(1,end)_infinite]"
+            className="w-2 h-2 bg-[var(--black)] opacity-0 group-hover:opacity-100 group-hover:animate-[ld-blink_0.6s_steps(1,end)_infinite]"
           />
           <span
             className="violet uppercase text-[var(--ink)] group-hover:text-[var(--black)] text-lg md:text-xl transition-colors"

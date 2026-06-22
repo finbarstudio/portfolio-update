@@ -82,6 +82,38 @@
   position: relative;
 }
 
+/* ── "Back to finbar.studio" tab — fixed, middle-left, above the demo nav ── */
+
+.lindon-site .ld-back {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.55rem 0.8rem;
+  font-family: "Remark", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(66, 66, 66, 0.16);
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  text-decoration: none;
+  transition: background 0.25s, color 0.25s, padding-right 0.25s;
+}
+.lindon-site .ld-back:hover {
+  background: #fff;
+  color: var(--black);
+  padding-right: 1rem;
+}
+
 /* ── Lenis smooth scroll (global helper classes; only active on demo pages) ── */
 
 html.lenis,

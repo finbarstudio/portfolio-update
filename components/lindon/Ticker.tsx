@@ -32,25 +32,37 @@ export default function Ticker({
     }
   }
 
+  // Tens reel: only the distinct values the tens digit passes through as the
+  // count climbs (blank → 1 → 2 → 3 for a target of 32), so it ticks slowly
+  // through those few states rather than rolling a long 0-9-style reel.
+  const tensSeq: string[] = [];
+  for (const t of tens) {
+    if (tensSeq[tensSeq.length - 1] !== t) tensSeq.push(t);
+  }
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const land = -(100 * (target - 1)) / target;
+      // Each reel lands on its own last cell, so the travel is sized to that
+      // reel's length (the tens reel is short; the units reel is the full set).
+      const landTens = -(100 * (tensSeq.length - 1)) / tensSeq.length;
+      const landUnits = -(100 * (units.length - 1)) / units.length;
       const DUR = 2.4;
       const DELAY = 0.3;
-      // Tens: a slow, even tick (linear) — no delayed-then-fast jump.
+      // Tens: a slow, even tick (linear) through its handful of values.
       gsap.fromTo(
         tensRef.current,
         { yPercent: 0 },
-        { yPercent: land, duration: DUR, delay: DELAY, ease: "none" }
+        { yPercent: landTens, duration: DUR, delay: DELAY, ease: "none" }
       );
       // Units: cycle fast, then decelerate dramatically into the final digit.
       gsap.fromTo(
         unitsRef.current,
         { yPercent: 0 },
-        { yPercent: land, duration: DUR, delay: DELAY, ease: "expo.out" }
+        { yPercent: landUnits, duration: DUR, delay: DELAY, ease: "expo.out" }
       );
     });
     return () => ctx.revert();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target]);
 
   const cell = { height: "1em", lineHeight: 1, width: "0.62em" } as const;
@@ -71,7 +83,7 @@ export default function Ticker({
 
   return (
     <span className={`inline-flex ${className}`} aria-label={String(target)}>
-      {reel(tensRef, tens)}
+      {reel(tensRef, tensSeq)}
       {reel(unitsRef, units)}
     </span>
   );

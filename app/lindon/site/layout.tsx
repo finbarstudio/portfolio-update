@@ -24,6 +24,11 @@ export default function LindonSiteLayout({
 }) {
   return (
     <div className="lindon-site">
+      {/* Small fixed tab back to the portfolio — this demo lives under
+          finbar.studio, so give a clear way out of it. */}
+      <a href="/" className="ld-back" aria-label="Back to finbar.studio">
+        <span aria-hidden="true">&larr;</span> back to finbar.studio
+      </a>
       <SmoothScroll>{children}</SmoothScroll>
     </div>
   );
