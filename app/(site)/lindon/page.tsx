@@ -80,9 +80,8 @@ export default function LindonPage() {
       </section>
 
       {/* ── 01 · Why I reached out (heading | body) ───────────── */}
-      <Reveal as="section" section className="home-section grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-5" aria-label="Why I reached out">
+      <Reveal as="section" section className="home-section py-24 md:py-36 grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-5" aria-label="Why I reached out">
         <div className="md:col-span-5">
-          <p className="mono-label text-ink-soft mb-3">01 / Why I reached out</p>
           <h2 className="home-display-sm">The homes are premium. The site isn&rsquo;t.</h2>
         </div>
         <div className="md:col-span-7">
@@ -97,10 +96,9 @@ export default function LindonPage() {
       </Reveal>
 
       {/* ── 02 · The numbers ──────────────────────────────────── */}
-      <Reveal as="section" section className="home-section" aria-label="What I noticed">
+      <Reveal as="section" section className="home-section py-24 md:py-36" aria-label="What I noticed">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-4 mb-12">
           <div className="md:col-span-5">
-            <p className="mono-label text-ink-soft mb-3">02 / What I noticed</p>
             <h2 className="home-display-sm">You&rsquo;ve already won the hard part. The site gives it back.</h2>
           </div>
           <div className="md:col-span-7 flex md:items-end">
@@ -139,9 +137,8 @@ export default function LindonPage() {
       </Reveal>
 
       {/* ── 03 · The demo (heading | body + card) ─────────────── */}
-      <Reveal as="section" section className="home-section grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-5" aria-label="The demo">
+      <Reveal as="section" section className="home-section py-24 md:py-36 grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-5" aria-label="The demo">
         <div className="md:col-span-5">
-          <p className="mono-label text-ink-soft mb-3">03 / So I built you something</p>
           <h2 className="home-display-sm">A quick demo, built around your homes.</h2>
         </div>
         <div className="md:col-span-7">
@@ -170,8 +167,7 @@ export default function LindonPage() {
       </Reveal>
 
       {/* ── 04 · What I see in it (story | logo) ──────────────── */}
-      <Reveal as="section" section className="home-section" aria-label="What I see in it">
-        <p className="mono-label text-ink-soft mb-3">04 / What I see in it</p>
+      <Reveal as="section" section className="home-section py-24 md:py-36" aria-label="What I see in it">
         <h2 className="home-display-sm mb-10 max-w-[20ch]">Honestly, I&rsquo;m excited about this one.</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
           <div className="border-t border-line pt-5">
@@ -195,9 +191,8 @@ export default function LindonPage() {
       </Reveal>
 
       {/* ── 05 · How I can help (heading | grid + value) ──────── */}
-      <Reveal as="section" section className="home-section grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-8" aria-label="How I can help">
+      <Reveal as="section" section className="home-section py-24 md:py-36 grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-8" aria-label="How I can help">
         <div className="md:col-span-4">
-          <p className="mono-label text-ink-soft mb-3">05 / How I can help</p>
           <h2 className="home-display-sm">What working together looks like.</h2>
         </div>
         <div className="md:col-span-8">
@@ -217,8 +212,8 @@ export default function LindonPage() {
       </Reveal>
 
       {/* ── Let's talk ────────────────────────────────────────── */}
-      <Reveal as="section" section className="home-section no-rule" aria-label="Let's talk">
-        <div className="py-8 md:py-16 text-center flex flex-col items-center">
+      <Reveal as="section" section className="home-section no-rule py-24 md:py-36" aria-label="Let's talk">
+        <div className="text-center flex flex-col items-center">
           <MaskReveal as="h2" className="home-display max-w-[16ch]">
             Let&rsquo;s have a chat.
           </MaskReveal>
