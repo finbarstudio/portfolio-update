@@ -189,10 +189,8 @@ export default function ProjectShowcase({
               key={src}
               onClick={() => select(i)}
               data-cursor="Switch View"
-              className={`cursor-none relative w-16 h-9 md:w-20 md:h-[45px] overflow-hidden transition-all duration-300 group ${
-                i === active
-                  ? "ring-2 ring-white"
-                  : "ring-1 ring-white/50 hover:ring-white"
+              className={`cursor-none relative w-16 h-9 md:w-20 md:h-[45px] overflow-hidden ring-1 ring-white transition-all duration-300 group ${
+                i === active ? "opacity-100" : "opacity-70 hover:opacity-100"
               }`}
               aria-label={`View image ${i + 1} of ${project.title}`}
             >
