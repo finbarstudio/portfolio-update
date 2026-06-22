@@ -153,8 +153,9 @@ export default function LindonPage() {
               View the live demo &rarr;
             </Link>
             <p className="text-ink-soft mt-5" style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>
-              Open it on desktop and have a click around. The full nav is there, but only Home,
-              Portfolio and About Us are built so far, so those are the links that work.
+              It&rsquo;s a responsive build, so it reflows to fit whatever screen it&rsquo;s on. It&rsquo;s
+              at its best on desktop, so open it there and have a click around. The full nav is there,
+              but only Home, Portfolio and About Us are built so far, so those are the links that work.
             </p>
           </div>
         </div>
