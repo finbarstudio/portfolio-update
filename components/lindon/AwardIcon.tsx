@@ -25,6 +25,8 @@ export default function AwardIcon({
   delay = 0,
 }: AwardIconProps) {
   const isWinner = status === "Winner";
+  // Winners get a gold laurel; finalists keep the ink one.
+  const laurelColor = isWinner ? "#b08d57" : "var(--ink)";
   const rootRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
@@ -73,9 +75,9 @@ export default function AwardIcon({
             ref={pathRef}
             d={LAUREL_PATH}
             pathLength={1}
-            fill="var(--ink)"
+            fill={laurelColor}
             fillOpacity={0}
-            stroke="var(--ink)"
+            stroke={laurelColor}
             strokeWidth={0.7}
             strokeDasharray={1}
             strokeDashoffset={1}
@@ -92,7 +94,7 @@ export default function AwardIcon({
       {/* Body + status — masked */}
       <div className="overflow-hidden">
         <span
-          className={`award-line block violet text-[8px] tracking-[0.14em] uppercase leading-none ${
+          className={`award-line block violet text-[8px] tracking-[0.14em] uppercase leading-none text-center [text-indent:0.14em] ${
             isWinner ? "text-[var(--black)]" : "text-[var(--ink)]/55"
           }`}
         >
@@ -102,7 +104,7 @@ export default function AwardIcon({
 
       {/* Label — masked */}
       <div className="overflow-hidden">
-        <span className="award-line block violet text-[var(--ink)]/70 text-[7.5px] tracking-[0.12em] uppercase leading-tight text-center">
+        <span className="award-line block violet text-[var(--ink)]/70 text-[7.5px] tracking-[0.12em] uppercase leading-tight text-center [text-indent:0.12em]">
           {label}
         </span>
       </div>
