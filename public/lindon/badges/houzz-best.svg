@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 487.06 488.7">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #4dbc15;
+      }
+
+      .cls-2 {
+        font-size: 68px;
+      }
+
+      .cls-2, .cls-3 {
+        fill: #1e2726;
+        font-family: DMSans-Black, 'DM Sans';
+        font-variation-settings: 'opsz' 14, 'wght' 900;
+        font-weight: 800;
+      }
+
+      .cls-4 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-5 {
+        letter-spacing: -.03em;
+      }
+
+      .cls-6 {
+        letter-spacing: 0em;
+      }
+
+      .cls-3 {
+        font-size: 159.06px;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <path class="cls-1" d="M0,0v488.7h487.06V134.02L0,0ZM100.95,111.86h-25.19v-22.13h-16.79v22.13h-25.19V35.87h25.19v22.4l41.98,10.77v42.82Z"/>
+      <text class="cls-3" transform="translate(26.55 285.59) scale(.98 1)"><tspan class="cls-6" x="0" y="0">20</tspan><tspan x="204.23" y="0">22</tspan></text>
+      <text class="cls-2" transform="translate(26.55 371.33) scale(.98 1)"><tspan class="cls-4" x="0" y="0">Be</tspan><tspan class="cls-5" x="82.96" y="0">s</tspan><tspan class="cls-4" x="117.44" y="0">t of Houzz </tspan><tspan class="cls-4"><tspan x="0" y="80">Design</tspan></tspan></text>
+    </g>
+  </g>
+</svg>

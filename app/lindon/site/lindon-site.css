@@ -1,0 +1,283 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Lindon Homes demo — scoped styles.
+
+   This is the demo site's original globals.css, adapted to live INSIDE the
+   portfolio app without leaking. Two changes from the standalone version:
+   1. No `@import "tailwindcss"` / `@theme` — the portfolio's single Tailwind
+      build already generates every utility this demo uses (only black/white,
+      which are Tailwind defaults). The demo's ink/grey tokens are plain CSS
+      variables consumed via var(), so they don't need to be theme colours.
+   2. Everything that was a bare element/`:root` rule is scoped under
+      `.lindon-site` so it can't touch the portfolio. @font-face + @keyframes
+      stay top-level (they're inert until referenced); the `blink` keyframe is
+      renamed to `ld-blink` because the portfolio already defines one.
+
+   This file is imported only by app/lindon/site/layout.tsx, so it loads on the
+   demo routes only.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* ── Fonts ─────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: "Violet Sans";
+  src: url("/lindon/fonts/VioletSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Body face — LT Remark */
+@font-face {
+  font-family: "Remark";
+  src: url("/lindon/fonts/Remark-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Remark";
+  src: url("/lindon/fonts/Remark-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Remark";
+  src: url("/lindon/fonts/Remark-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ── Root wrapper: tokens + base type, scoped to the demo subtree ── */
+
+.lindon-site {
+  --ink: #424242;        /* dark-grey default text */
+  --black: #000000;      /* highlight / hover */
+  --white: #ffffff;
+  --grey: #67686b;
+  --grey-light: #f2f2f2;
+
+  background: var(--white);
+  color: var(--ink);
+  font-family: "Remark", sans-serif;
+  min-height: 100svh;
+  overflow-x: hidden;
+}
+
+/* Headings — small all-caps Violet Sans, wide tracking (logo style) */
+.lindon-site :is(h1, h2, h3, h4, h5, h6),
+.lindon-site .heading {
+  font-family: "Violet Sans", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 400;
+}
+
+.lindon-site .violet {
+  font-family: "Violet Sans", sans-serif;
+}
+
+.lindon-site section {
+  position: relative;
+}
+
+/* ── Lenis smooth scroll (global helper classes; only active on demo pages) ── */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ── Animations ─────────────────────────────────────────────── */
+
+@keyframes ld-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes scrollDrop {
+  0% {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(200%);
+    opacity: 0;
+  }
+}
+
+/* ── Footer (demo-specific .lf-* classes; consume .lindon-site vars) ── */
+
+.lf {
+  position: relative;
+  min-height: 560px;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--white);
+  color: var(--ink);
+  padding-top: calc(3.5rem + 6px);
+  font-family: "aktiv-grotesk", sans-serif;
+}
+
+.lf-rule {
+  height: 1px;
+  background: var(--ink);
+  margin: 0 clamp(20px, 3vw, 40px);
+  transform-origin: left;
+}
+
+.lf-awards {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(20px, 4vh, 44px);
+  padding: clamp(24px, 4vh, 56px) clamp(20px, 3vw, 40px);
+}
+.lf-awards-rows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+.lf-awards-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.3rem 2.4rem;
+}
+.lf-award {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 200px;
+}
+.lf-award-text {
+  display: flex;
+  flex-direction: column;
+}
+.lf-award-status {
+  font-family: "Violet Sans", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 8px;
+  color: var(--ink);
+  opacity: 0.5;
+  line-height: 1.4;
+}
+.lf-award-status.is-winner {
+  color: var(--black);
+  opacity: 1;
+}
+.lf-award-label {
+  font-family: "Violet Sans", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 9px;
+  color: var(--ink);
+  opacity: 0.78;
+  line-height: 1.3;
+}
+.lf-houzz {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 8px 10px;
+  justify-content: center;
+  align-items: center;
+}
+.lf-houzz img {
+  height: 42px;
+  width: auto;
+  display: block;
+}
+
+.lf-info {
+  margin-top: auto;
+  padding: 0 clamp(20px, 3vw, 40px) clamp(22px, 3.5vh, 48px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: end;
+  gap: 1.6rem 1.5rem;
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+}
+
+@media (min-width: 768px) {
+  .lf-info {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+}
+
+.lf-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.lf-col-end {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.lf-mask {
+  overflow: hidden;
+}
+.lf-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+}
+
+.lf-label {
+  font-family: "Violet Sans", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 9px;
+  color: var(--ink);
+  opacity: 0.55;
+  margin-bottom: 0.4em;
+}
+.lf-value {
+  color: var(--ink);
+}
+.lf-link {
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 0.25s;
+}
+.lf-link:hover {
+  color: var(--black);
+}
+
+.lf-mark {
+  width: 100%;
+  padding: 0 clamp(16px, 2.6vw, 34px) clamp(8px, 1.4vw, 18px);
+  line-height: 0.82;
+  overflow: hidden;
+}
+.lf-mark-inner {
+  display: inline-block;
+  width: max-content;
+  white-space: nowrap;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  font-size: clamp(2rem, 11vw, 16rem);
+}

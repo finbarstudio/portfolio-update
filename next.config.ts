@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     // Local /public/images/* paths are used, no remote patterns needed.
     remotePatterns: [],
+    // Allowed next/image quality values. 75 = portfolio default; the rest are
+    // used by the Lindon demo (app/lindon/site). Next 16 rejects any quality
+    // not in this list once the array is set.
+    qualities: [55, 60, 75, 82, 90],
     // Allow our own SVGs (e.g. the Lows wordmark) through next/image, sandboxed.
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
