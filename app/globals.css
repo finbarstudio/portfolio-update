@@ -4459,3 +4459,44 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   transition: opacity var(--dur-fast) var(--ease);
 }
 .contact-chat:disabled { opacity: 0.5; cursor: default; }
+
+/* ═══════════════════════════════════════════════════════════════
+   LINDON — private pitch page (/lindon)
+   ═══════════════════════════════════════════════════════════════ */
+.lindon-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0.95em 1.7em;
+  border-radius: 999px;
+  border: 1px solid var(--ink);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.lindon-cta:hover { transform: translateY(-1px); }
+.lindon-cta-pink {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: var(--bg);
+}
+.lindon-cta-pink:hover { filter: brightness(1.04); }
+.lindon-cta-ghost {
+  background: transparent;
+  color: var(--ink);
+}
+.lindon-cta-ghost:hover { border-color: var(--pink); color: var(--pink); }
+
+/* Demo call-out panel */
+.lindon-demo-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: clamp(24px, 4vw, 40px);
+  background: color-mix(in srgb, var(--pink) 5%, transparent);
+}
