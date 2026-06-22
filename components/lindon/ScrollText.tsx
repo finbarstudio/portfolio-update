@@ -33,8 +33,12 @@ export default function ScrollText({
           ease: "none",
           scrollTrigger: {
             trigger: el,
-            start: "top 80%",
-            end: "bottom 55%",
+            // Anchor both ends to the same read-line so stacked paragraphs
+            // reveal in sequence: the next only starts lighting up once the
+            // previous has fully crossed the line. (Different start/end anchors
+            // let paragraph two begin while paragraph one was still going.)
+            start: "top 65%",
+            end: "bottom 65%",
             scrub: true,
           },
         }
