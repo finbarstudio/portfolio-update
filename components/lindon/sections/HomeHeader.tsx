@@ -76,6 +76,12 @@ export default function HomeHeader() {
 
       // DESKTOP — the logo travels into the nav.
       mm.add("(min-width: 768px)", () => {
+        // Position the travelling logo's wrapper at its centred start spot
+        // BEFORE the fade-in. On a cold load the fade used to begin while the
+        // fixed wrapper was still at top:0 (fonts not yet ready), so the logo
+        // flashed in too high and then dropped. Setting it now avoids that;
+        // the fonts.ready pass below re-measures once the real font is in.
+        buildTravel();
         gsap.fromTo(
           logo,
           { opacity: 0, yPercent: -35, scale: 0.92 },

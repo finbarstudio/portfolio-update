@@ -189,7 +189,7 @@ export default function ProjectShowcase({
               key={src}
               onClick={() => select(i)}
               data-cursor="Switch View"
-              className={`relative w-16 h-9 md:w-20 md:h-[45px] overflow-hidden transition-all duration-300 group ${
+              className={`cursor-none relative w-16 h-9 md:w-20 md:h-[45px] overflow-hidden transition-all duration-300 group ${
                 i === active
                   ? "ring-2 ring-white"
                   : "ring-1 ring-white/50 hover:ring-white"
