@@ -74,7 +74,7 @@ export default function AboutPage() {
       {/* Ashley portrait — poster placement, original ratio */}
       <section className="grid grid-cols-1 md:grid-cols-5 gap-6 px-6 md:px-16 pb-16 md:pb-40">
         <figure className="col-span-4 md:col-span-2">
-          <div className="relative aspect-[3/2] bg-[var(--ink)]/5">
+          <MaskReveal as="div" start="top 82%" className="relative aspect-[3/2] bg-[var(--ink)]/5">
             <Image
               src="/lindon/about/person.jpg"
               alt="Ashley Lindon"
@@ -83,10 +83,15 @@ export default function AboutPage() {
               className="object-cover"
               sizes="(min-width:768px) 40vw, 100vw"
             />
-          </div>
-          <figcaption className="violet text-[10px] tracking-[0.2em] uppercase text-[var(--ink)]/45 mt-3">
+          </MaskReveal>
+          <MaskReveal
+            as="figcaption"
+            start="top 82%"
+            delay={0.3}
+            className="violet text-[10px] tracking-[0.2em] uppercase text-[var(--ink)]/45 mt-3"
+          >
             Ashley Lindon, Founder
-          </figcaption>
+          </MaskReveal>
         </figure>
       </section>
 
@@ -112,7 +117,7 @@ export default function AboutPage() {
             established himself in custom home construction.
           </ScrollText>
           <figure className="pt-4">
-            <div className="relative aspect-[16/9] bg-[var(--ink)]/5">
+            <MaskReveal as="div" start="top 85%" className="relative aspect-[16/9] bg-[var(--ink)]/5">
               <Image
                 src="/lindon/about/family.jpg"
                 alt="The Lindon family"
@@ -121,10 +126,15 @@ export default function AboutPage() {
                 className="object-cover"
                 sizes="(min-width:768px) 60vw, 100vw"
               />
-            </div>
-            <figcaption className="violet text-[10px] tracking-[0.2em] uppercase text-[var(--ink)]/45 mt-3">
+            </MaskReveal>
+            <MaskReveal
+              as="figcaption"
+              start="top 85%"
+              delay={0.3}
+              className="violet text-[10px] tracking-[0.2em] uppercase text-[var(--ink)]/45 mt-3"
+            >
               The Lindon family
-            </figcaption>
+            </MaskReveal>
           </figure>
         </div>
       </section>
