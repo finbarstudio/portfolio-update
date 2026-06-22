@@ -35,16 +35,22 @@ export default function FooterClock() {
     };
   }, [pathname]);
 
-  // Dock (mobile: slide the floating pin away; desktop: switch in-flow) as soon as
-  // the footer's HR line scrolls into view — the footer has its own copy, so the
-  // floater should clear out the moment you reach the footer.
+  // Desktop: dock the moment the footer slot rises to the pin's resting line, so
+  // the fixed pin lands exactly in place (a smooth slot-in, no disappear/reappear).
+  // Tablet/mobile: the footer already shows its own copy, so just slide the floater
+  // away as soon as you reach the footer (the HR line enters the viewport).
   useEffect(() => {
     const el = anchorRef.current;
     if (!el) return;
     const rule = el.closest(".site-footer")?.querySelector<HTMLElement>(".site-footer-rule");
     if (!rule) return;
+    const PIN_BOTTOM = 16; // matches .sf-clock-pin { bottom: 16px }
     const check = () => {
-      setDocked(rule.getBoundingClientRect().top <= window.innerHeight);
+      if (window.matchMedia("(min-width: 1024px)").matches) {
+        setDocked(el.getBoundingClientRect().bottom <= window.innerHeight - PIN_BOTTOM + 0.5);
+      } else {
+        setDocked(rule.getBoundingClientRect().top <= window.innerHeight);
+      }
     };
     check();
     const lenis = window.__lenis;

@@ -61,7 +61,7 @@ export default function LindonPage() {
         </MaskReveal>
         <Reveal as="div" immediate delay={0.5} className="mt-10 max-w-[62ch]">
           <p className="text-ink-soft" style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)", lineHeight: 1.5 }}>
-            I&rsquo;m Finbar, a Brisbane designer. I built this page, and a quick demo of your site,
+            I&rsquo;m Finbar, a Brisbane designer. I built this page, and a working demo of your site,
             because I think your work deserves far better online, and I&rsquo;d rather show you than
             just say it.
           </p>
@@ -133,15 +133,15 @@ export default function LindonPage() {
       {/* ── 03 · The demo (heading | body + card) ─────────────── */}
       <Reveal as="section" section className="home-section py-24 md:py-36 grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-5" aria-label="The demo">
         <div className="md:col-span-5">
-          <h2 className="home-display-sm">A quick demo, built around your homes.</h2>
+          <h2 className="home-display-sm">A working demo, built around your homes.</h2>
         </div>
         <div className="md:col-span-7">
           <p className="text-ink" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)", lineHeight: 1.55 }}>
             Three pages, enough to show the direction. A home page that opens on the architecture, a
-            portfolio you can get lost scrolling, and an about page with room for the family story. I
-            wrote every line from scratch, custom code, no template, and it didn&rsquo;t take long.
-            That&rsquo;s the point really, because it means the site bends whichever way we want it
-            to. This is one version. A site like yours could go a dozen directions.
+            portfolio you can get lost scrolling, and an about page with room for the family story.
+            Every line is written from scratch, custom code, no template. That&rsquo;s the point,
+            because it means the site bends whichever way we want it to. This is one version. A site
+            like yours could go a dozen directions.
           </p>
           <div className="lindon-demo-card mt-8">
             <div className="flex flex-wrap gap-2 mb-5">
