@@ -5,6 +5,7 @@ import ImageTrail from "@/components/lindon/ImageTrail";
 import ScrollText from "@/components/lindon/ScrollText";
 import Ticker from "@/components/lindon/Ticker";
 import CountUp from "@/components/lindon/CountUp";
+import MaskReveal from "@/components/lindon/MaskReveal";
 
 export const metadata = {
   title: "About Us · Our Family History | Lindon Homes",
@@ -145,13 +146,14 @@ export default function AboutPage() {
             various parts of the business, carrying a dedication, an eye for
             detail &amp; a passion for building consulting &amp; design.
           </ScrollText>
-          <blockquote
-            className="violet text-[var(--ink)] text-2xl md:text-4xl leading-snug"
-            style={{ letterSpacing: "0.03em" }}
+          <MaskReveal
+            as="blockquote"
+            start="top 68%"
+            className="violet text-[var(--ink)] text-2xl md:text-4xl leading-snug tracking-[0.03em]"
           >
             “As the company grew it became evident a new name was needed. In
             April 2011, Lindon Homes Pty Ltd was registered.”
-          </blockquote>
+          </MaskReveal>
         </div>
       </section>
 

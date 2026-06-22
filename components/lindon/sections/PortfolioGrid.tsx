@@ -73,7 +73,10 @@ function GridTile({ p, eager }: { p: Item; eager: boolean }) {
         priority={eager}
         onLoad={() => setLoaded(true)}
         onError={() => setLoaded(true)}
-        className={`object-cover [transition:opacity_0.6s_ease-out,transform_1.2s_ease-out] group-hover:scale-[1.04] ${
+        // Tailwind v4 maps scale-* to the `scale` property (not `transform`),
+        // so the transition must name `scale` or the hover zoom snaps instantly.
+        style={{ transition: "opacity 0.6s ease-out, scale 1.2s ease-out, transform 1.2s ease-out" }}
+        className={`object-cover group-hover:scale-[1.04] ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
         sizes="(min-width: 768px) 33vw, 50vw"
