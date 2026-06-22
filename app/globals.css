@@ -4500,3 +4500,11 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding: clamp(24px, 4vw, 40px);
   background: color-mix(in srgb, var(--pink) 5%, transparent);
 }
+
+/* Emphasis call-out (the mobile-first point) — pink left rule */
+.lindon-callout {
+  border-left: 3px solid var(--pink);
+  padding: 0.2rem 0 0.2rem 1.1rem;
+  max-width: 58ch;
+  color: var(--ink);
+}
