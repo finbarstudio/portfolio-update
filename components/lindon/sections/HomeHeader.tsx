@@ -173,8 +173,9 @@ export default function HomeHeader() {
             LINDON&nbsp;HOMES
           </h1>
 
-          {/* Awards row — pushed lower on mobile so it centres in the white space */}
-          <div className="mt-[11vh] md:mt-6 flex flex-wrap items-start justify-center gap-x-5 gap-y-5 max-w-4xl">
+          {/* Awards row — pushed well below the wordmark so the laurels never
+              crowd the logo (they sit lower, not up against it). */}
+          <div className="mt-[11vh] md:mt-24 flex flex-wrap items-start justify-center gap-x-5 gap-y-5 max-w-4xl">
             {AWARDS.map((a, i) => (
               <AwardIcon
                 key={`${a.mark}-${a.label}-${i}`}

@@ -24,6 +24,23 @@ export default function LindonSiteLayout({
 }) {
   return (
     <div className="lindon-site">
+      {/* Precache the demo's own faces (React hoists these to <head>). The logo
+          is set in Violet Sans; without preloading it, a cold load painted the
+          fallback first and swapped/repositioned once the woff2 arrived. */}
+      <link
+        rel="preload"
+        href="/lindon/fonts/VioletSans-Regular.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="preload"
+        href="/lindon/fonts/Remark-Regular.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
       {/* Pink brand bubble back to the Lindon pitch — collapsed to an arrow,
           expands on hover to reveal the label. Styled like the main site. */}
       <a href="/lindon" className="ld-back" aria-label="Back to finbar.studio">

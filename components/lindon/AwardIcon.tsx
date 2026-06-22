@@ -61,9 +61,9 @@ export default function AwardIcon({
   return (
     <div
       ref={rootRef}
-      className="flex flex-col items-center gap-1.5 w-[80px] shrink-0"
+      className="flex flex-col items-center gap-1.5 w-[64px] shrink-0"
     >
-      <div className="relative w-12 flex items-center justify-center">
+      <div className="relative w-9 flex items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 90 73.04"
