@@ -67,7 +67,7 @@ function GridTile({ p, eager }: { p: Item; eager: boolean }) {
       />
       <Image
         src={`/lindon/portfolio/${p.slug}.jpg`}
-        alt={`${p.title} — Lindon Homes`}
+        alt={`${p.title}, Lindon Homes`}
         fill
         quality={82}
         priority={eager}

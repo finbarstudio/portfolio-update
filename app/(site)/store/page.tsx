@@ -12,7 +12,7 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   title: "Store",
   description:
-    "Digital products from finbar✶studio — tools and templates drawn from client work, by a Brisbane graphic designer.",
+    "Digital products from finbar✶studio. Tools and templates drawn from client work, by a Brisbane graphic designer.",
   alternates: { canonical: "/store" },
   openGraph: {
     title: "Store | Finbar Studio",
@@ -104,7 +104,7 @@ export default async function StorePage() {
             {live ? (
               <form action={startCheckout}>
                 <button type="submit" className="store-buy">
-                  Buy now{priceLabel ? ` — ${priceLabel}` : ""}
+                  Buy now{priceLabel ? ` · ${priceLabel}` : ""}
                 </button>
               </form>
             ) : (

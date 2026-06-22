@@ -44,10 +44,10 @@ export default function Intro() {
         <p className="intro-line text-[#0d0c0a]/60 text-xl font-light leading-relaxed max-w-2xl mb-6">
           For over three decades, Lindon Homes has partnered with Brisbane
           families to create homes that are as individual as the people who
-          live in them — from concept to completion, we handle everything.
+          live in them, from concept to completion, we handle everything.
         </p>
         <p className="intro-line text-[#0d0c0a]/50 text-lg font-light leading-relaxed max-w-2xl">
-          HIA Award winners. Houzz Best of winners. But most importantly —
+          HIA Award winners. Houzz Best of winners. But most importantly,
           our clients keep coming back, and they send their friends.
         </p>
         <div className="intro-line mt-16 flex gap-16">

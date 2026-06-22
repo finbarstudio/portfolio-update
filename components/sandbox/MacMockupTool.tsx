@@ -176,7 +176,7 @@ export default function MacMockupTool() {
             messages={messages}
             maxItems={MAC_MAX}
             landscapeThumbs
-            hint="A looping video works best — a still image is fine too"
+            hint="A looping video works best, a still image is fine too"
           />
           <ControlPanel
             aspect={aspect}

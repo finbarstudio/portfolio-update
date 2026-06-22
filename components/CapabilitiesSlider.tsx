@@ -61,7 +61,7 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
       href={`/work?filter=${c.filter}`}
       className="cap-card group"
       style={{ "--cap-accent": c.color } as CSSProperties}
-      aria-label={`${c.name} — see this work`}
+      aria-label={`${c.name}, see this work`}
       aria-hidden={hidden || undefined}
       tabIndex={hidden ? -1 : undefined}
       onPointerEnter={() => setActive(true)}

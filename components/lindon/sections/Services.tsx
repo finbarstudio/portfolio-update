@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 const services = [
   {
     num: "01",
-    title: "Custom Homes — Design & Build",
+    title: "Custom Homes, Design & Build",
     desc: "From blank canvas to completed home. Our in-house design team collaborates with you at every stage, delivering a truly bespoke result.",
   },
   {
@@ -20,7 +20,7 @@ const services = [
   {
     num: "03",
     title: "Knock Down Rebuild",
-    desc: "Love your land, not your house? We'll demolish and rebuild to maximise your block — seamlessly managing the entire process.",
+    desc: "Love your land, not your house? We'll demolish and rebuild to maximise your block, seamlessly managing the entire process.",
   },
   {
     num: "04",
@@ -35,7 +35,7 @@ const services = [
   {
     num: "06",
     title: "Swimming Pools",
-    desc: "Seamlessly integrated pool design and construction — a natural extension of your Lindon Home.",
+    desc: "Seamlessly integrated pool design and construction, a natural extension of your Lindon Home.",
   },
 ];
 

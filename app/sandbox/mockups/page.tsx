@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Mockups",
   description:
-    "3D mockup tools from finbar✶studio — drop in your media and export looping video, stills, GIFs or an embed.",
+    "3D mockup tools from finbar✶studio. Drop in your media and export looping video, stills, GIFs or an embed.",
 };
 
 // Only the live tools, titles only.

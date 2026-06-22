@@ -4,7 +4,7 @@ import ViewCursor from "@/components/lindon/ViewCursor";
 import SiteFooter from "@/components/lindon/sections/SiteFooter";
 
 export const metadata = {
-  title: "Portfolio — Lindon Homes",
+  title: "Portfolio · Lindon Homes",
   description:
     "A selection of custom homes, knock-down rebuilds and major renovations built by Lindon Homes across South East Queensland.",
 };

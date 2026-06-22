@@ -113,7 +113,7 @@ export default function ContactPanel() {
           <p className="contact-title">Say hi</p>
           <form className="contact-form" onSubmit={onSubmit}>
           {status === "sent" ? (
-            <p className="contact-sent">Thanks — I’ll be in touch.</p>
+            <p className="contact-sent">Thanks, I’ll be in touch.</p>
           ) : (
             <>
               <input className="contact-input" name="name" type="text" placeholder="Name" autoComplete="name" tabIndex={open ? 0 : -1} required />

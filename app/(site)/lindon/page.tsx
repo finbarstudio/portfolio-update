@@ -8,7 +8,7 @@ import ContactCta from "@/components/ContactCta";
 // the sitemap and the public nav — it's something Finbar sends, not something
 // people find. Editorial two-column sections keep it tight.
 export const metadata: Metadata = {
-  title: { absolute: "For Lindon Homes — Finbar Studio" },
+  title: { absolute: "For Lindon Homes · Finbar Studio" },
   description: "A note and a working demo for Lindon Homes, from Brisbane designer Finbar Skitini.",
   robots: { index: false, follow: false },
   alternates: { canonical: undefined },

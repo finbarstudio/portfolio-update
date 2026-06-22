@@ -44,7 +44,7 @@ export default function Contact() {
         </h2>
         <p className="contact-line text-[#0d0c0a]/50 text-lg font-light leading-relaxed mb-12">
           Ready to start your new home journey? Book a free consultation with
-          our team — no pressure, just a conversation about your vision.
+          our team, no pressure, just a conversation about your vision.
         </p>
 
         <form className="contact-line space-y-6">

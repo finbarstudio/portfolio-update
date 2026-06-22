@@ -119,7 +119,7 @@ export default function ExportPanel({
         </button>
         <p className="mono-label sb-note">
           {embeddableCount === 0
-            ? "Embeds need public media — uploaded files can’t be embedded yet."
+            ? "Embeds need public media. Uploaded files can’t be embedded yet."
             : embeddableCount < mediaCount
               ? `Embed uses the ${embeddableCount} public item(s); uploaded files are skipped.`
               : "Responsive iframe + backlink, ~1KB."}

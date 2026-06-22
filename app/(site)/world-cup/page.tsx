@@ -10,7 +10,7 @@ import CountryFlag from "@/components/CountryFlag";
 import wc from "@/content/worldcup.json";
 
 export const metadata: Metadata = {
-  title: "It’s coming home — finbarstudio",
+  title: "It’s coming home · finbarstudio",
   description: "A little corner of the studio for the football. England at the FIFA World Cup 2026.",
   robots: { index: false, follow: false },
 };

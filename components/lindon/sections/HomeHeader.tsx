@@ -207,7 +207,7 @@ export default function HomeHeader() {
         <button
           ref={logoRef}
           onClick={toTop}
-          aria-label="Lindon Homes — back to top"
+          aria-label="Lindon Homes, back to top"
           className="violet text-[var(--ink)] text-center whitespace-nowrap leading-none pointer-events-auto cursor-pointer"
           style={{ ...wordmarkStyle, opacity: 0 }}
         >
@@ -219,7 +219,7 @@ export default function HomeHeader() {
       <button
         ref={navLogoRef}
         onClick={toTop}
-        aria-label="Lindon Homes — back to top"
+        aria-label="Lindon Homes, back to top"
         className="md:hidden fixed top-0 left-0 h-14 z-[55] flex items-center justify-start pl-5 violet text-[var(--ink)] text-sm tracking-[0.18em] whitespace-nowrap pointer-events-none"
         style={{ opacity: 0 }}
       >

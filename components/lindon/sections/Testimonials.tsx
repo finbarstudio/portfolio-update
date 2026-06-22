@@ -9,12 +9,12 @@ gsap.registerPlugin(ScrollTrigger);
 const testimonials = [
   {
     quote:
-      "The team at Lindon Homes exceeded every expectation. The quality of the finish is extraordinary — we're still finding little details that delight us months later.",
+      "The team at Lindon Homes exceeded every expectation. The quality of the finish is extraordinary, we're still finding little details that delight us months later.",
     author: "Pete & Helen Campbell",
   },
   {
     quote:
-      "We had a very difficult sloping block that other builders walked away from. Lindon didn't just take it on — they turned it into the standout feature of our home.",
+      "We had a very difficult sloping block that other builders walked away from. Lindon didn't just take it on, they turned it into the standout feature of our home.",
     author: "Matt & Antoinette Allen",
   },
   {
@@ -67,7 +67,7 @@ export default function Testimonials() {
               &ldquo;{t.quote}&rdquo;
             </p>
             <span className="text-[#c8a96e] text-xs tracking-widest uppercase">
-              — {t.author}
+              {t.author}
             </span>
           </div>
         ))}

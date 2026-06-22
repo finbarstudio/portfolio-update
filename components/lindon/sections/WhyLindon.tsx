@@ -17,7 +17,7 @@ const pillars = [
   },
   {
     title: "Superior Selections Process",
-    desc: "Our dedicated selections studio guides you through every material and finish — removing overwhelm and elevating outcomes.",
+    desc: "Our dedicated selections studio guides you through every material and finish, removing overwhelm and elevating outcomes.",
   },
   {
     title: "Impeccable Craftsmanship",

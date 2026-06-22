@@ -43,7 +43,7 @@ export default function SandboxError({
         This tool hit a snag
       </h1>
       <p className="sb-tool-sub" style={{ maxWidth: "46ch" }}>
-        Something went wrong loading the 3D preview. Try again — if it keeps
+        Something went wrong loading the 3D preview. Try again. If it keeps
         happening, it&rsquo;s most reliable on a desktop browser.
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 4 }}>

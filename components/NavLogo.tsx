@@ -24,7 +24,7 @@ export default function NavLogo({ onHome = false }: { onHome?: boolean }) {
     <Link
       href="/"
       className={`nav-logo ${onHome ? "is-home" : ""}`}
-      aria-label="finbarstudio — home"
+      aria-label="finbarstudio, home"
       onClick={(e) => {
         if (onHome) {
           e.preventDefault();

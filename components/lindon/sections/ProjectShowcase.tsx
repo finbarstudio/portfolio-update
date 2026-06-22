@@ -135,7 +135,7 @@ export default function ProjectShowcase({
           >
             <Image
               src={src}
-              alt={i === 0 ? `${project.title} — Lindon Homes` : ""}
+              alt={i === 0 ? `${project.title}, Lindon Homes` : ""}
               fill
               priority={index === 0 && i === 0}
               quality={90}

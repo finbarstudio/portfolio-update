@@ -4,11 +4,12 @@ import SiteFooter from "@/components/lindon/sections/SiteFooter";
 import ImageTrail from "@/components/lindon/ImageTrail";
 import ScrollText from "@/components/lindon/ScrollText";
 import Ticker from "@/components/lindon/Ticker";
+import CountUp from "@/components/lindon/CountUp";
 
 export const metadata = {
-  title: "About Us — Our Family History | Lindon Homes",
+  title: "About Us · Our Family History | Lindon Homes",
   description:
-    "Over 32 years of building excellence. The history of the Lindon family business — from Ashley & Lynn's beginnings to Lindon Homes today.",
+    "Over 32 years of building excellence. The history of the Lindon family business, from Ashley & Lynn's beginnings to Lindon Homes today.",
 };
 
 export default function AboutPage() {
@@ -83,7 +84,7 @@ export default function AboutPage() {
             />
           </div>
           <figcaption className="violet text-[10px] tracking-[0.2em] uppercase text-[var(--ink)]/45 mt-3">
-            Ashley Lindon — Founder
+            Ashley Lindon, Founder
           </figcaption>
         </figure>
       </section>
@@ -101,7 +102,7 @@ export default function AboutPage() {
             After meeting, Ashley &amp; Lynn combined forces as a sub-contract
             company constructing homes for other large double-storey project
             builders in the 1980’s. You would often see Lynn onsite alongside
-            Ashley with a wheelbarrow or shovel in hand — and it wasn’t long
+            Ashley with a wheelbarrow or shovel in hand, and it wasn’t long
             before Ashley obtained his Registered Builders Licence.
           </ScrollText>
           <ScrollText>
@@ -141,7 +142,7 @@ export default function AboutPage() {
           <ScrollText className="text-base md:text-lg font-light leading-relaxed max-w-2xl ml-auto">
             Trent Lindon joined the family team after five years of university.
             He spent several years supervising alongside Ashley &amp; working in
-            various parts of the business — carrying a dedication, an eye for
+            various parts of the business, carrying a dedication, an eye for
             detail &amp; a passion for building consulting &amp; design.
           </ScrollText>
           <blockquote
@@ -166,21 +167,21 @@ export default function AboutPage() {
           <ScrollText className="text-base md:text-lg font-light leading-relaxed">
             Since the inception of Lindon Homes the company has continued in
             growth, quality &amp; expertise in luxury home design &amp;
-            construction — recognised by building professionals as one of
+            construction, recognised by building professionals as one of
             Brisbane’s award-winning builders.
           </ScrollText>
           <div className="grid grid-cols-3 gap-6">
             {[
-              { n: "32+", l: "Years" },
-              { n: "500+", l: "Homes" },
-              { n: "20+", l: "Awards" },
-            ].map((s) => (
+              { n: 32, l: "Years" },
+              { n: 500, l: "Homes" },
+              { n: 20, l: "Awards" },
+            ].map((s, i) => (
               <div key={s.l}>
                 <div
                   className="violet text-[var(--ink)] text-3xl md:text-5xl"
                   style={{ letterSpacing: "0.03em" }}
                 >
-                  {s.n}
+                  <CountUp to={s.n} suffix="+" delay={i * 0.2} />
                 </div>
                 <div className="violet text-[var(--ink)]/55 text-[10px] tracking-[0.2em] uppercase mt-2">
                   {s.l}

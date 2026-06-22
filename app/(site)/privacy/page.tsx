@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description: "How finbar✶studio handles your data — what's collected, why, and your rights.",
+  description: "How finbar✶studio handles your data, what's collected, why, and your rights.",
   alternates: { canonical: "/privacy" },
   robots: { index: true, follow: true },
 };
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
           <h2 className="mono-heading text-ink">How long I keep it</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
             Waitlist emails are kept until the launch you signed up for, or until you ask to be
-            removed or withdraw consent — whichever comes first.
+            removed or withdraw consent, whichever comes first.
           </p>
         </section>
 

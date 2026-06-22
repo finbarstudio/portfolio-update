@@ -66,7 +66,7 @@ export default function Hero() {
         <div ref={imgRef} className="absolute inset-0 will-change-transform">
           <Image
             src="/lindon/hero.jpg"
-            alt="Lindon Homes — luxury custom home Brisbane"
+            alt="Lindon Homes, luxury custom home Brisbane"
             fill
             priority
             quality={90}
