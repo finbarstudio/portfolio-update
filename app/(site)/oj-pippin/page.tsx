@@ -6,7 +6,7 @@ import ContactCta from "@/components/ContactCta";
 
 // Private pitch page for OJ Pippin Homes (ojpippin.com.au). Same play as
 // /lindon: reachable by URL, kept out of the index, the sitemap and the public
-// nav — something Finbar sends, not something people find. Reuses the pitch
+// nav, something Finbar sends, not something people find. Reuses the pitch
 // CTA / card styles (.lindon-cta / .lindon-demo-card) from the Lindon page.
 export const metadata: Metadata = {
   title: { absolute: "For OJ Pippin Homes · Finbar Studio" },
@@ -28,12 +28,12 @@ const STATS = [
   {
     value: "1,000+",
     label: "Homes built",
-    note: "A thousand finished homes is a photo library most builders would envy. Right now the site leans on renders instead.",
+    note: "A thousand finished homes is a photo library most builders would envy, and right now it's barely on the site.",
   },
   {
     value: "No fine print",
     label: "All-inclusive",
-    note: "Your all-inclusive pricing is a genuine differentiator. It deserves to be front and centre, not a line buried in the copy.",
+    note: "Your all-inclusive pricing is a real edge. It should be one of the first things people see, not a line buried in the copy.",
   },
 ];
 
@@ -70,7 +70,7 @@ export default function OjPippinPage() {
         <Reveal as="div" immediate delay={0.5} className="mt-10 max-w-[62ch]">
           <p className="text-ink-soft" style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)", lineHeight: 1.5 }}>
             I&rsquo;m Finbar, a Brisbane designer. I built this page, and a working demo of your site,
-            because I think there&rsquo;s a sharper, more custom version of it in here, and I&rsquo;d
+            because I reckon there&rsquo;s a sharper, more custom version of it in here, and I&rsquo;d
             rather show you than just say it.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -92,8 +92,7 @@ export default function OjPippinPage() {
             I went looking at the best builders around Brisbane and OJ Pippin kept coming up. Thirty
             years, a thousand homes, all-inclusive pricing with no fine print. Then I opened the site.
             It&rsquo;s clean and it works, but it looks like a lot of other builder sites, and it leans
-            on renders where it could be showing the real homes you&rsquo;ve put your name to. For a
-            builder with your record, it could feel a lot more like one of one.
+            on renders where it could be showing the real homes you&rsquo;ve put your name to.
           </p>
         </div>
       </Reveal>
@@ -125,8 +124,8 @@ export default function OjPippinPage() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-6 mt-12">
           <div className="md:col-span-8 flex md:items-center">
             <p className="text-ink" style={{ fontSize: "clamp(1.15rem, 1.9vw, 1.6rem)", lineHeight: 1.4 }}>
-              A builder with a thousand homes behind them should feel one of one online, not one of
-              many. The site does its job today. It could be unmistakably yours.
+              A builder with a thousand homes behind them should feel one of one online. The site
+              does its job today. It could be unmistakably yours.
             </p>
           </div>
           <div className="md:col-span-4 flex md:items-center">
@@ -171,17 +170,17 @@ export default function OjPippinPage() {
           <div className="border-t border-line pt-5">
             <h3 className="mono-heading text-ink mb-3">The real homes</h3>
             <p className="text-ink-soft" style={{ fontSize: "clamp(1rem, 1.4vw, 1.2rem)", lineHeight: 1.55 }}>
-              A thousand finished homes is a goldmine. Real photography, shot and shown well, beats a
+              All those finished homes are a goldmine. Real photography, shot and shown well, beats a
               render every time, and it&rsquo;s the fastest way to look like the builder you already
-              are. I&rsquo;d build the site to put those homes front and centre.
+              are. I&rsquo;d build the site to put those homes first.
             </p>
           </div>
           <div className="border-t border-line pt-5">
             <h3 className="mono-heading text-ink mb-3">The range</h3>
             <p className="text-ink-soft" style={{ fontSize: "clamp(1rem, 1.4vw, 1.2rem)", lineHeight: 1.55 }}>
               Your design series, the Bree, the Willow, the Airlie and the rest, could be a proper
-              range people lose an afternoon in, sorted by size, bedrooms and block. Something to
-              explore, not a static list.
+              range people lose an afternoon in, sorted by size, bedrooms and block. Something people
+              actually explore.
             </p>
           </div>
         </div>

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 // Placeholder for the OJ Pippin Homes demo. Lives OUTSIDE the (site) route
 // group on purpose, so it carries none of the portfolio chrome (nav, footer,
-// contact drawer) — this slot is for Finbar's standalone demo build or an
+// contact drawer), this slot is for Finbar's standalone demo build or an
 // <iframe> of the hosted demo. Swap the body below when the real demo is ready.
 export const metadata: Metadata = {
   title: { absolute: "OJ Pippin Homes · Demo" },
