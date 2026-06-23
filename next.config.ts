@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     // Allowed next/image quality values. 75 = portfolio default; the rest are
     // used by the Lindon demo (app/lindon/site). Next 16 rejects any quality
     // not in this list once the array is set.
-    qualities: [55, 60, 75, 82, 90],
+    qualities: [40, 50, 55, 60, 75, 82, 85, 86, 88, 90],
     // Allow our own SVGs (e.g. the Lows wordmark) through next/image, sandboxed.
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",

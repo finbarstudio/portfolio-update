@@ -1,0 +1,231 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   OJ Pippin Homes demo — scoped styles.
+
+   The demo's globals, adapted to live inside the portfolio app without leaking:
+   - No `@import "tailwindcss"` / `@theme` here — the portfolio's single Tailwind
+     build generates the utilities. The bone/clay/cream/olive/sand/umber colour
+     tokens are registered once in app/globals.css @theme; their values (and the
+     ink/ink-soft overrides) are defined on `.ojpippin-site` below, so they only
+     apply inside the demo.
+   - Every bare element/`:root`/`html`/`a`/`section`/`::selection` rule is scoped
+     under `.ojpippin-site`. @keyframes stay top-level (only loaded on these
+     routes; names don't collide with the portfolio).
+   - Fonts (Fraunces + Hanken) come from next/font variables set on the wrapper
+     in layout.tsx.
+
+   Loaded only via app/oj-pippin/site/layout.tsx.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.ojpippin-site {
+  --bone:      #f4eee3;
+  --bone-2:    #ece1d1;
+  --cream:     #fbf7ef;
+  --ink:       #211c17;
+  --ink-soft:  #534b40;
+  --clay:      #b35a33;
+  --clay-soft: #c47a55;
+  --olive:     #6e6e62;
+  --sand:      #d8c8b1;
+  --umber:     #221c16;
+
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  min-height: 100svh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headings, Fraunces, light, faintly tightened */
+.ojpippin-site :is(h1, h2, h3, h4, h5, h6),
+.ojpippin-site .display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 300;
+  letter-spacing: -0.012em;
+  line-height: 1.04;
+}
+
+.ojpippin-site .display-italic {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.ojpippin-site .eyebrow {
+  font-family: var(--font-hanken), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.26em;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.ojpippin-site .tracked {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.ojpippin-site .wordmark {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Nav/logo colour adapts to what's behind it: cream over dark, brown over light */
+.ojpippin-site .nav-tinted {
+  color: var(--cream);
+  text-shadow: 0 1px 22px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  transition: color 0.45s ease;
+}
+html.nav-light .ojpippin-site .nav-tinted {
+  color: var(--ink);
+  text-shadow: none;
+}
+
+.ojpippin-site ::selection {
+  background: var(--clay);
+  color: var(--cream);
+}
+
+.ojpippin-site a { color: inherit; }
+
+.ojpippin-site section { position: relative; }
+
+/* ── Lenis smooth scroll (html-level; only present on the demo routes) ── */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes scrollDrop {
+  0%   { transform: translateY(-100%); opacity: 1; }
+  100% { transform: translateY(220%); opacity: 0; }
+}
+@keyframes vcspin {
+  to { transform: rotate(360deg); }
+}
+@keyframes navpop {
+  0%   { opacity: 0; transform: translateY(-7px) scale(0.8); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes grainShift {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(-1.5%, 1%); }
+}
+.ojpippin-site .nav-enter {
+  animation: navpop 0.55s cubic-bezier(0.34, 1.6, 0.5, 1) both;
+  animation-delay: 2.55s;
+}
+
+/* Subtle paper grain overlay utility */
+.ojpippin-site .grain::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* ── Giant footer wordmark ──────────────────────────────────── */
+.ojpippin-site .of {
+  position: relative;
+  min-height: 560px;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--umber);
+  color: var(--cream);
+  padding-top: calc(3.5rem + 6px);
+}
+.ojpippin-site .of-info {
+  margin-top: auto;
+  padding: 0 clamp(20px, 3vw, 44px) clamp(22px, 3.5vh, 48px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: end;
+  gap: 1.8rem 1.5rem;
+  font-size: 12px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+@media (min-width: 768px) {
+  .ojpippin-site .of-info { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+}
+.ojpippin-site .of-col { display: flex; flex-direction: column; align-items: flex-start; }
+.ojpippin-site .of-col-end { align-items: flex-end; text-align: right; }
+.ojpippin-site .of-mask { overflow: hidden; }
+.ojpippin-site .of-reveal { display: flex; flex-direction: column; align-items: inherit; }
+.ojpippin-site .of-label {
+  font-family: var(--font-hanken), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--clay-soft);
+  margin-bottom: 0.7em;
+}
+.ojpippin-site .of-value { color: rgba(251, 247, 239, 0.82); }
+.ojpippin-site .of-link { color: rgba(251, 247, 239, 0.82); text-decoration: none; transition: color 0.25s; }
+.ojpippin-site .of-link:hover { color: var(--cream); }
+.ojpippin-site .of-mark {
+  width: 100%;
+  padding: 0 clamp(16px, 2.6vw, 38px) clamp(8px, 1.4vw, 20px);
+  line-height: 0.78;
+  overflow: hidden;
+}
+.ojpippin-site .of-mark-inner {
+  display: inline-block;
+  width: max-content;
+  white-space: nowrap;
+  color: var(--cream);
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  font-size: clamp(2rem, 11vw, 16rem);
+}
+
+/* ── "Back to finbar.studio" tab — pink brand bubble, expands on hover ── */
+.ojpippin-site .ld-back {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  height: 42px;
+  background: var(--pink, #e8718b);
+  color: #fbf7ef;
+  border-radius: 999px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(33, 28, 22, 0.22);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.ojpippin-site .ld-back:hover { transform: translateY(-50%) scale(1.03); box-shadow: 0 6px 18px rgba(33, 28, 22, 0.3); }
+.ojpippin-site .ld-back-arrow { flex: 0 0 42px; width: 42px; height: 42px; display: grid; place-items: center; font-size: 16px; line-height: 1; }
+.ojpippin-site .ld-back-text {
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 0;
+  transition: max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, padding-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ojpippin-site .ld-back:hover .ld-back-text,
+.ojpippin-site .ld-back:focus-visible .ld-back-text { max-width: 260px; opacity: 1; padding-right: 1.2rem; }
+@media (prefers-reduced-motion: reduce) {
+  .ojpippin-site .ld-back, .ojpippin-site .ld-back-text { transition: none; }
+}

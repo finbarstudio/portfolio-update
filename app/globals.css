@@ -45,6 +45,18 @@
   --ink-soft:   #6E675C;   /* warm grey, secondary text (AA on cream)     */
   --line:       #E2D8C5;   /* warm hairline borders                       */
 
+  /* OJ Pippin demo palette (used only by app/oj-pippin/site via @theme tokens
+     + .ojpippin-site). Defined here so the @theme color utilities resolve at
+     build. ink/ink-soft reuse the portfolio's above (near-identical). */
+  --bone:       #f4eee3;
+  --bone-2:     #ece1d1;
+  --cream:      #fbf7ef;
+  --clay:       #b35a33;
+  --clay-soft:  #c47a55;
+  --olive:      #6e6e62;
+  --sand:       #d8c8b1;
+  --umber:      #221c16;
+
   --pink:       #E8718B;   /* ★ PRIMARY accent, pastel coral-rose         */
   --pink-soft:  #F6C9D1;   /* light wash of the accent (reveals, fills)   */
 
@@ -150,6 +162,17 @@
   --color-surface:        var(--surface);
   --color-surface-raised: var(--surface-raised);
   --color-surface-sunken: var(--surface-sunken);
+
+  /* OJ Pippin demo palette (app/oj-pippin/site). Values live on .ojpippin-site
+     in ojpippin-site.css, so these utilities only resolve inside the demo. */
+  --color-bone:      var(--bone);
+  --color-bone-2:    var(--bone-2);
+  --color-cream:     var(--cream);
+  --color-clay:      var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-olive:     var(--olive);
+  --color-sand:      var(--sand);
+  --color-umber:     var(--umber);
 
   --font-sans: var(--font-primary);
   /* Space Mono (Google) — wide-tracked caps for small details only: dates,
