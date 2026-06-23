@@ -28,7 +28,7 @@ const STATS = [
   {
     value: "1,000+",
     label: "Homes built",
-    note: "A thousand finished homes is a photo library most builders would envy, and right now it's barely on the site.",
+    note: "A thousand finished homes is the kind of back catalogue most builders would envy. There's a lot a site could do with that.",
   },
   {
     value: "No fine print",
@@ -91,8 +91,8 @@ export default function OjPippinPage() {
           <p className="text-ink" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)", lineHeight: 1.55 }}>
             I went looking at the best builders around Brisbane and OJ Pippin kept coming up. Thirty
             years, a thousand homes, all-inclusive pricing with no fine print. Then I opened the site.
-            It&rsquo;s clean and it works, but it looks like a lot of other builder sites, and it leans
-            on renders where it could be showing the real homes you&rsquo;ve put your name to.
+            It&rsquo;s clean and it does the job, but it looks like a lot of other builder sites. For a
+            builder with your record, it could be the one that stops people scrolling.
           </p>
         </div>
       </Reveal>
@@ -168,11 +168,11 @@ export default function OjPippinPage() {
         <h2 className="home-display-sm mb-10 max-w-[20ch]">Honestly, I&rsquo;m keen on this one.</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
           <div className="border-t border-line pt-5">
-            <h3 className="mono-heading text-ink mb-3">The real homes</h3>
+            <h3 className="mono-heading text-ink mb-3">The homes</h3>
             <p className="text-ink-soft" style={{ fontSize: "clamp(1rem, 1.4vw, 1.2rem)", lineHeight: 1.55 }}>
-              All those finished homes are a goldmine. Real photography, shot and shown well, beats a
-              render every time, and it&rsquo;s the fastest way to look like the builder you already
-              are. I&rsquo;d build the site to put those homes first.
+              A thousand homes is a goldmine. I&rsquo;d build the site to put the work first, big and
+              immersive, the way people actually want to browse homes. Give the best ones room to
+              breathe and let someone fall for a build before they read a word.
             </p>
           </div>
           <div className="border-t border-line pt-5">
