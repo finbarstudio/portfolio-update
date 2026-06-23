@@ -5,7 +5,7 @@ import MaskReveal from "@/components/MaskReveal";
 import ContactCta from "@/components/ContactCta";
 
 // Private pitch page for Lindon Homes. Reachable by URL, kept out of the index,
-// the sitemap and the public nav — it's something Finbar sends, not something
+// the sitemap and the public nav, something Finbar sends, not something
 // people find. Editorial two-column sections keep it tight.
 export const metadata: Metadata = {
   title: { absolute: "For Lindon Homes · Finbar Studio" },
@@ -62,7 +62,7 @@ export default function LindonPage() {
         <Reveal as="div" immediate delay={0.5} className="mt-10 max-w-[62ch]">
           <p className="text-ink-soft" style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)", lineHeight: 1.5 }}>
             I&rsquo;m Finbar, a Brisbane designer. I built this page, and a working demo of your site,
-            because I think your work deserves far better online, and I&rsquo;d rather show you than
+            because I reckon your work deserves far better online, and I&rsquo;d rather show you than
             just say it.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -98,7 +98,7 @@ export default function LindonPage() {
           </div>
           <div className="md:col-span-7 flex md:items-end">
             <p className="text-ink-soft" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)", lineHeight: 1.5 }}>
-              I dug into your search and traffic first. Here is what stood out.
+              I dug into your search and traffic first. Here&rsquo;s what stood out.
             </p>
           </div>
         </div>
@@ -153,9 +153,10 @@ export default function LindonPage() {
               View the live demo &rarr;
             </Link>
             <p className="text-ink-soft mt-5" style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>
-              It&rsquo;s a responsive build, so it reflows to fit whatever screen it&rsquo;s on. It&rsquo;s
-              at its best on desktop, so open it there and have a click around. The full nav is there,
-              but only Home, Portfolio and About Us are built so far, so those are the links that work.
+              It&rsquo;s a responsive build that reflows to fit whatever screen it&rsquo;s on, though
+              it&rsquo;s at its best on desktop, so open it there and have a click around. The full nav
+              is there, but only Home, Portfolio and About Us are built so far, so those are the links
+              that work.
             </p>
           </div>
         </div>
