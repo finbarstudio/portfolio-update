@@ -2838,10 +2838,17 @@
    ════════════════════════════════════════════════════════════════════ */
 
 .sb-root {
-  /* Sandbox uses the main site's warm palette (cream bg, warm ink, pink accent) —
-     it just adds its own subtle surfaces + the device-radius tokens. */
-  --sb-surface: color-mix(in srgb, var(--ink) 2.5%, var(--bg));
-  --sb-surface-2: color-mix(in srgb, var(--ink) 5%, var(--bg));
+  /* Inverted palette: the sandbox runs dark — ink becomes the ground, the cream
+     becomes the text, pink stays. Every .sb-* class reads these vars directly
+     (no Tailwind colour utilities here), so overriding them flips the whole UI.
+     Surfaces/lines below are derived from the vars, so they invert with them. */
+  --bg: #211E1A;          /* ground (was the cream) */
+  --ink: #F6EFE1;         /* text (was the ink) */
+  --ink-soft: color-mix(in srgb, var(--ink) 58%, var(--bg));
+  --line: color-mix(in srgb, var(--ink) 16%, transparent);
+
+  --sb-surface: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  --sb-surface-2: color-mix(in srgb, var(--ink) 8%, var(--bg));
   --sb-line: var(--line);
   /* Small device corner radius + the neutral very-dark-grey bezel it paints into. */
   --sb-screen-radius: 16px;
