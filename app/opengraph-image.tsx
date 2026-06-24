@@ -6,11 +6,9 @@ import { ASTERISK_POINTS } from "@/components/brand-asterisk";
  *
  * Next.js auto-emits this as the `og:image` / `twitter:image` for every route
  * that doesn't set its own (home, about). Case studies override it with their
- * hero image in `generateMetadata`. Generated at build time as a 1200×630 PNG —
- * Swiss/type-driven to match the site, on the cream brand ground.
- *
- * The brand asterisk is drawn as an inline SVG polygon (next/og's bundled font
- * has no glyph for it), matching the mark in the site wordmark.
+ * hero image in `generateMetadata`. Generated at 1200×630 on the cream brand
+ * ground, built around the canonical logo: FINBARSTUDIO in Space Mono caps,
+ * no space, the brand asterisk on the end.
  */
 
 export const alt =
@@ -34,7 +32,29 @@ function Mark({ size: s, color = PINK }: { size: number; color?: string }) {
   );
 }
 
-export default function OpengraphImage() {
+// Space Mono (the wordmark face) isn't bundled with next/og, so fetch it from
+// Google Fonts at generation time. Falls back to the default face if offline.
+async function loadSpaceMono(weight: number): Promise<ArrayBuffer | null> {
+  try {
+    const css = await fetch(
+      `https://fonts.googleapis.com/css2?family=Space+Mono:wght@${weight}`
+    ).then((r) => r.text());
+    const url = css.match(
+      /src:\s*url\((https:\/\/[^)]+)\)\s*format\(['"]?(?:woff2?|truetype|opentype)['"]?\)/
+    )?.[1];
+    if (!url) return null;
+    return await fetch(url).then((r) => r.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
+export default async function OpengraphImage() {
+  const mono = await loadSpaceMono(700);
+  const fonts = mono
+    ? [{ name: "Space Mono", data: mono, weight: 700 as const, style: "normal" as const }]
+    : undefined;
+
   return new ImageResponse(
     (
       <div
@@ -47,37 +67,35 @@ export default function OpengraphImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "sans-serif",
+          fontFamily: "Space Mono, monospace",
           position: "relative",
         }}
       >
-        {/* The mark, big and centred — the asterisk + wordmark are the image. */}
-        <div style={{ display: "flex", marginBottom: 36 }}>
-          <Mark size={132} />
-        </div>
+        {/* Canonical wordmark: FINBARSTUDIO caps, no space, asterisk on the end */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            fontSize: 92,
+            fontSize: 88,
             fontWeight: 700,
             letterSpacing: "-0.02em",
+            textTransform: "uppercase",
             lineHeight: 1,
           }}
         >
-          finbar
-          <div style={{ display: "flex", margin: "0 8px" }}>
-            <Mark size={56} />
+          FINBARSTUDIO
+          <div style={{ display: "flex", marginLeft: 8 }}>
+            <Mark size={62} />
           </div>
-          studio
         </div>
+
         <div
           style={{
             display: "flex",
-            marginTop: 30,
-            fontSize: 30,
+            marginTop: 36,
+            fontSize: 28,
             color: INK_SOFT,
-            letterSpacing: "0.01em",
+            letterSpacing: "0.02em",
           }}
         >
           Brisbane graphic &amp; web design
@@ -89,9 +107,9 @@ export default function OpengraphImage() {
             display: "flex",
             position: "absolute",
             bottom: 56,
-            fontSize: 24,
-            fontWeight: 600,
-            letterSpacing: "0.08em",
+            fontSize: 22,
+            fontWeight: 700,
+            letterSpacing: "0.1em",
             textTransform: "uppercase",
             color: PINK,
           }}
@@ -100,6 +118,6 @@ export default function OpengraphImage() {
         </div>
       </div>
     ),
-    { ...size }
+    { ...size, fonts }
   );
 }
