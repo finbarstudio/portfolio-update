@@ -109,6 +109,10 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes vcspin {
   to { transform: rotate(360deg); }
 }
+@keyframes arrowBob {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  50% { transform: translateY(9px); opacity: 1; }
+}
 @keyframes navpop {
   0%   { opacity: 0; transform: translateY(-7px) scale(0.8); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -141,7 +145,7 @@ html.lenis, html.lenis body { height: auto; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--umber);
+  background: linear-gradient(to bottom, #1a140e 0%, #14100a 100%);
   color: var(--cream);
   padding-top: calc(3.5rem + 6px);
 }
@@ -161,6 +165,10 @@ html.lenis, html.lenis body { height: auto; }
 }
 .ojpippin-site .of-col { display: flex; flex-direction: column; align-items: flex-start; }
 .ojpippin-site .of-col-end { align-items: flex-end; text-align: right; }
+@media (max-width: 767px) {
+  .ojpippin-site .of-info { grid-template-columns: 1fr; gap: 1.4rem; text-align: center; }
+  .ojpippin-site .of-col, .ojpippin-site .of-col-end { align-items: center; text-align: center; }
+}
 .ojpippin-site .of-mask { overflow: hidden; }
 .ojpippin-site .of-reveal { display: flex; flex-direction: column; align-items: inherit; }
 .ojpippin-site .of-label {

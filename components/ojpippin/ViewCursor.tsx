@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
- * Follow-cursor badge: the label set in rotating type around a small ring with
- * an arrow at the centre. Shows over elements marked [data-cursor]; suppressed
- * over [data-cursor-skip] (e.g. the clickable thumbnails keep a normal pointer).
+ * Follow-cursor badge: the label set twice around a ring, stretched to fill the
+ * whole circumference so there's no gap, with an arrow at the centre. Shows over
+ * elements marked [data-cursor]; suppressed over [data-cursor-skip].
  */
+const R = 36;
+const CIRC = 2 * Math.PI * R;
+
 export default function ViewCursor() {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
@@ -22,8 +25,8 @@ export default function ViewCursor() {
     let raf = 0;
 
     const loop = () => {
-      cur.x += (pos.x - cur.x) * 0.28;
-      cur.y += (pos.y - cur.y) * 0.28;
+      cur.x += (pos.x - cur.x) * 0.3;
+      cur.y += (pos.y - cur.y) * 0.3;
       el.style.transform = `translate3d(${cur.x}px, ${cur.y}px, 0) translate(-50%, -50%)`;
       raf = requestAnimationFrame(loop);
     };
@@ -50,46 +53,53 @@ export default function ViewCursor() {
     };
   }, []);
 
-  const ringText = useMemo(() => {
-    const unit = `${label.toUpperCase()}   •   `;
-    const repeats = Math.max(2, Math.round(30 / unit.length));
-    return unit.repeat(repeats);
-  }, [label]);
+  const L = label.toUpperCase();
+  const ring = `${L} • ${L} • `;
 
   return (
     <div
       ref={ref}
       aria-hidden
-      className={`fixed left-0 top-0 z-[200] pointer-events-none transition-[opacity] duration-200 ${
+      className={`fixed left-0 top-0 z-[200] pointer-events-none transition-opacity duration-200 ${
         active ? "opacity-100" : "opacity-0"
       }`}
     >
       <div
-        className={`relative w-[76px] h-[76px] flex items-center justify-center transition-transform duration-300 ${
+        className={`relative w-[92px] h-[92px] flex items-center justify-center transition-transform duration-300 ${
           active ? "scale-100" : "scale-50"
         }`}
       >
-        <div className="absolute inset-0 rounded-full bg-[rgba(16,11,8,0.45)]" />
+        <div className="absolute inset-0 rounded-full bg-[rgba(16,11,8,0.42)]" />
         <svg
           viewBox="0 0 100 100"
           className="absolute inset-0 w-full h-full"
-          style={{ animation: "vcspin 10s linear infinite" }}
+          style={{ animation: "vcspin 11s linear infinite" }}
         >
           <defs>
-            <path id="vc-path" d="M50,50 m-35,0 a35,35 0 1,1 70,0 a35,35 0 1,1 -70,0" fill="none" />
+            <path
+              id="vc-path"
+              d={`M50,50 m-${R},0 a${R},${R} 0 1,1 ${R * 2},0 a${R},${R} 0 1,1 -${R * 2},0`}
+              fill="none"
+            />
           </defs>
           <text
             fill="var(--cream)"
-            style={{ fontFamily: "var(--font-hanken), sans-serif", fontSize: "8px", letterSpacing: "1.4px", fontWeight: 500 }}
+            style={{ fontFamily: "var(--font-hanken), sans-serif", fontSize: "10px", fontWeight: 500 }}
           >
-            <textPath xlinkHref="#vc-path" href="#vc-path">
-              {ringText}
+            <textPath
+              xlinkHref="#vc-path"
+              href="#vc-path"
+              startOffset="0"
+              textLength={CIRC}
+              lengthAdjust="spacingAndGlyphs"
+            >
+              {ring}
             </textPath>
           </text>
         </svg>
         <svg
           viewBox="0 0 24 24"
-          className="relative w-3.5 h-3.5"
+          className="relative w-4 h-4"
           fill="none"
           stroke="var(--cream)"
           strokeWidth="1.5"

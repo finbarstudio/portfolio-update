@@ -43,7 +43,7 @@ export default function Manifesto() {
   return (
     <section
       ref={ref}
-      className="bg-bone-2 px-6 md:px-16 py-28 md:py-40"
+      className="bg-bone-2 px-6 md:px-16 lg:px-24 py-24 md:py-32"
       id="story"
     >
       <p className="eyebrow text-clay mb-10 md:mb-14">{manifesto.eyebrow}</p>

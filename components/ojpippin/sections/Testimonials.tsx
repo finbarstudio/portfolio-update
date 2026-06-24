@@ -1,26 +1,28 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import MaskReveal from "@/components/ojpippin/MaskReveal";
 import { testimonials } from "@/components/ojpippin/lib/content";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/**
+ * A quiet dark moment. Three owner reviews stand side by side, divided by
+ * hairlines, the words carry the weight, the brand stays out of the way.
+ */
 export default function Testimonials() {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".t-line", {
+      gsap.from(".testi-card", {
         y: 32,
         opacity: 0,
-        duration: 0.9,
+        duration: 0.85,
         ease: "power3.out",
-        stagger: 0.1,
-        scrollTrigger: { trigger: ref.current, start: "top 70%" },
+        stagger: 0.12,
+        scrollTrigger: { trigger: ".testi-grid", start: "top 72%" },
       });
     }, ref);
     return () => ctx.revert();
@@ -28,70 +30,43 @@ export default function Testimonials() {
 
   return (
     <section
-      id="reviews"
       ref={ref}
-      className="min-h-screen flex flex-col justify-center bg-bone px-8 md:px-16 lg:px-24 py-24 md:py-32"
+      id="reviews"
+      data-tone="dark"
+      className="px-6 md:px-16 lg:px-24 pt-24 md:pt-32 pb-16 md:pb-24"
+      style={{ background: "linear-gradient(to bottom, #221c16 0%, #1a140e 100%)" }}
     >
-      <div className="w-full grid grid-cols-1 md:grid-cols-7 gap-y-20 md:gap-x-8 md:gap-y-28">
-        {/* Heading, sticky, holds top-left while the quotes cascade past */}
-        <h2
-          className="t-line md:col-span-4 md:self-start md:sticky md:top-28 text-ink font-light leading-[1.0]"
-          style={{ fontSize: "clamp(2.6rem, 6vw, 5.5rem)" }}
-        >
-          What our
-          <br />
-          owners <span className="display-italic">say.</span>
-        </h2>
+      <h2
+        className="text-cream font-light leading-[1.02] max-w-3xl mb-14 md:mb-20 text-center md:text-left mx-auto md:mx-0"
+        style={{ fontSize: "clamp(2.4rem, 5.5vw, 4.5rem)" }}
+      >
+        What our owners say.
+      </h2>
 
-        {/* Quote 01, upper right, cols 5–7, sits high */}
-        <blockquote className="t-line md:col-start-5 md:col-span-3 md:self-start">
-          <p className="text-ink font-light text-xl md:text-2xl leading-relaxed">
-            &ldquo;{testimonials[0].quote}&rdquo;
-          </p>
-          <footer className="mt-7">
-            <div className="text-clay text-base">{testimonials[0].author}</div>
-            <div className="text-ink-soft text-sm mt-1">{testimonials[0].place}</div>
-          </footer>
-        </blockquote>
+      <div className="testi-grid grid grid-cols-1 md:grid-cols-3 border-t border-cream/12">
+        {testimonials.map((t) => (
+          <figure
+            key={t.author}
+            className="testi-card flex flex-col items-center md:items-start text-center md:text-left border-b border-cream/12 md:border-b-0 md:border-l md:first:border-l-0 border-cream/12 py-10 md:py-12 md:px-10 md:first:pl-0 md:last:pr-0"
+          >
+            <span
+              aria-hidden="true"
+              className="font-serif text-clay-soft leading-none select-none mb-4"
+              style={{ fontFamily: "var(--font-fraunces, serif)", fontSize: "3rem" }}
+            >
+              &ldquo;
+            </span>
 
-        {/* Quote 02, left block, cols 1–4, dropped lower */}
-        <blockquote className="t-line md:col-start-1 md:col-span-4 md:self-end md:mt-20">
-          <p className="text-ink font-light text-xl md:text-2xl leading-relaxed">
-            &ldquo;{testimonials[1].quote}&rdquo;
-          </p>
-          <footer className="mt-7">
-            <div className="text-clay text-base">{testimonials[1].author}</div>
-            <div className="text-ink-soft text-sm mt-1">{testimonials[1].place}</div>
-          </footer>
-        </blockquote>
+            <blockquote className="text-cream/85 text-lg leading-relaxed font-normal flex-1">
+              {t.quote}
+            </blockquote>
 
-        {/* Portrait, tucked into the empty upper-right cell, side reveal */}
-        <MaskReveal
-          direction="left"
-          className="t-line hidden md:block md:col-start-6 md:col-span-2 md:self-start"
-        >
-          <div className="relative aspect-[3/4] w-full overflow-hidden">
-            <Image
-              src="/oj-pippin/homes/photo-real.jpg"
-              alt="An OJ Pippin home, lived in"
-              fill
-              sizes="(max-width: 768px) 100vw, 28vw"
-              quality={85}
-              className="object-cover"
-            />
-          </div>
-        </MaskReveal>
-
-        {/* Quote 03, centre-left, cols 2–5, lowest in the cascade */}
-        <blockquote className="t-line md:col-start-2 md:col-span-4 md:self-end md:mt-16">
-          <p className="text-ink font-light text-xl md:text-2xl leading-relaxed">
-            &ldquo;{testimonials[2].quote}&rdquo;
-          </p>
-          <footer className="mt-7">
-            <div className="text-clay text-base">{testimonials[2].author}</div>
-            <div className="text-ink-soft text-sm mt-1">{testimonials[2].place}</div>
-          </footer>
-        </blockquote>
+            <figcaption className="mt-8">
+              <p className="eyebrow text-clay-soft">{t.author}</p>
+              <p className="text-cream/50 text-xs mt-2">{t.place}</p>
+            </figcaption>
+          </figure>
+        ))}
       </div>
     </section>
   );

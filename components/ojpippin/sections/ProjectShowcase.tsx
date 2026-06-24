@@ -57,6 +57,22 @@ export default function ProjectShowcase({
         stagger: 0.08,
         scrollTrigger: { trigger: sectionRef.current, start: "top 55%" },
       });
+      // Thumbnails mask in, separators pop, staggered
+      gsap.from(".ps-thumb", {
+        yPercent: 130,
+        duration: 0.85,
+        ease: "power3.out",
+        stagger: 0.12,
+        scrollTrigger: { trigger: sectionRef.current, start: "top 52%" },
+      });
+      gsap.from(".ps-icon", {
+        opacity: 0,
+        scale: 0.4,
+        duration: 0.6,
+        ease: "back.out(2)",
+        stagger: 0.12,
+        scrollTrigger: { trigger: sectionRef.current, start: "top 52%" },
+      });
     }, sectionRef);
     return () => ctx.revert();
   }, []);
@@ -106,8 +122,8 @@ export default function ProjectShowcase({
 
       {/* Caption + thumbnails */}
       <div ref={layerRef} className="absolute inset-0 pointer-events-none">
-        {/* title, bottom left */}
-        <div className="absolute bottom-8 left-6 md:bottom-12 md:left-10">
+        {/* title, bottom (centre on mobile, left on desktop) */}
+        <div className="absolute bottom-8 left-6 right-6 md:right-auto md:bottom-12 md:left-10 text-center md:text-left">
           <h2 className="ps-line text-cream font-light leading-none" style={{ fontSize: "clamp(2.6rem, 7vw, 5.5rem)" }}>
             {project.title}
           </h2>
@@ -116,22 +132,30 @@ export default function ProjectShowcase({
           </p>
         </div>
 
-        {/* thumbnails, top right under nav, widescreen, widely spaced */}
-        <div className="ps-line absolute top-[5.5rem] right-6 md:right-10 flex gap-8 md:gap-16 pointer-events-auto">
+        {/* thumbnails with separator icons, top right under nav */}
+        <div className="absolute top-[5.5rem] right-6 md:right-10 flex items-center gap-5 md:gap-8 pointer-events-auto">
           {project.images.map((src, i) => (
-            <button
-              key={src}
-              onClick={() => select(i)}
-              data-cursor-skip
-              aria-label={`View image ${i + 1} of ${project.title}`}
-              className={`relative w-20 h-9 md:w-28 md:h-12 overflow-hidden rounded-md cursor-pointer transition-all duration-300 ${
-                i === active
-                  ? "ring-1 ring-cream/70"
-                  : "ring-1 ring-cream/15 hover:ring-cream/50"
-              }`}
-            >
-              <Image src={src} alt="" fill quality={50} className="object-cover" sizes="112px" />
-            </button>
+            <div key={src} className="flex items-center gap-5 md:gap-8">
+              {i > 0 && (
+                <span className="ps-icon text-cream/45" aria-hidden>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 8 L5 12 L9 16 M5 12 H19 M15 8 L19 12 L15 16" />
+                  </svg>
+                </span>
+              )}
+              <span className="block overflow-hidden rounded-md">
+                <button
+                  onClick={() => select(i)}
+                  data-cursor="Switch view"
+                  aria-label={`View image ${i + 1} of ${project.title}`}
+                  className={`ps-thumb relative block w-20 h-9 md:w-28 md:h-12 overflow-hidden rounded-md transition-shadow duration-300 ${
+                    i === active ? "ring-1 ring-cream/70" : "ring-1 ring-cream/15 hover:ring-cream/50"
+                  }`}
+                >
+                  <Image src={src} alt="" fill quality={50} className="object-cover" sizes="112px" />
+                </button>
+              </span>
+            </div>
           ))}
         </div>
       </div>

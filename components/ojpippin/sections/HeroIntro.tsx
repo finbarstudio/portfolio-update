@@ -8,6 +8,10 @@ import { heritage } from "@/components/ojpippin/lib/content";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Module-level so a back-navigation remount skips the preloader. Plays once per
+// page load; a hard reload re-runs the module and replays it.
+let introPlayed = false;
+
 export default function HeroIntro() {
   const sectionRef = useRef<HTMLElement>(null);
   const clipRef = useRef<HTMLDivElement>(null);
@@ -26,78 +30,77 @@ export default function HeroIntro() {
 
     let tl: gsap.core.Timeline | null = null;
 
-    const run = () => {
+    const compute = () => {
       const isMobile = window.innerWidth < 768;
       const pad = isMobile ? 24 : 40;
       const navCenterY = isMobile ? 32 : 40; // half of nav height (h-16 / h-20)
-
-      // Reset, measure at hero size
       gsap.set([oj, pippin], { x: 0 });
       gsap.set(wrap, { y: 0, scale: 1, transformOrigin: "center center" });
-
-      const btnR = btn.getBoundingClientRect();
-      const half = btnR.height / 2;
-      const startY = window.innerHeight / 2 - half; // centre vertically
-      const endY = navCenterY - half;
+      const half = btn.getBoundingClientRect().height / 2;
       const heroPx = parseFloat(getComputedStyle(btn).fontSize);
-      const navScale = 15 / heroPx;
-
       const ojR = oj.getBoundingClientRect();
       const piR = pippin.getBoundingClientRect();
-      const ojX = pad - ojR.left; // OJ → left padding
-      const piX = window.innerWidth - pad - piR.right; // PIPPIN → right padding
+      return {
+        startY: window.innerHeight / 2 - half,
+        endY: navCenterY - half,
+        navScale: 15 / heroPx,
+        ojX: pad - ojR.left,
+        piX: window.innerWidth - pad - piR.right,
+      };
+    };
 
-      // Initial states
-      gsap.set(wrap, { y: startY });
-      gsap.set(oj, { x: ojX });
-      gsap.set(pippin, { x: piX });
+    // Repeat visit (back to home, from contact): skip the preloader entirely.
+    const runSkip = () => {
+      const p = compute();
+      gsap.set(wrap, { y: p.endY, scale: p.navScale, autoAlpha: 1 });
+      gsap.set([oj, pippin], { x: 0 });
+      gsap.set(".hero-line", { yPercent: 0 });
+      gsap.set(".hero-meta", { yPercent: 0 });
+      gsap.set(clipRef.current, { clipPath: "inset(0% 0% 0% 0%)" });
+      gsap.set(preBgRef.current, { autoAlpha: 0 });
+      window.dispatchEvent(new Event("ojp:intro-done"));
+    };
+
+    // First load: the full converge → reveal → dock sequence.
+    const runFull = () => {
+      const p = compute();
+      // Position the logo, THEN reveal it — kills the first-frame jump.
+      gsap.set(wrap, { y: p.startY, autoAlpha: 1 });
+      gsap.set(oj, { x: p.ojX });
+      gsap.set(pippin, { x: p.piX });
       gsap.set(".hero-line", { yPercent: 120 });
       gsap.set(".hero-meta", { yPercent: 120 });
       gsap.set(clipRef.current, { clipPath: "inset(100% 0% 0% 0%)" });
-      gsap.set(preBgRef.current, { opacity: 1 });
+      gsap.set(preBgRef.current, { autoAlpha: 1 });
 
-      tl = gsap.timeline();
-      // ── Preloader (~2s): OJ + PIPPIN converge to centre ──
+      tl = gsap.timeline({ onComplete: () => { introPlayed = true; } });
       tl.to([oj, pippin], { x: 0, duration: 1.25, ease: "power3.inOut" }, 0.3)
         .to({}, { duration: 0.45 })
-        // ── Reveal (~3s) ──
-        .to(
-          preBgRef.current,
-          {
-            opacity: 0,
-            duration: 0.9,
-            ease: "power2.inOut",
-            onComplete: () => {
-              if (preBgRef.current) preBgRef.current.style.pointerEvents = "none";
-            },
-          },
-          2.0
-        )
-        .to(
-          clipRef.current,
-          { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "power3.inOut" },
-          2.0
-        )
-        .to(wrap, { y: endY, scale: navScale, duration: 1.2, ease: "power3.inOut" }, 2.3)
+        .to(preBgRef.current, { autoAlpha: 0, duration: 0.9, ease: "power2.inOut" }, 2.0)
+        .to(clipRef.current, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "power3.inOut" }, 2.0)
+        .to(wrap, { y: p.endY, scale: p.navScale, duration: 1.2, ease: "power3.inOut" }, 2.3)
         .to(".hero-line", { yPercent: 0, duration: 1.0, stagger: 0.14, ease: "power4.out" }, 2.65)
         .to(".hero-meta", { yPercent: 0, duration: 0.95, stagger: 0.12, ease: "power4.out" }, 2.8)
         .add(() => window.dispatchEvent(new Event("ojp:intro-done")), 2.55);
+    };
 
-      // Parallax drift once revealed
+    const go = () => (introPlayed ? runSkip() : runFull());
+
+    const ctx = gsap.context(() => {
+      if (document.fonts?.ready) document.fonts.ready.then(go);
+      else go();
+
+      // Parallax drift (always on)
       gsap.to(imgRef.current, {
         yPercent: 14,
         ease: "none",
         scrollTrigger: { trigger: sectionRef.current, start: "top top", end: "bottom top", scrub: true },
       });
-    };
-
-    const ctx = gsap.context(() => {
-      if (document.fonts?.ready) document.fonts.ready.then(run);
-      else run();
     });
 
-    // Safety: if anything stalls, force the page visible
+    // Safety: if anything stalls, force the logo + page visible
     const safety = window.setTimeout(() => {
+      gsap.set(logoWrapRef.current, { autoAlpha: 1 });
       window.dispatchEvent(new Event("ojp:intro-done"));
     }, 6500);
 
@@ -140,8 +143,8 @@ export default function HeroIntro() {
           />
         </div>
 
-        {/* Headline, bottom (left on mobile, right on desktop) */}
-        <div className="absolute z-10 bottom-10 left-6 right-6 text-left md:bottom-14 md:left-auto md:right-10 md:text-right">
+        {/* Headline, bottom (centre on mobile, right on desktop) */}
+        <div className="absolute z-10 bottom-10 left-6 right-6 text-center md:bottom-14 md:left-auto md:right-10 md:text-right">
           <h1 className="text-cream font-light leading-[1.08]" style={{ fontSize: "clamp(2.3rem, 5.6vw, 5.2rem)" }}>
             <span className="block overflow-hidden">
               <span className="hero-line block">Homes built around</span>
@@ -152,8 +155,8 @@ export default function HeroIntro() {
           </h1>
         </div>
 
-        {/* Heritage: top-left under the nav on mobile, bottom-left on desktop */}
-        <div className="absolute left-6 md:left-10 z-10 max-w-[20rem] top-[5.75rem] md:top-auto md:bottom-14">
+        {/* Heritage: top-centre on mobile, bottom-left on desktop */}
+        <div className="absolute left-6 right-6 md:left-10 md:right-auto z-10 max-w-none md:max-w-[20rem] top-[5.75rem] md:top-auto md:bottom-14 text-center md:text-left">
           <span className="block overflow-hidden mb-3 md:mb-4">
             <span className="hero-meta block text-cream/80 text-[11px] font-semibold tracking-[0.3em] uppercase">
               {heritage.since}
@@ -182,6 +185,7 @@ export default function HeroIntro() {
       <div
         ref={logoWrapRef}
         className="fixed left-0 right-0 top-0 z-[70] flex justify-center pointer-events-none"
+        style={{ opacity: 0 }}
       >
         <button
           ref={logoBtnRef}

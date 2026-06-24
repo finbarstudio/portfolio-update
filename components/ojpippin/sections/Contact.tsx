@@ -31,11 +31,11 @@ export default function Contact() {
     <section
       id="contact"
       ref={ref}
-      className="min-h-screen flex items-center bg-bone px-8 md:px-16 lg:px-24 py-28 md:py-32"
+      className="min-h-screen flex items-center bg-bone px-6 md:px-16 lg:px-24 py-24 md:py-32"
     >
       <div className="w-full grid grid-cols-1 md:grid-cols-7 gap-y-16 md:gap-8">
         {/* Left, heading top, details bottom (Swiss split) */}
-        <div className="md:col-span-3 flex flex-col justify-between md:min-h-[62vh]">
+        <div className="md:col-span-3 flex flex-col items-center md:items-start justify-between md:min-h-[62vh] text-center md:text-left">
           <h2
             className="c-line text-ink font-light leading-[1.0]"
             style={{ fontSize: "clamp(2.6rem, 5vw, 4.6rem)" }}
@@ -47,7 +47,7 @@ export default function Contact() {
             picturing.
           </h2>
 
-          <div className="c-line mt-14 md:mt-0 flex flex-col gap-6 text-ink-soft">
+          <div className="c-line mt-14 md:mt-0 flex flex-col items-center md:items-start gap-6 text-ink-soft">
             <div className="flex flex-col gap-1">
               <a href={company.phoneHref} className="text-ink text-lg hover:text-clay transition-colors tabular-nums">
                 {company.phone}
@@ -74,7 +74,7 @@ export default function Contact() {
         {/* Right, enquiry form (col 4 left intentionally empty) */}
         <form
           onSubmit={(e) => e.preventDefault()}
-          className="c-line md:col-span-3 md:col-start-5 self-center flex flex-col gap-7"
+          className="c-line md:col-span-3 md:col-start-5 self-center flex flex-col gap-7 text-center md:text-left"
         >
           <p className="text-ink-soft text-lg leading-relaxed mb-2">{cta.body}</p>
 
@@ -113,7 +113,7 @@ export default function Contact() {
 
           <button
             type="submit"
-            className="self-start mt-2 px-10 py-4 bg-ink text-cream text-[11px] tracking-[0.22em] uppercase hover:bg-clay transition-colors"
+            className="self-center md:self-start mt-2 px-10 py-4 bg-ink text-cream text-[11px] tracking-[0.22em] uppercase hover:bg-clay transition-colors"
           >
             Book a Consultation
           </button>

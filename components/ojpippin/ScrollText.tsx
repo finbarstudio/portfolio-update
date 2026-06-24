@@ -15,7 +15,7 @@ export default function ScrollText({
 }: {
   children: React.ReactNode;
   className?: string;
-  as?: "p" | "h2" | "h3" | "blockquote";
+  as?: "p" | "h2" | "h3" | "blockquote" | "div";
 }) {
   const ref = useRef<HTMLElement>(null);
 

@@ -7,69 +7,77 @@ import { services } from "@/components/ojpippin/lib/content";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* Asymmetric Swiss placement for the six services, varied spans,
-   start columns and vertical alignment so the block reads like a
-   poster rather than a tidy 3×2. Columns are deliberately left empty. */
-const placement = [
-  "md:col-start-5 md:col-span-2 md:self-start",
-  "md:col-start-1 md:col-span-2 md:self-end",
-  "md:col-start-4 md:col-span-2 md:self-start",
-  "md:col-start-6 md:col-span-2 md:self-end",
-  "md:col-start-2 md:col-span-2 md:self-start",
-  "md:col-start-5 md:col-span-2 md:self-end",
-];
-
+/**
+ * The six-cell grid. Two small dots travel the internal divider lines (never
+ * the outer edge), drawing them in from the top down while each card fades up
+ * in a top-right → bottom-left order.
+ */
 export default function Services() {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".s-line", {
-        y: 32,
-        opacity: 0,
-        duration: 0.9,
-        ease: "power3.out",
-        stagger: 0.1,
-        scrollTrigger: { trigger: ref.current, start: "top 70%" },
+      // top-right → bottom-left reveal order for cards (row-major 0..5)
+      const order = [0.42, 0.21, 0, 0.63, 0.42, 0.21];
+
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: ".svc-grid", start: "top 72%" },
       });
+      tl.fromTo(".svc-vline", { scaleY: 0 }, { scaleY: 1, duration: 1.4, ease: "power2.out", stagger: 0.12 }, 0)
+        .fromTo(".svc-hline", { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "power2.out" }, 0.2)
+        .fromTo(".svc-dot", { autoAlpha: 0, top: "0%" }, { autoAlpha: 1, duration: 0.3 }, 0)
+        .to(".svc-dot", { top: "100%", duration: 1.5, ease: "power1.inOut" }, 0)
+        .to(".svc-dot", { autoAlpha: 0, duration: 0.4 }, 1.45)
+        // horizontal dot draws the central line right → left
+        .fromTo(".svc-dot-h", { autoAlpha: 0, left: "100%" }, { autoAlpha: 1, duration: 0.3 }, 0.2)
+        .to(".svc-dot-h", { left: "0%", duration: 1.2, ease: "power1.inOut" }, 0.2)
+        .to(".svc-dot-h", { autoAlpha: 0, duration: 0.4 }, 1.45)
+        .from(
+          ".svc-item",
+          {
+            opacity: 0,
+            y: 26,
+            duration: 0.8,
+            ease: "power3.out",
+            stagger: (i: number) => order[i] ?? 0,
+          },
+          0.3
+        );
     }, ref);
     return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      id="services"
-      ref={ref}
-      className="min-h-screen flex flex-col justify-center bg-bone px-8 md:px-16 lg:px-24 py-24 md:py-32"
-    >
-      <div className="w-full grid grid-cols-1 md:grid-cols-7 gap-x-8 gap-y-16 md:gap-y-28">
-        {/* Heading, top of the grid, cols 1–4; sticks while services scroll past */}
-        <h2
-          className="s-line md:col-start-1 md:col-span-4 md:self-start md:sticky md:top-28 text-ink font-light leading-[1.0]"
-          style={{ fontSize: "clamp(2.6rem, 6vw, 5.5rem)" }}
-        >
-          Everything,
-          <br />
-          <span className="display-italic">under one roof.</span>
-        </h2>
+    <section ref={ref} id="services" className="bg-bone px-6 md:px-16 lg:px-24 py-16 md:py-20">
+      <div className="max-w-6xl mx-auto">
+        <div className="svc-grid relative">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+            {services.map((service) => (
+              <li
+                key={service.num}
+                className="svc-item group px-2 sm:px-7 md:px-8 py-9 md:py-12 text-center md:text-left"
+              >
+                <span className="block eyebrow text-olive tabular-nums">{service.num}</span>
+                <h3 className="text-ink font-light text-xl md:text-2xl leading-snug mt-5 transition-colors duration-500 group-hover:text-clay">
+                  {service.title}
+                </h3>
+                <p className="text-ink-soft text-sm leading-relaxed mt-3 max-w-xs mx-auto md:mx-0">
+                  {service.desc}
+                </p>
+              </li>
+            ))}
+          </ul>
 
-        {/* Services laid across the grid asymmetrically, no divider lines */}
-        {services.map((s, i) => (
-          <article
-            key={s.num}
-            className={`s-line group flex flex-col gap-4 max-w-sm ${placement[i]}`}
-          >
-            <span className="text-olive text-sm tabular-nums tracking-[0.1em]">
-              {s.num}
-            </span>
-            <h3 className="text-ink text-2xl md:text-[1.75rem] font-light leading-tight transition-colors duration-500 group-hover:text-clay">
-              {s.title}
-            </h3>
-            <p className="text-ink-soft text-[15px] leading-relaxed">
-              {s.desc}
-            </p>
-          </article>
-        ))}
+          {/* Internal divider lines + travelling dots (desktop only) */}
+          <div className="hidden md:block absolute inset-0 pointer-events-none">
+            <div className="svc-vline absolute top-0 left-1/3 w-px h-full bg-ink/15 origin-top" />
+            <div className="svc-vline absolute top-0 left-2/3 w-px h-full bg-ink/15 origin-top" />
+            <div className="svc-hline absolute left-0 top-1/2 h-px w-full bg-ink/15 origin-right" />
+            <div className="svc-dot absolute left-1/3 w-[5px] h-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-clay" />
+            <div className="svc-dot absolute left-2/3 w-[5px] h-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-clay" />
+            <div className="svc-dot-h absolute top-1/2 w-[5px] h-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-clay" />
+          </div>
+        </div>
       </div>
     </section>
   );
