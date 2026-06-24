@@ -45,73 +45,58 @@ export default function OpengraphImage() {
           color: INK,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "72px 80px",
+          alignItems: "center",
+          justifyContent: "center",
           fontFamily: "sans-serif",
+          position: "relative",
         }}
       >
-        {/* Wordmark */}
+        {/* The mark, big and centred — the asterisk + wordmark are the image. */}
+        <div style={{ display: "flex", marginBottom: 36 }}>
+          <Mark size={132} />
+        </div>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            fontSize: 34,
+            fontSize: 92,
             fontWeight: 700,
-            letterSpacing: "-0.01em",
+            letterSpacing: "-0.02em",
+            lineHeight: 1,
           }}
         >
           finbar
-          <div style={{ display: "flex", margin: "0 4px" }}>
-            <Mark size={24} />
+          <div style={{ display: "flex", margin: "0 8px" }}>
+            <Mark size={56} />
           </div>
           studio
         </div>
-
-        {/* Headline */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              fontSize: 80,
-              fontWeight: 700,
-              lineHeight: 1.04,
-              letterSpacing: "-0.02em",
-              maxWidth: 1040,
-            }}
-          >
-            <span>Brisbane</span>
-            <span style={{ color: PINK, padding: "0 20px" }}>graphic&nbsp;&amp;&nbsp;web</span>
-            <span>design</span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              marginTop: 28,
-              fontSize: 30,
-              color: INK_SOFT,
-              letterSpacing: "0.01em",
-            }}
-          >
-            Brand identity, websites, editorial &amp; motion
-          </div>
+        <div
+          style={{
+            display: "flex",
+            marginTop: 30,
+            fontSize: 30,
+            color: INK_SOFT,
+            letterSpacing: "0.01em",
+          }}
+        >
+          Brisbane graphic &amp; web design
         </div>
 
-        {/* Footer rule + URL */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ height: 4, width: 120, background: PINK, marginBottom: 24 }} />
-          <div
-            style={{
-              display: "flex",
-              fontSize: 26,
-              fontWeight: 600,
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              color: INK,
-            }}
-          >
-            www.finbar.studio
-          </div>
+        {/* URL, pinned to the bottom edge */}
+        <div
+          style={{
+            display: "flex",
+            position: "absolute",
+            bottom: 56,
+            fontSize: 24,
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: PINK,
+          }}
+        >
+          www.finbar.studio
         </div>
       </div>
     ),
