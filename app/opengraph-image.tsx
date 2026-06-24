@@ -50,10 +50,11 @@ async function loadSpaceMono(weight: number): Promise<ArrayBuffer | null> {
 }
 
 export default async function OpengraphImage() {
-  const mono = await loadSpaceMono(700);
-  const fonts = mono
-    ? [{ name: "Space Mono", data: mono, weight: 700 as const, style: "normal" as const }]
-    : undefined;
+  const [mono700, mono400] = await Promise.all([loadSpaceMono(700), loadSpaceMono(400)]);
+  const fonts = [
+    mono700 && { name: "Space Mono", data: mono700, weight: 700 as const, style: "normal" as const },
+    mono400 && { name: "Space Mono", data: mono400, weight: 400 as const, style: "normal" as const },
+  ].filter(Boolean) as { name: string; data: ArrayBuffer; weight: 400 | 700; style: "normal" }[];
 
   return new ImageResponse(
     (
@@ -92,10 +93,12 @@ export default async function OpengraphImage() {
         <div
           style={{
             display: "flex",
-            marginTop: 36,
-            fontSize: 28,
+            marginTop: 40,
+            fontSize: 22,
+            fontWeight: 400,
             color: INK_SOFT,
-            letterSpacing: "0.02em",
+            letterSpacing: "0.28em",
+            textTransform: "uppercase",
           }}
         >
           Brisbane graphic &amp; web design
