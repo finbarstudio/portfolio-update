@@ -118,14 +118,26 @@ export default function AboutPage() {
       <section className="px-6 md:px-16 lg:px-24 py-12 md:py-20">
         <ImageTrail>
           <div className="relative z-10 min-h-[58vh] flex items-center justify-center text-center pointer-events-none">
-            <blockquote
-              data-trail-zone
-              className="display-italic text-ink leading-[1.08] max-w-4xl"
-              style={{ fontSize: "clamp(2rem, 5.4vw, 4.6rem)" }}
-            >
-              &ldquo;We have never wanted to be the biggest builder in Brisbane.
-              Just the one a family would recommend to another.&rdquo;
-            </blockquote>
+            <div data-trail-zone className="relative">
+              {/* Soft bone glow behind the quote, fades out with no hard edge,
+                  so the text stays legible as images trail past it. */}
+              <div
+                aria-hidden
+                className="absolute -inset-24 -z-10 pointer-events-none"
+                style={{
+                  background:
+                    "radial-gradient(ellipse at center, rgba(244,238,227,0.92) 0%, rgba(244,238,227,0.7) 38%, rgba(244,238,227,0) 72%)",
+                  filter: "blur(10px)",
+                }}
+              />
+              <blockquote
+                className="display-italic text-ink leading-[1.08] max-w-4xl"
+                style={{ fontSize: "clamp(2rem, 5.4vw, 4.6rem)" }}
+              >
+                &ldquo;We have never wanted to be the biggest builder in Brisbane.
+                Just the one a family would recommend to another.&rdquo;
+              </blockquote>
+            </div>
           </div>
         </ImageTrail>
       </section>

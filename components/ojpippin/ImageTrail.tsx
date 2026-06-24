@@ -77,7 +77,7 @@ export default function ImageTrail({ children }: { children?: React.ReactNode })
   }, []);
 
   return (
-    <div ref={rootRef} className="relative overflow-hidden">
+    <div ref={rootRef} className="relative">
       {POOL.map((p, i) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img
