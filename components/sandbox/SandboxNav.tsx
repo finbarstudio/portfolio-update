@@ -19,7 +19,8 @@ export default function SandboxNav() {
   const pathname = usePathname();
   const onMockups = pathname.includes("mockup");
   const onTools = pathname.includes("tools") || pathname.includes("asterisk");
-  const pos = onTools ? "2" : onMockups ? "1" : "0";
+  const onLibrary = pathname.includes("library");
+  const pos = onLibrary ? "3" : onTools ? "2" : onMockups ? "1" : "0";
 
   return (
     <>
@@ -33,6 +34,9 @@ export default function SandboxNav() {
         </Link>
         <Link href="/tools" className={`sb-tab ${onTools ? "is-active" : ""}`} aria-current={onTools ? "page" : undefined}>
           tools
+        </Link>
+        <Link href="/library" className={`sb-tab ${onLibrary ? "is-active" : ""}`} aria-current={onLibrary ? "page" : undefined}>
+          library
         </Link>
       </nav>
 
