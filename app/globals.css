@@ -2940,6 +2940,15 @@ body:has(.sb-root) {
 .sb-tab:hover { color: var(--ink); }
 .sb-tab.is-active { color: #fff; }
 
+/* Narrow screens: tighten the 3-tab bar + the out-link so they don't collide. */
+@media (max-width: 560px) {
+  .sb-tabs, .sb-corner-tr { top: 12px; font-size: 9px; letter-spacing: 0.06em; }
+  .sb-tabs { left: 12px; padding: 4px; }
+  .sb-corner-tr { right: 12px; }
+  .sb-tab { padding: 7px 8px; }
+  .sb-corner-pill { padding: 7px 9px; }
+}
+
 .sb-content { flex: 1; width: 100%; max-width: 1560px; margin: 0 auto; padding: 84px clamp(12px, 2.2vw, 26px) clamp(40px, 6vw, 72px); }
 
 /* ── Landing ─────────────────────────────────────────────── */
