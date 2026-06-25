@@ -18,16 +18,21 @@ import { usePathname } from "next/navigation";
 export default function SandboxNav() {
   const pathname = usePathname();
   const onMockups = pathname.includes("mockup");
+  const onTools = pathname.includes("tools") || pathname.includes("asterisk");
+  const pos = onTools ? "2" : onMockups ? "1" : "0";
 
   return (
     <>
-      <nav className="sb-tabs" aria-label="Sandbox" data-pos={onMockups ? "1" : "0"}>
+      <nav className="sb-tabs" aria-label="Sandbox" data-pos={pos}>
         <span className="sb-tabs-glow" aria-hidden="true" />
-        <Link href="/" className={`sb-tab ${onMockups ? "" : "is-active"}`} aria-current={onMockups ? undefined : "page"}>
+        <Link href="/" className={`sb-tab ${pos === "0" ? "is-active" : ""}`} aria-current={pos === "0" ? "page" : undefined}>
           fs.s
         </Link>
         <Link href="/mockups" className={`sb-tab ${onMockups ? "is-active" : ""}`} aria-current={onMockups ? "page" : undefined}>
           mockups
+        </Link>
+        <Link href="/tools" className={`sb-tab ${onTools ? "is-active" : ""}`} aria-current={onTools ? "page" : undefined}>
+          tools
         </Link>
       </nav>
 
