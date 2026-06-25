@@ -16,10 +16,54 @@
  * it. The camera window is fixed; the type travels through the curved lens, which
  * is exactly what a fixed camera sees off a real drum. Reference video stored on
  * the page.
+ *
+ * The analogue treatment is all post: subtle UnrealBloom for emulsion halation
+ * (the cream type bleeding light on black), a grain + warm-vignette + flicker
+ * shader for the projected-film texture, and a slow gate weave that drifts the
+ * whole frame like an unsteady projector.
  */
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
+
+/** Grain + warm tint + vignette + flicker — the projected-film look, in one pass. */
+const FilmShader = {
+  uniforms: {
+    tDiffuse: { value: null as THREE.Texture | null },
+    uTime: { value: 0 },
+    uRes: { value: new THREE.Vector2(1, 1) },
+    uGrain: { value: 0.09 },
+    uVignette: { value: 0.9 },
+    uFlicker: { value: 0.05 },
+  },
+  vertexShader: /* glsl */ `
+    varying vec2 vUv;
+    void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+  `,
+  fragmentShader: /* glsl */ `
+    uniform sampler2D tDiffuse; uniform float uTime; uniform vec2 uRes;
+    uniform float uGrain; uniform float uVignette; uniform float uFlicker;
+    varying vec2 vUv;
+    float hash(vec2 p){ p = fract(p * vec2(443.897, 441.423)); p += dot(p, p + 19.19); return fract((p.x + p.y) * p.x); }
+    void main(){
+      vec3 col = texture2D(tDiffuse, vUv).rgb;
+      col *= vec3(1.06, 1.0, 0.90);                                   // warm cast
+      float fl = 1.0 - uFlicker * hash(vec2(floor(uTime * 20.0), 3.0)); // exposure flicker
+      col *= fl;
+      float g = hash(vUv * uRes + fract(uTime) * vec2(91.7, 113.3)) - 0.5;
+      col += g * uGrain;                                              // film grain
+      vec2 d = vUv - 0.5;
+      float vig = smoothstep(0.85, 0.18, dot(d, d) * 2.4);            // warm vignette
+      col *= mix(1.0, vig, uVignette);
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `,
+};
 
 /** Gentle arc of a large-radius drum. Bigger ARC = more pronounced curl. */
 const ARC = 0.82; // radians of cylinder visible (~47°)
@@ -79,8 +123,8 @@ function buildCreditsCanvas(): HTMLCanvasElement {
   ctx.clearRect(0, 0, W, h);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const cream = "#ece3d2";
-  const soft = "#b9ad96";
+  const cream = "#f1e6cc";
+  const soft = "#c2b294";
   const serif = "Georgia, 'Times New Roman', 'Hoefler Text', serif";
 
   let y = topPad;
@@ -147,9 +191,9 @@ export default function DrumCredits() {
     const canvas = canvasRef.current;
     if (!wrap || !canvas) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setClearColor(0x000000, 0);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x080706); // opaque film black (clean for post)
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
 
     // The credits texture.
@@ -161,6 +205,7 @@ export default function DrumCredits() {
     tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
     tex.repeat.set(1, WINDOW);
     tex.generateMipmaps = true;
+    tex.colorSpace = THREE.SRGBColorSpace;
 
     // Plane width matched to the canvas aspect so letters aren't stretched:
     // arc visible height is 2·R·sin(ARC/2); width = that × (canvasW / (canvasH·WINDOW)).
@@ -173,16 +218,32 @@ export default function DrumCredits() {
     const mesh = new THREE.Mesh(geo, mat);
     scene.add(mesh);
 
+    // Post: bloom (emulsion halation) → film grain/vignette/flicker → output.
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.5, 0.18);
+    composer.addPass(bloom);
+    const film = new ShaderPass(FilmShader);
+    composer.addPass(film);
+    composer.addPass(new OutputPass());
+
+    const baseFov = camera.fov;
+
     // Frame the arc with a little breathing room top and bottom.
     const fit = () => {
       const w = wrap.clientWidth || 1;
       const h = wrap.clientHeight || 1;
-      renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      renderer.setPixelRatio(dpr);
       renderer.setSize(w, h, false);
+      composer.setPixelRatio(dpr);
+      composer.setSize(w, h);
+      bloom.setSize(w, h);
+      film.uniforms.uRes.value.set(w * dpr, h * dpr);
       camera.aspect = w / h;
       // Distance so the visible arc fills ~78% of frame height.
       const margin = 0.78;
-      camera.position.z = (visibleH / margin / 2) / Math.tan((camera.fov * Math.PI) / 360);
+      camera.position.z = (visibleH / margin / 2) / Math.tan((baseFov * Math.PI) / 360);
       camera.updateProjectionMatrix();
     };
     fit();
@@ -191,14 +252,23 @@ export default function DrumCredits() {
 
     let raf = 0;
     let last = 0;
+    let elapsed = 0;
     let running = true;
+    const camZ = () => (visibleH / 0.78 / 2) / Math.tan((baseFov * Math.PI) / 360);
     const loop = (now: number) => {
       if (!running) return;
       raf = requestAnimationFrame(loop);
       const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
+      elapsed += dt;
       tex.offset.y -= SPEED * dt; // negative scrolls the type upward
-      renderer.render(scene, camera);
+      film.uniforms.uTime.value = elapsed;
+      // Gate weave: drift the whole frame like an unsteady projector.
+      const A = visibleH * 0.004;
+      camera.position.x = (Math.sin(elapsed * 2.1) + 0.6 * Math.sin(elapsed * 3.7)) * A;
+      camera.position.y = (Math.sin(elapsed * 1.7) + 0.5 * Math.sin(elapsed * 2.9)) * A;
+      camera.position.z = camZ(); // camera keeps looking down -Z, so x/y drift the frame
+      composer.render();
     };
     raf = requestAnimationFrame(loop);
 
