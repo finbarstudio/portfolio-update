@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Script from "next/script";
 import ClientImage from "@/components/ClientImage";
@@ -55,7 +56,7 @@ export default async function StorePage() {
           id="ld-product"
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(productJsonLd) }}
         />
       )}
 

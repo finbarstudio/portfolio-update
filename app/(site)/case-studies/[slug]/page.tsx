@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Script from "next/script";
@@ -429,13 +430,13 @@ export default async function CaseStudyPage({
         id={`ld-${project.slug}`}
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(creativeWorkJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(creativeWorkJsonLd) }}
       />
       <Script
         id={`ld-breadcrumb-${project.slug}`}
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbJsonLd) }}
       />
       {/* Header — mobile: stacked + centred. Desktop: logo+title left, tags right, bottom-aligned. */}
       <header className="flex flex-col items-center text-center gap-5 mb-8 md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left md:gap-x-6 md:gap-y-4 md:mb-6">

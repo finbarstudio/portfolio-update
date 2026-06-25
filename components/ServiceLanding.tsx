@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import Script from "next/script";
 import Link from "next/link";
 import { projects } from "@/content/projects";
@@ -66,7 +67,7 @@ export default function ServiceLanding({
         id={`ld-${slug}`}
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }}
       />
       <section className="px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14">
         <p className="mono-label text-ink-soft mb-4">{label}</p>

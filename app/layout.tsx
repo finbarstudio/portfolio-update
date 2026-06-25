@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata, Viewport } from "next";
 import { Archivo_Narrow, Archivo, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
 import Script from "next/script";
@@ -282,21 +283,21 @@ export default function RootLayout({
           type="application/ld+json"
           strategy="beforeInteractive"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(personJsonLd) }}
         />
         <Script
           id="ld-website"
           type="application/ld+json"
           strategy="beforeInteractive"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(websiteJsonLd) }}
         />
         <Script
           id="ld-studio"
           type="application/ld+json"
           strategy="beforeInteractive"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(serviceJsonLd) }}
         />
       </body>
     </html>

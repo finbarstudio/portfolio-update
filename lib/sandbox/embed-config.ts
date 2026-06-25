@@ -74,13 +74,22 @@ function asArray(v: string | string[] | undefined): string[] {
   return Array.isArray(v) ? v : [v];
 }
 
+/** A media src is only honoured in an embed if it's an absolute http(s) URL or a
+ *  root-relative path. This rejects `javascript:`, `data:` and other schemes that
+ *  could be smuggled in via the (attacker-craftable) embed query string. */
+function isSafeEmbedSrc(src: string): boolean {
+  return /^https?:\/\//i.test(src) || src.startsWith("/");
+}
+
 export function decodeEmbedConfig(params: RawParams): EmbedConfig {
   const srcs = asArray(params.m);
   const kinds = asArray(params.t);
-  const media: EmbedMedia[] = srcs.map((src, i) => ({
-    src,
-    kind: kinds[i] === "image" ? "image" : "video",
-  }));
+  const media: EmbedMedia[] = srcs
+    .map((src, i) => ({
+      src,
+      kind: kinds[i] === "image" ? ("image" as const) : ("video" as const),
+    }))
+    .filter((m) => isSafeEmbedSrc(m.src));
 
   const preset: AnimationPreset = params.p === "flat" ? "flat" : "carousel";
   const fit: FitMode =

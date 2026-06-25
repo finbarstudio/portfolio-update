@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
@@ -45,7 +46,7 @@ function HomeJsonLd() {
       id="ld-home"
       type="application/ld+json"
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }}
     />
   );
 }

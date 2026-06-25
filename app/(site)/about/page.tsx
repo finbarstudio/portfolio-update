@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
@@ -91,7 +92,7 @@ export default function AboutPage() {
         id="ld-about"
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(aboutJsonLd) }}
       />
 
       {/* ── Big statement with inline icons ───────────────────── */}
