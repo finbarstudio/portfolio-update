@@ -160,6 +160,7 @@ export default function PhoneMockupTool() {
   return (
     <div className="sb-tool">
       <header className="sb-tool-head">
+        <h1 className="sb-tool-title">Phone Mockup</h1>
         <p className="sb-tool-sub">Your images or videos on a 3D iPhone, ready to export. Free, watermarked.</p>
       </header>
 

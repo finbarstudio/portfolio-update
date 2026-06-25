@@ -53,14 +53,21 @@ export default function PhoneStage({
 
   const checker = background === "transparent";
 
+  // Fill the column width, but never let the box grow taller than the viewport
+  // (minus the sticky offset + breathing room). Driving the cap off the numeric
+  // ratio keeps every aspect — portrait, square, landscape — undistorted: width
+  // is the smaller of the column and (height-cap × ratio), and aspect-ratio
+  // derives a height that's guaranteed to fit.
+  const [aw, ah] = aspect.split(/[:/]/).map(Number);
+  const ratio = aw && ah ? aw / ah : 16 / 9;
+
   return (
     <div
       className="sandbox-stage"
       style={{
         position: "relative",
-        width: "100%",
-        maxWidth: "min(100%, 70vh)",
-        margin: "0 auto",
+        width: `min(100%, calc((100dvh - 132px) * ${ratio}))`,
+        margin: 0,
         aspectRatio: aspectToCss(aspect),
         borderRadius: 0,
         overflow: "hidden",
