@@ -52,7 +52,6 @@ export async function generateMetadata({
   const project = projects.find((p) => p.slug === slug);
   if (!project) return {};
   const url = `/case-studies/${project.slug}`;
-  const ogImage = project.heroImage?.src;
   // Match the indexed title/description pattern: "Name — Descriptor | Finbar Studio".
   // Per-project SEO copy (in projects.ts) preserves the exact text Google already
   // ranks for the migrated slugs; everything else falls back to a clean default.
@@ -67,18 +66,19 @@ export async function generateMetadata({
     // Hidden projects keep their page (migrated Framer backlinks may target the
     // slug) but are dropped from the sitemap + index — tell crawlers explicitly.
     robots: project.hidden ? { index: false, follow: true } : undefined,
+    // No per-project image: every page (case studies included) shares the
+    // asterisk + wordmark card from app/opengraph-image.tsx. Omitting images
+    // here lets the root file-convention card fill in for this route.
     openGraph: {
       title: seoTitle,
       description: seoDescription,
       url,
       type: "article",
-      images: ogImage ? [{ url: ogImage, alt: project.heroImage.alt }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: seoTitle,
       description: seoDescription,
-      images: ogImage ? [ogImage] : undefined,
     },
   };
 }

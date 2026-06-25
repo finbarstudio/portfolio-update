@@ -9,7 +9,13 @@
  */
 
 import { useState } from "react";
-import type { MockupExport } from "@/lib/sandbox/useMockupExport";
+import type { MockupExport, QualityKey } from "@/lib/sandbox/useMockupExport";
+
+const QUALITIES: { key: QualityKey; label: string }[] = [
+  { key: "sd", label: "SD" },
+  { key: "hd", label: "HD" },
+  { key: "uhd", label: "UHD" },
+];
 
 function formatDur(s: number): string {
   if (s < 60) return `${Math.round(s)}s`;
@@ -66,6 +72,29 @@ export default function ExportPanel({
         <button type="button" className="sb-btn" disabled={disabled} onClick={exp.exportAllStills}>
           All stills
         </button>
+      </div>
+
+      <div className="sb-field sb-loops">
+        <span className="mono-label sb-field-label">
+          Quality
+          <span className="sb-range-val">
+            {exp.quality === "sd" ? "540p" : exp.quality === "hd" ? "1080p" : "2160p"}
+          </span>
+        </span>
+        <div className="sb-segmented" role="group" aria-label="Export quality">
+          {QUALITIES.map((q) => (
+            <button
+              key={q.key}
+              type="button"
+              className={`sb-seg ${exp.quality === q.key ? "is-active" : ""}`}
+              aria-pressed={exp.quality === q.key}
+              disabled={exp.busy}
+              onClick={() => exp.setQuality(q.key)}
+            >
+              {q.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {exp.videoSupported && loopSeconds != null && (
@@ -143,7 +172,7 @@ export default function ExportPanel({
       {exp.error && <p className="sb-msg is-error" role="alert">{exp.error}</p>}
 
       <p className="mono-label sb-watermark-note">
-        Free exports are SD with a finbar.studio watermark. HD, 2K &amp; 4K coming soon.
+        Export up to UHD (2160p). Every export carries a finbar.studio watermark.
         {transparentBg ? " Video & GIF are opaque (transparent → matte); PNG keeps alpha." : ""}
       </p>
     </div>

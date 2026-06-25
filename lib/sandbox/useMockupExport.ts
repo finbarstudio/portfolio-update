@@ -8,10 +8,10 @@
  *   setOffset/setHover → invalidate → await 2 rAFs (demand-render paints) →
  *   fill background (or keep alpha) → drawImage(gl) → drawWatermark
  *
- * The watermark is always drawn behind a single `LICENSED` gate — that's the whole
- * monetization seam (MVP is free, so `LICENSED = false`). Progress lives in a ref
- * and is synced to state on a timer (never per frame), and a `cancelled` ref lets
- * the user abort cleanly between frames.
+ * Every frame carries the finbar.studio watermark (`WATERMARK`) — that's the
+ * standing monetization seam; resolution itself is free (SD/HD/UHD). Progress
+ * lives in a ref and is synced to state on a timer (never per frame), and a
+ * `cancelled` ref lets the user abort cleanly between frames.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -26,17 +26,19 @@ import { renderStillBlob } from "./export-still";
 import { recordLoop, canExportVideo } from "./export-video";
 import { encodeGif } from "./export-gif";
 
-/** MVP is free but always watermarked. The future license unlock flips this. */
-const LICENSED = false;
+/**
+ * The watermark is always drawn — every export carries the finbar.studio mark
+ * regardless of resolution. (Removing it is the future paid unlock.)
+ */
+const WATERMARK = true;
 
 /**
- * Export resolution tiers (short-side px). The free plan renders at SD; the
- * 1080 / 2K / 4K tiers unlock with payment (coming soon). Until then every
- * export uses FREE_TIER — flip `activeTier` to the paid value once licensed.
+ * Export resolution tiers (short-side px). SD is the quick/light option; HD and
+ * UHD are full-quality. All tiers are free and watermarked.
  */
-const TIERS = { sd: 540, hd: 1080, "2k": 1440, "4k": 2160 } as const;
-const FREE_TIER = TIERS.sd;
-const activeTier: number = LICENSED ? TIERS.hd : FREE_TIER;
+export type QualityKey = "sd" | "hd" | "uhd";
+const QUALITY_PX: Record<QualityKey, number> = { sd: 540, hd: 1080, uhd: 2160 };
+const DEFAULT_QUALITY: QualityKey = "hd";
 /** GIFs stay small regardless of tier (palette + file size). */
 const GIF_BASE = 360;
 
@@ -83,6 +85,8 @@ export type MockupExport = {
   status: string;
   error: string | null;
   videoSupported: boolean;
+  quality: QualityKey;
+  setQuality: (q: QualityKey) => void;
   exportStill: (focusIndex: number) => void;
   exportAllStills: () => void;
   exportVideo: (loops?: number) => void;
@@ -99,6 +103,16 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
   const busyRef = useRef(false);
   const cancelledRef = useRef(false);
   const progressRef = useRef(0);
+
+  // Export resolution. Held in a ref too so the (stable) export callbacks read
+  // the current tier at call time without churning their dependency arrays.
+  const [quality, setQualityState] = useState<QualityKey>(DEFAULT_QUALITY);
+  const qualityRef = useRef<QualityKey>(DEFAULT_QUALITY);
+  const setQuality = useCallback((q: QualityKey) => {
+    qualityRef.current = q;
+    setQualityState(q);
+  }, []);
+  const tierPx = () => QUALITY_PX[qualityRef.current];
 
   // Optimistic on SSR + first client render (so hydration matches), then
   // corrected to the real capability after mount (MediaRecorder is client-only).
@@ -136,7 +150,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
           ctx.clearRect(0, 0, w, h);
         }
         ctx.drawImage(ctrl.gl.domElement, 0, 0, w, h);
-        if (!LICENSED) drawWatermark(ctx, w, h);
+        if (WATERMARK) drawWatermark(ctx, w, h);
       };
 
       return { canvas, draw };
@@ -186,7 +200,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
     (focusIndex: number) => {
       void withExport("Rendering still…", async () => {
         const config = getConfig();
-        const { w, h } = resolutionFor(config.aspect, activeTier);
+        const { w, h } = resolutionFor(config.aspect, tierPx());
         const bgColor = config.background === "transparent" ? null : config.background;
         const { canvas, draw } = makeRenderer(w, h, bgColor);
         const offset = controllerRef.current?.offsetForFocus(focusIndex) ?? focusIndex;
@@ -202,7 +216,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
   const exportAllStills = useCallback(() => {
     void withExport("Rendering stills…", async () => {
       const config = getConfig();
-      const { w, h } = resolutionFor(config.aspect, activeTier);
+      const { w, h } = resolutionFor(config.aspect, tierPx());
       const bgColor = config.background === "transparent" ? null : config.background;
       const { canvas, draw } = makeRenderer(w, h, bgColor);
       const n = config.media.length;
@@ -224,7 +238,7 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
         throw new Error("Video export isn’t supported in this browser — try Chrome, or export a GIF.");
       }
       const config = getConfig();
-      const { w, h } = resolutionFor(config.aspect, activeTier);
+      const { w, h } = resolutionFor(config.aspect, tierPx());
       const matte = config.background === "transparent" ? MATTE : config.background;
       const { canvas, draw } = makeRenderer(w, h, matte);
       const ctrl = controllerRef.current;
@@ -282,6 +296,8 @@ export function useMockupExport({ controllerRef, setPaused, getConfig }: UseMock
     status,
     error,
     videoSupported,
+    quality,
+    setQuality,
     exportStill,
     exportAllStills,
     exportVideo,
