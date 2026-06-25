@@ -92,13 +92,17 @@ export default function AsteriskStudio() {
       onSync: rerender,
     });
     engineRef.current = eng;
-    // Drive the playhead + per-frame slider refresh without thrashing React.
+    // The engine only exists after this effect runs, so re-render once to bind
+    // every control handler to the live engine (otherwise they capture the
+    // first-render `null` and do nothing).
+    rerender();
+    // Drive the playhead directly + keep control values in sync at a low rate.
     let raf = 0, last = 0;
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
       const tl = eng.timeline;
       if (playheadRef.current) playheadRef.current.style.left = (tl.time / tl.duration * 100) + "%";
-      if (now - last > 90 && (tl.playing || eng.config.autoRotate === false)) { last = now; rerender(); }
+      if (now - last > 120) { last = now; rerender(); }
     };
     raf = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(raf); eng.dispose(); engineRef.current = null; };
