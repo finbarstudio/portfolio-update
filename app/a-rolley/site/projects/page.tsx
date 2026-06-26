@@ -25,13 +25,10 @@ export default function ARolleyProjects() {
       <Nav />
       <ViewCursor />
 
-      <section className="frame" style={{ paddingTop: "clamp(128px,18vh,200px)", paddingBottom: "clamp(32px,4vw,56px)" }}>
-        <div className="wrap">
-          <hr className="rule" />
-          <h1 className="display" style={{ fontSize: "var(--step-display)", marginTop: "clamp(18px,2.4vw,34px)", maxWidth: "14ch" }}>
-            Homes from the <span className="display-italic accent">Coast</span>.
-          </h1>
-        </div>
+      <section className="frame text-center" style={{ paddingTop: "clamp(116px,15vh,176px)", paddingBottom: "clamp(36px,5vw,72px)" }}>
+        <h1 className="display" style={{ fontSize: "var(--step-display)", maxWidth: "14ch", marginInline: "auto" }}>
+          Homes from the <span className="display-italic accent">Coast</span>.
+        </h1>
       </section>
 
       <section className="frame" style={{ paddingBottom: "clamp(72px,10vw,160px)" }}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import LogoMark from "./LogoMark";
 
 const LEFT = [
@@ -14,6 +15,16 @@ const ALL = [...LEFT, ...RIGHT];
 
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/a-rolley/site";
+
+  const onLogoClick = (e: React.MouseEvent) => {
+    if (!isHome) return; // other pages: let it navigate home
+    e.preventDefault();
+    const lenis = (window as unknown as { __arlLenis?: { scrollTo: (t: number, o?: object) => void } }).__arlLenis;
+    if (lenis) lenis.scrollTo(0, { duration: 1.2 });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -34,7 +45,7 @@ export default function Nav() {
             ))}
           </ul>
 
-          <a href="/a-rolley/site" className="col-start-2 justify-self-center" aria-label="A Rolley & Sons, home">
+          <a href="/a-rolley/site" onClick={onLogoClick} className="col-start-2 justify-self-center" aria-label="A Rolley & Sons, home">
             <LogoMark className="h-[18px] md:h-[20px] w-auto" />
           </a>
 
