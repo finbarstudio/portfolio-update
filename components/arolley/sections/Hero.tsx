@@ -22,7 +22,7 @@ export default function Hero() {
         <p className="eyebrow" style={{ color: "rgba(244,241,234,0.86)" }}>
           Fourth-generation Sunshine Coast builders
         </p>
-        <h1 className="display" style={{ color: "var(--paper)", fontSize: "clamp(38px, 6vw, 98px)", marginTop: "clamp(16px,1.8vw,26px)", maxWidth: "16ch" }}>
+        <h1 className="display" style={{ color: "var(--paper)", fontSize: "clamp(32px, 4.6vw, 74px)", marginTop: "clamp(16px,1.8vw,26px)", maxWidth: "18ch" }}>
           Homes you&rsquo;ll want to call <span className="display-italic">home</span>.
         </h1>
       </div>
