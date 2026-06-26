@@ -133,6 +133,27 @@
 .arolley-site .wrap  { max-width: 1320px; margin-inline: auto; }
 .arolley-site .pad-y { padding-block: clamp(72px, 11vw, 180px); }
 
+/* Hero / page-intro — one consistent treatment so heroes line up page to page:
+   100svh, content centred, identical top + bottom padding to the text. (A pinned
+   bottom meta row, e.g. the home hero's "Caloundra · Est. 1968", sits outside
+   this measure as an absolute element.) */
+.arolley-site .arl-hero {
+  min-height: 100svh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding-top: clamp(112px, 14vh, 168px);
+  padding-bottom: clamp(112px, 14vh, 168px);
+}
+/* Listing/projects intro: more padding, and shorter than the viewport so the
+   first project image peeks at the bottom as a "scroll to see them" cue. */
+.arolley-site .arl-hero-tall {
+  min-height: 78svh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding-top: clamp(140px, 18vh, 220px);
+  padding-bottom: clamp(48px, 7vh, 96px);
+}
+
 /* Hairline rule (timber-grain thin) */
 .arolley-site .rule { height: 1px; background: var(--line); border: 0; }
 

@@ -3,6 +3,7 @@ import { Spectral, Figtree } from "next/font/google";
 import "../site/a-rolley-site.css";
 import SmoothScroll from "@/components/arolley/SmoothScroll";
 import NavTone from "@/components/arolley/NavTone";
+import Preloader from "@/components/arolley/Preloader";
 
 // A Rolley & Sons demo — the EDITORIAL direction (the kept alternate). Warm paper
 // + Spectral serif, linked from the pitch beside the faithful grey signature
@@ -32,6 +33,7 @@ export const metadata: Metadata = {
 export default function ARolleyEditorialLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={`arolley-site ${display.variable} ${body.variable}`} data-theme="editorial">
+      <Preloader />
       <a href="/a-rolley" className="ld-back" aria-label="Back to finbar.studio">
         <span className="ld-back-arrow" aria-hidden="true">&larr;</span>
         <span className="ld-back-text">back to finbar.studio</span>

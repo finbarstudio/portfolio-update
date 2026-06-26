@@ -3,6 +3,7 @@ import { Figtree } from "next/font/google";
 import "./a-rolley-site.css";
 import SmoothScroll from "@/components/arolley/SmoothScroll";
 import NavTone from "@/components/arolley/NavTone";
+import Preloader from "@/components/arolley/Preloader";
 
 // A Rolley & Sons demo — the SIGNATURE direction. Faithful to their real site:
 // sans-serif on their grey #3E4148 ground (a refresh, not a rebrand). Their site
@@ -32,6 +33,7 @@ export default function ARolleySiteLayout({ children }: { children: React.ReactN
       // var onto the body font so all the `.display` type renders in the sans.
       style={{ ["--font-arolley-display" as string]: "var(--font-arolley-body)" }}
     >
+      <Preloader />
       <a href="/a-rolley" className="ld-back" aria-label="Back to finbar.studio">
         <span className="ld-back-arrow" aria-hidden="true">&larr;</span>
         <span className="ld-back-text">back to finbar.studio</span>

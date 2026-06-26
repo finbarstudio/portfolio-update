@@ -27,6 +27,9 @@ export default function FeaturedProjects({ base = "/a-rolley/site" }: { base?: s
   const layerRef = useRef<HTMLDivElement>(null);
   const whiteRef = useRef<HTMLDivElement>(null);
   const imgLayers = useRef<(HTMLDivElement | null)[]>([]);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const metaTextRef = useRef<HTMLParagraphElement>(null);
+  const firstSwitch = useRef(true);
   const [active, setActive] = useState(0);
 
   const select = (i: number) => {
@@ -47,9 +50,28 @@ export default function FeaturedProjects({ base = "/a-rolley/site" }: { base?: s
     const ctx = gsap.context(() => {
       gsap.fromTo(imgRef.current, { yPercent: -7 }, { yPercent: 7, ease: "none", scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: true } });
       gsap.fromTo(layerRef.current, { yPercent: 4 }, { yPercent: -4, ease: "none", scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: true } });
+      // Introduce the overlay text + controls with a stagger as the section enters.
+      const reveals = sectionRef.current?.querySelectorAll("[data-feat-reveal]");
+      if (reveals?.length) {
+        gsap.from(reveals, {
+          opacity: 0, y: 32, duration: 0.95, ease: "power3.out", stagger: 0.13,
+          scrollTrigger: { trigger: sectionRef.current, start: "top 62%" },
+        });
+      }
     }, sectionRef);
     return () => ctx.revert();
   }, []);
+
+  // On project switch, the title + meta rise back in (not an instant swap).
+  useEffect(() => {
+    if (firstSwitch.current) { firstSwitch.current = false; return; }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    gsap.fromTo(
+      [titleRef.current, metaTextRef.current],
+      { yPercent: 45, opacity: 0 },
+      { yPercent: 0, opacity: 1, duration: 0.55, ease: "power3.out", stagger: 0.07 },
+    );
+  }, [active]);
 
   const p = PROJECTS[active];
 
@@ -79,15 +101,15 @@ export default function FeaturedProjects({ base = "/a-rolley/site" }: { base?: s
       <div ref={layerRef} className="absolute inset-0 frame pointer-events-none z-[2]" style={{ willChange: "transform" }}>
         <div className="wrap relative h-full">
           {/* Bottom-left: active project details */}
-          <div className="absolute left-0 bottom-[clamp(32px,6vh,72px)]" style={{ color: "#f4f1ea" }}>
-            <a href={`${base}/projects/${p.slug}`} data-cursor="View project" className="block pointer-events-auto">
-              <h2 className="display" style={{ color: "#f4f1ea", fontSize: "clamp(28px,3.4vw,52px)" }}>{p.title}</h2>
+          <div data-feat-reveal className="absolute left-0 bottom-[clamp(32px,6vh,72px)]" style={{ color: "#f4f1ea" }}>
+            <a href={`${base}/projects/${p.slug}`} data-cursor="View project" className="block pointer-events-auto overflow-hidden">
+              <h2 ref={titleRef} className="display" style={{ color: "#f4f1ea", fontSize: "clamp(28px,3.4vw,52px)" }}>{p.title}</h2>
             </a>
-            <p style={{ color: "rgba(244,241,234,0.82)", fontSize: "var(--step-body)", marginTop: "0.4em" }}>{p.meta}</p>
+            <p ref={metaTextRef} style={{ color: "rgba(244,241,234,0.82)", fontSize: "var(--step-body)", marginTop: "0.4em" }}>{p.meta}</p>
           </div>
 
           {/* Top-right: thumbnails to switch */}
-          <div className="absolute right-0 top-[clamp(80px,12vh,120px)] flex gap-2 md:gap-3 pointer-events-auto">
+          <div data-feat-reveal className="absolute right-0 top-[clamp(80px,12vh,120px)] flex gap-2 md:gap-3 pointer-events-auto">
             {PROJECTS.map((proj, i) => (
               <button
                 key={proj.src}
@@ -105,7 +127,7 @@ export default function FeaturedProjects({ base = "/a-rolley/site" }: { base?: s
           </div>
 
           {/* Bottom-right: all-projects link */}
-          <div className="absolute right-0 bottom-[clamp(32px,6vh,72px)] text-right pointer-events-auto">
+          <div data-feat-reveal className="absolute right-0 bottom-[clamp(32px,6vh,72px)] text-right pointer-events-auto">
             <a href={`${base}/projects`} className="eyebrow" style={{ color: "#f4f1ea", borderBottom: "1px solid rgba(244,241,234,0.4)", paddingBottom: 3, display: "inline-block" }}>
               View all projects
             </a>

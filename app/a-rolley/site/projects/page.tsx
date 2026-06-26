@@ -1,6 +1,7 @@
 import Nav from "@/components/arolley/Nav";
 import ViewCursor from "@/components/arolley/ViewCursor";
 import MaskReveal from "@/components/arolley/MaskReveal";
+import EntryReveal from "@/components/arolley/EntryReveal";
 import SiteFooter from "@/components/arolley/sections/SiteFooter";
 
 export const metadata = {
@@ -25,10 +26,12 @@ export default function ARolleyProjects() {
       <Nav />
       <ViewCursor />
 
-      <section className="frame text-center" style={{ paddingTop: "clamp(116px,15vh,176px)", paddingBottom: "clamp(36px,5vw,72px)" }}>
-        <h1 className="display" style={{ fontSize: "var(--step-display)", maxWidth: "14ch", marginInline: "auto" }}>
-          Homes from the <span className="display-italic accent">Coast</span>.
-        </h1>
+      <section className="frame arl-hero-tall">
+        <EntryReveal className="flex flex-col items-center">
+          <h1 className="display" style={{ fontSize: "var(--step-display)", maxWidth: "14ch", marginInline: "auto" }}>
+            Homes from the <span className="display-italic accent">Coast</span>.
+          </h1>
+        </EntryReveal>
       </section>
 
       <section className="frame" style={{ paddingBottom: "clamp(72px,10vw,160px)" }}>

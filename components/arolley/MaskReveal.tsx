@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { playOnIntro } from "./intro";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,7 +16,9 @@ const FROM: Record<Dir, string> = {
 };
 
 /** Clip mask-reveal: the frame wipes open while the inner settles from a slight
- *  scale-up. Honours prefers-reduced-motion (renders open, no motion). */
+ *  scale-up. Elements already in view at load reveal on the page-entry intro
+ *  (so nothing stays stuck clipped, e.g. a project image peeking above the
+ *  fold); below-fold elements reveal on scroll. Honours prefers-reduced-motion. */
 export default function MaskReveal({
   children,
   className = "",
@@ -36,12 +39,27 @@ export default function MaskReveal({
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let cleanup = () => {};
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ delay, scrollTrigger: { trigger: ref.current, start } });
+      const tl = gsap.timeline({ paused: true });
       tl.fromTo(ref.current, { clipPath: FROM[direction] }, { clipPath: "inset(0% 0% 0% 0%)", duration, ease: "power3.inOut" })
         .fromTo(innerRef.current, { scale: 1.12 }, { scale: 1, duration: duration + 0.2, ease: "power3.out" }, 0);
+      const play = () => gsap.delayedCall(delay, () => tl.play());
+
+      const rect = ref.current?.getBoundingClientRect();
+      const inView = !!rect && rect.top < window.innerHeight * 0.95 && rect.bottom > 0;
+      if (inView) {
+        // Already on screen at load — reveal once the page-entry intro fires.
+        cleanup = playOnIntro(play);
+      } else {
+        const st = ScrollTrigger.create({ trigger: ref.current, start, once: true, onEnter: play });
+        cleanup = () => st.kill();
+      }
     }, ref);
-    return () => ctx.revert();
+    return () => {
+      cleanup();
+      ctx.revert();
+    };
   }, [direction, delay, start, duration]);
 
   return (
