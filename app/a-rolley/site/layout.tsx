@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 export default function ARolleySiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={`arolley-site ${display.variable} ${body.variable}`}>
-      <a href="/" className="ld-back" aria-label="Back to finbar.studio">
+      <a href="/a-rolley" className="ld-back" aria-label="Back to finbar.studio">
         <span className="ld-back-arrow" aria-hidden="true">&larr;</span>
         <span className="ld-back-text">back to finbar.studio</span>
       </a>
