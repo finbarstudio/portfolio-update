@@ -48,7 +48,10 @@ export function parsePath(d: string): SubPath[] {
     if (d[i] === "e" || d[i] === "E") { i++; if (d[i] === "+" || d[i] === "-") i++; while (i < n && d[i] >= "0" && d[i] <= "9") i++; }
     return parseFloat(d.slice(start, i)) || 0;
   }
-  function flag(): number { skipWS(); const ch = d[i]; i++; return ch === "1" ? 1 : 0; }
+  // Arc flag: a single 0/1, which may be packed against the next number
+  // (`a5 5 0 016 0` → 0,1,6). Bounds-guarded so a truncated path never reads past
+  // the end; lenient on the value (a malformed flag reads as 0) like browsers are.
+  function flag(): number { skipWS(); if (i >= n) return 0; const ch = d[i]; i++; return ch === "1" ? 1 : 0; }
   function hasMore(): boolean {
     skipWS();
     const ch = d[i];
@@ -154,7 +157,10 @@ export function parsePath(d: string): SubPath[] {
 /** Elliptical arc → array of cubic spans (SVG implementation notes F.6). */
 function arcToCubics(x0: number, y0: number, rx: number, ry: number, angleDeg: number, laf: number, sf: number, x: number, y: number) {
   const out: { c1: Pt; c2: Pt; p1: Pt }[] = [];
-  if (rx === 0 || ry === 0 || (x0 === x && y0 === y)) {
+  // Treat a zero radius or a near-zero chord as a line — an exact === test lets
+  // endpoints that differ by a rounding epsilon through, and the centre-finding
+  // maths then divides by ~0 and yields Infinity control points.
+  if (rx === 0 || ry === 0 || (Math.abs(x0 - x) < 1e-9 && Math.abs(y0 - y) < 1e-9)) {
     out.push({ c1: { x: x0, y: y0 }, c2: { x, y }, p1: { x, y } });
     return out;
   }
@@ -262,7 +268,9 @@ export function transformSubPaths(subs: SubPath[], m: Matrix): SubPath[] {
 
 /** Serialise normalised sub-paths back to a `d` string (absolute commands). */
 export function subPathsToD(subs: SubPath[]): string {
-  const r = (v: number) => (Math.round(v * 1000) / 1000).toString();
+  // Never emit "NaN"/"Infinity" into path data — coordinates that went non-finite
+  // upstream (degenerate transform/arc) become 0 so the SVG stays parseable.
+  const r = (v: number) => (Number.isFinite(v) ? Math.round(v * 1000) / 1000 : 0).toString();
   return subs.map((sp) => {
     if (!sp.segs.length) return "";
     let dd = `M${r(sp.segs[0].p0.x)} ${r(sp.segs[0].p0.y)}`;
@@ -312,6 +320,8 @@ export function boundsOf(subs: SubPath[]): { x: number; y: number; w: number; h:
     if (s.kind === "cubic") { eat(s.c1); eat(s.c2); }
     else if (s.kind === "quad") eat(s.c);
   }
-  if (!Number.isFinite(minX)) return { x: 0, y: 0, w: 100, h: 100 };
+  if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
+    return { x: 0, y: 0, w: 100, h: 100 };
+  }
   return { x: minX, y: minY, w: Math.max(1e-3, maxX - minX), h: Math.max(1e-3, maxY - minY) };
 }

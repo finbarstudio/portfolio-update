@@ -588,6 +588,7 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
     if (useTl) { prevLoop = timeline.loop; timeline.loop = false; timeline.time = 0; timeline.drive = true; togglePlay(true); }
     try { rec.start(); }
     catch (e) { busy(null); status("Recorder failed to start: " + (e as Error).message); return; }
+    busy("Recording…");   // immediate feedback before the first tick paints the countdown
     const total = (useTl ? timeline.duration : config.duration) * 1000;
     const t0 = performance.now();
     const tick = () => {

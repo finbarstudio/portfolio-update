@@ -154,7 +154,14 @@ function extractGeometry(svgText: string): SubPath[] {
   imported.querySelectorAll("script,foreignObject,a,image,use").forEach((el) => el.remove());
   document.body.appendChild(host);
   try {
-    const rootInv = imported.getScreenCTM()?.inverse() ?? null;
+    // A singular root transform (e.g. a zero-width viewBox or a scale(0)) makes
+    // inverse() return an all-NaN matrix; fall back to no transform baking so the
+    // geometry stays finite rather than turning every coordinate into NaN.
+    const ctm = imported.getScreenCTM();
+    let rootInv = ctm ? ctm.inverse() : null;
+    if (rootInv && !(Number.isFinite(rootInv.a) && Number.isFinite(rootInv.d) && Number.isFinite(rootInv.e) && Number.isFinite(rootInv.f))) {
+      rootInv = null;
+    }
     const els = imported.querySelectorAll("path,rect,circle,ellipse,line,polyline,polygon");
     const subs: SubPath[] = [];
     els.forEach((el) => {
