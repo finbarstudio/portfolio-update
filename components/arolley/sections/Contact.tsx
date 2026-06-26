@@ -2,9 +2,9 @@ import ContactForm from "../ContactForm";
 
 /** Contact: a brief invitation + the details, beside the enquiry form. Lives at
  *  the bottom of the home and the about pages. */
-export default function Contact() {
+export default function Contact({ tone }: { tone?: "dark" }) {
   return (
-    <section id="contact" className="frame pad-y" style={{ background: "var(--paper-2)" }}>
+    <section id="contact" data-tone={tone === "dark" ? "dark" : undefined} className="frame pad-y" style={{ background: "var(--paper-2)" }}>
       <div className="wrap grid grid-cols-1 md:grid-cols-12" style={{ gap: "clamp(36px,5vw,80px)" }}>
         <div className="md:col-span-5">
           <h2 className="display" style={{ fontSize: "var(--step-h2)", marginTop: "0.5em", maxWidth: "16ch" }}>

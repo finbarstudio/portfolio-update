@@ -28,8 +28,8 @@ export default function ARolleyAbout() {
 
       <Story />
       <Values />
-      <Contact />
-      <SiteFooter />
+      <Contact tone="dark" />
+      <SiteFooter tone="dark" />
     </main>
   );
 }

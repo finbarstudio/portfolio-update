@@ -20,14 +20,16 @@
    ────────────────────────────────────────────────────────────────────────── */
 
 .arolley-site {
-  /* signature (default) — their real DNA: grey ground, light ink, sans, warm red */
-  --paper:     #3e4148;  /* their grey ground (token name kept for reuse) */
-  --paper-2:   #363940;  /* deeper grey panel */
-  --ink:       #ecebe4;  /* warm light text on the grey */
-  --ink-soft:  #b2b3af;  /* secondary light (AA on grey) */
-  --terracotta:#e0603f;  /* their brand red, lifted a touch for contrast on grey */
-  --line:      color-mix(in srgb, var(--ink) 20%, transparent);
-  --line-soft: color-mix(in srgb, var(--ink) 11%, transparent);
+  /* signature (default) — their real DNA: white ground, their grey #3E4148 as the
+     text colour, sans throughout. Monochrome — grey + white, no coloured accent.
+     The grey is used to HIGHLIGHT a few sections (see [data-tone="dark"] below). */
+  --paper:     #f7f6f3;  /* near-white ground (token name kept for reuse) */
+  --paper-2:   #efede8;  /* faint warm panel for gentle section variation */
+  --ink:       #3e4148;  /* their grey, now the text colour */
+  --ink-soft:  #6f7176;  /* mid grey secondary (AA on the near-white) */
+  --terracotta:#26282c;  /* monochrome accent — a deeper charcoal, no orange */
+  --line:      color-mix(in srgb, var(--ink) 18%, transparent);
+  --line-soft: color-mix(in srgb, var(--ink) 9%, transparent);
   --display-weight: 500;     /* sans display sits heavier than the serif */
   --display-tracking: -0.005em;
 
@@ -64,6 +66,22 @@
   --line-soft: color-mix(in srgb, var(--ink) 9%, transparent);
   --display-weight: 300;
   --display-tracking: -0.01em;
+}
+
+/* Grey HIGHLIGHT sections — any section flagged data-tone="dark" flips locally to
+   their grey #3E4148 ground with light text, so the mostly-white page is punctuated
+   by a few grey blocks (the closing CTA, the footer). Accent goes near-white here.
+   Components read these via var() tokens, so no per-component colours needed. */
+.arolley-site [data-tone="dark"] {
+  --paper:     #3e4148;
+  --paper-2:   #3a3d43;
+  --ink:       #f3f2ee;
+  --ink-soft:  #b7b8b4;
+  --terracotta:#f3f2ee;
+  --line:      color-mix(in srgb, var(--ink) 22%, transparent);
+  --line-soft: color-mix(in srgb, var(--ink) 12%, transparent);
+  background: var(--paper);
+  color: var(--ink);
 }
 
 /* Display headings — family/weight/tracking come from the active theme. The
@@ -118,12 +136,10 @@
 /* Hairline rule (timber-grain thin) */
 .arolley-site .rule { height: 1px; background: var(--line); border: 0; }
 
-/* ── Nav tint: links read ink over paper, paper over dark imagery ── */
+/* ── Nav tint: links read ink over the light ground, flip to paper over dark
+   (the featured photo stage + the grey highlight sections). ── */
 .arolley-site .nav-tinted { color: var(--ink); transition: color 0.45s ease; }
 html.arl-nav-dark .arolley-site .nav-tinted { color: var(--paper); }
-/* signature ink is already light on the grey ground, so keep the nav light even
-   over dark sections (the editorial paper theme still flips to paper). */
-html.arl-nav-dark .arolley-site:not([data-theme="editorial"]) .nav-tinted { color: var(--ink); }
 
 /* ── "Back to finbar.studio" pill — fixed mid-left, collapses to a circle ── */
 .arolley-site .ld-back {
@@ -149,7 +165,9 @@ html.arl-nav-dark .arolley-site:not([data-theme="editorial"]) .nav-tinted { colo
 .arl-foot { background: var(--paper); color: var(--ink); padding-top: clamp(48px, 7vw, 96px); }
 .arl-foot-grid {
   display: grid; grid-template-columns: 1fr; gap: 2rem 1.5rem;
-  padding-inline: var(--gutter); padding-bottom: clamp(28px, 4vw, 56px);
+  padding-inline: var(--gutter);
+  padding-top: clamp(32px, 4.5vw, 60px);  /* breathing room below the rule */
+  padding-bottom: clamp(28px, 4vw, 56px);
 }
 @media (min-width: 760px) { .arl-foot-grid { grid-template-columns: repeat(4, 1fr); } }
 .arl-foot-label { font-family: var(--font-arolley-body); text-transform: uppercase; letter-spacing: 0.18em; font-size: 10px; color: var(--ink-soft); margin-bottom: 0.7em; }
@@ -162,7 +180,7 @@ html.arl-nav-dark .arolley-site:not([data-theme="editorial"]) .nav-tinted { colo
 /* Proud-Member-of-Master-Builders-QLD badge — recoloured to the theme ink via a
    CSS mask so it sits right on both the grey and the paper grounds. */
 .arl-mbq {
-  display: inline-block; width: clamp(112px, 12vw, 148px); aspect-ratio: 880 / 554;
+  display: block; width: clamp(76px, 7vw, 96px); aspect-ratio: 880 / 554;
   background: var(--ink-soft);
   -webkit-mask: url("/a-rolley/master-builders-qld.svg") center / contain no-repeat;
   mask: url("/a-rolley/master-builders-qld.svg") center / contain no-repeat;

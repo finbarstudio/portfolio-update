@@ -6,7 +6,7 @@ import MaskReveal from "../MaskReveal";
  *  scroll-triggered motion: the columns clip-rise in a stagger, then the giant
  *  wordmark wipes up as it enters. `base` keeps internal links on the right
  *  version (signature vs editorial). */
-export default function SiteFooter({ base = "/a-rolley/site" }: { base?: string }) {
+export default function SiteFooter({ base = "/a-rolley/site", tone }: { base?: string; tone?: "dark" }) {
   const COLS = [
     {
       label: "Studio",
@@ -33,7 +33,7 @@ export default function SiteFooter({ base = "/a-rolley/site" }: { base?: string 
   ];
 
   return (
-    <footer className="arl-foot">
+    <footer className="arl-foot" data-tone={tone === "dark" ? "dark" : undefined}>
       <MaskReveal direction="left" duration={1.1} className="arl-foot-rule">
         <hr className="rule" style={{ marginInline: "var(--gutter)" }} />
       </MaskReveal>
@@ -61,11 +61,8 @@ export default function SiteFooter({ base = "/a-rolley/site" }: { base?: string 
       </MaskReveal>
 
       <div className="arl-foot-base">
-        <span className="flex items-center" style={{ gap: "clamp(14px,1.6vw,22px)" }}>
-          <span className="arl-mbq" role="img" aria-label="Proud Member of Master Builders Queensland" />
-          <span>QBCC 1098669</span>
-        </span>
-        <span>Concept site by finbar✶studio</span>
+        <span className="arl-mbq" role="img" aria-label="Proud Member of Master Builders Queensland" />
+        <span>QBCC 1098669 &middot; Concept site by finbar&#10033;studio</span>
       </div>
     </footer>
   );

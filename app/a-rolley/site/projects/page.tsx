@@ -57,7 +57,7 @@ export default function ARolleyProjects() {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter tone="dark" />
     </main>
   );
 }

@@ -16,8 +16,8 @@ export default function ARolleyHome() {
       <FeaturedProjects />
       <Heritage />
       <Testimonials />
-      <Contact />
-      <SiteFooter />
+      <Contact tone="dark" />
+      <SiteFooter tone="dark" />
     </main>
   );
 }
