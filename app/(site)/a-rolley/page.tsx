@@ -189,9 +189,11 @@ export default function ARolleyPitchPage() {
               See the demo &rarr;
             </Link>
             <p className="text-ink-soft mt-5" style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>
-              It&rsquo;s an early build and still growing, so treat it as a direction rather than the
-              finished article. It is a responsive build, but at its best on desktop, so open it there
-              and have a click around.
+              This is a first draft, built to show the kind of uplift I can bring, not a finished
+              site. There are plenty of directions it could go and a lot of refinement still to do.
+              That part comes from a proper consultation and design process, working through your
+              homes, your priorities and your audience together. For now, treat it as a demonstration.
+              It is a responsive build but at its best on desktop, so open it there and have a click around.
             </p>
           </div>
         </div>

@@ -12,11 +12,11 @@ export default function Hero() {
     <section data-tone="dark" className="relative w-full" style={{ height: "100svh", minHeight: 560 }}>
       <ParallaxImage src="/a-rolley/projects/lake-house.webp" alt="A Rolley & Sons custom home on the Sunshine Coast" priority />
 
-      {/* Scrims for AA-legible type: a bottom-weighted gradient anchors the
-          headline, a soft left gradient anchors the column, a light top wash
-          keeps the nav legible. */}
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(18,15,11,0.82) 0%, rgba(18,15,11,0.34) 34%, rgba(18,15,11,0.14) 60%, rgba(18,15,11,0.36) 100%)" }} />
-      <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(18,15,11,0.42) 0%, rgba(18,15,11,0.08) 44%, rgba(18,15,11,0) 72%)" }} />
+      {/* Scrims for AA-legible type: a soft radial pool sits directly behind the
+          centred text so it reads against any part of the photo, plus a light
+          top wash to keep the nav legible. */}
+      <div aria-hidden className="absolute inset-0" style={{ background: "radial-gradient(ellipse 62% 48% at 50% 52%, rgba(18,15,11,0.62) 0%, rgba(18,15,11,0.34) 45%, rgba(18,15,11,0.06) 78%, rgba(18,15,11,0) 100%)" }} />
+      <div aria-hidden className="absolute inset-x-0 top-0 h-40" style={{ background: "linear-gradient(to bottom, rgba(18,15,11,0.42), transparent)" }} />
 
       <div className="absolute inset-0 frame flex flex-col items-center justify-center text-center" style={{ color: "var(--paper)" }}>
         <p className="eyebrow" style={{ color: "rgba(244,241,234,0.86)" }}>
