@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import SandboxLinkButton from "@/components/sandbox/SandboxLinkButton";
 
 export const metadata: Metadata = {
   title: "Mockups",
@@ -17,9 +17,9 @@ export default function MockupsPage() {
   return (
     <section className="sb-mockups">
       {LIVE_TOOLS.map((tool) => (
-        <Link key={tool.href} href={tool.href} className="sb-mock-btn">
+        <SandboxLinkButton key={tool.href} href={tool.href}>
           {tool.title}
-        </Link>
+        </SandboxLinkButton>
       ))}
     </section>
   );

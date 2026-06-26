@@ -15,9 +15,16 @@
  * the FS.S collapse smoothly.
  */
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef } from "react";
+
+/** Pending feedback for a tab: the glow only slides once navigation commits, so
+    while this tab's navigation is in flight, pulse its label to acknowledge the tap. */
+function TabLabel({ label }: { label: string }) {
+  const { pending } = useLinkStatus();
+  return <span className={`sb-tab-inner ${pending ? "is-pending" : ""}`}>{label}</span>;
+}
 
 const TABS = [
   { href: "/", label: "fs.s", key: "home" },
@@ -77,7 +84,7 @@ export default function SandboxNav() {
               aria-hidden={isHomeTab && !onHome ? true : undefined}
               tabIndex={isHomeTab && !onHome ? -1 : undefined}
             >
-              {t.label}
+              <TabLabel label={t.label} />
             </Link>
           );
         })}

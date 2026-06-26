@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import SandboxLinkButton from "@/components/sandbox/SandboxLinkButton";
 
 export const metadata: Metadata = {
   title: "Library",
@@ -14,9 +14,9 @@ export default function LibraryPage() {
   return (
     <section className="sb-mockups">
       {EFFECTS.map((fx) => (
-        <Link key={fx.href} href={fx.href} className="sb-mock-btn">
+        <SandboxLinkButton key={fx.href} href={fx.href}>
           {fx.title}
-        </Link>
+        </SandboxLinkButton>
       ))}
     </section>
   );

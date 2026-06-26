@@ -17,6 +17,7 @@ import {
   anchorsOf, handlesOf, boundsOf, type SubPath,
 } from "./bezier-path";
 import { downloadBlob, safeName } from "@/lib/sandbox/download";
+import SandboxLoader from "@/components/sandbox/SandboxLoader";
 import { STAR_POINTS } from "@/components/brand-star";
 import { ASTERISK_POINTS } from "@/components/brand-asterisk";
 
@@ -451,6 +452,7 @@ export default function BezierStudio() {
             )}
           </svg>
         )}
+        {!view && !status && <SandboxLoader label="Loading" />}
         {status && <div className="bz-status">{status}</div>}
       </div>
 
