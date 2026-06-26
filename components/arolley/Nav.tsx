@@ -5,10 +5,9 @@ import LogoMark from "./LogoMark";
 
 const LEFT = [
   { label: "Projects", href: "/a-rolley/site/projects" },
-  { label: "Expertise", href: "/a-rolley/site#expertise" },
+  { label: "About", href: "/a-rolley/site/about" },
 ];
 const RIGHT = [
-  { label: "About", href: "/a-rolley/site/about" },
   { label: "Contact", href: "/a-rolley/site#contact" },
 ];
 const ALL = [...LEFT, ...RIGHT];
@@ -28,7 +27,7 @@ export default function Nav() {
   return (
     <>
       <header className="fixed top-0 inset-x-0 z-50 nav-tinted">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 md:h-20 px-[var(--gutter)]">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 md:h-20 px-[var(--nav-gutter)]">
           <ul className="hidden md:flex items-center gap-8">
             {LEFT.map((l) => (
               <li key={l.label}><a href={l.href} className={link}>{l.label}</a></li>

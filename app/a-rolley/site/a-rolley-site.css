@@ -35,7 +35,10 @@
   --step-h2:      clamp(30px, 4.4vw, 60px);
   --step-display: clamp(40px, 8vw, 128px);
 
-  --gutter: clamp(20px, 4vw, 80px);
+  /* Content L/R inset is deliberately wider than the nav's, so the body sits
+     inboard of the header (a calmer, more editorial frame). */
+  --gutter: clamp(24px, 6vw, 124px);
+  --nav-gutter: clamp(18px, 2.6vw, 52px);
 
   background: var(--paper);
   color: var(--ink);

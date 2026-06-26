@@ -18,10 +18,8 @@ export default function Heritage() {
           <h2 className="display" style={{ fontSize: "var(--step-h2)", marginTop: "0.5em" }}>
             Four generations, <span className="display-italic accent">built to last.</span>
           </h2>
-          <p className="lead" style={{ marginTop: "clamp(18px,2vw,28px)", maxWidth: "44ch" }}>
-            From a Brisbane furniture workshop to the Sunshine Coast, the Rolley name has been
-            handed down with the tools. We still build the way the family always has: carefully,
-            honestly, and for the long run.
+          <p className="lead" style={{ marginTop: "clamp(18px,2vw,28px)", maxWidth: "40ch" }}>
+            The Rolley name has been handed down with the tools, from a Brisbane workshop to the Coast.
           </p>
         </div>
 
