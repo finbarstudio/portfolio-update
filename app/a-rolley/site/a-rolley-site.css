@@ -1,0 +1,155 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   A Rolley & Sons demo — scoped styles.
+
+   DESIGN LANGUAGE (refer back constantly)
+   Anchor nouns: heritage · lineage · light · timber · craft · subtropical.
+   Story spine: furniture-makers in 1943 → building on the Sunshine Coast since
+   1968 → fourth generation today. Every section ladders back to "four
+   generations, built to last." Minimal, typography- and imagery-led, traditional
+   UI, generous white space, a real grid, considered section padding — the Lindon
+   / OJ Pippin family. Restraint over decoration.
+
+   Palette: warm paper ground, charcoal-slate ink, one muted terracotta accent,
+   soft warm grey for secondary. Type: a light Spectral serif display over a
+   Figtree humanist grotesk body, with a small wide-tracked eyebrow.
+
+   Scoped under `.arolley-site` so nothing leaks into the portfolio. @font-face
+   come from next/font variables set on the wrapper; @keyframes are top-level.
+   Loaded only by app/a-rolley/site/layout.tsx.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.arolley-site {
+  --paper:     #f4f1ea;  /* warm paper ground */
+  --paper-2:   #ece5d8;  /* slightly deeper panel */
+  --ink:       #2a2a2d;  /* charcoal-slate text */
+  --ink-soft:  #5f5f66;  /* secondary text (AA on paper) */
+  --terracotta:#a8512f;  /* single muted accent, from their #E25735 */
+  --line:      color-mix(in srgb, var(--ink) 16%, transparent);
+  --line-soft: color-mix(in srgb, var(--ink) 9%, transparent);
+
+  /* Fluid type scale */
+  --step-eyebrow: clamp(10px, 0.9vw, 11px);
+  --step-body:    clamp(15px, 1.05vw, 17px);
+  --step-lead:    clamp(19px, 1.7vw, 24px);
+  --step-h3:      clamp(22px, 2.4vw, 32px);
+  --step-h2:      clamp(30px, 4.4vw, 60px);
+  --step-display: clamp(40px, 8vw, 128px);
+
+  --gutter: clamp(20px, 4vw, 80px);
+
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-arolley-body), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  min-height: 100svh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headings — Spectral serif, light, faintly tightened */
+.arolley-site :is(h1, h2, h3, h4),
+.arolley-site .display {
+  font-family: var(--font-arolley-display), Georgia, serif;
+  font-weight: 300;
+  letter-spacing: -0.014em;
+  line-height: 1.04;
+  color: var(--ink);
+}
+.arolley-site .display-italic {
+  font-family: var(--font-arolley-display), Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.arolley-site .eyebrow {
+  font-family: var(--font-arolley-body), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.26em;
+  font-size: var(--step-eyebrow);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+.arolley-site .tracked { letter-spacing: 0.22em; text-transform: uppercase; }
+.arolley-site .lead { font-size: var(--step-lead); line-height: 1.5; color: var(--ink-soft); }
+.arolley-site .accent { color: var(--terracotta); }
+
+.arolley-site section { position: relative; }
+.arolley-site a { color: inherit; text-decoration: none; }
+.arolley-site ::selection { background: var(--terracotta); color: var(--paper); }
+
+/* Shared section frame: generous padding + max width + grid alignment */
+.arolley-site .frame { padding-inline: var(--gutter); }
+.arolley-site .wrap  { max-width: 1320px; margin-inline: auto; }
+.arolley-site .pad-y { padding-block: clamp(72px, 11vw, 180px); }
+
+/* Hairline rule (timber-grain thin) */
+.arolley-site .rule { height: 1px; background: var(--line); border: 0; }
+
+/* ── Nav tint: links read ink over paper, paper over dark imagery ── */
+.arolley-site .nav-tinted { color: var(--ink); transition: color 0.45s ease; }
+html.arl-nav-dark .arolley-site .nav-tinted { color: var(--paper); }
+
+/* ── "Back to finbar.studio" pill — fixed mid-left, collapses to a circle ── */
+.arolley-site .ld-back {
+  position: fixed; left: 16px; top: 50%; transform: translateY(-50%); z-index: 80;
+  display: inline-flex; align-items: center; height: 42px;
+  background: var(--pink, #e8718b); color: #fff;
+  border-radius: 999px;
+  font-family: var(--font-mono, var(--font-space-mono, monospace));
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  overflow: hidden; box-shadow: 0 4px 14px rgba(33, 30, 26, 0.18);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.arolley-site .ld-back:hover { transform: translateY(-50%) scale(1.03); box-shadow: 0 6px 18px rgba(33, 30, 26, 0.26); }
+.arolley-site .ld-back-arrow { flex: 0 0 42px; width: 42px; height: 42px; display: grid; place-items: center; font-size: 16px; line-height: 1; }
+.arolley-site .ld-back-text {
+  max-width: 0; opacity: 0; white-space: nowrap; overflow: hidden; padding-right: 0;
+  transition: max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, padding-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.arolley-site .ld-back:hover .ld-back-text,
+.arolley-site .ld-back:focus-visible .ld-back-text { max-width: 260px; opacity: 1; padding-right: 1.2rem; }
+
+/* ── Footer: tall, info grid + giant wordmark sweep ── */
+.arl-foot { background: var(--paper); color: var(--ink); padding-top: clamp(48px, 7vw, 96px); }
+.arl-foot-grid {
+  display: grid; grid-template-columns: 1fr; gap: 2rem 1.5rem;
+  padding-inline: var(--gutter); padding-bottom: clamp(28px, 4vw, 56px);
+}
+@media (min-width: 760px) { .arl-foot-grid { grid-template-columns: repeat(4, 1fr); } }
+.arl-foot-label { font-family: var(--font-arolley-body); text-transform: uppercase; letter-spacing: 0.18em; font-size: 10px; color: var(--ink-soft); margin-bottom: 0.7em; }
+.arl-foot-val { font-size: 14px; line-height: 1.7; }
+.arl-foot-val a:hover { color: var(--terracotta); }
+.arl-mark { padding: 0 var(--gutter) clamp(10px, 1.6vw, 22px); overflow: hidden; }
+.arl-mark svg { width: 100%; height: auto; display: block; color: var(--ink); }
+.arl-foot-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding: clamp(14px,2vw,22px) var(--gutter) clamp(20px,3vw,32px); font-size: 11px; color: var(--ink-soft); letter-spacing: 0.03em; border-top: 1px solid var(--line-soft); }
+
+/* ── Form fields + button ── */
+.arolley-site .arl-input { border-color: var(--line); color: var(--ink); }
+.arolley-site .arl-input::placeholder { color: var(--ink-soft); }
+.arolley-site .arl-input:focus { border-color: var(--terracotta); }
+.arolley-site .arl-btn {
+  display: inline-flex; align-items: center;
+  font-family: var(--font-arolley-body); font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--paper); background: var(--ink);
+  padding: 16px 28px; border-radius: 999px;
+  transition: background 0.3s var(--ease, ease), transform 0.3s var(--ease, ease);
+}
+.arolley-site .arl-btn:hover { background: var(--terracotta); transform: translateY(-1px); }
+
+/* ── Lenis smooth scroll helpers (only present on demo routes) ── */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes arlScrollDrop { 0% { transform: translateY(-100%); opacity: 1; } 100% { transform: translateY(220%); opacity: 0; } }
+@keyframes arlSpin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .arolley-site .ld-back, .arolley-site .ld-back-text { transition: none; }
+}

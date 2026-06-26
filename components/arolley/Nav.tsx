@@ -1,0 +1,74 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import LogoMark from "./LogoMark";
+
+const LEFT = [
+  { label: "Projects", href: "/a-rolley/site/projects" },
+  { label: "Expertise", href: "/a-rolley/site#ethos" },
+];
+const RIGHT = [
+  { label: "About", href: "/a-rolley/site/about" },
+  { label: "Contact", href: "/a-rolley/site#contact" },
+];
+const ALL = [...LEFT, ...RIGHT];
+
+export default function Nav() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  const link = "text-[10px] tracking-[0.24em] uppercase whitespace-nowrap hover:opacity-50 transition-opacity duration-300";
+
+  return (
+    <>
+      <header className="fixed top-0 inset-x-0 z-50 nav-tinted">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 md:h-20 px-[var(--gutter)]">
+          <ul className="hidden md:flex items-center gap-8">
+            {LEFT.map((l) => (
+              <li key={l.label}><a href={l.href} className={link}>{l.label}</a></li>
+            ))}
+          </ul>
+
+          <a href="/a-rolley/site" className="col-start-2 justify-self-center" aria-label="A Rolley & Sons, home">
+            <LogoMark className="h-[18px] md:h-[20px] w-auto" />
+          </a>
+
+          <div className="col-start-3 flex items-center justify-end gap-8">
+            <ul className="hidden md:flex items-center gap-8">
+              {RIGHT.map((l) => (
+                <li key={l.label}><a href={l.href} className={link}>{l.label}</a></li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((o) => !o)}
+              className="md:hidden w-8 h-8 flex flex-col items-end justify-center gap-[5px]"
+            >
+              <span className={`block h-px bg-current transition-all duration-300 ${menuOpen ? "w-6 rotate-45 translate-y-[3px]" : "w-6"}`} />
+              <span className={`block h-px bg-current transition-all duration-300 ${menuOpen ? "w-6 -rotate-45 -translate-y-[3px]" : "w-4"}`} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div
+        className={`md:hidden fixed inset-0 z-40 flex flex-col px-8 pt-28 gap-1 transition-opacity duration-300 ${menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        style={{ background: "var(--paper)" }}
+      >
+        {ALL.map((l) => (
+          <a key={l.label} href={l.href} onClick={() => setMenuOpen(false)} className="display text-4xl py-3">
+            {l.label}
+          </a>
+        ))}
+      </div>
+    </>
+  );
+}
