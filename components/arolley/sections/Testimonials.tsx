@@ -11,7 +11,6 @@ export default function Testimonials() {
   return (
     <section className="frame pad-y">
       <div className="wrap">
-        <p className="eyebrow" style={{ marginBottom: "clamp(28px,4vw,56px)" }}>In their words</p>
         <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: "clamp(36px,5vw,80px)" }}>
           {QUOTES.map((q, i) => (
             <MaskReveal key={q.who} delay={i * 0.08}>

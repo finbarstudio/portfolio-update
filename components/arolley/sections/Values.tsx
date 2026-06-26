@@ -20,7 +20,6 @@ export default function Values() {
   return (
     <section className="frame pad-y">
       <div className="wrap">
-        <p className="eyebrow">How we build</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: "clamp(28px,3vw,56px)", marginTop: "clamp(28px,3.5vw,56px)" }}>
           {VALUES.map((v, i) => (
             <MaskReveal key={v.t} delay={(i % 3) * 0.05}>
@@ -33,7 +32,6 @@ export default function Values() {
         </div>
 
         <div style={{ marginTop: "clamp(56px,8vw,120px)" }}>
-          <p className="eyebrow">The team</p>
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: "clamp(20px,2vw,32px)", marginTop: "clamp(24px,3vw,44px)" }}>
             {TEAM.map((m) => (
               <li key={m.n} style={{ borderTop: "1px solid var(--line)", paddingTop: "clamp(14px,1.4vw,20px)" }}>

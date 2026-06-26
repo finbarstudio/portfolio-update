@@ -38,7 +38,6 @@ export default function FeaturedProjects() {
       <div className="wrap">
         <header className="flex items-end justify-between flex-wrap gap-4" style={{ marginBottom: "clamp(32px,4vw,64px)" }}>
           <div>
-            <p className="eyebrow">Selected Work</p>
             <h2 className="display" style={{ fontSize: "var(--step-h2)", marginTop: "0.5em", maxWidth: "18ch" }}>
               Homes made for the way the Coast lives.
             </h2>

@@ -19,7 +19,6 @@ export default function ARolleyAbout() {
       <section className="frame" style={{ paddingTop: "clamp(128px,18vh,200px)", paddingBottom: "clamp(40px,6vw,80px)" }}>
         <div className="wrap">
           <hr className="rule" />
-          <p className="eyebrow" style={{ marginTop: "clamp(28px,4vw,52px)" }}>Our Story <span className="accent">·</span> Since 1943</p>
           <h1 className="display" style={{ fontSize: "var(--step-display)", marginTop: "clamp(18px,2.4vw,34px)", maxWidth: "16ch" }}>
             A family of builders, four generations <span className="display-italic accent">deep</span>.
           </h1>

@@ -14,7 +14,6 @@ export default function Heritage() {
     <section className="frame pad-y" style={{ background: "var(--paper-2)" }}>
       <div className="wrap grid grid-cols-1 md:grid-cols-12" style={{ gap: "clamp(28px,4vw,64px)" }}>
         <div className="md:col-span-5">
-          <p className="eyebrow">Since 1943</p>
           <h2 className="display" style={{ fontSize: "var(--step-h2)", marginTop: "0.5em" }}>
             Four generations, <span className="display-italic accent">built to last.</span>
           </h2>

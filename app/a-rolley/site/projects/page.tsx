@@ -28,7 +28,6 @@ export default function ARolleyProjects() {
       <section className="frame" style={{ paddingTop: "clamp(128px,18vh,200px)", paddingBottom: "clamp(32px,4vw,56px)" }}>
         <div className="wrap">
           <hr className="rule" />
-          <p className="eyebrow" style={{ marginTop: "clamp(28px,4vw,52px)" }}>Selected Work</p>
           <h1 className="display" style={{ fontSize: "var(--step-display)", marginTop: "clamp(18px,2.4vw,34px)", maxWidth: "14ch" }}>
             Homes from the <span className="display-italic accent">Coast</span>.
           </h1>

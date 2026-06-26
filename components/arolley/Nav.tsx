@@ -27,7 +27,7 @@ export default function Nav() {
   return (
     <>
       <header className="fixed top-0 inset-x-0 z-50 nav-tinted">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 md:h-20 px-[var(--nav-gutter)]">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 md:h-20 px-[var(--gutter)]">
           <ul className="hidden md:flex items-center gap-8">
             {LEFT.map((l) => (
               <li key={l.label}><a href={l.href} className={link}>{l.label}</a></li>

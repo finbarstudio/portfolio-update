@@ -16,7 +16,6 @@ export default function Story() {
       <section className="frame pad-y">
         <div className="wrap grid grid-cols-1 md:grid-cols-12" style={{ gap: "clamp(28px,4vw,72px)" }}>
           <div className="md:col-span-7">
-            <p className="eyebrow">The family</p>
             <h2 className="display" style={{ fontSize: "var(--step-h2)", marginTop: "0.5em", maxWidth: "20ch" }}>
               The same hands, handed down.
             </h2>
@@ -47,7 +46,6 @@ export default function Story() {
 
       <section className="frame pad-y" style={{ background: "var(--paper-2)" }}>
         <div className="wrap">
-          <p className="eyebrow" style={{ marginBottom: "clamp(28px,4vw,56px)" }}>Four generations</p>
           <ol style={{ display: "grid", gap: 0 }}>
             {TIMELINE.map((s, i) => (
               <MaskReveal key={s.year} delay={i * 0.05}>

@@ -7,7 +7,6 @@ export default function Contact() {
     <section id="contact" className="frame pad-y" style={{ background: "var(--paper-2)" }}>
       <div className="wrap grid grid-cols-1 md:grid-cols-12" style={{ gap: "clamp(36px,5vw,80px)" }}>
         <div className="md:col-span-5">
-          <p className="eyebrow">Start a project</p>
           <h2 className="display" style={{ fontSize: "var(--step-h2)", marginTop: "0.5em", maxWidth: "16ch" }}>
             Let&rsquo;s talk about your build.
           </h2>
