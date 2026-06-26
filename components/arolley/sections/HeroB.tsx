@@ -1,32 +1,47 @@
 /**
- * Hero option B — asymmetric editorial split. A big left-aligned Spectral
- * statement against a right column carrying the brief story + a heritage meta
- * row, with a hairline across the top. Structured and grid-driven, no image.
+ * Hero option B — selected-works index. The hero doubles as an editorial
+ * contents page: a short statement up top, then a ruled list of recent homes
+ * (name + place + year) that fills the lower viewport. No index numbers (those
+ * read as templated); the rules and the hover tint carry the structure.
  */
+const HOMES = [
+  { name: "Lake House", place: "Lake Macdonald", year: "2024" },
+  { name: "MacPhee Residence", place: "Sunshine Beach", year: "2023" },
+  { name: "Watson House", place: "Peregian", year: "2022" },
+  { name: "KI House", place: "Noosa Heads", year: "2021" },
+  { name: "Curra’s Annex", place: "Cooroy", year: "2020" },
+];
+
 export default function HeroB() {
   return (
-    <section className="frame flex flex-col justify-center relative" style={{ minHeight: "100svh", paddingTop: "clamp(96px,12vh,140px)", paddingBottom: "clamp(48px,7vh,96px)" }}>
-      <span className="arl-opt">Hero option B · split</span>
+    <section className="frame flex flex-col justify-center relative" style={{ minHeight: "100svh", paddingTop: "clamp(96px,12vh,140px)", paddingBottom: "clamp(40px,6vh,80px)" }}>
+      <span className="arl-opt">Hero option B · index</span>
       <div className="wrap w-full">
-        <hr className="rule" />
-        <p className="eyebrow" style={{ marginTop: "clamp(24px,3vw,40px)" }}>Fourth-generation Sunshine Coast builders</p>
-        <div className="grid grid-cols-1 md:grid-cols-12 items-end" style={{ gap: "clamp(28px,4vw,64px)", marginTop: "clamp(20px,2.5vw,36px)" }}>
-          <h1 className="display md:col-span-8" style={{ fontSize: "var(--step-display)", maxWidth: "14ch" }}>
-            Homes you&rsquo;ll want to call <span className="display-italic accent">home</span>.
-          </h1>
-          <div className="md:col-span-4">
-            <p className="lead" style={{ maxWidth: "34ch" }}>
-              Light-filled, energy-considered homes that sit easily in the subtropics, built to last.
-            </p>
-            <ul className="grid grid-cols-2" style={{ gap: "clamp(16px,2vw,28px)", marginTop: "clamp(24px,3vw,40px)", borderTop: "1px solid var(--line)", paddingTop: "clamp(16px,2vw,24px)", width: "fit-content" }}>
-              {[{ n: "1968", l: "On the Coast since" }, { n: "4", l: "Generations" }].map((s) => (
-                <li key={s.l}>
-                  <span className="display" style={{ fontSize: "var(--step-h3)", display: "block", lineHeight: 1 }}>{s.n}</span>
-                  <span className="eyebrow" style={{ display: "block", marginTop: "0.6em" }}>{s.l}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="grid grid-cols-1 md:grid-cols-12 items-end" style={{ gap: "clamp(20px,3vw,48px)", marginBottom: "clamp(28px,4vw,56px)" }}>
+          <div className="md:col-span-7">
+            <p className="eyebrow">Fourth-generation Sunshine Coast builders</p>
+            <h1 className="display" style={{ fontSize: "clamp(28px,3.6vw,52px)", maxWidth: "16ch", marginTop: "clamp(14px,1.6vw,22px)" }}>
+              Homes you&rsquo;ll want to call <span className="display-italic accent">home</span>.
+            </h1>
           </div>
+          <div className="md:col-span-5 md:text-right">
+            <p className="lead" style={{ fontSize: "clamp(15px,1.05vw,18px)", maxWidth: "32ch", marginLeft: "auto" }}>
+              A selected record of homes built on the Coast since 1968.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          {HOMES.map((h) => (
+            <a key={h.name} href="#work" className="idx-row" data-cursor="View">
+              <span className="idx-name">{h.name}</span>
+              <span className="idx-meta">{h.place} &middot; {h.year}</span>
+            </a>
+          ))}
+        </div>
+
+        <div className="flex justify-end" style={{ marginTop: "clamp(18px,2vw,28px)" }}>
+          <a href="#work" className="eyebrow" data-cursor="View">View all projects &rarr;</a>
         </div>
       </div>
     </section>
