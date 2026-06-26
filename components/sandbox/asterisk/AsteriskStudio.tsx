@@ -82,6 +82,7 @@ export default function AsteriskStudio() {
 
   const [, setTick] = useState(0);
   const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
   const [paste, setPaste] = useState<string | null>(null);
   const rerender = useCallback(() => setTick((t) => (t + 1) % 1e9), []);
 
@@ -90,6 +91,7 @@ export default function AsteriskStudio() {
     const eng = createAsteriskEngine(canvasRef.current, stageRef.current, {
       onStatus: setStatus,
       onSync: rerender,
+      onBusy: setBusy,
     });
     engineRef.current = eng;
     // The engine only exists after this effect runs, so re-render once to bind
@@ -156,6 +158,12 @@ export default function AsteriskStudio() {
     <div className="sb-studio">
       <div className="sb-studio-stage" ref={stageRef}>
         <canvas ref={canvasRef} className="sb-studio-canvas" />
+        {busy !== null && (
+          <div className="sb-studio-busy" role="status" aria-live="polite">
+            <span className="sb-studio-busy-dot" aria-hidden="true" />
+            <span>{busy}</span>
+          </div>
+        )}
       </div>
 
       <aside className="sb-studio-panel">
@@ -215,8 +223,8 @@ export default function AsteriskStudio() {
             )}
             {sec.title === "Export" && (
               <div className="sb-studio-btns">
-                <button className="sb-studio-btn" onClick={() => eng?.recordVideo(false)}>Record .webm</button>
-                <button className="sb-studio-btn" onClick={() => eng?.recordVideo(true)}>Record .mp4</button>
+                <button className="sb-studio-btn" disabled={busy !== null} onClick={() => eng?.recordVideo(false)}>Record .webm</button>
+                <button className="sb-studio-btn" disabled={busy !== null} onClick={() => eng?.recordVideo(true)}>Record .mp4</button>
                 <button className="sb-studio-btn" onClick={() => eng?.savePNG()}>Save .png</button>
                 <button className="sb-studio-btn" onClick={() => eng?.exportCode()}>Embed code</button>
                 <button className="sb-studio-btn" onClick={() => eng?.exportSettings()}>Settings .json</button>

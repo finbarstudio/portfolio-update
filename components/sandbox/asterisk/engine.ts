@@ -11,7 +11,6 @@
  */
 
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
@@ -156,7 +155,12 @@ const FXShader = {
 
 const ease = (t: number) => t * t * (3 - 2 * t);
 
-export type EngineOpts = { onStatus?: (msg: string) => void; onSync?: () => void };
+export type EngineOpts = {
+  onStatus?: (msg: string) => void;
+  onSync?: () => void;
+  /** Long-running work (record / transcode / save). A string shows a busy badge; null clears it. */
+  onBusy?: (msg: string | null) => void;
+};
 
 export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLElement, opts: EngineOpts = {}) {
   const config = defaultConfig();
@@ -165,15 +169,18 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
   };
   const status = (m: string) => opts.onStatus?.(m);
   const sync = () => opts.onSync?.();
+  const busy = (m: string | null) => opts.onBusy?.(m);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
   camera.position.set(0, 0, 220);
-  const controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = true;
-  controls.enablePan = false;
+  // The preview is display-only: no mouse/touch orbit or zoom on the canvas (so it
+  // never hijacks a tap or a page scroll). The camera looks at a fixed target and
+  // distance is driven solely by the Zoom slider.
+  const target = new THREE.Vector3(0, 0, 0);
+  camera.lookAt(target);
 
   const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(80, 120, 160);
   const fill = new THREE.DirectionalLight(0xffffff, 0.8); fill.position.set(-120, -40, 60);
@@ -295,35 +302,38 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
     u.uVignette.value = config.vignette; u.uGrain.value = config.grain;
     u.uHue.value = config.hueShift; u.uTwist.value = config.twist;
     u.uKaleido.value = config.kaleidoscope; u.uHalftone.value = config.halftone;
-    controls.autoRotate = false;
   }
   function setZoom(v: number) {
-    const dir = camera.position.clone().sub(controls.target);
+    const dir = camera.position.clone().sub(target);
     if (dir.lengthSq() < 1e-6) dir.set(0, 0, 1);
     dir.normalize();
-    camera.position.copy(controls.target).addScaledVector(dir, Math.max(1, v));
+    camera.position.copy(target).addScaledVector(dir, Math.max(1, v));
+    camera.lookAt(target);
   }
-  function applyZoomFromConfig() { setZoom(config.zoom); controls.update(); }
+  function applyZoomFromConfig() { setZoom(config.zoom); }
   function resetTransform() {
     config.rotX = config.rotY = config.rotZ = 0;
     config.posX = config.posY = 0; config.zoom = 220;
     mesh?.rotation.set(0, 0, 0); mesh?.position.set(0, 0, 0);
-    camera.position.set(0, 0, 220); controls.target.set(0, 0, 0); controls.update();
+    camera.position.set(0, 0, 220); target.set(0, 0, 0); camera.lookAt(target);
     status("Transform reset."); sync();
   }
 
   // ---------- Timeline ----------
+  // Rotation + position only. Zoom is captured separately (below) as a first-class
+  // keyframed scalar, so it animates with "Drive scene" alone — it no longer needs
+  // the "Keyframe rotation" toggle, which is what made zoom keyframes appear broken.
   const TRANSFORM_GET = () => ({
     rotX: mesh!.rotation.x, rotY: mesh!.rotation.y, rotZ: mesh!.rotation.z,
     posX: mesh!.position.x, posY: mesh!.position.y,
-    zoom: camera.position.distanceTo(controls.target),
   });
   function captureVals(): Record<string, number | string> {
     const v: Record<string, number | string> = {};
     NUM_PROPS.forEach((p) => (v[p] = config[p]));
     GEO_PROPS.forEach((p) => (v[p] = config[p]));
     COLOR_PROPS.forEach((p) => (v[p] = config[p]));
-    if (timeline.xform) Object.assign(v, TRANSFORM_GET());
+    v.zoom = config.zoom;                                  // always keyframe zoom
+    if (timeline.xform && mesh) Object.assign(v, TRANSFORM_GET());
     return v;
   }
   function addKeyframe() {
@@ -358,6 +368,11 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
       (config[p] as number) = nv;
     });
     if (geoChanged) buildShape();
+    // Zoom interpolates on its own — independent of the rotation/position keyframes.
+    if (a.vals.zoom !== undefined && b.vals.zoom !== undefined) {
+      config.zoom = lerp(a.vals.zoom as number, b.vals.zoom as number);
+      setZoom(config.zoom);
+    }
     COLOR_PROPS.forEach((p) => {
       _ca.set(a.vals[p] as string); _cb.set(b.vals[p] as string);
       _cc.copy(_ca).lerp(_cb, f);
@@ -366,7 +381,6 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
     if (a.vals.rotX !== undefined && b.vals.rotX !== undefined && mesh) {
       mesh.rotation.set(lerp(a.vals.rotX as number, b.vals.rotX as number), lerp(a.vals.rotY as number, b.vals.rotY as number), lerp(a.vals.rotZ as number, b.vals.rotZ as number));
       mesh.position.set(lerp(a.vals.posX as number, b.vals.posX as number), lerp(a.vals.posY as number, b.vals.posY as number), 0);
-      setZoom(lerp(a.vals.zoom as number, b.vals.zoom as number));
     }
     syncMaterial(); syncFX();
   }
@@ -410,7 +424,7 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
   function setXform(on: boolean) {
     timeline.xform = on;
     if (on) timeline.keys.forEach((k) => { if (k.vals.rotX === undefined) Object.assign(k.vals, TRANSFORM_GET()); });
-    else timeline.keys.forEach((k) => ["rotX", "rotY", "rotZ", "posX", "posY", "zoom"].forEach((p) => delete k.vals[p]));
+    else timeline.keys.forEach((k) => ["rotX", "rotY", "rotZ", "posX", "posY"].forEach((p) => delete k.vals[p]));
     sync();
   }
   function setTime(t: number) {
@@ -453,8 +467,7 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
     }
     tlTick(dt);
     fxPass.uniforms.uTime.value = elapsed;
-    controls.update();
-    config.zoom = camera.position.distanceTo(controls.target);
+    config.zoom = camera.position.distanceTo(target);
     composer.render();
   }
 
@@ -484,13 +497,17 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
   async function toMP4(webmBlob: Blob): Promise<Blob> {
     if (!_ffmpeg) {
       // Variable specifiers so the bundler leaves these as runtime imports.
-      const ffmpegUrl = "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js";
+      const base = "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm";
       const utilUrl = "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
-      const { FFmpeg } = await import(/* webpackIgnore: true */ ffmpegUrl);
+      const { FFmpeg } = await import(/* webpackIgnore: true */ base + "/index.js");
       const { toBlobURL, fetchFile } = await import(/* webpackIgnore: true */ utilUrl);
       const core = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
       _ffmpeg = new FFmpeg();
+      // classWorkerURL MUST be a same-origin (blob) URL: the default loads
+      // ./worker.js from unpkg as a cross-origin Worker, which every browser
+      // blocks — that's why the transcode always failed and we fell back to .webm.
       await _ffmpeg.load({
+        classWorkerURL: await toBlobURL(base + "/worker.js", "text/javascript"),
         coreURL: await toBlobURL(core + "/ffmpeg-core.js", "text/javascript"),
         wasmURL: await toBlobURL(core + "/ffmpeg-core.wasm", "application/wasm"),
       });
@@ -502,31 +519,82 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
     const data = await ff.readFile("out.mp4");
     return new Blob([data.buffer], { type: "video/mp4" });
   }
+  /** Best supported recorder MIME for this browser, preferring MP4 when asked.
+      Safari and Chromium ≥130 record MP4 natively (Chrome advertises the `avc1`
+      codec) — when they do we skip the ffmpeg transcode entirely. iOS Safari only
+      records MP4, so this is also what makes .mp4 work on mobile. */
+  function pickRecordMime(preferMp4: boolean): string {
+    const mp4 = ["video/mp4;codecs=avc1.42E01E", "video/mp4;codecs=avc1", "video/mp4;codecs=h264", "video/mp4"];
+    const webm = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
+    const order = preferMp4 ? [...mp4, ...webm] : [...webm, ...mp4];
+    for (const t of order) {
+      try { if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)) return t; } catch { /* old browser */ }
+    }
+    return "";
+  }
   function recordVideo(toMp4 = false) {
+    if (typeof MediaRecorder === "undefined" || typeof canvas.captureStream !== "function") {
+      status("Recording isn’t supported in this browser.");
+      return;
+    }
     const fps = config.fps;
     const stream = canvas.captureStream(fps);
-    const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
-    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 16_000_000 });
+    const mime = pickRecordMime(toMp4);
+    let rec: MediaRecorder;
+    try {
+      rec = mime
+        ? new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 16_000_000 })
+        : new MediaRecorder(stream);
+    } catch {
+      try { rec = new MediaRecorder(stream); }
+      catch (e) { status("Couldn’t start the recorder: " + (e as Error).message); return; }
+    }
+    const recMime = rec.mimeType || mime || "video/webm";
+    const nativeMp4 = /mp4/i.test(recMime);
     const chunks: BlobPart[] = [];
     rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+
     const useTl = timeline.keys.length > 0;
     let prevLoop = timeline.loop;
     rec.onstop = async () => {
       if (useTl) { togglePlay(false); timeline.loop = prevLoop; sync(); }
-      const webm = new Blob(chunks, { type: "video/webm" });
-      if (toMp4) {
-        try { status("Transcoding to MP4 (first run downloads ffmpeg ~30MB)…"); downloadBlob(await toMP4(webm), "asterisk.mp4"); status("Saved asterisk.mp4"); }
-        catch (e) { downloadBlob(webm, "asterisk.webm"); status("MP4 failed (" + (e as Error).message + ") — saved .webm."); }
-      } else { downloadBlob(webm, "asterisk.webm"); status("Saved asterisk.webm"); }
+      const blob = new Blob(chunks, { type: recMime });
+      if (!blob.size) { busy(null); status("Recording produced no data — try again."); return; }
+      try {
+        if (toMp4 && !nativeMp4) {
+          // Desktop path: recorded WebM, transcode to MP4 with ffmpeg.wasm.
+          busy("Saving — transcoding to MP4 (first run downloads ffmpeg ~30 MB)…");
+          downloadBlob(await toMP4(blob), "asterisk.mp4");
+          status("Saved asterisk.mp4");
+        } else {
+          const ext = nativeMp4 ? "mp4" : "webm";
+          busy("Saving asterisk." + ext + "…");
+          downloadBlob(blob, "asterisk." + ext);
+          status("Saved asterisk." + ext);
+        }
+      } catch (e) {
+        // MP4 was asked for but neither native recording nor the ffmpeg transcode
+        // worked — save the raw WebM and say so plainly (no silent mislabelling).
+        const ext = nativeMp4 ? "mp4" : "webm";
+        downloadBlob(blob, "asterisk." + ext);
+        status(toMp4 && ext === "webm"
+          ? "This browser can’t make MP4 here — saved .webm instead (" + (e as Error).message + ")."
+          : "Export issue (" + (e as Error).message + ") — saved the raw ." + ext + ".");
+      } finally {
+        busy(null);
+      }
     };
+
     if (useTl) { prevLoop = timeline.loop; timeline.loop = false; timeline.time = 0; timeline.drive = true; togglePlay(true); }
-    rec.start();
+    try { rec.start(); }
+    catch (e) { busy(null); status("Recorder failed to start: " + (e as Error).message); return; }
     const total = (useTl ? timeline.duration : config.duration) * 1000;
     const t0 = performance.now();
     const tick = () => {
+      if (rec.state !== "recording") return;
       const left = total - (performance.now() - t0);
-      if (left <= 0) { rec.stop(); return; }
-      status(`Recording… ${(left / 1000).toFixed(1)}s`);
+      if (left <= 0) { busy("Saving…"); rec.stop(); return; }
+      busy(`Recording — ${(left / 1000).toFixed(1)}s left`);
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -595,7 +663,6 @@ loop();
   function dispose() {
     cancelAnimationFrame(raf);
     ro.disconnect();
-    controls.dispose();
     geometry?.dispose();
     material?.dispose();
     composer?.dispose?.();

@@ -7,7 +7,10 @@ export const metadata: Metadata = {
     "Creative tools from finbar✶studio. Asterisk Studio: extrude an SVG into 3D, animate it on a timeline, and export video, stills or an embed.",
 };
 
-const TOOLS = [{ title: "Asterisk Studio", href: "/asterisk" }];
+const TOOLS = [
+  { title: "Asterisk Studio", href: "/asterisk" },
+  { title: "Bezier Studio", href: "/bezier" },
+];
 
 export default function ToolsPage() {
   return (
