@@ -1,37 +1,31 @@
-import ParallaxImage from "../ParallaxImage";
-
 /**
- * Image-led hero: a full-bleed project photo (with scroll parallax) carries it,
- * imagery first. Kept deliberately spare, an eyebrow that does the story in one
- * line and a single short statement, room to breathe within one viewport. Depth
- * lives on the About page and the heritage strip below. data-tone="dark" flips
- * the nav to paper over the image.
+ * Hero — wordmark lockup. Treats the family name as the asset: A Rolley & Sons
+ * set large in Spectral as the focal point, one descriptor line above and a
+ * supporting line beneath, with a thin meta row along a bottom rule. The
+ * heritage flex a fourth-generation builder actually owns. Type only — the
+ * full-bleed featured showcase below carries the imagery.
  */
 export default function Hero() {
   return (
-    <section data-tone="dark" className="relative w-full" style={{ height: "100svh", minHeight: 560 }}>
-      <ParallaxImage src="/a-rolley/projects/lake-house.webp" alt="A Rolley & Sons custom home on the Sunshine Coast" priority />
+    <section className="frame flex flex-col items-center justify-center text-center relative" style={{ minHeight: "100svh" }}>
+      <p className="eyebrow">Builders of fine Sunshine Coast homes since 1968</p>
+      <h1 className="display" style={{ fontSize: "clamp(40px,7.2vw,116px)", lineHeight: 0.98, marginTop: "clamp(18px,2.4vw,34px)" }}>
+        A Rolley <span className="display-italic accent">&amp; Sons</span>
+      </h1>
+      <p className="lead" style={{ marginTop: "clamp(20px,2.4vw,32px)", maxWidth: "40ch", marginInline: "auto" }}>
+        Light-filled homes you&rsquo;ll want to call home.
+      </p>
 
-      {/* Scrims for AA-legible type: a soft radial pool sits directly behind the
-          centred text so it reads against any part of the photo, plus a light
-          top wash to keep the nav legible. */}
-      <div aria-hidden className="absolute inset-0" style={{ background: "radial-gradient(ellipse 62% 48% at 50% 52%, rgba(18,15,11,0.62) 0%, rgba(18,15,11,0.34) 45%, rgba(18,15,11,0.06) 78%, rgba(18,15,11,0) 100%)" }} />
-      <div aria-hidden className="absolute inset-x-0 top-0 h-40" style={{ background: "linear-gradient(to bottom, rgba(18,15,11,0.42), transparent)" }} />
-
-      <div className="absolute inset-0 frame flex flex-col items-center justify-center text-center" style={{ color: "var(--paper)" }}>
-        <p className="eyebrow" style={{ color: "rgba(244,241,234,0.86)" }}>
-          Fourth-generation Sunshine Coast builders
-        </p>
-        <h1 className="display" style={{ color: "var(--paper)", fontSize: "clamp(32px, 4.6vw, 74px)", marginTop: "clamp(16px,1.8vw,26px)", maxWidth: "18ch" }}>
-          Homes you&rsquo;ll want to call <span className="display-italic">home</span>.
-        </h1>
-      </div>
-
-      <div className="absolute right-[var(--gutter)] bottom-[clamp(48px,9vh,120px)] eyebrow flex items-center gap-2" style={{ color: "rgba(244,241,234,0.8)" }}>
-        <span>Scroll</span>
-        <span aria-hidden className="relative inline-block overflow-hidden" style={{ width: 1, height: 28, background: "rgba(244,241,234,0.5)" }}>
-          <span className="absolute inset-0" style={{ background: "var(--paper)", animation: "arlScrollDrop 2.4s ease-in-out infinite" }} />
-        </span>
+      <div
+        className="absolute flex flex-wrap items-center justify-center"
+        style={{ left: "var(--gutter)", right: "var(--gutter)", bottom: "clamp(28px,5vh,56px)", gap: "clamp(12px,1.4vw,22px)", borderTop: "1px solid var(--line)", paddingTop: "clamp(14px,1.6vw,22px)" }}
+      >
+        {["Noosa Hinterland", "Established 1968", "Master Builders QLD"].map((m, i) => (
+          <span key={m} className="eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: "clamp(12px,1.4vw,22px)" }}>
+            {i > 0 && <span className="accent" aria-hidden>&middot;</span>}
+            {m}
+          </span>
+        ))}
       </div>
     </section>
   );

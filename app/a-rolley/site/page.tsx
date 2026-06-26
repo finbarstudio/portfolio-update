@@ -1,10 +1,6 @@
 import Nav from "@/components/arolley/Nav";
 import ViewCursor from "@/components/arolley/ViewCursor";
-import HeroA from "@/components/arolley/sections/HeroA";
-import HeroB from "@/components/arolley/sections/HeroB";
-import HeroC from "@/components/arolley/sections/HeroC";
-import HeroD from "@/components/arolley/sections/HeroD";
-import HeroE from "@/components/arolley/sections/HeroE";
+import Hero from "@/components/arolley/sections/Hero";
 import FeaturedProjects from "@/components/arolley/sections/FeaturedProjects";
 import Heritage from "@/components/arolley/sections/Heritage";
 import Testimonials from "@/components/arolley/sections/Testimonials";
@@ -16,16 +12,7 @@ export default function ARolleyHome() {
     <main>
       <Nav />
       <ViewCursor />
-      {/* Hero chooser — five reference-led options stacked. Pick one and I'll keep it. */}
-      <HeroA />
-      <hr className="rule" style={{ marginInline: "var(--gutter)" }} />
-      <HeroB />
-      <hr className="rule" style={{ marginInline: "var(--gutter)" }} />
-      <HeroC />
-      <hr className="rule" style={{ marginInline: "var(--gutter)" }} />
-      <HeroD />
-      <hr className="rule" style={{ marginInline: "var(--gutter)" }} />
-      <HeroE />
+      <Hero />
       <FeaturedProjects />
       <Heritage />
       <Testimonials />
