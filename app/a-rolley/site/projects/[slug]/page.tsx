@@ -1,0 +1,32 @@
+import Nav from "@/components/arolley/Nav";
+import ViewCursor from "@/components/arolley/ViewCursor";
+import SiteFooter from "@/components/arolley/sections/SiteFooter";
+
+const BASE = "/a-rolley/site";
+
+export const metadata = {
+  title: { absolute: "Project | A Rolley & Sons" },
+};
+
+// Placeholder detail page. Project pages aren't built in this concept yet, so a
+// click from the featured showcase or the grid lands here. Next 16: params async.
+export default async function ARolleyProjectDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const name = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return (
+    <main>
+      <Nav base={BASE} />
+      <ViewCursor />
+      <section className="frame flex flex-col items-center justify-center text-center" style={{ minHeight: "82svh", paddingTop: "clamp(104px,13vh,150px)", paddingBottom: "clamp(40px,6vw,72px)" }}>
+        <p className="eyebrow">{name}</p>
+        <h1 className="display" style={{ fontSize: "var(--step-h2)", maxWidth: "22ch", marginTop: "clamp(14px,1.6vw,24px)" }}>
+          Project detail page yet to be developed.
+        </h1>
+        <a href={`${BASE}/projects`} className="eyebrow" data-cursor="Back" style={{ marginTop: "clamp(24px,3vw,40px)", borderBottom: "1px solid var(--line)", paddingBottom: 4 }}>
+          Back to projects
+        </a>
+      </section>
+      <SiteFooter base={BASE} tone="dark" />
+    </main>
+  );
+}

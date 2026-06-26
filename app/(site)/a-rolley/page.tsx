@@ -63,8 +63,8 @@ const OFFERINGS = [
     body: "A site designed by someone who cares, written in custom code, that works as well on a phone as it does on a desktop.",
   },
   {
-    title: "Headless CMS",
-    body: "You run your own content. Add a finished home, swap the photos, update a page, no developer and no waiting.",
+    title: "A proper CMS, on Sanity",
+    body: "Built on Sanity so you stay on top of your own content. Add a finished home, swap the photos, update a page, no developer and no waiting.",
   },
   {
     title: "SEO",

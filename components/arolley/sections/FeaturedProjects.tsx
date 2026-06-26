@@ -6,13 +6,13 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type P = { title: string; meta: string; src: string };
+type P = { title: string; meta: string; src: string; slug: string };
 const PROJECTS: P[] = [
-  { title: "Lake House", meta: "Custom Home · Sunshine Coast", src: "/a-rolley/projects/lake-house.webp" },
-  { title: "MacPhee Residence", meta: "Custom Home · Buderim", src: "/a-rolley/projects/macphee.webp" },
-  { title: "Watson Residence", meta: "Custom Home", src: "/a-rolley/projects/watson.webp" },
-  { title: "KI House", meta: "Custom Home", src: "/a-rolley/projects/ki-house.webp" },
-  { title: "Curra's Annex", meta: "Secondary Dwelling", src: "/a-rolley/projects/curras.webp" },
+  { title: "Lake House", meta: "Custom Home · Sunshine Coast", src: "/a-rolley/projects/lake-house.webp", slug: "lake-house" },
+  { title: "MacPhee Residence", meta: "Custom Home · Buderim", src: "/a-rolley/projects/macphee.webp", slug: "macphee-residence" },
+  { title: "Watson Residence", meta: "Custom Home", src: "/a-rolley/projects/watson.webp", slug: "watson-residence" },
+  { title: "KI House", meta: "Custom Home", src: "/a-rolley/projects/ki-house.webp", slug: "ki-house" },
+  { title: "Curra's Annex", meta: "Secondary Dwelling", src: "/a-rolley/projects/curras.webp", slug: "curras-annex" },
 ];
 
 /**
@@ -71,12 +71,16 @@ export default function FeaturedProjects({ base = "/a-rolley/site" }: { base?: s
       <div aria-hidden className="absolute inset-x-0 top-0 h-48 pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(18,15,11,0.5), transparent)" }} />
       <div aria-hidden className="absolute bottom-0 left-0 pointer-events-none" style={{ width: "70%", height: "70%", background: "radial-gradient(ellipse at bottom left, rgba(18,15,11,0.62) 0%, rgba(18,15,11,0.3) 38%, rgba(18,15,11,0) 70%)" }} />
 
+      {/* Whole image is a click target into the active project (the thumbnails,
+          title and view-all sit above this and keep their own behaviour). */}
+      <a href={`${base}/projects/${p.slug}`} data-cursor="View project" aria-label={`View ${p.title}`} className="absolute inset-0 z-[1]" />
+
       {/* Details + thumbnails (slower parallax layer) */}
-      <div ref={layerRef} className="absolute inset-0 frame pointer-events-none" style={{ willChange: "transform" }}>
+      <div ref={layerRef} className="absolute inset-0 frame pointer-events-none z-[2]" style={{ willChange: "transform" }}>
         <div className="wrap relative h-full">
           {/* Bottom-left: active project details */}
           <div className="absolute left-0 bottom-[clamp(32px,6vh,72px)]" style={{ color: "#f4f1ea" }}>
-            <a href={`${base}/projects`} data-cursor="View Project" className="block pointer-events-auto">
+            <a href={`${base}/projects/${p.slug}`} data-cursor="View project" className="block pointer-events-auto">
               <h2 className="display" style={{ color: "#f4f1ea", fontSize: "clamp(28px,3.4vw,52px)" }}>{p.title}</h2>
             </a>
             <p style={{ color: "rgba(244,241,234,0.82)", fontSize: "var(--step-body)", marginTop: "0.4em" }}>{p.meta}</p>
@@ -102,7 +106,7 @@ export default function FeaturedProjects({ base = "/a-rolley/site" }: { base?: s
 
           {/* Bottom-right: all-projects link */}
           <div className="absolute right-0 bottom-[clamp(32px,6vh,72px)] text-right pointer-events-auto">
-            <a href={`${base}/projects`} data-cursor="All Work" className="eyebrow" style={{ color: "#f4f1ea", borderBottom: "1px solid rgba(244,241,234,0.4)", paddingBottom: 3, display: "inline-block" }}>
+            <a href={`${base}/projects`} className="eyebrow" style={{ color: "#f4f1ea", borderBottom: "1px solid rgba(244,241,234,0.4)", paddingBottom: 3, display: "inline-block" }}>
               View all projects
             </a>
           </div>

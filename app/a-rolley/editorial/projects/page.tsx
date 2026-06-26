@@ -9,16 +9,16 @@ export const metadata = {
   title: { absolute: "Projects | A Rolley & Sons — Editorial" },
 };
 
-type P = { title: string; meta: string; src: string; ratio: string };
+type P = { title: string; meta: string; src: string; ratio: string; slug: string };
 const PROJECTS: P[] = [
-  { title: "Lake House", meta: "Custom Home · Sunshine Coast", src: "/a-rolley/projects/lake-house.webp", ratio: "16 / 10" },
-  { title: "MacPhee Residence", meta: "Custom Home", src: "/a-rolley/projects/macphee.webp", ratio: "4 / 5" },
-  { title: "Watson Residence", meta: "Custom Home", src: "/a-rolley/projects/watson.webp", ratio: "16 / 10" },
-  { title: "KI House", meta: "Custom Home", src: "/a-rolley/projects/ki-house.webp", ratio: "4 / 5" },
-  { title: "Curra's Annex", meta: "Secondary Dwelling", src: "/a-rolley/projects/curras.webp", ratio: "16 / 10" },
-  { title: "Bells Duplex", meta: "Dual Occupancy", src: "/a-rolley/projects/bells-duplex.webp", ratio: "4 / 5" },
-  { title: "The Cottage", meta: "Renovation", src: "/a-rolley/projects/cottage-living.webp", ratio: "16 / 10" },
-  { title: "M & L Residence", meta: "Custom Home", src: "/a-rolley/projects/ml-bathroom.webp", ratio: "4 / 5" },
+  { title: "Lake House", meta: "Custom Home · Sunshine Coast", src: "/a-rolley/projects/lake-house.webp", ratio: "16 / 10", slug: "lake-house" },
+  { title: "MacPhee Residence", meta: "Custom Home", src: "/a-rolley/projects/macphee.webp", ratio: "4 / 5", slug: "macphee-residence" },
+  { title: "Watson Residence", meta: "Custom Home", src: "/a-rolley/projects/watson.webp", ratio: "16 / 10", slug: "watson-residence" },
+  { title: "KI House", meta: "Custom Home", src: "/a-rolley/projects/ki-house.webp", ratio: "4 / 5", slug: "ki-house" },
+  { title: "Curra's Annex", meta: "Secondary Dwelling", src: "/a-rolley/projects/curras.webp", ratio: "16 / 10", slug: "curras-annex" },
+  { title: "Bells Duplex", meta: "Dual Occupancy", src: "/a-rolley/projects/bells-duplex.webp", ratio: "4 / 5", slug: "bells-duplex" },
+  { title: "The Cottage", meta: "Renovation", src: "/a-rolley/projects/cottage-living.webp", ratio: "16 / 10", slug: "the-cottage" },
+  { title: "M & L Residence", meta: "Custom Home", src: "/a-rolley/projects/ml-bathroom.webp", ratio: "4 / 5", slug: "ml-residence" },
 ];
 
 export default function ARolleyEditorialProjects() {
@@ -38,9 +38,9 @@ export default function ARolleyEditorialProjects() {
           {PROJECTS.map((p, i) => (
             <a
               key={p.title}
-              href={`${BASE}/projects`}
+              href={`${BASE}/projects/${p.slug}`}
               className="group block"
-              data-cursor="View"
+              data-cursor="View project"
               style={{ alignSelf: i % 2 ? "end" : "start" }}
               aria-label={`${p.title}, ${p.meta}`}
             >

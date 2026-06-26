@@ -48,8 +48,11 @@ export default function ViewCursor() {
     <div
       ref={ref}
       aria-hidden
-      className={`fixed left-0 top-0 z-[200] pointer-events-none transition-[opacity,transform] duration-200 ease-out ${active ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
+      className="fixed left-0 top-0 z-[200] pointer-events-none will-change-transform"
     >
+      {/* Position lives on the wrapper (rewritten every frame, no CSS transition,
+          so the follow stays smooth). Appearance (opacity + scale pop) lives here
+          on the pill, where a transition is safe. */}
       <span
         className="inline-flex items-center gap-2 rounded-full whitespace-nowrap"
         style={{
@@ -61,6 +64,10 @@ export default function ViewCursor() {
           fontWeight: 600,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
+          transformOrigin: "center",
+          opacity: active ? 1 : 0,
+          transform: `scale(${active ? 1 : 0.7})`,
+          transition: "opacity 0.22s ease, transform 0.22s cubic-bezier(0.16,1,0.3,1)",
         }}
       >
         {label}
