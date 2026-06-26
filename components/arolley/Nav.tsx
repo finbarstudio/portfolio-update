@@ -5,7 +5,7 @@ import LogoMark from "./LogoMark";
 
 const LEFT = [
   { label: "Projects", href: "/a-rolley/site/projects" },
-  { label: "Expertise", href: "/a-rolley/site#ethos" },
+  { label: "Expertise", href: "/a-rolley/site#expertise" },
 ];
 const RIGHT = [
   { label: "About", href: "/a-rolley/site/about" },

@@ -2,6 +2,7 @@ import Nav from "@/components/arolley/Nav";
 import ViewCursor from "@/components/arolley/ViewCursor";
 import Hero from "@/components/arolley/sections/Hero";
 import FeaturedProjects from "@/components/arolley/sections/FeaturedProjects";
+import Expertise from "@/components/arolley/sections/Expertise";
 import Heritage from "@/components/arolley/sections/Heritage";
 import Testimonials from "@/components/arolley/sections/Testimonials";
 import Contact from "@/components/arolley/sections/Contact";
@@ -14,6 +15,7 @@ export default function ARolleyHome() {
       <ViewCursor />
       <Hero />
       <FeaturedProjects />
+      <Expertise />
       <Heritage />
       <Testimonials />
       <Contact />
