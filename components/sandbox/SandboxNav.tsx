@@ -2,42 +2,92 @@
 
 /**
  * SandboxNav — the two corner navs.
- * Top-left: a joined box of two tabs (FS.S / MOCKUPS) with a pink highlight that
- * slides between them based on the active route. Top-right: a link out to the
- * main finbar.studio site.
+ * Top-left: a joined pill of tabs with a pink highlight that slides onto the
+ * active one. The landing (FS.S) tab collapses away once you leave it — it's just
+ * a hub with no info, so there's no need to return, and dropping it gives the
+ * remaining tabs room to breathe (the bar was too cramped on mobile otherwise).
+ * Top-right: a link out to the main finbar.studio site.
  *
- * Active state is derived with `pathname.includes("mockup")` so it's identical on
- * the server (which sees the rewritten /sandbox/... path) and the client (which
- * sees the clean /... path) — no hydration mismatch under the subdomain rewrite.
- * Any mockup page (/mockups, /phone-mockup, /mac-mockup) lights the MOCKUPS tab.
+ * The active section is derived from the pathname so it's identical on the server
+ * (which sees the rewritten /sandbox/... path) and the client (clean /... path) —
+ * no hydration mismatch under the subdomain rewrite. The highlight pill is
+ * positioned by measuring the active tab (JS), so it tracks tabs of any width and
+ * the FS.S collapse smoothly.
  */
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
+import { useLayoutEffect, useRef } from "react";
+
+/** Pending feedback for a tab: the glow only slides once navigation commits, so
+    while this tab's navigation is in flight, pulse its label to acknowledge the tap. */
+function TabLabel({ label }: { label: string }) {
+  const { pending } = useLinkStatus();
+  return <span className={`sb-tab-inner ${pending ? "is-pending" : ""}`}>{label}</span>;
+}
+
+const TABS = [
+  { href: "/", label: "fs.s", key: "home" },
+  { href: "/mockups", label: "mockups", key: "mockups" },
+  { href: "/tools", label: "tools", key: "tools" },
+  { href: "/library", label: "library", key: "library" },
+] as const;
 
 export default function SandboxNav() {
   const pathname = usePathname();
-  const onMockups = pathname.includes("mockup");
-  const onTools = pathname.includes("tools") || pathname.includes("asterisk");
-  const onLibrary = pathname.includes("library");
-  const pos = onLibrary ? "3" : onTools ? "2" : onMockups ? "1" : "0";
+  const active =
+    pathname.includes("mockup") ? "mockups"
+      : pathname.includes("tools") || pathname.includes("asterisk") || pathname.includes("bezier") ? "tools"
+        : pathname.includes("library") ? "library"
+          : "home";
+  const onHome = active === "home";
+
+  const navRef = useRef<HTMLElement>(null);
+  const glowRef = useRef<HTMLSpanElement>(null);
+  const tabRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+
+  // Slide + size the highlight onto the active tab. Re-measures after the FS.S
+  // collapse transition (and on resize) so it lands exactly.
+  useLayoutEffect(() => {
+    const place = () => {
+      const el = tabRefs.current[active];
+      const glow = glowRef.current;
+      const nav = navRef.current;
+      if (!el || !glow || !nav) return;
+      const nr = nav.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      glow.style.width = r.width + "px";
+      glow.style.transform = `translateX(${r.left - nr.left - 5}px)`;
+      glow.style.opacity = "1";
+    };
+    place();
+    const settle = setTimeout(place, 380);
+    const ro = new ResizeObserver(place);
+    if (navRef.current) ro.observe(navRef.current);
+    return () => { clearTimeout(settle); ro.disconnect(); };
+  }, [active, onHome]);
 
   return (
     <>
-      <nav className="sb-tabs" aria-label="Sandbox" data-pos={pos}>
-        <span className="sb-tabs-glow" aria-hidden="true" />
-        <Link href="/" className={`sb-tab ${pos === "0" ? "is-active" : ""}`} aria-current={pos === "0" ? "page" : undefined}>
-          fs.s
-        </Link>
-        <Link href="/mockups" className={`sb-tab ${onMockups ? "is-active" : ""}`} aria-current={onMockups ? "page" : undefined}>
-          mockups
-        </Link>
-        <Link href="/tools" className={`sb-tab ${onTools ? "is-active" : ""}`} aria-current={onTools ? "page" : undefined}>
-          tools
-        </Link>
-        <Link href="/library" className={`sb-tab ${onLibrary ? "is-active" : ""}`} aria-current={onLibrary ? "page" : undefined}>
-          library
-        </Link>
+      <nav ref={navRef} className={`sb-tabs ${onHome ? "is-home" : "is-away"}`} aria-label="Sandbox">
+        <span ref={glowRef} className="sb-tabs-glow" aria-hidden="true" />
+        {TABS.map((t) => {
+          const isActive = active === t.key;
+          const isHomeTab = t.key === "home";
+          return (
+            <Link
+              key={t.key}
+              href={t.href}
+              ref={(el) => { tabRefs.current[t.key] = el; }}
+              className={`sb-tab ${isActive ? "is-active" : ""} ${isHomeTab ? "sb-tab-home" : ""}`}
+              aria-current={isActive ? "page" : undefined}
+              aria-hidden={isHomeTab && !onHome ? true : undefined}
+              tabIndex={isHomeTab && !onHome ? -1 : undefined}
+            >
+              <TabLabel label={t.label} />
+            </Link>
+          );
+        })}
       </nav>
 
       <a
