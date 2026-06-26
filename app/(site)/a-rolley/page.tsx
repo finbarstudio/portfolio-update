@@ -160,7 +160,7 @@ export default function ARolleyPitchPage() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-6 mt-16">
           <div className="md:col-span-8 flex md:items-center">
             <p className="text-ink" style={{ fontSize: "clamp(1.15rem, 1.9vw, 1.6rem)", lineHeight: 1.4 }}>
-              A builder four generations deep should feel one of one online, and be easy to find. The
+              A builder four generations deep should feel one of a kind online, and be easy to find. The
               current site does the job. An update could make it unmistakably yours.
             </p>
           </div>

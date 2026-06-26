@@ -11,8 +11,8 @@ export default function Contact({ tone }: { tone?: "dark" }) {
             Let&rsquo;s talk about your build.
           </h2>
           <p className="lead" style={{ marginTop: "clamp(16px,2vw,26px)", maxWidth: "40ch" }}>
-            The best homes start with an early conversation. Tell us about your site and your plans,
-            and we will take it from there.
+            Tell us about your block and what you&rsquo;re picturing. The earlier we&rsquo;re involved,
+            the more we can do with it.
           </p>
 
           <dl style={{ marginTop: "clamp(28px,4vw,52px)", display: "grid", gap: "clamp(16px,2vw,24px)" }}>
