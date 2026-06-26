@@ -1,25 +1,19 @@
 import type { Metadata } from "next";
-import { Spectral, Figtree } from "next/font/google";
+import { Figtree } from "next/font/google";
 import "./a-rolley-site.css";
 import SmoothScroll from "@/components/arolley/SmoothScroll";
 import NavTone from "@/components/arolley/NavTone";
 
-// A Rolley & Sons demo. Lives outside the (site) route group, inheriting only
-// the root html/body; styling is scoped under `.arolley-site`. noindex: a
-// private concept build by finbar✶studio.
-const display = Spectral({
-  subsets: ["latin"],
-  variable: "--font-arolley-display",
-  display: "swap",
-  style: ["normal", "italic"],
-  weight: ["300", "400"],
-});
-
+// A Rolley & Sons demo — the SIGNATURE direction. Faithful to their real site:
+// sans-serif on their grey #3E4148 ground (a refresh, not a rebrand). Their site
+// uses Proxima Nova (commercial); Figtree is a close free stand-in here, the same
+// way the logo is a placeholder Finbar can swap for the licensed asset later.
+// Styling is scoped under `.arolley-site`; noindex (a private concept build).
 const body = Figtree({
   subsets: ["latin"],
   variable: "--font-arolley-body",
   display: "swap",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +25,13 @@ export const metadata: Metadata = {
 
 export default function ARolleySiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`arolley-site ${display.variable} ${body.variable}`}>
+    <div
+      className={`arolley-site ${body.variable}`}
+      data-theme="signature"
+      // signature is single-typeface (their site uses one sans): map the display
+      // var onto the body font so all the `.display` type renders in the sans.
+      style={{ ["--font-arolley-display" as string]: "var(--font-arolley-body)" }}
+    >
       <a href="/a-rolley" className="ld-back" aria-label="Back to finbar.studio">
         <span className="ld-back-arrow" aria-hidden="true">&larr;</span>
         <span className="ld-back-text">back to finbar.studio</span>

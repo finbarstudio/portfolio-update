@@ -4,19 +4,17 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import LogoMark from "./LogoMark";
 
-const LEFT = [
-  { label: "Projects", href: "/a-rolley/site/projects" },
-  { label: "About", href: "/a-rolley/site/about" },
-];
-const RIGHT = [
-  { label: "Contact", href: "/a-rolley/site#contact" },
-];
-const ALL = [...LEFT, ...RIGHT];
+export default function Nav({ base = "/a-rolley/site" }: { base?: string }) {
+  const LEFT = [
+    { label: "Projects", href: `${base}/projects` },
+    { label: "About", href: `${base}/about` },
+  ];
+  const RIGHT = [{ label: "Contact", href: `${base}#contact` }];
+  const ALL = [...LEFT, ...RIGHT];
 
-export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname === "/a-rolley/site";
+  const isHome = pathname === base;
 
   const onLogoClick = (e: React.MouseEvent) => {
     if (!isHome) return; // other pages: let it navigate home
@@ -45,7 +43,7 @@ export default function Nav() {
             ))}
           </ul>
 
-          <a href="/a-rolley/site" onClick={onLogoClick} className="col-start-2 justify-self-center" aria-label="A Rolley & Sons, home">
+          <a href={base} onClick={onLogoClick} className="col-start-2 justify-self-center" aria-label="A Rolley & Sons, home">
             <LogoMark className="h-[18px] md:h-[20px] w-auto" />
           </a>
 

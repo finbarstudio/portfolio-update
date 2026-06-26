@@ -1,31 +1,35 @@
 /* ──────────────────────────────────────────────────────────────────────────
    A Rolley & Sons demo — scoped styles.
 
-   DESIGN LANGUAGE (refer back constantly)
-   Anchor nouns: heritage · lineage · light · timber · craft · subtropical.
-   Story spine: furniture-makers in 1943 → building on the Sunshine Coast since
-   1968 → fourth generation today. Every section ladders back to "four
-   generations, built to last." Minimal, typography- and imagery-led, traditional
-   UI, generous white space, a real grid, considered section padding — the Lindon
-   / OJ Pippin family. Restraint over decoration.
+   This is a REFRESH of their real brand, not a rebrand. Two directions share
+   these styles via a `data-theme` on the `.arolley-site` wrapper:
+   - signature (DEFAULT): faithful to arolleyandsons.com.au — sans-serif (a
+     Proxima Nova stand-in via Figtree; swap to licensed Proxima later) on their
+     grey #3E4148 ground, with a warm-red accent. This is the primary direction.
+   - editorial: the earlier warm-paper + Spectral-serif direction, kept as an
+     alternate to link from the pitch.
 
-   Palette: warm paper ground, charcoal-slate ink, one muted terracotta accent,
-   soft warm grey for secondary. Type: a light Spectral serif display over a
-   Figtree humanist grotesk body, with a small wide-tracked eyebrow.
+   Colour + type TOKENS live in the theme blocks below; everything else is
+   shared and token-driven. Scoped under `.arolley-site` so nothing leaks into
+   the portfolio. Fonts come from next/font vars set per-route in layout.tsx;
+   @keyframes are top-level.
 
-   Scoped under `.arolley-site` so nothing leaks into the portfolio. @font-face
-   come from next/font variables set on the wrapper; @keyframes are top-level.
-   Loaded only by app/a-rolley/site/layout.tsx.
+   Anchor nouns: heritage · lineage · light · craft · subtropical. Story spine:
+   furniture-makers 1943 → building on the Sunshine Coast since 1968 → fourth
+   generation today. Minimal, typography- and imagery-led, generous white space.
    ────────────────────────────────────────────────────────────────────────── */
 
 .arolley-site {
-  --paper:     #f4f1ea;  /* warm paper ground */
-  --paper-2:   #ece5d8;  /* slightly deeper panel */
-  --ink:       #2a2a2d;  /* charcoal-slate text */
-  --ink-soft:  #5f5f66;  /* secondary text (AA on paper) */
-  --terracotta:#c0492c;  /* clean clay-red accent, from their brand #E25735 (less gold than the old muted tone) */
-  --line:      color-mix(in srgb, var(--ink) 16%, transparent);
-  --line-soft: color-mix(in srgb, var(--ink) 9%, transparent);
+  /* signature (default) — their real DNA: grey ground, light ink, sans, warm red */
+  --paper:     #3e4148;  /* their grey ground (token name kept for reuse) */
+  --paper-2:   #363940;  /* deeper grey panel */
+  --ink:       #ecebe4;  /* warm light text on the grey */
+  --ink-soft:  #b2b3af;  /* secondary light (AA on grey) */
+  --terracotta:#e0603f;  /* their brand red, lifted a touch for contrast on grey */
+  --line:      color-mix(in srgb, var(--ink) 20%, transparent);
+  --line-soft: color-mix(in srgb, var(--ink) 11%, transparent);
+  --display-weight: 500;     /* sans display sits heavier than the serif */
+  --display-tracking: -0.005em;
 
   /* Fluid type scale */
   --step-eyebrow: clamp(10px, 0.9vw, 11px);
@@ -49,14 +53,27 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Display headings — Spectral serif, light, faintly tightened. text-transform
-   none overrides the portfolio base layer's `h1 { text-transform: uppercase }`,
-   which otherwise forced these into all-caps (Spectral reads poorly in caps). */
+/* editorial direction — warm paper + Spectral serif (the kept alternate) */
+.arolley-site[data-theme="editorial"] {
+  --paper:     #f4f1ea;
+  --paper-2:   #ece5d8;
+  --ink:       #2a2a2d;
+  --ink-soft:  #5f5f66;
+  --terracotta:#c0492c;
+  --line:      color-mix(in srgb, var(--ink) 16%, transparent);
+  --line-soft: color-mix(in srgb, var(--ink) 9%, transparent);
+  --display-weight: 300;
+  --display-tracking: -0.01em;
+}
+
+/* Display headings — family/weight/tracking come from the active theme. The
+   serif fallback is harmless when the sans (signature) is active. text-transform
+   none overrides the portfolio base `h1 { text-transform: uppercase }`. */
 .arolley-site :is(h1, h2, h3, h4),
 .arolley-site .display {
   font-family: var(--font-arolley-display), Georgia, serif;
-  font-weight: 300;
-  letter-spacing: -0.01em;
+  font-weight: var(--display-weight, 400);
+  letter-spacing: var(--display-tracking, -0.01em);
   line-height: 1.06;
   text-transform: none;
   color: var(--ink);
@@ -64,8 +81,10 @@
 .arolley-site .display-italic {
   font-family: var(--font-arolley-display), Georgia, serif;
   font-style: italic;
-  font-weight: 300;
+  font-weight: var(--display-weight, 400);
 }
+/* signature is sans — synthesised italics read poorly, so keep accent words upright */
+.arolley-site:not([data-theme="editorial"]) .display-italic { font-style: normal; }
 
 .arolley-site .eyebrow {
   font-family: var(--font-arolley-body), sans-serif;
@@ -102,6 +121,9 @@
 /* ── Nav tint: links read ink over paper, paper over dark imagery ── */
 .arolley-site .nav-tinted { color: var(--ink); transition: color 0.45s ease; }
 html.arl-nav-dark .arolley-site .nav-tinted { color: var(--paper); }
+/* signature ink is already light on the grey ground, so keep the nav light even
+   over dark sections (the editorial paper theme still flips to paper). */
+html.arl-nav-dark .arolley-site:not([data-theme="editorial"]) .nav-tinted { color: var(--ink); }
 
 /* ── "Back to finbar.studio" pill — fixed mid-left, collapses to a circle ── */
 .arolley-site .ld-back {
@@ -135,7 +157,18 @@ html.arl-nav-dark .arolley-site .nav-tinted { color: var(--paper); }
 .arl-foot-val a:hover { color: var(--terracotta); }
 .arl-mark { padding: 0 var(--gutter) clamp(10px, 1.6vw, 22px); overflow: hidden; }
 .arl-mark svg { width: 100%; height: auto; display: block; color: var(--ink); }
-.arl-foot-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding: clamp(14px,2vw,22px) var(--gutter) clamp(20px,3vw,32px); font-size: 11px; color: var(--ink-soft); letter-spacing: 0.03em; border-top: 1px solid var(--line-soft); }
+.arl-foot-base { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: clamp(14px,2vw,22px) var(--gutter) clamp(20px,3vw,32px); font-size: 11px; color: var(--ink-soft); letter-spacing: 0.03em; border-top: 1px solid var(--line-soft); }
+
+/* Proud-Member-of-Master-Builders-QLD badge — recoloured to the theme ink via a
+   CSS mask so it sits right on both the grey and the paper grounds. */
+.arl-mbq {
+  display: inline-block; width: clamp(112px, 12vw, 148px); aspect-ratio: 880 / 554;
+  background: var(--ink-soft);
+  -webkit-mask: url("/a-rolley/master-builders-qld.svg") center / contain no-repeat;
+  mask: url("/a-rolley/master-builders-qld.svg") center / contain no-repeat;
+  opacity: 0.85; transition: opacity 0.3s ease;
+}
+.arl-foot-base .arl-mbq:hover { opacity: 1; }
 
 /* ── Form fields + button ── */
 .arolley-site .arl-input { border-color: var(--line); color: var(--ink); }

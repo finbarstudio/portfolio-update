@@ -1,35 +1,37 @@
 import LogoMark from "../LogoMark";
 import MaskReveal from "../MaskReveal";
 
-/** Tall footer: a four-column info grid over a full-bleed wordmark sweep.
- *  Premium scroll-triggered motion: the columns clip-rise in a stagger, then the
- *  giant wordmark wipes up into view as it enters. */
-const COLS = [
-  {
-    label: "Studio",
-    rows: [<>A Rolley &amp; Sons</>, <>Fourth-generation builders</>, <>Sunshine Coast, QLD</>],
-  },
-  {
-    label: "Visit",
-    rows: [<>37 Ascot Way</>, <>Little Mountain QLD 4551</>, <>By appointment</>],
-  },
-  {
-    label: "Contact",
-    rows: [
-      <a key="t" href="tel:+61754996811">07 5499 6811</a>,
-      <a key="s" href="/a-rolley/site#contact">Start a project</a>,
-    ],
-  },
-  {
-    label: "Follow",
-    rows: [
-      <a key="i" href="https://www.instagram.com/arolleyandsons/" target="_blank" rel="noopener noreferrer">Instagram</a>,
-      <a key="f" href="https://www.facebook.com/ARolleynSons/" target="_blank" rel="noopener noreferrer">Facebook</a>,
-    ],
-  },
-];
+/** Tall footer: a four-column info grid over a full-bleed wordmark sweep, with
+ *  the Master Builders QLD membership badge in the base row. Premium
+ *  scroll-triggered motion: the columns clip-rise in a stagger, then the giant
+ *  wordmark wipes up as it enters. `base` keeps internal links on the right
+ *  version (signature vs editorial). */
+export default function SiteFooter({ base = "/a-rolley/site" }: { base?: string }) {
+  const COLS = [
+    {
+      label: "Studio",
+      rows: [<>A Rolley &amp; Sons</>, <>Fourth-generation builders</>, <>Sunshine Coast, QLD</>],
+    },
+    {
+      label: "Visit",
+      rows: [<>37 Ascot Way</>, <>Little Mountain QLD 4551</>, <>By appointment</>],
+    },
+    {
+      label: "Contact",
+      rows: [
+        <a key="t" href="tel:+61754996811">07 5499 6811</a>,
+        <a key="s" href={`${base}#contact`}>Start a project</a>,
+      ],
+    },
+    {
+      label: "Follow",
+      rows: [
+        <a key="i" href="https://www.instagram.com/arolleyandsons/" target="_blank" rel="noopener noreferrer">Instagram</a>,
+        <a key="f" href="https://www.facebook.com/ARolleynSons/" target="_blank" rel="noopener noreferrer">Facebook</a>,
+      ],
+    },
+  ];
 
-export default function SiteFooter() {
   return (
     <footer className="arl-foot">
       <MaskReveal direction="left" duration={1.1} className="arl-foot-rule">
@@ -59,7 +61,10 @@ export default function SiteFooter() {
       </MaskReveal>
 
       <div className="arl-foot-base">
-        <span>QBCC 1098669 · Master Builders Queensland</span>
+        <span className="flex items-center" style={{ gap: "clamp(14px,1.6vw,22px)" }}>
+          <span className="arl-mbq" role="img" aria-label="Proud Member of Master Builders Queensland" />
+          <span>QBCC 1098669</span>
+        </span>
         <span>Concept site by finbar✶studio</span>
       </div>
     </footer>

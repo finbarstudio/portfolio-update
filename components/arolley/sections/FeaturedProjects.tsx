@@ -21,7 +21,7 @@ const PROJECTS: P[] = [
  * between projects with a soft cross-fade + white feather, and the project's
  * details (title + location) on a second, slower parallax layer.
  */
-export default function FeaturedProjects() {
+export default function FeaturedProjects({ base = "/a-rolley/site" }: { base?: string }) {
   const sectionRef = useRef<HTMLElement>(null);
   const imgRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
@@ -54,7 +54,7 @@ export default function FeaturedProjects() {
   const p = PROJECTS[active];
 
   return (
-    <section id="work" data-tone="dark" ref={sectionRef} className="relative w-full overflow-hidden" style={{ height: "100svh", minHeight: 560, background: "var(--ink)" }}>
+    <section id="work" data-tone="dark" ref={sectionRef} className="relative w-full overflow-hidden" style={{ height: "100svh", minHeight: 560, background: "#23262b" }}>
       {/* Oversized stacked images, cross-faded on select */}
       <div ref={imgRef} className="absolute left-0 w-full" style={{ height: "124%", top: "-12%", willChange: "transform" }}>
         {PROJECTS.map((proj, i) => (
@@ -75,9 +75,9 @@ export default function FeaturedProjects() {
       <div ref={layerRef} className="absolute inset-0 frame pointer-events-none" style={{ willChange: "transform" }}>
         <div className="wrap relative h-full">
           {/* Bottom-left: active project details */}
-          <div className="absolute left-0 bottom-[clamp(32px,6vh,72px)]" style={{ color: "var(--paper)" }}>
-            <a href="/a-rolley/site/projects" data-cursor="View Project" className="block pointer-events-auto">
-              <h2 className="display" style={{ color: "var(--paper)", fontSize: "clamp(28px,3.4vw,52px)" }}>{p.title}</h2>
+          <div className="absolute left-0 bottom-[clamp(32px,6vh,72px)]" style={{ color: "#f4f1ea" }}>
+            <a href={`${base}/projects`} data-cursor="View Project" className="block pointer-events-auto">
+              <h2 className="display" style={{ color: "#f4f1ea", fontSize: "clamp(28px,3.4vw,52px)" }}>{p.title}</h2>
             </a>
             <p style={{ color: "rgba(244,241,234,0.82)", fontSize: "var(--step-body)", marginTop: "0.4em" }}>{p.meta}</p>
           </div>
@@ -92,7 +92,7 @@ export default function FeaturedProjects() {
                 data-cursor="Switch"
                 aria-label={`View ${proj.title}`}
                 className="relative overflow-hidden transition-opacity duration-300"
-                style={{ width: "clamp(48px,5vw,76px)", height: "clamp(32px,3.3vw,48px)", outline: i === active ? "1px solid var(--paper)" : "1px solid transparent", opacity: i === active ? 1 : 0.55 }}
+                style={{ width: "clamp(48px,5vw,76px)", height: "clamp(32px,3.3vw,48px)", outline: i === active ? "1px solid #f4f1ea" : "1px solid transparent", opacity: i === active ? 1 : 0.55 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={proj.src} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
@@ -102,7 +102,7 @@ export default function FeaturedProjects() {
 
           {/* Bottom-right: all-projects link */}
           <div className="absolute right-0 bottom-[clamp(32px,6vh,72px)] text-right pointer-events-auto">
-            <a href="/a-rolley/site/projects" data-cursor="All Work" className="eyebrow" style={{ color: "var(--paper)", borderBottom: "1px solid rgba(244,241,234,0.4)", paddingBottom: 3, display: "inline-block" }}>
+            <a href={`${base}/projects`} data-cursor="All Work" className="eyebrow" style={{ color: "#f4f1ea", borderBottom: "1px solid rgba(244,241,234,0.4)", paddingBottom: 3, display: "inline-block" }}>
               View all projects
             </a>
           </div>
