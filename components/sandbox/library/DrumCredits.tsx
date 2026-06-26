@@ -1,23 +1,18 @@
 "use client";
 
 /**
- * DrumCredits — the "credits on a rotating drum" look, clean.
+ * DrumCredits — the "credits on a rotating drum" mechanic, restyled in the studio
+ * design tokens (no historical serif/film look) and composed as a 50/50 split:
+ * a single drum on the left, three drums stacked on the right.
  *
- * Old title sequences were sometimes shot off a physical drum: the credits were
- * printed around the circumference of a large-radius cylinder lying on its side,
- * and a camera filmed the front of it as it turned. The signature is that the
- * type isn't a flat sheet sliding up — near the top and bottom of frame the
- * surface curves away from the lens, so lines foreshorten and bow ever so
- * slightly as they enter and leave.
+ * Each drum is a fixed curved mesh (a tall, gentle arc of a horizontal-axis
+ * cylinder) facing the camera, with the credits rendered to a canvas texture that
+ * scrolls vertically through it — so near the top and bottom of frame the type
+ * bows and foreshortens, exactly like a camera filming a real printed drum.
  *
- * We reproduce it cheaply: a fixed curved mesh (a tall, gentle arc of a
- * horizontal-axis cylinder, large radius → subtle curve) facing the camera, with
- * the credits rendered to a canvas texture that scrolls vertically through it.
- * The camera window is fixed; the type travels through the curved lens, which is
- * exactly what a fixed camera sees off a real drum.
- *
- * This renders the drum straight — no analogue/old-film post (no grain, vignette,
- * flicker, warm cast, bloom halation or gate weave). Just the curved roll.
+ * Text uses the site tokens resolved at runtime: --font-primary (Archivo Narrow)
+ * for display/names, --font-mono (Space Mono) for tracked caps labels, and the
+ * sandbox --ink / --ink-soft / --pink colours.
  */
 
 import { useEffect, useRef } from "react";
@@ -51,64 +46,32 @@ const CREDITS: Credit[] = [
   { name: "THE END", big: true, gap: 3 },
 ];
 
-/** Render the credits to a tall canvas, return it plus its content metrics. */
-function buildCreditsCanvas(): HTMLCanvasElement {
-  const dpr = Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
-  const W = 1100;
-  const unit = 64; // one "line" of vertical rhythm
-  const roleSize = 30;
-  const nameSize = 46;
-  const bigSize = 78;
+type Tokens = { ink: string; inkSoft: string; pink: string; bg: string; primary: string; mono: string };
 
-  // Measure total height first (top pad + each line + its gap + bottom pad).
-  const topPad = unit * 3;
-  let h = topPad;
-  for (const c of CREDITS) {
-    if (c.role) h += roleSize * 1.4 + nameSize * 1.3;
-    else h += (c.big ? bigSize : nameSize) * 1.3;
-    h += unit * (c.gap ?? 1);
+/** Resolve a CSS custom property to a canvas-usable value via a hidden probe
+    (so color-mix() / next-font generated families collapse to a concrete value). */
+function probe(scope: Element, prop: "color" | "fontFamily", varName: string, fallback: string): string {
+  try {
+    const el = document.createElement("span");
+    el.style.cssText = "position:absolute;visibility:hidden;pointer-events:none";
+    el.style[prop] = `var(${varName})`;
+    scope.appendChild(el);
+    const v = getComputedStyle(el)[prop];
+    scope.removeChild(el);
+    return v || fallback;
+  } catch {
+    return fallback;
   }
-  // Trailing blank so the loop has a clean dark gap before it repeats.
-  const tailPad = unit * 10;
-  h += tailPad;
-
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(W * dpr);
-  canvas.height = Math.round(h * dpr);
-  const ctx = canvas.getContext("2d")!;
-  ctx.scale(dpr, dpr);
-
-  ctx.clearRect(0, 0, W, h);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  const cream = "#f1e6cc";
-  const soft = "#c2b294";
-  const serif = "Georgia, 'Times New Roman', 'Hoefler Text', serif";
-
-  let y = topPad;
-  for (const c of CREDITS) {
-    if (c.role) {
-      ctx.fillStyle = soft;
-      ctx.font = `400 ${roleSize}px ${serif}`;
-      // small-caps-ish: letter-spacing via manual tracking
-      drawTracked(ctx, c.role.toUpperCase(), W / 2, y, 4);
-      y += roleSize * 1.4;
-      ctx.fillStyle = cream;
-      ctx.font = `500 ${nameSize}px ${serif}`;
-      ctx.fillText(c.name, W / 2, y);
-      y += nameSize * 1.3;
-    } else {
-      const size = c.big ? bigSize : nameSize;
-      ctx.fillStyle = cream;
-      ctx.font = `${c.big ? 600 : 500} ${size}px ${serif}`;
-      const tracking = c.big ? 2 : c.name === c.name.toUpperCase() ? 8 : 0;
-      if (tracking) drawTracked(ctx, c.name, W / 2, y, tracking);
-      else ctx.fillText(c.name, W / 2, y);
-      y += size * 1.3;
-    }
-    y += unit * (c.gap ?? 1);
-  }
-  return canvas;
+}
+function readTokens(scope: Element): Tokens {
+  return {
+    ink: probe(scope, "color", "--ink", "#F6EFE1"),
+    inkSoft: probe(scope, "color", "--ink-soft", "#b4ac9d"),
+    pink: probe(scope, "color", "--pink", "#E8718B"),
+    bg: probe(scope, "color", "--bg", "#211E1A"),
+    primary: probe(scope, "fontFamily", "--font-primary", "system-ui, sans-serif"),
+    mono: probe(scope, "fontFamily", "--font-mono", "ui-monospace, monospace"),
+  };
 }
 
 /** Draw centred text with manual letter-spacing (canvas has no tracking). */
@@ -123,6 +86,69 @@ function drawTracked(ctx: CanvasRenderingContext2D, text: string, cx: number, y:
     x += widths[i];
   }
   ctx.textAlign = prev;
+}
+
+/** Render the credits to a tall canvas using the site tokens. Dimensions are
+    derived from fixed sizes (not measureText), so they're identical whether or
+    not the web fonts have loaded yet — a font-swap rebuild keeps the same size. */
+function buildCreditsCanvas(t: Tokens): HTMLCanvasElement {
+  const dpr = Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
+  const W = 1100;
+  const unit = 64;
+  const roleSize = 28;
+  const nameSize = 48;
+  const sectionSize = 34;
+  const bigSize = 84;
+  const isUpper = (s: string) => s === s.toUpperCase();
+
+  const topPad = unit * 3;
+  let h = topPad;
+  for (const c of CREDITS) {
+    if (c.role) h += roleSize * 1.5 + nameSize * 1.25;
+    else h += (c.big ? bigSize : isUpper(c.name) ? sectionSize : nameSize) * 1.3;
+    h += unit * (c.gap ?? 1);
+  }
+  h += unit * 10; // trailing blank for a clean loop gap
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(W * dpr);
+  canvas.height = Math.round(h * dpr);
+  const ctx = canvas.getContext("2d")!;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, h);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  let y = topPad;
+  for (const c of CREDITS) {
+    if (c.role) {
+      ctx.fillStyle = t.inkSoft;
+      ctx.font = `400 ${roleSize}px ${t.mono}`;
+      drawTracked(ctx, c.role.toUpperCase(), W / 2, y, 5);
+      y += roleSize * 1.5;
+      ctx.fillStyle = t.ink;
+      ctx.font = `500 ${nameSize}px ${t.primary}`;
+      ctx.fillText(c.name, W / 2, y);
+      y += nameSize * 1.25;
+    } else if (c.big) {
+      ctx.fillStyle = t.ink;
+      ctx.font = `700 ${bigSize}px ${t.primary}`;
+      drawTracked(ctx, c.name, W / 2, y, 2);
+      y += bigSize * 1.3;
+    } else if (isUpper(c.name)) {
+      ctx.fillStyle = t.pink;
+      ctx.font = `700 ${sectionSize}px ${t.mono}`;
+      drawTracked(ctx, c.name, W / 2, y, 9);
+      y += sectionSize * 1.3;
+    } else {
+      ctx.fillStyle = t.ink;
+      ctx.font = `400 ${nameSize}px ${t.primary}`;
+      ctx.fillText(c.name, W / 2, y);
+      y += nameSize * 1.3;
+    }
+    y += unit * (c.gap ?? 1);
+  }
+  return canvas;
 }
 
 /** Bend a flat plane into a vertical arc of a horizontal-axis cylinder. */
@@ -140,7 +166,9 @@ function curvedPlane(width: number, segW: number, segH: number): THREE.PlaneGeom
   return geo;
 }
 
-export default function DrumCredits() {
+/** One drum, filling its parent. `phase` offsets the starting credit so stacked
+    drums show different lines. */
+function Drum({ phase = 0 }: { phase?: number }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -149,25 +177,26 @@ export default function DrumCredits() {
     const canvas = canvasRef.current;
     if (!wrap || !canvas) return;
 
+    const scope = wrap.closest(".sb-root") ?? document.documentElement;
+    const tokens = readTokens(scope);
+
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x080706); // clean near-black ground
+    scene.background = new THREE.Color(tokens.bg);
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
 
-    // The credits texture.
-    const tex = new THREE.CanvasTexture(buildCreditsCanvas());
+    const tex = new THREE.CanvasTexture(buildCreditsCanvas(tokens));
     tex.wrapT = THREE.RepeatWrapping;
     tex.wrapS = THREE.ClampToEdgeWrapping;
     tex.minFilter = THREE.LinearMipmapLinearFilter;
     tex.magFilter = THREE.LinearFilter;
     tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
     tex.repeat.set(1, WINDOW);
+    tex.offset.y = phase; // stagger which credit each drum starts on
     tex.generateMipmaps = true;
     tex.colorSpace = THREE.SRGBColorSpace;
 
-    // Plane width matched to the canvas aspect so letters aren't stretched:
-    // arc visible height is 2·R·sin(ARC/2); width = that × (canvasW / (canvasH·WINDOW)).
     const visibleH = 2 * RADIUS * Math.sin(ARC / 2);
     const cnv = tex.image as HTMLCanvasElement;
     const planeW = visibleH * (cnv.width / (cnv.height * WINDOW));
@@ -178,8 +207,6 @@ export default function DrumCredits() {
     scene.add(mesh);
 
     const baseFov = camera.fov;
-
-    // Frame the arc with a little breathing room top and bottom.
     const fit = () => {
       const w = wrap.clientWidth || 1;
       const h = wrap.clientHeight || 1;
@@ -187,8 +214,7 @@ export default function DrumCredits() {
       renderer.setPixelRatio(dpr);
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
-      // Distance so the visible arc fills ~78% of frame height.
-      const margin = 0.78;
+      const margin = 0.78; // visible arc fills ~78% of frame height
       camera.position.set(0, 0, (visibleH / margin / 2) / Math.tan((baseFov * Math.PI) / 360));
       camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
@@ -196,6 +222,15 @@ export default function DrumCredits() {
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(wrap);
+
+    // The web fonts may still be swapping in when we first rasterise; redraw once
+    // they're ready (same canvas dimensions, so no geometry change needed).
+    let disposed = false;
+    document.fonts?.ready?.then(() => {
+      if (disposed) return;
+      tex.image = buildCreditsCanvas(tokens);
+      tex.needsUpdate = true;
+    });
 
     let raf = 0;
     let last = 0;
@@ -210,7 +245,6 @@ export default function DrumCredits() {
     };
     raf = requestAnimationFrame(loop);
 
-    // Pause when the tab/section is hidden (saves the GPU + keeps the loop seamless).
     const io = new IntersectionObserver(([e]) => {
       const vis = e.isIntersecting;
       if (vis && !running) {
@@ -225,6 +259,7 @@ export default function DrumCredits() {
     io.observe(wrap);
 
     return () => {
+      disposed = true;
       running = false;
       cancelAnimationFrame(raf);
       ro.disconnect();
@@ -234,11 +269,24 @@ export default function DrumCredits() {
       tex.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [phase]);
 
   return (
-    <div className="sb-fx-stage" ref={wrapRef}>
-      <canvas ref={canvasRef} className="sb-fx-canvas" />
+    <div className="dc-drum" ref={wrapRef}>
+      <canvas ref={canvasRef} className="dc-canvas" />
+    </div>
+  );
+}
+
+export default function DrumCredits() {
+  return (
+    <div className="sb-fx-stage dc-split">
+      <Drum phase={0} />
+      <div className="dc-stack">
+        <Drum phase={0.15} />
+        <Drum phase={0.5} />
+        <Drum phase={0.85} />
+      </div>
     </div>
   );
 }
