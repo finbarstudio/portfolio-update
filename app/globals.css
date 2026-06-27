@@ -3171,44 +3171,37 @@ body:has(.sb-root) {
 /* Route-level fallback (loading.tsx) gives the content area a tall stage to
    centre the loader in while the next page streams. */
 .sb-route-loading { position: relative; width: 100%; min-height: clamp(360px, 70vh, 760px); }
-/* Brand-star loader — fills any positioned parent (stage / route fallback). */
+/* Brand-mark loader — the pink asterisk + label FLASH together (the same pulse
+   the nav tabs use), so every load in the sandbox reads the same way. Fills any
+   positioned parent (stage / route fallback). */
 .sb-loader {
   position: absolute; inset: 0; z-index: 5;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
   color: var(--ink-soft); font-family: var(--font-mono); font-size: 11px;
   letter-spacing: 0.18em; text-transform: uppercase; pointer-events: none;
 }
-.sb-loader-star { width: 46px; height: 46px; overflow: visible; }
-.sb-loader-track { fill: none; stroke: color-mix(in srgb, var(--pink) 16%, transparent); stroke-width: 6; stroke-linejoin: round; }
-.sb-loader-draw {
-  fill: none; stroke: var(--pink); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round;
-  stroke-dasharray: 1; animation: star-draw 1.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--pink) 55%, transparent));
+.sb-loader-mark {
+  width: 40px; height: 40px; overflow: visible;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--pink) 45%, transparent));
+  animation: sb-loader-fade 0.85s var(--ease) infinite;
 }
-.sb-loader-label { animation: sb-loader-fade 1.6s var(--ease) infinite; }
+.sb-loader-label { animation: sb-loader-fade 0.85s var(--ease) infinite; }
+/* The shared "flash": the pulse the nav tabs use while a tap is in flight. */
 @keyframes sb-loader-fade { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.95; } }
 
-/* Index pill buttons: dim the label + reveal a spinner while the tap is pending. */
-.sb-mock-inner { display: inline-flex; align-items: center; justify-content: center; gap: 0; transition: gap 0.2s var(--ease); }
+/* Index pill buttons: flash the label while the tap is pending (same mechanic). */
+.sb-mock-inner { display: inline-flex; align-items: center; justify-content: center; }
 .sb-mock-label { transition: opacity 0.2s var(--ease); }
-.sb-mock-spin {
-  width: 13px; height: 13px; border-radius: 50%; flex: 0 0 auto;
-  border: 2px solid color-mix(in srgb, currentColor 30%, transparent); border-top-color: currentColor;
-  opacity: 0; transform: scale(0); transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
-}
-.sb-mock-inner.is-pending { gap: 10px; }
-.sb-mock-inner.is-pending .sb-mock-label { opacity: 0.55; }
-.sb-mock-inner.is-pending .sb-mock-spin { opacity: 1; animation: sb-spin 0.7s linear infinite; }
-@keyframes sb-spin { to { transform: rotate(360deg); } }
+.sb-mock-spin { display: none; }
+.sb-mock-inner.is-pending .sb-mock-label { animation: sb-loader-fade 0.85s var(--ease) infinite; }
 
 /* Nav tab: pulse the in-flight tab's label (the glow only slides once committed). */
 .sb-tab-inner { display: inline-block; }
 .sb-tab-inner.is-pending { animation: sb-loader-fade 0.85s var(--ease) infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .sb-loader-draw { animation: none; stroke-dasharray: none; }
-  .sb-loader-label, .sb-tab-inner.is-pending { animation: none; }
-  .sb-mock-inner.is-pending .sb-mock-spin { animation: none; }
+  .sb-loader-mark, .sb-loader-label, .sb-tab-inner.is-pending,
+  .sb-mock-inner.is-pending .sb-mock-label { animation: none; }
 }
 
 /* ── Bezier Studio (Tools): SVG specimen view, reuses the studio shell ─────── */

@@ -1,0 +1,7 @@
+finbar✶studio Sandbox — suggestions
+===================================
+Feature/tool ideas submitted via the "Suggest" box in the sandbox.
+New entries are appended below when the site runs locally (npm run dev).
+(Deployed/Vercel submissions can't write here — those stay in the visitor's
+browser localStorage. Add email/a DB later if you want to collect those.)
+

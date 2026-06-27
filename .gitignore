@@ -51,6 +51,3 @@ downloaded_files/
 
 # Local crest working files (OG/edit sources + PSD); generated output lives in public/crests
 Football Crests/
-
-# Local sandbox feature/tool suggestions (dev capture; localStorage is the real store)
-content/sandbox-suggestions.jsonl
