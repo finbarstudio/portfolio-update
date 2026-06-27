@@ -56,7 +56,7 @@ export default function ViewCursor() {
           background: "var(--ink)",
           color: "var(--paper)",
           padding: "9px 16px",
-          fontFamily: "var(--font-braeden-body, var(--font-braeden-body), sans-serif)",
+          fontFamily: "var(--font-montserrat), sans-serif",
           fontSize: "11px",
           fontWeight: 600,
           letterSpacing: "0.12em",
