@@ -70,6 +70,17 @@ const SECTIONS: { title: string; fields: Field[] }[] = [
   ]},
 ];
 
+/** Normalise a typed colour to #rrggbb for the native colour picker (the text
+    field keeps the raw value, so named/short hex still pass through to three.js). */
+function normHex(c: string): string {
+  const s = (c || "").trim();
+  if (/^#[0-9a-f]{6}$/i.test(s)) return s;
+  if (/^[0-9a-f]{6}$/i.test(s)) return "#" + s;
+  const m = /^#?([0-9a-f]{3})$/i.exec(s);
+  if (m) { const x = m[1]; return "#" + x[0] + x[0] + x[1] + x[1] + x[2] + x[2]; }
+  return "#000000";
+}
+
 export default function AsteriskStudio() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -197,7 +208,12 @@ export default function AsteriskStudio() {
               if (f.kind === "color") return (
                 <label key={f.key as string} className="sb-studio-row">
                   <span>{f.label}</span>
-                  <input type="color" value={String(v)} className="sb-studio-color" onChange={(e) => commit(f, e.target.value)} />
+                  <span className="bz-color-wrap">
+                    <input type="text" className="bz-hex" spellCheck={false} value={String(v)}
+                      onChange={(e) => commit(f, e.target.value)}
+                      onBlur={(e) => commit(f, normHex(e.target.value))} />
+                    <input type="color" value={normHex(String(v))} className="sb-studio-color" onChange={(e) => commit(f, e.target.value)} />
+                  </span>
                 </label>
               );
               if (f.kind === "select") return (
@@ -213,7 +229,8 @@ export default function AsteriskStudio() {
                   <span>{f.label}</span>
                   <span className="sb-studio-rangewrap">
                     <input type="range" min={f.min} max={f.max} step={f.step} value={Number(v)} onChange={(e) => commit(f, parseFloat(e.target.value))} />
-                    <em>{Number(v).toFixed(f.step < 1 ? 2 : 0)}</em>
+                    <input type="number" className="sb-studio-num" min={f.min} max={f.max} step={f.step} value={Number(v)}
+                      onChange={(e) => { const n = parseFloat(e.target.value); if (Number.isFinite(n)) commit(f, Math.max(f.min, Math.min(f.max, n))); }} />
                   </span>
                 </label>
               );

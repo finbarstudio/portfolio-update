@@ -762,7 +762,8 @@ export default function BezierStudio() {
                 <label key={f.key} className="sb-studio-row"><span>{f.label}</span>
                   <span className="sb-studio-rangewrap">
                     <input type="range" min={f.min} max={f.max} step={f.step} value={Number(v)} onChange={(e) => set(f.key, parseFloat(e.target.value) as never)} />
-                    <em>{Number(v).toFixed(f.step < 1 ? 2 : 0)}</em></span></label>
+                    <input type="number" className="sb-studio-num" min={f.min} max={f.max} step={f.step} value={Number(v)}
+                      onChange={(e) => { const n = parseFloat(e.target.value); if (Number.isFinite(n)) set(f.key, Math.max(f.min, Math.min(f.max, n)) as never); }} /></span></label>
               );
             })}
             {sec.title === "Grid + frame" && (
