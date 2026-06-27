@@ -5,7 +5,7 @@
  * fill=currentColor so it inherits the surrounding text colour. Used at giant,
  * full-bleed scale in the site footer (warm white over the dark ground).
  */
-export const LOGO_PATH = `M17824 11405 c-220 -126 -683 -393 -834 -480 -69 -40 -249 -143 -400
+const PATH = `M17824 11405 c-220 -126 -683 -393 -834 -480 -69 -40 -249 -143 -400
 -230 -151 -87 -374 -216 -495 -285 -274 -158 -544 -313 -880 -507 -143 -82
 -334 -192 -425 -245 -172 -99 -323 -186 -770 -443 -146 -84 -319 -184 -385
 -222 -66 -38 -259 -150 -430 -248 -170 -98 -353 -203 -405 -233 -130 -75 -477
@@ -144,7 +144,7 @@ export default function BraedenLogoFull({
       xmlns="http://www.w3.org/2000/svg"
     >
       <g transform="translate(0,1152) scale(0.1,-0.1)" fill="currentColor" stroke="none">
-        <path d={LOGO_PATH} />
+        <path d={PATH} />
       </g>
     </svg>
   );
