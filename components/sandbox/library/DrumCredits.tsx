@@ -17,19 +17,24 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { ASTERISK_POINTS } from "@/components/brand-asterisk";
 
-/** Gentle arc of a large-radius drum. Bigger ARC = more pronounced curl. */
-const ARC = 0.82; // radians of cylinder visible (~47°)
-const RADIUS = 6;
+/** Tighter drum: more arc + smaller radius = a more pronounced curl. */
+const ARC = 1.12; // radians of cylinder visible (~64°)
+const RADIUS = 4;
 /** How much of the credits canvas fills the visible arc (smaller = more lines). */
 const WINDOW = 0.2;
 /** Vertical scroll speed, in texture-units per second. */
 const SPEED = 0.018;
 
-/** The credits roll. Each entry is either a centred title or a role/name pair. */
-type Credit = { role?: string; name: string; big?: boolean; gap?: number };
+/** The brand asterisk polygon (0–100 viewBox) as [x,y] pairs, for canvas fill. */
+const ASTER = ASTERISK_POINTS.trim().split(/\s+/).map((p) => p.split(",").map(Number) as [number, number]);
+
+/** The credits roll. Each entry is either a centred title or a role/name pair.
+    `logo` renders the canonical FINBARSTUDIO wordmark (Space Mono + asterisk). */
+type Credit = { role?: string; name: string; big?: boolean; logo?: boolean; gap?: number };
 const CREDITS: Credit[] = [
-  { name: "finbar✶studio", big: true, gap: 1.4 },
+  { name: "FINBARSTUDIO", logo: true, gap: 1.8 },
   { name: "PRESENTS", gap: 2.2 },
   { role: "Directed by", name: "Finbar Skitini", gap: 1.4 },
   { role: "Produced by", name: "The Studio", gap: 1.4 },
@@ -88,6 +93,23 @@ function drawTracked(ctx: CanvasRenderingContext2D, text: string, cx: number, y:
   ctx.textAlign = prev;
 }
 
+/** Fill the brand asterisk polygon centred at (cx, cy) at the given pixel size. */
+function drawAsterisk(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, color: string) {
+  const s = size / 100;
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  for (let i = 0; i < ASTER.length; i++) {
+    const px = cx + (ASTER[i][0] - 50) * s;
+    const py = cy + (ASTER[i][1] - 50) * s;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
 /** Render the credits to a tall canvas using the site tokens. Dimensions are
     derived from fixed sizes (not measureText), so they're identical whether or
     not the web fonts have loaded yet — a font-swap rebuild keeps the same size. */
@@ -99,12 +121,14 @@ function buildCreditsCanvas(t: Tokens): HTMLCanvasElement {
   const nameSize = 48;
   const sectionSize = 34;
   const bigSize = 84;
+  const logoSize = 70;
   const isUpper = (s: string) => s === s.toUpperCase();
 
   const topPad = unit * 3;
   let h = topPad;
   for (const c of CREDITS) {
     if (c.role) h += roleSize * 1.5 + nameSize * 1.25;
+    else if (c.logo) h += logoSize * 1.3;
     else h += (c.big ? bigSize : isUpper(c.name) ? sectionSize : nameSize) * 1.3;
     h += unit * (c.gap ?? 1);
   }
@@ -130,6 +154,27 @@ function buildCreditsCanvas(t: Tokens): HTMLCanvasElement {
       ctx.font = `500 ${nameSize}px ${t.primary}`;
       ctx.fillText(c.name, W / 2, y);
       y += nameSize * 1.25;
+    } else if (c.logo) {
+      // Canonical wordmark: FINBARSTUDIO in Space Mono caps + the pink asterisk.
+      const tracking = 1;
+      ctx.font = `700 ${logoSize}px ${t.mono}`;
+      const chars = [...c.name];
+      const widths = chars.map((ch) => ctx.measureText(ch).width + tracking);
+      const textW = widths.reduce((a, b) => a + b, 0) - tracking;
+      const astSize = logoSize * 0.66;
+      const gap = logoSize * 0.2;
+      const totalW = textW + gap + astSize;
+      let x = W / 2 - totalW / 2;
+      ctx.fillStyle = t.ink;
+      const prev = ctx.textAlign;
+      ctx.textAlign = "left";
+      for (let i = 0; i < chars.length; i++) {
+        ctx.fillText(chars[i], x, y);
+        x += widths[i];
+      }
+      ctx.textAlign = prev;
+      drawAsterisk(ctx, x + gap + astSize / 2, y - logoSize * 0.04, astSize, t.pink);
+      y += logoSize * 1.3;
     } else if (c.big) {
       ctx.fillStyle = t.ink;
       ctx.font = `700 ${bigSize}px ${t.primary}`;
@@ -233,14 +278,14 @@ function Drum({ phase = 0 }: { phase?: number }) {
     });
 
     let raf = 0;
-    let last = 0;
     let running = true;
     const loop = (now: number) => {
       if (!running) return;
       raf = requestAnimationFrame(loop);
-      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
-      last = now;
-      tex.offset.y -= SPEED * dt; // negative scrolls the type upward
+      // Absolute-time offset so stacked drums stay in lockstep: with phases WINDOW
+      // apart their visible windows are contiguous, so the same roll flows up
+      // through them (off the bottom drum, onto the middle, onto the top).
+      tex.offset.y = (((phase - SPEED * (now / 1000)) % 1) + 1) % 1;
       renderer.render(scene, camera);
     };
     raf = requestAnimationFrame(loop);
@@ -249,7 +294,6 @@ function Drum({ phase = 0 }: { phase?: number }) {
       const vis = e.isIntersecting;
       if (vis && !running) {
         running = true;
-        last = 0;
         raf = requestAnimationFrame(loop);
       } else if (!vis) {
         running = false;
@@ -282,10 +326,12 @@ export default function DrumCredits() {
   return (
     <div className="sb-fx-stage dc-split">
       <Drum phase={0} />
+      {/* One continuous roll across three stacked windows: phases WINDOW apart so
+          the same copy flows up through them (bottom → middle → top). */}
       <div className="dc-stack">
-        <Drum phase={0.15} />
-        <Drum phase={0.5} />
-        <Drum phase={0.85} />
+        <Drum phase={2 * WINDOW} />
+        <Drum phase={WINDOW} />
+        <Drum phase={0} />
       </div>
     </div>
   );
