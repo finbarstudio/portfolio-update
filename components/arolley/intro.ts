@@ -21,6 +21,16 @@ export function alreadyPreloaded(): boolean {
   }
 }
 
+/** Clear the gate so the preloader plays again on the next demo load — used when
+ *  entering the demo from the marketing/pitch page, so Finbar gets the branded
+ *  intro every time he demos it (internal navigation + refresh stay gated). */
+export function resetIntro(): void {
+  introFired = false;
+  try {
+    sessionStorage.removeItem(PRELOAD_KEY);
+  } catch {}
+}
+
 /** Mark the intro done + tell every waiting reveal to play. Idempotent. */
 export function fireIntro(): void {
   introFired = true;
