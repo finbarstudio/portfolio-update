@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import BraedenLogoFull from "./BraedenLogoFull";
+import { playOnIntro } from "./intro";
 
 const LEFT = [
   { label: "Projects", href: "/braeden/site/projects" },
@@ -15,8 +16,19 @@ const ALL = [...LEFT, ...RIGHT];
 
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [shown, setShown] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/braeden/site";
+
+  // Pop the bar in (mask reveal) when the intro fires — after the preloader lifts
+  // on first load, immediately on later navigation, with a guaranteed fallback.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShown(true);
+      return;
+    }
+    return playOnIntro(() => setShown(true));
+  }, []);
 
   const onLogoClick = (e: React.MouseEvent) => {
     if (!isHome) return; // other pages: let it navigate home
@@ -38,7 +50,7 @@ export default function Nav() {
   return (
     <>
       <header className="fixed top-0 inset-x-0 z-50 nav-tinted">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 md:h-20 px-[var(--gutter)]">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 md:h-20 px-[var(--gutter)] brd-mask" data-revealed={shown ? "1" : undefined}>
           <ul className="hidden md:flex items-center gap-8">
             {LEFT.map((l) => (
               <li key={l.label}><a href={l.href} className={link}>{l.label}</a></li>
