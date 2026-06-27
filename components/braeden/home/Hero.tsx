@@ -1,25 +1,23 @@
 "use client";
 
 /**
- * Braeden homepage — HERO, Lindon-style: a big centred wordmark on white with the
- * award record beneath it (the imagery leads in the parallax showcase below). The
- * eyebrow, wordmark and award row stagger in when the intro fires (the preloader
- * lifting on first load, immediately on later navigation). Type-led, generous
- * white space, the brand red as one accent.
+ * Braeden homepage HERO — the "magazine cover" treatment (option J): a full-bleed
+ * home photo with micro mono type anchored in the corners and the scroll cue
+ * centred. No headline, no logo here — the nav logo sits top-left and stays there
+ * as you scroll. Corners mask-reveal when the intro fires (preloader lift on first
+ * load, immediately on later navigation).
  */
 
 import { useEffect, useState, type CSSProperties } from "react";
-import AwardIcon, { type AwardIconName } from "../AwardIcon";
 import { playOnIntro } from "../intro";
 
-const AWARDS: { label: string; icon: AwardIconName }[] = [
-  { label: "Est. 1996", icon: "flag" },
-  { label: "5× House of the Year", icon: "trophy" },
-  { label: "National Master Builder of the Year", icon: "rosette" },
-  { label: "National House of the Year", icon: "house" },
+const AWARDS = [
+  "5× House of the Year",
+  "National Master Builder of the Year",
+  "National House of the Year",
 ];
 
-const delay = (s: string): CSSProperties => ({ ["--reveal-delay"]: s } as CSSProperties);
+const d = (s: string): CSSProperties => ({ ["--reveal-delay"]: s } as CSSProperties);
 
 export default function Hero() {
   const [shown, setShown] = useState(false);
@@ -35,36 +33,34 @@ export default function Hero() {
   const rv = shown ? "1" : undefined;
 
   return (
-    <section className="brd-hero">
-      <p className="eyebrow brd-hero-eyebrow brd-reveal" data-revealed={rv} style={delay("0s")}>
-        Award-winning custom homes · Noosa hinterland
-      </p>
+    <section className="bx-hero" data-tone="dark">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/braeden/projects/modern-thai.webp"
+        alt="Modern Thai House, a Braeden Constructions home at Noosa Heads"
+        className="bx-hero-img bx-ken"
+      />
+      <div className="bx-scrim-full" aria-hidden />
 
-      <h1 className="brd-hero-mark ff-mont brd-reveal" data-revealed={rv} style={delay("0.1s")}>
-        BRAEDEN
-        <span className="brd-hero-sub">Constructions</span>
-      </h1>
-
-      <div className="brd-hero-awards brd-reveal" data-revealed={rv} style={delay("0.22s")}>
-        {AWARDS.map((a) => (
-          <span key={a.label} className="brd-award">
-            <AwardIcon name={a.icon} />
-            <span className="ff-mono">{a.label}</span>
-          </span>
-        ))}
-      </div>
-
-      <div
-        className="brd-hero-scroll eyebrow brd-reveal-fade"
-        data-revealed={rv}
-        style={delay("0.42s")}
-        aria-hidden
-      >
-        <span>Scroll</span>
-        <span className="brd-hero-scroll-track">
-          <span className="brd-hero-scroll-fill" />
+      <div className="bx-j">
+        <span className="ff-mono bx-eyebrow bx-on-img bx-j-tr brd-mask" data-revealed={rv} style={d("0s")}>
+          Est. 1996
         </span>
+        <span className="ff-mono bx-eyebrow bx-on-img bx-j-bl brd-mask" data-revealed={rv} style={d("0.1s")}>
+          Custom homes, Noosa hinterland
+        </span>
+        <div className="bx-j-br brd-mask" data-revealed={rv} style={d("0.2s")}>
+          {AWARDS.map((a) => (
+            <span key={a} className="ff-mono bx-eyebrow bx-on-img bx-j-awline">
+              {a}
+            </span>
+          ))}
+        </div>
       </div>
+
+      <span className="ff-mono bx-scrollcue bx-on-img" aria-hidden>
+        Scroll
+      </span>
     </section>
   );
 }

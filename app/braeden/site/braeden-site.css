@@ -678,7 +678,8 @@ html.lenis, html.lenis body { height: auto; }
 .braeden-site .bx-j-tl { top: clamp(84px, 12vh, 116px); left: var(--gutter); }
 .braeden-site .bx-j-tr { top: clamp(88px, 12vh, 120px); right: var(--gutter); }
 .braeden-site .bx-j-bl { bottom: clamp(54px, 8vh, 88px); left: var(--gutter); max-width: 24ch; }
-.braeden-site .bx-j-br { bottom: clamp(54px, 8vh, 88px); right: var(--gutter); max-width: 24ch; text-align: right; }
+.braeden-site .bx-j-br { bottom: clamp(54px, 8vh, 88px); right: var(--gutter); text-align: right; }
+.braeden-site .bx-j-awline { display: block; white-space: nowrap; line-height: 1.85; }
 
 /* K — minimal on white, lots of air (the ~88vh white-space hero) */
 .braeden-site .bx-logo-xl { width: clamp(180px, 24vw, 340px); height: auto; display: block; }
