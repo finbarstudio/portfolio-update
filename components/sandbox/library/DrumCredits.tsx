@@ -19,9 +19,12 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { ASTERISK_POINTS } from "@/components/brand-asterisk";
 
-/** Tighter drum: more arc + smaller radius = a more pronounced curl. */
-const ARC = 1.12; // radians of cylinder visible (~64°)
-const RADIUS = 4;
+/** Cylinder curve. More arc + smaller radius = a more pronounced curl; the stacked
+    (tight) drums use a bigger radius + gentler arc so their large type bows less. */
+const ARC_NORMAL = 1.12; // radians of cylinder visible (~64°)
+const ARC_TIGHT = 0.98;
+const R_NORMAL = 4;
+const R_TIGHT = 5;
 /** How much of the credits canvas fills the visible arc (smaller = fewer lines). */
 const W_NORMAL = 0.2; // the single "normal" drum: a classic multi-line roll
 const W_TIGHT = 0.055; // each stacked drum: ~one large line, halves curling top + bottom
@@ -31,25 +34,25 @@ const SPEED = 0.018;
 /** The brand asterisk polygon (0–100 viewBox) as [x,y] pairs, for canvas fill. */
 const ASTER = ASTERISK_POINTS.trim().split(/\s+/).map((p) => p.split(",").map(Number) as [number, number]);
 
-/** The credits roll. Each entry is either a centred title or a role/name pair.
+/** The roll. Each entry is either a centred title or a discipline/detail pair.
     `logo` renders the canonical FINBARSTUDIO wordmark (Space Mono + asterisk). */
 type Credit = { role?: string; name: string; big?: boolean; logo?: boolean; gap?: number };
 const CREDITS: Credit[] = [
   { name: "FINBARSTUDIO", logo: true, gap: 1.8 },
-  { name: "PRESENTS", gap: 2.2 },
-  { role: "Directed by", name: "Finbar Skitini", gap: 1.4 },
-  { role: "Produced by", name: "The Studio", gap: 1.4 },
-  { role: "Director of Photography", name: "A. Cinematographer", gap: 1.4 },
-  { role: "Original Music by", name: "The Orchestra", gap: 1.4 },
-  { role: "Edited by", name: "The Cutting Room", gap: 2.2 },
-  { name: "STARRING", gap: 1.4 },
-  { name: "The Leading Player", gap: 0.7 },
-  { name: "A Supporting Cast", gap: 0.7 },
-  { name: "And the Ensemble", gap: 2.2 },
-  { role: "Art Direction", name: "The Set Department", gap: 1.4 },
-  { role: "Costumes by", name: "Wardrobe", gap: 1.4 },
-  { role: "Filmed at", name: "Brisbane Studios", gap: 2.4 },
-  { name: "THE END", big: true, gap: 3 },
+  { name: "WHAT WE MAKE", gap: 2.2 },
+  { role: "Strategy", name: "Positioning & naming", gap: 1.4 },
+  { role: "Identity", name: "Brand systems", gap: 1.4 },
+  { role: "Web Design", name: "Sites that move", gap: 1.4 },
+  { role: "Development", name: "Next.js & WebGL", gap: 1.4 },
+  { role: "Motion", name: "Interaction & 3D", gap: 2.2 },
+  { name: "HOW WE WORK", gap: 1.4 },
+  { name: "Type leads, motion follows", gap: 0.7 },
+  { name: "Restraint over decoration", gap: 0.7 },
+  { name: "Built in code, not templates", gap: 2.2 },
+  { role: "Built by", name: "Finbar Skitini", gap: 1.4 },
+  { role: "Based in", name: "Sunshine Coast, QLD", gap: 1.4 },
+  { role: "Working", name: "Worldwide", gap: 2.4 },
+  { name: "LET'S BUILD", big: true, gap: 3 },
 ];
 
 type Tokens = { ink: string; inkSoft: string; pink: string; bg: string; primary: string; mono: string };
@@ -120,7 +123,7 @@ function buildCreditsCanvas(t: Tokens, tight = false): HTMLCanvasElement {
   // `tight` (the stacked drums) wants large type with low line + paragraph spacing;
   // the single drum keeps the classic proportions.
   const k = tight ? 1.34 : 1; // type scale
-  const lineMul = tight ? 0.72 : 1; // leading inside a credit (role→name, after a line)
+  const lineMul = tight ? 0.84 : 1; // leading inside a credit (role→name, after a line)
   const paraMul = tight ? 0.38 : 1; // blank gap between credits
   const unit = 64;
   const roleSize = 28 * k;
@@ -203,14 +206,14 @@ function buildCreditsCanvas(t: Tokens, tight = false): HTMLCanvasElement {
 }
 
 /** Bend a flat plane into a vertical arc of a horizontal-axis cylinder. */
-function curvedPlane(width: number, segW: number, segH: number): THREE.PlaneGeometry {
+function curvedPlane(width: number, segW: number, segH: number, arc: number, radius: number): THREE.PlaneGeometry {
   const geo = new THREE.PlaneGeometry(width, 1, segW, segH);
   const pos = geo.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const v = pos.getY(i) + 0.5; // 0..1 bottom→top
-    const theta = (v - 0.5) * ARC; // -ARC/2 .. ARC/2
-    pos.setY(i, RADIUS * Math.sin(theta));
-    pos.setZ(i, RADIUS * Math.cos(theta) - RADIUS); // front (centre) at z=0, edges recede
+    const theta = (v - 0.5) * arc; // -arc/2 .. arc/2
+    pos.setY(i, radius * Math.sin(theta));
+    pos.setZ(i, radius * Math.cos(theta) - radius); // front (centre) at z=0, edges recede
   }
   pos.needsUpdate = true;
   geo.computeVertexNormals();
@@ -231,6 +234,8 @@ function Drum({ phase = 0, tight = false }: { phase?: number; tight?: boolean })
     const scope = wrap.closest(".sb-root") ?? document.documentElement;
     const tokens = readTokens(scope);
     const win = tight ? W_TIGHT : W_NORMAL;
+    const arc = tight ? ARC_TIGHT : ARC_NORMAL;
+    const radius = tight ? R_TIGHT : R_NORMAL;
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -249,11 +254,11 @@ function Drum({ phase = 0, tight = false }: { phase?: number; tight?: boolean })
     tex.generateMipmaps = true;
     tex.colorSpace = THREE.SRGBColorSpace;
 
-    const visibleH = 2 * RADIUS * Math.sin(ARC / 2);
+    const visibleH = 2 * radius * Math.sin(arc / 2);
     const cnv = tex.image as HTMLCanvasElement;
     const planeW = visibleH * (cnv.width / (cnv.height * win));
 
-    const geo = curvedPlane(planeW, 16, 220);
+    const geo = curvedPlane(planeW, 16, 220, arc, radius);
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
     const mesh = new THREE.Mesh(geo, mat);
     scene.add(mesh);

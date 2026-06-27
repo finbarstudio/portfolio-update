@@ -5,7 +5,7 @@ import DrumCreditsClient from "@/components/sandbox/library/DrumCreditsClient";
 export const metadata: Metadata = {
   title: "Drum Credits",
   description:
-    "A 1950s title-sequence effect: credits printed on a tight-radius drum, bowing and foreshortening at the top and bottom of frame as one continuous roll turns through it.",
+    "A 1950s title-sequence effect: type printed on a tight-radius drum, bowing and foreshortening at the top and bottom of frame as one continuous roll turns through it.",
   robots: { index: false, follow: true },
 };
 
@@ -19,10 +19,10 @@ export default function DrumCreditsPage() {
         <div>
           <h1 className="sb-fx-title">Drum Credits</h1>
           <p className="sb-fx-note">
-            Credits shot off a rotating drum, not a flat sheet. A tight-radius cylinder, so the type
-            bows and foreshortens as it rolls through frame. On the left, the full roll on a single
-            drum. On the right, the same roll split across three short drums, the copy travelling off
-            the bottom, onto the middle, onto the top.
+            A 1950s title-roll trick: type printed on a spinning drum, not a flat sheet, so it bows
+            and foreshortens as the cylinder turns through frame. On the left, the full roll on a
+            single drum. On the right, the same roll split across three short drums, the copy
+            travelling off the bottom, onto the middle, onto the top.
           </p>
         </div>
         <Link className="sb-fx-ref" href={REFERENCE} target="_blank" rel="noopener noreferrer">
