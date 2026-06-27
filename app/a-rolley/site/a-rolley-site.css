@@ -232,6 +232,8 @@ html.arl-nav-dark .arolley-site .nav-tinted { color: var(--paper); }
   opacity: 0.85; transition: opacity 0.3s ease;
 }
 .arl-foot-base .arl-mbq:hover { opacity: 1; }
+/* finbar studio credit logo in the footer base row — the canonical wordmark. */
+.arolley-site .arl-foot-mark { font-size: 12px; color: var(--ink); }
 
 /* ── Form fields + button ── */
 .arolley-site .arl-input { border-color: var(--line); color: var(--ink); }

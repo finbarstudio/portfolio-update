@@ -1,5 +1,6 @@
 import LogoMark from "../LogoMark";
 import MaskReveal from "../MaskReveal";
+import BrandWordmark from "@/components/BrandWordmark";
 
 /** Tall footer: a four-column info grid over a full-bleed wordmark sweep, with
  *  the Master Builders QLD membership badge in the base row. Premium
@@ -62,7 +63,9 @@ export default function SiteFooter({ base = "/a-rolley/site", tone }: { base?: s
 
       <div className="arl-foot-base">
         <span className="arl-mbq" role="img" aria-label="Proud Member of Master Builders Queensland" />
-        <span>QBCC 1098669 &middot; Concept site by finbar&#10033;studio</span>
+        <span className="inline-flex items-center" style={{ gap: "0.5em", flexWrap: "wrap" }}>
+          QBCC 1098669 &middot; Concept site by <BrandWordmark className="arl-foot-mark" />
+        </span>
       </div>
     </footer>
   );
