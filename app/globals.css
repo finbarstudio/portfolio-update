@@ -3213,6 +3213,11 @@ body:has(.sb-root) {
   border: 1px solid var(--sb-line); border-radius: 5px; padding: 3px 6px;
   font-family: var(--font-mono); font-size: 11px;
 }
+.bz-color-wrap { display: inline-flex; align-items: center; gap: 6px; }
+.bz-hex {
+  width: 76px; background: var(--bg); color: var(--ink); border: 1px solid var(--sb-line);
+  border-radius: 5px; padding: 3px 6px; font-family: var(--font-mono); font-size: 10px;
+}
 /* Draw-on + node entrance / pulse. Export strips these classes, so captures are
    static and deterministic. */
 .bz-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: bz-draw-on var(--bz-dur, 1.6s) cubic-bezier(0.22, 1, 0.36, 1) forwards; }

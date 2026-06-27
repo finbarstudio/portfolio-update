@@ -54,13 +54,16 @@ type Cfg = {
   glow: boolean; glowColor: string; glowIntensity: number;
   fillShape: boolean; fillColor: string; fillOpacity: number;
   showAnchors: boolean; showControls: boolean; showHandles: boolean; nodeScale: number;
-  anchorShape: AnchorShape; anchorFill: string; anchorStroke: string; anchorSize: number; anchorWeight: number;
+  anchorShape: AnchorShape; anchorFill: string; anchorStroke: string; anchorSize: number; anchorWeight: number; anchorRotate: number;
   controlShape: ControlShape; controlFill: string; controlStroke: string; controlSize: number;
   handleColor: string; handleWeight: number; handleDash: number; handleOpacity: number;
   labelMode: "None" | "Index" | "Coords"; labelColor: string; labelSize: number;
-  labelPos: "Top right" | "Top left" | "Bottom right" | "Bottom left" | "Right" | "Above"; labelOffset: number;
+  labelPos: "Top right" | "Top left" | "Bottom right" | "Bottom left" | "Above" | "Below" | "Left" | "Right"; labelOffset: number;
   titleBlock: boolean; caption: string;
   drawOn: boolean; drawDuration: number; pulse: boolean;
+  revealStyle: "Draw" | "Fade" | "Scale" | "Wipe"; easing: "Linear" | "Ease out" | "Ease in-out" | "Spring";
+  stagger: number; layer: "Together" | "Curve first" | "Nodes first"; tracer: boolean;
+  loopMode: "Once" | "Loop" | "Ping-pong"; exportFps: number;
   traceColors: number; traceDetail: number;
   exportTransparent: boolean; exportNoGrid: boolean;
 };
@@ -75,13 +78,15 @@ function defaultCfg(): Cfg {
     glow: true, glowColor: "#E8718B", glowIntensity: 55,
     fillShape: false, fillColor: "#F6C9D1", fillOpacity: 0.1,
     showAnchors: true, showControls: true, showHandles: true, nodeScale: 1,
-    anchorShape: "Square", anchorFill: "#211E1A", anchorStroke: "#F6EFE1", anchorSize: 16, anchorWeight: 3,
+    anchorShape: "Square", anchorFill: "#211E1A", anchorStroke: "#F6EFE1", anchorSize: 16, anchorWeight: 3, anchorRotate: 0,
     controlShape: "Ring", controlFill: "#211E1A", controlStroke: "#E8718B", controlSize: 12,
     handleColor: "#E8718B", handleWeight: 2, handleDash: 0, handleOpacity: 0.7,
     labelMode: "Index", labelColor: "#9C9486", labelSize: 20,
     labelPos: "Top right", labelOffset: 18,
     titleBlock: true, caption: "BÉZIER SPECIMEN",
     drawOn: true, drawDuration: 1.6, pulse: false,
+    revealStyle: "Draw", easing: "Ease out", stagger: 0.7, layer: "Curve first", tracer: true,
+    loopMode: "Loop", exportFps: 30,
     traceColors: 8, traceDetail: 1,
     exportTransparent: false, exportNoGrid: false,
   };
@@ -131,6 +136,7 @@ const SECTIONS: { title: string; fields: Field[] }[] = [
     { kind: "color", key: "anchorFill", label: "Fill colour" },
     { kind: "range", key: "anchorSize", label: "Size", min: 4, max: 56, step: 1 },
     { kind: "range", key: "anchorWeight", label: "Stroke weight", min: 0.5, max: 12, step: 0.5 },
+    { kind: "range", key: "anchorRotate", label: "Rotation°", min: 0, max: 360, step: 5 },
   ]},
   { title: "Controls + handles", fields: [
     { kind: "toggle", key: "showControls", label: "Show controls" },
@@ -147,21 +153,28 @@ const SECTIONS: { title: string; fields: Field[] }[] = [
   ]},
   { title: "Labels + title block", fields: [
     { kind: "select", key: "labelMode", label: "Labels", options: ["None", "Index", "Coords"] },
-    { kind: "select", key: "labelPos", label: "Position", options: ["Top right", "Top left", "Bottom right", "Bottom left", "Right", "Above"] },
+    { kind: "select", key: "labelPos", label: "Position", options: ["Top right", "Top left", "Bottom right", "Bottom left", "Above", "Below", "Left", "Right"] },
     { kind: "range", key: "labelOffset", label: "Offset", min: 0, max: 90, step: 1 },
     { kind: "color", key: "labelColor", label: "Label colour" },
     { kind: "range", key: "labelSize", label: "Label size", min: 8, max: 64, step: 1 },
     { kind: "toggle", key: "titleBlock", label: "Title block" },
     { kind: "text", key: "caption", label: "Caption" },
   ]},
-  { title: "Motion", fields: [
-    { kind: "toggle", key: "drawOn", label: "Draw-on" },
-    { kind: "range", key: "drawDuration", label: "Draw secs", min: 0.4, max: 6, step: 0.1 },
-    { kind: "toggle", key: "pulse", label: "Pulse nodes" },
+  { title: "Motion (recording)", fields: [
+    { kind: "toggle", key: "drawOn", label: "Animate" },
+    { kind: "select", key: "revealStyle", label: "Reveal", options: ["Draw", "Fade", "Scale", "Wipe"] },
+    { kind: "select", key: "easing", label: "Easing", options: ["Linear", "Ease out", "Ease in-out", "Spring"] },
+    { kind: "range", key: "drawDuration", label: "Duration s", min: 0.4, max: 8, step: 0.1 },
+    { kind: "range", key: "stagger", label: "Node stagger", min: 0, max: 1, step: 0.05 },
+    { kind: "select", key: "layer", label: "Order", options: ["Together", "Curve first", "Nodes first"] },
+    { kind: "toggle", key: "tracer", label: "Tracer dot" },
+    { kind: "toggle", key: "pulse", label: "Pulse nodes (live)" },
+    { kind: "select", key: "loopMode", label: "Loop", options: ["Once", "Loop", "Ping-pong"] },
   ]},
   { title: "Trace + export", fields: [
     { kind: "range", key: "traceColors", label: "Trace colours", min: 2, max: 24, step: 1 },
     { kind: "range", key: "traceDetail", label: "Trace smoothing", min: 0.2, max: 6, step: 0.2 },
+    { kind: "range", key: "exportFps", label: "Video / GIF fps", min: 8, max: 60, step: 1 },
     { kind: "toggle", key: "exportTransparent", label: "Transparent bg" },
     { kind: "toggle", key: "exportNoGrid", label: "Hide grid" },
   ]},
@@ -214,6 +227,16 @@ const hexRgb = (c: string): [number, number, number] => {
 function autoUiColor(bg: string): string {
   const [r, g, b] = hexRgb(bg);
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.52 ? "#ECE6DA" : "#211E1A";
+}
+/** Normalise a typed colour to #rrggbb for the native colour picker (the text
+    field keeps the raw value, so rgba()/named colours still pass through to SVG). */
+function normHex(c: string): string {
+  const s = (c || "").trim();
+  if (/^#[0-9a-f]{6}$/i.test(s)) return s;
+  if (/^[0-9a-f]{6}$/i.test(s)) return "#" + s;
+  const m = /^#?([0-9a-f]{3})$/i.exec(s);
+  if (m) { const x = m[1]; return "#" + x[0] + x[0] + x[1] + x[1] + x[2] + x[2]; }
+  return "#000000";
 }
 
 export default function BezierStudio() {
@@ -275,6 +298,13 @@ export default function BezierStudio() {
   function set<K extends keyof Cfg>(key: K, value: Cfg[K]) { setCfg((c) => ({ ...c, [key]: value })); }
   function loadText(text: string, name: string) { setSvgText(text); setSourceName(name); }
 
+  // Grid sizing: fit the cells to the frame so they line up exactly, and step the
+  // cell count by ×2 / ÷2 while keeping that perfect fit.
+  const frameInnerW = () => Math.max(1, W - 2 * cfg.margin);
+  const gridCount = () => Math.max(1, Math.round(frameInnerW() / cfg.gridSize));
+  const autoFitGrid = () => set("gridSize", frameInnerW() / gridCount());
+  const stepGridCells = (mul: number) => set("gridSize", frameInnerW() / Math.max(1, Math.round(gridCount() * mul)));
+
   async function onTraceImage(file: File) {
     setBusy(true); setStatus("Tracing image…");
     try {
@@ -306,34 +336,74 @@ export default function BezierStudio() {
     cleanExport(clone, opts);
     return new XMLSerializer().serializeToString(clone);
   }
-  /** SVG serialised with the draw-on baked at progress p (for video frames). */
-  function serializeAtProgress(p: number): string {
+  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+  function ease(t: number): number {
+    t = clamp01(t);
+    if (cfg.easing === "Linear") return t;
+    if (cfg.easing === "Ease in-out") return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    if (cfg.easing === "Spring") { const c4 = (2 * Math.PI) / 3; return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1; }
+    return 1 - Math.pow(1 - t, 2); // Ease out
+  }
+  /** Frame phases (0..1) for the chosen loop mode. Ping-pong reverses back. */
+  function buildPhases(n: number): number[] {
+    const fwd = Array.from({ length: n }, (_, i) => i / (n - 1));
+    if (cfg.loopMode === "Ping-pong") return fwd.concat(fwd.slice(1, -1).reverse());
+    return fwd;
+  }
+  /** SVG serialised with the chosen reveal (style / easing / stagger / layer /
+      tracer) baked at the given phase — used for every recorded frame. */
+  function serializeAtProgress(phase: number): string {
+    const e = ease(phase);
+    let curveT = e, nodeT = e;
+    if (cfg.layer === "Curve first") { curveT = clamp01(e / 0.6); nodeT = clamp01((e - 0.4) / 0.6); }
+    else if (cfg.layer === "Nodes first") { nodeT = clamp01(e / 0.6); curveT = clamp01((e - 0.4) / 0.6); }
+    const style = cfg.revealStyle;
     const clone = svgRef.current!.cloneNode(true) as SVGSVGElement;
+
+    const anim = clone.querySelector<SVGElement>("[data-anim]");
+    if (anim) {
+      if (style === "Scale") { const s = 0.55 + 0.45 * e; anim.setAttribute("transform", `translate(${W / 2} ${H / 2}) scale(${s}) translate(${-W / 2} ${-H / 2})`); anim.style.opacity = String(e); }
+      else { anim.removeAttribute("transform"); anim.style.removeProperty("opacity"); }
+    }
+    clone.querySelector<SVGElement>("#bz-wipe-rect")?.setAttribute("width", String(style === "Wipe" ? W * e : W));
+
     clone.querySelectorAll<SVGElement>("[data-draw]").forEach((el) => {
-      el.setAttribute("pathLength", "1");
-      el.style.strokeDasharray = "1";
-      el.style.strokeDashoffset = String(Math.max(0, Math.min(1, 1 - p)));
+      el.style.removeProperty("stroke-dasharray"); el.style.removeProperty("stroke-dashoffset"); el.style.removeProperty("opacity"); el.removeAttribute("pathLength");
+      if (style === "Draw") { el.setAttribute("pathLength", "1"); el.style.strokeDasharray = "1"; el.style.strokeDashoffset = String(clamp01(1 - curveT)); }
+      else if (style === "Fade") el.style.opacity = String(curveT);
     });
     clone.querySelectorAll<SVGElement>("[data-pop]").forEach((el) => {
-      const ap = parseFloat(el.getAttribute("data-pop") || "0") || 0;
-      el.style.opacity = p >= ap ? "1" : "0";
+      if (style === "Draw" || style === "Fade") {
+        const frac = parseFloat(el.getAttribute("data-pop") || "0") || 0;
+        el.style.opacity = String(clamp01((nodeT - frac * cfg.stagger) / 0.18));
+      } else el.style.removeProperty("opacity");
     });
+    const tracer = clone.querySelector<SVGElement>("#bz-tracer");
+    if (tracer) {
+      if (cfg.tracer && style === "Draw" && curveT > 0.001 && curveT < 0.999 && measureRef.current && pathLen > 0) {
+        try { const pt = measureRef.current.getPointAtLength(curveT * pathLen); tracer.setAttribute("cx", String(pt.x)); tracer.setAttribute("cy", String(pt.y)); tracer.style.opacity = "1"; }
+        catch { tracer.style.opacity = "0"; }
+      } else tracer.style.opacity = "0";
+    }
+
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     clone.querySelectorAll<SVGElement>("*").forEach((el) => {
-      el.removeAttribute("class"); el.removeAttribute("data-draw"); el.removeAttribute("data-pop");
+      el.removeAttribute("class"); el.removeAttribute("data-draw"); el.removeAttribute("data-pop"); el.removeAttribute("data-anim");
       el.style.removeProperty("animation"); el.style.removeProperty("--bz-dur"); el.style.removeProperty("--bz-delay");
     });
     clone.querySelector("#bz-measure")?.remove();
     return new XMLSerializer().serializeToString(clone);
   }
-  function svgToBitmap(str: string): Promise<ImageBitmap | null> {
+  function svgToBitmap(str: string, fillBg: boolean): Promise<ImageBitmap | null> {
     return new Promise((res) => {
       const url = URL.createObjectURL(new Blob([str], { type: "image/svg+xml;charset=utf-8" }));
       const img = new Image();
       img.onload = async () => {
         try {
           const c = document.createElement("canvas"); c.width = W; c.height = H;
-          const x = c.getContext("2d")!; x.fillStyle = cfg.bg; x.fillRect(0, 0, W, H); x.drawImage(img, 0, 0, W, H);
+          const x = c.getContext("2d")!;
+          if (fillBg) { x.fillStyle = cfg.bg; x.fillRect(0, 0, W, H); }
+          x.drawImage(img, 0, 0, W, H);
           const bmp = await createImageBitmap(c); URL.revokeObjectURL(url); res(bmp);
         } catch { URL.revokeObjectURL(url); res(null); }
       };
@@ -381,22 +451,27 @@ export default function BezierStudio() {
     }
     return "";
   }
-  /** Record the draw-on animation by pre-rendering baked frames then playing them
+  async function renderFrames(phases: number[], fillBg: boolean, tag: string): Promise<ImageBitmap[]> {
+    const frames: ImageBitmap[] = [];
+    for (let i = 0; i < phases.length; i++) {
+      setStatus(`${tag} ${i + 1}/${phases.length}…`);
+      const bmp = await svgToBitmap(serializeAtProgress(phases[i]), fillBg);
+      if (bmp) frames.push(bmp);
+      await new Promise((r) => setTimeout(r, 0));
+    }
+    return frames;
+  }
+  /** Record the reveal to MP4/WebM by pre-rendering baked frames then playing them
       into a recorded canvas (native MP4 where supported, else WebM). */
   async function recordAnimation(preferMp4: boolean) {
     if (!svgRef.current || !view) return;
     if (typeof MediaRecorder === "undefined") { setStatus("Recording isn’t supported in this browser."); return; }
     setBusy(true);
-    const fps = 30;
+    const fps = cfg.exportFps;
     const dur = Math.max(0.4, cfg.drawDuration);
     const nFrames = Math.max(2, Math.round(dur * fps));
     try {
-      const frames: ImageBitmap[] = [];
-      for (let i = 0; i < nFrames; i++) {
-        setStatus(`Rendering ${i + 1}/${nFrames}…`);
-        const bmp = await svgToBitmap(serializeAtProgress(i / (nFrames - 1)));
-        if (bmp) frames.push(bmp);
-      }
+      const frames = await renderFrames(buildPhases(nFrames), true, "Rendering"); // video has no alpha → flatten on bg
       if (!frames.length) throw new Error("no frames");
       const cap = 1280, sc = Math.min(1, cap / Math.max(W, H));
       const cw = Math.round(W * sc), ch = Math.round(H * sc);
@@ -412,25 +487,68 @@ export default function BezierStudio() {
       const chunks: BlobPart[] = [];
       rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
       rec.onstop = () => {
-        const blob = new Blob(chunks, { type: rec.mimeType || "video/webm" });
-        downloadBlob(blob, safeName(sourceName + "-bezier") + "." + ext);
+        downloadBlob(new Blob(chunks, { type: rec.mimeType || "video/webm" }), safeName(sourceName + "-bezier") + "." + ext);
         setStatus(preferMp4 && !nativeMp4 ? "Saved .webm (this browser can’t record MP4)" : "Saved ." + ext);
         frames.forEach((f) => f.close?.());
         setBusy(false);
       };
       rec.start();
-      const final = frames[frames.length - 1];
+      const playDur = frames.length / fps;
       const t0 = performance.now();
       const tick = () => {
         const el = (performance.now() - t0) / 1000;
-        if (el <= dur) { rctx.drawImage(frames[Math.min(frames.length - 1, Math.floor((el / dur) * frames.length))], 0, 0, cw, ch); requestAnimationFrame(tick); }
-        else if (el <= dur + 0.7) { rctx.drawImage(final, 0, 0, cw, ch); requestAnimationFrame(tick); }
+        if (el <= playDur) { rctx.drawImage(frames[Math.min(frames.length - 1, Math.floor((el / playDur) * frames.length))], 0, 0, cw, ch); requestAnimationFrame(tick); }
+        else if (el <= playDur + 0.6) { rctx.drawImage(frames[frames.length - 1], 0, 0, cw, ch); requestAnimationFrame(tick); }
         else rec.stop();
       };
       rctx.drawImage(frames[0], 0, 0, cw, ch);
       setStatus("Recording…");
       requestAnimationFrame(tick);
     } catch (e) { setStatus("Recording failed: " + (e as Error).message); setBusy(false); }
+  }
+  /** Save the reveal as an animated (looping) GIF, with optional transparency. */
+  async function saveGIF() {
+    if (!svgRef.current || !view) return;
+    setBusy(true);
+    try {
+      type GifMod = {
+        GIFEncoder: () => { writeFrame: (i: Uint8Array, w: number, h: number, o: Record<string, unknown>) => void; finish: () => void; bytes: () => Uint8Array };
+        quantize: (d: Uint8ClampedArray, n: number, o?: Record<string, unknown>) => number[][];
+        applyPalette: (d: Uint8ClampedArray, p: number[][], f?: string) => Uint8Array;
+      };
+      const { GIFEncoder, quantize, applyPalette } = (await import("gifenc")) as unknown as GifMod;
+      const fps = Math.min(50, cfg.exportFps);
+      const dur = Math.max(0.4, cfg.drawDuration);
+      const nFrames = Math.max(2, Math.round(dur * fps));
+      const phases = buildPhases(nFrames);
+      const transparent = cfg.exportTransparent;
+      const cap = 720, sc = Math.min(1, cap / Math.max(W, H));
+      const gw = Math.round(W * sc), gh = Math.round(H * sc);
+      const cnv = document.createElement("canvas"); cnv.width = gw; cnv.height = gh;
+      const cx = cnv.getContext("2d")!;
+      const gif = GIFEncoder();
+      const delay = Math.round(1000 / fps);
+      for (let i = 0; i < phases.length; i++) {
+        setStatus(`GIF ${i + 1}/${phases.length}…`);
+        const bmp = await svgToBitmap(serializeAtProgress(phases[i]), !transparent);
+        cx.clearRect(0, 0, gw, gh);
+        if (bmp) cx.drawImage(bmp, 0, 0, gw, gh);
+        const { data } = cx.getImageData(0, 0, gw, gh);
+        if (transparent) {
+          const palette = quantize(data, 256, { format: "rgba4444", oneBitAlpha: true });
+          gif.writeFrame(applyPalette(data, palette, "rgba4444"), gw, gh, { palette, delay, transparent: true });
+        } else {
+          const palette = quantize(data, 256);
+          gif.writeFrame(applyPalette(data, palette), gw, gh, { palette, delay });
+        }
+        bmp?.close?.();
+        await new Promise((r) => setTimeout(r, 0));
+      }
+      gif.finish();
+      downloadBlob(new Blob([gif.bytes() as unknown as BlobPart], { type: "image/gif" }), safeName(sourceName + "-bezier") + ".gif");
+      setStatus("Saved .gif" + (transparent ? " (transparent)" : ""));
+    } catch (e) { setStatus("GIF failed: " + (e as Error).message); }
+    finally { setBusy(false); }
   }
 
   // ── Derived render values ─────────────────────────────────────────────────────
@@ -459,23 +577,26 @@ export default function BezierStudio() {
     "Top left": { dx: -lp, dy: -lp * 0.5, anchor: "end" },
     "Bottom right": { dx: lp, dy: lp + cfg.labelSize * 0.6, anchor: "start" },
     "Bottom left": { dx: -lp, dy: lp + cfg.labelSize * 0.6, anchor: "end" },
-    "Right": { dx: lp + cfg.anchorSize * 0.5, dy: cfg.labelSize * 0.35, anchor: "start" },
     "Above": { dx: 0, dy: -lp - cfg.anchorSize * 0.4, anchor: "middle" },
+    "Below": { dx: 0, dy: lp + cfg.anchorSize * 0.4 + cfg.labelSize * 0.7, anchor: "middle" },
+    "Left": { dx: -(lp + cfg.anchorSize * 0.5), dy: cfg.labelSize * 0.35, anchor: "end" },
+    "Right": { dx: lp + cfg.anchorSize * 0.5, dy: cfg.labelSize * 0.35, anchor: "start" },
   };
   const lab = LABEL[cfg.labelPos];
 
   const shape = (
     kind: AnchorShape | ControlShape, p: { x: number; y: number }, s: number,
-    fill: string, stroke: string, weight: number, key: string, cls?: string, style?: React.CSSProperties, pop?: number,
+    fill: string, stroke: string, weight: number, key: string, cls?: string, style?: React.CSSProperties, pop?: number, rot = 0,
   ) => {
     const common = { key, className: cls, style, "data-pop": pop } as Record<string, unknown>;
     const h = s / 2;
-    if (kind === "Diamond") return <rect {...common} x={p.x - h} y={p.y - h} width={s} height={s} fill={fill} stroke={stroke} strokeWidth={weight} transform={`rotate(45 ${p.x} ${p.y})`} />;
+    const tr = (a: number) => (a % 360 ? `rotate(${a} ${p.x} ${p.y})` : undefined);
+    if (kind === "Diamond") return <rect {...common} x={p.x - h} y={p.y - h} width={s} height={s} fill={fill} stroke={stroke} strokeWidth={weight} transform={tr(45 + rot)} />;
     if (kind === "Circle" || kind === "Ring") return <circle {...common} cx={p.x} cy={p.y} r={h} fill={fill} stroke={stroke} strokeWidth={weight} />;
-    if (kind === "Triangle") { const r = h * 1.18; const pts = `${p.x},${p.y - r} ${p.x + r * 0.87},${p.y + r * 0.5} ${p.x - r * 0.87},${p.y + r * 0.5}`; return <polygon {...common} points={pts} fill={fill} stroke={stroke} strokeWidth={weight} />; }
-    if (kind === "Cross") return <path {...common} d={`M${p.x - h} ${p.y} H${p.x + h} M${p.x} ${p.y - h} V${p.y + h}`} fill="none" stroke={stroke} strokeWidth={weight} strokeLinecap="round" />;
+    if (kind === "Triangle") { const r = h * 1.18; const pts = `${p.x},${p.y - r} ${p.x + r * 0.87},${p.y + r * 0.5} ${p.x - r * 0.87},${p.y + r * 0.5}`; return <polygon {...common} points={pts} fill={fill} stroke={stroke} strokeWidth={weight} transform={tr(rot)} />; }
+    if (kind === "Cross") return <path {...common} d={`M${p.x - h} ${p.y} H${p.x + h} M${p.x} ${p.y - h} V${p.y + h}`} fill="none" stroke={stroke} strokeWidth={weight} strokeLinecap="round" transform={tr(rot)} />;
     if (kind === "Dot") return <circle {...common} cx={p.x} cy={p.y} r={h} fill={stroke} />;
-    return <rect {...common} x={p.x - h} y={p.y - h} width={s} height={s} fill={fill} stroke={stroke} strokeWidth={weight} />; // Square
+    return <rect {...common} x={p.x - h} y={p.y - h} width={s} height={s} fill={fill} stroke={stroke} strokeWidth={weight} transform={tr(rot)} />; // Square
   };
 
   return (
@@ -484,13 +605,13 @@ export default function BezierStudio() {
         {fit > 0 && (
           <svg ref={svgRef} className="bz-svg" width={dispW} height={dispH} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
             <defs>
-              <pattern id="bz-fine" width={cfg.gridSize} height={cfg.gridSize} patternUnits="userSpaceOnUse">
+              <pattern id="bz-fine" width={cfg.gridSize} height={cfg.gridSize} patternUnits="userSpaceOnUse" patternTransform={`translate(${cfg.margin} ${cfg.margin})`}>
                 <path d={`M${cfg.gridSize} 0 H0 V${cfg.gridSize}`} fill="none" stroke={ui} strokeOpacity={0.18} strokeWidth={cfg.gridWeight} />
               </pattern>
-              <pattern id="bz-majorp" width={cfg.gridSize * 5} height={cfg.gridSize * 5} patternUnits="userSpaceOnUse">
+              <pattern id="bz-majorp" width={cfg.gridSize * 5} height={cfg.gridSize * 5} patternUnits="userSpaceOnUse" patternTransform={`translate(${cfg.margin} ${cfg.margin})`}>
                 <path d={`M${cfg.gridSize * 5} 0 H0 V${cfg.gridSize * 5}`} fill="none" stroke={ui} strokeOpacity={0.12} strokeWidth={cfg.gridWeight * 1.4} />
               </pattern>
-              <pattern id="bz-dots" width={cfg.gridSize} height={cfg.gridSize} patternUnits="userSpaceOnUse">
+              <pattern id="bz-dots" width={cfg.gridSize} height={cfg.gridSize} patternUnits="userSpaceOnUse" patternTransform={`translate(${cfg.margin} ${cfg.margin})`}>
                 <circle cx={cfg.gridSize / 2} cy={cfg.gridSize / 2} r={cfg.gridWeight * 1.4} fill={ui} fillOpacity={0.3} />
               </pattern>
               <radialGradient id="bz-vig" cx="50%" cy="50%" r="62%">
@@ -498,6 +619,7 @@ export default function BezierStudio() {
                 <stop offset="100%" stopColor={cfg.bg} stopOpacity={cfg.vignette} />
               </radialGradient>
               <filter id="bz-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation={blur} /></filter>
+              <clipPath id="bz-wipe"><rect id="bz-wipe-rect" x="0" y="0" width={W} height={H} /></clipPath>
             </defs>
 
             {!cfg.exportTransparent && <rect id="bz-bg" x="0" y="0" width={W} height={H} fill={cfg.bg} />}
@@ -522,7 +644,7 @@ export default function BezierStudio() {
             })()}
 
             {view && (
-              <g key={`${sourceName}:${drawNonce}`}>
+              <g key={`${sourceName}:${drawNonce}`} data-anim="" clipPath="url(#bz-wipe)">
                 <path id="bz-measure" ref={measureRef} d={view.d} fill="none" stroke="none" style={{ visibility: "hidden" }} />
 
                 {cfg.showCurve && cfg.glow && cfg.glowIntensity > 0 && (
@@ -537,7 +659,10 @@ export default function BezierStudio() {
                   <line key={"h" + i} data-pop={i / Math.max(1, handleN)} x1={hd.from.x} y1={hd.from.y} x2={hd.to.x} y2={hd.to.y} stroke={cfg.handleColor} strokeWidth={cfg.handleWeight * ns} strokeLinecap="round" strokeDasharray={cfg.handleDash > 0 ? `${cfg.handleDash} ${cfg.handleDash}` : undefined} opacity={cfg.handleOpacity} className={nodeCls} style={nodeStyle(i, handleN)} />
                 ))}
                 {cfg.showControls && view.handles.map((hd, i) => shape(cfg.controlShape, hd.to, Math.max(1, cfg.controlSize * ns), cfg.controlFill, cfg.controlStroke, Math.max(0.5, cfg.anchorWeight * 0.7), "c" + i, nodeCls, nodeStyle(i, handleN), i / Math.max(1, handleN)))}
-                {cfg.showAnchors && view.anchors.map((p, i) => shape(cfg.anchorShape, p, Math.max(1, cfg.anchorSize * ns), cfg.anchorFill, cfg.anchorStroke, cfg.anchorWeight, "a" + i, nodeCls, nodeStyle(i, anchorN), i / Math.max(1, anchorN)))}
+                {cfg.showAnchors && view.anchors.map((p, i) => shape(cfg.anchorShape, p, Math.max(1, cfg.anchorSize * ns), cfg.anchorFill, cfg.anchorStroke, cfg.anchorWeight, "a" + i, nodeCls, nodeStyle(i, anchorN), i / Math.max(1, anchorN), cfg.anchorRotate))}
+
+                <circle id="bz-tracer" cx="0" cy="0" r={Math.max(2, cfg.curveWeight * 1.7)} fill={cfg.glowColor} opacity="0" />
+
 
                 {showLabels && view.anchors.map((p, i) => (
                   <text key={"l" + i} x={p.x + lab.dx} y={p.y + lab.dy} fontFamily={MONO} fontSize={cfg.labelSize} fill={cfg.labelColor} textAnchor={lab.anchor} letterSpacing="0.5">
@@ -594,7 +719,12 @@ export default function BezierStudio() {
               );
               if (f.kind === "color") return (
                 <label key={f.key} className="sb-studio-row"><span>{f.label}</span>
-                  <input type="color" className="sb-studio-color" value={String(v)} onChange={(e) => set(f.key, e.target.value as never)} /></label>
+                  <span className="bz-color-wrap">
+                    <input type="text" className="bz-hex" spellCheck={false} value={String(v)}
+                      onChange={(e) => set(f.key, e.target.value as never)}
+                      onBlur={(e) => set(f.key, normHex(e.target.value) as never)} />
+                    <input type="color" className="sb-studio-color" value={normHex(String(v))} onChange={(e) => set(f.key, e.target.value as never)} />
+                  </span></label>
               );
               if (f.kind === "select") return (
                 <label key={f.key} className="sb-studio-row"><span>{f.label}</span>
@@ -612,6 +742,13 @@ export default function BezierStudio() {
                     <em>{Number(v).toFixed(f.step < 1 ? 2 : 0)}</em></span></label>
               );
             })}
+            {sec.title === "Grid + frame" && (
+              <div className="sb-studio-btns">
+                <button className="sb-studio-btn" onClick={autoFitGrid}>Auto-fit</button>
+                <button className="sb-studio-btn" onClick={() => stepGridCells(0.5)}>Cell ×2</button>
+                <button className="sb-studio-btn" onClick={() => stepGridCells(2)}>Cell ÷2</button>
+              </div>
+            )}
             {sec.title === "Motion" && <div className="sb-studio-btns"><button className="sb-studio-btn" onClick={replay}>↻ Replay draw</button></div>}
             {sec.title === "Trace + export" && (
               <div className="sb-studio-btns">
@@ -619,6 +756,7 @@ export default function BezierStudio() {
                 <button className="sb-studio-btn" onClick={savePNG}>Save .png</button>
                 <button className="sb-studio-btn" disabled={busy} onClick={() => recordAnimation(true)}>Record .mp4</button>
                 <button className="sb-studio-btn" disabled={busy} onClick={() => recordAnimation(false)}>Record .webm</button>
+                <button className="sb-studio-btn" disabled={busy} onClick={saveGIF}>Save .gif</button>
                 <button className="sb-studio-btn" onClick={copySVG}>Copy SVG</button>
                 <button className="sb-studio-btn" onClick={saveSettings}>Settings .json</button>
               </div>
