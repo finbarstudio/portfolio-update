@@ -1,10 +1,17 @@
-// Coordinates page-entry reveals with the preloader. The preloader sets a
-// per-session flag and dispatches "arl:intro" when it lifts. Reveal components
-// call playOnIntro(fn): if the preloader already ran this session (or won't run,
-// e.g. a client-side navigation), fn fires next frame; otherwise it waits for the
-// lift, with a fallback timeout so content never gets stuck hidden.
+// Coordinates page-entry reveals with the preloader. The preloader calls
+// fireIntro() when it lifts (and a safety timer guarantees that even if its
+// animation stalls). Reveal components call playOnIntro(fn): it runs fn once the
+// intro has happened — immediately if it already has (this session / flagged),
+// on the event otherwise, and on a hard fallback so text can NEVER stay hidden.
 export const INTRO_EVENT = "arl:intro";
 export const PRELOAD_KEY = "arl:preloaded";
+
+let introFired = false;
+if (typeof window !== "undefined") {
+  window.addEventListener(INTRO_EVENT, () => {
+    introFired = true;
+  });
+}
 
 export function alreadyPreloaded(): boolean {
   try {
@@ -14,6 +21,15 @@ export function alreadyPreloaded(): boolean {
   }
 }
 
+/** Mark the intro done + tell every waiting reveal to play. Idempotent. */
+export function fireIntro(): void {
+  introFired = true;
+  try {
+    sessionStorage.setItem(PRELOAD_KEY, "1");
+  } catch {}
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(INTRO_EVENT));
+}
+
 export function playOnIntro(fn: () => void): () => void {
   let done = false;
   const run = () => {
@@ -21,12 +37,18 @@ export function playOnIntro(fn: () => void): () => void {
     done = true;
     fn();
   };
-  if (alreadyPreloaded()) {
+  // Intro already happened (flagged this render, or preloader seen this session).
+  if (introFired || alreadyPreloaded()) {
     const r = requestAnimationFrame(() => requestAnimationFrame(run));
-    return () => cancelAnimationFrame(r);
+    const t = window.setTimeout(run, 300); // safety if rAF is throttled
+    return () => {
+      cancelAnimationFrame(r);
+      clearTimeout(t);
+    };
   }
+  // Wait for the intro, with a hard fallback so the text reveals no matter what.
   window.addEventListener(INTRO_EVENT, run, { once: true });
-  const t = window.setTimeout(run, 3200);
+  const t = window.setTimeout(run, 3600);
   return () => {
     window.removeEventListener(INTRO_EVENT, run);
     clearTimeout(t);

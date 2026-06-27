@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import LogoMark from "./LogoMark";
-import { INTRO_EVENT, PRELOAD_KEY, alreadyPreloaded } from "./intro";
+import { alreadyPreloaded, fireIntro } from "./intro";
 
 /**
  * Full-screen brand preloader (Lindon / OJ Pippin family). Shows once per browser
@@ -22,8 +22,7 @@ export default function Preloader() {
   useEffect(() => {
     if (alreadyPreloaded()) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      try { sessionStorage.setItem(PRELOAD_KEY, "1"); } catch {}
-      window.dispatchEvent(new Event(INTRO_EVENT));
+      fireIntro();
       return;
     }
     setShow(true);
@@ -31,11 +30,16 @@ export default function Preloader() {
 
   useEffect(() => {
     if (!show) return;
+    let finished = false;
     const finish = () => {
-      try { sessionStorage.setItem(PRELOAD_KEY, "1"); } catch {}
-      window.dispatchEvent(new Event(INTRO_EVENT));
+      if (finished) return;
+      finished = true;
+      fireIntro();
       setShow(false);
     };
+    // Hard safety: never leave the screen covered / the reveals waiting, even if a
+    // tween stalls (e.g. a throttled rAF).
+    const safety = window.setTimeout(finish, 5000);
     const ctx = gsap.context(() => {
       gsap.set(logoRef.current, { clipPath: "inset(0% 100% 0% 0%)" });
       gsap
@@ -45,7 +49,10 @@ export default function Preloader() {
         .to(logoRef.current, { clipPath: "inset(0% 0% 0% 100%)", duration: 0.8, ease: "power3.inOut" })
         .to(ref.current, { yPercent: -100, duration: 0.9, ease: "power3.inOut" }, "-=0.15");
     });
-    return () => ctx.revert();
+    return () => {
+      clearTimeout(safety);
+      ctx.revert();
+    };
   }, [show]);
 
   if (!show) return null;
