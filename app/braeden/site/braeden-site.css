@@ -395,6 +395,29 @@ html.lenis, html.lenis body { height: auto; }
 .braeden-site .brd-hero-scroll-track { position: relative; width: 1px; height: 30px; overflow: hidden; background: var(--line-2); display: inline-block; }
 .braeden-site .brd-hero-scroll-fill { position: absolute; inset: 0; background: var(--ink); animation: brdScrollDrop 2.4s ease-in-out infinite; }
 
+/* ── Page-entry reveals — hidden until the intro fires (preloader lifts on first
+   load, immediately on later navigation; see intro.ts). CSS-driven so they can
+   never get stuck waiting on the animation ticker. Stagger via --reveal-delay. */
+.braeden-site .brd-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+  will-change: opacity, transform;
+}
+.braeden-site .brd-reveal[data-revealed="1"] { opacity: 1; transform: none; }
+/* Fade only — for elements that already own a transform (e.g. the centred scroll cue). */
+.braeden-site .brd-reveal-fade {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  transition-delay: var(--reveal-delay, 0s);
+}
+.braeden-site .brd-reveal-fade[data-revealed="1"] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .braeden-site .brd-reveal,
+  .braeden-site .brd-reveal-fade { transition: none; }
+}
+
 /* A quiet type-led story/proof band (no grid): centred statement + a line. */
 .braeden-site .brd-band {
   background: var(--paper); padding: clamp(110px, 16vw, 220px) var(--gutter);
