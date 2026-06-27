@@ -631,66 +631,54 @@ html.lenis, html.lenis body { height: auto; }
   background: linear-gradient(to top, rgba(14,16,20,0.8) 0%, rgba(14,16,20,0.12) 46%, rgba(14,16,20,0.36) 100%);
 }
 
-/* A — cinematic, low-left */
-.braeden-site .bx-bl { align-self: flex-end; max-width: 42ch; padding-bottom: clamp(64px, 9vh, 112px); }
-.braeden-site .bx-bl .bx-eyebrow { margin-bottom: clamp(14px, 2vh, 22px); }
-.braeden-site .bx-a-title {
-  font-weight: 300; color: #fff; line-height: 1.04; letter-spacing: -0.01em;
-  font-size: clamp(40px, 6vw, 92px); margin: 0 0 clamp(20px, 3vh, 32px); text-transform: none;
-}
+/* The real logo carries these — small, no big headline. */
+.braeden-site .bx-logo-lg { width: clamp(150px, 17vw, 230px); height: auto; display: block; }
+.braeden-site .bx-logo-md { width: clamp(130px, 14vw, 180px); height: auto; display: block; }
+.braeden-site .bx-logo-sm { width: clamp(96px, 10vw, 132px); height: auto; display: block; }
+.braeden-site .bx-mt { margin-top: clamp(14px, 2vh, 22px); }
 
-/* B — editorial split */
+/* F — pure image, low-left lockup */
+.braeden-site .bx-bl { align-self: flex-end; max-width: 46ch; padding-bottom: clamp(64px, 9vh, 112px); }
+
+/* G — bottom caption bar */
+.braeden-site .bx-g-bar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between; gap: clamp(16px, 3vw, 48px); flex-wrap: wrap;
+  padding: clamp(20px, 3vh, 34px) var(--gutter);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+}
+.braeden-site .bx-g-meta { display: flex; gap: clamp(16px, 3vw, 48px); flex-wrap: wrap; }
+.braeden-site .bx-scroll-top { top: clamp(86px, 12vh, 120px); bottom: auto; }
+
+/* H — centred lockup */
+.braeden-site .bx-h {
+  align-self: center; display: flex; flex-direction: column; align-items: center;
+  gap: clamp(18px, 2.6vh, 30px); text-align: center;
+}
+.braeden-site .bx-rule { display: block; width: 1px; height: clamp(28px, 5vh, 52px); background: rgba(255, 255, 255, 0.5); }
+
+/* I — split, small type, photo dominant */
 .braeden-site .bx-split { display: grid; grid-template-columns: 1fr; }
-@media (min-width: 860px) { .braeden-site .bx-split { grid-template-columns: 1.05fr 0.95fr; } }
+@media (min-width: 860px) { .braeden-site .bx-split { grid-template-columns: 0.82fr 1.18fr; } }
 .braeden-site .bx-split-type {
-  display: flex; flex-direction: column; justify-content: center; order: 2;
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; order: 2;
   padding: clamp(96px, 13vh, 150px) var(--gutter) clamp(48px, 7vh, 90px); background: var(--paper);
 }
 @media (min-width: 860px) { .braeden-site .bx-split-type { order: 0; } }
 .braeden-site .bx-split-img { position: relative; min-height: 46svh; }
 @media (min-width: 860px) { .braeden-site .bx-split-img { min-height: 100svh; } }
-.braeden-site .bx-b-title {
-  font-weight: 400; color: var(--ink); line-height: 1.0; letter-spacing: -0.005em;
-  font-size: clamp(44px, 5.6vw, 104px); margin: clamp(16px, 2.4vh, 28px) 0 0; text-transform: none; max-width: 14ch;
-}
-.braeden-site .bx-b-lead {
-  color: var(--ink-soft); font-size: clamp(15px, 1.2vw, 19px); line-height: 1.55; max-width: 44ch;
-  margin: clamp(22px, 3vh, 34px) 0 clamp(26px, 3.4vh, 38px);
+.braeden-site .bx-i-lead {
+  color: var(--ink-soft); font-size: clamp(15px, 1.15vw, 18px); line-height: 1.6; max-width: 36ch;
+  margin: clamp(22px, 3vh, 32px) 0 clamp(22px, 3vh, 30px);
 }
 
-/* C — giant type over image */
-.braeden-site .bx-c { align-self: flex-end; padding-bottom: clamp(40px, 6vh, 72px); }
-.braeden-site .bx-c-title {
-  font-weight: 800; color: #fff; text-transform: uppercase; line-height: 0.84; letter-spacing: -0.01em;
-  font-size: clamp(60px, 13vw, 220px); margin: clamp(14px, 2vh, 22px) 0;
-}
-.braeden-site .bx-c-awards { text-transform: uppercase; letter-spacing: 0.14em; font-size: clamp(9.5px, 0.8vw, 11px); }
-
-/* D — gallery frame */
-.braeden-site .bx-frame {
-  flex-direction: column; align-items: stretch;
-  padding: clamp(86px, 12vh, 124px) var(--gutter) clamp(36px, 5vh, 56px);
-}
-.braeden-site .bx-frame-top { display: flex; justify-content: space-between; gap: 1rem; }
-.braeden-site .bx-frame-img { position: relative; flex: 1; margin: clamp(20px, 3vh, 34px) 0; overflow: hidden; min-height: 40svh; }
-.braeden-site .bx-frame-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
-.braeden-site .bx-d-title {
-  font-weight: 500; color: var(--ink); text-transform: none; line-height: 1.0; letter-spacing: -0.01em;
-  font-size: clamp(28px, 3.6vw, 56px); margin: 0; max-width: 16ch;
-}
-.braeden-site .bx-dim { color: var(--ink-soft); }
-
-/* E — kinetic marquee */
-.braeden-site .bx-e { align-self: center; text-align: center; display: flex; flex-direction: column; align-items: center; gap: clamp(18px, 2.6vh, 30px); }
-.braeden-site .bx-rule { display: block; width: 1px; height: clamp(30px, 5vh, 54px); background: rgba(255,255,255,0.5); }
-.braeden-site .bx-e-title {
-  font-weight: 600; color: #fff; text-transform: none; line-height: 1.05; letter-spacing: -0.01em;
-  font-size: clamp(34px, 5vw, 86px); margin: 0; max-width: 18ch;
-}
-.braeden-site .bx-marquee { position: absolute; left: 0; right: 0; bottom: clamp(20px, 3.4vh, 40px); z-index: 2; overflow: hidden; white-space: nowrap; }
-.braeden-site .bx-marquee-row { display: inline-flex; animation: bxMarquee 30s linear infinite; will-change: transform; }
-.braeden-site .bx-marquee-item { text-transform: uppercase; letter-spacing: 0.22em; font-size: clamp(11px, 1vw, 13px); display: inline-flex; align-items: center; }
-.braeden-site .bx-marquee-dot { margin: 0 clamp(22px, 3vw, 46px); opacity: 0.55; }
+/* J — magazine corners */
+.braeden-site .bx-j { position: absolute; inset: 0; z-index: 2; }
+.braeden-site .bx-j > * { position: absolute; }
+.braeden-site .bx-j-tl { top: clamp(84px, 12vh, 116px); left: var(--gutter); }
+.braeden-site .bx-j-tr { top: clamp(88px, 12vh, 120px); right: var(--gutter); }
+.braeden-site .bx-j-bl { bottom: clamp(54px, 8vh, 88px); left: var(--gutter); max-width: 24ch; }
+.braeden-site .bx-j-br { bottom: clamp(54px, 8vh, 88px); right: var(--gutter); max-width: 24ch; text-align: right; }
 
 /* On-image text wins last (white over the photo) */
 .braeden-site .bx-on-img { color: rgba(255, 255, 255, 0.92); }
@@ -703,9 +691,8 @@ html.lenis, html.lenis body { height: auto; }
   font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap;
 }
 
-@keyframes bxMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
-  .braeden-site .bx-marquee-row, .braeden-site .bx-ken { animation: none; }
+  .braeden-site .bx-ken { animation: none; }
 }
 
 /* ── Keyframes ──────────────────────────────────────────────── */

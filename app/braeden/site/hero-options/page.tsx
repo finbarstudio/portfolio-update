@@ -1,4 +1,4 @@
-import { HeroA, HeroB, HeroC, HeroD, HeroE } from "@/components/braeden/herochooser/heroes";
+import { HeroF, HeroG, HeroH, HeroI, HeroJ } from "@/components/braeden/herochooser/heroes";
 
 export const metadata = {
   title: { absolute: "Hero options · Braeden" },
@@ -6,16 +6,16 @@ export const metadata = {
 };
 
 /**
- * Hero chooser — five image-led options stacked full-screen, each badged A–E so
- * Finbar can scroll through and call the winner. Not linked or indexed; once he
+ * Hero chooser, round 2 — five image-led options with small/restrained type (the
+ * real logo carries them), each badged F–J. Not linked or indexed; once Finbar
  * picks, the chosen hero replaces components/braeden/home/Hero.
  */
 const OPTIONS: { id: string; name: string; el: React.ReactNode }[] = [
-  { id: "A", name: "Cinematic · Fraunces serif", el: <HeroA /> },
-  { id: "B", name: "Editorial split · Cormorant", el: <HeroB /> },
-  { id: "C", name: "Giant type · Archivo", el: <HeroC /> },
-  { id: "D", name: "Gallery frame · Space Grotesk", el: <HeroD /> },
-  { id: "E", name: "Kinetic marquee · Poppins", el: <HeroE /> },
+  { id: "F", name: "Pure image · logo low-left", el: <HeroF /> },
+  { id: "G", name: "Gallery caption bar", el: <HeroG /> },
+  { id: "H", name: "Centred logo lockup", el: <HeroH /> },
+  { id: "I", name: "Split · small type", el: <HeroI /> },
+  { id: "J", name: "Magazine corners", el: <HeroJ /> },
 ];
 
 export default function HeroOptionsPage() {
