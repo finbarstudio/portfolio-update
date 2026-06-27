@@ -10,6 +10,8 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import { playOnIntro } from "../intro";
+import BlurImage from "../BlurImage";
+import { HERO_LQIP } from "./hero-lqip";
 
 const AWARDS = [
   "5× House of the Year",
@@ -34,11 +36,12 @@ export default function Hero() {
 
   return (
     <section className="bx-hero" data-tone="dark">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <BlurImage
         src="/braeden/projects/modern-thai.webp"
+        lqip={HERO_LQIP}
         alt="Modern Thai House, a Braeden Constructions home at Noosa Heads"
-        className="bx-hero-img bx-ken"
+        imgClassName="bx-ken"
+        priority
       />
       <div className="bx-scrim-full" aria-hidden />
 
