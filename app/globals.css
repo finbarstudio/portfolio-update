@@ -3002,33 +3002,10 @@ body:has(.sb-root) {
 
 /* ── Fresh home: just the star, with an outline drawing itself around it ── */
 .sb-home {
-  flex: 1; min-height: 72vh;
-  display: flex; align-items: center; justify-content: center;
+  position: relative; flex: 1; min-height: min(72vh, 620px);
+  display: flex; align-items: stretch; justify-content: stretch;
 }
-.sb-home-mark {
-  position: relative; display: grid; place-items: center;
-  width: clamp(160px, 30vw, 248px); aspect-ratio: 1;
-}
-.sb-home-star {
-  position: relative; z-index: 1; color: var(--pink);
-  width: clamp(56px, 11vw, 86px); height: auto;   /* CSS overrides the size attr */
-}
-.sb-home-ring {
-  position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
-}
-.sb-home-ring circle {
-  fill: none; stroke: var(--ink); stroke-width: 1.25; stroke-linecap: round;
-  /* circumference for r=54 ≈ 339.29: a long arc + gap that orbits the star. */
-  stroke-dasharray: 250 89;
-  animation: sb-ring-draw 2.9s linear infinite;
-}
-@keyframes sb-ring-draw {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: -339.29; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .sb-home-ring circle { animation: none; stroke-dasharray: none; }
-}
+.sb-home-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* ── Page slide on route change — a clear horizontal swipe in the same
    direction the nav highlight moves (mockups = in from the right, home = in
