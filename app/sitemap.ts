@@ -1,27 +1,44 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import { projects } from "@/content/projects";
 
-const SITE_URL = "https://www.finbar.studio";
+const WWW = "https://www.finbar.studio";
+const SANDBOX = "https://sandbox.finbar.studio";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+/**
+ * Host-aware sitemap. On sandbox.finbar.studio it lists the Sandbox's own
+ * indexable pages (the landing + the section indexes); the individual tools and
+ * embeds are noindex so they're intentionally excluded. On www it lists the
+ * portfolio. (Search engines treat the subdomain as a separate site.)
+ */
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  const host = (await headers()).get("host")?.split(":")[0].toLowerCase() || "";
+
+  if (host.startsWith("sandbox.")) {
+    return [
+      { url: `${SANDBOX}/`,        lastModified: now, changeFrequency: "weekly",  priority: 1 },
+      { url: `${SANDBOX}/tools`,   lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
+      { url: `${SANDBOX}/mockups`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+      { url: `${SANDBOX}/library`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    ];
+  }
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${SITE_URL}/`,              lastModified: now, changeFrequency: "monthly", priority: 1 },
-    { url: `${SITE_URL}/work`,          lastModified: now, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${SITE_URL}/web-design`,    lastModified: now, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${SITE_URL}/graphic-design`,lastModified: now, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${SITE_URL}/about`,         lastModified: now, changeFrequency: "yearly",  priority: 0.8 },
-    { url: `${SITE_URL}/store`,   lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
+    { url: `${WWW}/`,               lastModified: now, changeFrequency: "monthly", priority: 1 },
+    { url: `${WWW}/work`,           lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${WWW}/web-design`,     lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${WWW}/graphic-design`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${WWW}/about`,          lastModified: now, changeFrequency: "yearly",  priority: 0.8 },
+    { url: `${WWW}/store`,          lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${WWW}/privacy`,        lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
   ];
 
-  // Every non-hidden project has a real /case-studies/<slug> page (generateStaticParams
-  // builds them all, and gallery cards link to them), so index them all but the hidden ones.
+  // Every non-hidden project has a real /case-studies/<slug> page.
   const projectRoutes: MetadataRoute.Sitemap = projects
     .filter((p) => !p.hidden)
     .map((p) => ({
-      url: `${SITE_URL}/case-studies/${p.slug}`,
+      url: `${WWW}/case-studies/${p.slug}`,
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.7,
