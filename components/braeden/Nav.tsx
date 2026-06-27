@@ -45,7 +45,7 @@ export default function Nav() {
     };
   }, [menuOpen]);
 
-  const link = "text-[10px] tracking-[0.24em] uppercase whitespace-nowrap hover:opacity-50 transition-opacity duration-300";
+  const link = "ff-mono text-[11px] tracking-[0.2em] uppercase whitespace-nowrap hover:opacity-50 transition-opacity duration-300";
 
   return (
     <>

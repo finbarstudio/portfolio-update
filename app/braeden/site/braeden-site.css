@@ -53,6 +53,10 @@
   --gutter: clamp(20px, 4vw, 84px);
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* The label/mono voice — ONE token shared by the nav items, the footer labels
+     and the project pills, so they always match. (Space Mono via next/font.) */
+  --font-mono: var(--font-space-mono);
+
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-quick), ui-sans-serif, system-ui, sans-serif;
@@ -85,7 +89,7 @@
 .braeden-site .ff-grotesk   { font-family: var(--font-grotesk), system-ui, sans-serif; }
 .braeden-site .ff-archivo   { font-family: var(--font-archivo), system-ui, sans-serif; }
 .braeden-site .ff-poppins   { font-family: var(--font-poppins), system-ui, sans-serif; }
-.braeden-site .ff-mono      { font-family: var(--font-space-mono), ui-monospace, monospace; }
+.braeden-site .ff-mono      { font-family: var(--font-mono), ui-monospace, monospace; }
 
 .braeden-site .eyebrow {
   font-family: var(--font-montserrat), sans-serif;
@@ -266,7 +270,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 .braeden-site .bledger-row:hover { border-color: var(--red); }
 .braeden-site .bledger-key {
-  font-family: var(--font-space-mono);
+  font-family: var(--font-mono);
   font-size: clamp(9px, 0.72vw, 10.5px);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -285,13 +289,13 @@ html.lenis, html.lenis body { height: auto; }
 .braeden-site .bledger-row:hover .bledger-val { transform: translateX(5px); }
 .braeden-site .bledger-sub {
   display: block; margin-top: 0.4em;
-  font-family: var(--font-space-mono);
+  font-family: var(--font-mono);
   font-size: clamp(9px, 0.72vw, 10px);
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
 }
 .braeden-site .bnote {
   margin-top: clamp(20px, 2.5vw, 32px);
-  font-family: var(--font-space-mono);
+  font-family: var(--font-mono);
   font-size: clamp(9px, 0.72vw, 10px);
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
 }
@@ -350,7 +354,7 @@ html.lenis, html.lenis body { height: auto; }
   letter-spacing: 0.02em; font-size: clamp(13px, 1.05vw, 18px); line-height: 1.05;
 }
 .braeden-site .b-bento-cap .m {
-  font-family: var(--font-space-mono); font-size: clamp(8.5px, 0.66vw, 10px);
+  font-family: var(--font-mono); font-size: clamp(8.5px, 0.66vw, 10px);
   letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.86;
 }
 @media (max-width: 760px) {
@@ -456,7 +460,7 @@ html.lenis, html.lenis body { height: auto; }
   color: var(--ink-soft); max-width: 56ch; margin: clamp(24px, 3vw, 40px) auto 0;
 }
 .braeden-site .brd-band-cite {
-  font-family: var(--font-space-mono); font-size: 11px; letter-spacing: 0.13em;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.13em;
   text-transform: uppercase; color: var(--ink-soft); margin-top: clamp(28px, 3.4vw, 44px);
 }
 .braeden-site .brd-band-cite b { color: var(--red); font-weight: 400; }
@@ -511,7 +515,7 @@ html.lenis, html.lenis body { height: auto; }
   .braeden-site .brd-foot-col-end .brd-foot-reveal { align-items: center; }
 }
 .braeden-site .brd-foot-label {
-  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-family: var(--font-mono), ui-monospace, monospace;
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: 10px;
@@ -582,7 +586,7 @@ html.lenis, html.lenis body { height: auto; }
 .braeden-site .brd-pill {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.66rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;

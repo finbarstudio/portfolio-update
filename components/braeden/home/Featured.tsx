@@ -28,6 +28,29 @@ export default function Featured() {
   const whiteRef = useRef<HTMLDivElement>(null);
   const imgLayers = useRef<(HTMLDivElement | null)[]>([]);
   const [active, setActive] = useState(0);
+  const [shown, setShown] = useState(false);
+
+  // Mask-reveal the overlay copy when the showcase scrolls into view (matches the
+  // bands + footer, so the reveal language carries all the way down the page).
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShown(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -10% 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const select = (i: number) => {
     if (i === active) return;
@@ -73,9 +96,9 @@ export default function Featured() {
       {/* Details + thumbnails (slower parallax layer) */}
       <div ref={layerRef} className="absolute inset-0 frame pointer-events-none" style={{ willChange: "transform" }}>
         <div className="wrap relative h-full">
-          <p className="eyebrow" style={{ position: "absolute", left: 0, top: "clamp(96px,13vh,128px)", color: "rgba(255,255,255,0.8)" }}>Selected work</p>
+          <p className="eyebrow brd-mask" data-revealed={shown ? "1" : undefined} style={{ position: "absolute", left: 0, top: "clamp(96px,13vh,128px)", color: "rgba(255,255,255,0.8)", ["--reveal-delay"]: "0s" } as React.CSSProperties}>Selected work</p>
 
-          <div className="absolute left-0 bottom-[clamp(32px,6vh,72px)]" style={{ color: "#fff" }}>
+          <div className="absolute left-0 bottom-[clamp(32px,6vh,72px)] brd-mask" data-revealed={shown ? "1" : undefined} style={{ color: "#fff", ["--reveal-delay"]: "0.12s" } as React.CSSProperties}>
             <a href="/braeden/site/projects" data-cursor="View project" className="block pointer-events-auto">
               <h2 className="ff-mont" style={{ color: "#fff", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.01em", fontSize: "clamp(28px,3.6vw,56px)", lineHeight: 1.02 }}>{p.title}</h2>
             </a>
@@ -99,7 +122,7 @@ export default function Featured() {
             ))}
           </div>
 
-          <div className="absolute right-0 bottom-[clamp(32px,6vh,72px)] text-right pointer-events-auto">
+          <div className="absolute right-0 bottom-[clamp(32px,6vh,72px)] text-right pointer-events-auto brd-mask" data-revealed={shown ? "1" : undefined} style={{ ["--reveal-delay"]: "0.22s" } as React.CSSProperties}>
             <a href="/braeden/site/projects" data-cursor="All work" className="eyebrow" style={{ color: "#fff", borderBottom: "1px solid rgba(255,255,255,0.4)", paddingBottom: 3, display: "inline-block" }}>
               View all projects
             </a>
