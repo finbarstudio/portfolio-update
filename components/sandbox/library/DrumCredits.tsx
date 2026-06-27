@@ -166,13 +166,13 @@ function buildCreditsCanvas(t: Tokens): HTMLCanvasElement {
       const totalW = textW + gap + astSize;
       let x = W / 2 - totalW / 2;
       ctx.fillStyle = t.ink;
-      const prev = ctx.textAlign;
+      const prevAlign: CanvasTextAlign = ctx.textAlign;
       ctx.textAlign = "left";
       for (let i = 0; i < chars.length; i++) {
         ctx.fillText(chars[i], x, y);
         x += widths[i];
       }
-      ctx.textAlign = prev;
+      ctx.textAlign = prevAlign;
       drawAsterisk(ctx, x + gap + astSize / 2, y - logoSize * 0.04, astSize, t.pink);
       y += logoSize * 1.3;
     } else if (c.big) {
