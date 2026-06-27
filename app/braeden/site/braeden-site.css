@@ -597,6 +597,41 @@ html.lenis, html.lenis body { height: auto; }
   white-space: nowrap;
 }
 
+/* ── About page (magazine): full-bleed photo band + recognition ledger ── */
+.braeden-site .bx-about-photo { min-height: 82svh; }
+.braeden-site .brd-about-rec { text-align: left; }
+.braeden-site .brd-about-rec .eyebrow,
+.braeden-site .brd-rec-ledger,
+.braeden-site .brd-rec-foot { max-width: 60rem; margin-inline: auto; }
+.braeden-site .brd-rec-ledger { width: 100%; margin-top: clamp(26px, 4vh, 46px); }
+.braeden-site .brd-rec-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: clamp(16px, 3vw, 44px);
+  padding: clamp(16px, 2vw, 24px) 0;
+  border-top: 1px solid var(--line);
+  align-items: baseline;
+}
+.braeden-site .brd-rec-row:last-of-type { border-bottom: 1px solid var(--line); }
+.braeden-site .brd-rec-key {
+  font-size: clamp(12px, 1.1vw, 15px);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.braeden-site .brd-rec-val {
+  font-family: var(--font-quick), sans-serif;
+  font-size: clamp(14px, 1.2vw, 18px);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.braeden-site .brd-rec-foot {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: clamp(24px, 3vw, 38px);
+}
+
 /* ── Hero options (chooser at /braeden/site/hero-options) — .bx-* ── */
 .braeden-site .bx-hero {
   position: relative;
