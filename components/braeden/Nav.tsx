@@ -6,10 +6,10 @@ import BraedenLogoFull from "./BraedenLogoFull";
 import { playOnIntro } from "./intro";
 
 /**
- * Nav — magazine treatment. The logo sits top-left and stays there (it's the
- * hero's top-left mark too, so it reads as one thing); it fades in on the intro.
- * The other nav items don't show over the hero — they pop in once you've scrolled
- * past it. On non-home pages everything is present immediately. Mono throughout.
+ * Nav — magazine treatment. The logo sits top-left (it's the hero's top-left mark
+ * too, so it reads as one thing), the items sit right. Both fade in together on
+ * the intro and stay visible over the hero and everywhere after. Mono throughout;
+ * NavTone flips it ink/paper over light vs dark sections.
  */
 const LINKS = [
   { label: "Projects", href: "/braeden/site/projects" },
@@ -19,8 +19,7 @@ const LINKS = [
 
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [logoIn, setLogoIn] = useState(false);
-  const [itemsIn, setItemsIn] = useState(false);
+  const [shown, setShown] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/braeden/site";
 
@@ -32,43 +31,15 @@ export default function Nav() {
     else window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Logo fades in with the intro (after the preloader lifts; immediately later).
+  // Logo + items fade in together on the intro (after the preloader lifts on first
+  // load, immediately on later navigation).
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setLogoIn(true);
+      setShown(true);
       return;
     }
-    return playOnIntro(() => setLogoIn(true));
+    return playOnIntro(() => setShown(true));
   }, []);
-
-  // Nav items appear once you've scrolled most of the way past the hero (home
-  // only). An IntersectionObserver on the hero is robust under Lenis (no reliance
-  // on window scroll events): items show once the hero is <~20% in view.
-  useEffect(() => {
-    if (!isHome) {
-      setItemsIn(true);
-      return;
-    }
-    const onScroll = () => setItemsIn(window.scrollY > window.innerHeight * 0.82);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    // IntersectionObserver as the primary signal (robust under Lenis); the scroll
-    // listener is a fallback so the items can never get stranded hidden.
-    let io: IntersectionObserver | undefined;
-    const hero = document.querySelector(".bx-hero");
-    if (hero) {
-      io = new IntersectionObserver(
-        ([entry]) => setItemsIn(entry.intersectionRatio < 0.2),
-        { threshold: [0, 0.2, 0.6, 1] }
-      );
-      io.observe(hero);
-    }
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      io?.disconnect();
-    };
-  }, [isHome]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -82,25 +53,15 @@ export default function Nav() {
   return (
     <>
       <header className="fixed top-0 inset-x-0 z-50 nav-tinted">
-        <div className="flex items-center justify-between h-16 md:h-20 px-[var(--gutter)]">
-          <a
-            href="/braeden/site"
-            onClick={onLogoClick}
-            aria-label="Braeden Constructions, home"
-            className="transition-opacity duration-700 ease-out"
-            style={{ opacity: logoIn ? 1 : 0 }}
-          >
+        <div
+          className="flex items-center justify-between h-16 md:h-20 px-[var(--gutter)] transition-opacity duration-700 ease-out"
+          style={{ opacity: shown ? 1 : 0 }}
+        >
+          <a href="/braeden/site" onClick={onLogoClick} aria-label="Braeden Constructions, home">
             <BraedenLogoFull variant="wordmark" className="h-[22px] md:h-[26px] w-auto" />
           </a>
 
-          <div
-            className="flex items-center gap-8 transition-[opacity,transform] duration-500 ease-out"
-            style={{
-              opacity: itemsIn ? 1 : 0,
-              transform: itemsIn ? "none" : "translateY(-6px)",
-              pointerEvents: itemsIn ? "auto" : "none",
-            }}
-          >
+          <div className="flex items-center gap-8">
             <ul className="hidden md:flex items-center gap-8">
               {LINKS.map((l) => (
                 <li key={l.label}>

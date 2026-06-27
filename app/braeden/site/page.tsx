@@ -18,8 +18,8 @@ export default function BraedenHome() {
       <Nav />
       <ViewCursor />
       <Hero />
-      <Featured />
       <Story />
+      <Featured />
       <Voices />
       <Footer />
     </main>
