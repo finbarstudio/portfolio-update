@@ -20,7 +20,7 @@ const PROJECTS: { img: string; name: string; meta: string; feature?: boolean; sp
 export default function Featured() {
   return (
     <section className="bsec-plain">
-      <div className="frame wrap pad-y">
+      <div className="bcol">
         <BReveal>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "1.4rem", marginBottom: "clamp(28px,3.4vw,52px)" }}>
             <div>

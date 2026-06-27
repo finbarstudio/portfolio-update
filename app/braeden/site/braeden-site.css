@@ -189,25 +189,33 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
 
-/* ── Cohesive card system (everything is based on the Awards section) ────────
-   Every homepage section is the SAME off-white card panel at ~100vh, with the
-   same header treatment (eyebrow + Montserrat-800 caps title + a short red rule)
-   and the same hairline-ledger / Space-Mono motifs. Consistent tokens + padding
-   throughout so the page reads as one piece. (The footer keeps its own panel.) */
-.braeden-site .bsec {
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
-  padding: clamp(26px, 4.5vh, 60px) var(--gutter);
+/* ── Consistent section spacing ──────────────────────────────────────────────
+   Every section shares the SAME L/R rhythm: a gutter inset, one 1280 content
+   column, and an inner --inset, so CARD and NON-CARD sections align their
+   content to the exact same edges. Cards (contact + footer) add a panel + a
+   vertical pad over that column; non-card sections use the column with no panel.
+   Vertical padding is consistent too. Shared header + ledger motifs do the rest. */
+.braeden-site { --inset: clamp(16px, 2.1vw, 40px); --sec-max: 1280px; }
+
+.braeden-site .bsec,
+.braeden-site .bsec-plain {
+  padding-block: clamp(78px, 10.5vw, 156px);
+  padding-inline: var(--gutter);
   background: var(--paper);
 }
-.braeden-site .bcard {
+/* The shared content column — card + non-card content align here. */
+.braeden-site .bcol {
   width: 100%;
-  max-width: 1280px;
+  max-width: var(--sec-max);
+  margin-inline: auto;
+  padding-inline: var(--inset);
+}
+/* A card = the same column + an off-white panel + a vertical pad. */
+.braeden-site .bcard {
   background: var(--paper-2);
   border: 1px solid var(--line);
   border-radius: clamp(16px, 1.6vw, 26px);
-  padding: clamp(30px, 4.4vw, 76px);
+  padding-block: clamp(40px, 5vw, 72px);
   box-shadow: 0 30px 70px rgba(20, 20, 22, 0.05);
 }
 /* The shared two-column body: a sticky heading block + a content column. */
@@ -290,8 +298,6 @@ html.lenis, html.lenis body { height: auto; }
 /* A plain (un-carded) section: same gutter + generous padding rhythm as the
    cards, white ground, so cohesion comes from the shared header + tokens + motion
    rather than from wrapping everything in a panel. Cards stay for contact/footer. */
-.braeden-site .bsec-plain { background: var(--paper); }
-.braeden-site .bsec-plain > .frame { width: 100%; }
 
 /* ── Scroll reveal (consistent across the page) ───────────────────────────── */
 .braeden-site .b-reveal {

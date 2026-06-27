@@ -37,16 +37,9 @@ export function CardSection({
     </div>
   );
 
-  if (card) {
-    return (
-      <section id={id} className="bsec">
-        <div className="bcard">{inner}</div>
-      </section>
-    );
-  }
   return (
     <section id={id} className="bsec-plain">
-      <div className="frame wrap pad-y">{inner}</div>
+      <div className={`bcol${card ? " bcard" : ""}`}>{inner}</div>
     </section>
   );
 }

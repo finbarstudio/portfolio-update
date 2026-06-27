@@ -1,6 +1,6 @@
 import Nav from "@/components/braeden/Nav";
 import ViewCursor from "@/components/braeden/ViewCursor";
-import HeroChoices from "@/components/braeden/home/HeroChoices";
+import Hero from "@/components/braeden/home/Hero";
 import Featured from "@/components/braeden/home/Featured";
 import Story from "@/components/braeden/home/Story";
 import Awards from "@/components/braeden/home/Awards";
@@ -22,7 +22,7 @@ export default function BraedenHome() {
     <main>
       <Nav />
       <ViewCursor />
-      <HeroChoices />
+      <Hero />
       <Featured />
       <Story />
       <Awards />
