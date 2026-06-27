@@ -24,8 +24,8 @@ const body = Figtree({
 });
 
 export const metadata: Metadata = {
-  title: { absolute: "A Rolley & Sons — Editorial direction | finbar✶studio" },
-  description: "An alternate editorial concept for A Rolley & Sons by finbar✶studio.",
+  title: { absolute: "A Rolley & Sons — Editorial direction | finbar.studio" },
+  description: "An alternate editorial concept for A Rolley & Sons by finbar.studio.",
   robots: { index: false, follow: false },
   alternates: { canonical: undefined },
 };

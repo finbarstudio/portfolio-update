@@ -183,6 +183,13 @@ html.lenis, html.lenis body { height: auto; }
 .ojpippin-site .of-value { color: rgba(251, 247, 239, 0.82); }
 .ojpippin-site .of-link { color: rgba(251, 247, 239, 0.82); text-decoration: none; transition: color 0.25s; }
 .ojpippin-site .of-link:hover { color: var(--cream); }
+/* finbar credit — canonical wordmark (cream text + pink asterisk) */
+.ojpippin-site .of-credit {
+  display: inline-flex; align-items: center; gap: 0.4em; flex-wrap: wrap;
+  justify-content: flex-end; margin-top: 0.5em; opacity: 0.8;
+}
+.ojpippin-site .of-foot-mark { font-size: 9px; }
+
 .ojpippin-site .of-mark {
   width: 100%;
   padding: 0 clamp(16px, 2.6vw, 38px) clamp(8px, 1.4vw, 20px);

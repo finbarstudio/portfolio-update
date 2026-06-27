@@ -537,10 +537,15 @@ html.lenis, html.lenis body { height: auto; }
 }
 .braeden-site .brd-foot-link:hover { color: #ffffff; }
 .braeden-site .brd-foot-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  flex-wrap: wrap;
   margin-top: 0.8em;
   font-size: 12px;
   color: rgba(244, 242, 238, 0.4);
 }
+.braeden-site .brd-foot-mark { font-size: 11px; color: rgba(244, 242, 238, 0.62); }
 .braeden-site .brd-foot-mark {
   width: 100%;
   padding: clamp(8px, 1.6vw, 24px) var(--gutter) clamp(10px, 1.8vw, 30px);

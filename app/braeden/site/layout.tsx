@@ -10,7 +10,7 @@ import Preloader from "@/components/braeden/Preloader";
 
 // Braeden Constructions demo. Lives outside the (site) route group, inheriting
 // only the root html/body; styling is scoped under `.braeden-site`. noindex: a
-// private concept build by finbar✶studio.
+// private concept build by finbar.studio.
 //
 // Braeden's real DNA = Montserrat (display/nav/caps) + Quicksand (body). The
 // other faces are the per-option display fonts the homepage CHOOSER uses to let
@@ -30,7 +30,7 @@ const FONTS = [montserrat, quicksand, fraunces, cormorant, grotesk, archivo, pop
 
 export const metadata: Metadata = {
   title: { absolute: "Braeden Constructions | Award-Winning Custom Home Builder, Noosa" },
-  description: "A concept site for Braeden Constructions by finbar✶studio.",
+  description: "A concept site for Braeden Constructions by finbar.studio.",
   robots: { index: false, follow: false },
   alternates: { canonical: undefined },
 };

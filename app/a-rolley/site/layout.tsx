@@ -19,7 +19,7 @@ const body = Figtree({
 
 export const metadata: Metadata = {
   title: { absolute: "A Rolley & Sons | Fourth-Generation Sunshine Coast Home Builders" },
-  description: "A concept site for A Rolley & Sons by finbar✶studio.",
+  description: "A concept site for A Rolley & Sons by finbar.studio.",
   robots: { index: false, follow: false },
   alternates: { canonical: undefined },
 };

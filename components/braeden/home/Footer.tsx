@@ -12,6 +12,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import BraedenLogoFull from "../BraedenLogoFull";
+import BrandWordmark from "@/components/BrandWordmark";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -105,7 +106,7 @@ export default function Footer() {
               <p className="brd-foot-val">
                 <span>© {YEAR} Braeden Constructions</span>
                 <span>QBCC 1017247 · MBA #19831</span>
-                <span className="brd-foot-credit">Concept site by finbar✶studio</span>
+                <span className="brd-foot-credit">Concept site by <BrandWordmark className="brd-foot-mark" /></span>
               </p>
             </div>
           </div>

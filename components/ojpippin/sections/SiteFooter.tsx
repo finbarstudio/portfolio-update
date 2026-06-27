@@ -9,6 +9,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { company } from "@/components/ojpippin/lib/content";
+import BrandWordmark from "@/components/BrandWordmark";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -114,6 +115,7 @@ export default function SiteFooter() {
             <div className="of-reveal">
               <span className="of-value">© {year} OJ Pippin Homes</span>
               <span className="of-label">QBCC No. {company.qbcc}</span>
+              <span className="of-value of-credit">Concept site by <BrandWordmark className="of-foot-mark" /></span>
             </div>
           </div>
         </div>
