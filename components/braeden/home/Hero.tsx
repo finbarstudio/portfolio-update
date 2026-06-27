@@ -4,13 +4,13 @@
  * grids, no cards. Type-led, generous white space, the brand red as one accent.
  */
 
-import { Fragment } from "react";
+import AwardIcon, { type AwardIconName } from "../AwardIcon";
 
-const AWARDS = [
-  "Est. 1996",
-  "5× House of the Year",
-  "National Master Builder of the Year",
-  "National House of the Year",
+const AWARDS: { label: string; icon: AwardIconName }[] = [
+  { label: "Est. 1996", icon: "flag" },
+  { label: "5× House of the Year", icon: "trophy" },
+  { label: "National Master Builder of the Year", icon: "rosette" },
+  { label: "National House of the Year", icon: "house" },
 ];
 
 export default function Hero() {
@@ -24,11 +24,11 @@ export default function Hero() {
       </h1>
 
       <div className="brd-hero-awards">
-        {AWARDS.map((a, i) => (
-          <Fragment key={a}>
-            {i > 0 && <span aria-hidden className="brd-hero-dot" />}
-            <span className="ff-mono">{a}</span>
-          </Fragment>
+        {AWARDS.map((a) => (
+          <span key={a.label} className="brd-award">
+            <AwardIcon name={a.icon} />
+            <span className="ff-mono">{a.label}</span>
+          </span>
         ))}
       </div>
 
