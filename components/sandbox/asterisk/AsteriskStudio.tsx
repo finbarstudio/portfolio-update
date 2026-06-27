@@ -167,7 +167,7 @@ export default function AsteriskStudio() {
       </div>
 
       <aside className="sb-studio-panel">
-        <div className="sb-studio-title">Asterisk Studio</div>
+        <div className="sb-studio-title">3D SVG Studio</div>
 
         <div className="sb-studio-sec">
           <div className="sb-studio-sec-h">Source SVG</div>
