@@ -1,6 +1,11 @@
 import Nav from "@/components/braeden/Nav";
 import ViewCursor from "@/components/braeden/ViewCursor";
 import HeroOptions from "@/components/braeden/chooser/HeroOptions";
+import FeaturedProjectsOptions from "@/components/braeden/chooser/FeaturedProjectsOptions";
+import StoryOptions from "@/components/braeden/chooser/StoryOptions";
+import ProofOptions from "@/components/braeden/chooser/ProofOptions";
+import ContactOptions from "@/components/braeden/chooser/ContactOptions";
+import FooterOptions from "@/components/braeden/chooser/FooterOptions";
 
 /**
  * Braeden Constructions homepage — built as a 6-OPTIONS-PER-SECTION CHOOSER.
@@ -43,6 +48,21 @@ export default function BraedenHome() {
 
       <GroupDivider title="Hero" note="The opening moment. Photo-led or type-led, but always within one calm viewport." />
       <HeroOptions />
+
+      <GroupDivider title="Featured work" note="A few award homes, imagery leading. Parallax, split, pinned, or hover-to-reveal." />
+      <FeaturedProjectsOptions />
+
+      <GroupDivider title="Story" note="One short heritage beat. Est. 1996, deal direct with Mick, lots of white space." />
+      <StoryOptions />
+
+      <GroupDivider title="Proof" note="Awards and the clients' own words. Restrained credibility for a decorated builder." />
+      <ProofOptions />
+
+      <GroupDivider title="Contact" note="The closing invitation. The one place the brand red can lead." />
+      <ContactOptions />
+
+      <GroupDivider title="Footer" note="The site's floor: a tidy info grid and a giant wordmark that sweeps in." />
+      <FooterOptions />
     </main>
   );
 }
