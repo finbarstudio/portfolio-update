@@ -4229,6 +4229,11 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 .wc-fix-card.is-live { border-color: var(--pink); }
 .wc-live-label { color: var(--pink); }
+/* Each in-play game inside the live box; a faint pink divider when two are live. */
+.wc-live-game + .wc-live-game {
+  border-top: 1px solid color-mix(in srgb, var(--pink) 30%, transparent);
+  padding-top: 0.7rem;
+}
 .wc-fix-teams {
   display: flex;
   align-items: center;

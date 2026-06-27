@@ -49,21 +49,29 @@ export default function LiveMatch({ fallback }: { fallback: Fallback }) {
     return () => { alive = false; clearInterval(id); };
   }, []);
 
-  const liveMatch = feed?.live?.[0];
+  const liveMatches = feed?.live ?? [];
   const nextMatch = feed?.next;
   const today = feed?.today ?? [];
 
   let card: React.ReactNode;
-  if (liveMatch) {
+  if (liveMatches.length > 0) {
+    // One box, every in-play game — so if two are live (e.g. simultaneous group
+    // games) both show, separated by a divider.
     card = (
       <div className="wc-fix-card is-live">
-        <p className="mono-label wc-live-label">● Live now</p>
-        <p className="wc-fix-teams">
-          <span className="wc-fix-side"><Crest url={liveMatch.home.crest} alt={liveMatch.home.name} /> {liveMatch.home.name}</span>
-          <span className="wc-fix-score text-pink tabular-nums">{liveMatch.home.score ?? 0}–{liveMatch.away.score ?? 0}</span>
-          <span className="wc-fix-side">{liveMatch.away.name} <Crest url={liveMatch.away.crest} alt={liveMatch.away.name} /></span>
+        <p className="mono-label wc-live-label">
+          ● Live now{liveMatches.length > 1 ? ` · ${liveMatches.length} games` : ""}
         </p>
-        <p className="wc-venue mono-label text-ink-soft">{liveMatch.minute || "In play"}</p>
+        {liveMatches.map((m) => (
+          <div key={m.id} className="wc-live-game">
+            <p className="wc-fix-teams">
+              <span className="wc-fix-side"><Crest url={m.home.crest} alt={m.home.name} /> {m.home.name}</span>
+              <span className="wc-fix-score text-pink tabular-nums">{m.home.score ?? 0}–{m.away.score ?? 0}</span>
+              <span className="wc-fix-side">{m.away.name} <Crest url={m.away.crest} alt={m.away.name} /></span>
+            </p>
+            <p className="wc-venue mono-label text-ink-soft">{m.minute || "In play"}</p>
+          </div>
+        ))}
       </div>
     );
   } else if (nextMatch) {
