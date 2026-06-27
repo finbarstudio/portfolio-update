@@ -15,6 +15,7 @@ export default function Contact() {
   return (
     <CardSection
       id="contact"
+      card
       eyebrow="Enquire"
       title="Start a conversation"
       intro="Tell us about your block. You'll deal directly with Mick."

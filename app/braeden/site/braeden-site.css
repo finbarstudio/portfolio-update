@@ -287,6 +287,72 @@ html.lenis, html.lenis body { height: auto; }
   .braeden-site .bhead { position: static; }
 }
 
+/* A plain (un-carded) section: same gutter + generous padding rhythm as the
+   cards, white ground, so cohesion comes from the shared header + tokens + motion
+   rather than from wrapping everything in a panel. Cards stay for contact/footer. */
+.braeden-site .bsec-plain { background: var(--paper); }
+.braeden-site .bsec-plain > .frame { width: 100%; }
+
+/* ── Scroll reveal (consistent across the page) ───────────────────────────── */
+.braeden-site .b-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+  will-change: opacity, transform;
+}
+.braeden-site .b-reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .braeden-site .b-reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Bento project grid ───────────────────────────────────────────────────── */
+.braeden-site .b-bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: clamp(150px, 18vw, 270px);
+  grid-auto-flow: row dense;
+  gap: clamp(10px, 1.1vw, 16px);
+}
+.braeden-site .b-bento-cell {
+  position: relative;
+  overflow: hidden;
+  border-radius: clamp(12px, 1.1vw, 18px);
+  background: #e6e3dd;
+  display: block;
+}
+.braeden-site .b-bento-cell img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.85s var(--ease);
+}
+.braeden-site .b-bento-cell:hover img { transform: scale(1.055); }
+.braeden-site .b-bento-cap {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: clamp(13px, 1.5vw, 22px);
+  background: linear-gradient(to top, rgba(18,18,20,0.72), rgba(18,18,20,0.12) 62%, rgba(18,18,20,0));
+  color: #fff;
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5em;
+}
+.braeden-site .b-bento-cap .n {
+  font-family: var(--font-montserrat); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.02em; font-size: clamp(13px, 1.05vw, 18px); line-height: 1.05;
+}
+.braeden-site .b-bento-cap .m {
+  font-family: var(--font-space-mono); font-size: clamp(8.5px, 0.66vw, 10px);
+  letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.86;
+}
+@media (max-width: 760px) {
+  .braeden-site .b-bento { grid-template-columns: repeat(2, 1fr); grid-auto-rows: clamp(150px, 40vw, 220px); }
+  .braeden-site .b-bento-cell { grid-column: span 1 !important; grid-row: span 1 !important; }
+  .braeden-site .b-bento-cell.b-bento-feature { grid-column: span 2 !important; grid-row: span 2 !important; }
+}
+
+/* ── Heroes: full-height, with the shared option tag for the mini-chooser ──── */
+.braeden-site .bhero { position: relative; min-height: 100svh; overflow: hidden; }
+.braeden-site .bhero-scrim-radial { position: absolute; inset: 0; background: radial-gradient(125% 105% at 50% 48%, rgba(18,18,20,0.52) 0%, rgba(18,18,20,0.24) 46%, rgba(18,18,20,0) 82%); }
+.braeden-site .bhero-scrim-edge { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(18,18,20,0.42), rgba(18,18,20,0) 150px), linear-gradient(to top, rgba(18,18,20,0.44), rgba(18,18,20,0) 36%); }
+.braeden-site .bhero img.bhero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: brdKen 24s ease-in-out infinite alternate; }
+
 /* ── Keyframes ──────────────────────────────────────────────── */
 @keyframes brdScrollDrop { 0% { transform: translateY(-100%); opacity: 1; } 100% { transform: translateY(220%); opacity: 0; } }
 @keyframes brdKen { from { transform: scale(1.06); } to { transform: scale(1.12); } }

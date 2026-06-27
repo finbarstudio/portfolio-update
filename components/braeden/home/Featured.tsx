@@ -1,43 +1,59 @@
 /**
- * Braeden homepage — FEATURED WORK (cohesive card system). The work lives inside
- * the shared card: a sticky "Selected work" heading + a column of project plates,
- * each with a Montserrat name and a Space Mono location / award line.
+ * Braeden homepage — FEATURED WORK as a BENTO grid. A full-width white section
+ * with the shared header, then an asymmetric bento of project plates (a 2×2
+ * feature + wide + small tiles), each with a hover image-zoom and a caption.
  */
 
-import { CardSection } from "./Card";
+import BReveal from "./BReveal";
 
 const P = "/braeden/projects";
-const PROJECTS = [
-  { img: "modern-thai", name: "Modern Thai House", meta: "Noosa Heads · MBA Queensland House of the Year" },
-  { img: "noosaville", name: "Riverside", meta: "Noosaville · 2025 Best Individual Home" },
-  { img: "peregian", name: "Peregian", meta: "Sunshine Coast · Custom home" },
+
+const PROJECTS: { img: string; name: string; meta: string; feature?: boolean; span?: React.CSSProperties }[] = [
+  { img: "modern-thai", name: "Modern Thai House", meta: "Noosa Heads", feature: true, span: { gridColumn: "span 2", gridRow: "span 2" } },
+  { img: "noosaville", name: "Riverside", meta: "Noosaville", span: { gridColumn: "span 2" } },
+  { img: "peregian", name: "Peregian", meta: "Sunshine Coast" },
+  { img: "sunrise-beach", name: "Sunrise Beach", meta: "Noosa" },
+  { img: "river-haven", name: "River Haven", meta: "Noosa", span: { gridColumn: "span 2" } },
+  { img: "cooroy-mountain", name: "Cooroy", meta: "Hinterland", span: { gridColumn: "span 2" } },
 ];
 
 export default function Featured() {
   return (
-    <CardSection
-      eyebrow="Our work"
-      title="Selected work"
-      intro="A few of the homes behind the record. Every one bespoke to its block."
-      headExtra={
-        <a href="/braeden/site/projects" className="redlink" style={{ marginTop: "2em", display: "inline-flex" }}>
-          View all projects <span className="ar" aria-hidden>→</span>
-        </a>
-      }
-    >
-      <div style={{ display: "grid", gap: "clamp(30px,3.2vw,48px)" }}>
-        {PROJECTS.map((p) => (
-          <a key={p.name} href="/braeden/site/projects" data-cursor="View project" style={{ display: "block" }}>
-            <div style={{ position: "relative", aspectRatio: "16 / 10", overflow: "hidden", borderRadius: 10, background: "#e6e3dd" }}>
-              <img src={`${P}/${p.img}.webp`} alt={`${p.name}, ${p.meta}`} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+    <section className="bsec-plain">
+      <div className="frame wrap pad-y">
+        <BReveal>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "1.4rem", marginBottom: "clamp(28px,3.4vw,52px)" }}>
+            <div>
+              <p className="eyebrow" style={{ marginBottom: "1.3em" }}>Our work</p>
+              <h2 className="bhead-title" style={{ marginBottom: "0.5em" }}>Selected work</h2>
+              <span className="brule" aria-hidden style={{ margin: "0 0 1.1em" }} />
+              <p className="ff-quick" style={{ fontSize: "clamp(14px,1vw,16.5px)", lineHeight: 1.6, color: "var(--ink-soft)", maxWidth: "42ch", margin: 0 }}>
+                A few of the homes behind the record. Every one bespoke to its block.
+              </p>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between", gap: "0.6em", marginTop: "0.95em" }}>
-              <h3 className="ff-mont" style={{ fontWeight: 700, fontSize: "clamp(17px,1.5vw,23px)", textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--ink)", margin: 0 }}>{p.name}</h3>
-              <span className="ff-mono" style={{ fontSize: "clamp(9px,0.72vw,10.5px)", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-soft)" }}>{p.meta}</span>
-            </div>
-          </a>
-        ))}
+            <a href="/braeden/site/projects" className="redlink">View all projects <span className="ar" aria-hidden>→</span></a>
+          </div>
+        </BReveal>
+        <BReveal delay={0.08}>
+          <div className="b-bento">
+            {PROJECTS.map((p) => (
+              <a
+                key={p.name}
+                href="/braeden/site/projects"
+                data-cursor="View project"
+                className={`b-bento-cell${p.feature ? " b-bento-feature" : ""}`}
+                style={p.span}
+              >
+                <img src={`${P}/${p.img}.webp`} alt={`${p.name}, ${p.meta}`} />
+                <div className="b-bento-cap">
+                  <span className="n">{p.name}</span>
+                  <span className="m">{p.meta}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </BReveal>
       </div>
-    </CardSection>
+    </section>
   );
 }

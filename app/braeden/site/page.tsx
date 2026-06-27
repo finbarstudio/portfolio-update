@@ -1,6 +1,6 @@
 import Nav from "@/components/braeden/Nav";
 import ViewCursor from "@/components/braeden/ViewCursor";
-import Hero from "@/components/braeden/home/Hero";
+import HeroChoices from "@/components/braeden/home/HeroChoices";
 import Featured from "@/components/braeden/home/Featured";
 import Story from "@/components/braeden/home/Story";
 import Awards from "@/components/braeden/home/Awards";
@@ -9,20 +9,20 @@ import Contact from "@/components/braeden/home/Contact";
 import Footer from "@/components/braeden/home/Footer";
 
 /**
- * Braeden Constructions — the final, cohesive homepage, built from Finbar's picks
- * out of the 6-options chooser (hero image-led / featured offset stack / story
- * sticky-label / proof awards-ledger + word-of-mouth marquee / contact card /
- * footer panel), all harmonised to one system: Montserrat + Quicksand + Space
- * Mono, white/#222/red #E1251B, imagery-led, the card treatments kept to the
- * close so they stay sparing. The chooser components remain in
- * components/braeden/chooser/ for reference.
+ * Braeden Constructions homepage.
+ *
+ * Cohesion comes from a shared design language (one header treatment, the brand
+ * tokens, Montserrat/Quicksand/Space Mono, consistent spacing + a consistent
+ * scroll reveal) across DISTINCT section layouts, not from carding everything.
+ * The hero is offered as three image-led options to choose from; the card panel
+ * is reserved for contact + footer; projects are a bento grid.
  */
 export default function BraedenHome() {
   return (
     <main>
       <Nav />
       <ViewCursor />
-      <Hero />
+      <HeroChoices />
       <Featured />
       <Story />
       <Awards />

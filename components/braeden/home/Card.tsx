@@ -1,39 +1,52 @@
 /**
- * Braeden homepage — the ONE shared section shell.
+ * Braeden homepage — the ONE shared section frame.
  *
- * Everything is based on the Awards section: an off-white card panel at ~100vh,
- * a sticky heading block (eyebrow + Montserrat-800 caps title + a short red
- * rule), and a content column. Every homepage section uses this so the page
- * reads as one cohesive piece (consistent tokens, type, padding, the ledger
- * motif). The footer keeps its own panel.
+ * Cohesion comes from a consistent HEADER (eyebrow + Montserrat-800 caps title +
+ * short red rule), consistent tokens/spacing, and a consistent scroll reveal,
+ * NOT from wrapping every section in a card. `card` opts a section into the
+ * off-white panel (reserved for contact + footer); everything else is a plain
+ * white section with the same header + grid. The ledger motif is shared too.
  */
 
 import React from "react";
+import BReveal from "./BReveal";
 
 export function CardSection({
-  id, eyebrow, title, intro, headExtra, children,
+  id, card = false, eyebrow, title, intro, headExtra, children,
 }: {
   id?: string;
+  card?: boolean;
   eyebrow?: string;
   title: string;
   intro?: string;
   headExtra?: React.ReactNode;
   children: React.ReactNode;
 }) {
-  return (
-    <section id={id} className="bsec">
-      <div className="bcard">
-        <div className="bcard-grid">
-          <div className="bhead">
-            {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-            <h2 className="bhead-title">{title}</h2>
-            {intro && <p className="bhead-intro">{intro}</p>}
-            <span className="brule" aria-hidden />
-            {headExtra}
-          </div>
-          <div>{children}</div>
-        </div>
+  const inner = (
+    <div className="bcard-grid">
+      <div className="bhead">
+        <BReveal>
+          {eyebrow && <p className="eyebrow">{eyebrow}</p>}
+          <h2 className="bhead-title">{title}</h2>
+          {intro && <p className="bhead-intro">{intro}</p>}
+          <span className="brule" aria-hidden />
+          {headExtra}
+        </BReveal>
       </div>
+      <BReveal delay={0.08}>{children}</BReveal>
+    </div>
+  );
+
+  if (card) {
+    return (
+      <section id={id} className="bsec">
+        <div className="bcard">{inner}</div>
+      </section>
+    );
+  }
+  return (
+    <section id={id} className="bsec-plain">
+      <div className="frame wrap pad-y">{inner}</div>
     </section>
   );
 }
