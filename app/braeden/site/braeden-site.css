@@ -415,6 +415,94 @@ html.lenis, html.lenis body { height: auto; }
 }
 .braeden-site .brd-band-cite b { color: var(--red); font-weight: 400; }
 
+/* ── Footer (Lindon / OJ Pippin language, on Braeden's dark ground) ── */
+.braeden-site .brd-foot {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(180deg, #242321 0%, #161615 100%);
+  color: #f4f2ee;
+  padding-top: clamp(64px, 9vh, 116px);
+}
+.braeden-site .brd-foot-line {
+  border: 0;
+  height: 1px;
+  margin: 0 var(--gutter);
+  background: rgba(244, 242, 238, 0.2);
+  transform-origin: left;
+}
+.braeden-site .brd-foot-grid {
+  margin-top: auto;
+  padding: 0 var(--gutter) clamp(24px, 4vh, 52px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: end;
+  gap: 2rem 1.5rem;
+  font-family: var(--font-quick), system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+@media (min-width: 768px) {
+  .braeden-site .brd-foot-grid { grid-template-columns: repeat(4, 1fr); gap: 2.4rem; }
+}
+@media (max-width: 600px) {
+  .braeden-site .brd-foot-grid { grid-template-columns: 1fr; gap: 1.6rem; text-align: center; }
+}
+.braeden-site .brd-foot-col { display: flex; flex-direction: column; align-items: flex-start; }
+.braeden-site .brd-foot-col-end { align-items: flex-end; text-align: right; }
+.braeden-site .brd-foot-mask { overflow: hidden; align-self: stretch; }
+.braeden-site .brd-foot-col-end .brd-foot-mask { display: flex; justify-content: flex-end; }
+.braeden-site .brd-foot-reveal { display: inline-flex; flex-direction: column; align-items: flex-start; }
+.braeden-site .brd-foot-col-end .brd-foot-reveal { align-items: flex-end; }
+@media (max-width: 600px) {
+  .braeden-site .brd-foot-col,
+  .braeden-site .brd-foot-col-end { align-items: center; text-align: center; }
+  .braeden-site .brd-foot-col-end .brd-foot-mask { justify-content: center; }
+  .braeden-site .brd-foot-reveal,
+  .braeden-site .brd-foot-col-end .brd-foot-reveal { align-items: center; }
+}
+.braeden-site .brd-foot-label {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  color: var(--red);
+  margin: 0 0 0.9em;
+}
+.braeden-site .brd-foot-val {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  gap: 0.12em;
+  color: rgba(244, 242, 238, 0.74);
+  margin: 0;
+}
+.braeden-site .brd-foot-link {
+  color: rgba(244, 242, 238, 0.74);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+.braeden-site .brd-foot-link:hover { color: #ffffff; }
+.braeden-site .brd-foot-credit {
+  margin-top: 0.8em;
+  font-size: 12px;
+  color: rgba(244, 242, 238, 0.4);
+}
+.braeden-site .brd-foot-mark {
+  width: 100%;
+  padding: clamp(8px, 1.6vw, 24px) var(--gutter) clamp(10px, 1.8vw, 30px);
+  overflow: hidden;
+}
+.braeden-site .brd-foot-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: #f4f2ee;
+}
+
 /* ── Keyframes ──────────────────────────────────────────────── */
 @keyframes brdScrollDrop { 0% { transform: translateY(-100%); opacity: 1; } 100% { transform: translateY(220%); opacity: 0; } }
 @keyframes brdKen { from { transform: scale(1.06); } to { transform: scale(1.12); } }
