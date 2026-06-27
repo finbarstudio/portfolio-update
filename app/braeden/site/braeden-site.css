@@ -599,9 +599,21 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ── Voices: swappable testimonials ── */
 .braeden-site .brd-voices-card {
-  min-height: clamp(160px, 22vh, 220px);
+  /* FIXED height (not min-height) so the section never jumps as the quote length
+     changes between testimonials; the longest fits, shorter ones centre. */
+  height: clamp(210px, 30vh, 290px);
+  overflow: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   animation: brdVoiceIn 0.5s var(--ease) both;
+}
+.braeden-site .brd-voices-quote {
+  font-family: var(--font-quick), sans-serif;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: clamp(19px, 2.2vw, 30px);
+  line-height: 1.4;
+  max-width: 34ch;
 }
 @keyframes brdVoiceIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .braeden-site .brd-voices-card { animation: none; } }

@@ -7,7 +7,7 @@
  * the quote; the band mask-reveals on scroll-in.
  */
 
-import { useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useReveal } from "../useReveal";
 
 const TESTIMONIALS = [
@@ -47,18 +47,21 @@ export default function Voices() {
 
   const swap = (dir: number) => setI((p) => (p + dir + TESTIMONIALS.length) % TESTIMONIALS.length);
 
+  // Auto-advance every 6s; the timer resets whenever the index changes (so a
+  // manual prev/next restarts the dwell). Off for reduced-motion.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setTimeout(() => setI((p) => (p + 1) % TESTIMONIALS.length), 6000);
+    return () => window.clearTimeout(id);
+  }, [i]);
+
   return (
     <section className="brd-band brd-voices" style={{ background: "var(--paper-2)" }} ref={ref}>
       <p className="eyebrow brd-mask" data-revealed={rv} style={d("0s")}>In their words</p>
 
       {/* key re-mounts the card on swap so the new quote fades in (no timer) */}
       <div className="brd-voices-card" key={i}>
-        <blockquote
-          className="brd-band-quote brd-voices-quote"
-          style={{ textTransform: "none", fontWeight: 400, fontFamily: "var(--font-quick)", letterSpacing: 0, maxWidth: "26ch" }}
-        >
-          “{t.quote}”
-        </blockquote>
+        <blockquote className="brd-band-quote brd-voices-quote">“{t.quote}”</blockquote>
         <p className="brd-band-cite">
           {t.author} <b>·</b> {t.place}
         </p>
