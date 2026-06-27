@@ -125,11 +125,19 @@ c-139 -24 -316 -112 -385 -193 -73 -85 -90 -137 -90 -277 0 -117 2 -129 28
 -150 186 c-82 102 -159 198 -170 213 -11 14 -65 82 -121 151 -55 69 -268 334
 -473 590 l-373 465 -54 3 -54 3 0 -931z`;
 
-export default function BraedenLogoFull({ className }: { className?: string }) {
+export default function BraedenLogoFull({
+  className,
+  variant = "full",
+}: {
+  className?: string;
+  /** "full" = wordmark + CONSTRUCTIONS; "wordmark" = just Braeden + the roofline
+   *  (the viewBox is cropped above the CONSTRUCTIONS line, which clips it out). */
+  variant?: "full" | "wordmark";
+}) {
   return (
     <svg
       className={className}
-      viewBox="0 0 2400 1152"
+      viewBox={variant === "wordmark" ? "0 0 2400 910" : "0 0 2400 1152"}
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Braeden Constructions"

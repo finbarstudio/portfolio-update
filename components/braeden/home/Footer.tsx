@@ -113,7 +113,7 @@ export default function Footer() {
       </div>
 
       <div className="brd-foot-mark" aria-label="Braeden Constructions">
-        <BraedenLogoFull className="brd-foot-logo" />
+        <BraedenLogoFull className="brd-foot-logo" variant="wordmark" />
       </div>
     </footer>
   );

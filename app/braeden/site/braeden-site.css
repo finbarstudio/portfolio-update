@@ -30,8 +30,14 @@
   --paper-warm: #faf8f4;  /* warmed off-white, for the editorial/warm options */
   --ink:        #222222;  /* near-black text (their real ink) */
   --ink-soft:   #484848;  /* secondary text (their real grey, AA on white) */
-  --red:        #e1251b;  /* the real brand red (NOT the old orange #E25735) */
-  --red-2:      #e6392f;  /* hover/active tint */
+  /* Accent — monochrome. Braeden's real site uses red (#e1251b) as its one
+     highlight; Finbar wanted it gone and their site has no second accent, so
+     emphasis is carried by ink + weight, not colour. To reintroduce a colour
+     later, change just --accent (+ --accent-2) and everything follows. */
+  --accent:     #222222;
+  --accent-2:   #000000;  /* darker press/hover */
+  --red:        var(--accent);   /* legacy alias — existing var(--red) usages follow the accent token */
+  --red-2:      var(--accent-2);
   --line:       #ebebeb;  /* hairline borders */
   --line-2:     #cccccc;  /* slightly stronger line */
 
@@ -493,7 +499,7 @@ html.lenis, html.lenis body { height: auto; }
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: 10px;
-  color: var(--red);
+  color: rgba(244, 242, 238, 0.92);
   margin: 0 0 0.9em;
 }
 .braeden-site .brd-foot-val {

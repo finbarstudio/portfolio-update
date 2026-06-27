@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import LogoMark from "./LogoMark";
+import BraedenLogoFull from "./BraedenLogoFull";
 
 const LEFT = [
   { label: "Projects", href: "/braeden/site/projects" },
@@ -45,8 +45,8 @@ export default function Nav() {
             ))}
           </ul>
 
-          <a href="/braeden/site" onClick={onLogoClick} className="col-start-2 justify-self-center" aria-label="A Rolley & Sons, home">
-            <LogoMark className="h-[18px] md:h-[20px] w-auto" />
+          <a href="/braeden/site" onClick={onLogoClick} className="col-start-2 justify-self-center" aria-label="Braeden Constructions, home">
+            <BraedenLogoFull variant="wordmark" className="h-[22px] md:h-[26px] w-auto" />
           </a>
 
           <div className="col-start-3 flex items-center justify-end gap-8">
