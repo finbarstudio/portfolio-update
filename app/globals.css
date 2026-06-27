@@ -3002,10 +3002,20 @@ body:has(.sb-root) {
 
 /* ── Fresh home: just the star, with an outline drawing itself around it ── */
 .sb-home {
-  position: relative; flex: 1; min-height: min(72vh, 620px);
+  position: relative; flex: 1; min-height: 0;
   display: flex; align-items: stretch; justify-content: stretch;
+  cursor: crosshair;
 }
 .sb-home-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Landing: the hero fills the screen below the nav, with EQUAL top/bottom padding
+   (the nav clearance is added on top of the equal pad). */
+.sb-content:has(.sb-home) {
+  display: flex;
+  flex-direction: column;
+  padding-top: calc(var(--menubar-h) + clamp(18px, 3vh, 44px));
+  padding-bottom: clamp(18px, 3vh, 44px);
+}
+.sb-content:has(.sb-home) .sb-page { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
 /* ── Page slide on route change — a clear horizontal swipe in the same
    direction the nav highlight moves (mockups = in from the right, home = in
