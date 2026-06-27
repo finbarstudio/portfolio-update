@@ -9,8 +9,8 @@ gsap.registerPlugin(ScrollTrigger);
 const P = "/braeden/projects";
 type Project = { title: string; meta: string; src: string };
 const PROJECTS: Project[] = [
-  { title: "Modern Thai House", meta: "Noosa Heads · MBA Queensland House of the Year", src: `${P}/modern-thai.webp` },
   { title: "Riverside", meta: "Noosaville · 2025 Best Individual Home", src: `${P}/noosaville.webp` },
+  { title: "Coolum", meta: "Coolum Beach · Custom home", src: `${P}/coolum.webp` },
   { title: "Peregian", meta: "Sunshine Coast · Custom home", src: `${P}/peregian.webp` },
   { title: "River Haven", meta: "Noosa · Custom home", src: `${P}/river-haven.webp` },
   { title: "Sunrise Beach", meta: "Noosa · Custom home", src: `${P}/sunrise-beach.webp` },

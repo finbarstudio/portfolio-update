@@ -597,6 +597,27 @@ html.lenis, html.lenis body { height: auto; }
   white-space: nowrap;
 }
 
+/* ── Voices: swappable testimonials ── */
+.braeden-site .brd-voices-card {
+  min-height: clamp(160px, 22vh, 220px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  animation: brdVoiceIn 0.5s var(--ease) both;
+}
+@keyframes brdVoiceIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .braeden-site .brd-voices-card { animation: none; } }
+.braeden-site .brd-voices-nav {
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(20px, 3vw, 40px); margin-top: clamp(26px, 3.4vw, 44px);
+}
+.braeden-site .brd-voices-btn {
+  font-size: 17px; line-height: 1; padding: 8px 12px; color: var(--ink);
+  transition: opacity 0.25s ease;
+}
+.braeden-site .brd-voices-btn:hover { opacity: 0.45; }
+.braeden-site .brd-voices-idx {
+  font-size: 11px; letter-spacing: 0.18em; color: var(--ink-soft); min-width: 7ch; text-align: center;
+}
+
 /* ── About page (magazine): full-bleed photo band + recognition ledger ── */
 .braeden-site .bx-about-photo { min-height: 82svh; }
 .braeden-site .brd-about-rec { text-align: left; }
