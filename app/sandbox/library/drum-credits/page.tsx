@@ -20,8 +20,9 @@ export default function DrumCreditsPage() {
           <h1 className="sb-fx-title">Drum Credits</h1>
           <p className="sb-fx-note">
             Credits shot off a rotating drum, not a flat sheet. A tight-radius cylinder, so the type
-            bows and foreshortens as it rolls through frame. Three stacked drums share one roll, the
-            same copy travelling off the bottom, onto the middle, onto the top.
+            bows and foreshortens as it rolls through frame. On the left, the full roll on a single
+            drum. On the right, the same roll split across three short drums, the copy travelling off
+            the bottom, onto the middle, onto the top.
           </p>
         </div>
         <Link className="sb-fx-ref" href={REFERENCE} target="_blank" rel="noopener noreferrer">

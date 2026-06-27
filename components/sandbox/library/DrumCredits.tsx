@@ -22,9 +22,9 @@ import { ASTERISK_POINTS } from "@/components/brand-asterisk";
 /** Tighter drum: more arc + smaller radius = a more pronounced curl. */
 const ARC = 1.12; // radians of cylinder visible (~64°)
 const RADIUS = 4;
-/** How much of the credits canvas fills the visible arc (smaller = fewer lines).
-    Tuned so each short drum shows ~one line, with halves curling top + bottom. */
-const WINDOW = 0.09;
+/** How much of the credits canvas fills the visible arc (smaller = fewer lines). */
+const W_NORMAL = 0.2; // the single "normal" drum: a classic multi-line roll
+const W_TIGHT = 0.055; // each stacked drum: ~one large line, halves curling top + bottom
 /** Vertical scroll speed, in texture-units per second. */
 const SPEED = 0.018;
 
@@ -114,26 +114,31 @@ function drawAsterisk(ctx: CanvasRenderingContext2D, cx: number, cy: number, siz
 /** Render the credits to a tall canvas using the site tokens. Dimensions are
     derived from fixed sizes (not measureText), so they're identical whether or
     not the web fonts have loaded yet — a font-swap rebuild keeps the same size. */
-function buildCreditsCanvas(t: Tokens): HTMLCanvasElement {
+function buildCreditsCanvas(t: Tokens, tight = false): HTMLCanvasElement {
   const dpr = Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
   const W = 1100;
+  // `tight` (the stacked drums) wants large type with low line + paragraph spacing;
+  // the single drum keeps the classic proportions.
+  const k = tight ? 1.34 : 1; // type scale
+  const lineMul = tight ? 0.72 : 1; // leading inside a credit (role→name, after a line)
+  const paraMul = tight ? 0.38 : 1; // blank gap between credits
   const unit = 64;
-  const roleSize = 28;
-  const nameSize = 48;
-  const sectionSize = 34;
-  const bigSize = 84;
-  const logoSize = 70;
+  const roleSize = 28 * k;
+  const nameSize = 48 * k;
+  const sectionSize = 34 * k;
+  const bigSize = 84 * k;
+  const logoSize = 70 * k;
   const isUpper = (s: string) => s === s.toUpperCase();
 
   const topPad = unit * 3;
   let h = topPad;
   for (const c of CREDITS) {
-    if (c.role) h += roleSize * 1.5 + nameSize * 1.25;
-    else if (c.logo) h += logoSize * 1.3;
-    else h += (c.big ? bigSize : isUpper(c.name) ? sectionSize : nameSize) * 1.3;
-    h += unit * (c.gap ?? 1);
+    if (c.role) h += (roleSize * 1.5 + nameSize * 1.25) * lineMul;
+    else if (c.logo) h += logoSize * 1.3 * lineMul;
+    else h += (c.big ? bigSize : isUpper(c.name) ? sectionSize : nameSize) * 1.3 * lineMul;
+    h += unit * (c.gap ?? 1) * paraMul;
   }
-  h += unit * 10; // trailing blank for a clean loop gap
+  h += unit * 10 * paraMul; // trailing blank for a clean loop gap
 
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(W * dpr);
@@ -150,11 +155,11 @@ function buildCreditsCanvas(t: Tokens): HTMLCanvasElement {
       ctx.fillStyle = t.inkSoft;
       ctx.font = `400 ${roleSize}px ${t.mono}`;
       drawTracked(ctx, c.role.toUpperCase(), W / 2, y, 5);
-      y += roleSize * 1.5;
+      y += roleSize * 1.5 * lineMul;
       ctx.fillStyle = t.ink;
       ctx.font = `500 ${nameSize}px ${t.primary}`;
       ctx.fillText(c.name, W / 2, y);
-      y += nameSize * 1.25;
+      y += nameSize * 1.25 * lineMul;
     } else if (c.logo) {
       // Canonical wordmark: FINBARSTUDIO in Space Mono caps + the pink asterisk.
       const tracking = 1;
@@ -175,24 +180,24 @@ function buildCreditsCanvas(t: Tokens): HTMLCanvasElement {
       }
       ctx.textAlign = prevAlign;
       drawAsterisk(ctx, x + gap + astSize / 2, y - logoSize * 0.04, astSize, t.pink);
-      y += logoSize * 1.3;
+      y += logoSize * 1.3 * lineMul;
     } else if (c.big) {
       ctx.fillStyle = t.ink;
       ctx.font = `700 ${bigSize}px ${t.primary}`;
       drawTracked(ctx, c.name, W / 2, y, 2);
-      y += bigSize * 1.3;
+      y += bigSize * 1.3 * lineMul;
     } else if (isUpper(c.name)) {
       ctx.fillStyle = t.pink;
       ctx.font = `700 ${sectionSize}px ${t.mono}`;
       drawTracked(ctx, c.name, W / 2, y, 9);
-      y += sectionSize * 1.3;
+      y += sectionSize * 1.3 * lineMul;
     } else {
       ctx.fillStyle = t.ink;
       ctx.font = `400 ${nameSize}px ${t.primary}`;
       ctx.fillText(c.name, W / 2, y);
-      y += nameSize * 1.3;
+      y += nameSize * 1.3 * lineMul;
     }
-    y += unit * (c.gap ?? 1);
+    y += unit * (c.gap ?? 1) * paraMul;
   }
   return canvas;
 }
@@ -214,7 +219,7 @@ function curvedPlane(width: number, segW: number, segH: number): THREE.PlaneGeom
 
 /** One drum, filling its parent. `phase` offsets the starting credit so stacked
     drums show different lines. */
-function Drum({ phase = 0 }: { phase?: number }) {
+function Drum({ phase = 0, tight = false }: { phase?: number; tight?: boolean }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -225,6 +230,7 @@ function Drum({ phase = 0 }: { phase?: number }) {
 
     const scope = wrap.closest(".sb-root") ?? document.documentElement;
     const tokens = readTokens(scope);
+    const win = tight ? W_TIGHT : W_NORMAL;
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -232,20 +238,20 @@ function Drum({ phase = 0 }: { phase?: number }) {
     scene.background = new THREE.Color(tokens.bg);
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
 
-    const tex = new THREE.CanvasTexture(buildCreditsCanvas(tokens));
+    const tex = new THREE.CanvasTexture(buildCreditsCanvas(tokens, tight));
     tex.wrapT = THREE.RepeatWrapping;
     tex.wrapS = THREE.ClampToEdgeWrapping;
     tex.minFilter = THREE.LinearMipmapLinearFilter;
     tex.magFilter = THREE.LinearFilter;
     tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-    tex.repeat.set(1, WINDOW);
+    tex.repeat.set(1, win);
     tex.offset.y = phase; // stagger which credit each drum starts on
     tex.generateMipmaps = true;
     tex.colorSpace = THREE.SRGBColorSpace;
 
     const visibleH = 2 * RADIUS * Math.sin(ARC / 2);
     const cnv = tex.image as HTMLCanvasElement;
-    const planeW = visibleH * (cnv.width / (cnv.height * WINDOW));
+    const planeW = visibleH * (cnv.width / (cnv.height * win));
 
     const geo = curvedPlane(planeW, 16, 220);
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
@@ -274,7 +280,7 @@ function Drum({ phase = 0 }: { phase?: number }) {
     let disposed = false;
     document.fonts?.ready?.then(() => {
       if (disposed) return;
-      tex.image = buildCreditsCanvas(tokens);
+      tex.image = buildCreditsCanvas(tokens, tight);
       tex.needsUpdate = true;
     });
 
@@ -314,7 +320,7 @@ function Drum({ phase = 0 }: { phase?: number }) {
       tex.dispose();
       renderer.dispose();
     };
-  }, [phase]);
+  }, [phase, tight]);
 
   return (
     <div className="dc-drum" ref={wrapRef}>
@@ -325,12 +331,16 @@ function Drum({ phase = 0 }: { phase?: number }) {
 
 export default function DrumCredits() {
   return (
-    // Three wide, short drums stacked with a 40px gap. One continuous roll flows up
-    // through them (phases WINDOW apart): off the bottom, onto the middle, onto the top.
-    <div className="sb-fx-stage dc-stack">
-      <Drum phase={2 * WINDOW} />
-      <Drum phase={WINDOW} />
+    // Left: the full roll on a single drum. Right: the same roll across three short,
+    // wide drums (large type, tight leading) with a 20px gap, the windows W_TIGHT apart
+    // so it reads as one roll travelling off the bottom, onto the middle, onto the top.
+    <div className="sb-fx-stage dc-split">
       <Drum phase={0} />
+      <div className="dc-stack">
+        <Drum phase={2 * W_TIGHT} tight />
+        <Drum phase={W_TIGHT} tight />
+        <Drum phase={0} tight />
+      </div>
     </div>
   );
 }
