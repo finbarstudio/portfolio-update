@@ -100,3 +100,17 @@ export function HeroJ() {
     </section>
   );
 }
+
+/* K — minimal on white. The ~88vh white-space hero Finbar liked, type stripped
+   right back: just the logo + one small caption line, lots of air, no photo. */
+export function HeroK() {
+  return (
+    <section className="bx-hero bx-k">
+      <div className="bx-k-inner">
+        <BraedenLogoFull variant="wordmark" className="bx-logo-xl bx-k-logo" />
+        <p className="ff-mono bx-eyebrow">Custom homes · Noosa hinterland · Est. 1996</p>
+      </div>
+      <span className="ff-mono bx-scrollcue bx-k-scroll" aria-hidden>Scroll</span>
+    </section>
+  );
+}

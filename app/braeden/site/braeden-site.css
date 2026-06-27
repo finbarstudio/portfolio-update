@@ -680,6 +680,16 @@ html.lenis, html.lenis body { height: auto; }
 .braeden-site .bx-j-bl { bottom: clamp(54px, 8vh, 88px); left: var(--gutter); max-width: 24ch; }
 .braeden-site .bx-j-br { bottom: clamp(54px, 8vh, 88px); right: var(--gutter); max-width: 24ch; text-align: right; }
 
+/* K — minimal on white, lots of air (the ~88vh white-space hero) */
+.braeden-site .bx-logo-xl { width: clamp(180px, 24vw, 340px); height: auto; display: block; }
+.braeden-site .bx-k { background: var(--paper); min-height: 88svh; align-items: center; justify-content: center; }
+.braeden-site .bx-k-inner {
+  text-align: center; display: flex; flex-direction: column; align-items: center;
+  gap: clamp(16px, 2.4vh, 28px); padding: var(--gutter);
+}
+.braeden-site .bx-k-logo { color: var(--ink); }
+.braeden-site .bx-k-scroll { color: var(--ink-soft); }
+
 /* On-image text wins last (white over the photo) */
 .braeden-site .bx-on-img { color: rgba(255, 255, 255, 0.92); }
 

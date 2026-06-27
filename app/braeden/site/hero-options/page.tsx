@@ -1,4 +1,4 @@
-import { HeroF, HeroG, HeroH, HeroI, HeroJ } from "@/components/braeden/herochooser/heroes";
+import { HeroF, HeroG, HeroH, HeroI, HeroJ, HeroK } from "@/components/braeden/herochooser/heroes";
 
 export const metadata = {
   title: { absolute: "Hero options · Braeden" },
@@ -16,6 +16,7 @@ const OPTIONS: { id: string; name: string; el: React.ReactNode }[] = [
   { id: "H", name: "Centred logo lockup", el: <HeroH /> },
   { id: "I", name: "Split · small type", el: <HeroI /> },
   { id: "J", name: "Magazine corners", el: <HeroJ /> },
+  { id: "K", name: "Minimal on white · logo + air", el: <HeroK /> },
 ];
 
 export default function HeroOptionsPage() {
