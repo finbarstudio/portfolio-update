@@ -1,4 +1,6 @@
+import BlurImage from "../BlurImage";
 import { BRAEDEN_PROJECTS } from "./data";
+import { PROJECT_LQIP } from "./lqip";
 
 /**
  * Projects listing grid (modelled on Lows): a full-bleed 1 → 2 → 3 column grid
@@ -50,13 +52,14 @@ export default function ProjectsGrid() {
               )}
             </figcaption>
 
-            {/* photo on top — crops up from the bottom on hover (gentle open, snappier close) */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            {/* photo on top — blur-up, and crops up from the bottom on hover (gentle
+                open, snappier close) to uncover the caption beneath */}
+            <BlurImage
               src={p.src}
+              lqip={PROJECT_LQIP[p.src.split("/").pop()!.replace(".webp", "")] ?? ""}
               alt={`${p.title}, ${p.location} — a Braeden Constructions home`}
-              loading={i < 3 ? "eager" : "lazy"}
-              className="absolute inset-0 h-full w-full object-cover [clip-path:inset(0_0_0_0)] transition-[clip-path] duration-[320ms] ease-[cubic-bezier(0.4,0,0.1,1)] group-hover:[clip-path:inset(0_0_11rem_0)] group-hover:duration-[520ms] group-hover:ease-[cubic-bezier(0.22,1,0.36,1)]"
+              priority={i < 3}
+              className="[clip-path:inset(0_0_0_0)] transition-[clip-path] duration-[320ms] ease-[cubic-bezier(0.4,0,0.1,1)] group-hover:[clip-path:inset(0_0_11rem_0)] group-hover:duration-[520ms] group-hover:ease-[cubic-bezier(0.22,1,0.36,1)]"
             />
 
             {/* touch: always-on title on a gradient (no hover to reveal the caption) */}

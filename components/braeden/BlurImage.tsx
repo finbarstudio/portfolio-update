@@ -12,12 +12,16 @@ export default function BlurImage({
   src,
   lqip,
   alt,
+  className = "",
   imgClassName = "",
   priority = false,
 }: {
   src: string;
   lqip: string;
   alt: string;
+  /** on the container (e.g. the grid card's clip-path crop-up hover) */
+  className?: string;
+  /** on the <img> (e.g. the Ken-burns drift) */
   imgClassName?: string;
   priority?: boolean;
 }) {
@@ -30,7 +34,7 @@ export default function BlurImage({
   }, []);
 
   return (
-    <div className="bx-blur">
+    <div className={`bx-blur ${className}`}>
       <div className="bx-blur-lqip" style={{ backgroundImage: `url(${lqip})` }} aria-hidden />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
