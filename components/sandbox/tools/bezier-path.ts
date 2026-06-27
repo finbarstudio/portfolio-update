@@ -129,7 +129,7 @@ export function parsePath(d: string): SubPath[] {
       } while (hasMore());
     } else if (U === "A") {
       do {
-        let rx = num(), ry = num(), rot = num();
+        const rx = num(), ry = num(), rot = num();
         const laf = flag(), sf = flag();
         let ex = num(), ey = num();
         if (rel) { ex += x; ey += y; }
@@ -309,6 +309,34 @@ export function handlesOf(subs: SubPath[]): { from: Pt; to: Pt }[] {
     }
   }
   return out;
+}
+
+const r2 = (v: number) => Math.round(v * 100) / 100;
+
+/** One path `d` drawing `shape` at every point — combined rendering so a heavy
+    SVG's thousands of node markers become a single element. Decimates past `cap`. */
+export function shapePathAll(shape: string, pts: Pt[], s: number, cap = 4000): string {
+  const h = s / 2;
+  const step = pts.length > cap ? Math.ceil(pts.length / cap) : 1;
+  let d = "";
+  for (let i = 0; i < pts.length; i += step) {
+    const x = pts[i].x, y = pts[i].y;
+    if (shape === "Dot" || shape === "Circle" || shape === "Ring")
+      d += `M${r2(x - h)} ${r2(y)}a${r2(h)} ${r2(h)} 0 1 0 ${r2(s)} 0a${r2(h)} ${r2(h)} 0 1 0 ${r2(-s)} 0`;
+    else if (shape === "Diamond")
+      d += `M${r2(x)} ${r2(y - h)}L${r2(x + h)} ${r2(y)}L${r2(x)} ${r2(y + h)}L${r2(x - h)} ${r2(y)}Z`;
+    else if (shape === "Triangle") { const rr = h * 1.18; d += `M${r2(x)} ${r2(y - rr)}L${r2(x + rr * 0.87)} ${r2(y + rr * 0.5)}L${r2(x - rr * 0.87)} ${r2(y + rr * 0.5)}Z`; }
+    else if (shape === "Cross") d += `M${r2(x - h)} ${r2(y)}H${r2(x + h)}M${r2(x)} ${r2(y - h)}V${r2(y + h)}`;
+    else d += `M${r2(x - h)} ${r2(y - h)}h${r2(s)}v${r2(s)}h${r2(-s)}Z`; // Square
+  }
+  return d;
+}
+/** One path `d` drawing every handle line — combined rendering for heavy SVGs. */
+export function handleLinesPath(handles: { from: Pt; to: Pt }[], cap = 4000): string {
+  const step = handles.length > cap ? Math.ceil(handles.length / cap) : 1;
+  let d = "";
+  for (let i = 0; i < handles.length; i += step) d += `M${r2(handles[i].from.x)} ${r2(handles[i].from.y)}L${r2(handles[i].to.x)} ${r2(handles[i].to.y)}`;
+  return d;
 }
 
 /** Axis-aligned bounds of every point we will draw (anchors + controls). */

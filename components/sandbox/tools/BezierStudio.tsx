@@ -14,7 +14,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   parsePath, shapeToPathData, transformSubPaths, subPathsToD,
-  anchorsOf, handlesOf, boundsOf, type SubPath,
+  anchorsOf, handlesOf, boundsOf, shapePathAll, handleLinesPath, type SubPath,
 } from "./bezier-path";
 import { traceImageToSVG } from "./image-trace";
 import { downloadBlob, safeName } from "@/lib/sandbox/download";
@@ -565,6 +565,19 @@ export default function BezierStudio() {
     cfg.pulse ? { animationDelay: `${(i % 24) * 0.06}s` }
       : cfg.drawOn ? { animationDelay: `${(i / Math.max(1, n)) * cfg.drawDuration}s` } : undefined;
   const showLabels = cfg.labelMode !== "None" && anchorN <= 80;
+  // Heavy SVGs (many nodes): draw the markers as a few combined <path>s instead
+  // of thousands of elements, so editing stays smooth. Memoised so unrelated
+  // changes (colour, vignette, motion…) don't rebuild the big path strings.
+  const heavy = anchorN + handleN > 200;
+  const combined = useMemo(() => {
+    if (!view || !heavy) return null;
+    const aS = Math.max(1, cfg.anchorSize * ns), cS = Math.max(1, cfg.controlSize * ns);
+    return {
+      handles: cfg.showHandles ? handleLinesPath(view.handles) : "",
+      controls: cfg.showControls ? shapePathAll(cfg.controlShape, view.handles.map((h) => h.to), cS) : "",
+      anchors: cfg.showAnchors ? shapePathAll(cfg.anchorShape, view.anchors, aS) : "",
+    };
+  }, [view, heavy, cfg.showHandles, cfg.showControls, cfg.showAnchors, cfg.controlShape, cfg.anchorShape, cfg.controlSize, cfg.anchorSize, ns]);
 
   const ui = cfg.gridAuto ? autoUiColor(cfg.bg) : cfg.gridColor;
   const fit = size.w > 4 && size.h > 4 ? Math.min(size.w / W, size.h / H) * 0.94 : 0; // 0.94 = a little breathing room
@@ -655,11 +668,21 @@ export default function BezierStudio() {
                   <path data-draw="" className={drawCls} style={drawStyle} d={view.d} fill="none" stroke={cfg.curveColor} strokeWidth={cfg.curveWeight} strokeLinecap="round" strokeLinejoin="round" opacity={cfg.curveOpacity} pathLength={pl} />
                 )}
 
-                {cfg.showHandles && view.handles.map((hd, i) => (
-                  <line key={"h" + i} data-pop={i / Math.max(1, handleN)} x1={hd.from.x} y1={hd.from.y} x2={hd.to.x} y2={hd.to.y} stroke={cfg.handleColor} strokeWidth={cfg.handleWeight * ns} strokeLinecap="round" strokeDasharray={cfg.handleDash > 0 ? `${cfg.handleDash} ${cfg.handleDash}` : undefined} opacity={cfg.handleOpacity} className={nodeCls} style={nodeStyle(i, handleN)} />
-                ))}
-                {cfg.showControls && view.handles.map((hd, i) => shape(cfg.controlShape, hd.to, Math.max(1, cfg.controlSize * ns), cfg.controlFill, cfg.controlStroke, Math.max(0.5, cfg.anchorWeight * 0.7), "c" + i, nodeCls, nodeStyle(i, handleN), i / Math.max(1, handleN)))}
-                {cfg.showAnchors && view.anchors.map((p, i) => shape(cfg.anchorShape, p, Math.max(1, cfg.anchorSize * ns), cfg.anchorFill, cfg.anchorStroke, cfg.anchorWeight, "a" + i, nodeCls, nodeStyle(i, anchorN), i / Math.max(1, anchorN), cfg.anchorRotate))}
+                {heavy && combined ? (
+                  <>
+                    {cfg.showHandles && combined.handles && <path data-pop="0.45" d={combined.handles} fill="none" stroke={cfg.handleColor} strokeWidth={cfg.handleWeight * ns} strokeLinecap="round" strokeDasharray={cfg.handleDash > 0 ? `${cfg.handleDash} ${cfg.handleDash}` : undefined} opacity={cfg.handleOpacity} />}
+                    {cfg.showControls && combined.controls && <path data-pop="0.5" d={combined.controls} fill={cfg.controlShape === "Dot" ? cfg.controlStroke : cfg.controlShape === "Cross" ? "none" : cfg.controlFill} stroke={cfg.controlShape === "Dot" ? "none" : cfg.controlStroke} strokeWidth={cfg.controlShape === "Dot" ? undefined : Math.max(0.5, cfg.anchorWeight * 0.7)} strokeLinecap="round" />}
+                    {cfg.showAnchors && combined.anchors && <path data-pop="0.55" d={combined.anchors} fill={cfg.anchorShape === "Dot" ? cfg.anchorStroke : cfg.anchorShape === "Cross" ? "none" : cfg.anchorFill} stroke={cfg.anchorShape === "Dot" ? "none" : cfg.anchorStroke} strokeWidth={cfg.anchorShape === "Dot" ? undefined : cfg.anchorWeight} strokeLinecap="round" />}
+                  </>
+                ) : (
+                  <>
+                    {cfg.showHandles && view.handles.map((hd, i) => (
+                      <line key={"h" + i} data-pop={i / Math.max(1, handleN)} x1={hd.from.x} y1={hd.from.y} x2={hd.to.x} y2={hd.to.y} stroke={cfg.handleColor} strokeWidth={cfg.handleWeight * ns} strokeLinecap="round" strokeDasharray={cfg.handleDash > 0 ? `${cfg.handleDash} ${cfg.handleDash}` : undefined} opacity={cfg.handleOpacity} className={nodeCls} style={nodeStyle(i, handleN)} />
+                    ))}
+                    {cfg.showControls && view.handles.map((hd, i) => shape(cfg.controlShape, hd.to, Math.max(1, cfg.controlSize * ns), cfg.controlFill, cfg.controlStroke, Math.max(0.5, cfg.anchorWeight * 0.7), "c" + i, nodeCls, nodeStyle(i, handleN), i / Math.max(1, handleN)))}
+                    {cfg.showAnchors && view.anchors.map((p, i) => shape(cfg.anchorShape, p, Math.max(1, cfg.anchorSize * ns), cfg.anchorFill, cfg.anchorStroke, cfg.anchorWeight, "a" + i, nodeCls, nodeStyle(i, anchorN), i / Math.max(1, anchorN), cfg.anchorRotate))}
+                  </>
+                )}
 
                 <circle id="bz-tracer" cx="0" cy="0" r={Math.max(2, cfg.curveWeight * 1.7)} fill={cfg.glowColor} opacity="0" />
 
