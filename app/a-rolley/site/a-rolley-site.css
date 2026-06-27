@@ -144,6 +144,30 @@
   padding-top: clamp(112px, 14vh, 168px);
   padding-bottom: clamp(112px, 14vh, 168px);
 }
+/* Page-entry reveal — CSS-driven so it never depends on the JS animation ticker
+   and can't get stuck hidden. Children start hidden; JS sets data-revealed="1"
+   (on the preloader lift, or a guaranteed fallback) and they transition in with a
+   stagger. Reduced motion shows everything immediately. */
+.arolley-site .arl-reveal > *,
+.arolley-site .arl-reveal-solo {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.arolley-site .arl-reveal[data-revealed="1"] > *,
+.arolley-site .arl-reveal-solo[data-revealed="1"] {
+  opacity: 1;
+  transform: none;
+}
+.arolley-site .arl-reveal[data-revealed="1"] > *:nth-child(2) { transition-delay: 0.12s; }
+.arolley-site .arl-reveal[data-revealed="1"] > *:nth-child(3) { transition-delay: 0.24s; }
+.arolley-site .arl-reveal[data-revealed="1"] > *:nth-child(4) { transition-delay: 0.36s; }
+.arolley-site .arl-reveal-solo[data-revealed="1"] { transition-delay: 0.3s; }
+@media (prefers-reduced-motion: reduce) {
+  .arolley-site .arl-reveal > *,
+  .arolley-site .arl-reveal-solo { opacity: 1 !important; transform: none !important; transition: none; }
+}
+
 /* Listing/projects intro: more padding, and shorter than the viewport so the
    first project image peeks at the bottom as a "scroll to see them" cue. */
 .arolley-site .arl-hero-tall {
