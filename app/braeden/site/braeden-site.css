@@ -553,6 +553,22 @@ html.lenis, html.lenis body { height: auto; }
   color: #f4f2ee;
 }
 
+/* Negative / knockout footer mode — the page reads through the cut-out logo, a
+   bold colour slab as the transition from the white page into the dark footer. */
+.braeden-site .brd-foot-negmode { padding-top: 0; }
+.braeden-site .brd-foot-neg {
+  width: 100%;
+  background: var(--paper);
+  overflow: hidden;
+  line-height: 0;
+}
+.braeden-site .brd-foot-neg-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: #161615;
+}
+
 /* ── Projects (Lows-style listing: tall hero, full-bleed crop-up grid) ── */
 .braeden-site .brd-projects-hero {
   min-height: 88svh;

@@ -1,17 +1,17 @@
 "use client";
 
 /**
- * Footer — full-screen dark close, in the Lindon / OJ Pippin language: a thin
- * rule up top, a four-column info row pinned to the bottom, then Braeden's real
- * logo spanning the gutters. One GSAP timeline draws the rule, clip-rises the
- * columns in a stagger, then wipes the logo up. data-tone="dark" flips the nav
- * to its light treatment while it sits over this section.
+ * Footer — NEGATIVE / knockout treatment. The page→footer transition is a solid
+ * colour slab with the Braeden logo cut OUT of it, so the white page reads through
+ * the knocked-out mark. The four-column info row sits below on the dark ground.
+ * One GSAP timeline brings the slab in, then clip-rises the columns in a stagger.
+ * data-tone="dark" flips the nav to its light treatment over this section.
  */
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import BraedenLogoFull from "../BraedenLogoFull";
+import BraedenLogoKnockout from "../BraedenLogoKnockout";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,32 +24,28 @@ export default function Footer() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: ref.current, start: "top 68%" },
+        scrollTrigger: { trigger: ref.current, start: "top 72%" },
       });
       tl.fromTo(
-        ".brd-foot-line",
-        { scaleX: 0 },
-        { scaleX: 1, duration: 1.1, ease: "power3.inOut" }
-      )
-        .fromTo(
-          ".brd-foot-reveal",
-          { yPercent: 120 },
-          { yPercent: 0, duration: 0.9, stagger: 0.08, ease: "power3.out" },
-          "-=0.7"
-        )
-        .fromTo(
-          ".brd-foot-logo",
-          { yPercent: 118 },
-          { yPercent: 0, duration: 1.2, ease: "power3.out" },
-          "-=0.55"
-        );
+        ".brd-foot-neg",
+        { yPercent: 14, opacity: 0 },
+        { yPercent: 0, opacity: 1, duration: 1.1, ease: "power3.out" }
+      ).fromTo(
+        ".brd-foot-reveal",
+        { yPercent: 120 },
+        { yPercent: 0, duration: 0.9, stagger: 0.08, ease: "power3.out" },
+        "-=0.55"
+      );
     }, ref);
     return () => ctx.revert();
   }, []);
 
   return (
-    <footer className="brd-foot" data-tone="dark" aria-label="Footer" ref={ref}>
-      <hr className="brd-foot-line" />
+    <footer className="brd-foot brd-foot-negmode" data-tone="dark" aria-label="Footer" ref={ref}>
+      {/* the page reads through the cut-out logo — the slab is the transition */}
+      <div className="brd-foot-neg" aria-label="Braeden Constructions">
+        <BraedenLogoKnockout className="brd-foot-neg-logo" />
+      </div>
 
       <div className="brd-foot-grid">
         <div className="brd-foot-col">
@@ -110,10 +106,6 @@ export default function Footer() {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="brd-foot-mark" aria-label="Braeden Constructions">
-        <BraedenLogoFull className="brd-foot-logo" variant="wordmark" />
       </div>
     </footer>
   );
