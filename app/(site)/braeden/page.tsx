@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import MaskReveal from "@/components/MaskReveal";
 import ContactCta from "@/components/ContactCta";
+import DemoLink from "@/components/braeden/DemoLink";
 
 // Private pitch page for Braeden Constructions (braedenconstructions.com.au).
 // Same play as /lindon, /oj-pippin and /a-rolley: reachable by URL, kept out of
@@ -93,9 +94,9 @@ export default function BraedenPitchPage() {
             your fonts and your red and building around the homes themselves.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a href={DEMO_HREF} className="lindon-cta lindon-cta-pink">
+            <DemoLink href={DEMO_HREF} className="lindon-cta lindon-cta-pink">
               See the demo &rarr;
-            </a>
+            </DemoLink>
             <ContactCta className="lindon-cta lindon-cta-ghost">Talk to me</ContactCta>
           </div>
         </Reveal>
@@ -186,9 +187,9 @@ export default function BraedenPitchPage() {
           </p>
           <div className="lindon-demo-card mt-8">
             <div className="flex flex-wrap items-center gap-3">
-              <a href={DEMO_HREF} className="lindon-cta lindon-cta-pink">
+              <DemoLink href={DEMO_HREF} className="lindon-cta lindon-cta-pink">
                 See the demo &rarr;
-              </a>
+              </DemoLink>
             </div>
             <p className="text-ink-soft mt-5" style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>
               This is a first draft, built to show the kind of uplift I can bring, not a finished site.
@@ -256,9 +257,9 @@ export default function BraedenPitchPage() {
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <ContactCta className="lindon-cta lindon-cta-pink">Talk to me</ContactCta>
-            <a href={DEMO_HREF} className="lindon-cta lindon-cta-ghost">
+            <DemoLink href={DEMO_HREF} className="lindon-cta lindon-cta-ghost">
               See the demo &rarr;
-            </a>
+            </DemoLink>
           </div>
           <p className="mono-label text-ink-soft mt-10">Finbar Skitini · finbar.studio</p>
         </div>

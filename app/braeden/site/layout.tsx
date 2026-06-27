@@ -6,6 +6,7 @@ import {
 import "./braeden-site.css";
 import SmoothScroll from "@/components/braeden/SmoothScroll";
 import NavTone from "@/components/braeden/NavTone";
+import Preloader from "@/components/braeden/Preloader";
 
 // Braeden Constructions demo. Lives outside the (site) route group, inheriting
 // only the root html/body; styling is scoped under `.braeden-site`. noindex: a
@@ -37,6 +38,7 @@ export const metadata: Metadata = {
 export default function BraedenSiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={`braeden-site ${FONTS}`}>
+      <Preloader />
       <a href="/braeden" className="ld-back" aria-label="Back to finbar.studio">
         <span className="ld-back-arrow" aria-hidden="true">&larr;</span>
         <span className="ld-back-text">back to finbar.studio</span>
