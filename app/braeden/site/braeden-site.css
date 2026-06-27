@@ -189,6 +189,104 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
 
+/* ── Cohesive card system (everything is based on the Awards section) ────────
+   Every homepage section is the SAME off-white card panel at ~100vh, with the
+   same header treatment (eyebrow + Montserrat-800 caps title + a short red rule)
+   and the same hairline-ledger / Space-Mono motifs. Consistent tokens + padding
+   throughout so the page reads as one piece. (The footer keeps its own panel.) */
+.braeden-site .bsec {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(26px, 4.5vh, 60px) var(--gutter);
+  background: var(--paper);
+}
+.braeden-site .bcard {
+  width: 100%;
+  max-width: 1280px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: clamp(16px, 1.6vw, 26px);
+  padding: clamp(30px, 4.4vw, 76px);
+  box-shadow: 0 30px 70px rgba(20, 20, 22, 0.05);
+}
+/* The shared two-column body: a sticky heading block + a content column. */
+.braeden-site .bcard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.9fr;
+  gap: clamp(28px, 5vw, 76px);
+  align-items: start;
+}
+.braeden-site .bhead { position: sticky; top: clamp(80px, 10vw, 120px); }
+.braeden-site .bhead .eyebrow { margin-bottom: 1.5em; }
+.braeden-site .bhead-title {
+  font-family: var(--font-montserrat);
+  font-weight: 800;
+  font-size: clamp(30px, 3.4vw, 56px);
+  line-height: 1.0;
+  letter-spacing: 0.012em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 0.55em;
+}
+.braeden-site .bhead-intro {
+  font-family: var(--font-quick);
+  font-size: clamp(14px, 1vw, 16.5px);
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 28ch;
+  margin-bottom: 1.7em;
+}
+.braeden-site .brule { display: block; width: 34px; height: 2px; background: var(--red); }
+
+/* Shared ledger (hairline rows, Space Mono key + value), lifted from Awards. */
+.braeden-site .bledger { border-top: 1px solid var(--line); }
+.braeden-site .bledger-row {
+  display: grid;
+  grid-template-columns: clamp(72px, 8vw, 124px) 1fr;
+  gap: clamp(14px, 2.2vw, 34px);
+  align-items: baseline;
+  padding: clamp(15px, 1.7vw, 24px) 0;
+  border-bottom: 1px solid var(--line);
+  transition: border-color 0.22s var(--ease);
+}
+.braeden-site .bledger-row:hover { border-color: var(--red); }
+.braeden-site .bledger-key {
+  font-family: var(--font-space-mono);
+  font-size: clamp(9px, 0.72vw, 10.5px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.35;
+  transition: color 0.22s var(--ease);
+}
+.braeden-site .bledger-row:hover .bledger-key { color: var(--red); }
+.braeden-site .bledger-val {
+  font-family: var(--font-quick);
+  font-size: clamp(15px, 1.1vw, 18px);
+  line-height: 1.45;
+  color: var(--ink);
+  transition: transform 0.22s var(--ease);
+}
+.braeden-site .bledger-row:hover .bledger-val { transform: translateX(5px); }
+.braeden-site .bledger-sub {
+  display: block; margin-top: 0.4em;
+  font-family: var(--font-space-mono);
+  font-size: clamp(9px, 0.72vw, 10px);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
+}
+.braeden-site .bnote {
+  margin-top: clamp(20px, 2.5vw, 32px);
+  font-family: var(--font-space-mono);
+  font-size: clamp(9px, 0.72vw, 10px);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
+}
+
+@media (max-width: 820px) {
+  .braeden-site .bcard-grid { grid-template-columns: 1fr; gap: 26px; }
+  .braeden-site .bhead { position: static; }
+}
+
 /* ── Keyframes ──────────────────────────────────────────────── */
 @keyframes brdScrollDrop { 0% { transform: translateY(-100%); opacity: 1; } 100% { transform: translateY(220%); opacity: 0; } }
 @keyframes brdKen { from { transform: scale(1.06); } to { transform: scale(1.12); } }
