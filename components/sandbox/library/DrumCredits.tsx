@@ -22,8 +22,9 @@ import { ASTERISK_POINTS } from "@/components/brand-asterisk";
 /** Tighter drum: more arc + smaller radius = a more pronounced curl. */
 const ARC = 1.12; // radians of cylinder visible (~64°)
 const RADIUS = 4;
-/** How much of the credits canvas fills the visible arc (smaller = more lines). */
-const WINDOW = 0.2;
+/** How much of the credits canvas fills the visible arc (smaller = fewer lines).
+    Tuned so each short drum shows ~one line, with halves curling top + bottom. */
+const WINDOW = 0.09;
 /** Vertical scroll speed, in texture-units per second. */
 const SPEED = 0.018;
 
@@ -324,15 +325,12 @@ function Drum({ phase = 0 }: { phase?: number }) {
 
 export default function DrumCredits() {
   return (
-    <div className="sb-fx-stage dc-split">
+    // Three wide, short drums stacked with a 40px gap. One continuous roll flows up
+    // through them (phases WINDOW apart): off the bottom, onto the middle, onto the top.
+    <div className="sb-fx-stage dc-stack">
+      <Drum phase={2 * WINDOW} />
+      <Drum phase={WINDOW} />
       <Drum phase={0} />
-      {/* One continuous roll across three stacked windows: phases WINDOW apart so
-          the same copy flows up through them (bottom → middle → top). */}
-      <div className="dc-stack">
-        <Drum phase={2 * WINDOW} />
-        <Drum phase={WINDOW} />
-        <Drum phase={0} />
-      </div>
     </div>
   );
 }
