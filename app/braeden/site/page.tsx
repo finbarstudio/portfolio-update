@@ -3,19 +3,14 @@ import ViewCursor from "@/components/braeden/ViewCursor";
 import Hero from "@/components/braeden/home/Hero";
 import Featured from "@/components/braeden/home/Featured";
 import Story from "@/components/braeden/home/Story";
-import Awards from "@/components/braeden/home/Awards";
 import Voices from "@/components/braeden/home/Voices";
-import Contact from "@/components/braeden/home/Contact";
 import Footer from "@/components/braeden/home/Footer";
 
 /**
- * Braeden Constructions homepage.
- *
- * Cohesion comes from a shared design language (one header treatment, the brand
- * tokens, Montserrat/Quicksand/Space Mono, consistent spacing + a consistent
- * scroll reveal) across DISTINCT section layouts, not from carding everything.
- * The hero is offered as three image-led options to choose from; the card panel
- * is reserved for contact + footer; projects are a bento grid.
+ * Braeden Constructions homepage — Lindon-style: minimal, type-led, imagery-led.
+ * A wordmark + awards hero on white, the work in a full-bleed parallax showcase,
+ * two quiet type-led bands (story + a client voice), and the signature giant
+ * BRAEDEN wordmark footer. No grids, no cards. Contact lives in the footer.
  */
 export default function BraedenHome() {
   return (
@@ -25,9 +20,7 @@ export default function BraedenHome() {
       <Hero />
       <Featured />
       <Story />
-      <Awards />
       <Voices />
-      <Contact />
       <Footer />
     </main>
   );
