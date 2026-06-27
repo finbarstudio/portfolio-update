@@ -63,7 +63,7 @@ type Cfg = {
   drawOn: boolean; drawDuration: number; pulse: boolean;
   revealStyle: "Draw" | "Fade" | "Scale" | "Wipe"; easing: "Linear" | "Ease out" | "Ease in-out" | "Spring";
   stagger: number; layer: "Together" | "Curve first" | "Nodes first"; tracer: boolean;
-  loopMode: "Once" | "Loop" | "Ping-pong"; exportFps: number;
+  loopMode: "Once" | "Loop" | "Ping-pong" | "Around"; exportFps: number;
   traceColors: number; traceDetail: number;
   exportTransparent: boolean; exportNoGrid: boolean;
 };
@@ -86,7 +86,7 @@ function defaultCfg(): Cfg {
     titleBlock: true, caption: "BÉZIER SPECIMEN",
     drawOn: true, drawDuration: 1.6, pulse: false,
     revealStyle: "Draw", easing: "Ease out", stagger: 0.7, layer: "Curve first", tracer: true,
-    loopMode: "Loop", exportFps: 30,
+    loopMode: "Around", exportFps: 30,
     traceColors: 8, traceDetail: 1,
     exportTransparent: false, exportNoGrid: false,
   };
@@ -169,7 +169,7 @@ const SECTIONS: { title: string; fields: Field[] }[] = [
     { kind: "select", key: "layer", label: "Order", options: ["Together", "Curve first", "Nodes first"] },
     { kind: "toggle", key: "tracer", label: "Tracer dot" },
     { kind: "toggle", key: "pulse", label: "Pulse nodes (live)" },
-    { kind: "select", key: "loopMode", label: "Loop", options: ["Once", "Loop", "Ping-pong"] },
+    { kind: "select", key: "loopMode", label: "Loop", options: ["Once", "Loop", "Ping-pong", "Around"] },
   ]},
   { title: "Trace + export", fields: [
     { kind: "range", key: "traceColors", label: "Trace colours", min: 2, max: 24, step: 1 },
@@ -241,6 +241,8 @@ function normHex(c: string): string {
 
 export default function BezierStudio() {
   const [cfg, setCfg] = useState<Cfg>(defaultCfg);
+  const cfgRef = useRef(cfg);
+  cfgRef.current = cfg;
   const [svgText, setSvgText] = useState<string>(SAMPLES.Wave);
   const [sourceName, setSourceName] = useState("Wave");
   const [subs, setSubs] = useState<SubPath[] | null>(null);
@@ -295,6 +297,36 @@ export default function BezierStudio() {
 
   useEffect(() => { if (measureRef.current) { try { setPathLen(measureRef.current.getTotalLength()); } catch { /* */ } } }, [view?.d]);
 
+  // Live preview: animate the real SVG with the same phase logic the export uses.
+  // Looping modes run continuously (so any param tweak previews live); "Once" plays
+  // through then settles on the resting state. Restarts when the motion settings or
+  // the geometry change, or when Replay is pressed (drawNonce).
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || !view) return;
+    const reduced = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!cfgRef.current.drawOn || reduced) { applyResting(svg); return; }
+    let raf = 0, start = 0, stopped = false;
+    const frame = (now: number) => {
+      if (stopped) return;
+      if (!start) start = now;
+      const mode = cfgRef.current.loopMode;
+      const dur = Math.max(0.2, cfgRef.current.drawDuration) * 1000;
+      const t = (now - start) / dur;
+      let phase = 0, done = false;
+      if (mode === "Once") { phase = Math.min(1, t); done = t >= 1; }
+      else if (mode === "Ping-pong") { const cc = t % 2; phase = cc <= 1 ? cc : 2 - cc; }
+      else phase = t % 1; // Loop / Around
+      applyProgress(svg, phase);
+      if (done) { applyResting(svg); return; }
+      raf = requestAnimationFrame(frame);
+    };
+    applyProgress(svg, 0); // start hidden, no flash of the full plate
+    raf = requestAnimationFrame(frame);
+    return () => { stopped = true; cancelAnimationFrame(raf); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, drawNonce, pathLen, cfg.drawOn, cfg.loopMode, cfg.revealStyle, cfg.easing, cfg.drawDuration, cfg.stagger, cfg.layer, cfg.tracer]);
+
   function set<K extends keyof Cfg>(key: K, value: Cfg[K]) { setCfg((c) => ({ ...c, [key]: value })); }
   function loadText(text: string, name: string) { setSvgText(text); setSourceName(name); }
 
@@ -339,56 +371,93 @@ export default function BezierStudio() {
   const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
   function ease(t: number): number {
     t = clamp01(t);
-    if (cfg.easing === "Linear") return t;
-    if (cfg.easing === "Ease in-out") return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    if (cfg.easing === "Spring") { const c4 = (2 * Math.PI) / 3; return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1; }
+    const easing = cfgRef.current.easing;
+    if (easing === "Linear") return t;
+    if (easing === "Ease in-out") return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    if (easing === "Spring") { const c4 = (2 * Math.PI) / 3; return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1; }
     return 1 - Math.pow(1 - t, 2); // Ease out
   }
-  /** Frame phases (0..1) for the chosen loop mode. Ping-pong reverses back. */
+  /** Frame phases (0..1) for the chosen loop mode. Ping-pong reverses back; Around
+      excludes the duplicate endpoint so the exported loop is seamless. */
   function buildPhases(n: number): number[] {
+    if (cfg.loopMode === "Around") return Array.from({ length: n }, (_, i) => i / n);
     const fwd = Array.from({ length: n }, (_, i) => i / (n - 1));
     if (cfg.loopMode === "Ping-pong") return fwd.concat(fwd.slice(1, -1).reverse());
     return fwd;
   }
-  /** SVG serialised with the chosen reveal (style / easing / stagger / layer /
-      tracer) baked at the given phase — used for every recorded frame. */
-  function serializeAtProgress(phase: number): string {
+  /** Bake the chosen reveal (style / easing / stagger / layer / tracer / loop) onto
+      a root's elements at the given phase. Used both to drive the LIVE preview each
+      frame and to render every recorded export frame — so what you see is what you get. */
+  function applyProgress(root: SVGSVGElement, phase: number) {
+    const c = cfgRef.current;
+    const around = c.loopMode === "Around";
     const e = ease(phase);
     let curveT = e, nodeT = e;
-    if (cfg.layer === "Curve first") { curveT = clamp01(e / 0.6); nodeT = clamp01((e - 0.4) / 0.6); }
-    else if (cfg.layer === "Nodes first") { nodeT = clamp01(e / 0.6); curveT = clamp01((e - 0.4) / 0.6); }
-    const style = cfg.revealStyle;
-    const clone = svgRef.current!.cloneNode(true) as SVGSVGElement;
+    if (c.layer === "Curve first") { curveT = clamp01(e / 0.6); nodeT = clamp01((e - 0.4) / 0.6); }
+    else if (c.layer === "Nodes first") { nodeT = clamp01(e / 0.6); curveT = clamp01((e - 0.4) / 0.6); }
+    const style = c.revealStyle;
 
-    const anim = clone.querySelector<SVGElement>("[data-anim]");
+    const anim = root.querySelector<SVGElement>("[data-anim]");
     if (anim) {
-      if (style === "Scale") { const s = 0.55 + 0.45 * e; anim.setAttribute("transform", `translate(${W / 2} ${H / 2}) scale(${s}) translate(${-W / 2} ${-H / 2})`); anim.style.opacity = String(e); }
+      if (style === "Scale" && !around) { const s = 0.55 + 0.45 * e; anim.setAttribute("transform", `translate(${W / 2} ${H / 2}) scale(${s}) translate(${-W / 2} ${-H / 2})`); anim.style.opacity = String(e); }
       else { anim.removeAttribute("transform"); anim.style.removeProperty("opacity"); }
     }
-    clone.querySelector<SVGElement>("#bz-wipe-rect")?.setAttribute("width", String(style === "Wipe" ? W * e : W));
+    root.querySelector<SVGElement>("#bz-wipe-rect")?.setAttribute("width", String(style === "Wipe" && !around ? W * e : W));
 
-    clone.querySelectorAll<SVGElement>("[data-draw]").forEach((el) => {
+    root.querySelectorAll<SVGElement>("[data-draw]").forEach((el) => {
       el.style.removeProperty("stroke-dasharray"); el.style.removeProperty("stroke-dashoffset"); el.style.removeProperty("opacity"); el.removeAttribute("pathLength");
-      if (style === "Draw") { el.setAttribute("pathLength", "1"); el.style.strokeDasharray = "1"; el.style.strokeDashoffset = String(clamp01(1 - curveT)); }
-      else if (style === "Fade") el.style.opacity = String(curveT);
+      if (around) {
+        // Trace on, then peel off the far side, travelling one direction — seamless
+        // because offset 1 and offset -1 are the same point on a "1 1" dash pattern.
+        el.setAttribute("pathLength", "1"); el.style.strokeDasharray = "1"; el.style.strokeDashoffset = String(1 - 2 * phase);
+      } else if (style === "Draw") {
+        el.setAttribute("pathLength", "1"); el.style.strokeDasharray = "1"; el.style.strokeDashoffset = String(clamp01(1 - curveT));
+      } else if (style === "Fade") {
+        const fin = parseFloat(el.getAttribute("data-fin") || "1");
+        el.style.opacity = String(fin * curveT);
+      }
     });
-    clone.querySelectorAll<SVGElement>("[data-pop]").forEach((el) => {
+    root.querySelectorAll<SVGElement>("[data-pop]").forEach((el) => {
+      if (around) { el.style.removeProperty("opacity"); return; } // markers hold while the line travels
       if (style === "Draw" || style === "Fade") {
         const frac = parseFloat(el.getAttribute("data-pop") || "0") || 0;
-        el.style.opacity = String(clamp01((nodeT - frac * cfg.stagger) / 0.18));
+        const fin = parseFloat(el.getAttribute("data-fin") || "1");
+        // Spread the per-node pop across [0,1] so even at max stagger the LAST node
+        // finishes exactly at phase 1 — no anchors left half-faded when "complete".
+        el.style.opacity = String(fin * clamp01((nodeT - frac * c.stagger * 0.82) / 0.18));
       } else el.style.removeProperty("opacity");
     });
-    const tracer = clone.querySelector<SVGElement>("#bz-tracer");
+    const tracer = root.querySelector<SVGElement>("#bz-tracer");
     if (tracer) {
-      if (cfg.tracer && style === "Draw" && curveT > 0.001 && curveT < 0.999 && measureRef.current && pathLen > 0) {
+      if (c.tracer && !around && style === "Draw" && curveT > 0.001 && curveT < 0.999 && measureRef.current && pathLen > 0) {
         try { const pt = measureRef.current.getPointAtLength(curveT * pathLen); tracer.setAttribute("cx", String(pt.x)); tracer.setAttribute("cy", String(pt.y)); tracer.style.opacity = "1"; }
         catch { tracer.style.opacity = "0"; }
       } else tracer.style.opacity = "0";
     }
+  }
 
+  /** Clear every imperative animation style so the elements show their authored
+      resting state: curve fully drawn, anchors fully opaque, handles at their set
+      opacity. This is the clean "animation complete" state. */
+  function applyResting(root: SVGSVGElement) {
+    const anim = root.querySelector<SVGElement>("[data-anim]");
+    if (anim) { anim.removeAttribute("transform"); anim.style.removeProperty("opacity"); }
+    root.querySelector<SVGElement>("#bz-wipe-rect")?.setAttribute("width", String(W));
+    root.querySelectorAll<SVGElement>("[data-draw]").forEach((el) => {
+      el.style.removeProperty("stroke-dasharray"); el.style.removeProperty("stroke-dashoffset"); el.style.removeProperty("opacity"); el.removeAttribute("pathLength");
+    });
+    root.querySelectorAll<SVGElement>("[data-pop]").forEach((el) => el.style.removeProperty("opacity"));
+    const tracer = root.querySelector<SVGElement>("#bz-tracer");
+    if (tracer) tracer.style.opacity = "0";
+  }
+
+  /** SVG serialised with the reveal baked at the given phase — one recorded frame. */
+  function serializeAtProgress(phase: number): string {
+    const clone = svgRef.current!.cloneNode(true) as SVGSVGElement;
+    applyProgress(clone, phase);
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     clone.querySelectorAll<SVGElement>("*").forEach((el) => {
-      el.removeAttribute("class"); el.removeAttribute("data-draw"); el.removeAttribute("data-pop"); el.removeAttribute("data-anim");
+      el.removeAttribute("class"); el.removeAttribute("data-draw"); el.removeAttribute("data-pop"); el.removeAttribute("data-anim"); el.removeAttribute("data-fin");
       el.style.removeProperty("animation"); el.style.removeProperty("--bz-dur"); el.style.removeProperty("--bz-delay");
     });
     clone.querySelector("#bz-measure")?.remove();
@@ -555,15 +624,13 @@ export default function BezierStudio() {
   const ns = cfg.nodeScale;
   const blur = (cfg.glowIntensity / 100) * (W / 90);
   const bloomW = cfg.curveWeight + (cfg.glowIntensity / 100) * (W / 50);
-  const drawCls = cfg.drawOn ? "bz-draw" : undefined;
-  const drawStyle = cfg.drawOn ? ({ ["--bz-dur" as string]: `${cfg.drawDuration}s` } as React.CSSProperties) : undefined;
-  const pl = cfg.drawOn ? 1 : undefined;
   const anchorN = view?.anchors.length ?? 0;
   const handleN = view?.handles.length ?? 0;
-  const nodeCls = cfg.pulse ? "bz-pulse" : cfg.drawOn ? "bz-pop" : undefined;
-  const nodeStyle = (i: number, n: number): React.CSSProperties | undefined =>
-    cfg.pulse ? { animationDelay: `${(i % 24) * 0.06}s` }
-      : cfg.drawOn ? { animationDelay: `${(i / Math.max(1, n)) * cfg.drawDuration}s` } : undefined;
+  // The draw / pop reveal is now driven imperatively per frame (applyProgress); the
+  // only CSS class left is the optional idle pulse.
+  const nodeCls = cfg.pulse ? "bz-pulse" : undefined;
+  const nodeStyle = (i: number, _n: number): React.CSSProperties | undefined =>
+    cfg.pulse ? { animationDelay: `${(i % 24) * 0.06}s` } : undefined;
   const showLabels = cfg.labelMode !== "None" && anchorN <= 80;
   // Heavy SVGs (many nodes): draw the markers as a few combined <path>s instead
   // of thousands of elements, so editing stays smooth. Memoised so unrelated
@@ -657,27 +724,27 @@ export default function BezierStudio() {
             })()}
 
             {view && (
-              <g key={`${sourceName}:${drawNonce}`} data-anim="" clipPath="url(#bz-wipe)">
+              <g key={sourceName} data-anim="" clipPath="url(#bz-wipe)">
                 <path id="bz-measure" ref={measureRef} d={view.d} fill="none" stroke="none" style={{ visibility: "hidden" }} />
 
                 {cfg.showCurve && cfg.glow && cfg.glowIntensity > 0 && (
-                  <path data-draw="" className={drawCls} style={drawStyle} d={view.d} fill="none" stroke={cfg.glowColor} strokeWidth={bloomW} strokeLinecap="round" strokeLinejoin="round" opacity={0.18} pathLength={pl} filter="url(#bz-glow)" />
+                  <path data-draw="" data-fin="0.18" d={view.d} fill="none" stroke={cfg.glowColor} strokeWidth={bloomW} strokeLinecap="round" strokeLinejoin="round" opacity={0.18} filter="url(#bz-glow)" />
                 )}
                 {cfg.showCurve && cfg.fillShape && <path d={view.d} fill={cfg.fillColor} fillOpacity={cfg.fillOpacity} stroke="none" />}
                 {cfg.showCurve && (
-                  <path data-draw="" className={drawCls} style={drawStyle} d={view.d} fill="none" stroke={cfg.curveColor} strokeWidth={cfg.curveWeight} strokeLinecap="round" strokeLinejoin="round" opacity={cfg.curveOpacity} pathLength={pl} />
+                  <path data-draw="" data-fin={cfg.curveOpacity} d={view.d} fill="none" stroke={cfg.curveColor} strokeWidth={cfg.curveWeight} strokeLinecap="round" strokeLinejoin="round" opacity={cfg.curveOpacity} />
                 )}
 
                 {heavy && combined ? (
                   <>
-                    {cfg.showHandles && combined.handles && <path data-pop="0.45" d={combined.handles} fill="none" stroke={cfg.handleColor} strokeWidth={cfg.handleWeight * ns} strokeLinecap="round" strokeDasharray={cfg.handleDash > 0 ? `${cfg.handleDash} ${cfg.handleDash}` : undefined} opacity={cfg.handleOpacity} />}
+                    {cfg.showHandles && combined.handles && <path data-pop="0.45" data-fin={cfg.handleOpacity} d={combined.handles} fill="none" stroke={cfg.handleColor} strokeWidth={cfg.handleWeight * ns} strokeLinecap="round" strokeDasharray={cfg.handleDash > 0 ? `${cfg.handleDash} ${cfg.handleDash}` : undefined} opacity={cfg.handleOpacity} />}
                     {cfg.showControls && combined.controls && <path data-pop="0.5" d={combined.controls} fill={cfg.controlShape === "Dot" ? cfg.controlStroke : cfg.controlShape === "Cross" ? "none" : cfg.controlFill} stroke={cfg.controlShape === "Dot" ? "none" : cfg.controlStroke} strokeWidth={cfg.controlShape === "Dot" ? undefined : Math.max(0.5, cfg.anchorWeight * 0.7)} strokeLinecap="round" />}
                     {cfg.showAnchors && combined.anchors && <path data-pop="0.55" d={combined.anchors} fill={cfg.anchorShape === "Dot" ? cfg.anchorStroke : cfg.anchorShape === "Cross" ? "none" : cfg.anchorFill} stroke={cfg.anchorShape === "Dot" ? "none" : cfg.anchorStroke} strokeWidth={cfg.anchorShape === "Dot" ? undefined : cfg.anchorWeight} strokeLinecap="round" />}
                   </>
                 ) : (
                   <>
                     {cfg.showHandles && view.handles.map((hd, i) => (
-                      <line key={"h" + i} data-pop={i / Math.max(1, handleN)} x1={hd.from.x} y1={hd.from.y} x2={hd.to.x} y2={hd.to.y} stroke={cfg.handleColor} strokeWidth={cfg.handleWeight * ns} strokeLinecap="round" strokeDasharray={cfg.handleDash > 0 ? `${cfg.handleDash} ${cfg.handleDash}` : undefined} opacity={cfg.handleOpacity} className={nodeCls} style={nodeStyle(i, handleN)} />
+                      <line key={"h" + i} data-pop={i / Math.max(1, handleN)} data-fin={cfg.handleOpacity} x1={hd.from.x} y1={hd.from.y} x2={hd.to.x} y2={hd.to.y} stroke={cfg.handleColor} strokeWidth={cfg.handleWeight * ns} strokeLinecap="round" strokeDasharray={cfg.handleDash > 0 ? `${cfg.handleDash} ${cfg.handleDash}` : undefined} opacity={cfg.handleOpacity} className={nodeCls} style={nodeStyle(i, handleN)} />
                     ))}
                     {cfg.showControls && view.handles.map((hd, i) => shape(cfg.controlShape, hd.to, Math.max(1, cfg.controlSize * ns), cfg.controlFill, cfg.controlStroke, Math.max(0.5, cfg.anchorWeight * 0.7), "c" + i, nodeCls, nodeStyle(i, handleN), i / Math.max(1, handleN)))}
                     {cfg.showAnchors && view.anchors.map((p, i) => shape(cfg.anchorShape, p, Math.max(1, cfg.anchorSize * ns), cfg.anchorFill, cfg.anchorStroke, cfg.anchorWeight, "a" + i, nodeCls, nodeStyle(i, anchorN), i / Math.max(1, anchorN), cfg.anchorRotate))}
@@ -688,7 +755,7 @@ export default function BezierStudio() {
 
 
                 {showLabels && view.anchors.map((p, i) => (
-                  <text key={"l" + i} x={p.x + lab.dx} y={p.y + lab.dy} fontFamily={MONO} fontSize={cfg.labelSize} fill={cfg.labelColor} textAnchor={lab.anchor} letterSpacing="0.5">
+                  <text key={"l" + i} data-pop={i / Math.max(1, anchorN)} x={p.x + lab.dx} y={p.y + lab.dy} fontFamily={MONO} fontSize={cfg.labelSize} fill={cfg.labelColor} textAnchor={lab.anchor} letterSpacing="0.5">
                     {cfg.labelMode === "Index" ? "P" + String(i).padStart(2, "0") : `${Math.round(view.anchorsArt[i]?.x ?? 0)},${Math.round(view.anchorsArt[i]?.y ?? 0)}`}
                   </text>
                 ))}

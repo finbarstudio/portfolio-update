@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import SandboxNav from "@/components/sandbox/SandboxNav";
 import SandboxTransition from "@/components/sandbox/SandboxTransition";
+import SuggestionWidget from "@/components/sandbox/SuggestionWidget";
 
 const SANDBOX_URL = "https://sandbox.finbar.studio";
 
@@ -40,6 +41,7 @@ export default function SandboxLayout({ children }: { children: React.ReactNode 
           <SandboxTransition>{children}</SandboxTransition>
         </div>
       </div>
+      <SuggestionWidget />
     </div>
   );
 }
