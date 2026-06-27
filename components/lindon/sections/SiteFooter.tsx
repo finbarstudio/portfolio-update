@@ -9,7 +9,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import BrandWordmark from "@/components/BrandWordmark";
+import BrandWordmarkText from "@/components/BrandWordmarkText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -125,7 +125,7 @@ export default function SiteFooter() {
             <div className="lf-reveal">
               <span className="lf-value">© {year} Lindon Homes</span>
               <span className="lf-label">QBCC No. 1207078</span>
-              <span className="lf-value lf-credit">Concept site by <BrandWordmark className="lf-foot-mark" /></span>
+              <span className="lf-value lf-credit">Concept site by <BrandWordmarkText className="lf-foot-mark" /></span>
             </div>
           </div>
         </div>

@@ -3771,8 +3771,12 @@ body:has(.sb-root) {
 }
 
 /* ── Brand wordmark token ─────────────────────────────────────────
-   The canonical logo, used everywhere: FINBARSTUDIO in Space Mono caps with a
-   pink asterisk (Space Mono's own * glyph, set as type) on the end, no space. */
+   The canonical logo: FINBARSTUDIO in Space Mono caps with the pink brand
+   asterisk on the end, no space. BrandWordmark draws that asterisk as the
+   rectangular SVG polygon — the nav, main footer, favicon, OG and home intro
+   all use it. The demo footer credits use BrandWordmarkText instead, which sets
+   the asterisk as Space Mono's own * glyph (.brand-wordmark-star) for clean
+   inline spacing at small sizes. */
 .brand-wordmark {
   font-family: var(--font-mono);
   font-weight: 700;
