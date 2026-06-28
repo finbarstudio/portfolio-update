@@ -8,6 +8,7 @@ import {
   tripDateLabel,
 } from "@/content/imogen";
 import RouteMap from "@/components/imogen/RouteMap";
+import TripGraph from "@/components/imogen/TripGraph";
 import StopCard from "@/components/imogen/StopCard";
 import Reveal from "@/components/imogen/Reveal";
 
@@ -58,6 +59,17 @@ export default function ImogenPage() {
             <RouteMap />
             <p className="im-map-cap">
               Tap a numbered stop to jump to it. The faded ones I&apos;m still writing.
+            </p>
+          </Reveal>
+        </section>
+
+        {/* ── time per place ── */}
+        <section className="im-section">
+          <Reveal>
+            <p className="im-section-label">Time in each place</p>
+            <TripGraph />
+            <p className="im-graph-note">
+              Rough nights per stop, just so you can see the shape of it. Travel days and side trips aren&apos;t counted.
             </p>
           </Reveal>
         </section>

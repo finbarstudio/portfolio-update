@@ -61,7 +61,9 @@ export type Stop = {
   /** Shown in place of dates for a side trip, e.g. "Side trip · 2–3 days if you go". */
   sideNote?: string;
   blurb: string;
+  /** One hostel, or use `hostels` for a couple of options. */
   hostel?: Hostel;
+  hostels?: Hostel[];
   dos?: DoItem[];
   /** How you get from here to the next stop. */
   leg?: Leg;
@@ -70,7 +72,7 @@ export type Stop = {
 /** A point on the route map. `detailed` = has a stop card to link to. */
 export type RoutePoint = {
   id: string;
-  /** Spine number; omitted for side trips. */
+  /** Spine number; omitted for side trips and pass-through waypoints. */
   n?: number;
   name: string;
   country: Country;
@@ -80,6 +82,8 @@ export type RoutePoint = {
   detailed?: boolean;
   /** A spur off the main line (e.g. Pai) rather than a spine stop. */
   side?: boolean;
+  /** On the route line but just passed through, not a stay (e.g. Vientiane). */
+  waypoint?: boolean;
   /** For a side spur, the spine point id it branches from. */
   from?: string;
   /** Force the label to the other side of the pin. */
@@ -115,13 +119,13 @@ export const apps: AppItem[] = [
     name: "12go.asia",
     tagline: "Buses, boats and trains",
     url: "https://12go.asia",
-    note: "Book travel across the whole region. It's in English and you pay online. Easy.",
+    note: "In English, pay online. This is the one for complicated multi-leg trips (like Laos into Vietnam): search your start and end and it chains the buses and boats together for you.",
   },
   {
     name: "Vexere",
-    tagline: "Buses in Vietnam",
+    tagline: "Single trips in Vietnam",
     url: "https://vexere.com",
-    note: "Once you're in Vietnam, use this for buses instead. It's what the locals use, you can actually see the bus before you book, and it's far cheaper than 12go there.",
+    note: "Once you're inside Vietnam and just booking a single trip, use this. It's what the locals use, you can see the actual bus before you book, and it's far cheaper than 12go there.",
   },
 ];
 
@@ -141,7 +145,11 @@ export const tips: Tip[] = [
   },
   {
     title: "Renting a moped",
-    body: "Mopeds are the best way to explore. Look for a rental with good reviews, but honestly the best move is to ask the hostel staff who they'd use, as long as they seem trustworthy and aren't just pushing a mate's shop, which is where scams happen. And always film a slow video all the way around the bike before you ride off, so nobody can pin existing scratches on you.",
+    body: "Mopeds are the best way to explore (except big cities like Hanoi). Look for a rental with good reviews, but honestly the best move is to ask the hostel staff who they'd use, as long as they seem trustworthy and aren't just pushing a mate's shop, which is where scams happen. And always film a slow video all the way around the bike before you ride off, so nobody can pin existing scratches on you.",
+  },
+  {
+    title: "Don't trust Google ratings blindly",
+    body: "A general Asia tip, but especially in Hanoi. Locals don't really leave Google reviews the way we do back home, so a lot of the high ratings come from tourists that managers have sweet-talked into reviewing. A massive score often just means a place is good at working tourists. Ask other travellers and your hostel instead, and when in doubt, eat where it's busy with locals.",
   },
   {
     title: "Stay flexible",
@@ -322,8 +330,8 @@ export const stops: Stop[] = [
     ],
     leg: {
       to: "Vang Vieng",
-      mode: "Bus south to Vang Vieng (a few hours)",
-      note: "Easy hop, and Vang Vieng turned out to be a highlight.",
+      mode: "The new high-speed train (about an hour)",
+      note: "Worth doing for its own sake. It's a sleek, modern Chinese-built line dropped into the middle of a really poor country, which is a fascinating thing to see in itself. Fast and easy.",
     },
   },
   {
@@ -331,35 +339,133 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Vang Vieng",
     country: "Laos",
-    nights: 2,
+    nights: 3,
     blurb:
-      "Don't let the safety note put you off, Vang Vieng was one of my favourites. Big limestone-mountain scenery and a proper backpacker buzz, and it's the kind of place that's the best with a group of friends. I'll add the specifics on what to do here soon. Just be drink-smart while you're here (see the note above).",
+      "Don't let the safety note put you off, Vang Vieng was one of my favourites. Big limestone-mountain scenery, and the most beautiful place on the whole trip to drive a moped around. Go with a group of friends and it's the best. Just be drink-smart while you're here (see the note above).",
     hostel: {
       name: "Golden Dragon House",
       url: "https://www.hostelworld.com/pwa/hosteldetails.php/Golden-Dragon-House/Vang-Vieng/327611?from=2026-06-29&to=2026-07-02&guests=2#position=1",
       maps: "Golden Dragon House, Vang Vieng",
       note: "Stayed here and it was good. Go with a group of friends and you're set.",
     },
+    dos: [
+      {
+        name: "Rent a moped",
+        note: "Do this, it's a must. The scenery here is unreal and riding around it is the best way to see it. (Check the moped tips above.)",
+        kind: "do",
+      },
+      {
+        name: "Nam Xay Viewpoint",
+        note: "Ride out here for the classic Vang Vieng view over the valley. Worth the climb.",
+        maps: "Nam Xay Viewpoint, Vang Vieng",
+        kind: "do",
+      },
+      {
+        name: "Blue Lagoon 3",
+        note: "The best of the three blue lagoons. Pair it with Nam Xay in one day on the moped.",
+        maps: "Blue Lagoon 3, Vang Vieng",
+        kind: "do",
+      },
+      {
+        name: "Paragliding",
+        note: "You have to do this. Book an early-morning or late-afternoon flight, it was amazing.",
+        maps: "Vang Vieng paragliding",
+        kind: "do",
+      },
+    ],
     leg: {
-      to: "Vientiane",
-      mode: "Bus on to Vientiane",
-      note: "Short leg down to the capital to set up the crossing into Vietnam.",
+      to: "Hanoi, through Vientiane",
+      mode: "Book the whole Vang Vieng → Hanoi trip on 12go",
+      app: "12go (it chains the legs for you)",
+      appUrl: "https://12go.asia",
+      note: "It's a long one and a proper adventure. See the next card.",
     },
   },
   {
-    id: "vientiane",
-    kind: "place",
-    name: "Vientiane",
-    country: "Laos",
-    nights: 1,
+    id: "crossing",
+    kind: "travel",
+    name: "The crossing into Vietnam",
+    country: "Vietnam",
+    days: 1,
     blurb:
-      "I'll be honest, this was my least favourite stop, and the rest of Laos after Luang Prabang and Vang Vieng didn't do much for me. But you pass through the capital to catch the bus into Vietnam, so think of it as a one-night transit stop, then move on.",
+      "Getting from Vang Vieng to Hanoi is a mission, and honestly half the adventure. You route through Vientiane, the capital, but don't bother stopping there, it's not worth your time. Then it's a long bus to the border, where we waited around 6 hours, and the passport process was wild. With someone next to you it's all part of it, and it makes one of the best stories afterwards.",
     leg: {
-      to: "Northern Vietnam (Hanoi)",
-      mode: "Overnight bus from Vientiane across the border into Vietnam",
-      app: "Book on 12go (or Vexere once you're in)",
+      to: "Hanoi",
+      mode: "One 12go booking from Vang Vieng covers the whole chain",
+      app: "12go",
       appUrl: "https://12go.asia",
-      note: "Fair warning: this overnight bus is long, rough, hard to book and mostly locals, so it's the least fun leg of the trip. It's the price of doing Laos. If that really puts you off, the alternative is to skip Laos altogether and fly Thailand to Vietnam (you'd miss Luang Prabang and Vang Vieng though). I'll firm up my recommendation on this. Still writing the Vietnam stops, more soon.",
+      note: "This is exactly the kind of complicated multi-leg trip 12go is best for. Save Vexere for single trips once you're inside Vietnam.",
+    },
+  },
+  {
+    id: "hanoi",
+    kind: "place",
+    name: "Hanoi",
+    country: "Vietnam",
+    nights: 4,
+    blurb:
+      "And then Hanoi, which is amazing. There's so much to do that you'll want a few days. Stay in the Old Quarter, that's where you want to be. Don't hire a moped here, just walk the Old Quarter and use Grab for anything further out. I wouldn't bother with day trips, you've had loads of nature in Laos and there's more to come down south, so just take the city in. The food is incredible, honestly I was eating banh mi every single day.",
+    hostels: [
+      {
+        name: "Lake View",
+        maps: "Lake View Hostel, Hanoi Old Quarter",
+        url: "https://www.hostelworld.com/st/hostels/asia/vietnam/hanoi/",
+        note: "Where I stayed the second time round. Slightly more social, and a slightly better location.",
+      },
+      {
+        name: "The One",
+        maps: "The One Hostel, Hanoi Old Quarter",
+        url: "https://www.hostelworld.com/st/hostels/asia/vietnam/hanoi/",
+        note: "Where I stayed first. A touch more upmarket but somehow even cheaper, so great value. Both are in the Old Quarter.",
+      },
+    ],
+    dos: [
+      {
+        name: "Wander the Old Quarter",
+        note: "Spend a morning, maybe 4 hours, just wandering. There are about five parallel streets full of shops, you'll find them as you go. Grab some food while you're at it.",
+        maps: "Hanoi Old Quarter",
+        kind: "do",
+      },
+      {
+        name: "The replica shops",
+        note: "Inside the Old Quarter there's a great selection of replica gear, Arc'teryx jackets, shoes, all sorts. The proper shopping is just outside the Old Quarter.",
+        kind: "do",
+      },
+      {
+        name: "Hanoi Train Street",
+        note: "Go one evening to watch the train squeeze right through the houses. Awesome.",
+        maps: "Hanoi Train Street",
+        kind: "night",
+      },
+      {
+        name: "Banh Mi 25",
+        note: "The best banh mi in the city. (I wasn't kidding about eating it every day.)",
+        maps: "Banh Mi 25 Hanoi",
+        kind: "food",
+      },
+      {
+        name: "Pho 10",
+        note: "Good pho. Not my favourite and a little overrated, but still worth a go.",
+        maps: "Pho 10 Hanoi",
+        kind: "food",
+      },
+      {
+        name: "Egg coffee",
+        note: "A fun novelty to try while you're here.",
+        maps: "egg coffee Hanoi",
+        kind: "food",
+      },
+      {
+        name: "Ho Chi Minh's Mausoleum",
+        note: "Worth a look while you're in the city.",
+        maps: "Ho Chi Minh Mausoleum Hanoi",
+        kind: "do",
+      },
+    ],
+    leg: {
+      to: "Down south (Huế & Hội An)",
+      mode: "Heading down the Vietnamese coast",
+      note: "Still writing the rest of Vietnam, more coming soon.",
     },
   },
 ];
@@ -367,18 +473,17 @@ export const stops: Stop[] = [
 // ── The map: full intended route. Detailed points link to a stop card. ─────
 // Coords are in the RouteMap's 0–600 (x) / 0–800 (y) viewBox, placed roughly
 // by real geography (Chiang Mai NW → down through Laos → Hanoi → coast → south).
-// Pai is a side spur off Chiang Mai. The Laos cluster (LP/Vang Vieng/Vientiane)
-// is nudged + label-flipped so the pins don't collide on a small screen.
+// Pai is a side spur off Chiang Mai; Vientiane is a pass-through waypoint.
 export const route: RoutePoint[] = [
   { id: "chiang-mai", n: 1, name: "Chiang Mai", country: "Thailand", x: 99, y: 265, detailed: true },
   { id: "pai", name: "Pai", country: "Thailand", x: 78, y: 237, detailed: true, side: true, from: "chiang-mai", flip: true },
   { id: "luang-prabang", n: 2, name: "Luang Prabang", country: "Laos", x: 220, y: 206, detailed: true },
   { id: "vang-vieng", n: 3, name: "Vang Vieng", country: "Laos", x: 252, y: 258, detailed: true, flip: true },
-  { id: "vientiane", n: 4, name: "Vientiane", country: "Laos", x: 236, y: 312, detailed: true },
-  { id: "hanoi", n: 5, name: "Hanoi", country: "Vietnam", x: 374, y: 156 },
-  { id: "hue-hoi-an", n: 6, name: "Huế & Hội An", country: "Vietnam", x: 456, y: 389 },
-  { id: "nha-trang", n: 7, name: "Nha Trang", country: "Vietnam", x: 508, y: 583 },
-  { id: "hcmc", n: 8, name: "Ho Chi Minh City", country: "Vietnam", x: 406, y: 655 },
+  { id: "vientiane", name: "Vientiane", country: "Laos", x: 236, y: 312, waypoint: true },
+  { id: "hanoi", n: 4, name: "Hanoi", country: "Vietnam", x: 374, y: 156, detailed: true },
+  { id: "hue-hoi-an", n: 5, name: "Huế & Hội An", country: "Vietnam", x: 456, y: 389 },
+  { id: "nha-trang", n: 6, name: "Nha Trang", country: "Vietnam", x: 508, y: 583 },
+  { id: "hcmc", n: 7, name: "Ho Chi Minh City", country: "Vietnam", x: 406, y: 655 },
 ];
 
 // ── Rough date helper ──────────────────────────────────────────────────────

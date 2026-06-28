@@ -25,6 +25,7 @@ export default function StopCard({
 }) {
   const isTravel = stop.kind === "travel";
   const loc = route.find((p) => p.id === stop.id);
+  const hostelList = stop.hostels ?? (stop.hostel ? [stop.hostel] : []);
   const dateStr = dates
     ? `≈ ${dates.from} – ${dates.to} · ${
         dates.nights != null
@@ -55,40 +56,60 @@ export default function StopCard({
 
       <p className="im-stop-blurb">{stop.blurb}</p>
 
-      {stop.hostel && (
+      {hostelList.length > 0 && (
         <div className="im-block">
-          <div className="im-block-label">Stay</div>
+          <div className="im-block-label">Stay{hostelList.length > 1 ? " · two good options" : ""}</div>
           <div className="im-stay">
             <div className="im-stay-top">
               {loc && (
                 <a
                   className="im-stay-loc"
-                  href={mapsUrl(stop.hostel.maps ?? `${stop.hostel.name}, ${stop.name}`)}
+                  href={mapsUrl(hostelList[0].maps ?? `${hostelList[0].name}, ${stop.name}`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Map of ${stop.hostel.name}`}
+                  aria-label={`Map of ${hostelList[0].name}`}
                 >
                   <LocatorMap x={loc.x} y={loc.y} />
                 </a>
               )}
               <div className="im-stay-main">
-                <div className="im-stay-name">{stop.hostel.name}</div>
-                {stop.hostel.room && <span className="im-stay-room">{stop.hostel.room}</span>}
+                <div className="im-stay-name">{hostelList[0].name}</div>
+                {hostelList[0].room && <span className="im-stay-room">{hostelList[0].room}</span>}
               </div>
             </div>
-            {stop.hostel.note && <p className="im-stay-note">{stop.hostel.note}</p>}
+            {hostelList[0].note && <p className="im-stay-note">{hostelList[0].note}</p>}
             <div className="im-stay-links">
-              {stop.hostel.url && (
-                <a className="im-linkbtn is-primary" href={stop.hostel.url} target="_blank" rel="noopener noreferrer">
+              {hostelList[0].url && (
+                <a className="im-linkbtn is-primary" href={hostelList[0].url} target="_blank" rel="noopener noreferrer">
                   Book on Hostelworld
                 </a>
               )}
-              {stop.hostel.maps && (
-                <a className="im-linkbtn is-quiet" href={mapsUrl(stop.hostel.maps)} target="_blank" rel="noopener noreferrer">
+              {hostelList[0].maps && (
+                <a className="im-linkbtn is-quiet" href={mapsUrl(hostelList[0].maps)} target="_blank" rel="noopener noreferrer">
                   Open in Maps
                 </a>
               )}
             </div>
+
+            {hostelList.slice(1).map((h) => (
+              <div className="im-stay-opt is-more" key={h.name}>
+                <div className="im-stay-name">{h.name}</div>
+                {h.room && <span className="im-stay-room">{h.room}</span>}
+                {h.note && <p className="im-stay-note">{h.note}</p>}
+                <div className="im-stay-links">
+                  {h.url && (
+                    <a className="im-linkbtn is-primary" href={h.url} target="_blank" rel="noopener noreferrer">
+                      Book on Hostelworld
+                    </a>
+                  )}
+                  {h.maps && (
+                    <a className="im-linkbtn is-quiet" href={mapsUrl(h.maps)} target="_blank" rel="noopener noreferrer">
+                      Open in Maps
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -61,10 +61,11 @@ export default function RouteMap() {
         const left = `${(p.x / VB_W) * 100}%`;
         const top = `${(p.y / VB_H) * 100}%`;
         const flip = p.flip ?? p.x > 440;
-        const cls = `im-pin ${COUNTRY_CLASS[p.country]} ${p.detailed ? "" : "is-planned"} ${p.side ? "is-side" : ""} ${flip ? "flip" : ""}`;
+        const planned = !p.detailed && !p.side && !p.waypoint;
+        const cls = `im-pin ${COUNTRY_CLASS[p.country]} ${planned ? "is-planned" : ""} ${p.side ? "is-side" : ""} ${p.waypoint ? "is-waypoint" : ""} ${flip ? "flip" : ""}`;
         const inner = (
           <>
-            <span className="im-pin-dot">{p.side ? "" : p.n}</span>
+            <span className="im-pin-dot">{p.side || p.waypoint ? "" : p.n}</span>
             <span className="im-pin-name">{p.name}</span>
           </>
         );

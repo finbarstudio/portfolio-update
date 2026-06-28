@@ -625,3 +625,59 @@
   font-family: var(--font-space-mono), ui-monospace, monospace;
   letter-spacing: 0.04em;
 }
+
+/* ── extra hostel option (a second "good option") ──────────────────────── */
+.imogen-page .im-stay-opt.is-more {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* ── waypoint pin (passed through, not a stay) ─────────────────────────── */
+.imogen-page .im-pin.is-waypoint .im-pin-dot {
+  width: 13px;
+  height: 13px;
+  background: var(--ink-soft);
+  border: 2px solid var(--bg-raised);
+  box-shadow: none;
+}
+.imogen-page .im-pin.is-waypoint .im-pin-name { color: var(--ink-soft); }
+
+/* ── trip graph (time in each place) ───────────────────────────────────── */
+.imogen-page .im-graph { display: grid; gap: 16px; }
+.imogen-page .im-graph-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.imogen-page .im-graph-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.imogen-page .im-graph-val {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.imogen-page .im-graph-track {
+  display: block;
+  height: 12px;
+  background: var(--bg-sunken);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.imogen-page .im-graph-bar {
+  display: block;
+  height: 100%;
+  background: var(--c, var(--ink));
+  border-radius: 999px;
+}
+.imogen-page .im-graph-bar.is-side { opacity: 0.4; }
+.imogen-page .im-graph-note { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-top: 16px; }
