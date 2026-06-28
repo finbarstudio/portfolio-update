@@ -861,6 +861,20 @@ export const stops: Stop[] = [
         kind: "do",
       },
       {
+        name: "Hoianese History Talk",
+        rating: 8,
+        note: "Really good. The guy who runs it is a super sweet, passionate local, and you come away understanding the place a lot more.",
+        url: "https://hoianese.com/hoi-an-tour/hoianese-history-talk/",
+        kind: "do",
+      },
+      {
+        name: "Coconut Basket Boat Ride",
+        rating: 4,
+        note: "Honestly a bit naff, I'd probably skip it. It's a bit of a TikTok thing though, so plenty of people still do it.",
+        maps: "Coconut Basket Boat Ride Hoi An",
+        kind: "do",
+      },
+      {
         name: "Get a suit tailored",
         note: "Hoi An is famous for its tailors, and it's cheap and such good value. We all got suits made, such a cool experience, I got mine for a wedding I had in Bali straight after. Order early in your stay so it's done and fitted before you move on.",
         maps: "Hoi An tailors",
