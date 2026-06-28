@@ -48,13 +48,13 @@ export default function TripGraph() {
         {remaining > 0 && (
           <span className="im-tl-key is-rest">
             <span className="im-tl-key-dot" aria-hidden="true" />
-            <span className="im-tl-key-name">Open</span>
+            <span className="im-tl-key-name">On the move</span>
             <span className="im-tl-key-n">{remaining}n</span>
           </span>
         )}
       </div>
       <p className="im-tl-total">
-        {sumNights} of {totalDays} nights mapped · the grey is still open · Pai, Ha Giang, Sapa and Halong sit on top
+        {sumNights} nights in places, the grey is time on the move · roughly your {totalDays}
       </p>
     </div>
   );

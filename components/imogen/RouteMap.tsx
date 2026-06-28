@@ -22,19 +22,8 @@ const markerClass = (p: RoutePoint) => {
 const markerText = (p: RoutePoint) => (p.side ? "↗" : p.waypoint ? "" : p.n);
 
 export default function RouteMap() {
-  const spine = route.filter((p) => !p.side).map((p) => project(p.lon, p.lat));
-  const boatD = `M${spine[0].x},${spine[0].y} L${spine[1].x},${spine[1].y}`;
-  const roadD = "M" + spine.slice(1).map((p) => `${p.x},${p.y}`).join(" L");
-  const spurs = route
-    .filter((p) => p.side && p.from)
-    .map((p) => {
-      const parent = route.find((q) => q.id === p.from);
-      if (!parent) return null;
-      const a = project(parent.lon, parent.lat);
-      const b = project(p.lon, p.lat);
-      return `M${a.x},${a.y} L${b.x},${b.y}`;
-    })
-    .filter((d): d is string => d !== null);
+  const linePts = route.filter((p) => !p.side).map((p) => project(p.lon, p.lat));
+  const lineD = "M" + linePts.map((p) => `${p.x},${p.y}`).join(" L");
 
   return (
     <div className="im-map-wrap">
@@ -72,11 +61,7 @@ export default function RouteMap() {
             );
           })}
 
-          <path className="im-map-route" d={roadD} />
-          <path className="im-map-route is-boat" d={boatD} />
-          {spurs.map((d, i) => (
-            <path key={i} className="im-map-route is-boat" d={d} />
-          ))}
+          <path className="im-map-route" d={lineD} />
         </svg>
 
         {route.map((p) => {

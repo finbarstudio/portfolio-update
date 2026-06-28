@@ -99,7 +99,7 @@ export default function ImogenPage() {
         {/* ── how to travel ── */}
         <section className="im-section">
           <Reveal>
-            <p className="im-section-label">How to travel</p>
+            <p className="im-section-label">Things I learnt</p>
             <div className="im-tips">
               {tips.map((t) => (
                 <div key={t.title}>
@@ -114,7 +114,7 @@ export default function ImogenPage() {
         {/* ── safety ── */}
         <section className="im-section">
           <Reveal>
-            <p className="im-section-label">Looking after yourself</p>
+            <p className="im-section-label">A heads-up</p>
             <div className="im-safety">
               <p className="im-safety-title im-serif">{safety.title}</p>
               <p className="im-safety-body">{safety.body}</p>

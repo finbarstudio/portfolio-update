@@ -103,13 +103,13 @@ export type RoutePoint = {
 export const trip = {
   who: "Imogen",
   title: "Southeast Asia",
-  subtitle: "your first big one",
+  subtitle: "my rough route",
   start: "2026-07-21", // rough — we'll tune this together
   end: "2026-08-25",
   weeks: "about 5 weeks",
   routeLine: "Chiang Mai → Laos → Vietnam, top to bottom",
   intro:
-    "Hey Im. You're about to have the best few months of your life. I've done this exact trip, so I've dumped everything I know in here for you to just follow along. It's built for your phone, so keep it open as you go. The dates are rough, we'll tweak them together, and you can message me whenever you get stuck.",
+    "Hey Im! So excited for you. I just did this exact trip and loved it, so I've thrown everything I'd do into here, grab whatever's useful and ignore the rest. It's built for your phone so you can keep it open as you go. The dates are totally rough and we'll mess with them together, so shout me anytime.",
 };
 
 // ── Apps you'll actually use ───────────────────────────────────────────────
@@ -155,40 +155,40 @@ export const apps: AppItem[] = [
 // ── How to travel (the stuff nobody tells you) ─────────────────────────────
 export const tips: Tip[] = [
   {
-    title: "Be social, follow your people",
-    body: "Talk to the staff and talk to your dorm. I met people in Chiang Mai and ended up travelling with them through Laos and Vietnam. That was the best part of the whole thing. Don't overthink the plan, follow the good people you meet.",
+    title: "The people make it",
+    body: "Honestly the best thing I did was just talk to people, the staff and whoever was in my dorm. I met a group in Chiang Mai and ended up travelling with them through Laos and Vietnam, and that was the whole trip really. The plan matters way less than who you end up with.",
   },
   {
-    title: "Book through the hostel",
-    body: "At every hostel, book your activities and your next journey through reception. They're so helpful, they sort it all for you, and they almost always get you the cheapest price.",
+    title: "Hostels can sort everything",
+    body: "I booked nearly all my activities and onward travel through hostel reception. They're so helpful, they handle it for you, and it almost always came back cheaper than booking it myself.",
   },
   {
-    title: "Take night buses",
-    body: "Where you can, take the overnight buses. You sleep while you move, so you don't waste a day getting somewhere. The sleeper ones are generally comfy.",
+    title: "Night buses are your friend",
+    body: "I took the overnight buses wherever I could. You sleep while you move so you don't lose a day getting anywhere, and the sleeper ones are genuinely comfy.",
   },
   {
-    title: "Pharmacies + the night-bus hack",
-    body: "You can grab over-the-counter meds at pretty much any pharmacy in Asia, no prescription needed. The one I'd flag is dimenhydrinate (travel-sickness tablets). My move before a night bus was to take one, pass straight out, and wake up at the other end feeling fine instead of wrecked. Basically overnight teleportation. Great for the windy mountain roads too.",
+    title: "My little night-bus hack",
+    body: "You can grab over-the-counter meds at pretty much any pharmacy out here, no prescription. I'd take a dimenhydrinate (travel-sickness tablet) before a night bus, pass straight out, and wake up at the other end feeling fine instead of wrecked. Basically overnight teleportation, and great for the windy roads too.",
   },
   {
-    title: "Renting a moped",
-    body: "Mopeds are the best way to explore (except big cities like Hanoi). Look for a rental with good reviews, but honestly the best move is to ask the hostel staff who they'd use, as long as they seem trustworthy and aren't just pushing a mate's shop, which is where scams happen. And always film a slow video all the way around the bike before you ride off, so nobody can pin existing scratches on you. One more thing: when you're navigating, set Google Maps to motorbike mode rather than car. It keeps you off the big motorways you're not allowed to ride on, and the back roads are usually nicer anyway.",
+    title: "Mopeds (and a scam I dodged)",
+    body: "Mopeds were my favourite way to explore, outside the big cities anyway. I'd ask the hostel staff who they'd rent from, as long as they're not just pushing a mate's shop, which is where the scams are. I always filmed a slow video right around the bike before riding off, so no one could pin old scratches on me. And on Google Maps, set it to motorbike mode (not car) so it keeps you off the motorways you can't ride.",
   },
   {
-    title: "Don't trust Google ratings blindly",
-    body: "A general Asia tip, but especially in Hanoi. Locals don't really leave Google reviews the way we do back home, so a lot of the high ratings come from tourists that managers have sweet-talked into reviewing. A massive score often just means a place is good at working tourists. Ask other travellers and your hostel instead, and when in doubt, eat where it's busy with locals.",
+    title: "Google ratings can lie",
+    body: "Something I picked up, especially in Vietnam: locals don't really leave Google reviews the way we do, so a lot of the high scores come from tourists that managers have sweet-talked. A huge rating often just means a place is good at working tourists. I leaned on other travellers and the hostel, and when in doubt ate where it was busy with locals.",
   },
   {
-    title: "Stay flexible",
-    body: "Book a few nights, not your whole stay. If you love a place or the people, extend. If not, move on. Most hostels you can book the night before, but a few of the best ones fill up days ahead, so watch for those.",
+    title: "I'd keep it loose",
+    body: "I only ever booked a few nights at a time, not the whole stay. If you love a place or the people, extend. If not, move on. Most hostels you can grab the night before, though a few of the best ones go a few days ahead.",
   },
   {
-    title: "Use Hostelworld's numbers",
-    body: "On Hostelworld you can see how many people have booked a place for the next few nights. My picks are always good, but sometimes a town has a few good ones, and it's worth booking where the most people are headed, that's where the crowd (and the fun) will be. You can also message a hostel through the app when you book. Such a good app.",
+    title: "A Hostelworld trick",
+    body: "On Hostelworld you can see how many people have booked a place for the next few nights. When a town had a couple of good options, I'd book where the most people were headed, that's where everyone ends up. You can also message a hostel through the app. Such a good app.",
   },
   {
-    title: "Read a bit of the history",
-    body: "Vietnam's recent history is genuinely fascinating: the French colonial era, the American War, and how the country was split into north and south. A little reading before you go (or the museums along the way) makes a lot of the places hit differently.",
+    title: "Worth reading the history",
+    body: "Vietnam's recent history is genuinely fascinating: the French colonial era, the American War, and how the country got split north and south. A bit of reading before you go (or the museums on the way) made a lot of the places hit differently for me.",
   },
 ];
 
@@ -344,10 +344,9 @@ export const stops: Stop[] = [
   {
     id: "pai",
     kind: "place",
-    side: true,
     name: "Pai",
     country: "Thailand",
-    sideNote: "Side trip from Chiang Mai · 2–3 days if you go",
+    nights: 2,
     blurb:
       "A little hippie town up in the hills, kind of like Nimbin. I didn't fall head over heels for it, but I get the appeal, and plenty of people fall into the \"Pai hole\" and never leave. Honestly, I'd still say go if you've got the days.",
     hostel: {
@@ -592,11 +591,9 @@ export const stops: Stop[] = [
   {
     id: "ha-giang",
     kind: "place",
-    side: true,
-    sideLabel: "The loop",
     name: "Ha Giang Loop",
     country: "Vietnam",
-    sideNote: "From Hanoi · do the LONG version · the famous bike loop",
+    nights: 4,
     blurb:
       "The most famous thing to do up north, and a proper must. Ha Giang is a province right up on the Chinese border, and \"the loop\" is a big multi-day motorbike circuit through it. There's a short and a long version, do the long one. You book it through a hostel and they handle everything: they pick you up in Hanoi, drive you up to Ha Giang, and you stay the night in their hostel there. The next morning a huge group (like 200 people) sets off together, split into smaller groups each with a leader. You can ride your own bike if you hire one, or take an \"easy rider\" and sit on the back while a local drives. Get the easy rider, honestly. It's far less stressful, the roads are tough, and the riders grew up there so they know every bend. They're lovely too, you end up proper mates, and it means you can actually look up and take the views in. Don't stress the planning either, once you're on the loop your next few days are completely sorted. It was so amazing.",
     dos: [
@@ -622,11 +619,9 @@ export const stops: Stop[] = [
   {
     id: "sapa",
     kind: "place",
-    side: true,
-    sideLabel: "Up north",
     name: "Sapa",
     country: "Vietnam",
-    sideNote: "From Hanoi · 2–3 days · the mountains",
+    nights: 3,
     blurb:
       "A mountain town up in the far north, and a brilliant one. It's a genuinely odd place, styled like a European ski resort but full of Chinese tourists, since it's right by the border. After the loop you'll be knackered and short on sleep, so it's the perfect reset. One heads-up: Sapa has a real problem with kids selling things in the streets instead of being at school. It's tied to poverty and it's a bit confronting. Dinh's tour below is part of the answer to it.",
     hostels: [
@@ -665,11 +660,9 @@ export const stops: Stop[] = [
   {
     id: "halong-bay",
     kind: "place",
-    side: true,
-    sideLabel: "Day trip",
     name: "Halong Bay",
     country: "Vietnam",
-    sideNote: "From Hanoi · about a day on the water",
+    nights: 1,
     blurb:
       "Worth doing, it was fun as hell, but realistically it's about a one-day thing and it can be a bit out of the way once you're heading south. Mine got storm-delayed so we got messed around a bit. One tip: skip Cat Ba Island. We went and it was a waste of time, desolate, nothing going on.",
     dos: [
@@ -950,19 +943,19 @@ export const stops: Stop[] = [
 // a pass-through waypoint.
 export const route: RoutePoint[] = [
   { id: "chiang-mai", n: 1, name: "Chiang Mai", country: "Thailand", lon: 98.98, lat: 18.79, detailed: true },
-  { id: "pai", name: "Pai", country: "Thailand", lon: 98.44, lat: 19.36, detailed: true, side: true, from: "chiang-mai", flip: true },
-  { id: "luang-prabang", n: 2, name: "Luang Prabang", country: "Laos", lon: 102.13, lat: 19.88, detailed: true },
-  { id: "vang-vieng", n: 3, name: "Vang Vieng", country: "Laos", lon: 102.45, lat: 18.92, detailed: true, flip: true },
+  { id: "pai", n: 2, name: "Pai", country: "Thailand", lon: 98.44, lat: 19.36, detailed: true },
+  { id: "luang-prabang", n: 3, name: "Luang Prabang", country: "Laos", lon: 102.13, lat: 19.88, detailed: true },
+  { id: "vang-vieng", n: 4, name: "Vang Vieng", country: "Laos", lon: 102.45, lat: 18.92, detailed: true },
   { id: "vientiane", name: "Vientiane", country: "Laos", lon: 102.6, lat: 17.97, waypoint: true },
-  { id: "hanoi", n: 4, name: "Hanoi", country: "Vietnam", lon: 105.84, lat: 21.03, detailed: true },
-  { id: "ha-giang", name: "Ha Giang", country: "Vietnam", lon: 104.98, lat: 22.82, detailed: true, side: true, from: "hanoi", flip: true },
-  { id: "sapa", name: "Sapa", country: "Vietnam", lon: 103.84, lat: 22.34, detailed: true, side: true, from: "hanoi", flip: true },
-  { id: "halong-bay", name: "Halong Bay", country: "Vietnam", lon: 107.04, lat: 20.91, detailed: true, side: true, from: "hanoi" },
-  { id: "ninh-binh", n: 5, name: "Ninh Binh", country: "Vietnam", lon: 105.97, lat: 20.25, detailed: true },
-  { id: "phong-nha", n: 6, name: "Phong Nha", country: "Vietnam", lon: 106.28, lat: 17.59, detailed: true },
-  { id: "hue", n: 7, name: "Huế", country: "Vietnam", lon: 107.58, lat: 16.46, detailed: true },
-  { id: "hoi-an", n: 8, name: "Hội An", country: "Vietnam", lon: 108.34, lat: 15.88, detailed: true },
-  { id: "hcmc", n: 9, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76, detailed: true },
+  { id: "hanoi", n: 5, name: "Hanoi", country: "Vietnam", lon: 105.84, lat: 21.03, detailed: true },
+  { id: "ha-giang", n: 6, name: "Ha Giang", country: "Vietnam", lon: 104.98, lat: 22.82, detailed: true },
+  { id: "sapa", n: 7, name: "Sapa", country: "Vietnam", lon: 103.84, lat: 22.34, detailed: true },
+  { id: "halong-bay", n: 8, name: "Halong Bay", country: "Vietnam", lon: 107.04, lat: 20.91, detailed: true },
+  { id: "ninh-binh", n: 9, name: "Ninh Binh", country: "Vietnam", lon: 105.97, lat: 20.25, detailed: true },
+  { id: "phong-nha", n: 10, name: "Phong Nha", country: "Vietnam", lon: 106.28, lat: 17.59, detailed: true },
+  { id: "hue", n: 11, name: "Huế", country: "Vietnam", lon: 107.58, lat: 16.46, detailed: true },
+  { id: "hoi-an", n: 12, name: "Hội An", country: "Vietnam", lon: 108.34, lat: 15.88, detailed: true },
+  { id: "hcmc", n: 13, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76, detailed: true },
 ];
 
 // ── Rough date helper ──────────────────────────────────────────────────────
