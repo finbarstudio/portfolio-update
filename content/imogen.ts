@@ -400,6 +400,12 @@ export const stops: Stop[] = [
         kind: "do",
       },
       {
+        name: "A river cruise",
+        note: "We did a cruise on the Mekong and it was lovely, a really chilled way to see it.",
+        maps: "Luang Prabang Mekong river cruise",
+        kind: "do",
+      },
+      {
         name: "Mount Phousi",
         note: "Climb the hill in the middle of town for sunset over the rivers.",
         maps: "Mount Phousi Luang Prabang",
@@ -833,7 +839,7 @@ export const stops: Stop[] = [
     country: "Vietnam",
     nights: 2,
     blurb:
-      "Hoi An was my favourite place of the whole trip. You roll in at the end of the pass (through Da Nang), and honestly I don't think you'll want to leave. Hire a moped for sure. Do the hostel drinks and head out with the group on their nights, but make sure you get into the old town itself, the lanterns and the river, that's the real magic.",
+      "Hoi An was my favourite place of the whole trip. You roll in at the end of the pass (through Da Nang), and honestly I don't think you'll want to leave. Hire a moped for sure. Do the hostel drinks and head out with the group on their nights, but make sure you get into the old town itself, the lanterns and the river, that's the real magic. More than anything it was peaceful, my favourite place on the whole trip to just sit and look at. To be fair there isn't a huge amount going on, but honestly that was the appeal, a calm and lovely way to end the trip.",
     hostel: {
       name: "Cuckoo's Nest",
       maps: "Cuckoo's Nest Hostel Hoi An",
@@ -856,9 +862,15 @@ export const stops: Stop[] = [
       },
       {
         name: "Get a suit tailored",
-        note: "Hoi An is famous for its tailors, and we all got suits made, such a cool experience. Order it early in your stay so it's done and fitted before you move on.",
+        note: "Hoi An is famous for its tailors, and it's cheap and such good value. We all got suits made, such a cool experience, I got mine for a wedding I had in Bali straight after. Order early in your stay so it's done and fitted before you move on.",
         maps: "Hoi An tailors",
         kind: "do",
+      },
+      {
+        name: "Lantern boats on the river",
+        note: "At night you can take a little boat out on the river and float a lantern, the classic Hoi An moment. So pretty.",
+        maps: "Hoi An lantern boat ride",
+        kind: "night",
       },
       {
         name: "Hostel drinks + a night out",
