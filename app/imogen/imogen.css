@@ -27,10 +27,12 @@
   --maxw: 680px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --star: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  /* gold star with a cream outline + soft shadow (filter, so the fill stays gold) */
-  --star-filter: drop-shadow(1px 0 0 var(--bg-raised)) drop-shadow(-1px 0 0 var(--bg-raised))
-    drop-shadow(0 1px 0 var(--bg-raised)) drop-shadow(0 -1px 0 var(--bg-raised))
-    drop-shadow(0 2px 4px rgba(36, 31, 26, 0.4));
+  /* gold star with a white outline ring (8-way) + soft shadow, via filter so the fill stays gold */
+  --star-filter: drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff)
+    drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff)
+    drop-shadow(1.1px 1.1px 0 #fff) drop-shadow(-1.1px 1.1px 0 #fff)
+    drop-shadow(1.1px -1.1px 0 #fff) drop-shadow(-1.1px -1.1px 0 #fff)
+    drop-shadow(0 2px 5px rgba(36, 31, 26, 0.5));
 
   background: var(--bg);
   color: var(--ink);
