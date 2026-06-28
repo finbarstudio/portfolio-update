@@ -114,7 +114,7 @@ export const trip = {
   weeks: "about 5 weeks",
   routeLine: "Chiang Mai → Laos → Vietnam, top to bottom",
   intro:
-    "Hey Im! So excited for you. I just did this exact trip and loved it, so I've thrown everything I'd do into here, grab whatever's useful and ignore the rest. It's built for your phone so you can keep it open as you go. The dates are totally rough and we'll mess with them together, so shout me anytime.",
+    "Hey Im! So excited for you. I've thrown everything I'd do into here, grab whatever's useful and ignore the rest. It's built for your phone so you can keep it open as you go. The dates are totally rough and we'll mess with them together, so shout me anytime.",
 };
 
 // ── Apps you'll actually use ───────────────────────────────────────────────
@@ -737,14 +737,15 @@ export const stops: Stop[] = [
     hostels: [
       {
         name: "Lady Hill Resort",
+        rating: 10,
         maps: "Lady Hill Sapa Resort",
         note: "Not a hostel, a proper hotel that blew up on TikTok. Pricey for a backpacker but so worth it after the loop: the infinity pool and the view are insane, and I did a massage and aromatherapy. We extended because we didn't want to leave.",
       },
       {
         name: "Lustig Hostel",
-        rec: "low",
+        rating: 7,
         maps: "Lustig Hostel Sapa",
-        note: "A solid, normal hostel if you'd rather keep it cheap. Sapa isn't really a hostel town, but this does the job.",
+        note: "It is what it is, a normal hostel that did the job. We got in late off the loop and needed a bed. Sapa isn't really a hostel town, but this is fine if you'd rather keep it cheap.",
       },
     ],
     dos: [
@@ -766,7 +767,7 @@ export const stops: Stop[] = [
     leg: {
       to: "Getting there",
       mode: "Bus or sleeper from Hanoi (about 6 hours), then back to Hanoi after",
-      note: "Easy to book through your Hanoi hostel. From Sapa you loop back through Hanoi and out to Halong Bay (below), or carry straight south if you'd rather.",
+      note: "Handy tip: when you book the loop with Bong they'll ask if you want to come back to Hanoi or carry straight on, and you can have them drop you towards Sapa instead of doubling back. We got in late off the loop and went straight there. Otherwise it's an easy book through your Hanoi hostel. From Sapa you loop back through Hanoi and out to Halong Bay (below), or carry straight south if you'd rather.",
     },
   },
   {
@@ -774,6 +775,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Halong Bay",
     country: "Vietnam",
+    rating: 7,
     vibe: "scenic",
     nights: 1,
     blurb:
@@ -781,7 +783,8 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "A Halong Bay cruise",
-        note: "Do it as a day cruise out of Hanoi. Book through your hostel or on GetYourGuide.",
+        rating: 8,
+        note: "Do it as a day cruise out of Hanoi. Book through your hostel or on GetYourGuide. The cruise itself was an 8, I probably just didn't do the area justice.",
         url: "https://www.getyourguide.com",
         kind: "do",
       },
@@ -797,6 +800,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Ninh Binh",
     country: "Vietnam",
+    rating: 8,
     vibe: "karsts",
     nights: 2,
     blurb:
@@ -804,7 +808,7 @@ export const stops: Stop[] = [
     hostel: {
       name: "Banana Tree Hostel",
       maps: "Banana Tree Hostel Ninh Binh",
-      rating: 8,
+      rating: 9,
       note: "One of the best hostels I stayed at, genuinely. Lovely pool, right on the river, and a great spot to rent a moped or bike. Book it.",
     },
     dos: [
@@ -817,24 +821,25 @@ export const stops: Stop[] = [
       },
       {
         name: "The Bear Sanctuary",
-        rating: 9,
-        note: "A 9/10, and honestly it's mostly about the drive. Do one of these scenic routes out and the other on the way back, they're both gorgeous and it's a proper must-do. You can't take a moped on the big motorway anyway, so set Google Maps to motorbike mode (or, if it won't let you, choose 'avoid motorways').",
+        rating: 8,
+        note: "The sanctuary itself is an 8, but the drive out is the real 9/10. Take one of these exact scenic routes out and the other on the way back, they're both gorgeous and it's a proper must-do. You can't take a moped on the big motorway anyway, so set Google Maps to motorbike mode (or, if it won't let you, choose 'avoid motorways').",
         maps: "Bear Sanctuary Ninh Binh Vietnam",
         links: [
-          { label: "Scenic route 1", url: "https://maps.app.goo.gl/wcD5VomY8rPUi9oD8" },
-          { label: "Scenic route 2", url: "https://maps.app.goo.gl/f63dhKJPWcuaSjcd7" },
+          { label: "Scenic route 1 (9/10)", url: "https://maps.app.goo.gl/wcD5VomY8rPUi9oD8" },
+          { label: "Scenic route 2 (9/10)", url: "https://maps.app.goo.gl/f63dhKJPWcuaSjcd7" },
         ],
         kind: "do",
       },
       {
         name: "The grottos",
+        rating: 7,
         note: "The little boat trips through the caves and karsts are lovely.",
         maps: "Tam Coc Ninh Binh",
         kind: "do",
       },
       {
         name: "The bus karaoke (the Local Bar)",
-        rating: 9,
+        rating: 8,
         note: "Right by Banana Tree: old buses converted into karaoke bars, parked up, with locals singing their hearts out. You just hang there and walk back to the hostel. So cool.",
         maps: "Boat Station Thai Vi Street Tam Coc Ninh Binh",
         kind: "night",
@@ -848,12 +853,14 @@ export const stops: Stop[] = [
       },
       {
         name: "Duck Farm",
+        rating: 7,
         note: "Good food spot nearby.",
         maps: "Duck Farm Ninh Binh",
         kind: "food",
       },
       {
         name: "Bus Bar Pub Tam Coc",
+        rating: 7,
         note: "Open late and fun. The whole hostel ends up out, just follow them.",
         maps: "Bus bar pub Tam Coc Ninh Binh",
         kind: "night",
@@ -873,12 +880,24 @@ export const stops: Stop[] = [
     vibe: "caves",
     nights: 1,
     blurb:
-      "Full honesty: I skipped this one to keep moving south, but my friends went and raved about it. It's all about the caves. Totally up to you and how your timing is looking.",
+      "Full honesty: I skipped this one to keep moving south, but my friends raved about it and it's the one place I half wish I'd squeezed in. It's proper karst-and-jungle cave country. The thing people lose their minds over is camping overnight inside a cave and waking up for the beam of light coming through at dawn (more on that below). Most people give it 2 to 4 days. Totally up to you and how your timing's looking.",
     dos: [
       {
-        name: "The caves",
-        note: "The whole reason to come. My friends rated it really highly.",
+        name: "The caves (self-guided)",
+        note: "The cheap way in: rent a moped and do the self-guided loop, Paradise Cave and the Phong Nha Cave boat trip, plus the free viewpoints along the Ho Chi Minh Highway. A good day even if you skip the big treks.",
         maps: "Phong Nha Ke Bang caves",
+        kind: "do",
+      },
+      {
+        name: "Hang En overnight cave camp",
+        note: "This is the famous one and what you half-remembered: a jungle trek in, then you camp on the sand beach inside Hang En (one of the biggest caves on earth) and wake for the light pouring through the roof. It's run by Oxalis and it's a proper splurge (around US$330), but it's the experience people say is worth blowing the budget on once.",
+        url: "https://oxalisadventure.com/tour/hang-en-adventure-cave-camp/",
+        kind: "do",
+      },
+      {
+        name: "A budget overnight (Jungle Boss)",
+        note: "If Hang En's too steep, Jungle Boss run overnight jungle-and-cave camps for under US$100, the budget way to still sleep out in there. There's also a proper mountain summit, U Bo, the 'roof of Phong Nha', but that's a harder, niche 2-day trek, the cave camps are what most people do.",
+        url: "https://junglebosstours.com",
         kind: "do",
       },
     ],
@@ -893,10 +912,11 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Hue",
     country: "Vietnam",
+    rating: 6,
     vibe: "quiet",
     nights: 1,
     blurb:
-      "Honest take: Hue was a bit boring, more of a local city than a backpacker spot. The real reason to come is to ride the Hai Van Pass out of it. So treat it as a quick one-nighter, then ride.",
+      "Honest take: Hue was a bit boring on its own, more of a local city than a backpacker spot, but you need it as the jumping-off point for the Hai Van Pass. The real reason to come is to ride out of it. So treat it as a quick one-nighter, then ride.",
     dos: [
       {
         name: "Abandoned waterpark (Hồ Thuỷ Tiên)",
@@ -917,14 +937,15 @@ export const stops: Stop[] = [
     kind: "travel",
     name: "The Hai Van Pass",
     country: "Vietnam",
+    rating: 9,
     vibe: "the ride",
     days: 1,
     blurb:
-      "This was unreal, a 9.5/10. We took easy riders on the Ha Giang loop and never drove ourselves, so we did this one on our own bikes, and it was the best. You ride from Hue up through the mountains and back down to the coast, through Da Nang and into Hoi An. It rained on us but it was warm and just so much fun.",
+      "This was unreal. We took easy riders on the Ha Giang loop and never drove ourselves, so we did this one on our own bikes, and it was the best. You ride from Hue up through the mountains and back down to the coast, through Da Nang and into Hoi An. It rained on us but it was warm and just so much fun.",
     dos: [
       {
         name: "Ride the pass",
-        rating: 9.5,
+        rating: 10,
         note: "Plenty of companies set it up: you ride Hue → Hoi An and they collect the bike from Hoi An at the other end. It's popular and it felt safe, I'd put the risk at about 3/10. Go with people, and convince someone to do it with you. If you'd rather not drive, you can hire a jeep and have someone drive you, but the bike is so worth it. I've dropped a Google Maps route below that strings the Lang Co stops together (switch it to motorbike once it opens).",
         links: [
           {
@@ -936,18 +957,21 @@ export const stops: Stop[] = [
       },
       {
         name: "An Bang Cemetery (City of Ghosts)",
+        rating: 7,
         note: "A wild cemetery of huge, ornate, colourful tombs near the coast, nicknamed the City of Ghosts. A surreal, beautiful detour.",
         maps: "An Bang Cemetery City of Ghosts Hue Vietnam",
         kind: "do",
       },
       {
         name: "Six Miles Coast (the abandoned resort)",
+        rating: 8,
         note: "A great detour on the ride: a huge abandoned resort at Lang Co you can wander around. Super cool to explore. It's on the route link above.",
         maps: "Six Miles Coast Lang Co Vietnam",
         kind: "do",
       },
       {
         name: "An Lagoon Seafood (Lang Co)",
+        rating: 7,
         note: "The food wasn't the best, but that's not really the point. Pulling over at little local spots like this along the ride, for a drink, a toilet stop and a bit of local life, is half the fun.",
         maps: "AN LAGOON Seafood Master Lang Co Hue",
         kind: "food",
@@ -964,33 +988,43 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Hoi An",
     country: "Vietnam",
+    rating: 9,
     vibe: "peaceful",
     nights: 2,
     blurb:
       "Hoi An was my favourite place of the whole trip. You roll in at the end of the pass (through Da Nang), and honestly I don't think you'll want to leave. Hire a moped for sure. Do the hostel drinks and head out with the group on their nights, but make sure you get into the old town itself, the lanterns and the river, that's the real magic. More than anything it was peaceful, my favourite place on the whole trip to just sit and look at. To be fair there isn't a huge amount going on, but honestly that was the appeal, a calm and lovely way to end the trip.",
-    hostel: {
-      name: "Cuckoo's Nest",
-      maps: "Cuckoo's Nest Hostel Hoi An",
-      rec: "must",
-      note: "Stay here. So social and such a good vibe, I genuinely don't think you'll want to leave.",
-    },
+    hostels: [
+      {
+        name: "Cuckoo's Nest",
+        rating: 10,
+        maps: "Cuckoo's Nest Hostel Hoi An",
+        rec: "must",
+        note: "Stay here. One of my two favourite hostels of the whole trip (right up there with Stamps). So social and such a good vibe, I genuinely don't think you'll want to leave. It's a little out of town though, so you'll want a moped.",
+      },
+      {
+        name: "Fuse Hostel",
+        rating: 7,
+        maps: "Fuse Hostel Hoi An",
+        note: "Where I stayed in the city itself. Good facilities and the nights out were good too. Honestly you could split your stay: Fuse for being in the middle of things, Cuckoo's for the social side.",
+      },
+    ],
     dos: [
       {
         name: "Hire a moped",
-        rec: "must",
-        note: "Do it for sure. It's the best way to get around Hoi An and out to the beach and the rice paddies.",
+        note: "Great for getting out to the beach and the rice paddies, but you really only need one if you're staying at Cuckoo's Nest, since it's out of town. If you're in the city itself you can walk most of it.",
         kind: "do",
       },
       {
         name: "The old town",
         rec: "must",
+        rating: 9,
         note: "The heart of it: lantern-lit streets, the river, the tailors, the food. Spend your evenings here, not just at the hostel.",
         maps: "Hoi An Ancient Town",
         kind: "do",
       },
       {
         name: "Hoianese History Talk",
-        rating: 8,
+        rating: 9,
         note: "Really good. The guy who runs it is a super sweet, passionate local, and you come away understanding the place a lot more.",
         url: "https://hoianese.com/hoi-an-tour/hoianese-history-talk/",
         kind: "do",
@@ -1003,8 +1037,9 @@ export const stops: Stop[] = [
         kind: "do",
       },
       {
-        name: "Get a suit tailored",
-        note: "Hoi An is famous for its tailors, and it's cheap and such good value. We all got suits made, such a cool experience, I got mine for a wedding I had in Bali straight after. Order early in your stay so it's done and fitted before you move on.",
+        name: "Get a suit tailored (or cowboy boots)",
+        rating: 9,
+        note: "Hoi An is famous for its tailors, and it's cheap and such good value. We all got suits made (I got mine for a wedding I had in Bali straight after), and you can get cowboy boots made here too. Order early in your stay so it's done and fitted before you move on.",
         maps: "Hoi An tailors",
         kind: "do",
       },
@@ -1016,7 +1051,8 @@ export const stops: Stop[] = [
       },
       {
         name: "Hostel drinks + a night out",
-        note: "Do the hostel drinks and head out with the group on their nights. Great crowd at Cuckoo's Nest.",
+        rating: 9,
+        note: "Do the hostel drinks and head out with the group on their nights. Both Cuckoo's Nest and Fuse had really good nights out.",
         kind: "night",
       },
       {
@@ -1027,7 +1063,7 @@ export const stops: Stop[] = [
       },
       {
         name: "Pizza 4P's (Indochina Riverside)",
-        rating: 6,
+        rating: 8,
         note: "Went one night and the pizza was genuinely great, but it's a fair way from everything. Worth it if you're bored and fancy a proper feed, otherwise maybe give it a miss.",
         maps: "Pizza 4P's Indochina Riverside Da Nang",
         kind: "food",
