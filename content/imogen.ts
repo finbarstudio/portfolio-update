@@ -1042,8 +1042,8 @@ export const stops: Stop[] = [
       },
       {
         name: "Six Miles Coast (the abandoned resort)",
-        rating: 8,
-        note: "A great detour on the ride: a huge abandoned resort at Lang Co you can wander around. Super cool to explore. It's on the route link above.",
+        rating: 7,
+        note: "A huge abandoned resort at Lang Co you can wander around. A bit boring in itself but cool to see, and it only takes a couple of minutes, so worth the quick stop on the ride. It's on the route link above.",
         maps: "Six Miles Coast Lang Co Vietnam",
         kind: "do",
       },
@@ -1117,7 +1117,7 @@ export const stops: Stop[] = [
       {
         name: "Hoianese History Talk",
         rating: 9,
-        note: "Really good. The guy who runs it is a super sweet, passionate local, and you come away understanding the place a lot more.",
+        note: "Really good. Mr Bao, the guy who runs it, is a super sweet, passionate local and so cool, and you come away understanding the place a lot more. You can book it on their site or just ask Cuckoo's Nest to sort it.",
         url: "https://hoianese.com/hoi-an-tour/hoianese-history-talk/",
         kind: "do",
       },
@@ -1131,9 +1131,16 @@ export const stops: Stop[] = [
       {
         name: "Get a suit tailored (or cowboy boots)",
         rating: 9,
-        note: "Hoi An is famous for its tailors, and it's cheap and such good value. We all got suits made (I got mine for a wedding I had in Bali straight after), and you can get cowboy boots made here too. Order early in your stay so it's done and fitted before you move on.",
-        maps: "Hoi An tailors",
+        note: "Hoi An is famous for its tailors, cheap and such good value. We all got suits made (I got mine for a wedding in Bali straight after), and you can get cowboy boots done too. There are about 3 or 4 really good ones and they each nail specific things, so chat to Cuckoo's Nest first, that's part of why they're so good, they'll tell you who's best for what you want. I went to Kimmy Tailor and would recommend it: I was skeptical but came away super pleased with the outcome and the service. They take your measurements, make it, and turn it around in a day or two, or if you're out of time they'll post it to you back home and even make more later off your measurements. One heads-up: they all push you hard for reviews, which is why they all look amazing online, so they're probably all good, but Kimmy's service was genuinely great.",
+        maps: "Kimmy Tailor Hoi An",
         kind: "do",
+      },
+      {
+        name: "A cooking class",
+        rating: 7,
+        note: "Worth doing. I booked mine through the hostel (Fuse or Cuckoo's, can't remember), but you can do them anywhere or on GetYourGuide. Nowhere near as good as Sammy's in Chiang Mai, but that's just because Sammy's such a funny guy, and it's worth it anyway because Vietnamese food is so different to Thai.",
+        maps: "Hoi An cooking class",
+        kind: "food",
       },
       {
         name: "Lantern boats on the river",

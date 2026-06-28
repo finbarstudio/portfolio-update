@@ -47,6 +47,23 @@ function recLevel(rec?: "must" | "low", rating?: number): "must" | "low" | "mid"
   return "mid";
 }
 
+const isVideo = (src: string) => /\.mp4$/i.test(src);
+
+function MediaThumb({ src, alt, onClick }: { src: string; alt: string; onClick: () => void }) {
+  if (isVideo(src)) {
+    return (
+      <button className="im-item-thumb is-video" onClick={onClick} aria-label={`Play ${alt} video`}>
+        <video src={`${src}#t=0.1`} muted playsInline preload="metadata" />
+        <span className="im-thumb-play" aria-hidden="true">▶</span>
+      </button>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img className="im-item-thumb" src={src} alt={alt} loading="lazy" onClick={onClick} />
+  );
+}
+
 export default function StopCard({
   stop,
   dates,
@@ -64,6 +81,8 @@ export default function StopCard({
   const [filter, setFilter] = useState<Cat | "All">("All");
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
   const [lightbox, setLightbox] = useState<{ list: string[]; i: number } | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const step = (d: number) => setLightbox((l) => l && { ...l, i: (l.i + d + l.list.length) % l.list.length });
 
   // Arrow keys / Escape drive the full-screen image viewer.
   useEffect(() => {
@@ -155,8 +174,7 @@ export default function StopCard({
           {stopPhotos.length > 0 && (
             <div className="im-item-thumbs im-stop-thumbs">
               {stopPhotos.map((src, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={src} className="im-item-thumb" src={src} alt={stop.name} loading="lazy" onClick={() => setLightbox({ list: stopPhotos, i })} />
+                <MediaThumb key={src} src={src} alt={stop.name} onClick={() => setLightbox({ list: stopPhotos, i })} />
               ))}
             </div>
           )}
@@ -209,7 +227,7 @@ export default function StopCard({
                                 }
                                 aria-hidden="true"
                               >
-                                {it.rating != null ? it.rating : it.star ? "★" : ""}
+                                {it.star || (it.rating != null && it.rating >= 10) ? "" : it.rating != null ? it.rating : ""}
                               </span>
                               <span className="im-item-title">{it.title}</span>
                             </button>
@@ -239,15 +257,7 @@ export default function StopCard({
                               {it.imgs && it.imgs.length > 0 && (
                                 <div className="im-item-thumbs">
                                   {it.imgs.map((src, idx) => (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                      key={src}
-                                      className="im-item-thumb"
-                                      src={src}
-                                      alt={it.title}
-                                      loading="lazy"
-                                      onClick={() => setLightbox({ list: it.imgs!, i: idx })}
-                                    />
+                                    <MediaThumb key={src} src={src} alt={it.title} onClick={() => setLightbox({ list: it.imgs!, i: idx })} />
                                   ))}
                                 </div>
                               )}
@@ -303,9 +313,32 @@ export default function StopCard({
       )}
 
       {lightbox && (
-        <div className="im-lightbox" onClick={() => setLightbox(null)} role="dialog" aria-modal="true">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={lightbox.list[lightbox.i]} alt="" onClick={(e) => e.stopPropagation()} />
+        <div
+          className="im-lightbox"
+          onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+          onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
+          onTouchEnd={(e) => {
+            if (touchStartX.current == null || lightbox.list.length < 2) return;
+            const dx = e.changedTouches[0].clientX - touchStartX.current;
+            if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
+            touchStartX.current = null;
+          }}
+        >
+          {isVideo(lightbox.list[lightbox.i]) ? (
+            <video
+              key={lightbox.list[lightbox.i]}
+              src={lightbox.list[lightbox.i]}
+              controls
+              autoPlay
+              playsInline
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={lightbox.list[lightbox.i]} alt="" onClick={(e) => e.stopPropagation()} />
+          )}
           {lightbox.list.length > 1 && (
             <>
               <button

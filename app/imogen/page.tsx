@@ -25,7 +25,7 @@ import Reveal from "@/components/imogen/Reveal";
 // searched images. Each subfolder is named after a place or activity; its web
 // images (jpg/png/webp/avif — HEIC/MOV can't show in a browser) attach there.
 // Matching is by name; anything that doesn't match auto-resolves via PHOTO_ALIASES.
-const WEB_IMG = /\.(jpe?g|png|webp|avif)$/i;
+const WEB_IMG = /\.(jpe?g|png|webp|avif|mp4)$/i;
 
 type PhotoIndex = {
   stops: Record<string, string[]>; // stopId -> place photos
