@@ -841,6 +841,13 @@ export const stops: Stop[] = [
         maps: "Da Nang Vietnam",
         kind: "do",
       },
+      {
+        name: "Pizza 4P's (Indochina Riverside)",
+        rating: 6,
+        note: "Went one night and the pizza was genuinely great, but it's a fair way from everything. Worth it if you're bored and fancy a proper feed, otherwise maybe give it a miss.",
+        maps: "Pizza 4P's Indochina Riverside Da Nang",
+        kind: "food",
+      },
     ],
     leg: {
       to: "Further south",
