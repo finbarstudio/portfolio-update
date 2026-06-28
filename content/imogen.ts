@@ -144,6 +144,12 @@ export const apps: AppItem[] = [
     url: "https://www.getyourguide.com",
     note: "The best app for booking activities and day tours (the Sapa trek further down is on here). Good reviews, and you can usually cancel for free.",
   },
+  {
+    name: "eSIMDB",
+    tagline: "Mobile data (eSIMs)",
+    url: "https://esimdb.com",
+    note: "Perfect for sorting a data eSIM. It compares all the providers so you get the cheapest deal, and you can set it up on your phone before you even land, no hunting for a SIM card.",
+  },
 ];
 
 // ── How to travel (the stuff nobody tells you) ─────────────────────────────
