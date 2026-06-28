@@ -1,0 +1,529 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Imogen's Asia guide — scoped styles. Everything under `.imogen-page` so it
+   can't leak into the portfolio. No `@import "tailwindcss"` / `@theme` here —
+   the root build already ships the utilities; this is plain CSS variables +
+   classes. Fonts come from the root layout (--font-archivo / --font-space-mono /
+   --font-display). Loaded only by app/imogen/layout.tsx.
+   Mobile-first: base styles target phones; a couple of min-width tweaks widen
+   it on larger screens.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.imogen-page {
+  /* warm, friendly palette (in the brand family, a touch lighter) */
+  --bg: #f7f1e5;
+  --bg-raised: #fdfaf3;
+  --bg-sunken: #efe6d3;
+  --ink: #241f1a;
+  --ink-soft: #6c645a;
+  --line: #e6dcc8;
+  --pink: #e8718b;
+  --pink-soft: #f7d3da;
+
+  /* country accents */
+  --c-thailand: #d99a3a;
+  --c-laos: #4fa284;
+  --c-vietnam: #d9644e;
+
+  --maxw: 680px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100svh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.imogen-page * { box-sizing: border-box; }
+
+/* country tint helpers */
+.imogen-page .c-thailand { --c: var(--c-thailand); }
+.imogen-page .c-laos { --c: var(--c-laos); }
+.imogen-page .c-vietnam { --c: var(--c-vietnam); }
+
+/* ── type ──────────────────────────────────────────────────────────────── */
+.imogen-page .im-eyebrow {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pink);
+}
+.imogen-page .im-mono {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+}
+.imogen-page .im-serif {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+.imogen-page h1,
+.imogen-page h2,
+.imogen-page h3 { margin: 0; }
+.imogen-page a { color: inherit; }
+
+/* ── sticky top bar ────────────────────────────────────────────────────── */
+.imogen-page .im-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.imogen-page .im-bar-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+  font-weight: 700;
+}
+.imogen-page .im-bar-name b { color: var(--pink); font-weight: 700; }
+.imogen-page .im-bar-link {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.imogen-page .im-bar-link:hover { color: var(--pink); border-color: var(--pink); }
+
+/* ── shared container ──────────────────────────────────────────────────── */
+.imogen-page .im-wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 18px;
+}
+.imogen-page .im-section { padding: 46px 0; }
+.imogen-page .im-section + .im-section { border-top: 1px solid var(--line); }
+.imogen-page .im-section-label {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+}
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.imogen-page .im-hero { padding: 30px 0 40px; }
+.imogen-page .im-hero h1 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 13vw, 4.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  margin: 14px 0 6px;
+}
+.imogen-page .im-hero h1 em {
+  font-style: italic;
+  color: var(--pink);
+}
+.imogen-page .im-hero-dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 14px;
+  margin: 8px 0 20px;
+  background: var(--bg-raised);
+}
+.imogen-page .im-hero-dates .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pink); }
+.imogen-page .im-hero-intro {
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--ink);
+  max-width: 38ch;
+}
+.imogen-page .im-route-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+.imogen-page .im-chip {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--c, var(--ink));
+  color: var(--c, var(--ink));
+  border-radius: 999px;
+  padding: 5px 11px;
+  white-space: nowrap;
+}
+
+/* ── route map ─────────────────────────────────────────────────────────── */
+.imogen-page .im-map-cap {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 14px;
+  text-align: center;
+}
+.imogen-page .im-map {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+.imogen-page .im-map svg { width: 100%; height: auto; display: block; overflow: visible; }
+.imogen-page .im-map-country { stroke: var(--line); stroke-width: 1.5; }
+.imogen-page .im-map-label {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  fill: var(--ink-soft);
+  opacity: 0.65;
+}
+.imogen-page .im-map-route {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.5;
+}
+.imogen-page .im-map-route.is-boat {
+  stroke-dasharray: 2 8;
+  opacity: 0.4;
+}
+/* HTML pins overlaid on the SVG */
+.imogen-page .im-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.imogen-page .im-pin-dot {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--c, var(--ink));
+  box-shadow: 0 2px 6px rgba(36, 31, 26, 0.25);
+  border: 2px solid var(--bg-raised);
+}
+.imogen-page .im-pin.is-planned .im-pin-dot {
+  background: var(--bg-raised);
+  color: var(--c, var(--ink-soft));
+  border: 2px dashed var(--c, var(--line));
+  box-shadow: none;
+}
+.imogen-page .im-pin-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--bg-raised) 88%, transparent);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.imogen-page .im-pin.is-planned .im-pin-name { color: var(--ink-soft); }
+.imogen-page .im-pin.flip { flex-direction: row-reverse; }
+.imogen-page a.im-pin:active .im-pin-dot { transform: scale(0.92); }
+
+/* ── app cards ─────────────────────────────────────────────────────────── */
+.imogen-page .im-apps { display: grid; gap: 12px; }
+.imogen-page .im-app {
+  display: block;
+  text-decoration: none;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 16px 17px;
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.imogen-page .im-app:hover { border-color: var(--pink); transform: translateY(-1px); }
+.imogen-page .im-app-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.imogen-page .im-app-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.imogen-page .im-app-go {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+.imogen-page .im-app-tag {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.imogen-page .im-app-note { font-size: 14.5px; line-height: 1.55; margin-top: 9px; color: var(--ink); }
+
+/* ── tips ──────────────────────────────────────────────────────────────── */
+.imogen-page .im-tips { display: grid; gap: 18px; margin-top: 22px; }
+.imogen-page .im-tip-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 19px;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+.imogen-page .im-tip-body { font-size: 15px; line-height: 1.58; color: var(--ink); }
+
+/* ── stop cards ────────────────────────────────────────────────────────── */
+.imogen-page .im-stops { display: grid; gap: 22px; }
+.imogen-page .im-stop {
+  scroll-margin-top: 72px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px 18px 22px;
+  border-top: 3px solid var(--c, var(--ink));
+}
+.imogen-page .im-stop.is-travel {
+  background: var(--bg-sunken);
+  border-style: dashed;
+  border-top-style: solid;
+}
+.imogen-page .im-stop-head { display: flex; align-items: flex-start; gap: 13px; }
+.imogen-page .im-stop-num {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--c, var(--ink));
+}
+.imogen-page .im-stop.is-travel .im-stop-num {
+  background: var(--bg-raised);
+  color: var(--c, var(--ink));
+  border: 2px dashed var(--c, var(--line));
+}
+.imogen-page .im-stop-headtext { flex: 1; min-width: 0; }
+.imogen-page .im-stop-name {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.6rem, 7vw, 2rem);
+  line-height: 1.04;
+}
+.imogen-page .im-stop-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 7px;
+}
+.imogen-page .im-stop-country {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--c, var(--ink));
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.imogen-page .im-stop-dates {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-stop-blurb { font-size: 15.5px; line-height: 1.6; margin-top: 14px; }
+
+.imogen-page .im-block { margin-top: 18px; }
+.imogen-page .im-block-label {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+/* stay block */
+.imogen-page .im-stay {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 14px;
+}
+.imogen-page .im-stay-name { font-weight: 700; font-size: 16px; }
+.imogen-page .im-stay-room {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--pink-soft);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+.imogen-page .im-stay-note { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 9px; }
+.imogen-page .im-stay-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+/* do list */
+.imogen-page .im-dos { display: grid; gap: 10px; }
+.imogen-page .im-do {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+.imogen-page .im-do:first-child { border-top: none; padding-top: 2px; }
+.imogen-page .im-do-mark {
+  flex: 0 0 auto;
+  font-size: 15px;
+  line-height: 1.5;
+  width: 1.4em;
+  text-align: center;
+}
+.imogen-page .im-do-body { flex: 1; min-width: 0; }
+.imogen-page .im-do-name { font-weight: 600; font-size: 15.5px; }
+.imogen-page .im-do-name .im-tagword {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.imogen-page .im-tag-food { color: var(--c-thailand); }
+.imogen-page .im-tag-night { color: var(--pink); }
+.imogen-page .im-tag-optional { color: var(--ink-soft); }
+.imogen-page .im-do-note { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 2px; }
+.imogen-page .im-do-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 7px; }
+
+/* next-leg block */
+.imogen-page .im-leg {
+  margin-top: 18px;
+  border-top: 1px dashed var(--line);
+  padding-top: 15px;
+}
+.imogen-page .im-leg-to { font-weight: 700; font-size: 15px; }
+.imogen-page .im-leg-mode { font-size: 14.5px; line-height: 1.5; margin-top: 4px; }
+.imogen-page .im-leg-note { font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); margin-top: 6px; }
+
+/* small link button */
+.imogen-page .im-linkbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--bg-raised);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 7px 13px;
+  min-height: 36px;
+  transition: color 0.18s var(--ease), border-color 0.18s var(--ease), background 0.18s var(--ease);
+}
+.imogen-page .im-linkbtn:hover { color: var(--pink); border-color: var(--pink); }
+.imogen-page .im-linkbtn.is-primary { background: var(--pink); border-color: var(--pink); color: #fff; }
+.imogen-page .im-linkbtn.is-primary:hover { background: #df5d7a; }
+.imogen-page .im-linkbtn.is-quiet {
+  border-color: var(--line);
+  color: var(--ink-soft);
+  background: transparent;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.imogen-page .im-linkbtn.is-quiet:hover { color: var(--pink); border-color: var(--pink); }
+
+/* ── footer ────────────────────────────────────────────────────────────── */
+.imogen-page .im-foot {
+  padding: 50px 0 70px;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+.imogen-page .im-foot-more {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-foot-sign {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 22px;
+  line-height: 1.3;
+  margin-top: 14px;
+}
+.imogen-page .im-foot-by {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 20px;
+}
+.imogen-page .im-foot-by a { color: var(--pink); text-decoration: none; }
+
+/* ── reveal ────────────────────────────────────────────────────────────── */
+.imogen-page .im-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.imogen-page .im-reveal[data-shown="true"] { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .imogen-page .im-reveal { opacity: 1; transform: none; transition: none; }
+  .imogen-page * { scroll-behavior: auto !important; }
+}
+
+/* ── wider screens: a bit more air, never sprawling ────────────────────── */
+@media (min-width: 720px) {
+  .imogen-page .im-section { padding: 64px 0; }
+  .imogen-page .im-apps { grid-template-columns: 1fr 1fr; }
+  .imogen-page .im-app:first-child { grid-column: 1 / -1; }
+}
