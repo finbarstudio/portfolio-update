@@ -1263,6 +1263,15 @@ export function mapsUrl(query: string): string {
 export const PHOTO_ALIASES: Record<string, { stopId: string; item?: string }> = {
   dinh: { stopId: "sapa", item: "Explore Sapa: 2D1N trek & homestay with Dinh" },
   "vang-vien-moped": { stopId: "vang-vieng", item: "Rent a moped" },
+  "vang-vien-lagoon": { stopId: "vang-vieng", item: "Blue Lagoon 3" },
+  "chang-mai-pork": { stopId: "chiang-mai", item: "Neng Roasted Pork" },
+  "cuckoos-nest": { stopId: "hoi-an", item: "Cuckoo's Nest" },
+  "ha-long-bay": { stopId: "halong-bay" },
+  "hai-van-pass": { stopId: "hai-van" },
+  "slow-boat-to-laos": { stopId: "slow-boat" },
+  "ninh-binh-duck": { stopId: "ninh-binh", item: "Duck Farm" },
+  "pai-cancyon-and-bar": { stopId: "pai", item: "Pai Canyon" },
+  "latern-boats-hoi-an": { stopId: "hoi-an", item: "Lantern boats on the river" },
 };
 
 /** Slug used to match a name to a local photo file in public/imogen. */
