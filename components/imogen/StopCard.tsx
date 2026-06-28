@@ -36,6 +36,7 @@ type UItem = {
   rec?: "must" | "low";
   rating?: number;
   star?: boolean;
+  imgs?: string[];
 };
 
 function recLevel(rec?: "must" | "low", rating?: number): "must" | "low" | "mid" {
@@ -49,6 +50,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<Cat | "All">("All");
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   // Open this stop when a map pin (or any #stop-<id> link) targets it.
   useEffect(() => {
@@ -71,8 +73,8 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
 
   const hostels = stop.hostels ?? (stop.hostel ? [stop.hostel] : []);
   const items: UItem[] = [
-    ...hostels.map((h): UItem => ({ cat: "Hostel", title: h.name, maps: h.maps, book: h.url, note: h.note, room: h.room, rec: h.rec, rating: h.rating })),
-    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating, star: d.star })),
+    ...hostels.map((h): UItem => ({ cat: "Hostel", title: h.name, maps: h.maps, book: h.url, note: h.note, room: h.room, rec: h.rec, rating: h.rating, imgs: h.imgs })),
+    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating, star: d.star, imgs: d.imgs })),
   ];
   const cats = CAT_ORDER.filter((c) => items.some((i) => i.cat === c));
   const shown = filter === "All" ? items : items.filter((i) => i.cat === filter);
@@ -97,7 +99,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
   }, [stop.id]);
 
   return (
-    <article id={`stop-${stop.id}`} className={`im-stop ${COUNTRY_CLASS[stop.country]} ${isTravel ? "is-travel" : ""} ${open ? "is-open" : ""}`}>
+    <article id={`stop-${stop.id}`} className={`im-stop ${COUNTRY_CLASS[stop.country]} ${isTravel ? "is-travel" : ""} ${open ? "is-open" : ""} ${stop.rating != null && stop.rating >= 10 ? "is-top" : ""}`}>
       <button className="im-stop-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className="im-stop-num">{badge}</span>
         <span className="im-stop-headtext">
@@ -154,7 +156,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                       const isOpen = !!openItems[key];
                       const lvl = recLevel(it.rec, it.rating);
                       return (
-                        <div className={`im-item rec-${lvl} ${it.star ? "is-star" : ""} ${isOpen ? "is-open" : ""}`} key={key}>
+                        <div className={`im-item rec-${lvl} ${it.star ? "is-star" : ""} ${(it.star || (it.rating != null && it.rating >= 10)) ? "is-top" : ""} ${isOpen ? "is-open" : ""}`} key={key}>
                           <div className="im-item-row">
                             <button
                               className="im-item-toggle"
@@ -197,6 +199,21 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                             <div className="im-item-detail">
                               {it.room && <span className="im-stay-room">{it.room}</span>}
                               {it.note && <p className="im-item-note">{it.note}</p>}
+                              {it.imgs && it.imgs.length > 0 && (
+                                <div className="im-item-thumbs">
+                                  {it.imgs.map((src) => (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                      key={src}
+                                      className="im-item-thumb"
+                                      src={src}
+                                      alt={it.title}
+                                      loading="lazy"
+                                      onClick={() => setLightbox(src)}
+                                    />
+                                  ))}
+                                </div>
+                              )}
                               {(it.book || it.url || it.links?.length) && (
                                 <div className="im-item-links">
                                   {it.book && (
@@ -245,6 +262,14 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
               {stop.leg.note && <p className="im-leg-note">{stop.leg.note}</p>}
             </div>
           )}
+        </div>
+      )}
+
+      {lightbox && (
+        <div className="im-lightbox" onClick={() => setLightbox(null)} role="dialog" aria-modal="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={lightbox} alt="" />
+          <button className="im-lightbox-close" aria-label="Close">✕</button>
         </div>
       )}
     </article>

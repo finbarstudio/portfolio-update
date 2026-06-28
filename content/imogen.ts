@@ -33,6 +33,8 @@ export type DoItem = {
   rating?: number;
   /** Gold-star highlight — the single standout (e.g. Dinh's trek). */
   star?: boolean;
+  /** Small images shown in the expanded detail; tap to enlarge. */
+  imgs?: string[];
 };
 
 export type Hostel = {
@@ -47,6 +49,8 @@ export type Hostel = {
   /** Recommendation strength → colour-codes the item. Finbar's /10 goes in rating. */
   rec?: "must" | "low";
   rating?: number;
+  /** Small images shown in the expanded detail; tap to enlarge. */
+  imgs?: string[];
 };
 
 export type Leg = {
@@ -1179,12 +1183,13 @@ export function mapsUrl(query: string): string {
  */
 export function ratingColor(rating?: number): string | null {
   if (rating == null) return null;
-  if (rating >= 9) return "#2f8f57"; // green — amazing
-  if (rating >= 8) return "#5aa64f"; // green
-  if (rating >= 7) return "#8aa83a"; // yellow-green — good
-  if (rating >= 6) return "#c79a2e"; // amber — fine
-  if (rating >= 4) return "#cc7a33"; // orange — weak
-  return "#c25141"; // red — poor
+  if (rating >= 10) return "#177a3e"; // deep green — perfect
+  if (rating >= 9) return "#3a9d5a"; // green — amazing
+  if (rating >= 8) return "#74b24a"; // green/lime
+  if (rating >= 7) return "#a8b033"; // lime — good
+  if (rating >= 6) return "#cf9a26"; // amber — fine
+  if (rating >= 5) return "#d2792f"; // orange — weak
+  return "#c2473b"; // red — poor
 }
 export const STAR_COLOR = "#c8922e"; // gold — the single standout (Dinh)
 
