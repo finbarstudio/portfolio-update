@@ -318,6 +318,10 @@ export const stops: Stop[] = [
       },
       {
         name: "Sticky Waterfall",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%95%E0%B8%81%E0%B8%9A%E0%B8%B1%E0%B8%A7%E0%B8%95%E0%B8%AD%E0%B8%87_Buatong_Waterfall_Thailand_-_panoramio.jpg/960px-%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%95%E0%B8%81%E0%B8%9A%E0%B8%B1%E0%B8%A7%E0%B8%95%E0%B8%AD%E0%B8%87_Buatong_Waterfall_Thailand_-_panoramio.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%95%E0%B8%81%E0%B8%AB%E0%B8%99%E0%B8%B6%E0%B9%88%E0%B8%87%E0%B9%80%E0%B8%AB%E0%B8%99%E0%B8%B5%E0%B8%A2%E0%B8%A7_%E0%B9%91_-_One_sticky_waterfall_1.jpg/960px-%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%95%E0%B8%81%E0%B8%AB%E0%B8%99%E0%B8%B6%E0%B9%88%E0%B8%87%E0%B9%80%E0%B8%AB%E0%B8%99%E0%B8%B5%E0%B8%A2%E0%B8%A7_%E0%B9%91_-_One_sticky_waterfall_1.jpg",
+        ],
         rating: 8,
         note: "A waterfall you can literally walk up. Book it through the hostel.",
         maps: "Bua Tong Sticky Waterfall, Chiang Mai",
@@ -409,6 +413,10 @@ export const stops: Stop[] = [
       },
       {
         name: "Pai Canyon",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Pai_canyon_2.jpg/960px-Pai_canyon_2.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Pai_canyon_1.jpg/960px-Pai_canyon_1.jpg",
+        ],
         rating: 8,
         note: "Narrow ridges and big drops with great views. Really cool, especially near sunset.",
         maps: "Pai Canyon",
@@ -501,6 +509,10 @@ export const stops: Stop[] = [
       },
       {
         name: "Kuang Si Falls",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Kuang_Si_Falls_and_a_turquoise_water_pool_in_Luang_Prabang_province_Laos.jpg/960px-Kuang_Si_Falls_and_a_turquoise_water_pool_in_Luang_Prabang_province_Laos.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/20171112_Kuang_Si_Falls_2004_DxO.jpg/960px-20171112_Kuang_Si_Falls_2004_DxO.jpg",
+        ],
         rating: 7,
         note: "A gorgeous day trip out to bright turquoise pools you can swim in.",
         maps: "Kuang Si Falls",
@@ -515,6 +527,10 @@ export const stops: Stop[] = [
       },
       {
         name: "Mount Phousi",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/View_from_Mount_Phou_Si_at_sunset_in_Luang_Prabang_Laos.jpg/960px-View_from_Mount_Phou_Si_at_sunset_in_Luang_Prabang_Laos.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/20191212_Luang_Prabang_view_Phousi_Hill-10.jpg/960px-20191212_Luang_Prabang_view_Phousi_Hill-10.jpg",
+        ],
         rating: 7,
         note: "Climb the hill in the middle of town for sunset over the rivers. Easy win: not a big commitment and right by the markets and old town.",
         maps: "Mount Phousi Luang Prabang",
@@ -590,6 +606,10 @@ export const stops: Stop[] = [
       },
       {
         name: "Blue Lagoon 3",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Blue_Lagoon_at_Vang_Vieng_-_panoramio.jpg/960px-Blue_Lagoon_at_Vang_Vieng_-_panoramio.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Blue_Lagoon_Vang_Vieng.jpg/960px-Blue_Lagoon_Vang_Vieng.jpg",
+        ],
         rating: 8,
         note: "The best of the three blue lagoons. Pair it with Nam Xay in one day on the moped.",
         maps: "Blue Lagoon 3, Vang Vieng",
@@ -674,6 +694,10 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Wander the Old Quarter",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Old_Quarter_street_scene%2C_Hanoi_%281%29_%2838464672752%29.jpg/960px-Old_Quarter_street_scene%2C_Hanoi_%281%29_%2838464672752%29.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Hanoi_Old_Quarter_%2840267872341%29.jpg/960px-Hanoi_Old_Quarter_%2840267872341%29.jpg",
+        ],
         rating: 9,
         note: "Spend a morning, maybe 4 hours, just wandering. There are about five parallel streets full of shops, you'll find them as you go. Grab some food while you're at it.",
         maps: "Hanoi Old Quarter",
@@ -693,6 +717,10 @@ export const stops: Stop[] = [
       },
       {
         name: "Hanoi Train Street",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Train_street_in_Hanoi.jpg/960px-Train_street_in_Hanoi.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Hanoi_Train_Street_%2851955804948%29.jpg/960px-Hanoi_Train_Street_%2851955804948%29.jpg",
+        ],
         rating: 9,
         note: "Go one evening to watch the train squeeze right through the houses. Awesome.",
         maps: "Hanoi Train Street",
@@ -721,6 +749,10 @@ export const stops: Stop[] = [
       },
       {
         name: "Ho Chi Minh's Mausoleum",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Hanoi_Vietnam_Mausoleum-of-Ho-Chi-Minh-03.jpg/960px-Hanoi_Vietnam_Mausoleum-of-Ho-Chi-Minh-03.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Hanoi_Vietnam_Mausoleum-of-Ho-Chi-Minh-01.jpg/960px-Hanoi_Vietnam_Mausoleum-of-Ho-Chi-Minh-01.jpg",
+        ],
         rating: 8,
         note: "Worth a look while you're in the city.",
         maps: "Ho Chi Minh Mausoleum Hanoi",
@@ -831,6 +863,10 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "A Halong Bay cruise",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Halong_Bay_in_Vietnam.jpg/960px-Halong_Bay_in_Vietnam.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ha_Long_Bay_22.jpg/960px-Ha_Long_Bay_22.jpg",
+        ],
         rating: 8,
         note: "Do it as a day cruise out of Hanoi. Book through your hostel or on GetYourGuide. The cruise itself was an 8, I probably just didn't do the area justice.",
         url: "https://www.getyourguide.com",
@@ -863,6 +899,10 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Lying Dragon Mountain (Mua Caves)",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Mua_Cave%2C_Ninh_Binh%2C_Vietnam%2C_20240202_0926_4964.jpg/960px-Mua_Cave%2C_Ninh_Binh%2C_Vietnam%2C_20240202_0926_4964.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/View_of_Ninh_Binh_atop_limestone_rocks_near_Mua_Cave.jpg/960px-View_of_Ninh_Binh_atop_limestone_rocks_near_Mua_Cave.jpg",
+        ],
         rating: 9,
         note: "Drive your moped out and hike up to the top. Super cool, and the view over the karsts is unreal.",
         maps: "Mua Caves Lying Dragon Mountain Ninh Binh",
@@ -881,6 +921,10 @@ export const stops: Stop[] = [
       },
       {
         name: "The grottos",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Tam_Coc%2C_Ninh_Binh_%2CVietnam.jpg/960px-Tam_Coc%2C_Ninh_Binh_%2CVietnam.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Tam_Coc_Ninh_Binh_%2853115%29.jpg/960px-Tam_Coc_Ninh_Binh_%2853115%29.jpg",
+        ],
         rating: 7,
         note: "The little boat trips through the caves and karsts are lovely.",
         maps: "Tam Coc Ninh Binh",
@@ -950,6 +994,10 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Abandoned waterpark (Hồ Thuỷ Tiên)",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Ho_Thuy_Tien_water_park.jpg/960px-Ho_Thuy_Tien_water_park.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Ho_Thuy_Tien_water_park_entrance.jpg/960px-Ho_Thuy_Tien_water_park_entrance.jpg",
+        ],
         rating: 6,
         note: "An eerie abandoned waterpark you can wander around. We ran out of time and didn't make it, but it looked cool. Up to you.",
         maps: "Ho Thuy Tien abandoned waterpark Hue",
@@ -1049,6 +1097,10 @@ export const stops: Stop[] = [
       },
       {
         name: "The old town",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/H%E1%BB%99i_An%2C_Ancient_Town%2C_2020-01_CN-11.jpg/960px-H%E1%BB%99i_An%2C_Ancient_Town%2C_2020-01_CN-11.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/H%E1%BB%99i_An%2C_Ancient_Town%2C_2020-01_CN-10.jpg/960px-H%E1%BB%99i_An%2C_Ancient_Town%2C_2020-01_CN-10.jpg",
+        ],
         rec: "must",
         rating: 9,
         note: "The heart of it: lantern-lit streets, the river, the tailors, the food. Spend your evenings here, not just at the hostel.",
@@ -1085,6 +1137,10 @@ export const stops: Stop[] = [
       },
       {
         name: "Lantern boats on the river",
+        imgs: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Hoi_An_Full_Moon_Festival.jpg/960px-Hoi_An_Full_Moon_Festival.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Boats_with_lanterns_on_the_Thu_Bon_river_IMG_3864.jpg/960px-Boats_with_lanterns_on_the_Thu_Bon_river_IMG_3864.jpg",
+        ],
         note: "At night you can take a little boat out on the river and float a lantern, the classic Hoi An moment. So pretty.",
         maps: "Hoi An lantern boat ride",
         kind: "night",

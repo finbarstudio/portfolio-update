@@ -239,17 +239,29 @@
   box-shadow: 0 2px 6px rgba(36, 31, 26, 0.25);
   border: 2px solid var(--bg-raised);
 }
-/* 9/10 stops: same circle pin as the rest, with a gold star badge on it */
+/* 9/10 stops: a gold STAR pin, with the same cream outline + shadow as the circles */
 .imogen-page .im-pin.is-top { z-index: 3; }
-.imogen-page .im-pin.is-top .im-pin-star {
-  position: absolute;
-  top: -9px;
-  right: -9px;
-  font-size: 14px;
-  line-height: 1;
-  color: #e3a82a;
-  text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 1px 1.5px rgba(36, 31, 26, 0.4);
+.imogen-page .im-pin.is-top .im-pin-dot {
+  --star: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 0;
+  background: #e3a82a;
+  color: #fff;
+  font-size: 10px;
+  clip-path: var(--star);
+  filter: drop-shadow(0 2px 5px rgba(36, 31, 26, 0.4));
 }
+.imogen-page .im-pin.is-top .im-pin-dot::before {
+  content: "";
+  position: absolute;
+  inset: -2.5px;
+  background: var(--bg-raised); /* the cream "outline", same as circle borders */
+  clip-path: var(--star);
+  z-index: -1;
+}
+.imogen-page .im-pin.is-top .im-pin-star { display: none; } /* the pin itself is the star */
 .imogen-page .im-leg-star { margin-left: 4px; color: #d8932a; font-size: 12px; }
 .imogen-page .im-pin.is-planned .im-pin-dot {
   background: var(--bg-raised);
