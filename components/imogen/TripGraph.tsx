@@ -38,7 +38,7 @@ export default function TripGraph() {
         ))}
       </div>
       <p className="im-tl-total">
-        {total} nights so far · Pai and the Ha Giang Loop sit on top of this
+        {total} nights so far · Pai, plus Ha Giang, Sapa and Halong up north, sit on top of this
       </p>
     </div>
   );

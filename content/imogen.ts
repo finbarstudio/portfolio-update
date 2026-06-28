@@ -129,6 +129,12 @@ export const apps: AppItem[] = [
     url: "https://vexere.com",
     note: "Once you're inside Vietnam and just booking a single trip, use this. It's what the locals use, you can see the actual bus before you book, and it's far cheaper than 12go there.",
   },
+  {
+    name: "GetYourGuide",
+    tagline: "Tours & activities",
+    url: "https://www.getyourguide.com",
+    note: "The best app for booking activities and day tours (the Sapa trek further down is on here). Good reviews, and you can usually cancel for free.",
+  },
 ];
 
 // ── How to travel (the stuff nobody tells you) ─────────────────────────────
@@ -157,16 +163,24 @@ export const tips: Tip[] = [
     title: "Stay flexible",
     body: "Book a few nights, not your whole stay. If you love a place or the people, extend. If not, move on. Most hostels you can book the night before, but a few of the best ones fill up days ahead, so watch for those.",
   },
+  {
+    title: "Use Hostelworld's numbers",
+    body: "On Hostelworld you can see how many people have booked a place for the next few nights. My picks are always good, but sometimes a town has a few good ones, and it's worth booking where the most people are headed, that's where the crowd (and the fun) will be. You can also message a hostel through the app when you book. Such a good app.",
+  },
 ];
 
 // ── One serious safety note (drinks / methanol) ────────────────────────────
 export const safety = {
   title: "One serious thing: drinks",
   body: "Please read this one properly. Laos is noticeably poorer than Thailand and Vietnam, which is part of what makes it such an interesting place to see, but a lot of the local spirits are home-made and the methanol in them can be dangerously high. In 2024, several young backpackers died in Vang Vieng after drinking tainted spirits. So keep it simple: stick to beer (that's all I drank the whole time in Laos, and it's a good habit anywhere in Asia), and only drink spirits if you actually watch the bottle being opened in front of you. Be wary of free shots and very cheap spirits. This can happen in any hostel, so look out for yourself and the people you're with.",
+  vangVieng:
+    "The hostel where it happened was Nana's. It has since reopened under a new name, Vang Vieng Central Backpacker Hostel, so I'd give that one a miss. Golden Dragon (in the Vang Vieng stop below) was great.",
   closer:
     "None of this is to scare you off anywhere, least of all Vang Vieng. It's just so you can be smart and still have a brilliant time. Vietnam felt much safer to me anyway, and the people there are honestly the best of the whole trip.",
-  linkText: "What happened in Vang Vieng",
-  linkUrl: "https://en.wikipedia.org/wiki/2024_Laos_methanol_poisoning",
+  sources: [
+    { text: "What happened (Wikipedia)", url: "https://en.wikipedia.org/wiki/2024_Laos_methanol_poisoning" },
+    { text: "The story (BBC)", url: "https://www.bbc.com/news/articles/ckg7x4x1lk5o" },
+  ],
 };
 
 // ── Ha Giang Loop: the hostels you can book the loop through, most → least party.
@@ -254,8 +268,7 @@ export const stops: Stop[] = [
       },
       {
         name: "See a Muay Thai fight",
-        note: "Go to a live fight night. Loud, fun, very Thailand.",
-        maps: "Muay Thai stadium, Chiang Mai",
+        note: "Go to a live fight night, loud and fun and very Thailand. Ask the hostel which stadium has a fight on, I don't have a specific one for you.",
         kind: "night",
       },
       {
@@ -290,9 +303,8 @@ export const stops: Stop[] = [
     leg: {
       to: "Luang Prabang, Laos",
       mode: "Bus to Chiang Rai, then the 2-day slow boat down the Mekong",
-      app: "Book through the hostel (or 12go)",
-      appUrl: "https://12go.asia",
-      note: "It's the classic way to cross into Laos and makes total sense geographically. Lock it in a day or two ahead. (Optional: you can skip Laos and fly straight to Vietnam if you're tight on time, but you'd miss Luang Prabang and Vang Vieng, which are both worth it. See the Pai side trip below too.)",
+      app: "Book it through Stamps reception",
+      note: "Stamps sorts the whole thing for you. It's the classic way to cross into Laos and makes total sense geographically, so lock it in a day or two ahead. (Optional: you could skip Laos and fly straight to Vietnam if you're tight on time, but you'd miss Luang Prabang and Vang Vieng, which are both worth it.)",
     },
   },
   {
@@ -303,7 +315,7 @@ export const stops: Stop[] = [
     country: "Thailand",
     sideNote: "Side trip from Chiang Mai · 2–3 days if you go",
     blurb:
-      "A little hippie town up in the hills, kind of like Nimbin. I didn't fall head over heels for it, but I get the appeal, and plenty of people fall into the \"Pai hole\" and never leave. Honestly, I'd still say go if you've got the days. We'll sort the timing nearer the trip and maybe bump this up the list.",
+      "A little hippie town up in the hills, kind of like Nimbin. I didn't fall head over heels for it, but I get the appeal, and plenty of people fall into the \"Pai hole\" and never leave. Honestly, I'd still say go if you've got the days.",
     dos: [
       {
         name: "Pai Canyon",
@@ -524,9 +536,9 @@ export const stops: Stop[] = [
       },
     ],
     leg: {
-      to: "The Ha Giang Loop, then south",
-      mode: "The big one up north first (next), then back to Hanoi and down the coast",
-      note: "Still writing the southern stops, more coming soon.",
+      to: "The north, then south",
+      mode: "Use Hanoi as your base: the Ha Giang Loop, Sapa and Halong Bay are all from here (next), then carry on down the coast",
+      note: "Do the northern bits below, then point yourself south.",
     },
   },
   {
@@ -539,10 +551,89 @@ export const stops: Stop[] = [
     sideNote: "From Hanoi · do the LONG version · the famous bike loop",
     blurb:
       "The most famous thing to do up north, and a proper must. Ha Giang is a province right up on the Chinese border, and \"the loop\" is a big multi-day motorbike circuit through it. There's a short and a long version, do the long one. You book it through a hostel and they handle everything: they pick you up in Hanoi, drive you up to Ha Giang, and you stay the night in their hostel there. The next morning a huge group (like 200 people) sets off together, split into smaller groups each with a leader. You can ride your own bike if you hire one, or take an \"easy rider\" and sit on the back while a local drives. Get the easy rider, honestly. It's far less stressful, the roads are tough, and the riders grew up there so they know every bend. They're lovely too, you end up proper mates, and it means you can actually look up and take the views in. Don't stress the planning either, once you're on the loop your next few days are completely sorted. It was so amazing.",
+    dos: [
+      {
+        name: "Pizza near Bong",
+        note: "You get a night in Ha Giang before the loop (and sometimes one after). If you're staying at Bong it's right nearby. We ate pizza here and it was so good.",
+        maps: "137 Nguyễn Thái Học, Hà Giang, Vietnam",
+        kind: "food",
+      },
+      {
+        name: "Rooftop at the Tuan Son Building",
+        note: "A cool rooftop for food and drinks in Ha Giang town.",
+        maps: "Tuan Son Building, 38 Hai Bà Trưng, Hà Giang, Vietnam",
+        kind: "night",
+      },
+    ],
     leg: {
       to: "Booking it",
       mode: "Book through one of the loop hostels below, they collect you in Hanoi",
       note: "Easiest move: pop into Bong Hostel in Hanoi and they'll help you sort the lot. Have a chat with your friends about the vibe you want, then just book it.",
+    },
+  },
+  {
+    id: "sapa",
+    kind: "place",
+    side: true,
+    sideLabel: "Up north",
+    name: "Sapa",
+    country: "Vietnam",
+    sideNote: "From Hanoi · 2–3 days · the mountains",
+    blurb:
+      "A mountain town up in the far north, and a brilliant one. It's a genuinely odd place, styled like a European ski resort but full of Chinese tourists, since it's right by the border. After the loop you'll be knackered and short on sleep, so it's the perfect reset. One heads-up: Sapa has a real problem with kids selling things in the streets instead of being at school. It's tied to poverty and it's a bit confronting. Dinh's tour below is part of the answer to it.",
+    hostels: [
+      {
+        name: "Lady Hill Resort",
+        maps: "Lady Hill Sapa Resort",
+        note: "Not a hostel, a proper hotel that blew up on TikTok. Pricey for a backpacker but so worth it after the loop: the infinity pool and the view are insane, and I did a massage and aromatherapy. We extended because we didn't want to leave.",
+      },
+      {
+        name: "Lustig Hostel",
+        maps: "Lustig Hostel Sapa",
+        note: "A solid, normal hostel if you'd rather keep it cheap. Sapa isn't really a hostel town, but this does the job.",
+      },
+    ],
+    dos: [
+      {
+        name: "Explore Sapa: 2D1N trek & homestay with Dinh",
+        note: "You MUST do this, a genuine 10/10 and the best thing I did on the whole trip. Dinh takes you trekking through the rice fields, then you stay at her homestay up the hill, where she runs a little school for local kids whose families can't afford one. We were there on graduation day: the kids put on a talent show, we judged it, and everyone was in tears by the end. Unforgettable. Book it on GetYourGuide.",
+        url: "https://www.getyourguide.com/en-au/sa-pa-l1049/explore-sapa-2d1n-trekking-hmong-culture-with-dinh-t737160/",
+        kind: "do",
+      },
+      {
+        name: "The spa at Lady Hill",
+        note: "Infinity pool, massage, aromatherapy, and that view. After the loop, treat yourself.",
+        kind: "do",
+      },
+    ],
+    leg: {
+      to: "Getting there",
+      mode: "Bus or sleeper from Hanoi (about 6 hours), then back to Hanoi after",
+      note: "Easy to book through your Hanoi hostel. From Sapa you loop back through Hanoi and out to Halong Bay (below), or carry straight south if you'd rather.",
+    },
+  },
+  {
+    id: "halong-bay",
+    kind: "place",
+    side: true,
+    sideLabel: "Day trip",
+    name: "Halong Bay",
+    country: "Vietnam",
+    sideNote: "From Hanoi · about a day on the water",
+    blurb:
+      "Worth doing, it was fun as hell, but realistically it's about a one-day thing and it can be a bit out of the way once you're heading south. Mine got storm-delayed so we got messed around a bit. One tip: skip Cat Ba Island. We went and it was a waste of time, desolate, nothing going on.",
+    dos: [
+      {
+        name: "A Halong Bay cruise",
+        note: "Do it as a day cruise out of Hanoi. Book through your hostel or on GetYourGuide.",
+        url: "https://www.getyourguide.com",
+        kind: "do",
+      },
+    ],
+    leg: {
+      to: "Getting there",
+      mode: "Day cruise from Hanoi",
+      note: "After this you're set to head south down the coast.",
     },
   },
 ];
@@ -559,6 +650,8 @@ export const route: RoutePoint[] = [
   { id: "vientiane", name: "Vientiane", country: "Laos", lon: 102.6, lat: 17.97, waypoint: true },
   { id: "hanoi", n: 4, name: "Hanoi", country: "Vietnam", lon: 105.84, lat: 21.03, detailed: true },
   { id: "ha-giang", name: "Ha Giang", country: "Vietnam", lon: 104.98, lat: 22.82, detailed: true, side: true, from: "hanoi", flip: true },
+  { id: "sapa", name: "Sapa", country: "Vietnam", lon: 103.84, lat: 22.34, detailed: true, side: true, from: "hanoi", flip: true },
+  { id: "halong-bay", name: "Halong Bay", country: "Vietnam", lon: 107.04, lat: 20.91, detailed: true, side: true, from: "hanoi" },
   { id: "hue-hoi-an", n: 5, name: "Huế & Hội An", country: "Vietnam", lon: 107.9, lat: 16.2 },
   { id: "nha-trang", n: 6, name: "Nha Trang", country: "Vietnam", lon: 109.19, lat: 12.24 },
   { id: "hcmc", n: 7, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76 },

@@ -118,10 +118,15 @@ export default function ImogenPage() {
             <div className="im-safety">
               <p className="im-safety-title im-serif">{safety.title}</p>
               <p className="im-safety-body">{safety.body}</p>
+              <p className="im-safety-body">{safety.vangVieng}</p>
               <p className="im-safety-body">{safety.closer}</p>
-              <a className="im-linkbtn is-quiet" href={safety.linkUrl} target="_blank" rel="noopener noreferrer">
-                {safety.linkText} ↗
-              </a>
+              <div className="im-safety-links">
+                {safety.sources.map((s) => (
+                  <a key={s.url} className="im-linkbtn is-quiet" href={s.url} target="_blank" rel="noopener noreferrer">
+                    {s.text} ↗
+                  </a>
+                ))}
+              </div>
             </div>
           </Reveal>
         </section>

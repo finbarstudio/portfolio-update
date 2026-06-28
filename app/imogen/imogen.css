@@ -571,7 +571,7 @@
 }
 .imogen-page .im-safety-title { font-size: 20px; color: #b4452f; margin-bottom: 6px; }
 .imogen-page .im-safety-body { font-size: 14.5px; line-height: 1.6; margin-top: 10px; }
-.imogen-page .im-safety .im-linkbtn { margin-top: 14px; }
+.imogen-page .im-safety-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 
 /* ── password lock ─────────────────────────────────────────────────────── */
 .imogen-page .im-lock { min-height: 100svh; display: grid; place-items: center; padding: 24px; }
