@@ -554,7 +554,6 @@
 @media (min-width: 720px) {
   .imogen-page .im-section { padding: 64px 0; }
   .imogen-page .im-apps { grid-template-columns: 1fr 1fr; }
-  .imogen-page .im-app:first-child { grid-column: 1 / -1; }
 }
 
 /* ── muted (off-route) country label on the big map ────────────────────── */
