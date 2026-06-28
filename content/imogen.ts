@@ -784,16 +784,11 @@ export const stops: Stop[] = [
         kind: "food",
       },
       {
-        name: "The top of the loop",
+        name: "Mã Pì Lèng Panorama",
         rating: 8,
-        note: "The high passes are the best of it. When you're up at the top, with the road dropping away on both sides, that's the whole thing right there.",
-        kind: "do",
-      },
-      {
-        name: "Rooftop at the Tuan Son Building",
-        note: "A cool rooftop for food and drinks in Ha Giang town.",
-        maps: "Tuan Son Building, 38 Hai Bà Trưng, Hà Giang, Vietnam",
-        kind: "night",
+        note: "The bar/restaurant at the top of the loop, built right on the lip of the Ma Pi Leng Pass, the highest, most jaw-dropping point of the whole thing. The groups pull in here for a beer or a coffee on the cliffside terrace looking straight down onto the turquoise Nho Que river and the canyon. Small entry fee. This is the view you came for.",
+        maps: "Ma Pi Leng Panorama Meo Vac Ha Giang",
+        kind: "food",
       },
     ],
     leg: {
