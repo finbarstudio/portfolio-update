@@ -72,9 +72,7 @@ export default function ImogenPage() {
           <Reveal>
             <p className="im-section-label">The route</p>
             <RouteMap />
-            <p className="im-map-cap">
-              Tap a numbered stop to jump to it. The faded ones I&apos;m still writing.
-            </p>
+            <p className="im-map-cap">Tap a numbered stop to jump to it.</p>
           </Reveal>
         </section>
 
