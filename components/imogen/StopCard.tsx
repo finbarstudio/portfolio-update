@@ -133,14 +133,14 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                               onClick={() => setOpenItems((s) => ({ ...s, [key]: !s[key] }))}
                               aria-expanded={isOpen}
                             >
-                              {it.star ? (
-                                <span className="im-item-star" aria-hidden="true">★</span>
-                              ) : (
-                                <span className="im-item-dot" aria-hidden="true" />
-                              )}
+                              <span
+                                className={`im-item-score ${it.star ? "is-star" : it.rating == null ? "is-empty" : ""}`}
+                                aria-hidden="true"
+                              >
+                                {it.star ? "★" : it.rating != null ? it.rating : ""}
+                              </span>
                               <span className="im-item-title">{it.title}</span>
                             </button>
-                            {it.rating != null && <span className="im-item-rating">{it.rating}/10</span>}
                             {it.maps && (
                               <a className="im-item-map" href={mapsUrl(it.maps)} target="_blank" rel="noopener noreferrer">
                                 Map ↗

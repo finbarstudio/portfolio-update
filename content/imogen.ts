@@ -267,6 +267,107 @@ export const loopNote =
 // ── The route, in order ────────────────────────────────────────────────────
 export const stops: Stop[] = [
   {
+    id: "bangkok",
+    kind: "place",
+    name: "Bangkok",
+    country: "Thailand",
+    rating: 7,
+    vibe: "chaos",
+    nights: 2,
+    blurb:
+      "Where you'll probably land, and where it all kicks off. It's hot, loud and a total sensory overload in the best way. You don't need long, a couple of nights to shake off the flight, eat your bodyweight in street food and see a bit, then move on. Most people go south to the islands first or straight up to Chiang Mai.",
+    hostel: {
+      name: "Around Khao San Road",
+      maps: "Khao San Road Bangkok",
+      note: "The backpacker heart of the city. Loud and a bit mad, but it's where everyone stays and it's the easiest place to fall in with people. Loads of hostels right around here.",
+    },
+    dos: [
+      {
+        name: "Street food",
+        rating: 8,
+        note: "Honestly the best bit of Bangkok. Pad thai, mango sticky rice, grilled everything. Eat where it's busy and full of locals and you can't go wrong.",
+        kind: "food",
+      },
+      {
+        name: "The Grand Palace & Wat Pho",
+        rating: 7,
+        note: "The big temples. Go early before the heat, and cover your shoulders and knees or they won't let you in.",
+        maps: "Grand Palace Bangkok",
+        kind: "do",
+      },
+      {
+        name: "A rooftop bar",
+        rating: 7,
+        note: "Bangkok does a great rooftop. Worth one slightly fancy drink up high to watch the city sprawl out under you.",
+        maps: "Bangkok rooftop bar",
+        kind: "night",
+      },
+      {
+        name: "Khao San Road at night",
+        rating: 7,
+        note: "The famous backpacker street: bars, street stalls, chaos. Worth a night even if it's not really your scene.",
+        maps: "Khao San Road Bangkok",
+        kind: "night",
+      },
+    ],
+    leg: {
+      to: "South to the islands (or up to Chiang Mai)",
+      mode: "Cheap domestic flight, or the overnight train/bus",
+      note: "I went down to the Gulf islands first, then flew up to Chiang Mai. If you're tight on time you can skip the islands and head straight north.",
+    },
+  },
+  {
+    id: "gulf-islands",
+    kind: "place",
+    name: "The Gulf islands",
+    country: "Thailand",
+    rating: 9,
+    vibe: "islands",
+    nights: 5,
+    blurb:
+      "Down in the Gulf there are three islands that go together: Koh Samui (the airport and the comfy one), Koh Phangan (the Full Moon Party) and Koh Tao (the diving). Koh Tao was unreal, my favourite of the three by a mile. Ferry-hop between them, then fly back up to Chiang Mai from Samui to start the proper route north.",
+    hostel: {
+      name: "Koh Tao (Sairee Beach)",
+      maps: "Koh Tao Sairee Beach hostels",
+      note: "Base yourself around Sairee Beach on Koh Tao, that's where the dive crowd and the nights out are. Book a couple of nights and extend once you're in.",
+    },
+    dos: [
+      {
+        name: "Learn to dive on Koh Tao",
+        rating: 10,
+        note: "Koh Tao is one of the cheapest places on earth to get your PADI Open Water, and it's incredible. Even if you just snorkel, the water is unreal. One of my favourite things of the whole trip.",
+        maps: "Koh Tao diving",
+        kind: "do",
+      },
+      {
+        name: "Koh Tao itself",
+        rating: 9,
+        note: "Just a brilliant island. Rent a moped (carefully, the roads are rough), find the viewpoints and the quiet bays, and watch the sunset from Sairee.",
+        maps: "Koh Tao",
+        kind: "do",
+      },
+      {
+        name: "Island-hop by ferry",
+        rating: 8,
+        note: "The three islands are a short ferry apart. Samui has the airport, Phangan the party, Tao the diving. Lomprayah is the main boat.",
+        maps: "Lomprayah ferry Koh Tao",
+        kind: "do",
+      },
+      {
+        name: "Full Moon Party (Koh Phangan)",
+        rating: 7,
+        note: "The famous beach party on Koh Phangan: thousands of people, buckets and body paint. A proper rite of passage if the dates line up, and total chaos. Look after your stuff and your drinks (see the heads-up above).",
+        maps: "Full Moon Party Haad Rin Koh Phangan",
+        kind: "night",
+      },
+    ],
+    leg: {
+      to: "Chiang Mai",
+      mode: "Fly from Koh Samui up to Chiang Mai",
+      note: "Easiest is a quick flight from Samui. Then the route proper begins up north.",
+    },
+  },
+  {
     id: "chiang-mai",
     kind: "place",
     name: "Chiang Mai",
@@ -275,7 +376,7 @@ export const stops: Stop[] = [
     vibe: "social",
     nights: 4,
     blurb:
-      "Start here. The best hostel I stayed in anywhere in Asia, and the most social. This is where the trip really begins and where you'll meet your people.",
+      "Fly up here from the south and the backpacking really begins. Stamps was the best hostel I stayed in anywhere in Asia, and the most social, this is where you'll meet your people and the crew you carry north into Laos.",
     hostel: {
       name: "Stamps Backpackers",
       rating: 10,
@@ -1097,20 +1198,22 @@ export const stops: Stop[] = [
 // in components/imogen/geo.ts. Pai is a side spur off Chiang Mai; Vientiane is
 // a pass-through waypoint.
 export const route: RoutePoint[] = [
-  { id: "chiang-mai", n: 1, name: "Chiang Mai", country: "Thailand", lon: 98.98, lat: 18.79, detailed: true },
-  { id: "pai", n: 2, name: "Pai", country: "Thailand", lon: 98.44, lat: 19.36, detailed: true },
-  { id: "luang-prabang", n: 3, name: "Luang Prabang", country: "Laos", lon: 102.13, lat: 19.88, detailed: true },
-  { id: "vang-vieng", n: 4, name: "Vang Vieng", country: "Laos", lon: 102.45, lat: 18.92, detailed: true },
+  { id: "bangkok", n: 1, name: "Bangkok", country: "Thailand", lon: 100.5, lat: 13.75, detailed: true },
+  { id: "gulf-islands", n: 2, name: "Koh Tao", country: "Thailand", lon: 99.84, lat: 10.1, detailed: true },
+  { id: "chiang-mai", n: 3, name: "Chiang Mai", country: "Thailand", lon: 98.98, lat: 18.79, detailed: true },
+  { id: "pai", n: 4, name: "Pai", country: "Thailand", lon: 98.44, lat: 19.36, detailed: true },
+  { id: "luang-prabang", n: 5, name: "Luang Prabang", country: "Laos", lon: 102.13, lat: 19.88, detailed: true },
+  { id: "vang-vieng", n: 6, name: "Vang Vieng", country: "Laos", lon: 102.45, lat: 18.92, detailed: true },
   { id: "vientiane", name: "Vientiane", country: "Laos", lon: 102.6, lat: 17.97, waypoint: true },
-  { id: "hanoi", n: 5, name: "Hanoi", country: "Vietnam", lon: 105.84, lat: 21.03, detailed: true },
-  { id: "ha-giang", n: 6, name: "Ha Giang", country: "Vietnam", lon: 104.98, lat: 22.82, detailed: true },
-  { id: "sapa", n: 7, name: "Sapa", country: "Vietnam", lon: 103.84, lat: 22.34, detailed: true },
-  { id: "halong-bay", n: 8, name: "Halong Bay", country: "Vietnam", lon: 107.04, lat: 20.91, detailed: true },
-  { id: "ninh-binh", n: 9, name: "Ninh Binh", country: "Vietnam", lon: 105.97, lat: 20.25, detailed: true },
-  { id: "phong-nha", n: 10, name: "Phong Nha", country: "Vietnam", lon: 106.28, lat: 17.59, detailed: true },
-  { id: "hue", n: 11, name: "Huế", country: "Vietnam", lon: 107.58, lat: 16.46, detailed: true },
-  { id: "hoi-an", n: 12, name: "Hội An", country: "Vietnam", lon: 108.34, lat: 15.88, detailed: true },
-  { id: "hcmc", n: 13, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76, detailed: true },
+  { id: "hanoi", n: 7, name: "Hanoi", country: "Vietnam", lon: 105.84, lat: 21.03, detailed: true },
+  { id: "ha-giang", n: 8, name: "Ha Giang", country: "Vietnam", lon: 104.98, lat: 22.82, detailed: true },
+  { id: "sapa", n: 9, name: "Sapa", country: "Vietnam", lon: 103.84, lat: 22.34, detailed: true },
+  { id: "halong-bay", n: 10, name: "Halong Bay", country: "Vietnam", lon: 107.04, lat: 20.91, detailed: true },
+  { id: "ninh-binh", n: 11, name: "Ninh Binh", country: "Vietnam", lon: 105.97, lat: 20.25, detailed: true },
+  { id: "phong-nha", n: 12, name: "Phong Nha", country: "Vietnam", lon: 106.28, lat: 17.59, detailed: true },
+  { id: "hue", n: 13, name: "Huế", country: "Vietnam", lon: 107.58, lat: 16.46, detailed: true },
+  { id: "hoi-an", n: 14, name: "Hội An", country: "Vietnam", lon: 108.34, lat: 15.88, detailed: true },
+  { id: "hcmc", n: 15, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76, detailed: true },
 ];
 
 // ── Rough date helper ──────────────────────────────────────────────────────
