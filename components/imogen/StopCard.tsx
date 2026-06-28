@@ -199,9 +199,9 @@ export default function StopCard({
                               aria-expanded={isOpen}
                             >
                               <span
-                                className={`im-item-score ${it.star || (it.rating != null && it.rating >= 9) ? "is-topstar" : ""} ${it.rating == null && !it.star ? "is-empty" : ""}`}
+                                className={`im-item-score ${it.star || (it.rating != null && it.rating >= 10) ? "is-topstar" : ""} ${it.rating == null && !it.star ? "is-empty" : ""}`}
                                 style={
-                                  it.star || (it.rating != null && it.rating >= 9)
+                                  it.star || (it.rating != null && it.rating >= 10)
                                     ? undefined
                                     : it.rating != null
                                       ? { background: ratingColor(it.rating) ?? undefined, color: "#fff" }

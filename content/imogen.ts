@@ -137,7 +137,7 @@ export const apps: AppItem[] = [
     name: "Grab",
     tagline: "Taxis (and food)",
     url: "https://www.grab.com",
-    note: "Get this everywhere in SE Asia. It's the local Uber for taxis and tuk-tuks, with the price agreed up front so there's no haggling. It does food delivery too.",
+    note: "Get this everywhere in SE Asia. It's the local Uber for taxis and tuk-tuks, price agreed up front so there's no haggling, and it does food delivery too. Big one: order a bike taxi (GrabBike) rather than a car, they're so fun, cut straight through traffic, and cost like 50 cents to a dollar.",
   },
   {
     name: "12go.asia",
@@ -656,7 +656,7 @@ export const stops: Stop[] = [
     vibe: "an adventure",
     days: 2,
     blurb:
-      "Getting from Vang Vieng to Hanoi is a mission, and honestly half the adventure. You route through Vientiane, the capital, but don't bother stopping there, it's not worth your time. Then it's a long bus to the border, where we waited around 6 hours, and the passport process was wild. The genuinely hard bit is finding a good bus in the first place, so sort it in advance and brace yourself. In the moment it's a 5/10, but the second it's over it's an 8/10 story, and having someone next to you makes it.",
+      "Getting from Vang Vieng to Hanoi is a two-day mission through Vientiane, the capital (don't bother stopping there, it's not worth your time), then a long bus to the border, a wait of around 6 hours, and a wild passport process. But it's the necessary price of doing Laos, and do Laos. In the moment I'd have called the whole Laos leg underrated, but writing this up made me realise it was actually the most fun and unique part of the trip, somewhere not many people bother with. So take the haul on the chin: sort a good bus in advance, brace yourself, and bring someone to share it with. 5/10 while it's happening, a solid 8/10 story the second it's done.",
     leg: {
       to: "Hanoi",
       mode: "One 12go booking from Vang Vieng covers the whole chain",
@@ -1281,11 +1281,11 @@ export function imgSlug(s: string): string {
  */
 export function ratingColor(rating?: number): string | null {
   if (rating == null) return null;
-  if (rating >= 10) return "#177a3e"; // deep green — perfect
-  if (rating >= 9) return "#3a9d5a"; // green — amazing
-  if (rating >= 8) return "#74b24a"; // green/lime
-  if (rating >= 7) return "#a8b033"; // lime — good
-  if (rating >= 6) return "#cf9a26"; // amber — fine
+  if (rating >= 10) return "#0c6b3f"; // deep emerald — perfect
+  if (rating >= 9) return "#3fa44f"; // green — amazing
+  if (rating >= 8) return "#8fb43a"; // lime — great
+  if (rating >= 7) return "#ccb52f"; // yellow — good
+  if (rating >= 6) return "#d9962a"; // amber — fine
   if (rating >= 5) return "#d2792f"; // orange — weak
   return "#c2473b"; // red — poor
 }
