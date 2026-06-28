@@ -796,6 +796,12 @@ export const stops: Stop[] = [
         kind: "do",
       },
       {
+        name: "An Bang Cemetery (City of Ghosts)",
+        note: "A wild cemetery of huge, ornate, colourful tombs near the coast, nicknamed the City of Ghosts. A surreal, beautiful detour.",
+        maps: "An Bang Cemetery City of Ghosts Hue Vietnam",
+        kind: "do",
+      },
+      {
         name: "Six Miles Coast (the abandoned resort)",
         note: "A great detour on the ride: a huge abandoned resort at Lang Co you can wander around. Super cool to explore. It's on the route link above.",
         maps: "Six Miles Coast Lang Co Vietnam",
