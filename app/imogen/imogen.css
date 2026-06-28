@@ -767,8 +767,8 @@
   color: var(--ink);
 }
 .imogen-page .im-tl-key-n { font-family: var(--font-space-mono), ui-monospace, monospace; font-size: 10px; color: var(--ink-soft); }
-.imogen-page .im-tl-seg.is-rest { background: #d6d3cb; }
-.imogen-page .im-tl-key.is-rest .im-tl-key-dot { background: #d6d3cb; }
+.imogen-page .im-tl-seg.is-rest { background: #8e9aae; }
+.imogen-page .im-tl-key.is-rest .im-tl-key-dot { background: #8e9aae; }
 .imogen-page .im-tl-key.is-rest .im-tl-key-name { color: var(--ink-soft); }
 .imogen-page .im-tl-total {
   font-family: var(--font-space-mono), ui-monospace, monospace;

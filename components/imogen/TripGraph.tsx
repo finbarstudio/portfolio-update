@@ -54,7 +54,7 @@ export default function TripGraph() {
         )}
       </div>
       <p className="im-tl-total">
-        {sumNights} nights in places, the grey is time on the move · roughly your {totalDays}
+        {sumNights} nights in places, the blue is time on the move · roughly your {totalDays}
       </p>
     </div>
   );
