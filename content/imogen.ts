@@ -25,6 +25,8 @@ export type DoItem = {
   maps?: string;
   /** Any other link (booking page etc.). */
   url?: string;
+  /** Extra labelled links (e.g. two scenic route links). */
+  links?: { label: string; url: string }[];
   kind?: "do" | "food" | "night" | "optional";
   /** Recommendation strength → colour-codes the item. Finbar's /10 goes in rating. */
   rec?: "must" | "low";
@@ -103,6 +105,7 @@ export const trip = {
   title: "Southeast Asia",
   subtitle: "your first big one",
   start: "2026-07-21", // rough — we'll tune this together
+  end: "2026-08-25",
   weeks: "about 5 weeks",
   routeLine: "Chiang Mai → Laos → Vietnam, top to bottom",
   intro:
@@ -159,7 +162,7 @@ export const tips: Tip[] = [
   },
   {
     title: "Renting a moped",
-    body: "Mopeds are the best way to explore (except big cities like Hanoi). Look for a rental with good reviews, but honestly the best move is to ask the hostel staff who they'd use, as long as they seem trustworthy and aren't just pushing a mate's shop, which is where scams happen. And always film a slow video all the way around the bike before you ride off, so nobody can pin existing scratches on you.",
+    body: "Mopeds are the best way to explore (except big cities like Hanoi). Look for a rental with good reviews, but honestly the best move is to ask the hostel staff who they'd use, as long as they seem trustworthy and aren't just pushing a mate's shop, which is where scams happen. And always film a slow video all the way around the bike before you ride off, so nobody can pin existing scratches on you. One more thing: when you're navigating, set Google Maps to motorbike mode rather than car. It keeps you off the big motorways you're not allowed to ride on, and the back roads are usually nicer anyway.",
   },
   {
     title: "Don't trust Google ratings blindly",
@@ -673,6 +676,17 @@ export const stops: Stop[] = [
         kind: "do",
       },
       {
+        name: "The Bear Sanctuary",
+        rating: 9,
+        note: "A 9/10, and honestly it's mostly about the drive. Do one of these scenic routes out and the other on the way back, they're both gorgeous and it's a proper must-do. You can't take a moped on the big motorway anyway, so set Google Maps to motorbike mode (or, if it won't let you, choose 'avoid motorways').",
+        maps: "Bear Sanctuary Ninh Binh Vietnam",
+        links: [
+          { label: "Scenic route 1", url: "https://maps.app.goo.gl/wcD5VomY8rPUi9oD8" },
+          { label: "Scenic route 2", url: "https://maps.app.goo.gl/f63dhKJPWcuaSjcd7" },
+        ],
+        kind: "do",
+      },
+      {
         name: "The grottos",
         note: "The little boat trips through the caves and karsts are lovely.",
         maps: "Tam Coc Ninh Binh",
@@ -769,6 +783,12 @@ export const stops: Stop[] = [
         name: "Ride the pass",
         rating: 9.5,
         note: "Plenty of companies set it up: you ride Hue → Hoi An and they collect the bike from Hoi An at the other end. It's popular and it felt safe, I'd put the risk at about 3/10. Go with people, and convince someone to do it with you. If you'd rather not drive, you can hire a jeep and have someone drive you, but the bike is so worth it.",
+        kind: "do",
+      },
+      {
+        name: "Abandoned hotel complex (Lang Co)",
+        note: "A great detour on the ride: a huge abandoned hotel complex at Lang Co you can wander around. Super cool to explore.",
+        maps: "abandoned hotel Lang Co Vietnam",
         kind: "do",
       },
     ],

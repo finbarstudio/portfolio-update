@@ -30,6 +30,7 @@ type UItem = {
   maps?: string;
   url?: string;
   book?: string;
+  links?: { label: string; url: string }[];
   note?: string;
   room?: string;
   rec?: "must" | "low";
@@ -70,7 +71,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
   const hostels = stop.hostels ?? (stop.hostel ? [stop.hostel] : []);
   const items: UItem[] = [
     ...hostels.map((h): UItem => ({ cat: "Hostel", title: h.name, maps: h.maps, book: h.url, note: h.note, room: h.room, rec: h.rec, rating: h.rating })),
-    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, note: d.note, rec: d.rec, rating: d.rating })),
+    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating })),
   ];
   const cats = CAT_ORDER.filter((c) => items.some((i) => i.cat === c));
   const shown = filter === "All" ? items : items.filter((i) => i.cat === filter);
@@ -149,7 +150,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                             <div className="im-item-detail">
                               {it.room && <span className="im-stay-room">{it.room}</span>}
                               {it.note && <p className="im-item-note">{it.note}</p>}
-                              {(it.book || it.url) && (
+                              {(it.book || it.url || it.links?.length) && (
                                 <div className="im-item-links">
                                   {it.book && (
                                     <a className="im-linkbtn is-primary" href={it.book} target="_blank" rel="noopener noreferrer">
@@ -161,6 +162,11 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                                       Open ↗
                                     </a>
                                   )}
+                                  {it.links?.map((l) => (
+                                    <a key={l.url} className="im-linkbtn is-quiet" href={l.url} target="_blank" rel="noopener noreferrer">
+                                      {l.label} ↗
+                                    </a>
+                                  ))}
                                 </div>
                               )}
                             </div>

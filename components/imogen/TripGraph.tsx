@@ -1,11 +1,11 @@
-import { stops, type Country } from "@/content/imogen";
+import { stops, trip, type Country } from "@/content/imogen";
 
 /**
- * TripGraph — the trip as one continuous line, split into places by how many
- * nights you spend in each. The bar shows the split; a wrapping legend names the
- * segments (so it scales to lots of stops without the labels colliding). Spine
- * place-stops only; side trips (Pai, Ha Giang, Sapa, Halong) sit on top and
- * travel days aren't counted.
+ * TripGraph — the trip as one continuous line FIXED to the real trip length
+ * (trip.start → trip.end). Place nights fill it from the left in their country
+ * colours; whatever's left to the end of the dates is grey (still open). A
+ * wrapping legend names the segments. Side trips (Pai, Ha Giang, Sapa, Halong)
+ * and travel days sit on top of this and aren't counted in the fill.
  */
 const COUNTRY_CLASS: Record<Country, string> = {
   Thailand: "c-thailand",
@@ -15,7 +15,12 @@ const COUNTRY_CLASS: Record<Country, string> = {
 
 export default function TripGraph() {
   const places = stops.filter((s) => s.kind === "place" && !s.side && s.nights);
-  const total = places.reduce((a, s) => a + (s.nights ?? 0), 0);
+  const sumNights = places.reduce((a, s) => a + (s.nights ?? 0), 0);
+  const totalDays = Math.max(
+    sumNights,
+    Math.round((Date.parse(trip.end) - Date.parse(trip.start)) / 86_400_000)
+  );
+  const remaining = Math.max(0, totalDays - sumNights);
 
   return (
     <div className="im-tl">
@@ -28,6 +33,9 @@ export default function TripGraph() {
             title={`${s.name} · ${s.nights} nights`}
           />
         ))}
+        {remaining > 0 && (
+          <span className="im-tl-seg is-rest" style={{ flexGrow: remaining }} title={`${remaining} nights still open`} />
+        )}
       </div>
       <div className="im-tl-legend">
         {places.map((s) => (
@@ -37,9 +45,16 @@ export default function TripGraph() {
             <span className="im-tl-key-n">{s.nights}n</span>
           </span>
         ))}
+        {remaining > 0 && (
+          <span className="im-tl-key is-rest">
+            <span className="im-tl-key-dot" aria-hidden="true" />
+            <span className="im-tl-key-name">Open</span>
+            <span className="im-tl-key-n">{remaining}n</span>
+          </span>
+        )}
       </div>
       <p className="im-tl-total">
-        {total} nights so far · Pai, plus Ha Giang, Sapa and Halong up north, sit on top of this
+        {sumNights} of {totalDays} nights mapped · the grey is still open · Pai, Ha Giang, Sapa and Halong sit on top
       </p>
     </div>
   );
