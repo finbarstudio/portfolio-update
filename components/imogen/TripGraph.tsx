@@ -1,9 +1,11 @@
 import { stops, type Country } from "@/content/imogen";
 
 /**
- * TripGraph — a quick bar chart of nights per place, so the pacing of the trip
- * is easy to eyeball. Place stops only (travel legs aren't a "place"); side
- * trips show as a faded bar since their length is still open.
+ * TripGraph — the trip as one continuous line, split into places by how many
+ * nights you spend in each, so the pacing is easy to read at a glance. Spine
+ * place-stops only; side trips (Pai, Ha Giang) sit on top of this and travel
+ * days aren't counted. Segments + their labels share the same flex-grow so they
+ * line up.
  */
 const COUNTRY_CLASS: Record<Country, string> = {
   Thailand: "c-thailand",
@@ -12,28 +14,32 @@ const COUNTRY_CLASS: Record<Country, string> = {
 };
 
 export default function TripGraph() {
-  const places = stops.filter((s) => s.kind === "place");
-  const max = Math.max(...places.map((s) => s.nights ?? 3));
+  const places = stops.filter((s) => s.kind === "place" && !s.side && s.nights);
+  const total = places.reduce((a, s) => a + (s.nights ?? 0), 0);
 
   return (
-    <div className="im-graph">
-      {places.map((s) => {
-        const n = s.nights;
-        const width = ((n ?? 2.5) / max) * 100;
-        return (
-          <div className={`im-graph-row ${COUNTRY_CLASS[s.country]}`} key={s.id}>
-            <div className="im-graph-head">
-              <span className="im-graph-name">{s.name}</span>
-              <span className="im-graph-val">
-                {s.side ? "side trip" : `${n} ${n === 1 ? "night" : "nights"}`}
-              </span>
-            </div>
-            <span className="im-graph-track">
-              <span className={`im-graph-bar ${s.side ? "is-side" : ""}`} style={{ width: `${width}%` }} />
-            </span>
+    <div className="im-tl">
+      <div className="im-tl-bar">
+        {places.map((s) => (
+          <span
+            key={s.id}
+            className={`im-tl-seg ${COUNTRY_CLASS[s.country]}`}
+            style={{ flexGrow: s.nights }}
+            title={`${s.name} · ${s.nights} nights`}
+          />
+        ))}
+      </div>
+      <div className="im-tl-keys">
+        {places.map((s) => (
+          <div key={s.id} className="im-tl-key" style={{ flexGrow: s.nights }}>
+            <span className="im-tl-key-name">{s.name}</span>
+            <span className="im-tl-key-n">{s.nights}n</span>
           </div>
-        );
-      })}
+        ))}
+      </div>
+      <p className="im-tl-total">
+        {total} nights so far · Pai and the Ha Giang Loop sit on top of this
+      </p>
     </div>
   );
 }

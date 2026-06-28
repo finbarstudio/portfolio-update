@@ -227,13 +227,13 @@
 }
 .imogen-page .im-pin-dot {
   flex: 0 0 auto;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #fff;
   background: var(--c, var(--ink));
@@ -681,3 +681,144 @@
 }
 .imogen-page .im-graph-bar.is-side { opacity: 0.4; }
 .imogen-page .im-graph-note { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-top: 16px; }
+
+/* ── map legend (names live here, not crowding the map) ────────────────── */
+.imogen-page .im-map-legend {
+  list-style: none;
+  padding: 0;
+  margin: 16px auto 0;
+  max-width: 460px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  justify-content: center;
+}
+.imogen-page .im-leg-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.imogen-page .im-leg-link.is-static { color: var(--ink-soft); }
+.imogen-page .im-leg-dot {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--c, var(--ink));
+}
+.imogen-page .im-leg-dot.is-side {
+  background: var(--bg-raised);
+  color: var(--c, var(--ink-soft));
+  border: 1.5px dashed var(--c, var(--line));
+}
+.imogen-page .im-leg-dot.is-waypoint { width: 12px; height: 12px; background: var(--ink-soft); }
+.imogen-page .im-leg-dot.is-planned {
+  background: var(--bg-raised);
+  color: var(--c, var(--ink-soft));
+  border: 1.5px dashed var(--c, var(--line));
+}
+
+/* ── trip timeline (one continuous line split into places) ─────────────── */
+.imogen-page .im-tl-bar {
+  display: flex;
+  gap: 2px;
+  height: 18px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-sunken);
+}
+.imogen-page .im-tl-seg {
+  flex-basis: 0;
+  flex-shrink: 1;
+  min-width: 6px;
+  background: var(--c, var(--ink));
+}
+.imogen-page .im-tl-keys { display: flex; gap: 2px; margin-top: 8px; }
+.imogen-page .im-tl-key {
+  flex-basis: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 2px;
+}
+.imogen-page .im-tl-key-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.imogen-page .im-tl-key-n {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.imogen-page .im-tl-total {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* ── Ha Giang Loop hostel comparison ───────────────────────────────────── */
+.imogen-page .im-loop-intro { font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 4px; }
+.imogen-page .im-loop-row { padding: 13px 0; border-top: 1px solid var(--line); }
+.imogen-page .im-loop-row:first-of-type { border-top: none; }
+.imogen-page .im-loop-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.imogen-page .im-loop-name { font-weight: 700; font-size: 15px; }
+.imogen-page .im-loop-pick {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--pink);
+  border-radius: 999px;
+  padding: 2px 7px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.imogen-page .im-loop-price {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.imogen-page .im-loop-party {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 7px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-loop-party i { font-style: normal; color: var(--line); font-size: 11px; }
+.imogen-page .im-loop-party i.on { color: var(--pink); }
+.imogen-page .im-loop-meta {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+}
+.imogen-page .im-loop-note { font-size: 13.5px; line-height: 1.5; color: var(--ink); margin-top: 6px; }

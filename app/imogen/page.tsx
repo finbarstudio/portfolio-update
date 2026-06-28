@@ -68,9 +68,6 @@ export default function ImogenPage() {
           <Reveal>
             <p className="im-section-label">Time in each place</p>
             <TripGraph />
-            <p className="im-graph-note">
-              Rough nights per stop, just so you can see the shape of it. Travel days and side trips aren&apos;t counted.
-            </p>
           </Reveal>
         </section>
 

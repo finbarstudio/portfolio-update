@@ -1,5 +1,6 @@
 import { mapsUrl, route, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
 import LocatorMap from "./LocatorMap";
+import LoopTable from "./LoopTable";
 
 const COUNTRY_CLASS: Record<Country, string> = {
   Thailand: "c-thailand",
@@ -55,6 +56,13 @@ export default function StopCard({
       </div>
 
       <p className="im-stop-blurb">{stop.blurb}</p>
+
+      {stop.id === "ha-giang" && (
+        <div className="im-block">
+          <div className="im-block-label">Which hostel to book with</div>
+          <LoopTable />
+        </div>
+      )}
 
       {hostelList.length > 0 && (
         <div className="im-block">

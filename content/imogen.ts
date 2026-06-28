@@ -60,6 +60,8 @@ export type Stop = {
   side?: boolean;
   /** Shown in place of dates for a side trip, e.g. "Side trip · 2–3 days if you go". */
   sideNote?: string;
+  /** Pill label for a side trip (defaults to "Side trip"). */
+  sideLabel?: string;
   blurb: string;
   /** One hostel, or use `hostels` for a couple of options. */
   hostel?: Hostel;
@@ -166,6 +168,59 @@ export const safety = {
   linkText: "What happened in Vang Vieng",
   linkUrl: "https://en.wikipedia.org/wiki/2024_Laos_methanol_poisoning",
 };
+
+// ── Ha Giang Loop: the hostels you can book the loop through, most → least party.
+// Prices are rough USD, per person, for the long 4D3N loop with an easy rider
+// (self-ride is a bit cheaper). They change with season, so treat as ballpark.
+export type LoopHostel = {
+  name: string;
+  /** 1 (quiet) – 4 (full party). */
+  party: number;
+  longEasyRider: string;
+  selfRide?: string;
+  versions: string;
+  note: string;
+  pick?: boolean;
+};
+
+export const loopHostels: LoopHostel[] = [
+  {
+    name: "Mama's",
+    party: 4,
+    longEasyRider: "~$200",
+    selfRide: "~$170",
+    versions: "3-day or 4-day",
+    note: "Biggest party of the lot, all the groups pile in together for huge nights. Younger backpacker crowd. I heard great things.",
+  },
+  {
+    name: "Jasmine",
+    party: 3,
+    longEasyRider: "~$230–290",
+    selfRide: "~$140–160",
+    versions: "3-day or 4-day",
+    note: "Pitches itself as the premium, organised option, but the reputation is still pretty party. I heard great things here too.",
+  },
+  {
+    name: "Bong",
+    party: 2,
+    longEasyRider: "~$160–180",
+    selfRide: "~$130–150",
+    versions: "3-day, 4-day (+ longer combos)",
+    note: "What I did, and I'd 100% recommend it. A genuine happy medium (party if you want it, no pressure if you don't). You can pop into their Hanoi hostel and they'll sort the whole thing for you.",
+    pick: true,
+  },
+  {
+    name: "Road Kings",
+    party: 1,
+    longEasyRider: "~$300–335",
+    selfRide: "~$260",
+    versions: "3-day or 4-day",
+    note: "The most professional and the quietest. Small groups, more late-20s/early-30s couples. Priciest, but the best inclusions.",
+  },
+];
+
+export const loopNote =
+  "Booked through a hostel that collects you in Hanoi. Prices are rough, per person, for the long 4-day / 3-night loop with an easy rider. Self-ride is a bit cheaper, and the short 3-day version knocks roughly $30–40 off. Most include the bike or easy rider, fuel, meals, homestays, gear and the Hanoi pickup; the ~$10 border permit and drinks are usually extra.";
 
 // ── The route, in order ────────────────────────────────────────────────────
 export const stops: Stop[] = [
@@ -402,9 +457,9 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Hanoi",
     country: "Vietnam",
-    nights: 4,
+    nights: 3,
     blurb:
-      "And then Hanoi, which is amazing. There's so much to do that you'll want a few days. Stay in the Old Quarter, that's where you want to be. Don't hire a moped here, just walk the Old Quarter and use Grab for anything further out. I wouldn't bother with day trips, you've had loads of nature in Laos and there's more to come down south, so just take the city in. The food is incredible, honestly I was eating banh mi every single day.",
+      "And then Hanoi, which is amazing. About 3 days is right, there's loads to do. Stay in the Old Quarter, that's where you want to be. Don't hire a moped here, just walk the Old Quarter and use Grab for anything further out. The food is incredible and most of it's within walking distance, so wander and graze, and ask your hostel or locals for spots rather than trusting Google. I wouldn't bother with day trips here, just take the city in. Same as everywhere, meet people and see where they're headed next. Honestly I was eating banh mi every single day.",
     hostels: [
       {
         name: "Lake View",
@@ -429,6 +484,12 @@ export const stops: Stop[] = [
       {
         name: "The replica shops",
         note: "Inside the Old Quarter there's a great selection of replica gear, Arc'teryx jackets, shoes, all sorts. The proper shopping is just outside the Old Quarter.",
+        kind: "do",
+      },
+      {
+        name: "Đồng Xuân Market",
+        note: "Cool for fake clothes, and just a nice hour wandering around.",
+        maps: "Dong Xuan Market Hanoi",
         kind: "do",
       },
       {
@@ -463,9 +524,25 @@ export const stops: Stop[] = [
       },
     ],
     leg: {
-      to: "Down south (Huế & Hội An)",
-      mode: "Heading down the Vietnamese coast",
-      note: "Still writing the rest of Vietnam, more coming soon.",
+      to: "The Ha Giang Loop, then south",
+      mode: "The big one up north first (next), then back to Hanoi and down the coast",
+      note: "Still writing the southern stops, more coming soon.",
+    },
+  },
+  {
+    id: "ha-giang",
+    kind: "place",
+    side: true,
+    sideLabel: "The loop",
+    name: "Ha Giang Loop",
+    country: "Vietnam",
+    sideNote: "From Hanoi · do the LONG version · the famous bike loop",
+    blurb:
+      "The most famous thing to do up north, and a proper must. Ha Giang is a province right up on the Chinese border, and \"the loop\" is a big multi-day motorbike circuit through it. There's a short and a long version, do the long one. You book it through a hostel and they handle everything: they pick you up in Hanoi, drive you up to Ha Giang, and you stay the night in their hostel there. The next morning a huge group (like 200 people) sets off together, split into smaller groups each with a leader. You can ride your own bike if you hire one, or take an \"easy rider\" and sit on the back while a local drives. Get the easy rider, honestly. It's far less stressful, the roads are tough, and the riders grew up there so they know every bend. They're lovely too, you end up proper mates, and it means you can actually look up and take the views in. Don't stress the planning either, once you're on the loop your next few days are completely sorted. It was so amazing.",
+    leg: {
+      to: "Booking it",
+      mode: "Book through one of the loop hostels below, they collect you in Hanoi",
+      note: "Easiest move: pop into Bong Hostel in Hanoi and they'll help you sort the lot. Have a chat with your friends about the vibe you want, then just book it.",
     },
   },
 ];
@@ -481,6 +558,7 @@ export const route: RoutePoint[] = [
   { id: "vang-vieng", n: 3, name: "Vang Vieng", country: "Laos", x: 252, y: 258, detailed: true, flip: true },
   { id: "vientiane", name: "Vientiane", country: "Laos", x: 236, y: 312, waypoint: true },
   { id: "hanoi", n: 4, name: "Hanoi", country: "Vietnam", x: 374, y: 156, detailed: true },
+  { id: "ha-giang", name: "Ha Giang", country: "Vietnam", x: 339, y: 69, detailed: true, side: true, from: "hanoi", flip: true },
   { id: "hue-hoi-an", n: 5, name: "Huế & Hội An", country: "Vietnam", x: 456, y: 389 },
   { id: "nha-trang", n: 6, name: "Nha Trang", country: "Vietnam", x: 508, y: 583 },
   { id: "hcmc", n: 7, name: "Ho Chi Minh City", country: "Vietnam", x: 406, y: 655 },
