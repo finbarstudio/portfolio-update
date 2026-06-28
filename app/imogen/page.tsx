@@ -173,17 +173,10 @@ export default function ImogenPage() {
       {/* ── footer ── */}
       <footer className="im-foot">
         <div className="im-wrap">
-          <p className="im-foot-more">More coming · I&apos;ll keep adding as we plan</p>
           <p className="im-foot-sign im-serif">
             Have the best time.
             <br />
-            Say yes to everything. — Finbar
-          </p>
-          <p className="im-foot-by">
-            made by{" "}
-            <a href="https://www.finbar.studio" target="_blank" rel="noopener noreferrer">
-              finbar.studio
-            </a>
+            Say yes to everything. Finbar
           </p>
         </div>
       </footer>

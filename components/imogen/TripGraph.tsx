@@ -54,7 +54,7 @@ export default function TripGraph() {
         )}
       </div>
       <p className="im-tl-total">
-        {sumNights} nights across the places{remaining > 0 ? ", the blue is time on the move" : ""}, plus travel on top. That&apos;s the whole route, a bit more than your window, so we&apos;ll trim it to your dates together.
+        {sumNights} nights across the places{remaining > 0 ? ", the blue is time on the move" : ""}, plus travel on top. That&apos;s the whole route, a bit more than your window, so trim it down to your dates.
       </p>
     </div>
   );

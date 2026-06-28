@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { mapsUrl, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
+import { mapsUrl, ratingColor, STAR_COLOR, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
 import LoopTable from "./LoopTable";
 
 /**
@@ -86,7 +86,14 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
           <span className="im-stop-name">{stop.name}</span>
           <span className="im-stop-meta">
             <span className="im-stop-country">{stop.country}</span>
-            {stop.rating != null && <span className="im-stop-rating">{stop.rating}/10</span>}
+            {stop.rating != null && (
+              <span
+                className="im-stop-rating"
+                style={{ background: ratingColor(stop.rating) ?? undefined, color: "#fff" }}
+              >
+                {stop.rating}/10
+              </span>
+            )}
             {stop.vibe && <span className="im-stop-vibe">{stop.vibe}</span>}
             {dateStr && <span className="im-stop-dates">{dateStr}</span>}
           </span>
@@ -135,6 +142,13 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                             >
                               <span
                                 className={`im-item-score ${it.star ? "is-star" : it.rating == null ? "is-empty" : ""}`}
+                                style={
+                                  it.star
+                                    ? { background: STAR_COLOR, color: "#fff" }
+                                    : it.rating != null
+                                      ? { background: ratingColor(it.rating) ?? undefined, color: "#fff" }
+                                      : undefined
+                                }
                                 aria-hidden="true"
                               >
                                 {it.star ? "★" : it.rating != null ? it.rating : ""}
