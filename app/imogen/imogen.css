@@ -759,26 +759,37 @@
   background: var(--bg-sunken);
 }
 .imogen-page .im-tl-group {
-  position: relative;
   display: flex;
   gap: 2px;
   min-width: 0;
 }
-.imogen-page .im-tl-group-label {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
+/* labels above the bar: country + the places in it, aligned to each span */
+.imogen-page .im-tl-axis {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  margin-bottom: 8px;
+}
+.imogen-page .im-tl-axis-item {
+  flex-basis: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.imogen-page .im-tl-axis-country {
   font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: 9px;
-  letter-spacing: 0.1em;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #fff;
-  pointer-events: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  z-index: 1;
+  color: var(--c, var(--ink));
+}
+.imogen-page .im-tl-axis-item.is-rest .im-tl-axis-country { color: #8e9aae; }
+.imogen-page .im-tl-axis-places {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--ink-soft);
 }
 .imogen-page .im-tl-seg {
   flex-basis: 0;

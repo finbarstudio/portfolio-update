@@ -36,6 +36,21 @@ export default function TripGraph() {
 
   return (
     <div className="im-tl">
+      <div className="im-tl-axis">
+        {groups.map((g) => (
+          <div key={g.country} className={`im-tl-axis-item ${COUNTRY_CLASS[g.country]}`} style={{ flexGrow: g.nights }}>
+            <span className="im-tl-axis-country">{g.country} · {g.nights}n</span>
+            <span className="im-tl-axis-places">{g.places.map((p) => p.name).join(", ")}</span>
+          </div>
+        ))}
+        {remaining > 0 && (
+          <div className="im-tl-axis-item is-rest" style={{ flexGrow: remaining }}>
+            <span className="im-tl-axis-country">On the move</span>
+            <span className="im-tl-axis-places">{remaining}n</span>
+          </div>
+        )}
+      </div>
+
       <div className="im-tl-bar">
         {groups.map((g) => (
           <div key={g.country} className={`im-tl-group ${COUNTRY_CLASS[g.country]}`} style={{ flexGrow: g.nights }}>
@@ -47,28 +62,10 @@ export default function TripGraph() {
                 title={`${s.name} · ${s.nights} nights`}
               />
             ))}
-            <span className="im-tl-group-label">{g.country}</span>
           </div>
         ))}
         {remaining > 0 && (
           <span className="im-tl-seg is-rest" style={{ flexGrow: remaining }} title={`${remaining} nights on the move`} />
-        )}
-      </div>
-
-      <div className="im-tl-legend">
-        {groups.map((g) => (
-          <span key={g.country} className={`im-tl-key ${COUNTRY_CLASS[g.country]}`}>
-            <span className="im-tl-key-dot" aria-hidden="true" />
-            <span className="im-tl-key-name">{g.country}</span>
-            <span className="im-tl-key-n">{g.nights}n</span>
-          </span>
-        ))}
-        {remaining > 0 && (
-          <span className="im-tl-key is-rest">
-            <span className="im-tl-key-dot" aria-hidden="true" />
-            <span className="im-tl-key-name">On the move</span>
-            <span className="im-tl-key-n">{remaining}n</span>
-          </span>
         )}
       </div>
 
