@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { mapsUrl, ratingColor, STAR_COLOR, COUNTRY_FLAG, imgSlug, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
+import { mapsUrl, ratingColor, COUNTRY_FLAG, imgSlug, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
 import LoopTable from "./LoopTable";
 
 /**
@@ -199,22 +199,19 @@ export default function StopCard({
                               aria-expanded={isOpen}
                             >
                               <span
-                                className={`im-item-score ${it.star ? "is-star" : it.rating == null ? "is-empty" : ""}`}
+                                className={`im-item-score ${it.star || (it.rating != null && it.rating >= 9) ? "is-topstar" : ""} ${it.rating == null && !it.star ? "is-empty" : ""}`}
                                 style={
-                                  it.star
-                                    ? { background: STAR_COLOR, color: "#fff" }
+                                  it.star || (it.rating != null && it.rating >= 9)
+                                    ? undefined
                                     : it.rating != null
                                       ? { background: ratingColor(it.rating) ?? undefined, color: "#fff" }
                                       : undefined
                                 }
                                 aria-hidden="true"
                               >
-                                {it.star ? "★" : it.rating != null ? it.rating : ""}
+                                {it.rating != null ? it.rating : it.star ? "★" : ""}
                               </span>
                               <span className="im-item-title">{it.title}</span>
-                              {!it.star && it.rating != null && it.rating >= 9 && (
-                                <span className="im-top-star" aria-hidden="true">★</span>
-                              )}
                             </button>
                             {it.maps && (
                               <a className="im-item-map" href={mapsUrl(it.maps)} target="_blank" rel="noopener noreferrer">

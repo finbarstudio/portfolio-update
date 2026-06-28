@@ -26,6 +26,11 @@
 
   --maxw: 680px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --star: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  /* gold star with a cream outline + soft shadow (filter, so the fill stays gold) */
+  --star-filter: drop-shadow(1px 0 0 var(--bg-raised)) drop-shadow(-1px 0 0 var(--bg-raised))
+    drop-shadow(0 1px 0 var(--bg-raised)) drop-shadow(0 -1px 0 var(--bg-raised))
+    drop-shadow(0 2px 4px rgba(36, 31, 26, 0.4));
 
   background: var(--bg);
   color: var(--ink);
@@ -242,7 +247,6 @@
 /* 9/10 stops: a gold STAR pin, with the same cream outline + shadow as the circles */
 .imogen-page .im-pin.is-top { z-index: 3; }
 .imogen-page .im-pin.is-top .im-pin-dot {
-  --star: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   width: 28px;
   height: 28px;
   border: none;
@@ -251,15 +255,7 @@
   color: #fff;
   font-size: 10px;
   clip-path: var(--star);
-  filter: drop-shadow(0 2px 5px rgba(36, 31, 26, 0.4));
-}
-.imogen-page .im-pin.is-top .im-pin-dot::before {
-  content: "";
-  position: absolute;
-  inset: -2.5px;
-  background: var(--bg-raised); /* the cream "outline", same as circle borders */
-  clip-path: var(--star);
-  z-index: -1;
+  filter: var(--star-filter);
 }
 .imogen-page .im-pin.is-top .im-pin-star { display: none; } /* the pin itself is the star */
 .imogen-page .im-leg-star { margin-left: 4px; color: #d8932a; font-size: 12px; }
@@ -374,11 +370,10 @@
   border-radius: 999px;
   padding: 2px 7px;
 }
-/* muted map pins + legend rows */
-.imogen-page .im-pin.is-muted { opacity: 0.5; }
-.imogen-page .im-pin.is-muted .im-pin-dot { background: var(--ink-soft); }
-.imogen-page .im-map-legend li.is-muted { opacity: 0.5; }
-.imogen-page .im-map-legend li.is-muted .im-leg-dot { background: var(--ink-soft); }
+/* muted map pins + legend rows — solid grey, not transparent */
+.imogen-page .im-pin.is-muted .im-pin-dot { background: #b4ab9c; }
+.imogen-page .im-map-legend li.is-muted { color: var(--ink-soft); }
+.imogen-page .im-map-legend li.is-muted .im-leg-dot { background: #b4ab9c; }
 .imogen-page .im-stop-head {
   display: flex;
   align-items: center;
@@ -1143,8 +1138,17 @@
   background: var(--bg-sunken);
   color: var(--ink);
 }
-.imogen-page .im-item-score.is-star { font-size: 19px; }
 .imogen-page .im-item-score.is-empty { background: transparent; color: var(--ink-soft); box-shadow: inset 0 0 0 1px var(--line); }
+/* top items (9/10) get the same gold star icon as the map, with the number in it */
+.imogen-page .im-item-score.is-topstar {
+  width: 36px;
+  height: 36px;
+  border-radius: 0;
+  background: #e3a82a;
+  color: #fff;
+  clip-path: var(--star);
+  filter: var(--star-filter);
+}
 .imogen-page .im-top-star { flex: 0 0 auto; color: #c8922e; font-size: 16px; line-height: 1; }
 .imogen-page .im-item-title { font-size: 15px; font-weight: 600; line-height: 1.3; }
 .imogen-page .im-item.rec-low .im-item-title { color: var(--ink-soft); font-weight: 500; }
