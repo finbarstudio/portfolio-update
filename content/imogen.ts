@@ -786,13 +786,19 @@ export const stops: Stop[] = [
       {
         name: "Ride the pass",
         rating: 9.5,
-        note: "Plenty of companies set it up: you ride Hue → Hoi An and they collect the bike from Hoi An at the other end. It's popular and it felt safe, I'd put the risk at about 3/10. Go with people, and convince someone to do it with you. If you'd rather not drive, you can hire a jeep and have someone drive you, but the bike is so worth it.",
+        note: "Plenty of companies set it up: you ride Hue → Hoi An and they collect the bike from Hoi An at the other end. It's popular and it felt safe, I'd put the risk at about 3/10. Go with people, and convince someone to do it with you. If you'd rather not drive, you can hire a jeep and have someone drive you, but the bike is so worth it. I've dropped a Google Maps route below that strings the Lang Co stops together (switch it to motorbike once it opens).",
+        links: [
+          {
+            label: "The route, Hue → Hoi An",
+            url: "https://www.google.com/maps/dir/?api=1&origin=Hue,+Vietnam&destination=Hoi+An,+Vietnam&waypoints=Six+Miles+Coast+Lang+Co%7CAn+Lagoon+Seafood+Lang+Co&travelmode=driving",
+          },
+        ],
         kind: "do",
       },
       {
-        name: "Abandoned hotel complex (Lang Co)",
-        note: "A great detour on the ride: a huge abandoned hotel complex at Lang Co you can wander around. Super cool to explore.",
-        maps: "abandoned hotel Lang Co Vietnam",
+        name: "Six Miles Coast (the abandoned resort)",
+        note: "A great detour on the ride: a huge abandoned resort at Lang Co you can wander around. Super cool to explore. It's on the route link above.",
+        maps: "Six Miles Coast Lang Co Vietnam",
         kind: "do",
       },
       {
