@@ -197,6 +197,22 @@ export const tips: Tip[] = [
   },
 ];
 
+// ── What I wish I'd done (regrets, mostly about keeping memories) ───────────
+export const wishlist: Tip[] = [
+  {
+    title: "Kept more physical memorabilia",
+    body: "I wish I'd held onto more physical bits: ticket stubs, patches, postcards, a few coins, whatever. The photos are great, but the tangible stuff is what I'd actually want on a shelf now.",
+  },
+  {
+    title: "Shot some film",
+    body: "Take a disposable or a cheap film camera alongside your phone. The grainy film shots are the ones I keep coming back to, way more than the camera roll.",
+  },
+  {
+    title: "Kept a scrappy journal",
+    body: "Even a couple of lines in your notes each night. You forget the small funny stuff so fast, and that's the gold later.",
+  },
+];
+
 // ── One serious safety note (drinks / methanol) ────────────────────────────
 export const safety = {
   title: "One serious thing: drinks",

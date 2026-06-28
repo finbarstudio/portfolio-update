@@ -2,6 +2,7 @@ import {
   trip,
   apps,
   tips,
+  wishlist,
   safety,
   stops,
   buildItinerary,
@@ -11,6 +12,7 @@ import {
 import RouteMap from "@/components/imogen/RouteMap";
 import TripGraph from "@/components/imogen/TripGraph";
 import StopCard from "@/components/imogen/StopCard";
+import Highlights from "@/components/imogen/Highlights";
 import Reveal from "@/components/imogen/Reveal";
 
 export default function ImogenPage() {
@@ -58,18 +60,7 @@ export default function ImogenPage() {
         <section className="im-section">
           <Reveal>
             <p className="im-section-label">The highlights · my 9s and 10s</p>
-            <div className="im-highlights">
-              {highlights.map((h) => (
-                <a
-                  key={`${h.stopId}-${h.label}`}
-                  className={`im-hl ${h.star ? "is-star" : ""}`}
-                  href={`#stop-${h.stopId}`}
-                >
-                  <span className="im-hl-label">{h.label}</span>
-                  <span className="im-hl-rating">{h.star ? "★ 10/10" : `${h.rating}/10`}</span>
-                </a>
-              ))}
-            </div>
+            <Highlights items={highlights} />
           </Reveal>
         </section>
       </div>
@@ -128,6 +119,21 @@ export default function ImogenPage() {
                 <div key={t.title}>
                   <h3 className="im-tip-title im-serif">{t.title}</h3>
                   <p className="im-tip-body">{t.body}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+
+        {/* ── what I wish I'd done ── */}
+        <section className="im-section">
+          <Reveal>
+            <p className="im-section-label">What I wish I&apos;d done</p>
+            <div className="im-tips">
+              {wishlist.map((w) => (
+                <div key={w.title}>
+                  <h3 className="im-tip-title im-serif">{w.title}</h3>
+                  <p className="im-tip-body">{w.body}</p>
                 </div>
               ))}
             </div>

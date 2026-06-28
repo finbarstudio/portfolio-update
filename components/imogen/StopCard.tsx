@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { mapsUrl, ratingColor, STAR_COLOR, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
 import LoopTable from "./LoopTable";
 
@@ -78,6 +78,24 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
   const shown = filter === "All" ? items : items.filter((i) => i.cat === filter);
   const groups = CAT_ORDER.map((c) => ({ c, list: shown.filter((i) => i.cat === c) })).filter((g) => g.list.length);
 
+  // Keys of every currently-shown item (for "expand all" from a highlight).
+  const itemKeys = groups.flatMap((g) => g.list.map((_, i) => `${g.c}-${i}`));
+  const itemKeysRef = useRef<string[]>(itemKeys);
+  itemKeysRef.current = itemKeys;
+
+  // A highlight click opens this stop AND expands all its items.
+  useEffect(() => {
+    const onExpand = (e: Event) => {
+      const id = (e as CustomEvent<{ id?: string }>).detail?.id;
+      if (id === stop.id) {
+        setOpen(true);
+        setOpenItems(Object.fromEntries(itemKeysRef.current.map((k) => [k, true])));
+      }
+    };
+    window.addEventListener("imogen:expand", onExpand);
+    return () => window.removeEventListener("imogen:expand", onExpand);
+  }, [stop.id]);
+
   return (
     <article id={`stop-${stop.id}`} className={`im-stop ${COUNTRY_CLASS[stop.country]} ${isTravel ? "is-travel" : ""} ${open ? "is-open" : ""}`}>
       <button className="im-stop-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
@@ -93,6 +111,9 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
               >
                 {stop.rating}/10
               </span>
+            )}
+            {stop.rating != null && stop.rating >= 9 && (
+              <span className="im-top-star" aria-hidden="true">★</span>
             )}
             {stop.vibe && <span className="im-stop-vibe">{stop.vibe}</span>}
             {dateStr && <span className="im-stop-dates">{dateStr}</span>}
@@ -154,6 +175,9 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                                 {it.star ? "★" : it.rating != null ? it.rating : ""}
                               </span>
                               <span className="im-item-title">{it.title}</span>
+                              {!it.star && it.rating != null && it.rating >= 9 && (
+                                <span className="im-top-star" aria-hidden="true">★</span>
+                              )}
                             </button>
                             {it.maps && (
                               <a className="im-item-map" href={mapsUrl(it.maps)} target="_blank" rel="noopener noreferrer">
