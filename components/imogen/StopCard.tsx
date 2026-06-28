@@ -39,7 +39,14 @@ export default function StopCard({
           <h3 className="im-stop-name">{stop.name}</h3>
           <div className="im-stop-meta">
             <span className="im-stop-country">{stop.country}</span>
-            {dateStr && <span className="im-stop-dates">{dateStr}</span>}
+            {stop.side ? (
+              <>
+                <span className="im-stop-side">Side trip</span>
+                {stop.sideNote && <span className="im-stop-dates">{stop.sideNote}</span>}
+              </>
+            ) : (
+              dateStr && <span className="im-stop-dates">{dateStr}</span>
+            )}
           </div>
         </div>
       </div>
@@ -105,7 +112,7 @@ export default function StopCard({
 
       {stop.leg && (
         <div className="im-leg">
-          <div className="im-block-label">{isTravel ? "Then" : "Getting to the next place"}</div>
+          <div className="im-block-label">{isTravel ? "Then" : stop.side ? "Getting there" : "Getting to the next place"}</div>
           <div className="im-leg-to">{stop.leg.to}</div>
           <p className="im-leg-mode">{stop.leg.mode}</p>
           {(stop.leg.app || stop.leg.appUrl) &&

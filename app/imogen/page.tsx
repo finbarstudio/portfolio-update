@@ -106,7 +106,7 @@ export default function ImogenPage() {
           <p className="im-section-label">The trip, in order</p>
           <div className="im-stops">
             {stops.map((s) => {
-              const badge = s.kind === "place" ? String(++placeN) : "≈";
+              const badge = s.side ? "↗" : s.kind === "place" ? String(++placeN) : "≈";
               return (
                 <Reveal key={s.id}>
                   <StopCard stop={s} dates={dates[s.id]} badge={badge} />

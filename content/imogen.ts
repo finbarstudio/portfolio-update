@@ -2,8 +2,9 @@
 // Imogen's Asia — all the content for the /imogen travel guide in ONE place.
 // Finbar edits this file; the page renders from it. Add a stop = add an object
 // to `stops`. Dates are computed from `trip.start` + each stop's nights/days,
-// so changing the nights re-flows every date after it. Everything is rough and
-// meant to be tweaked.
+// so changing the nights re-flows every date after it. Side trips (side: true)
+// are skipped by the date maths since their timing is still up in the air.
+// Everything is rough and meant to be tweaked.
 // ─────────────────────────────────────────────────────────────────────────
 
 export type Country = "Thailand" | "Laos" | "Vietnam";
@@ -55,6 +56,10 @@ export type Stop = {
   nights?: number;
   /** Days on the move for a travel leg. */
   days?: number;
+  /** Side trip / optional detour — excluded from the running date flow. */
+  side?: boolean;
+  /** Shown in place of dates for a side trip, e.g. "Side trip · 2–3 days if you go". */
+  sideNote?: string;
   blurb: string;
   hostel?: Hostel;
   dos?: DoItem[];
@@ -65,13 +70,20 @@ export type Stop = {
 /** A point on the route map. `detailed` = has a stop card to link to. */
 export type RoutePoint = {
   id: string;
-  n: number;
+  /** Spine number; omitted for side trips. */
+  n?: number;
   name: string;
   country: Country;
   /** Position in the map's 0–600 (x) / 0–800 (y) viewBox. */
   x: number;
   y: number;
   detailed?: boolean;
+  /** A spur off the main line (e.g. Pai) rather than a spine stop. */
+  side?: boolean;
+  /** For a side spur, the spine point id it branches from. */
+  from?: string;
+  /** Force the label to the other side of the pin. */
+  flip?: boolean;
 };
 
 export const trip = {
@@ -92,6 +104,12 @@ export const apps: AppItem[] = [
     tagline: "Every hostel you book",
     url: "https://www.hostelworld.com",
     note: "The reviews are honest and it's what everyone uses. Book a couple of nights at a time, then extend once you've seen the place and met people.",
+  },
+  {
+    name: "Grab",
+    tagline: "Taxis (and food)",
+    url: "https://www.grab.com",
+    note: "Get this everywhere in SE Asia. It's the local Uber for taxis and tuk-tuks, with the price agreed up front so there's no haggling. It does food delivery too.",
   },
   {
     name: "12go.asia",
@@ -120,6 +138,10 @@ export const tips: Tip[] = [
   {
     title: "Take night buses",
     body: "Where you can, take the overnight buses. You sleep while you move, so you don't waste a day getting somewhere. The sleeper ones are generally comfy.",
+  },
+  {
+    title: "Renting a moped",
+    body: "Mopeds are the best way to explore. Look for a rental with good reviews, but honestly the best move is to ask the hostel staff who they'd use, as long as they seem trustworthy and aren't just pushing a mate's shop, which is where scams happen. And always film a slow video all the way around the bike before you ride off, so nobody can pin existing scratches on you.",
   },
   {
     title: "Stay flexible",
@@ -181,6 +203,12 @@ export const stops: Stop[] = [
         kind: "food",
       },
       {
+        name: "Khao Soi",
+        note: "The northern coconut curry noodle soup. A Chiang Mai speciality, get it while you're up here.",
+        maps: "Khao Soi Chiang Mai",
+        kind: "food",
+      },
+      {
         name: "Elephant sanctuary + the water park",
         note: "I didn't do these but they looked great if you've got the days.",
         kind: "optional",
@@ -191,7 +219,36 @@ export const stops: Stop[] = [
       mode: "Bus to Chiang Rai, then the 2-day slow boat down the Mekong",
       app: "Book through the hostel (or 12go)",
       appUrl: "https://12go.asia",
-      note: "It's the classic way to cross into Laos and it makes total sense geographically. Lock it in a day or two ahead.",
+      note: "It's the classic way to cross into Laos and it makes total sense geographically. Lock it in a day or two ahead. (See the Pai side trip below first, if you've got time.)",
+    },
+  },
+  {
+    id: "pai",
+    kind: "place",
+    side: true,
+    name: "Pai",
+    country: "Thailand",
+    sideNote: "Side trip from Chiang Mai · 2–3 days if you go",
+    blurb:
+      "A little hippie town up in the hills, kind of like Nimbin. I didn't fall head over heels for it, but I get the appeal, and plenty of people fall into the \"Pai hole\" and never leave. Honestly, I'd still say go if you've got the days. We'll sort the timing nearer the trip and maybe bump this up the list.",
+    dos: [
+      {
+        name: "Pai Canyon",
+        note: "Narrow ridges and big drops with great views. Really cool, especially near sunset.",
+        maps: "Pai Canyon",
+        kind: "do",
+      },
+      {
+        name: "Pai Vinyl & Sky Lounge",
+        note: "Chilled spot for a drink with a good vibe.",
+        maps: "Pai Vinyl and Sky Lounge",
+        kind: "night",
+      },
+    ],
+    leg: {
+      to: "The road from Chiang Mai",
+      mode: "Bus from the Chiang Mai hostel, or ride it yourself on a moped",
+      note: "Heads up: it's one of the windiest roads in Thailand, hundreds of hairpin bends, so loads of people get carsick on the bus (take a motion-sickness tablet). Riding it on a moped is stunning, but it's the most full-on ride of the whole trip: misty most of the year, steep drops, 180-degree hairpins, and fast local drivers cutting the corners. Only if you're a confident rider.",
     },
   },
   {
@@ -215,13 +272,37 @@ export const stops: Stop[] = [
     country: "Laos",
     nights: 4,
     blurb:
-      "My favourite place in Laos. Beautiful, relaxed, great food, and an easy place to just be for a few days.",
+      "My favourite place in Laos and one of my standout spots of the whole trip. It has this surprising European feel left over from the old French-colonial days, really pretty and walkable, with great food.",
     hostel: {
       name: "Jam Hostel",
       maps: "Jam Hostel, Luang Prabang",
       note: "Really cool spot, great crowd.",
     },
     dos: [
+      {
+        name: "The night market",
+        note: "One of the best night markets going. Go hungry, the food alley is unreal.",
+        maps: "Luang Prabang Night Market",
+        kind: "food",
+      },
+      {
+        name: "Kuang Si Falls",
+        note: "A gorgeous day trip out to bright turquoise pools you can swim in.",
+        maps: "Kuang Si Falls",
+        kind: "do",
+      },
+      {
+        name: "Mount Phousi",
+        note: "Climb the hill in the middle of town for sunset over the rivers.",
+        maps: "Mount Phousi Luang Prabang",
+        kind: "do",
+      },
+      {
+        name: "UXO Bomb Museum",
+        note: "Sobering but worth it. Laos is one of the most heavily bombed countries in history and this tells that story.",
+        maps: "UXO Lao Visitor Centre Luang Prabang",
+        kind: "do",
+      },
       {
         name: "Late-night bowling",
         note: "When the bars close, everyone ends up at the bowling alley. Random and so fun.",
@@ -230,23 +311,42 @@ export const stops: Stop[] = [
       },
     ],
     leg: {
-      to: "Northern Vietnam",
-      mode: "Heading toward Hanoi and the north",
-      note: "Still writing this leg, more coming soon.",
+      to: "Vientiane",
+      mode: "Bus south to Vientiane",
+      note: "Not the most thrilling leg, but Vientiane is where you pick up the bus into Vietnam.",
+    },
+  },
+  {
+    id: "vientiane",
+    kind: "place",
+    name: "Vientiane",
+    country: "Laos",
+    nights: 1,
+    blurb:
+      "I'll be honest, this was my least favourite stop and the rest of Laos after Luang Prabang didn't do much for me. But you pass through the capital to catch the bus into Vietnam, so think of it as a one-night transit stop, then move on.",
+    leg: {
+      to: "Northern Vietnam (Hanoi)",
+      mode: "Overnight bus from Vientiane across the border into Vietnam",
+      app: "Book on 12go (or Vexere once you're in)",
+      appUrl: "https://12go.asia",
+      note: "This is the crossing into Vietnam. I'm still writing the Vietnam stops, more coming soon.",
     },
   },
 ];
 
 // ── The map: full intended route. Detailed points link to a stop card. ─────
 // Coords are in the RouteMap's 0–600 (x) / 0–800 (y) viewBox, placed roughly
-// by real geography (Chiang Mai NW → Luang Prabang → Hanoi → coast → south).
+// by real geography (Chiang Mai NW → Luang Prabang → Vientiane → Hanoi → coast
+// → south). Pai is a side spur off Chiang Mai.
 export const route: RoutePoint[] = [
   { id: "chiang-mai", n: 1, name: "Chiang Mai", country: "Thailand", x: 99, y: 265, detailed: true },
+  { id: "pai", name: "Pai", country: "Thailand", x: 78, y: 237, detailed: true, side: true, from: "chiang-mai", flip: true },
   { id: "luang-prabang", n: 2, name: "Luang Prabang", country: "Laos", x: 225, y: 211, detailed: true },
-  { id: "hanoi", n: 3, name: "Hanoi", country: "Vietnam", x: 374, y: 156 },
-  { id: "hue-hoi-an", n: 4, name: "Huế & Hội An", country: "Vietnam", x: 456, y: 389 },
-  { id: "nha-trang", n: 5, name: "Nha Trang", country: "Vietnam", x: 508, y: 583 },
-  { id: "hcmc", n: 6, name: "Ho Chi Minh City", country: "Vietnam", x: 406, y: 655 },
+  { id: "vientiane", n: 3, name: "Vientiane", country: "Laos", x: 244, y: 304, detailed: true },
+  { id: "hanoi", n: 4, name: "Hanoi", country: "Vietnam", x: 374, y: 156 },
+  { id: "hue-hoi-an", n: 5, name: "Huế & Hội An", country: "Vietnam", x: 456, y: 389 },
+  { id: "nha-trang", n: 6, name: "Nha Trang", country: "Vietnam", x: 508, y: 583 },
+  { id: "hcmc", n: 7, name: "Ho Chi Minh City", country: "Vietnam", x: 406, y: 655 },
 ];
 
 // ── Rough date helper ──────────────────────────────────────────────────────
@@ -264,11 +364,13 @@ function label(iso: string): string {
 
 export type StopDates = { from: string; to: string; nights?: number; days?: number };
 
-/** Walk the stops from trip.start, accumulating nights/days into rough dates. */
+/** Walk the stops from trip.start, accumulating nights/days into rough dates.
+ *  Side trips don't consume the timeline, so they're skipped. */
 export function buildItinerary(): Record<string, StopDates> {
   let cursor = trip.start;
   const out: Record<string, StopDates> = {};
   for (const s of stops) {
+    if (s.side) continue;
     const len = s.nights ?? s.days ?? 0;
     const from = cursor;
     const to = addDays(cursor, len);
@@ -281,9 +383,8 @@ export function buildItinerary(): Record<string, StopDates> {
 /** "21 Jul – 25 Aug" style label for the whole trip header. */
 export function tripDateLabel(): string {
   const it = buildItinerary();
-  const ids = stops.map((s) => s.id);
-  const first = it[ids[0]];
-  // Trip end is rough: the last detailed stop + a buffer to the planned end.
+  const first = it[stops[0].id];
+  // Trip end is rough: a buffer out to the planned end of the trip.
   return `${first?.from ?? "21 Jul"} – 25 Aug`;
 }
 

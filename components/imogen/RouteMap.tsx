@@ -33,14 +33,18 @@ const VIETNAM =
   "M352,96 C372,86 398,104 410,128 C424,150 432,166 440,186 C452,214 452,238 456,266 C462,298 460,330 462,360 C476,372 486,388 482,406 C500,452 516,506 520,556 C522,588 512,620 486,648 C462,672 430,694 404,700 C384,704 372,690 374,668 C376,644 392,628 398,604 C406,572 410,540 430,508 C444,484 446,456 440,430 C434,402 428,384 426,360 C424,330 420,300 404,276 C388,252 366,236 352,212 C338,188 330,160 332,138 C334,116 338,104 352,96 Z";
 
 export default function RouteMap() {
-  // route line: first leg (Chiang Mai → Luang Prabang) is the slow boat (dashed)
-  const boatD = `M${route[0].x},${route[0].y} L${route[1].x},${route[1].y}`;
-  const roadD =
-    "M" +
-    route
-      .slice(1)
-      .map((p) => `${p.x},${p.y}`)
-      .join(" L");
+  // The spine = main-line stops (side trips are spurs). First spine leg
+  // (Chiang Mai → Luang Prabang) is the slow boat, so it's drawn dashed.
+  const spine = route.filter((p) => !p.side);
+  const boatD = `M${spine[0].x},${spine[0].y} L${spine[1].x},${spine[1].y}`;
+  const roadD = "M" + spine.slice(1).map((p) => `${p.x},${p.y}`).join(" L");
+  const spurs = route
+    .filter((p) => p.side && p.from)
+    .map((p) => {
+      const parent = route.find((q) => q.id === p.from);
+      return parent ? `M${parent.x},${parent.y} L${p.x},${p.y}` : null;
+    })
+    .filter((d): d is string => d !== null);
 
   return (
     <div className="im-map" role="img" aria-label="Map of the route through Thailand, Laos and Vietnam">
@@ -53,18 +57,21 @@ export default function RouteMap() {
         <text className="im-map-label" x="238" y="300" textAnchor="middle">LAOS</text>
         <text className="im-map-label" x="452" y="250" textAnchor="middle">VIETNAM</text>
 
-        <path className="im-map-route is-boat" d={boatD} />
         <path className="im-map-route" d={roadD} />
+        <path className="im-map-route is-boat" d={boatD} />
+        {spurs.map((d, i) => (
+          <path key={i} className="im-map-route is-boat" d={d} />
+        ))}
       </svg>
 
       {route.map((p) => {
         const left = `${(p.x / VB_W) * 100}%`;
         const top = `${(p.y / VB_H) * 100}%`;
-        const flip = p.x > 440;
-        const cls = `im-pin ${COUNTRY_CLASS[p.country]} ${p.detailed ? "" : "is-planned"} ${flip ? "flip" : ""}`;
+        const flip = p.flip ?? p.x > 440;
+        const cls = `im-pin ${COUNTRY_CLASS[p.country]} ${p.detailed ? "" : "is-planned"} ${p.side ? "is-side" : ""} ${flip ? "flip" : ""}`;
         const inner = (
           <>
-            <span className="im-pin-dot">{p.n}</span>
+            <span className="im-pin-dot">{p.side ? "" : p.n}</span>
             <span className="im-pin-name">{p.name}</span>
           </>
         );
