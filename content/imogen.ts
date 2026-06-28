@@ -795,6 +795,12 @@ export const stops: Stop[] = [
         maps: "abandoned hotel Lang Co Vietnam",
         kind: "do",
       },
+      {
+        name: "An Lagoon Seafood (Lang Co)",
+        note: "The food wasn't the best, but that's not really the point. Pulling over at little local spots like this along the ride, for a drink, a toilet stop and a bit of local life, is half the fun.",
+        maps: "AN LAGOON Seafood Master Lang Co Hue",
+        kind: "food",
+      },
     ],
     leg: {
       to: "Hoi An",
