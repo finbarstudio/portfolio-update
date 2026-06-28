@@ -186,6 +186,10 @@ export const tips: Tip[] = [
     title: "Use Hostelworld's numbers",
     body: "On Hostelworld you can see how many people have booked a place for the next few nights. My picks are always good, but sometimes a town has a few good ones, and it's worth booking where the most people are headed, that's where the crowd (and the fun) will be. You can also message a hostel through the app when you book. Such a good app.",
   },
+  {
+    title: "Read a bit of the history",
+    body: "Vietnam's recent history is genuinely fascinating: the French colonial era, the American War, and how the country was split into north and south. A little reading before you go (or the museums along the way) makes a lot of the places hit differently.",
+  },
 ];
 
 // ── One serious safety note (drinks / methanol) ────────────────────────────
@@ -339,6 +343,12 @@ export const stops: Stop[] = [
     sideNote: "Side trip from Chiang Mai · 2–3 days if you go",
     blurb:
       "A little hippie town up in the hills, kind of like Nimbin. I didn't fall head over heels for it, but I get the appeal, and plenty of people fall into the \"Pai hole\" and never leave. Honestly, I'd still say go if you've got the days.",
+    hostel: {
+      name: "Bros Music Bar and Hostel",
+      maps: "Bros Music Bar and Hostel Pai",
+      rating: 8,
+      note: "Really good. A hostel with a proper music bar attached, so it's social and a good night out in one.",
+    },
     dos: [
       {
         name: "Pai Canyon",
