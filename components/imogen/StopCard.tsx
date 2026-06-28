@@ -1,6 +1,7 @@
 import { mapsUrl, route, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
 import LocatorMap from "./LocatorMap";
 import LoopTable from "./LoopTable";
+import { project } from "./geo";
 
 const COUNTRY_CLASS: Record<Country, string> = {
   Thailand: "c-thailand",
@@ -26,6 +27,7 @@ export default function StopCard({
 }) {
   const isTravel = stop.kind === "travel";
   const loc = route.find((p) => p.id === stop.id);
+  const lp = loc ? project(loc.lon, loc.lat) : null;
   const hostelList = stop.hostels ?? (stop.hostel ? [stop.hostel] : []);
   const dateStr = dates
     ? `≈ ${dates.from} – ${dates.to} · ${
@@ -69,7 +71,7 @@ export default function StopCard({
           <div className="im-block-label">Stay{hostelList.length > 1 ? " · two good options" : ""}</div>
           <div className="im-stay">
             <div className="im-stay-top">
-              {loc && (
+              {lp && (
                 <a
                   className="im-stay-loc"
                   href={mapsUrl(hostelList[0].maps ?? `${hostelList[0].name}, ${stop.name}`)}
@@ -77,7 +79,7 @@ export default function StopCard({
                   rel="noopener noreferrer"
                   aria-label={`Map of ${hostelList[0].name}`}
                 >
-                  <LocatorMap x={loc.x} y={loc.y} />
+                  <LocatorMap x={lp.x} y={lp.y} />
                 </a>
               )}
               <div className="im-stay-main">

@@ -78,9 +78,9 @@ export type RoutePoint = {
   n?: number;
   name: string;
   country: Country;
-  /** Position in the map's 0–600 (x) / 0–800 (y) viewBox. */
-  x: number;
-  y: number;
+  /** Real coordinates; projected onto the map viewBox by project() in geo.ts. */
+  lon: number;
+  lat: number;
   detailed?: boolean;
   /** A spur off the main line (e.g. Pai) rather than a spine stop. */
   side?: boolean;
@@ -548,20 +548,20 @@ export const stops: Stop[] = [
 ];
 
 // ── The map: full intended route. Detailed points link to a stop card. ─────
-// Coords are in the RouteMap's 0–600 (x) / 0–800 (y) viewBox, placed roughly
-// by real geography (Chiang Mai NW → down through Laos → Hanoi → coast → south).
-// Pai is a side spur off Chiang Mai; Vientiane is a pass-through waypoint.
+// Points are real lon/lat, projected onto the traced SE Asia map by project()
+// in components/imogen/geo.ts. Pai is a side spur off Chiang Mai; Vientiane is
+// a pass-through waypoint.
 export const route: RoutePoint[] = [
-  { id: "chiang-mai", n: 1, name: "Chiang Mai", country: "Thailand", x: 99, y: 265, detailed: true },
-  { id: "pai", name: "Pai", country: "Thailand", x: 78, y: 237, detailed: true, side: true, from: "chiang-mai", flip: true },
-  { id: "luang-prabang", n: 2, name: "Luang Prabang", country: "Laos", x: 220, y: 206, detailed: true },
-  { id: "vang-vieng", n: 3, name: "Vang Vieng", country: "Laos", x: 252, y: 258, detailed: true, flip: true },
-  { id: "vientiane", name: "Vientiane", country: "Laos", x: 236, y: 312, waypoint: true },
-  { id: "hanoi", n: 4, name: "Hanoi", country: "Vietnam", x: 374, y: 156, detailed: true },
-  { id: "ha-giang", name: "Ha Giang", country: "Vietnam", x: 339, y: 69, detailed: true, side: true, from: "hanoi", flip: true },
-  { id: "hue-hoi-an", n: 5, name: "Huế & Hội An", country: "Vietnam", x: 456, y: 389 },
-  { id: "nha-trang", n: 6, name: "Nha Trang", country: "Vietnam", x: 508, y: 583 },
-  { id: "hcmc", n: 7, name: "Ho Chi Minh City", country: "Vietnam", x: 406, y: 655 },
+  { id: "chiang-mai", n: 1, name: "Chiang Mai", country: "Thailand", lon: 98.98, lat: 18.79, detailed: true },
+  { id: "pai", name: "Pai", country: "Thailand", lon: 98.44, lat: 19.36, detailed: true, side: true, from: "chiang-mai", flip: true },
+  { id: "luang-prabang", n: 2, name: "Luang Prabang", country: "Laos", lon: 102.13, lat: 19.88, detailed: true },
+  { id: "vang-vieng", n: 3, name: "Vang Vieng", country: "Laos", lon: 102.45, lat: 18.92, detailed: true, flip: true },
+  { id: "vientiane", name: "Vientiane", country: "Laos", lon: 102.6, lat: 17.97, waypoint: true },
+  { id: "hanoi", n: 4, name: "Hanoi", country: "Vietnam", lon: 105.84, lat: 21.03, detailed: true },
+  { id: "ha-giang", name: "Ha Giang", country: "Vietnam", lon: 104.98, lat: 22.82, detailed: true, side: true, from: "hanoi", flip: true },
+  { id: "hue-hoi-an", n: 5, name: "Huế & Hội An", country: "Vietnam", lon: 107.9, lat: 16.2 },
+  { id: "nha-trang", n: 6, name: "Nha Trang", country: "Vietnam", lon: 109.19, lat: 12.24 },
+  { id: "hcmc", n: 7, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76 },
 ];
 
 // ── Rough date helper ──────────────────────────────────────────────────────
