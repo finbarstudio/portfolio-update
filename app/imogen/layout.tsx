@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./imogen.css";
 import SmoothScrollScope from "@/components/imogen/SmoothScrollScope";
+import PasswordGate from "@/components/imogen/PasswordGate";
 
 // Imogen's Asia — a private travel guide. Lives OUTSIDE the (site) route group,
 // so it inherits only the root html/body (fonts) and never gets the portfolio
@@ -20,7 +21,7 @@ export default function ImogenLayout({ children }: { children: React.ReactNode }
         <style dangerouslySetInnerHTML={{ __html: ".imogen-page .im-reveal{opacity:1;transform:none}" }} />
       </noscript>
       <SmoothScrollScope />
-      {children}
+      <PasswordGate>{children}</PasswordGate>
     </div>
   );
 }

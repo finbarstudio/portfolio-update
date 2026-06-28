@@ -544,3 +544,84 @@
   .imogen-page .im-apps { grid-template-columns: 1fr 1fr; }
   .imogen-page .im-app:first-child { grid-column: 1 / -1; }
 }
+
+/* ── muted (off-route) country label on the big map ────────────────────── */
+.imogen-page .im-map-label.is-muted { opacity: 0.4; font-size: 11px; }
+
+/* ── hostel locator (little drawn map in the Stay block) ───────────────── */
+.imogen-page .im-stay-top { display: flex; gap: 12px; align-items: flex-start; }
+.imogen-page .im-stay-loc {
+  flex: 0 0 92px;
+  width: 92px;
+  height: 92px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  display: block;
+}
+.imogen-page .im-loc-svg { width: 100%; height: 100%; display: block; }
+.imogen-page .im-stay-main { flex: 1; min-width: 0; }
+
+/* ── safety callout ────────────────────────────────────────────────────── */
+.imogen-page .im-safety {
+  background: #fbe9e4;
+  border: 1px solid var(--c-vietnam);
+  border-left: 4px solid var(--c-vietnam);
+  border-radius: 14px;
+  padding: 18px 18px 20px;
+}
+.imogen-page .im-safety-title { font-size: 20px; color: #b4452f; margin-bottom: 6px; }
+.imogen-page .im-safety-body { font-size: 14.5px; line-height: 1.6; margin-top: 10px; }
+.imogen-page .im-safety .im-linkbtn { margin-top: 14px; }
+
+/* ── password lock ─────────────────────────────────────────────────────── */
+.imogen-page .im-lock { min-height: 100svh; display: grid; place-items: center; padding: 24px; }
+.imogen-page .im-lock-card {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 34px 24px 28px;
+}
+.imogen-page .im-lock-title { font-size: clamp(2rem, 9vw, 2.6rem); margin: 8px 0 8px; }
+.imogen-page .im-lock-sub { font-size: 15px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 20px; }
+.imogen-page .im-lock-input {
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  margin-bottom: 10px;
+  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  text-align: center;
+}
+.imogen-page .im-lock-input:focus { outline: none; border-color: var(--pink); }
+.imogen-page .im-lock-btn {
+  width: 100%;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pink);
+  color: #fff;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.2s var(--ease);
+}
+.imogen-page .im-lock-btn:hover { background: #df5d7a; }
+.imogen-page .im-lock-err { color: var(--c-vietnam); font-size: 13px; margin-top: 12px; }
+.imogen-page .im-lock-hint {
+  color: var(--ink-soft);
+  font-size: 12px;
+  margin-top: 16px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}

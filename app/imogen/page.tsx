@@ -2,6 +2,7 @@ import {
   trip,
   apps,
   tips,
+  safety,
   stops,
   buildItinerary,
   tripDateLabel,
@@ -97,6 +98,21 @@ export default function ImogenPage() {
                   <p className="im-tip-body">{t.body}</p>
                 </div>
               ))}
+            </div>
+          </Reveal>
+        </section>
+
+        {/* ── safety ── */}
+        <section className="im-section">
+          <Reveal>
+            <p className="im-section-label">Looking after yourself</p>
+            <div className="im-safety">
+              <p className="im-safety-title im-serif">{safety.title}</p>
+              <p className="im-safety-body">{safety.body}</p>
+              <p className="im-safety-body">{safety.closer}</p>
+              <a className="im-linkbtn is-quiet" href={safety.linkUrl} target="_blank" rel="noopener noreferrer">
+                {safety.linkText} ↗
+              </a>
             </div>
           </Reveal>
         </section>

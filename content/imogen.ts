@@ -121,7 +121,7 @@ export const apps: AppItem[] = [
     name: "Vexere",
     tagline: "Buses in Vietnam",
     url: "https://vexere.com",
-    note: "Once you're in Vietnam, use this for buses instead. It's what the locals use, and you can actually see the bus before you book, which helps a lot.",
+    note: "Once you're in Vietnam, use this for buses instead. It's what the locals use, you can actually see the bus before you book, and it's far cheaper than 12go there.",
   },
 ];
 
@@ -148,6 +148,16 @@ export const tips: Tip[] = [
     body: "Book a few nights, not your whole stay. If you love a place or the people, extend. If not, move on. Most hostels you can book the night before, but a few of the best ones fill up days ahead, so watch for those.",
   },
 ];
+
+// ── One serious safety note (drinks / methanol) ────────────────────────────
+export const safety = {
+  title: "One serious thing: drinks",
+  body: "Please read this one properly. Laos is noticeably poorer than Thailand and Vietnam, which is part of what makes it such an interesting place to see, but a lot of the local spirits are home-made and the methanol in them can be dangerously high. In 2024, several young backpackers died in Vang Vieng after drinking tainted spirits. So keep it simple: stick to beer (that's all I drank the whole time in Laos, and it's a good habit anywhere in Asia), and only drink spirits if you actually watch the bottle being opened in front of you. Be wary of free shots and very cheap spirits. This can happen in any hostel, so look out for yourself and the people you're with.",
+  closer:
+    "None of this is to scare you off anywhere, least of all Vang Vieng. It's just so you can be smart and still have a brilliant time. Vietnam felt much safer to me anyway, and the people there are honestly the best of the whole trip.",
+  linkText: "What happened in Vang Vieng",
+  linkUrl: "https://en.wikipedia.org/wiki/2024_Laos_methanol_poisoning",
+};
 
 // ── The route, in order ────────────────────────────────────────────────────
 export const stops: Stop[] = [
@@ -219,7 +229,7 @@ export const stops: Stop[] = [
       mode: "Bus to Chiang Rai, then the 2-day slow boat down the Mekong",
       app: "Book through the hostel (or 12go)",
       appUrl: "https://12go.asia",
-      note: "It's the classic way to cross into Laos and it makes total sense geographically. Lock it in a day or two ahead. (See the Pai side trip below first, if you've got time.)",
+      note: "It's the classic way to cross into Laos and makes total sense geographically. Lock it in a day or two ahead. (Optional: you can skip Laos and fly straight to Vietnam if you're tight on time, but you'd miss Luang Prabang and Vang Vieng, which are both worth it. See the Pai side trip below too.)",
     },
   },
   {
@@ -311,9 +321,29 @@ export const stops: Stop[] = [
       },
     ],
     leg: {
+      to: "Vang Vieng",
+      mode: "Bus south to Vang Vieng (a few hours)",
+      note: "Easy hop, and Vang Vieng turned out to be a highlight.",
+    },
+  },
+  {
+    id: "vang-vieng",
+    kind: "place",
+    name: "Vang Vieng",
+    country: "Laos",
+    nights: 2,
+    blurb:
+      "Don't let the safety note put you off, Vang Vieng was one of my favourites. Big limestone-mountain scenery and a proper backpacker buzz, and it's the kind of place that's the best with a group of friends. I'll add the specifics on what to do here soon. Just be drink-smart while you're here (see the note above).",
+    hostel: {
+      name: "Golden Dragon House",
+      url: "https://www.hostelworld.com/pwa/hosteldetails.php/Golden-Dragon-House/Vang-Vieng/327611?from=2026-06-29&to=2026-07-02&guests=2#position=1",
+      maps: "Golden Dragon House, Vang Vieng",
+      note: "Stayed here and it was good. Go with a group of friends and you're set.",
+    },
+    leg: {
       to: "Vientiane",
-      mode: "Bus south to Vientiane",
-      note: "Not the most thrilling leg, but Vientiane is where you pick up the bus into Vietnam.",
+      mode: "Bus on to Vientiane",
+      note: "Short leg down to the capital to set up the crossing into Vietnam.",
     },
   },
   {
@@ -323,30 +353,32 @@ export const stops: Stop[] = [
     country: "Laos",
     nights: 1,
     blurb:
-      "I'll be honest, this was my least favourite stop and the rest of Laos after Luang Prabang didn't do much for me. But you pass through the capital to catch the bus into Vietnam, so think of it as a one-night transit stop, then move on.",
+      "I'll be honest, this was my least favourite stop, and the rest of Laos after Luang Prabang and Vang Vieng didn't do much for me. But you pass through the capital to catch the bus into Vietnam, so think of it as a one-night transit stop, then move on.",
     leg: {
       to: "Northern Vietnam (Hanoi)",
       mode: "Overnight bus from Vientiane across the border into Vietnam",
       app: "Book on 12go (or Vexere once you're in)",
       appUrl: "https://12go.asia",
-      note: "This is the crossing into Vietnam. I'm still writing the Vietnam stops, more coming soon.",
+      note: "Fair warning: this overnight bus is long, rough, hard to book and mostly locals, so it's the least fun leg of the trip. It's the price of doing Laos. If that really puts you off, the alternative is to skip Laos altogether and fly Thailand to Vietnam (you'd miss Luang Prabang and Vang Vieng though). I'll firm up my recommendation on this. Still writing the Vietnam stops, more soon.",
     },
   },
 ];
 
 // ── The map: full intended route. Detailed points link to a stop card. ─────
 // Coords are in the RouteMap's 0–600 (x) / 0–800 (y) viewBox, placed roughly
-// by real geography (Chiang Mai NW → Luang Prabang → Vientiane → Hanoi → coast
-// → south). Pai is a side spur off Chiang Mai.
+// by real geography (Chiang Mai NW → down through Laos → Hanoi → coast → south).
+// Pai is a side spur off Chiang Mai. The Laos cluster (LP/Vang Vieng/Vientiane)
+// is nudged + label-flipped so the pins don't collide on a small screen.
 export const route: RoutePoint[] = [
   { id: "chiang-mai", n: 1, name: "Chiang Mai", country: "Thailand", x: 99, y: 265, detailed: true },
   { id: "pai", name: "Pai", country: "Thailand", x: 78, y: 237, detailed: true, side: true, from: "chiang-mai", flip: true },
-  { id: "luang-prabang", n: 2, name: "Luang Prabang", country: "Laos", x: 225, y: 211, detailed: true },
-  { id: "vientiane", n: 3, name: "Vientiane", country: "Laos", x: 244, y: 304, detailed: true },
-  { id: "hanoi", n: 4, name: "Hanoi", country: "Vietnam", x: 374, y: 156 },
-  { id: "hue-hoi-an", n: 5, name: "Huế & Hội An", country: "Vietnam", x: 456, y: 389 },
-  { id: "nha-trang", n: 6, name: "Nha Trang", country: "Vietnam", x: 508, y: 583 },
-  { id: "hcmc", n: 7, name: "Ho Chi Minh City", country: "Vietnam", x: 406, y: 655 },
+  { id: "luang-prabang", n: 2, name: "Luang Prabang", country: "Laos", x: 220, y: 206, detailed: true },
+  { id: "vang-vieng", n: 3, name: "Vang Vieng", country: "Laos", x: 252, y: 258, detailed: true, flip: true },
+  { id: "vientiane", n: 4, name: "Vientiane", country: "Laos", x: 236, y: 312, detailed: true },
+  { id: "hanoi", n: 5, name: "Hanoi", country: "Vietnam", x: 374, y: 156 },
+  { id: "hue-hoi-an", n: 6, name: "Huế & Hội An", country: "Vietnam", x: 456, y: 389 },
+  { id: "nha-trang", n: 7, name: "Nha Trang", country: "Vietnam", x: 508, y: 583 },
+  { id: "hcmc", n: 8, name: "Ho Chi Minh City", country: "Vietnam", x: 406, y: 655 },
 ];
 
 // ── Rough date helper ──────────────────────────────────────────────────────

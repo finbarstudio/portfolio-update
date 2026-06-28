@@ -1,4 +1,5 @@
-import { mapsUrl, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
+import { mapsUrl, route, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
+import LocatorMap from "./LocatorMap";
 
 const COUNTRY_CLASS: Record<Country, string> = {
   Thailand: "c-thailand",
@@ -23,6 +24,7 @@ export default function StopCard({
   badge: string;
 }) {
   const isTravel = stop.kind === "travel";
+  const loc = route.find((p) => p.id === stop.id);
   const dateStr = dates
     ? `≈ ${dates.from} – ${dates.to} · ${
         dates.nights != null
@@ -57,8 +59,23 @@ export default function StopCard({
         <div className="im-block">
           <div className="im-block-label">Stay</div>
           <div className="im-stay">
-            <div className="im-stay-name">{stop.hostel.name}</div>
-            {stop.hostel.room && <span className="im-stay-room">{stop.hostel.room}</span>}
+            <div className="im-stay-top">
+              {loc && (
+                <a
+                  className="im-stay-loc"
+                  href={mapsUrl(stop.hostel.maps ?? `${stop.hostel.name}, ${stop.name}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Map of ${stop.hostel.name}`}
+                >
+                  <LocatorMap x={loc.x} y={loc.y} />
+                </a>
+              )}
+              <div className="im-stay-main">
+                <div className="im-stay-name">{stop.hostel.name}</div>
+                {stop.hostel.room && <span className="im-stay-room">{stop.hostel.room}</span>}
+              </div>
+            </div>
             {stop.hostel.note && <p className="im-stay-note">{stop.hostel.note}</p>}
             <div className="im-stay-links">
               {stop.hostel.url && (
@@ -68,7 +85,7 @@ export default function StopCard({
               )}
               {stop.hostel.maps && (
                 <a className="im-linkbtn is-quiet" href={mapsUrl(stop.hostel.maps)} target="_blank" rel="noopener noreferrer">
-                  Map
+                  Open in Maps
                 </a>
               )}
             </div>
