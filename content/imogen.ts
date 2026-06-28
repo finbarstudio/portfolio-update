@@ -302,6 +302,13 @@ export const stops: Stop[] = [
         kind: "night",
       },
       {
+        name: "North Gate Jazz Co-Op",
+        rec: "must",
+        note: "A must. A tiny, packed live-jazz bar by the north gate, the music spills out onto the street. Such a good night.",
+        maps: "North Gate Jazz Co-Op Chiang Mai",
+        kind: "night",
+      },
+      {
         name: "The old town and night markets",
         note: "Spend a day wandering the markets and the temples.",
         maps: "Chiang Mai Old Town",
