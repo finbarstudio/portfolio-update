@@ -299,15 +299,23 @@ export const stops: Stop[] = [
     vibe: "social",
     nights: 3,
     blurb:
-      "Start here. Stamps was the best hostel I stayed in anywhere in Asia, and the most social, this is where the trip really begins and where you'll meet your people.",
-    hostel: {
-      name: "Stamps Backpackers",
-      rating: 10,
-      url: "https://www.hostelworld.com/hostels/p/265137/stamps-backpackers-chiang-mai/",
-      maps: "Stamps Backpackers Hostel, Chiang Mai",
-      room: "Deluxe 6 Bed Mixed Dorm Ensuite",
-      note: "Worth the extra few dollars a night. This one's so good it books out a few days ahead, so reserve it before you fly. Super social, the whole place hangs out together.",
-    },
+      "I know your trip's really about Vietnam, but start here, trust me. The whole reason I'm sending you to Chiang Mai is Stamps: it's the most social hostel I stayed in anywhere in Asia, genuinely unlike anywhere else for how easy it is to make friends. Doing it near the start is perfect, you meet the people you then travel the rest of the trip with. Book a couple of nights, then extend if you need a bit longer to lock in your crew. The highlight of Chiang Mai, honestly, is the people.",
+    hostels: [
+      {
+        name: "Stamps Backpackers",
+        rating: 10,
+        url: "https://www.hostelworld.com/hostels/p/265137/stamps-backpackers-chiang-mai/",
+        maps: "Stamps Backpackers Hostel, Chiang Mai",
+        room: "Deluxe 6 Bed Mixed Dorm Ensuite",
+        note: "Worth the extra few dollars a night. So good it books out a few days ahead, so reserve before you fly. Unreal how social it is, the whole place hangs out together, and the staff are brilliant. Book 2 nights, extend once you've found your people.",
+      },
+      {
+        name: "The Cabin (next door)",
+        maps: "The Cabin Hostel Chiang Mai",
+        url: "https://www.hostelworld.com/hostels/p/292495/the-cabin-backpackers-hostel-and-bar/",
+        note: "Your backup, right next door to Stamps. If Stamps is full, or you want to extend last-minute and can't, grab a bed here and just walk into Stamps for the social side. It's lovely in its own right, more chilled, with a cool movie room and great staff, just not as social. The staff at both places are a real highlight.",
+      },
+    ],
     dos: [
       {
         name: "Cooking with Sammy",
