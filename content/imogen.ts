@@ -393,7 +393,8 @@ export const stops: Stop[] = [
       {
         name: "Ride a moped around",
         rating: 8,
-        note: "Easily the best thing to do here, just rent a moped and explore the hills and waterfalls.",
+        rec: "must",
+        note: "Get a moped, no question. It's how you do Pai, the hills, the waterfalls, and the hippie communes are all spread out and you need one to reach them.",
         kind: "do",
       },
       {
@@ -412,7 +413,7 @@ export const stops: Stop[] = [
       },
       {
         name: "Banh Banh Pun",
-        rating: 9,
+        rating: 8,
         note: "Top sandwich spot, this place was so good.",
         maps: "Banh Banh Pun Pai",
         kind: "food",
@@ -1196,21 +1197,21 @@ export type Highlight = {
   star?: boolean;
 };
 
-/** All places, hostels and things rated 9+ — gold-star first, then by rating. */
+/** The very best of the trip — only 10/10s (and the gold-star standout). */
 export function getHighlights(): Highlight[] {
   const out: Highlight[] = [];
   for (const s of stops) {
-    if (s.rating != null && s.rating >= 9) {
+    if (s.rating != null && s.rating >= 10) {
       out.push({ label: s.name, stopId: s.id, stopName: s.name, rating: s.rating });
     }
     const hostels = s.hostels ?? (s.hostel ? [s.hostel] : []);
     for (const h of hostels) {
-      if (h.rating != null && h.rating >= 9) {
+      if (h.rating != null && h.rating >= 10) {
         out.push({ label: h.name, stopId: s.id, stopName: s.name, rating: h.rating });
       }
     }
     for (const d of s.dos ?? []) {
-      if (d.star || (d.rating != null && d.rating >= 9)) {
+      if (d.star || (d.rating != null && d.rating >= 10)) {
         out.push({ label: d.name, stopId: s.id, stopName: s.name, rating: d.rating ?? 10, star: d.star });
       }
     }

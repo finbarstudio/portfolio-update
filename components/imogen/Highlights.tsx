@@ -1,6 +1,6 @@
 "use client";
 
-import type { Highlight } from "@/content/imogen";
+import { ratingColor, STAR_COLOR, type Highlight } from "@/content/imogen";
 
 /**
  * Highlights strip — the 9s and 10s as tappable chips. Clicking one jumps to
@@ -21,7 +21,12 @@ export default function Highlights({ items }: { items: Highlight[] }) {
           }}
         >
           <span className="im-hl-label">{h.label}</span>
-          <span className="im-hl-rating">★ {h.rating}/10</span>
+          <span
+            className="im-hl-rating"
+            style={{ background: h.star ? STAR_COLOR : ratingColor(h.rating) ?? undefined, color: "#fff" }}
+          >
+            ★ {h.rating}/10
+          </span>
         </a>
       ))}
     </div>

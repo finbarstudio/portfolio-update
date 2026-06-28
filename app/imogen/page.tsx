@@ -59,7 +59,7 @@ export default function ImogenPage() {
       <div className="im-wrap">
         <section className="im-section">
           <Reveal>
-            <p className="im-section-label">The highlights · my 9s and 10s</p>
+            <p className="im-section-label">The highlights · my 10/10s</p>
             <Highlights items={highlights} />
           </Reveal>
         </section>
