@@ -111,7 +111,7 @@ export default function ImogenPage() {
         {/* ── hero ── */}
         <section className="im-hero">
           <Reveal>
-            <p className="im-eyebrow">For {trip.who} · from Finbar</p>
+            <p className="im-eyebrow">from Finbar</p>
             <h1 className="im-serif">
               {trip.title}
               <br />
