@@ -906,9 +906,23 @@ export const stops: Stop[] = [
       },
     ],
     leg: {
-      to: "Further south",
-      mode: "Carry on down the coast",
-      note: "Nha Trang and Ho Chi Minh City are next.",
+      to: "Saigon, or not",
+      mode: "If you carry on, it's a long way down the coast to Ho Chi Minh City (Saigon)",
+      note: "Honestly you might just stay put in Hoi An, my friend did. See the Saigon card for the honest take.",
+    },
+  },
+  {
+    id: "hcmc",
+    kind: "place",
+    name: "Ho Chi Minh City (Saigon)",
+    country: "Vietnam",
+    nights: 1,
+    blurb:
+      "Full honesty: this was my least favourite stop in Vietnam, and an optional one. I only went to say I'd been, and because my flight to Bali was cheaper out of here. It's a big metropolis without a lot that grabbed me, the hostels were worse, and everything's noticeably pricier. My friend just stayed on in Hoi An, which is probably the better shout unless your onward flight is cheaper from Saigon.",
+    leg: {
+      to: "Onward",
+      mode: "Flights out of Saigon (mine went to Bali)",
+      note: "And that's the end of the Vietnam run.",
     },
   },
 ];
@@ -931,8 +945,7 @@ export const route: RoutePoint[] = [
   { id: "phong-nha", n: 6, name: "Phong Nha", country: "Vietnam", lon: 106.28, lat: 17.59, detailed: true },
   { id: "hue", n: 7, name: "Huế", country: "Vietnam", lon: 107.58, lat: 16.46, detailed: true },
   { id: "hoi-an", n: 8, name: "Hội An", country: "Vietnam", lon: 108.34, lat: 15.88, detailed: true },
-  { id: "nha-trang", n: 9, name: "Nha Trang", country: "Vietnam", lon: 109.19, lat: 12.24 },
-  { id: "hcmc", n: 10, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76 },
+  { id: "hcmc", n: 9, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76, detailed: true },
 ];
 
 // ── Rough date helper ──────────────────────────────────────────────────────
