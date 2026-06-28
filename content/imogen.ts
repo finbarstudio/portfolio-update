@@ -60,6 +60,9 @@ export type Stop = {
   kind: "place" | "travel";
   name: string;
   country: Country;
+  /** Place-level /10 and a one-word vibe, shown as tags on the collapsed card. */
+  rating?: number;
+  vibe?: string;
   /** Nights for a place stop. */
   nights?: number;
   /** Days on the move for a travel leg. */
@@ -266,12 +269,14 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Chiang Mai",
     country: "Thailand",
+    rating: 8,
+    vibe: "social",
     nights: 4,
     blurb:
       "Start here. The best hostel I stayed in anywhere in Asia, and the most social. This is where the trip really begins and where you'll meet your people.",
     hostel: {
       name: "Stamps Backpackers",
-      rec: "must",
+      rating: 10,
       url: "https://www.hostelworld.com/pwa/s?q=Chiang%20Mai,%20Thailand&country=Thailand&city=Chiang%20Mai&type=city&id=831&from=2026-08-06&to=2026-08-14&guests=2&HostelNumber=265137&MoreOptions=true&page=1",
       maps: "Stamps Backpackers Hostel, Chiang Mai",
       room: "Deluxe 6 Bed Mixed Dorm Ensuite",
@@ -280,13 +285,14 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Cooking with Sammy",
-        rec: "must",
+        rating: 9,
         note: "A Thai cooking class, so much fun. Ask reception for Sammy.",
         maps: "Cooking with Sammy, Chiang Mai",
         kind: "do",
       },
       {
         name: "Sticky Waterfall",
+        rating: 8,
         note: "A waterfall you can literally walk up. Book it through the hostel.",
         maps: "Bua Tong Sticky Waterfall, Chiang Mai",
         kind: "do",
@@ -298,25 +304,27 @@ export const stops: Stop[] = [
       },
       {
         name: "A night out with the hostel",
+        rating: 6,
         note: "They run a social night out. Go to it, that's how the group forms.",
         kind: "night",
       },
       {
         name: "North Gate Jazz Co-Op",
-        rec: "must",
+        rating: 8,
         note: "A must. A tiny, packed live-jazz bar by the north gate, the music spills out onto the street. Such a good night.",
         maps: "North Gate Jazz Co-Op Chiang Mai",
         kind: "night",
       },
       {
         name: "The old town and night markets",
-        note: "Spend a day wandering the markets and the temples.",
+        rating: 7,
+        note: "Wander the old town and the night markets of an evening, a lovely way to spend a few hours.",
         maps: "Chiang Mai Old Town",
-        kind: "do",
+        kind: "night",
       },
       {
         name: "Neng Roasted Pork",
-        rec: "must",
+        rating: 9,
         note: "Michelin-listed roast pork. Eat here before you leave Thailand, you won't get it again after this.",
         maps: "Neng Roasted Pork, Chiang Mai",
         kind: "food",
@@ -346,26 +354,63 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Pai",
     country: "Thailand",
+    rating: 8,
+    vibe: "hippie",
     nights: 2,
     blurb:
-      "A little hippie town up in the hills, kind of like Nimbin. I didn't fall head over heels for it, but I get the appeal, and plenty of people fall into the \"Pai hole\" and never leave. Honestly, I'd still say go if you've got the days.",
-    hostel: {
-      name: "Bros Music Bar and Hostel",
-      maps: "Bros Music Bar and Hostel Pai",
-      rating: 8,
-      note: "Really good. A hostel with a proper music bar attached, so it's social and a good night out in one.",
-    },
+      "A little hippie town up in the hills, kind of like Nimbin. A lot of why I loved it was the people I was with, it's super social. Plenty of folks fall into the \"Pai hole\" and never leave. I went in low season so the weather was hit and miss, and I reckon better weather would lift it, but I'd still say go if you've got the days.",
+    hostels: [
+      {
+        name: "K Bunk",
+        maps: "K Bunk Hostel Pai",
+        rating: 6,
+        note: "Where I stayed, right in town. Fine and social-ish with a good location, but the beds were a bit rubbish.",
+      },
+      {
+        name: "The hippie communes (Nolo Hub / Common Grounds)",
+        note: "Some people stayed a bit out of town at these laid-back commune-style places (think lots of people smoking weed) and said they were cool as. You'll want a moped to reach them. K Bunk is the in-town option if you'd rather be central.",
+      },
+    ],
     dos: [
       {
+        name: "Ride a moped around",
+        rating: 8,
+        note: "Easily the best thing to do here, just rent a moped and explore the hills and waterfalls.",
+        kind: "do",
+      },
+      {
         name: "Pai Canyon",
+        rating: 8,
         note: "Narrow ridges and big drops with great views. Really cool, especially near sunset.",
         maps: "Pai Canyon",
         kind: "do",
       },
       {
+        name: "Na's Kitchen",
+        rating: 8,
+        note: "Great food, get the khao soi.",
+        maps: "Na's Kitchen Pai",
+        kind: "food",
+      },
+      {
+        name: "Banh Banh Pun",
+        rating: 9,
+        note: "Top sandwich spot, this place was so good.",
+        maps: "Banh Banh Pun Pai",
+        kind: "food",
+      },
+      {
         name: "Pai Vinyl & Sky Lounge",
+        rating: 7,
         note: "Chilled spot for a drink with a good vibe.",
         maps: "Pai Vinyl and Sky Lounge",
+        kind: "night",
+      },
+      {
+        name: "Bros Music Bar",
+        rating: 7,
+        note: "A proper music bar, good for a night out.",
+        maps: "Bros Music Bar Pai",
         kind: "night",
       },
     ],
@@ -380,9 +425,20 @@ export const stops: Stop[] = [
     kind: "travel",
     name: "The slow boat",
     country: "Laos",
+    rating: 8,
+    vibe: "scenic",
     days: 2,
     blurb:
       "Two days down the Mekong with an overnight stop in Pak Beng. It sounds long but it was one of the best bits, especially once you've made mates to do it with. Bring snacks, a book, and something soft to sit on.",
+    dos: [
+      {
+        name: "Sabaidee Restaurant (Pak Beng)",
+        rating: 8,
+        note: "On the overnight stop in Pak Beng, eat here and don't bother with anywhere else.",
+        maps: "Sabaidee Restaurant Pak Beng",
+        kind: "food",
+      },
+    ],
     leg: {
       to: "Luang Prabang",
       mode: "You land right in Luang Prabang",
@@ -394,6 +450,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Luang Prabang",
     country: "Laos",
+    vibe: "charming",
     nights: 4,
     blurb:
       "My favourite place in Laos and one of my standout spots of the whole trip. It has this surprising European feel left over from the old French-colonial days, really pretty and walkable, with great food.",
@@ -451,6 +508,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Vang Vieng",
     country: "Laos",
+    vibe: "party",
     nights: 3,
     blurb:
       "Don't let the safety note put you off, Vang Vieng was one of my favourites. Big limestone-mountain scenery, and the most beautiful place on the whole trip to drive a moped around. Go with a group of friends and it's the best. Just be drink-smart while you're here (see the note above).",
@@ -499,6 +557,7 @@ export const stops: Stop[] = [
     kind: "travel",
     name: "The crossing into Vietnam",
     country: "Vietnam",
+    vibe: "an adventure",
     days: 1,
     blurb:
       "Getting from Vang Vieng to Hanoi is a mission, and honestly half the adventure. You route through Vientiane, the capital, but don't bother stopping there, it's not worth your time. Then it's a long bus to the border, where we waited around 6 hours, and the passport process was wild. With someone next to you it's all part of it, and it makes one of the best stories afterwards.",
@@ -515,6 +574,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Hanoi",
     country: "Vietnam",
+    vibe: "buzzy",
     nights: 3,
     blurb:
       "And then Hanoi, which is amazing. About 3 days is right, there's loads to do. Stay in the Old Quarter, that's where you want to be. Don't hire a moped here, just walk the Old Quarter and use Grab for anything further out. The food is incredible and most of it's within walking distance, so wander and graze, and ask your hostel or locals for spots rather than trusting Google. I wouldn't bother with day trips here, just take the city in. Same as everywhere, meet people and see where they're headed next. Honestly I was eating banh mi every single day.",
@@ -593,6 +653,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Ha Giang Loop",
     country: "Vietnam",
+    vibe: "epic",
     nights: 4,
     blurb:
       "The most famous thing to do up north, and a proper must. Ha Giang is a province right up on the Chinese border, and \"the loop\" is a big multi-day motorbike circuit through it. There's a short and a long version, do the long one. You book it through a hostel and they handle everything: they pick you up in Hanoi, drive you up to Ha Giang, and you stay the night in their hostel there. The next morning a huge group (like 200 people) sets off together, split into smaller groups each with a leader. You can ride your own bike if you hire one, or take an \"easy rider\" and sit on the back while a local drives. Get the easy rider, honestly. It's far less stressful, the roads are tough, and the riders grew up there so they know every bend. They're lovely too, you end up proper mates, and it means you can actually look up and take the views in. Don't stress the planning either, once you're on the loop your next few days are completely sorted. It was so amazing.",
@@ -621,6 +682,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Sapa",
     country: "Vietnam",
+    vibe: "mountains",
     nights: 3,
     blurb:
       "A mountain town up in the far north, and a brilliant one. It's a genuinely odd place, styled like a European ski resort but full of Chinese tourists, since it's right by the border. After the loop you'll be knackered and short on sleep, so it's the perfect reset. One heads-up: Sapa has a real problem with kids selling things in the streets instead of being at school. It's tied to poverty and it's a bit confronting. Dinh's tour below is part of the answer to it.",
@@ -662,6 +724,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Halong Bay",
     country: "Vietnam",
+    vibe: "scenic",
     nights: 1,
     blurb:
       "Worth doing, it was fun as hell, but realistically it's about a one-day thing and it can be a bit out of the way once you're heading south. Mine got storm-delayed so we got messed around a bit. One tip: skip Cat Ba Island. We went and it was a waste of time, desolate, nothing going on.",
@@ -684,6 +747,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Ninh Binh",
     country: "Vietnam",
+    vibe: "karsts",
     nights: 2,
     blurb:
       "First proper stop heading south, and I wouldn't skip it. Limestone karsts, rivers and caves, a bit like a greener Halong but on land. Rent a moped or a bicycle from the hostel and just explore. The real highlight, though, was the hostel.",
@@ -756,6 +820,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Phong Nha",
     country: "Vietnam",
+    vibe: "caves",
     nights: 1,
     blurb:
       "Full honesty: I skipped this one to keep moving south, but my friends went and raved about it. It's all about the caves. Totally up to you and how your timing is looking.",
@@ -778,6 +843,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Hue",
     country: "Vietnam",
+    vibe: "quiet",
     nights: 1,
     blurb:
       "Honest take: Hue was a bit boring, more of a local city than a backpacker spot. The real reason to come is to ride the Hai Van Pass out of it. So treat it as a quick one-nighter, then ride.",
@@ -801,6 +867,7 @@ export const stops: Stop[] = [
     kind: "travel",
     name: "The Hai Van Pass",
     country: "Vietnam",
+    vibe: "the ride",
     days: 1,
     blurb:
       "This was unreal, a 9.5/10. We took easy riders on the Ha Giang loop and never drove ourselves, so we did this one on our own bikes, and it was the best. You ride from Hue up through the mountains and back down to the coast, through Da Nang and into Hoi An. It rained on us but it was warm and just so much fun.",
@@ -847,6 +914,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Hoi An",
     country: "Vietnam",
+    vibe: "peaceful",
     nights: 2,
     blurb:
       "Hoi An was my favourite place of the whole trip. You roll in at the end of the pass (through Da Nang), and honestly I don't think you'll want to leave. Hire a moped for sure. Do the hostel drinks and head out with the group on their nights, but make sure you get into the old town itself, the lanterns and the river, that's the real magic. More than anything it was peaceful, my favourite place on the whole trip to just sit and look at. To be fair there isn't a huge amount going on, but honestly that was the appeal, a calm and lovely way to end the trip.",
@@ -926,6 +994,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Ho Chi Minh City (Saigon)",
     country: "Vietnam",
+    vibe: "big city",
     nights: 1,
     blurb:
       "Full honesty: this was my least favourite stop in Vietnam, and an optional one. I only went to say I'd been, and because my flight to Bali was cheaper out of here. It's a big metropolis without a lot that grabbed me, the hostels were worse, and everything's noticeably pricier. My friend just stayed on in Hoi An, which is probably the better shout unless your onward flight is cheaper from Saigon.",

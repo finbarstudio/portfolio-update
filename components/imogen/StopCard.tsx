@@ -85,14 +85,9 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
           <span className="im-stop-name">{stop.name}</span>
           <span className="im-stop-meta">
             <span className="im-stop-country">{stop.country}</span>
-            {stop.side ? (
-              <>
-                <span className="im-stop-side">{stop.sideLabel ?? "Side trip"}</span>
-                {stop.sideNote && <span className="im-stop-dates">{stop.sideNote}</span>}
-              </>
-            ) : (
-              dateStr && <span className="im-stop-dates">{dateStr}</span>
-            )}
+            {stop.rating != null && <span className="im-stop-rating">{stop.rating}/10</span>}
+            {stop.vibe && <span className="im-stop-vibe">{stop.vibe}</span>}
+            {dateStr && <span className="im-stop-dates">{dateStr}</span>}
           </span>
         </span>
         <span className="im-stop-chev" aria-hidden="true">{open ? "−" : "+"}</span>
@@ -113,6 +108,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
             <div className="im-block">
               {cats.length > 1 && (
                 <div className="im-filters">
+                  <span className="im-filter-label">Show</span>
                   <button className={`im-filter ${filter === "All" ? "is-active" : ""}`} onClick={() => setFilter("All")}>All</button>
                   {cats.map((c) => (
                     <button key={c} className={`im-filter ${filter === c ? "is-active" : ""}`} onClick={() => setFilter(c)}>{c}</button>
@@ -145,6 +141,14 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                                 Map ↗
                               </a>
                             )}
+                            <button
+                              className="im-item-chev"
+                              onClick={() => setOpenItems((s) => ({ ...s, [key]: !s[key] }))}
+                              aria-label={isOpen ? "Collapse" : "Expand"}
+                              aria-expanded={isOpen}
+                            >
+                              {isOpen ? "▾" : "▸"}
+                            </button>
                           </div>
                           {isOpen && (
                             <div className="im-item-detail">

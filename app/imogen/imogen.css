@@ -908,3 +908,44 @@
 .imogen-page .im-item-detail { padding: 0 0 13px 17px; }
 .imogen-page .im-item-note { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 2px; }
 .imogen-page .im-item-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+/* place overview tags (collapsed card) */
+.imogen-page .im-stop-rating {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+.imogen-page .im-stop-vibe {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* item expand chevron (different from the place +/−) */
+.imogen-page .im-item-chev {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding: 0 2px;
+  line-height: 1;
+}
+
+/* filter label */
+.imogen-page .im-filter-label {
+  align-self: center;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-right: 2px;
+}
