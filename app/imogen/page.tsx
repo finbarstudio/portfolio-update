@@ -13,6 +13,7 @@ import RouteMap from "@/components/imogen/RouteMap";
 import TripGraph from "@/components/imogen/TripGraph";
 import StopCard from "@/components/imogen/StopCard";
 import Highlights from "@/components/imogen/Highlights";
+import CollapsibleSection from "@/components/imogen/CollapsibleSection";
 import Reveal from "@/components/imogen/Reveal";
 
 export default function ImogenPage() {
@@ -88,75 +89,79 @@ export default function ImogenPage() {
         {/* ── apps ── */}
         <section className="im-section">
           <Reveal>
-            <p className="im-section-label">Apps to get first</p>
-            <div className="im-apps">
-              {apps.map((a) => (
-                <a
-                  key={a.name}
-                  className="im-app"
-                  href={a.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="im-app-top">
-                    <span className="im-app-name">{a.name}</span>
-                    <span className="im-app-go">Open ↗</span>
-                  </div>
-                  <div className="im-app-tag">{a.tagline}</div>
-                  {a.note && <p className="im-app-note">{a.note}</p>}
-                </a>
-              ))}
-            </div>
+            <CollapsibleSection label="Apps to get first">
+              <div className="im-apps">
+                {apps.map((a) => (
+                  <a
+                    key={a.name}
+                    className="im-app"
+                    href={a.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="im-app-top">
+                      <span className="im-app-name">{a.name}</span>
+                      <span className="im-app-go">Open ↗</span>
+                    </div>
+                    <div className="im-app-tag">{a.tagline}</div>
+                    {a.note && <p className="im-app-note">{a.note}</p>}
+                  </a>
+                ))}
+              </div>
+            </CollapsibleSection>
           </Reveal>
         </section>
 
         {/* ── how to travel ── */}
         <section className="im-section">
           <Reveal>
-            <p className="im-section-label">Things I learnt</p>
-            <div className="im-tips">
-              {tips.map((t) => (
-                <div key={t.title}>
-                  <h3 className="im-tip-title im-serif">{t.title}</h3>
-                  <p className="im-tip-body">{t.body}</p>
-                </div>
-              ))}
-            </div>
+            <CollapsibleSection label="Things I learnt">
+              <div className="im-tips">
+                {tips.map((t) => (
+                  <div key={t.title}>
+                    <h3 className="im-tip-title im-serif">{t.title}</h3>
+                    <p className="im-tip-body">{t.body}</p>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleSection>
           </Reveal>
         </section>
 
         {/* ── what I wish I'd done ── */}
         <section className="im-section">
           <Reveal>
-            <p className="im-section-label">What I wish I&apos;d done</p>
-            <div className="im-tips">
-              {wishlist.map((w) => (
-                <div key={w.title}>
-                  <h3 className="im-tip-title im-serif">{w.title}</h3>
-                  <p className="im-tip-body">{w.body}</p>
-                </div>
-              ))}
-            </div>
+            <CollapsibleSection label="What I wish I'd done">
+              <div className="im-tips">
+                {wishlist.map((w) => (
+                  <div key={w.title}>
+                    <h3 className="im-tip-title im-serif">{w.title}</h3>
+                    <p className="im-tip-body">{w.body}</p>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleSection>
           </Reveal>
         </section>
 
         {/* ── safety ── */}
         <section className="im-section">
           <Reveal>
-            <p className="im-section-label">A heads-up</p>
-            <div className="im-safety">
-              <p className="im-safety-title im-serif">{safety.title}</p>
-              <p className="im-safety-body">{safety.body}</p>
-              <p className="im-safety-body">{safety.vangVieng}</p>
-              <p className="im-safety-body">{safety.closer}</p>
-              <div className="im-safety-links">
-                {safety.sources.map((s) => (
-                  <a key={s.url} className="im-linkbtn is-quiet" href={s.url} target="_blank" rel="noopener noreferrer">
-                    {s.text} ↗
-                  </a>
-                ))}
+            <CollapsibleSection label="A heads-up" defaultOpen>
+              <div className="im-safety">
+                <p className="im-safety-title im-serif">{safety.title}</p>
+                <p className="im-safety-body">{safety.body}</p>
+                <p className="im-safety-body">{safety.vangVieng}</p>
+                <p className="im-safety-body">{safety.closer}</p>
+                <div className="im-safety-links">
+                  {safety.sources.map((s) => (
+                    <a key={s.url} className="im-linkbtn is-quiet" href={s.url} target="_blank" rel="noopener noreferrer">
+                      {s.text} ↗
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
+            </CollapsibleSection>
           </Reveal>
         </section>
 

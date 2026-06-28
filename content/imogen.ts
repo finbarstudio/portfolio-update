@@ -822,10 +822,10 @@ export const stops: Stop[] = [
     name: "Ninh Binh",
     country: "Vietnam",
     rating: 8,
-    vibe: "karsts",
+    vibe: "limestone cliffs",
     nights: 2,
     blurb:
-      "First proper stop heading south, and I wouldn't skip it. Limestone karsts, rivers and caves, a bit like a greener Halong but on land. Rent a moped or a bicycle from the hostel and just explore. The real highlight, though, was the hostel.",
+      "First proper stop heading south, and I wouldn't skip it. Big limestone cliffs, rivers and caves, a bit like a greener Halong but on land. Rent a moped or a bicycle from the hostel and just explore. The real highlight, though, was the hostel.",
     hostel: {
       name: "Banana Tree Hostel",
       maps: "Banana Tree Hostel Ninh Binh",
@@ -937,7 +937,7 @@ export const stops: Stop[] = [
     vibe: "quiet",
     nights: 1,
     blurb:
-      "Honest take: Hue was a bit boring on its own, more of a local city than a backpacker spot, but you need it as the jumping-off point for the Hai Van Pass. The real reason to come is to ride out of it. So treat it as a quick one-nighter, then ride.",
+      "Honest take: Hue was a bit boring on its own, more of a local city than a backpacker spot, but you need it as the jumping-off point for the Hai Van Pass. The real reason to come is to ride out of it. So treat it as a quick one-nighter, then ride. And if you're not going to do the pass at all, honestly just skip Hue entirely and go straight to Hoi An.",
     dos: [
       {
         name: "Abandoned waterpark (Hồ Thuỷ Tiên)",
@@ -967,7 +967,7 @@ export const stops: Stop[] = [
       {
         name: "Ride the pass",
         rating: 10,
-        note: "Plenty of companies set it up: you ride Hue → Hoi An and they collect the bike from Hoi An at the other end. It's popular and it felt safe, I'd put the risk at about 3/10. Go with people, and convince someone to do it with you. If you'd rather not drive, you can hire a jeep and have someone drive you, but the bike is so worth it. I've dropped a Google Maps route below that strings the Lang Co stops together (switch it to motorbike once it opens).",
+        note: "Plenty of companies set it up: you ride Hue → Hoi An and they collect the bike from Hoi An at the other end. It's popular and it felt safe, I'd put the risk at about 3/10. Go with people, and convince someone to do it with you. If you'd rather not drive, you don't have to hire a jeep, you can just take a bus over instead, but the bike is so worth it. I've dropped a Google Maps route below that strings the Lang Co stops together (switch it to motorbike once it opens).",
         links: [
           {
             label: "The route, Hue → Hoi An",

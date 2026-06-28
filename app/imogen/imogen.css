@@ -1008,17 +1008,60 @@
   color: var(--ink-soft);
 }
 
-/* item expand chevron (different from the place +/−) */
+/* item expand chevron — a clear little button so it's obvious items open */
 .imogen-page .im-item-chev {
   flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--ink-soft);
+  transition: background 0.15s var(--ease), color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.imogen-page .im-item.is-open .im-item-chev {
+  background: var(--c, var(--ink));
+  border-color: var(--c, var(--ink));
+  color: #fff;
+}
+
+/* collapsible whole-section (Apps, Things I learnt, A heads-up, …) */
+.imogen-page .im-coll-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 12px;
-  color: var(--ink-soft);
-  padding: 0 2px;
-  line-height: 1;
+  color: inherit;
+  font: inherit;
+  text-align: left;
 }
+.imogen-page .im-coll-head .im-section-label { margin: 0; }
+.imogen-page .im-coll-chev {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+.imogen-page .im-coll.is-open .im-coll-chev { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.imogen-page .im-coll-body { margin-top: 16px; }
 
 /* filter label */
 .imogen-page .im-filter-label {
