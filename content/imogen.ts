@@ -192,6 +192,10 @@ export const tips: Tip[] = [
     body: "Something I picked up, especially in Vietnam: locals don't really leave Google reviews the way we do, so a lot of the high scores come from tourists that managers have sweet-talked. A huge rating often just means a place is good at working tourists. I leaned on other travellers and the hostel, and when in doubt ate where it was busy with locals.",
   },
   {
+    title: "Don't over-plan it",
+    body: "Don't plan every day out in so much detail that it ruins it. Have a rough idea of the shape, save a handful of must-dos, and leave the rest open. Honestly half the best things I did came from people I met: someone would mention where they'd just been or what they were about to go and do, and you'd tag along. It fills itself in as you go.",
+  },
+  {
     title: "I'd keep it loose",
     body: "I only ever booked a few nights at a time, not the whole stay. If you love a place or the people, extend. If not, move on. Most hostels you can grab the night before, though a few of the best ones go a few days ahead.",
   },
@@ -792,10 +796,10 @@ export const stops: Stop[] = [
         kind: "food",
       },
       {
-        name: "Mã Pì Lèng Panorama",
+        name: "Top of the Loop",
         rating: 8,
-        note: "The bar/restaurant at the top of the loop, built right on the lip of the Ma Pi Leng Pass, the highest, most jaw-dropping point of the whole thing. The groups pull in here for a beer or a coffee on the cliffside terrace looking straight down onto the turquoise Nho Que river and the canyon. Small entry fee. This is the view you came for.",
-        maps: "Ma Pi Leng Panorama Meo Vac Ha Giang",
+        note: "A rooftop bar and restaurant up on top of the Tuan Son Building in Ha Giang town. You get a night in Ha Giang before the loop, and this is where everyone ends up: best view in town, sunset beers, wood-fired pizza and a big breakfast before you ride out. Go up for a drink the evening before you set off.",
+        maps: "Top of the Loop Ha Giang",
         kind: "food",
       },
     ],

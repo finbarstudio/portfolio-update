@@ -114,7 +114,7 @@ export default function RouteMap() {
       </div>
 
       <p className="im-map-key">
-        <span className="im-map-key-item"><span className="im-map-key-star" aria-hidden="true">★</span> my 9/10s</span>
+        <span className="im-map-key-item"><span className="im-map-key-star" aria-hidden="true" /> my 9/10s</span>
         <span className="im-map-key-item"><span className="im-map-key-grey" aria-hidden="true" /> optional</span>
       </p>
 
