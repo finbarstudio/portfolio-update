@@ -117,8 +117,7 @@ export default function TripGraph() {
         <span className="im-tl-keyitem">
           <span className="im-tl-keydot is-travel" aria-hidden="true" /> On the move
         </span>
-        <span className="im-tl-keyitem">number on each block = nights (or travel days)</span>
-        <span className="im-tl-keyitem">tap or hover a block for the place</span>
+        <span className="im-tl-keyitem">numbers = nights · hover a block to name it</span>
       </div>
     </div>
   );

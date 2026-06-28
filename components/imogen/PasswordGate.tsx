@@ -47,11 +47,8 @@ export default function PasswordGate({ children }: { children: ReactNode }) {
   return (
     <div className="im-lock">
       <form className="im-lock-card" onSubmit={submit}>
-        <p className="im-eyebrow">A little guide</p>
-        <h1 className="im-lock-title im-serif">Hey Imogen</h1>
-        <p className="im-lock-sub">This one&apos;s just for you. Pop in the password to come in.</p>
         <input
-          className="im-lock-input"
+          className={`im-lock-input ${err ? "is-err" : ""}`}
           type="password"
           value={val}
           onChange={(e) => {
@@ -65,8 +62,6 @@ export default function PasswordGate({ children }: { children: ReactNode }) {
         <button className="im-lock-btn" type="submit">
           Enter
         </button>
-        {err && <p className="im-lock-err">Not quite, try again.</p>}
-        <p className="im-lock-hint">Finbar sent you the word.</p>
       </form>
     </div>
   );

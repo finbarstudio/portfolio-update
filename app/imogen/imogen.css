@@ -224,35 +224,32 @@
   white-space: nowrap;
 }
 .imogen-page .im-pin-dot {
+  position: relative;
   flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 21px;
+  height: 21px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: #fff;
   background: var(--c, var(--ink));
   box-shadow: 0 2px 6px rgba(36, 31, 26, 0.25);
   border: 2px solid var(--bg-raised);
 }
-.imogen-page .im-pin-dot { position: relative; }
-/* 9/10 stops: the pin itself becomes a bold gold star */
+/* 9/10 stops: same circle pin as the rest, with a gold star badge on it */
 .imogen-page .im-pin.is-top { z-index: 3; }
-.imogen-page .im-pin.is-top .im-pin-dot {
-  width: 34px;
-  height: 34px;
-  border: none;
-  border-radius: 0;
-  background: #e3a82a;
-  color: #fff;
-  font-size: 11px;
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  filter: drop-shadow(0 2px 3px rgba(36, 31, 26, 0.45));
+.imogen-page .im-pin.is-top .im-pin-star {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  font-size: 14px;
+  line-height: 1;
+  color: #e3a82a;
+  text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 1px 1.5px rgba(36, 31, 26, 0.4);
 }
-.imogen-page .im-pin.is-top .im-pin-star { display: none; } /* the dot is the star now */
 .imogen-page .im-leg-star { margin-left: 4px; color: #d8932a; font-size: 12px; }
 .imogen-page .im-pin.is-planned .im-pin-dot {
   background: var(--bg-raised);
@@ -664,6 +661,7 @@
   text-align: center;
 }
 .imogen-page .im-lock-input:focus { outline: none; border-color: var(--pink); }
+.imogen-page .im-lock-input.is-err { border-color: #c2473b; }
 .imogen-page .im-lock-btn {
   width: 100%;
   font-family: var(--font-space-mono), ui-monospace, monospace;
@@ -746,10 +744,24 @@
 .imogen-page .im-graph-note { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-top: 16px; }
 
 /* ── map legend (names live here, not crowding the map) ────────────────── */
+.imogen-page .im-map-key {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 14px 0 0;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-map-key-item { display: inline-flex; align-items: center; gap: 5px; }
+.imogen-page .im-map-key-star { color: #e3a82a; font-size: 13px; text-shadow: 0 0 1.5px rgba(36, 31, 26, 0.3); }
+.imogen-page .im-map-key-grey { width: 11px; height: 11px; border-radius: 50%; background: var(--ink-soft); opacity: 0.5; }
 .imogen-page .im-map-legend {
   list-style: none;
   padding: 0;
-  margin: 16px auto 0;
+  margin: 12px auto 0;
   max-width: 460px;
   display: flex;
   flex-wrap: wrap;
@@ -826,7 +838,6 @@
   gap: 1.5px;
   height: 26px;
   border-radius: 7px;
-  overflow: hidden;
   background: var(--line);
 }
 .imogen-page .im-tl-seg {
@@ -838,6 +849,9 @@
   place-items: center;
   background: var(--c, var(--ink));
 }
+/* round only the bar ends (no overflow:hidden, so tooltips can escape) */
+.imogen-page .im-tl-seg:first-child { border-top-left-radius: 7px; border-bottom-left-radius: 7px; }
+.imogen-page .im-tl-seg:last-child { border-top-right-radius: 7px; border-bottom-right-radius: 7px; }
 .imogen-page .im-tl-seg-n {
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 10px;
@@ -896,10 +910,11 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px 14px;
-  margin-top: 12px;
+  gap: 4px 12px;
+  margin: 16px auto 0;
+  max-width: 22rem;
   font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 9.5px;
   letter-spacing: 0.02em;
   color: var(--ink-soft);
   text-align: center;
@@ -946,10 +961,13 @@
   transform: translateX(-50%) translateY(0);
 }
 
-/* date leaders down to the bar ends */
-.imogen-page .im-tl-date { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+/* date leaders running all the way up to the bar ends */
+.imogen-page .im-tl-dates { margin-top: 0; }
+.imogen-page .im-tl-date { display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
 .imogen-page .im-tl-date.is-end { align-items: flex-end; }
-.imogen-page .im-tl-date-lead { width: 1.5px; height: 8px; background: var(--ink-soft); opacity: 0.5; }
+.imogen-page .im-tl-date-lead { width: 1.5px; height: 15px; background: var(--ink-soft); opacity: 0.55; }
+.imogen-page .im-tl-date span:last-child,
+.imogen-page .im-tl-date { padding-top: 0; }
 
 /* ── Ha Giang Loop hostel comparison ───────────────────────────────────── */
 .imogen-page .im-loop-intro { font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 4px; }

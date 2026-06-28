@@ -180,8 +180,8 @@ export const tips: Tip[] = [
     body: "Heads-up: most of the hops between places out here are overnight buses anyway, so lean into them. You sleep while you move, don't lose a day getting anywhere, and the sleeper ones are genuinely comfy. Book the sleeper option where there's a choice.",
   },
   {
-    title: "My little night-bus hack",
-    body: "You can grab over-the-counter meds at pretty much any pharmacy out here, no prescription. I'd take a dimenhydrinate (travel-sickness tablet) before a night bus, pass straight out, and wake up at the other end feeling fine instead of wrecked. Basically overnight teleportation, and great for the windy roads too.",
+    title: "Always have travel-sickness pills",
+    body: "Genuinely my biggest tip: always keep travel-sickness tablets (dimenhydrinate) on you, even if you never normally get travel sick. You can grab them over the counter at any pharmacy out here, no prescription. Take one before a night bus and you pass straight out and wake up at the other end feeling fine instead of wrecked, basically overnight teleportation, and they're a lifesaver on the windy roads too.",
   },
   {
     title: "Mopeds (and a scam I dodged)",
@@ -458,7 +458,7 @@ export const stops: Stop[] = [
     vibe: "scenic",
     days: 2,
     blurb:
-      "Two days down the Mekong with an overnight stop in Pak Beng. It sounds long but it was one of the best bits, especially once you've made mates to do it with. Bring snacks, a book, and something soft to sit on.",
+      "Two days down the Mekong with an overnight stop in Pak Beng. It sounds long but it was one of the best bits, especially once you've made mates to do it with. Bring snacks, a deck of cards, and (if that's your thing) cigarettes, that's what gets the whole boat talking.",
     dos: [
       {
         name: "Sabaidee Restaurant (Pak Beng)",
@@ -550,39 +550,7 @@ export const stops: Stop[] = [
     vibe: "mountains",
     nights: 2,
     blurb:
-      "A tiny riverside village a few hours north of Luang Prabang, wrapped in limestone karst peaks that rise straight out of the Nam Ou. This is the one I'd got mixed up with Phong Nha in Vietnam: the overnight mountain camp here, sleeping up on a peak for sunset, the stars and sunrise, is the thing I kept banging on about. Sleepy, cheap, and all about the viewpoint hikes.",
-    hostel: {
-      name: "Nong Khiaw guesthouses",
-      maps: "Nong Khiaw guesthouses Laos",
-      url: "https://www.hostelworld.com/hostels/asia/laos/nong-khiaw/",
-      note: "Loads of cheap riverside guesthouses, just turn up. Book the overnight camp in person once you're there (Eco Farm Stay is the known one).",
-    },
-    dos: [
-      {
-        name: "The overnight mountain camp",
-        note: "The big one, and the thing I half-remembered. Instead of a brutal 4am hike you head up in the afternoon, camp on a peak, and get sunset, the stars and sunrise from the top. Around US$30pp with transport, guide, tent and meals (Eco Farm Stay run the well-known one, book in person).",
-        maps: "Eco Farm Stay Nong Khiaw",
-        kind: "do",
-      },
-      {
-        name: "Pha Daeng Peak viewpoint",
-        note: "The classic day hike: steep, about 1.5 to 2 hours up, for a massive view over the Nam Ou valley. Go for sunrise or sunset and bring water. Small cash entry fee.",
-        maps: "Pha Daeng Peak Nong Khiaw",
-        kind: "do",
-      },
-      {
-        name: "100 Waterfalls Trek",
-        note: "Run from Muang Ngoi (an even sleepier village an hour upriver by boat), a day spent climbing up through a chain of waterfalls. A proper highlight if you've got time.",
-        maps: "100 Waterfalls Trek Nong Khiaw",
-        kind: "do",
-      },
-      {
-        name: "Muang Ngoi",
-        note: "An hour up the river by boat, even quieter and more beautiful. Worth a night if you want to properly slow down.",
-        maps: "Muang Ngoi Laos",
-        kind: "do",
-      },
-    ],
+      "A tiny riverside village a few hours north of Luang Prabang, wrapped in limestone karst peaks rising straight out of the Nam Ou. I didn't make it here myself, but friends went and loved it. It's all about the viewpoint hikes (Pha Daeng Peak is the classic), with the big draw being an overnight camp up on a peak for sunset, the stars and sunrise, booked in the village for around US$30. There's also the 100 Waterfalls trek out of Muang Ngoi nearby. Sleepy, cheap, and a proper detour north if you've got the time, a couple of nights does it.",
     leg: {
       to: "Back to Luang Prabang, then Vang Vieng",
       mode: "Minivan back to Luang Prabang (~3 to 4 hours), then the train south",
@@ -962,27 +930,7 @@ export const stops: Stop[] = [
     vibe: "caves",
     nights: 1,
     blurb:
-      "Full honesty: I skipped this one to keep moving south, but my friends raved about it and it's the one place I half wish I'd squeezed in. It's proper karst-and-jungle cave country. The thing people lose their minds over is camping overnight inside a cave and waking up for the beam of light coming through at dawn (more on that below). Most people give it 2 to 4 days. Totally up to you and how your timing's looking.",
-    dos: [
-      {
-        name: "The caves (self-guided)",
-        note: "The cheap way in: rent a moped and do the self-guided loop, Paradise Cave and the Phong Nha Cave boat trip, plus the free viewpoints along the Ho Chi Minh Highway. A good day even if you skip the big treks.",
-        maps: "Phong Nha Ke Bang caves",
-        kind: "do",
-      },
-      {
-        name: "Hang En overnight cave camp",
-        note: "The famous one: a jungle trek in, then you camp on the sand beach inside Hang En (one of the biggest caves on earth) and wake for the light pouring through the roof. It's run by Oxalis and it's a proper splurge (around US$330), but it's the experience people say is worth blowing the budget on once.",
-        url: "https://oxalisadventure.com/tour/hang-en-adventure-cave-camp/",
-        kind: "do",
-      },
-      {
-        name: "A budget overnight (Jungle Boss)",
-        note: "If Hang En's too steep, Jungle Boss run overnight jungle-and-cave camps for under US$100, the budget way to still sleep out in there. There's also a proper mountain summit, U Bo, the 'roof of Phong Nha', but that's a harder, niche 2-day trek, the cave camps are what most people do.",
-        url: "https://junglebosstours.com",
-        kind: "do",
-      },
-    ],
+      "Full honesty: I skipped this one to keep moving south, but my friends raved about it. It's proper karst-and-jungle cave country, and the thing people lose their minds over is camping overnight inside a cave (the famous Hang En trek with Oxalis, around US$330) and waking up for the beam of light coming through at dawn, with cheaper jungle-camp options from operators like Jungle Boss too. You can also just rent a moped and do the self-guided caves. Most people give it 2 to 4 days, totally up to you and your timing.",
     leg: {
       to: "South to Hue",
       mode: "Bus south",
