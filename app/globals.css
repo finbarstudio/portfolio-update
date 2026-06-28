@@ -10,6 +10,11 @@
 
 @import "tailwindcss";
 
+/* Never scan static assets for class names. Uploaded photos (incl. .JPG/.HEIC,
+   whose nested .gitignore Tailwind doesn't honour) were being parsed as garbage
+   "classes" and breaking the CSS build. */
+@source not "../public";
+
 /* ═══════════════════════════════════════════════════════════════
    ★  MASTER CONTROL PANEL
    ───────────────────────────────────────────────────────────────
