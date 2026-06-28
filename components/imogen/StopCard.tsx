@@ -35,6 +35,7 @@ type UItem = {
   room?: string;
   rec?: "must" | "low";
   rating?: number;
+  star?: boolean;
 };
 
 function recLevel(rec?: "must" | "low", rating?: number): "must" | "low" | "mid" {
@@ -71,7 +72,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
   const hostels = stop.hostels ?? (stop.hostel ? [stop.hostel] : []);
   const items: UItem[] = [
     ...hostels.map((h): UItem => ({ cat: "Hostel", title: h.name, maps: h.maps, book: h.url, note: h.note, room: h.room, rec: h.rec, rating: h.rating })),
-    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating })),
+    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating, star: d.star })),
   ];
   const cats = CAT_ORDER.filter((c) => items.some((i) => i.cat === c));
   const shown = filter === "All" ? items : items.filter((i) => i.cat === filter);
@@ -125,14 +126,18 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                       const isOpen = !!openItems[key];
                       const lvl = recLevel(it.rec, it.rating);
                       return (
-                        <div className={`im-item rec-${lvl} ${isOpen ? "is-open" : ""}`} key={key}>
+                        <div className={`im-item rec-${lvl} ${it.star ? "is-star" : ""} ${isOpen ? "is-open" : ""}`} key={key}>
                           <div className="im-item-row">
                             <button
                               className="im-item-toggle"
                               onClick={() => setOpenItems((s) => ({ ...s, [key]: !s[key] }))}
                               aria-expanded={isOpen}
                             >
-                              <span className="im-item-dot" aria-hidden="true" />
+                              {it.star ? (
+                                <span className="im-item-star" aria-hidden="true">★</span>
+                              ) : (
+                                <span className="im-item-dot" aria-hidden="true" />
+                              )}
                               <span className="im-item-title">{it.title}</span>
                             </button>
                             {it.rating != null && <span className="im-item-rating">{it.rating}/10</span>}

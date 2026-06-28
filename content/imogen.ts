@@ -31,6 +31,8 @@ export type DoItem = {
   /** Recommendation strength → colour-codes the item. Finbar's /10 goes in rating. */
   rec?: "must" | "low";
   rating?: number;
+  /** Gold-star highlight — the single standout (e.g. Dinh's trek). */
+  star?: boolean;
 };
 
 export type Hostel = {
@@ -227,40 +229,40 @@ export const loopHostels: LoopHostel[] = [
   {
     name: "Mama's",
     party: 4,
-    longEasyRider: "~$200",
-    selfRide: "~$170",
+    longEasyRider: "~$180–210",
+    selfRide: "~$150",
     versions: "3-day or 4-day",
-    note: "Biggest party of the lot, all the groups pile in together for huge nights. Younger backpacker crowd. I heard great things.",
+    note: "A big, social party with the groups piling in together, though by all accounts the nights wind down earlier than you'd expect (around 11). Younger backpacker crowd, and the best value of the bunch. I heard great things.",
   },
   {
     name: "Jasmine",
     party: 3,
-    longEasyRider: "~$230–290",
+    longEasyRider: "~$290–350+",
     selfRide: "~$140–160",
     versions: "3-day or 4-day",
-    note: "Pitches itself as the premium, organised option, but the reputation is still pretty party. I heard great things here too.",
+    note: "The premium, most-organised option (full safety kit, support van) and the priciest by a fair bit. The party reputation swings a lot by group: some call it the rowdiest, some the buttoned-up one. I heard great things either way.",
   },
   {
     name: "Bong",
-    party: 2,
-    longEasyRider: "~$160–180",
+    party: 3,
+    longEasyRider: "~$160–200",
     selfRide: "~$130–150",
     versions: "3-day, 4-day (+ longer combos)",
-    note: "What I did, and I'd 100% recommend it. A genuine happy medium (party if you want it, no pressure if you don't). You can pop into their Hanoi hostel and they'll sort the whole thing for you.",
+    note: "What I did, and I'd 100% recommend it. It's a 3-star party, sociable and lively (karaoke and 'happy water' nights) with zero pressure to join in if you fancy an early one. The easy riders are like family and it's one of the highest-rated of the lot. Pop into their Hanoi hostel and they'll sort the whole thing for you.",
     pick: true,
   },
   {
     name: "Road Kings",
     party: 1,
-    longEasyRider: "~$300–335",
-    selfRide: "~$260",
+    longEasyRider: "~$299",
+    selfRide: "~$259",
     versions: "3-day or 4-day",
-    note: "The most professional and the quietest. Small groups, more late-20s/early-30s couples. Priciest, but the best inclusions.",
+    note: "The small-group, safety-first pick (private room every night), and the one Reddit keeps recommending lately. Smaller, quieter groups, more late-20s/early-30s, drivers like dads. A touch pricey, but brilliant if a 30-bike convoy isn't your thing.",
   },
 ];
 
 export const loopNote =
-  "Booked through a hostel that collects you in Hanoi. Prices are rough, per person, for the long 4-day / 3-night loop with an easy rider. Self-ride is a bit cheaper, and the short 3-day version knocks roughly $30–40 off. Most include the bike or easy rider, fuel, meals, homestays, gear and the Hanoi pickup; the ~$10 border permit and drinks are usually extra.";
+  "Booked through a hostel that collects you in Hanoi. Prices are rough, per person, for the long 4-day / 3-night loop with an easy rider (I double-checked these against current reviews). Self-ride is a bit cheaper, and the short 3-day version knocks roughly $30–40 off. Most include the bike or easy rider, fuel, meals, homestays, gear and the Hanoi pickup; the ~$10 border permit and drinks are usually extra. One more worth knowing about: Cheers Hostel runs a more party-leaning loop with a free Hanoi pickup if you want another option.";
 
 // ── The route, in order ────────────────────────────────────────────────────
 export const stops: Stop[] = [
@@ -450,48 +452,56 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Luang Prabang",
     country: "Laos",
+    rating: 8,
     vibe: "charming",
     nights: 4,
     blurb:
       "My favourite place in Laos and one of my standout spots of the whole trip. It has this surprising European feel left over from the old French-colonial days, really pretty and walkable, with great food.",
     hostel: {
       name: "Jam Hostel",
+      rating: 9,
       maps: "Jam Hostel, Luang Prabang",
       note: "Really cool spot, great crowd.",
     },
     dos: [
       {
         name: "The night market",
+        rating: 8,
         note: "One of the best night markets going. Go hungry, the food alley is unreal.",
         maps: "Luang Prabang Night Market",
         kind: "food",
       },
       {
         name: "Kuang Si Falls",
+        rating: 7,
         note: "A gorgeous day trip out to bright turquoise pools you can swim in.",
         maps: "Kuang Si Falls",
         kind: "do",
       },
       {
         name: "A river cruise",
+        rating: 6,
         note: "We did a cruise on the Mekong and it was lovely, a really chilled way to see it.",
         maps: "Luang Prabang Mekong river cruise",
         kind: "do",
       },
       {
         name: "Mount Phousi",
-        note: "Climb the hill in the middle of town for sunset over the rivers.",
+        rating: 7,
+        note: "Climb the hill in the middle of town for sunset over the rivers. Easy win: not a big commitment and right by the markets and old town.",
         maps: "Mount Phousi Luang Prabang",
         kind: "do",
       },
       {
         name: "UXO Bomb Museum",
+        rating: 8,
         note: "Sobering but worth it. Laos is one of the most heavily bombed countries in history and this tells that story.",
         maps: "UXO Lao Visitor Centre Luang Prabang",
         kind: "do",
       },
       {
         name: "Late-night bowling",
+        rating: 8,
         note: "When the bars close, everyone ends up at the bowling alley. Random and so fun.",
         maps: "Luang Prabang Bowling Alley",
         kind: "night",
@@ -508,12 +518,14 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Vang Vieng",
     country: "Laos",
+    rating: 9,
     vibe: "party",
     nights: 3,
     blurb:
-      "Don't let the safety note put you off, Vang Vieng was one of my favourites. Big limestone-mountain scenery, and the most beautiful place on the whole trip to drive a moped around. Go with a group of friends and it's the best. Just be drink-smart while you're here (see the note above).",
+      "Plot twist: this ended up being my actual favourite place on the whole trip. It's got a strange edge to it, the whole of Laos honestly, it can feel a bit lawless and like the place runs on its own rules. But the scenery is unreal, it's the most beautiful spot of the trip to ride a moped around, and the nature stuff is the real draw. Go with a group, lean into the outdoors, and just be drink-smart (see the note above).",
     hostel: {
       name: "Golden Dragon House",
+      rating: 8,
       url: "https://www.hostelworld.com/pwa/hosteldetails.php/Golden-Dragon-House/Vang-Vieng/327611?from=2026-06-29&to=2026-07-02&guests=2#position=1",
       maps: "Golden Dragon House, Vang Vieng",
       note: "Stayed here and it was good. Go with a group of friends and you're set.",
@@ -521,17 +533,19 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Rent a moped",
+        rating: 9,
         note: "Do this, it's a must. The scenery here is unreal and riding around it is the best way to see it. (Check the moped tips above.)",
         kind: "do",
       },
       {
         name: "Nam Xay Viewpoint",
-        note: "Ride out here for the classic Vang Vieng view over the valley. Worth the climb.",
+        note: "I didn't actually make it up here myself, but everyone who did rated it, the classic Vang Vieng view over the valley. Pair it with Blue Lagoon 3 on the moped.",
         maps: "Nam Xay Viewpoint, Vang Vieng",
         kind: "do",
       },
       {
         name: "Blue Lagoon 3",
+        rating: 8,
         note: "The best of the three blue lagoons. Pair it with Nam Xay in one day on the moped.",
         maps: "Blue Lagoon 3, Vang Vieng",
         kind: "do",
@@ -539,9 +553,24 @@ export const stops: Stop[] = [
       {
         name: "Paragliding",
         rec: "must",
+        rating: 10,
         note: "You have to do this. Book an early-morning or late-afternoon flight, it was amazing.",
         maps: "Vang Vieng paragliding",
         kind: "do",
+      },
+      {
+        name: "Gary's Irish Bar (The Rising Sun)",
+        rating: 9,
+        note: "Right across the road from Golden Dragon, so handy. Pool table, music, stays open late-ish. So sick, this was the spot.",
+        maps: "Gary's Irish Bar The Rising Sun Vang Vieng",
+        kind: "night",
+      },
+      {
+        name: "Jaidee Bar",
+        rating: 7,
+        note: "A decent bar in its own right. Quick heads-up so it's not a surprise: bars here will openly offer you drugs if you ask, which is wild given how illegal it all is in Laos. Everyone seems to know, but the smart move is to steer well clear, the safety note above is there for a reason.",
+        maps: "Jaidee Bar Vang Vieng",
+        kind: "night",
       },
     ],
     leg: {
@@ -557,10 +586,11 @@ export const stops: Stop[] = [
     kind: "travel",
     name: "The crossing into Vietnam",
     country: "Vietnam",
+    rating: 8,
     vibe: "an adventure",
     days: 1,
     blurb:
-      "Getting from Vang Vieng to Hanoi is a mission, and honestly half the adventure. You route through Vientiane, the capital, but don't bother stopping there, it's not worth your time. Then it's a long bus to the border, where we waited around 6 hours, and the passport process was wild. With someone next to you it's all part of it, and it makes one of the best stories afterwards.",
+      "Getting from Vang Vieng to Hanoi is a mission, and honestly half the adventure. You route through Vientiane, the capital, but don't bother stopping there, it's not worth your time. Then it's a long bus to the border, where we waited around 6 hours, and the passport process was wild. The genuinely hard bit is finding a good bus in the first place, so sort it in advance and brace yourself. In the moment it's a 5/10, but the second it's over it's an 8/10 story, and having someone next to you makes it.",
     leg: {
       to: "Hanoi",
       mode: "One 12go booking from Vang Vieng covers the whole chain",
@@ -574,6 +604,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Hanoi",
     country: "Vietnam",
+    rating: 9,
     vibe: "buzzy",
     nights: 3,
     blurb:
@@ -581,12 +612,14 @@ export const stops: Stop[] = [
     hostels: [
       {
         name: "Lake View",
+        rating: 8,
         maps: "Lake View Hostel, Hanoi Old Quarter",
         url: "https://www.hostelworld.com/st/hostels/asia/vietnam/hanoi/",
         note: "Where I stayed the second time round. Slightly more social, and a slightly better location.",
       },
       {
         name: "The One",
+        rating: 8,
         maps: "The One Hostel, Hanoi Old Quarter",
         url: "https://www.hostelworld.com/st/hostels/asia/vietnam/hanoi/",
         note: "Where I stayed first. A touch more upmarket but somehow even cheaper, so great value. Both are in the Old Quarter.",
@@ -595,6 +628,7 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Wander the Old Quarter",
+        rating: 9,
         note: "Spend a morning, maybe 4 hours, just wandering. There are about five parallel streets full of shops, you'll find them as you go. Grab some food while you're at it.",
         maps: "Hanoi Old Quarter",
         kind: "do",
@@ -606,37 +640,42 @@ export const stops: Stop[] = [
       },
       {
         name: "Đồng Xuân Market",
+        rating: 7,
         note: "Cool for fake clothes, and just a nice hour wandering around.",
         maps: "Dong Xuan Market Hanoi",
         kind: "do",
       },
       {
         name: "Hanoi Train Street",
+        rating: 9,
         note: "Go one evening to watch the train squeeze right through the houses. Awesome.",
         maps: "Hanoi Train Street",
         kind: "night",
       },
       {
         name: "Banh Mi 25",
+        rating: 9,
         note: "The best banh mi in the city. (I wasn't kidding about eating it every day.)",
         maps: "Banh Mi 25 Hanoi",
         kind: "food",
       },
       {
         name: "Pho 10",
-        rec: "low",
+        rating: 7,
         note: "Good pho. Not my favourite and a little overrated, but still worth a go.",
         maps: "Pho 10 Hanoi",
         kind: "food",
       },
       {
         name: "Egg coffee",
+        rating: 7,
         note: "A fun novelty to try while you're here.",
         maps: "egg coffee Hanoi",
         kind: "food",
       },
       {
         name: "Ho Chi Minh's Mausoleum",
+        rating: 8,
         note: "Worth a look while you're in the city.",
         maps: "Ho Chi Minh Mausoleum Hanoi",
         kind: "do",
@@ -653,16 +692,24 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Ha Giang Loop",
     country: "Vietnam",
+    rating: 10,
     vibe: "epic",
     nights: 4,
     blurb:
       "The most famous thing to do up north, and a proper must. Ha Giang is a province right up on the Chinese border, and \"the loop\" is a big multi-day motorbike circuit through it. There's a short and a long version, do the long one. You book it through a hostel and they handle everything: they pick you up in Hanoi, drive you up to Ha Giang, and you stay the night in their hostel there. The next morning a huge group (like 200 people) sets off together, split into smaller groups each with a leader. You can ride your own bike if you hire one, or take an \"easy rider\" and sit on the back while a local drives. Get the easy rider, honestly. It's far less stressful, the roads are tough, and the riders grew up there so they know every bend. They're lovely too, you end up proper mates, and it means you can actually look up and take the views in. Don't stress the planning either, once you're on the loop your next few days are completely sorted. It was so amazing.",
     dos: [
       {
-        name: "Pizza near Bong",
+        name: "PIZZAHERE (the pizza near Bong)",
+        rating: 8,
         note: "You get a night in Ha Giang before the loop (and sometimes one after). If you're staying at Bong it's right nearby. We ate pizza here and it was so good.",
-        maps: "137 Nguyễn Thái Học, Hà Giang, Vietnam",
+        maps: "PIZZAHERE Ha Giang Vietnam",
         kind: "food",
+      },
+      {
+        name: "The top of the loop",
+        rating: 8,
+        note: "The high passes are the best of it. When you're up at the top, with the road dropping away on both sides, that's the whole thing right there.",
+        kind: "do",
       },
       {
         name: "Rooftop at the Tuan Son Building",
@@ -682,6 +729,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Sapa",
     country: "Vietnam",
+    rating: 9,
     vibe: "mountains",
     nights: 3,
     blurb:
@@ -703,7 +751,9 @@ export const stops: Stop[] = [
       {
         name: "Explore Sapa: 2D1N trek & homestay with Dinh",
         rec: "must",
-        note: "You MUST do this, a genuine 10/10 and the best thing I did on the whole trip. Dinh takes you trekking through the rice fields, then you stay at her homestay up the hill, where she runs a little school for local kids whose families can't afford one. We were there on graduation day: the kids put on a talent show, we judged it, and everyone was in tears by the end. Unforgettable. Book it on GetYourGuide.",
+        rating: 10,
+        star: true,
+        note: "The best thing I did on the whole trip, honestly an 11/10, gold star it. Dinh takes you trekking through the rice fields, then you stay at her homestay up the hill, where she runs a little school for local kids whose families can't afford one. We were there on graduation day: the kids put on a talent show, we judged it, and everyone was in tears by the end. Unforgettable. Book it on GetYourGuide.",
         url: "https://www.getyourguide.com/en-au/sa-pa-l1049/explore-sapa-2d1n-trekking-hmong-culture-with-dinh-t737160/",
         kind: "do",
       },
@@ -1068,4 +1118,37 @@ export function tripDateLabel(): string {
 
 export function mapsUrl(query: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+// ── Highlights: every 9 and 10 across the trip, for the strip near the top ──
+export type Highlight = {
+  label: string;
+  stopId: string;
+  stopName: string;
+  rating: number;
+  star?: boolean;
+};
+
+/** All places, hostels and things rated 9+ — gold-star first, then by rating. */
+export function getHighlights(): Highlight[] {
+  const out: Highlight[] = [];
+  for (const s of stops) {
+    if (s.rating != null && s.rating >= 9) {
+      out.push({ label: s.name, stopId: s.id, stopName: s.name, rating: s.rating });
+    }
+    const hostels = s.hostels ?? (s.hostel ? [s.hostel] : []);
+    for (const h of hostels) {
+      if (h.rating != null && h.rating >= 9) {
+        out.push({ label: h.name, stopId: s.id, stopName: s.name, rating: h.rating });
+      }
+    }
+    for (const d of s.dos ?? []) {
+      if (d.star || (d.rating != null && d.rating >= 9)) {
+        out.push({ label: d.name, stopId: s.id, stopName: s.name, rating: d.rating ?? 10, star: d.star });
+      }
+    }
+  }
+  return out.sort(
+    (a, b) => Number(b.star ?? false) - Number(a.star ?? false) || b.rating - a.rating,
+  );
 }

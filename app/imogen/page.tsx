@@ -6,6 +6,7 @@ import {
   stops,
   buildItinerary,
   tripDateLabel,
+  getHighlights,
 } from "@/content/imogen";
 import RouteMap from "@/components/imogen/RouteMap";
 import TripGraph from "@/components/imogen/TripGraph";
@@ -14,6 +15,7 @@ import Reveal from "@/components/imogen/Reveal";
 
 export default function ImogenPage() {
   const dates = buildItinerary();
+  const highlights = getHighlights();
   let placeN = 0;
 
   return (
@@ -46,6 +48,27 @@ export default function ImogenPage() {
               <span className="im-chip c-thailand">Thailand</span>
               <span className="im-chip c-laos">Laos</span>
               <span className="im-chip c-vietnam">Vietnam</span>
+            </div>
+          </Reveal>
+        </section>
+      </div>
+
+      {/* ── highlights ── */}
+      <div className="im-wrap">
+        <section className="im-section">
+          <Reveal>
+            <p className="im-section-label">The highlights · my 9s and 10s</p>
+            <div className="im-highlights">
+              {highlights.map((h) => (
+                <a
+                  key={`${h.stopId}-${h.label}`}
+                  className={`im-hl ${h.star ? "is-star" : ""}`}
+                  href={`#stop-${h.stopId}`}
+                >
+                  <span className="im-hl-label">{h.label}</span>
+                  <span className="im-hl-rating">{h.star ? "★ 10/10" : `${h.rating}/10`}</span>
+                </a>
+              ))}
             </div>
           </Reveal>
         </section>
