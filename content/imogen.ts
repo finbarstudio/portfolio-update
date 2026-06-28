@@ -161,6 +161,10 @@ export const tips: Tip[] = [
     body: "Where you can, take the overnight buses. You sleep while you move, so you don't waste a day getting somewhere. The sleeper ones are generally comfy.",
   },
   {
+    title: "Pharmacies + the night-bus hack",
+    body: "You can grab over-the-counter meds at pretty much any pharmacy in Asia, no prescription needed. The one I'd flag is dimenhydrinate (travel-sickness tablets). My move before a night bus was to take one, pass straight out, and wake up at the other end feeling fine instead of wrecked. Basically overnight teleportation. Great for the windy mountain roads too.",
+  },
+  {
     title: "Renting a moped",
     body: "Mopeds are the best way to explore (except big cities like Hanoi). Look for a rental with good reviews, but honestly the best move is to ask the hostel staff who they'd use, as long as they seem trustworthy and aren't just pushing a mate's shop, which is where scams happen. And always film a slow video all the way around the bike before you ride off, so nobody can pin existing scratches on you. One more thing: when you're navigating, set Google Maps to motorbike mode rather than car. It keeps you off the big motorways you're not allowed to ride on, and the back roads are usually nicer anyway.",
   },
