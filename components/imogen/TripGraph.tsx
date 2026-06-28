@@ -1,11 +1,11 @@
-import { stops, trip, type Country } from "@/content/imogen";
+import { stops, trip, type Country, type Stop } from "@/content/imogen";
 
 /**
  * TripGraph — the trip as one continuous line FIXED to the real trip length
  * (trip.start → trip.end). Place nights fill it from the left in their country
- * colours; whatever's left to the end of the dates is grey (still open). A
- * wrapping legend names the segments. Side trips (Pai, Ha Giang, Sapa, Halong)
- * and travel days sit on top of this and aren't counted in the fill.
+ * colours, grouped by country with the country named on the bar; whatever's left
+ * to the end of the dates is the "on the move" segment. The legend combines the
+ * nights per country.
  */
 const COUNTRY_CLASS: Record<Country, string> = {
   Thailand: "c-thailand",
@@ -22,27 +22,45 @@ export default function TripGraph() {
   );
   const remaining = Math.max(0, totalDays - sumNights);
 
+  // Group consecutive places by country (the route runs Thailand → Laos → Vietnam).
+  const groups: { country: Country; nights: number; places: Stop[] }[] = [];
+  for (const s of places) {
+    const last = groups[groups.length - 1];
+    if (last && last.country === s.country) {
+      last.nights += s.nights ?? 0;
+      last.places.push(s);
+    } else {
+      groups.push({ country: s.country, nights: s.nights ?? 0, places: [s] });
+    }
+  }
+
   return (
     <div className="im-tl">
       <div className="im-tl-bar">
-        {places.map((s) => (
-          <span
-            key={s.id}
-            className={`im-tl-seg ${COUNTRY_CLASS[s.country]}`}
-            style={{ flexGrow: s.nights }}
-            title={`${s.name} · ${s.nights} nights`}
-          />
+        {groups.map((g) => (
+          <div key={g.country} className={`im-tl-group ${COUNTRY_CLASS[g.country]}`} style={{ flexGrow: g.nights }}>
+            {g.places.map((s) => (
+              <span
+                key={s.id}
+                className={`im-tl-seg ${COUNTRY_CLASS[g.country]}`}
+                style={{ flexGrow: s.nights }}
+                title={`${s.name} · ${s.nights} nights`}
+              />
+            ))}
+            <span className="im-tl-group-label">{g.country}</span>
+          </div>
         ))}
         {remaining > 0 && (
-          <span className="im-tl-seg is-rest" style={{ flexGrow: remaining }} title={`${remaining} nights still open`} />
+          <span className="im-tl-seg is-rest" style={{ flexGrow: remaining }} title={`${remaining} nights on the move`} />
         )}
       </div>
+
       <div className="im-tl-legend">
-        {places.map((s) => (
-          <span key={s.id} className={`im-tl-key ${COUNTRY_CLASS[s.country]}`}>
+        {groups.map((g) => (
+          <span key={g.country} className={`im-tl-key ${COUNTRY_CLASS[g.country]}`}>
             <span className="im-tl-key-dot" aria-hidden="true" />
-            <span className="im-tl-key-name">{s.name}</span>
-            <span className="im-tl-key-n">{s.nights}n</span>
+            <span className="im-tl-key-name">{g.country}</span>
+            <span className="im-tl-key-n">{g.nights}n</span>
           </span>
         ))}
         {remaining > 0 && (
@@ -53,6 +71,7 @@ export default function TripGraph() {
           </span>
         )}
       </div>
+
       <p className="im-tl-total">
         {sumNights} nights across the places{remaining > 0 ? ", the blue is time on the move" : ""}, plus travel on top. That&apos;s the whole route, a bit more than your window, so trim it down to your dates.
       </p>
