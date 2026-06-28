@@ -26,6 +26,9 @@ export type DoItem = {
   /** Any other link (booking page etc.). */
   url?: string;
   kind?: "do" | "food" | "night" | "optional";
+  /** Recommendation strength → colour-codes the item. Finbar's /10 goes in rating. */
+  rec?: "must" | "low";
+  rating?: number;
 };
 
 export type Hostel = {
@@ -37,6 +40,9 @@ export type Hostel = {
   /** Recommended room type. */
   room?: string;
   note?: string;
+  /** Recommendation strength → colour-codes the item. Finbar's /10 goes in rating. */
+  rec?: "must" | "low";
+  rating?: number;
 };
 
 export type Leg = {
@@ -248,6 +254,7 @@ export const stops: Stop[] = [
       "Start here. The best hostel I stayed in anywhere in Asia, and the most social. This is where the trip really begins and where you'll meet your people.",
     hostel: {
       name: "Stamps Backpackers",
+      rec: "must",
       url: "https://www.hostelworld.com/pwa/s?q=Chiang%20Mai,%20Thailand&country=Thailand&city=Chiang%20Mai&type=city&id=831&from=2026-08-06&to=2026-08-14&guests=2&HostelNumber=265137&MoreOptions=true&page=1",
       maps: "Stamps Backpackers Hostel, Chiang Mai",
       room: "Deluxe 6 Bed Mixed Dorm Ensuite",
@@ -256,6 +263,7 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Cooking with Sammy",
+        rec: "must",
         note: "A Thai cooking class, so much fun. Ask reception for Sammy.",
         maps: "Cooking with Sammy, Chiang Mai",
         kind: "do",
@@ -284,6 +292,7 @@ export const stops: Stop[] = [
       },
       {
         name: "Neng Roasted Pork",
+        rec: "must",
         note: "Michelin-listed roast pork. Eat here before you leave Thailand, you won't get it again after this.",
         maps: "Neng Roasted Pork, Chiang Mai",
         kind: "food",
@@ -296,6 +305,7 @@ export const stops: Stop[] = [
       },
       {
         name: "Elephant sanctuary + the water park",
+        rec: "low",
         note: "I didn't do these but they looked great if you've got the days.",
         kind: "optional",
       },
@@ -435,6 +445,7 @@ export const stops: Stop[] = [
       },
       {
         name: "Paragliding",
+        rec: "must",
         note: "You have to do this. Book an early-morning or late-afternoon flight, it was amazing.",
         maps: "Vang Vieng paragliding",
         kind: "do",
@@ -518,6 +529,7 @@ export const stops: Stop[] = [
       },
       {
         name: "Pho 10",
+        rec: "low",
         note: "Good pho. Not my favourite and a little overrated, but still worth a go.",
         maps: "Pho 10 Hanoi",
         kind: "food",
@@ -589,6 +601,7 @@ export const stops: Stop[] = [
       },
       {
         name: "Lustig Hostel",
+        rec: "low",
         maps: "Lustig Hostel Sapa",
         note: "A solid, normal hostel if you'd rather keep it cheap. Sapa isn't really a hostel town, but this does the job.",
       },
@@ -596,6 +609,7 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Explore Sapa: 2D1N trek & homestay with Dinh",
+        rec: "must",
         note: "You MUST do this, a genuine 10/10 and the best thing I did on the whole trip. Dinh takes you trekking through the rice fields, then you stay at her homestay up the hill, where she runs a little school for local kids whose families can't afford one. We were there on graduation day: the kids put on a talent show, we judged it, and everyone was in tears by the end. Unforgettable. Book it on GetYourGuide.",
         url: "https://www.getyourguide.com/en-au/sa-pa-l1049/explore-sapa-2d1n-trekking-hmong-culture-with-dinh-t737160/",
         kind: "do",
