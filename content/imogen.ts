@@ -830,8 +830,8 @@ export const stops: Stop[] = [
       "You roll into Hoi An at the end of the pass, through Da Nang. The two are right next to each other, so you can easily do trips back and forth between them.",
     dos: [
       {
-        name: "Bounce to Da Nang",
-        note: "Da Nang and Hoi An are close and easy to go between, beaches and city one side, old town the other.",
+        name: "Da Nang",
+        note: "You come out of the hills and into Da Nang on the way in. It's got a bit of a tacky feel, loads of high-end resorts strung along the coast, and it was busy. I didn't actually stop, and I reckon you'll prefer Hoi An, but it looked kind of cool and I'd have gone with more time. You just drive through it into Hoi An.",
         maps: "Da Nang Vietnam",
         kind: "do",
       },
