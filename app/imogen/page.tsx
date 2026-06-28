@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import {
   trip,
   apps,
@@ -8,6 +10,8 @@ import {
   buildItinerary,
   tripDateLabel,
   getHighlights,
+  imgSlug,
+  PHOTO_ALIASES,
 } from "@/content/imogen";
 import RouteMap from "@/components/imogen/RouteMap";
 import TripGraph from "@/components/imogen/TripGraph";
@@ -17,9 +21,78 @@ import CollapsibleSection from "@/components/imogen/CollapsibleSection";
 import MapFab from "@/components/imogen/MapFab";
 import Reveal from "@/components/imogen/Reveal";
 
+// Photos Finbar drops in public/imogen are auto-detected and take priority over
+// searched images. Each subfolder is named after a place or activity; its web
+// images (jpg/png/webp/avif — HEIC/MOV can't show in a browser) attach there.
+// Matching is by name; anything that doesn't match auto-resolves via PHOTO_ALIASES.
+const WEB_IMG = /\.(jpe?g|png|webp|avif)$/i;
+
+type PhotoIndex = {
+  stops: Record<string, string[]>; // stopId -> place photos
+  items: Record<string, Record<string, string[]>>; // stopId -> itemSlug -> photos
+};
+
+function buildPhotoIndex(): PhotoIndex {
+  const out: PhotoIndex = { stops: {}, items: {} };
+  const root = path.join(process.cwd(), "public", "imogen");
+  let entries: fs.Dirent[] = [];
+  try {
+    entries = fs.readdirSync(root, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+
+  // Lookup of every stop + item by slug.
+  const stopSlugs = new Map<string, string>();
+  const itemList: { stopId: string; slug: string }[] = [];
+  for (const s of stops) {
+    stopSlugs.set(s.id, s.id);
+    stopSlugs.set(imgSlug(s.name), s.id);
+    for (const h of s.hostels ?? (s.hostel ? [s.hostel] : [])) itemList.push({ stopId: s.id, slug: imgSlug(h.name) });
+    for (const d of s.dos ?? []) itemList.push({ stopId: s.id, slug: imgSlug(d.name) });
+  }
+
+  const resolve = (slug: string): { stopId: string; itemSlug?: string } | null => {
+    const alias = PHOTO_ALIASES[slug];
+    if (alias) return { stopId: alias.stopId, itemSlug: alias.item ? imgSlug(alias.item) : undefined };
+    if (stopSlugs.has(slug)) return { stopId: stopSlugs.get(slug)! };
+    const exact = itemList.filter((i) => i.slug === slug);
+    if (exact.length === 1) return { stopId: exact[0].stopId, itemSlug: exact[0].slug };
+    const fuzzy = itemList.filter((i) => i.slug.includes(slug) || slug.includes(i.slug));
+    if (fuzzy.length === 1) return { stopId: fuzzy[0].stopId, itemSlug: fuzzy[0].slug };
+    return null;
+  };
+
+  const add = (target: { stopId: string; itemSlug?: string }, urls: string[]) => {
+    if (!urls.length) return;
+    if (target.itemSlug) {
+      (out.items[target.stopId] ??= {});
+      out.items[target.stopId][target.itemSlug] = [...(out.items[target.stopId][target.itemSlug] ?? []), ...urls];
+    } else {
+      out.stops[target.stopId] = [...(out.stops[target.stopId] ?? []), ...urls];
+    }
+  };
+
+  for (const e of entries) {
+    if (e.isDirectory()) {
+      const target = resolve(imgSlug(e.name));
+      if (!target) continue;
+      let files: string[] = [];
+      try {
+        files = fs.readdirSync(path.join(root, e.name)).filter((f) => WEB_IMG.test(f)).sort();
+      } catch {
+        /* ignore */
+      }
+      add(target, files.map((f) => `/imogen/${encodeURIComponent(e.name)}/${encodeURIComponent(f)}`));
+    }
+  }
+  return out;
+}
+
 export default function ImogenPage() {
   const dates = buildItinerary();
   const highlights = getHighlights();
+  const photos = buildPhotoIndex();
   let placeN = 0;
 
   return (
@@ -173,7 +246,13 @@ export default function ImogenPage() {
               const badge = s.side ? "↗" : s.kind === "place" ? String(++placeN) : "≈";
               return (
                 <Reveal key={s.id}>
-                  <StopCard stop={s} dates={dates[s.id]} badge={badge} />
+                  <StopCard
+                    stop={s}
+                    dates={dates[s.id]}
+                    badge={badge}
+                    stopPhotos={photos.stops[s.id] ?? []}
+                    itemPhotos={photos.items[s.id] ?? {}}
+                  />
                 </Reveal>
               );
             })}

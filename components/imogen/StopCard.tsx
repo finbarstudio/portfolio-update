@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { mapsUrl, ratingColor, STAR_COLOR, COUNTRY_FLAG, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
+import { mapsUrl, ratingColor, STAR_COLOR, COUNTRY_FLAG, imgSlug, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
 import LoopTable from "./LoopTable";
 
 /**
@@ -46,7 +46,19 @@ function recLevel(rec?: "must" | "low", rating?: number): "must" | "low" | "mid"
   return "mid";
 }
 
-export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: StopDates; badge: string }) {
+export default function StopCard({
+  stop,
+  dates,
+  badge,
+  stopPhotos = [],
+  itemPhotos = {},
+}: {
+  stop: Stop;
+  dates?: StopDates;
+  badge: string;
+  stopPhotos?: string[];
+  itemPhotos?: Record<string, string[]>;
+}) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<Cat | "All">("All");
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
@@ -73,8 +85,8 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
 
   const hostels = stop.hostels ?? (stop.hostel ? [stop.hostel] : []);
   const items: UItem[] = [
-    ...hostels.map((h): UItem => ({ cat: "Hostel", title: h.name, maps: h.maps, book: h.url, note: h.note, room: h.room, rec: h.rec, rating: h.rating, imgs: h.imgs })),
-    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating, star: d.star, imgs: d.imgs })),
+    ...hostels.map((h): UItem => ({ cat: "Hostel", title: h.name, maps: h.maps, book: h.url, note: h.note, room: h.room, rec: h.rec, rating: h.rating, imgs: itemPhotos[imgSlug(h.name)] ?? h.imgs })),
+    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating, star: d.star, imgs: itemPhotos[imgSlug(d.name)] ?? d.imgs })),
   ];
   const cats = CAT_ORDER.filter((c) => items.some((i) => i.cat === c));
   const shown = filter === "All" ? items : items.filter((i) => i.cat === filter);
@@ -126,6 +138,14 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
 
       {open && (
         <div className="im-stop-body">
+          {stopPhotos.length > 0 && (
+            <div className="im-item-thumbs im-stop-thumbs">
+              {stopPhotos.map((src) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={src} className="im-item-thumb" src={src} alt={stop.name} loading="lazy" onClick={() => setLightbox(src)} />
+              ))}
+            </div>
+          )}
           <p className="im-stop-blurb">{stop.blurb}</p>
 
           {stop.id === "ha-giang" && (

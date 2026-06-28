@@ -1020,6 +1020,8 @@
 
 /* small images in the detail, tap to enlarge */
 .imogen-page .im-item-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.imogen-page .im-stop-thumbs { margin-top: 0; margin-bottom: 14px; }
+.imogen-page .im-stop-thumbs .im-item-thumb { width: 96px; height: 96px; }
 .imogen-page .im-item-thumb {
   width: 72px;
   height: 72px;

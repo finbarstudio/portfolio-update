@@ -1178,6 +1178,27 @@ export function mapsUrl(query: string): string {
 }
 
 /**
+ * Photo folders in public/imogen are matched to a stop or item by their name.
+ * Most match automatically (folder name === a stop or item name). Anything that
+ * doesn't is mapped here by hand — folder-name slug → target. `item` omitted
+ * means the folder's photos belong to the stop itself.
+ */
+export const PHOTO_ALIASES: Record<string, { stopId: string; item?: string }> = {
+  dinh: { stopId: "sapa", item: "Explore Sapa: 2D1N trek & homestay with Dinh" },
+  "vang-vien-moped": { stopId: "vang-vieng", item: "Rent a moped" },
+};
+
+/** Slug used to match a name to a local photo file in public/imogen. */
+export function imgSlug(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+/**
  * Rating → colour. A green-to-red scale tuned to Finbar's harsh /10
  * (9–10 amazing, 6–8 good, 5 and under weak). Drives the rating tiles.
  */

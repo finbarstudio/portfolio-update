@@ -1,0 +1,7 @@
+# Non-web photo/video formats can't display in a browser — keep them out of the
+# repo. Convert HEIC → JPG before dropping photos in (see README).
+*.heic
+*.HEIC
+*.mov
+*.MOV
+.DS_Store
