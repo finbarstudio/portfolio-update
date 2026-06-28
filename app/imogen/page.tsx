@@ -264,8 +264,9 @@ export default function ImogenPage() {
       <footer className="im-foot">
         <div className="im-wrap">
           <p className="im-foot-note">
-            Honestly, putting this together made me relive the whole trip and it was so cool to
-            sit back in it all. If it gives you even a fraction of what it gave me, I&apos;ll be made up.
+            Honestly, putting this together brought the whole trip flooding back and it was so cool
+            to sit in it all again, so thank you for that. If it gives you even a fraction of what it
+            gave me, I&apos;ll be made up.
           </p>
           <p className="im-foot-sign im-serif">
             Have the best time.

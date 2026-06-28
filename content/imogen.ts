@@ -177,7 +177,7 @@ export const tips: Tip[] = [
   },
   {
     title: "Night buses are your friend",
-    body: "I took the overnight buses wherever I could. You sleep while you move so you don't lose a day getting anywhere, and the sleeper ones are genuinely comfy.",
+    body: "Heads-up: most of the hops between places out here are overnight buses anyway, so lean into them. You sleep while you move, don't lose a day getting anywhere, and the sleeper ones are genuinely comfy. Book the sleeper option where there's a choice.",
   },
   {
     title: "My little night-bus hack",
@@ -297,7 +297,7 @@ export const stops: Stop[] = [
     country: "Thailand",
     rating: 8,
     vibe: "social",
-    nights: 4,
+    nights: 3,
     blurb:
       "Start here. Stamps was the best hostel I stayed in anywhere in Asia, and the most social, this is where the trip really begins and where you'll meet your people.",
     hostel: {
@@ -382,7 +382,7 @@ export const stops: Stop[] = [
     country: "Thailand",
     rating: 8,
     vibe: "hippie",
-    nights: 2,
+    nights: 3,
     blurb:
       "A little hippie town up in the hills, kind of like Nimbin. A lot of why I loved it was the people I was with, it's super social. Plenty of folks fall into the \"Pai hole\" and never leave. I went in low season so the weather was hit and miss, and I reckon better weather would lift it, but I'd still say go if you've got the days.",
     hostels: [
@@ -401,7 +401,7 @@ export const stops: Stop[] = [
     dos: [
       {
         name: "Ride a moped around",
-        rating: 8,
+        rating: 9,
         rec: "must",
         note: "Get a moped, no question. It's how you do Pai, the hills, the waterfalls, and the hippie communes are all spread out and you need one to reach them.",
         tip: { label: "Moped tips", href: "#learnt" },
@@ -437,7 +437,7 @@ export const stops: Stop[] = [
       },
       {
         name: "Bros Music Bar",
-        rating: 7,
+        rating: 8,
         note: "A proper music bar, good for a night out.",
         maps: "Bros Music Bar Pai",
         kind: "night",
@@ -481,7 +481,7 @@ export const stops: Stop[] = [
     country: "Laos",
     rating: 8,
     vibe: "charming",
-    nights: 4,
+    nights: 3,
     blurb:
       "My favourite place in Laos and one of my standout spots of the whole trip. It has this surprising European feel left over from the old French-colonial days, really pretty and walkable, with great food.",
     hostel: {
@@ -596,7 +596,7 @@ export const stops: Stop[] = [
     country: "Laos",
     rating: 9,
     vibe: "scenic",
-    nights: 3,
+    nights: 2,
     blurb:
       "Plot twist: this ended up being my actual favourite place on the whole trip. It's got a strange edge to it, the whole of Laos honestly, it can feel a bit lawless and like the place runs on its own rules. But the scenery is unreal, it's the most beautiful spot of the trip to ride a moped around, and the nature stuff is the real draw. Go with a group, lean into the outdoors, and just be drink-smart (see the note above).",
     hostel: {
@@ -1072,7 +1072,7 @@ export const stops: Stop[] = [
     country: "Vietnam",
     rating: 9,
     vibe: "peaceful",
-    nights: 2,
+    nights: 3,
     blurb:
       "Hoi An was my favourite place of the whole trip. You roll in at the end of the pass (through Da Nang), and honestly I don't think you'll want to leave. Hire a moped for sure. Do the hostel drinks and head out with the group on their nights, but make sure you get into the old town itself, the lanterns and the river, that's the real magic. More than anything it was peaceful, my favourite place on the whole trip to just sit and look at. To be fair there isn't a huge amount going on, but honestly that was the appeal, a calm and lovely way to end the trip.",
     hostels: [
@@ -1106,6 +1106,13 @@ export const stops: Stop[] = [
         note: "The heart of it: lantern-lit streets, the river, the tailors, the food. Spend your evenings here, not just at the hostel.",
         maps: "Hoi An Ancient Town",
         kind: "do",
+      },
+      {
+        name: "Madam Khanh (The Banh Mi Queen)",
+        rating: 9,
+        note: "The Banh Mi Queen, and she earns the name. One of the best banh mi of the whole trip, go hungry.",
+        maps: "Madam Khanh The Banh Mi Queen Hoi An",
+        kind: "food",
       },
       {
         name: "Hoianese History Talk",
