@@ -75,6 +75,8 @@ export type Stop = {
   nights?: number;
   /** Days on the move for a travel leg. */
   days?: number;
+  /** Optional / not-fully-done stop — greyed off and left out of the timeline. */
+  muted?: boolean;
   /** Side trip / optional detour — excluded from the running date flow. */
   side?: boolean;
   /** Shown in place of dates for a side trip, e.g. "Side trip · 2–3 days if you go". */
@@ -301,7 +303,7 @@ export const stops: Stop[] = [
     hostel: {
       name: "Stamps Backpackers",
       rating: 10,
-      url: "https://www.hostelworld.com/pwa/s?q=Chiang%20Mai,%20Thailand&country=Thailand&city=Chiang%20Mai&type=city&id=831&from=2026-08-06&to=2026-08-14&guests=2&HostelNumber=265137&MoreOptions=true&page=1",
+      url: "https://www.hostelworld.com/hostels/p/265137/stamps-backpackers-chiang-mai/",
       maps: "Stamps Backpackers Hostel, Chiang Mai",
       room: "Deluxe 6 Bed Mixed Dorm Ensuite",
       note: "Worth the extra few dollars a night. This one's so good it books out a few days ahead, so reserve it before you fly. Super social, the whole place hangs out together.",
@@ -387,6 +389,7 @@ export const stops: Stop[] = [
       {
         name: "K Bunk",
         maps: "K Bunk Hostel Pai",
+        url: "https://www.hostelworld.com/hostels/p/319544/k-bunk-hostel-pai-walking-street/",
         rating: 6,
         note: "Where I stayed, right in town. Fine and social-ish with a good location, but the beds were a bit rubbish.",
       },
@@ -485,6 +488,7 @@ export const stops: Stop[] = [
       name: "Jam Hostel",
       rating: 9,
       maps: "Jam Hostel, Luang Prabang",
+      url: "https://www.hostelworld.com/hostels/p/321537/the-jam-hostel/",
       note: "Really cool spot, great crowd.",
     },
     dos: [
@@ -542,6 +546,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Nong Khiaw",
     country: "Laos",
+    muted: true,
     vibe: "mountains",
     nights: 2,
     blurb:
@@ -549,6 +554,7 @@ export const stops: Stop[] = [
     hostel: {
       name: "Nong Khiaw guesthouses",
       maps: "Nong Khiaw guesthouses Laos",
+      url: "https://www.hostelworld.com/hostels/asia/laos/nong-khiaw/",
       note: "Loads of cheap riverside guesthouses, just turn up. Book the overnight camp in person once you're there (Eco Farm Stay is the known one).",
     },
     dos: [
@@ -660,7 +666,7 @@ export const stops: Stop[] = [
     country: "Vietnam",
     rating: 8,
     vibe: "an adventure",
-    days: 1,
+    days: 2,
     blurb:
       "Getting from Vang Vieng to Hanoi is a mission, and honestly half the adventure. You route through Vientiane, the capital, but don't bother stopping there, it's not worth your time. Then it's a long bus to the border, where we waited around 6 hours, and the passport process was wild. The genuinely hard bit is finding a good bus in the first place, so sort it in advance and brace yourself. In the moment it's a 5/10, but the second it's over it's an 8/10 story, and having someone next to you makes it.",
     leg: {
@@ -686,14 +692,14 @@ export const stops: Stop[] = [
         name: "Lake View",
         rating: 8,
         maps: "Lake View Hostel, Hanoi Old Quarter",
-        url: "https://www.hostelworld.com/st/hostels/asia/vietnam/hanoi/",
+        url: "https://www.hostelworld.com/hostels/p/326518/lake-view-backpackers-hostel-rooftop-bar/",
         note: "Where I stayed the second time round. Slightly more social, and a slightly better location.",
       },
       {
         name: "The One",
         rating: 8,
         maps: "The One Hostel, Hanoi Old Quarter",
-        url: "https://www.hostelworld.com/st/hostels/asia/vietnam/hanoi/",
+        url: "https://www.hostelworld.com/hostels/p/319525/the-one-hostel-and-rooftop-pool-hanoi/",
         note: "Where I stayed first. A touch more upmarket but somehow even cheaper, so great value. Both are in the Old Quarter.",
       },
     ],
@@ -811,12 +817,14 @@ export const stops: Stop[] = [
         name: "Lady Hill Resort",
         rating: 10,
         maps: "Lady Hill Sapa Resort",
+        url: "https://www.booking.com/hotel/vn/lady-hill-sapa-resort.html",
         note: "Not a hostel, a proper hotel that blew up on TikTok. Pricey for a backpacker but so worth it after the loop: the infinity pool and the view are insane, and I did a massage and aromatherapy. We extended because we didn't want to leave.",
       },
       {
         name: "Lustig Hostel",
         rating: 7,
         maps: "Lustig Hostel Sapa",
+        url: "https://www.hostelworld.com/hostels/p/290292/lustig-hostel/",
         note: "It is what it is, a normal hostel that did the job. We got in late off the loop and needed a bed. Sapa isn't really a hostel town, but this is fine if you'd rather keep it cheap.",
       },
     ],
@@ -880,6 +888,7 @@ export const stops: Stop[] = [
     hostel: {
       name: "Banana Tree Hostel",
       maps: "Banana Tree Hostel Ninh Binh",
+      url: "https://www.hostelworld.com/hostels/p/299332/the-banana-tree-hostel/",
       rating: 9,
       note: "One of the best hostels I stayed at, genuinely. Lovely pool, right on the river, and a great spot to rent a moped or bike. Book it.",
     },
@@ -949,6 +958,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Phong Nha",
     country: "Vietnam",
+    muted: true,
     vibe: "caves",
     nights: 1,
     blurb:
@@ -1070,6 +1080,7 @@ export const stops: Stop[] = [
         name: "Cuckoo's Nest",
         rating: 10,
         maps: "Cuckoo's Nest Hostel Hoi An",
+        url: "https://www.hostelworld.com/hostels/p/318026/the-cuckoo-s-nest-hostel-and-bar/",
         rec: "must",
         note: "Stay here. One of my two favourite hostels of the whole trip (right up there with Stamps). So social and such a good vibe, I genuinely don't think you'll want to leave. It's a little out of town though, so you'll want a moped.",
       },
@@ -1077,6 +1088,7 @@ export const stops: Stop[] = [
         name: "Fuse Hostel",
         rating: 7,
         maps: "Fuse Hostel Hoi An",
+        url: "https://www.hostelworld.com/hostels/p/317286/fuse-old-town-hoi-an/",
         note: "Where I stayed in the city itself. Good facilities and the nights out were good too. Honestly you could split your stay: Fuse for being in the middle of things, Cuckoo's for the social side.",
       },
     ],
@@ -1153,6 +1165,7 @@ export const stops: Stop[] = [
     kind: "place",
     name: "Ho Chi Minh City (Saigon)",
     country: "Vietnam",
+    muted: true,
     vibe: "big city",
     nights: 1,
     blurb:

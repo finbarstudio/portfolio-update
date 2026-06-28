@@ -123,13 +123,14 @@ export default function StopCard({
   }, [stop.id]);
 
   return (
-    <article id={`stop-${stop.id}`} className={`im-stop ${COUNTRY_CLASS[stop.country]} ${isTravel ? "is-travel" : ""} ${open ? "is-open" : ""} ${stop.rating != null && stop.rating >= 10 ? "is-top" : ""}`}>
+    <article id={`stop-${stop.id}`} className={`im-stop ${COUNTRY_CLASS[stop.country]} ${isTravel ? "is-travel" : ""} ${open ? "is-open" : ""} ${stop.rating != null && stop.rating >= 10 ? "is-top" : ""} ${stop.muted ? "is-muted" : ""}`}>
       <button className="im-stop-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className="im-stop-num">{badge}</span>
         <span className="im-stop-headtext">
           <span className="im-stop-name">{stop.name}</span>
           <span className="im-stop-meta">
             <span className="im-stop-country">{COUNTRY_FLAG[stop.country]} {stop.country}</span>
+            {stop.muted && <span className="im-stop-optional">optional</span>}
             {stop.rating != null && (
               <span
                 className="im-stop-rating"
@@ -257,7 +258,7 @@ export default function StopCard({
                                 <div className="im-item-links">
                                   {it.book && (
                                     <a className="im-linkbtn is-primary" href={it.book} target="_blank" rel="noopener noreferrer">
-                                      Book on Hostelworld
+                                      {it.book.includes("booking.com") ? "Book on Booking.com" : "Book on Hostelworld"} ↗
                                     </a>
                                   )}
                                   {it.url && (

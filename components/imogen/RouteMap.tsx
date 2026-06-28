@@ -3,6 +3,8 @@ import { COUNTRIES, LABELS, VB_W, VB_H, project } from "./geo";
 
 // Stops rated 9 or 10 get a star on their pin + in the legend.
 const TOP_IDS = new Set(stops.filter((s) => s.rating != null && s.rating >= 9).map((s) => s.id));
+// Optional / not-fully-done stops are greyed off.
+const MUTED_IDS = new Set(stops.filter((s) => s.muted).map((s) => s.id));
 
 const FLAG_BY_LABEL: Record<string, string> = {
   THAILAND: "🇹🇭",
@@ -92,7 +94,7 @@ export default function RouteMap() {
           const left = `${(x / VB_W) * 100}%`;
           const top = `${(y / VB_H) * 100}%`;
           const isTop = TOP_IDS.has(p.id);
-          const cls = `im-pin ${markerClass(p)} ${isTop ? "is-top" : ""}`;
+          const cls = `im-pin ${markerClass(p)} ${isTop ? "is-top" : ""} ${MUTED_IDS.has(p.id) ? "is-muted" : ""}`;
           const dot = (
             <span className="im-pin-dot">
               {markerText(p)}
@@ -121,7 +123,7 @@ export default function RouteMap() {
             </>
           );
           return (
-            <li key={p.id}>
+            <li key={p.id} className={MUTED_IDS.has(p.id) ? "is-muted" : ""}>
               {p.detailed ? (
                 <a href={`#stop-${p.id}`} className="im-leg-link">
                   {inner}

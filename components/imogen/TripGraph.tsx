@@ -24,16 +24,17 @@ const addDays = (iso: string, n: number) => {
 };
 
 type Seg =
-  | { id: string; kind: "place"; country: Country; span: number }
-  | { id: string; kind: "travel"; span: number };
+  | { id: string; kind: "place"; country: Country; span: number; name: string }
+  | { id: string; kind: "travel"; span: number; name: string };
 
 export default function TripGraph() {
+  // muted stops (optional / not fully done) are left out of the timeline.
   const segs: Seg[] = stops
-    .filter((s) => (s.nights ?? s.days) != null)
+    .filter((s) => (s.nights ?? s.days) != null && !s.muted)
     .map((s) =>
       s.kind === "place"
-        ? { id: s.id, kind: "place", country: s.country, span: s.nights ?? 0 }
-        : { id: s.id, kind: "travel", span: s.days ?? 0 },
+        ? { id: s.id, kind: "place", country: s.country, span: s.nights ?? 0, name: s.name }
+        : { id: s.id, kind: "travel", span: s.days ?? 0, name: s.name },
     );
   const total = segs.reduce((a, s) => a + s.span, 0) || 1;
 
@@ -53,7 +54,7 @@ export default function TripGraph() {
       const last = arr[arr.length - 1];
       const end = last.start + last.span;
       const nights = arr.reduce((a, p) => a + p.span, 0);
-      const places = stops.filter((s) => s.kind === "place" && s.country === c && s.nights).map((s) => s.name);
+      const places = stops.filter((s) => s.kind === "place" && s.country === c && s.nights && !s.muted).map((s) => s.name);
       return { country: c, midPct: ((start + (end - start) / 2) / total) * 100, nights, places };
     })
     .filter((g): g is NonNullable<typeof g> => g != null);
@@ -88,9 +89,12 @@ export default function TripGraph() {
               key={s.id}
               className={`im-tl-seg ${s.kind === "place" ? COUNTRY_CLASS[s.country] : "is-travel"}`}
               style={{ flexGrow: s.span }}
-              title={s.kind === "travel" ? `${s.span} on the move` : `${s.span} nights`}
             >
               <span className="im-tl-seg-n">{s.span}</span>
+              <span className="im-tl-segtip">
+                {s.name}
+                <small>{s.kind === "travel" ? `${s.span} on the move` : `${s.span} ${s.span === 1 ? "night" : "nights"}`}</small>
+              </span>
             </span>
           ))}
         </div>
@@ -99,15 +103,22 @@ export default function TripGraph() {
       </div>
 
       <div className="im-tl-dates">
-        <span>{fmt(trip.start)}</span>
-        <span>{fmt(addDays(trip.start, total))}</span>
+        <span className="im-tl-date">
+          <span className="im-tl-date-lead" />
+          {fmt(trip.start)}
+        </span>
+        <span className="im-tl-date is-end">
+          <span className="im-tl-date-lead" />
+          {fmt(addDays(trip.start, total))}
+        </span>
       </div>
 
       <div className="im-tl-key">
         <span className="im-tl-keyitem">
           <span className="im-tl-keydot is-travel" aria-hidden="true" /> On the move
         </span>
-        <span className="im-tl-keyitem">the number on each block is nights (or travel days)</span>
+        <span className="im-tl-keyitem">number on each block = nights (or travel days)</span>
+        <span className="im-tl-keyitem">tap or hover a block for the place</span>
       </div>
     </div>
   );
