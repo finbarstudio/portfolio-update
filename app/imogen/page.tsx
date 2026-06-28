@@ -188,7 +188,7 @@ export default function ImogenPage() {
         {/* ── how to travel ── */}
         <section className="im-section">
           <Reveal>
-            <CollapsibleSection label="Things I learnt">
+            <CollapsibleSection id="learnt" label="Things I learnt">
               <div className="im-tips">
                 {tips.map((t) => (
                   <div key={t.title}>
@@ -220,7 +220,7 @@ export default function ImogenPage() {
         {/* ── safety ── */}
         <section className="im-section">
           <Reveal>
-            <CollapsibleSection label="A heads-up" defaultOpen>
+            <CollapsibleSection id="heads-up" label="A heads-up" defaultOpen>
               <div className="im-safety">
                 <p className="im-safety-title im-serif">{safety.title}</p>
                 <p className="im-safety-body">{safety.body}</p>
@@ -263,6 +263,10 @@ export default function ImogenPage() {
       {/* ── footer ── */}
       <footer className="im-foot">
         <div className="im-wrap">
+          <p className="im-foot-note">
+            Honestly, putting this together made me relive the whole trip and it was so cool to
+            sit back in it all. If it gives you even a fraction of what it gave me, I&apos;ll be made up.
+          </p>
           <p className="im-foot-sign im-serif">
             Have the best time.
             <br />

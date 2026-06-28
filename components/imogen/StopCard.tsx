@@ -37,6 +37,7 @@ type UItem = {
   rating?: number;
   star?: boolean;
   imgs?: string[];
+  tip?: { label: string; href: string };
 };
 
 function recLevel(rec?: "must" | "low", rating?: number): "must" | "low" | "mid" {
@@ -62,7 +63,19 @@ export default function StopCard({
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<Cat | "All">("All");
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
-  const [lightbox, setLightbox] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<{ list: string[]; i: number } | null>(null);
+
+  // Arrow keys / Escape drive the full-screen image viewer.
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+      else if (e.key === "ArrowRight") setLightbox((l) => l && { ...l, i: (l.i + 1) % l.list.length });
+      else if (e.key === "ArrowLeft") setLightbox((l) => l && { ...l, i: (l.i - 1 + l.list.length) % l.list.length });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox]);
 
   // Open this stop when a map pin (or any #stop-<id> link) targets it.
   useEffect(() => {
@@ -85,7 +98,7 @@ export default function StopCard({
   const hostels = stop.hostels ?? (stop.hostel ? [stop.hostel] : []);
   const items: UItem[] = [
     ...hostels.map((h): UItem => ({ cat: "Hostel", title: h.name, maps: h.maps, book: h.url, note: h.note, room: h.room, rec: h.rec, rating: h.rating, imgs: itemPhotos[imgSlug(h.name)] ?? h.imgs })),
-    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating, star: d.star, imgs: itemPhotos[imgSlug(d.name)] ?? d.imgs })),
+    ...(stop.dos ?? []).map((d): UItem => ({ cat: catOf(d.kind), title: d.name, maps: d.maps, url: d.url, links: d.links, note: d.note, rec: d.rec, rating: d.rating, star: d.star, imgs: itemPhotos[imgSlug(d.name)] ?? d.imgs, tip: d.tip })),
   ];
   const cats = CAT_ORDER.filter((c) => items.some((i) => i.cat === c));
   const shown = filter === "All" ? items : items.filter((i) => i.cat === filter);
@@ -140,9 +153,9 @@ export default function StopCard({
         <div className="im-stop-body">
           {stopPhotos.length > 0 && (
             <div className="im-item-thumbs im-stop-thumbs">
-              {stopPhotos.map((src) => (
+              {stopPhotos.map((src, i) => (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img key={src} className="im-item-thumb" src={src} alt={stop.name} loading="lazy" onClick={() => setLightbox(src)} />
+                <img key={src} className="im-item-thumb" src={src} alt={stop.name} loading="lazy" onClick={() => setLightbox({ list: stopPhotos, i })} />
               ))}
             </div>
           )}
@@ -157,6 +170,7 @@ export default function StopCard({
 
           {items.length > 0 && (
             <div className="im-block">
+              <p className="im-tap-hint">Tap any item below for the notes, photos &amp; map ↓</p>
               {cats.length > 1 && (
                 <div className="im-filters">
                   <span className="im-filter-label">Show</span>
@@ -219,9 +233,14 @@ export default function StopCard({
                             <div className="im-item-detail">
                               {it.room && <span className="im-stay-room">{it.room}</span>}
                               {it.note && <p className="im-item-note">{it.note}</p>}
+                              {it.tip && (
+                                <a className="im-item-tiplink" href={it.tip.href}>
+                                  ↑ {it.tip.label}
+                                </a>
+                              )}
                               {it.imgs && it.imgs.length > 0 && (
                                 <div className="im-item-thumbs">
-                                  {it.imgs.map((src) => (
+                                  {it.imgs.map((src, idx) => (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img
                                       key={src}
@@ -229,7 +248,7 @@ export default function StopCard({
                                       src={src}
                                       alt={it.title}
                                       loading="lazy"
-                                      onClick={() => setLightbox(src)}
+                                      onClick={() => setLightbox({ list: it.imgs!, i: idx })}
                                     />
                                   ))}
                                 </div>
@@ -288,7 +307,34 @@ export default function StopCard({
       {lightbox && (
         <div className="im-lightbox" onClick={() => setLightbox(null)} role="dialog" aria-modal="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={lightbox} alt="" />
+          <img src={lightbox.list[lightbox.i]} alt="" onClick={(e) => e.stopPropagation()} />
+          {lightbox.list.length > 1 && (
+            <>
+              <button
+                className="im-lightbox-nav is-prev"
+                aria-label="Previous photo"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightbox((l) => l && { ...l, i: (l.i - 1 + l.list.length) % l.list.length });
+                }}
+              >
+                ‹
+              </button>
+              <button
+                className="im-lightbox-nav is-next"
+                aria-label="Next photo"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightbox((l) => l && { ...l, i: (l.i + 1) % l.list.length });
+                }}
+              >
+                ›
+              </button>
+              <span className="im-lightbox-count">
+                {lightbox.i + 1} / {lightbox.list.length}
+              </span>
+            </>
+          )}
           <button className="im-lightbox-close" aria-label="Close">✕</button>
         </div>
       )}

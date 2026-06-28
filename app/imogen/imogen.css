@@ -543,11 +543,18 @@
   text-transform: uppercase;
   color: var(--ink-soft);
 }
+.imogen-page .im-foot-note {
+  max-width: 30rem;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
 .imogen-page .im-foot-sign {
   font-family: var(--font-display), Georgia, serif;
   font-size: 22px;
   line-height: 1.3;
-  margin-top: 14px;
+  margin-top: 22px;
 }
 .imogen-page .im-foot-by {
   font-family: var(--font-space-mono), ui-monospace, monospace;
@@ -939,6 +946,18 @@
 .imogen-page .im-stop.is-open .im-stop-chev { background: var(--c, var(--ink)); color: #fff; }
 .imogen-page .im-stop-body { margin-top: 2px; }
 
+/* when a stop is open, keep its header (and close button) stuck at the top */
+.imogen-page .im-stop.is-open .im-stop-head {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: var(--bg-raised);
+  margin: -4px 0 0;
+  padding: 10px 0 8px;
+  box-shadow: 0 6px 10px -8px rgba(36, 31, 26, 0.3);
+}
+.imogen-page .im-stop.is-travel.is-open .im-stop-head { background: var(--bg-sunken); }
+
 /* filters */
 .imogen-page .im-filters { display: flex; flex-wrap: wrap; gap: 7px; margin: 18px 0 2px; }
 .imogen-page .im-filter {
@@ -967,14 +986,25 @@
   margin-bottom: 4px;
 }
 
+/* hint that items open */
+.imogen-page .im-tap-hint {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c, var(--ink-soft));
+  margin: 0 0 10px;
+}
+
 /* items — score-led list, rating is the lead UI element */
 .imogen-page .im-items { display: grid; gap: 6px; }
 .imogen-page .im-item {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--bg-raised);
-  transition: border-color 0.15s var(--ease);
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
 }
+.imogen-page .im-item:not(.is-open):hover { border-color: var(--c, var(--ink)); background-color: var(--bg-sunken); }
 .imogen-page .im-item.is-open { border-color: var(--c, var(--ink)); }
 /* subtle highlight on a 10/10 item card */
 .imogen-page .im-item.is-top {
@@ -1080,6 +1110,34 @@
   font-size: 16px;
   cursor: pointer;
 }
+.imogen-page .im-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.imogen-page .im-lightbox-nav.is-prev { left: 12px; }
+.imogen-page .im-lightbox-nav.is-next { right: 12px; }
+.imogen-page .im-lightbox-count {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.85);
+}
 
 /* place overview tags (collapsed card) — rating is a filled colour tile */
 .imogen-page .im-stop-rating {
@@ -1132,7 +1190,22 @@
   color: #fff;
 }
 
+/* tip back-link chip inside an item */
+.imogen-page .im-item-tiplink {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pink);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--pink) 45%, transparent);
+}
+.imogen-page .im-item-tiplink:hover { color: var(--ink); }
+
 /* collapsible whole-section (Apps, Things I learnt, A heads-up, …) */
+.imogen-page .im-coll { scroll-margin-top: 16px; }
 .imogen-page .im-coll-head {
   display: flex;
   align-items: center;

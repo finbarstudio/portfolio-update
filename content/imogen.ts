@@ -35,6 +35,8 @@ export type DoItem = {
   star?: boolean;
   /** Small images shown in the expanded detail; tap to enlarge. */
   imgs?: string[];
+  /** A pointer back to a tip/section at the top, e.g. {label:"Moped tips", href:"#learnt"}. */
+  tip?: { label: string; href: string };
 };
 
 export type Hostel = {
@@ -399,6 +401,7 @@ export const stops: Stop[] = [
         rating: 8,
         rec: "must",
         note: "Get a moped, no question. It's how you do Pai, the hills, the waterfalls, and the hippie communes are all spread out and you need one to reach them.",
+        tip: { label: "Moped tips", href: "#learnt" },
         kind: "do",
       },
       {
@@ -601,7 +604,8 @@ export const stops: Stop[] = [
       {
         name: "Rent a moped",
         rating: 9,
-        note: "Do this, it's a must. The scenery here is unreal and riding around it is the best way to see it. (Check the moped tips above.)",
+        note: "Do this, it's a must. The scenery here is unreal and riding around it is the best way to see it.",
+        tip: { label: "Moped tips", href: "#learnt" },
         kind: "do",
       },
       {
@@ -635,7 +639,8 @@ export const stops: Stop[] = [
       {
         name: "Jaidee Bar",
         rating: 7,
-        note: "A decent bar in its own right. Quick heads-up so it's not a surprise: bars here will openly offer you drugs if you ask, which is wild given how illegal it all is in Laos. Everyone seems to know, but the smart move is to steer well clear, the safety note above is there for a reason.",
+        note: "A decent bar in its own right. Quick heads-up so it's not a surprise: bars here will openly offer you drugs if you ask, which is wild given how illegal it all is in Laos. Everyone seems to know, but the smart move is to steer well clear.",
+        tip: { label: "Read the drinks heads-up", href: "#heads-up" },
         maps: "Jaidee Bar Vang Vieng",
         kind: "night",
       },
@@ -763,7 +768,7 @@ export const stops: Stop[] = [
     vibe: "epic",
     nights: 4,
     blurb:
-      "The most famous thing to do up north, and a proper must. Ha Giang is a province right up on the Chinese border, and \"the loop\" is a big multi-day motorbike circuit through it. There's a short and a long version, do the long one. You book it through a hostel and they handle everything: they pick you up in Hanoi, drive you up to Ha Giang, and you stay the night in their hostel there. The next morning a huge group (like 200 people) sets off together, split into smaller groups each with a leader. You can ride your own bike if you hire one, or take an \"easy rider\" and sit on the back while a local drives. Get the easy rider, honestly. It's far less stressful, the roads are tough, and the riders grew up there so they know every bend. They're lovely too, you end up proper mates, and it means you can actually look up and take the views in. Don't stress the planning either, once you're on the loop your next few days are completely sorted. It was so amazing.",
+      "The most famous thing to do up north, and a proper must. Ha Giang is a province right up on the Chinese border, and \"the loop\" is a big multi-day motorbike circuit through it. There's a short and a long version, do the long one. You book it through a hostel and they handle everything: they pick you up in Hanoi, drive you up to Ha Giang, and you stay the night there. The way it works is the magic of it: there's a huge crowd (like 200 people) but you're split into small groups, so all day, riding to your activities and along the route, it's just your little group and your riders. You get really close with them. Then every evening the whole 200 reunites at a homestay: a big meal, karaoke, all the guides and riders together. That's the best bit. And the homestays are in tiny local villages, so it's not a hotel, it's real life. We got taken to our rider's own home, fed his buffalo in his garden, met his family, saw all this cool local stuff you'd never find on your own. Ride your own bike if you hire one, or take an \"easy rider\" (sit on the back while a local drives), I'd get the easy rider every time: far less stressful, the roads are tough, the riders grew up on them, and you can actually look up and take it in. Don't stress the planning, once you're on the loop your days are completely sorted. So amazing.",
     dos: [
       {
         name: "PIZZAHERE (the pizza near Bong)",
@@ -1079,6 +1084,7 @@ export const stops: Stop[] = [
       {
         name: "Hire a moped",
         note: "Great for getting out to the beach and the rice paddies, but you really only need one if you're staying at Cuckoo's Nest, since it's out of town. If you're in the city itself you can walk most of it.",
+        tip: { label: "Moped tips", href: "#learnt" },
         kind: "do",
       },
       {
