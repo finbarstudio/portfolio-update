@@ -118,7 +118,7 @@ export const trip = {
   weeks: "about 5 weeks",
   routeLine: "Chiang Mai → Laos → Vietnam, top to bottom",
   intro:
-    "Hey Im! So excited for you. I've thrown everything I'd do into here, grab whatever's useful and ignore the rest. It's built for your phone so you can keep it open as you go. The dates are totally rough, just a sketch to move around.",
+    "Everything I'd do out here, in one place. Grab what's useful, ignore the rest. The dates are rough, just a sketch to move around.",
 };
 
 // ── Apps you'll actually use ───────────────────────────────────────────────
