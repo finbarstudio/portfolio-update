@@ -249,18 +249,28 @@
 /* 9/10 stops: a gold STAR pin, with the same cream outline + shadow as the circles */
 .imogen-page .im-pin.is-top { z-index: 3; }
 .imogen-page .im-pin.is-top .im-pin-dot {
-  width: 28px;
-  height: 28px;
+  width: 27px;
+  height: 27px;
   border: none;
   border-radius: 0;
-  background: #e3a82a;
+  background: transparent;
+  box-shadow: none;
   color: #fff;
   font-size: 10px;
-  clip-path: var(--star);
-  filter: var(--star-filter);
+  filter: drop-shadow(0 2px 4px rgba(36, 31, 26, 0.45));
 }
+/* Layered star: a larger white star behind (the outline) + the gold star on
+   top, both behind the number. drop-shadow chains read as no outline at all, so
+   the ring is a real second shape instead. */
+.imogen-page .im-pin.is-top .im-pin-dot::before,
+.imogen-page .im-pin.is-top .im-pin-dot::after {
+  content: "";
+  position: absolute;
+  clip-path: var(--star);
+}
+.imogen-page .im-pin.is-top .im-pin-dot::before { inset: 0; z-index: -1; background: #e3a82a; }
+.imogen-page .im-pin.is-top .im-pin-dot::after { inset: -3px; z-index: -2; background: #fff; }
 .imogen-page .im-pin.is-top .im-pin-star { display: none; } /* the pin itself is the star */
-.imogen-page .im-leg-star { margin-left: 4px; color: #d8932a; font-size: 12px; }
 .imogen-page .im-pin.is-planned .im-pin-dot {
   background: var(--bg-raised);
   color: var(--c, var(--ink-soft));
@@ -767,12 +777,20 @@
 .imogen-page .im-map-key-item { display: inline-flex; align-items: center; gap: 5px; }
 .imogen-page .im-map-key-star {
   flex: none;
+  position: relative;
   display: inline-block;
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  clip-path: var(--star);
+  filter: drop-shadow(0 1px 1.5px rgba(36, 31, 26, 0.35));
+}
+.imogen-page .im-map-key-star::before {
+  content: "";
+  position: absolute;
+  inset: 1.6px;
   background: #e3a82a;
   clip-path: var(--star);
-  filter: var(--star-filter);
 }
 .imogen-page .im-map-key-grey { width: 11px; height: 11px; border-radius: 50%; background: var(--ink-soft); opacity: 0.5; }
 .imogen-page .im-map-legend {
@@ -820,6 +838,24 @@
   color: var(--c, var(--ink-soft));
   border: 1.5px dashed var(--c, var(--line));
 }
+/* 9/10 stops: the numbered dot itself becomes a gold star (same layered
+   outline as the map pins), so the number sits inside the star. */
+.imogen-page .im-leg-dot.is-top {
+  position: relative;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  filter: drop-shadow(0 1px 1.5px rgba(36, 31, 26, 0.3));
+}
+.imogen-page .im-leg-dot.is-top::before,
+.imogen-page .im-leg-dot.is-top::after {
+  content: "";
+  position: absolute;
+  clip-path: var(--star);
+}
+.imogen-page .im-leg-dot.is-top::before { inset: 0; z-index: -1; background: #e3a82a; }
+.imogen-page .im-leg-dot.is-top::after { inset: -2.5px; z-index: -2; background: #fff; }
 
 /* floating "jump to the map" button */
 .imogen-page .im-map-fab {

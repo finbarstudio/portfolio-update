@@ -122,9 +122,10 @@ export default function RouteMap() {
         {route.map((p) => {
           const inner = (
             <>
-              <span className={`im-leg-dot ${markerClass(p)}`}>{markerText(p)}</span>
+              <span className={`im-leg-dot ${markerClass(p)} ${TOP_IDS.has(p.id) ? "is-top" : ""}`}>
+                {markerText(p)}
+              </span>
               {p.name}
-              {TOP_IDS.has(p.id) && <span className="im-leg-star" aria-hidden="true">★</span>}
             </>
           );
           return (
