@@ -14,6 +14,7 @@ import TripGraph from "@/components/imogen/TripGraph";
 import StopCard from "@/components/imogen/StopCard";
 import Highlights from "@/components/imogen/Highlights";
 import CollapsibleSection from "@/components/imogen/CollapsibleSection";
+import MapFab from "@/components/imogen/MapFab";
 import Reveal from "@/components/imogen/Reveal";
 
 export default function ImogenPage() {
@@ -23,6 +24,7 @@ export default function ImogenPage() {
 
   return (
     <>
+      <MapFab />
       <header className="im-bar">
         <span className="im-bar-name">
           {trip.who}&apos;s Asia
@@ -48,9 +50,9 @@ export default function ImogenPage() {
             </div>
             <p className="im-hero-intro">{trip.intro}</p>
             <div className="im-route-chips">
-              <span className="im-chip c-thailand">Thailand</span>
-              <span className="im-chip c-laos">Laos</span>
-              <span className="im-chip c-vietnam">Vietnam</span>
+              <span className="im-chip c-thailand">🇹🇭 Thailand</span>
+              <span className="im-chip c-laos">🇱🇦 Laos</span>
+              <span className="im-chip c-vietnam">🇻🇳 Vietnam</span>
             </div>
           </Reveal>
         </section>

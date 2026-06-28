@@ -1,4 +1,4 @@
-import { stops, trip, type Country, type Stop } from "@/content/imogen";
+import { stops, trip, COUNTRY_FLAG, type Country, type Stop } from "@/content/imogen";
 
 /**
  * TripGraph — the trip as one continuous line FIXED to the real trip length
@@ -39,7 +39,7 @@ export default function TripGraph() {
       <div className="im-tl-axis">
         {groups.map((g) => (
           <div key={g.country} className={`im-tl-axis-item ${COUNTRY_CLASS[g.country]}`} style={{ flexGrow: g.nights }}>
-            <span className="im-tl-axis-country">{g.country} · {g.nights}n</span>
+            <span className="im-tl-axis-country">{COUNTRY_FLAG[g.country]} {g.country} · {g.nights}n</span>
             <span className="im-tl-axis-places">{g.places.map((p) => p.name).join(", ")}</span>
           </div>
         ))}

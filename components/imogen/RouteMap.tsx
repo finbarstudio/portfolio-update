@@ -1,5 +1,8 @@
-import { route, type Country, type RoutePoint } from "@/content/imogen";
+import { route, stops, type Country, type RoutePoint } from "@/content/imogen";
 import { COUNTRIES, LABELS, VB_W, VB_H, project } from "./geo";
+
+// Stops rated 9 or 10 get a star on their pin + in the legend.
+const TOP_IDS = new Set(stops.filter((s) => s.rating != null && s.rating >= 9).map((s) => s.id));
 
 /**
  * RouteMap — the big map, drawn on Finbar's traced SE Asia outlines (geo.ts /
@@ -68,8 +71,14 @@ export default function RouteMap() {
           const { x, y } = project(p.lon, p.lat);
           const left = `${(x / VB_W) * 100}%`;
           const top = `${(y / VB_H) * 100}%`;
-          const cls = `im-pin ${markerClass(p)}`;
-          const dot = <span className="im-pin-dot">{markerText(p)}</span>;
+          const isTop = TOP_IDS.has(p.id);
+          const cls = `im-pin ${markerClass(p)} ${isTop ? "is-top" : ""}`;
+          const dot = (
+            <span className="im-pin-dot">
+              {markerText(p)}
+              {isTop && <span className="im-pin-star" aria-hidden="true">★</span>}
+            </span>
+          );
           return p.detailed ? (
             <a key={p.id} className={cls} style={{ left, top }} href={`#stop-${p.id}`} aria-label={p.name}>
               {dot}
@@ -88,6 +97,7 @@ export default function RouteMap() {
             <>
               <span className={`im-leg-dot ${markerClass(p)}`}>{markerText(p)}</span>
               {p.name}
+              {TOP_IDS.has(p.id) && <span className="im-leg-star" aria-hidden="true">★</span>}
             </>
           );
           return (

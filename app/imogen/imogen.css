@@ -238,6 +238,19 @@
   box-shadow: 0 2px 6px rgba(36, 31, 26, 0.25);
   border: 2px solid var(--bg-raised);
 }
+.imogen-page .im-pin-dot { position: relative; }
+/* star on the pins of 9/10 stops */
+.imogen-page .im-pin-star {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 12px;
+  line-height: 1;
+  color: #c8922e;
+  text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.35);
+}
+.imogen-page .im-pin.is-top .im-pin-dot { box-shadow: 0 0 0 2px #e0bd6f, 0 2px 6px rgba(36, 31, 26, 0.25); }
+.imogen-page .im-leg-star { margin-left: 4px; color: #c8922e; font-size: 11px; }
 .imogen-page .im-pin.is-planned .im-pin-dot {
   background: var(--bg-raised);
   color: var(--c, var(--ink-soft));
@@ -748,6 +761,33 @@
   color: var(--c, var(--ink-soft));
   border: 1.5px dashed var(--c, var(--line));
 }
+
+/* floating "jump to the map" button */
+.imogen-page .im-map-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 18px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 15px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 8px 22px -8px rgba(36, 31, 26, 0.55);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.imogen-page .im-map-fab.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+.imogen-page .im-map-fab-icon { font-size: 14px; }
 
 /* ── trip timeline (one continuous line, grouped + labelled by country) ── */
 .imogen-page .im-tl-bar {

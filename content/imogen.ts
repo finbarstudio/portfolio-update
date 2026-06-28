@@ -1193,6 +1193,13 @@ export function ratingColor(rating?: number): string | null {
 }
 export const STAR_COLOR = "#c8922e"; // gold — the single standout (Dinh)
 
+/** Flag emoji per country, for tasteful little accents. */
+export const COUNTRY_FLAG: Record<Country, string> = {
+  Thailand: "🇹🇭",
+  Laos: "🇱🇦",
+  Vietnam: "🇻🇳",
+};
+
 // ── Highlights: every 9 and 10 across the trip, for the strip near the top ──
 export type Highlight = {
   label: string;

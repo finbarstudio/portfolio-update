@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { mapsUrl, ratingColor, STAR_COLOR, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
+import { mapsUrl, ratingColor, STAR_COLOR, COUNTRY_FLAG, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
 import LoopTable from "./LoopTable";
 
 /**
@@ -105,7 +105,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
         <span className="im-stop-headtext">
           <span className="im-stop-name">{stop.name}</span>
           <span className="im-stop-meta">
-            <span className="im-stop-country">{stop.country}</span>
+            <span className="im-stop-country">{COUNTRY_FLAG[stop.country]} {stop.country}</span>
             {stop.rating != null && (
               <span
                 className="im-stop-rating"
