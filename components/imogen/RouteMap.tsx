@@ -4,6 +4,13 @@ import { COUNTRIES, LABELS, VB_W, VB_H, project } from "./geo";
 // Stops rated 9 or 10 get a star on their pin + in the legend.
 const TOP_IDS = new Set(stops.filter((s) => s.rating != null && s.rating >= 9).map((s) => s.id));
 
+const FLAG_BY_LABEL: Record<string, string> = {
+  THAILAND: "🇹🇭",
+  LAOS: "🇱🇦",
+  VIETNAM: "🇻🇳",
+  CAMBODIA: "🇰🇭",
+};
+
 /**
  * RouteMap — the big map, drawn on Finbar's traced SE Asia outlines (geo.ts /
  * sea-geo.ts). Pins are projected from real lon/lat by project(). To stay
@@ -49,18 +56,31 @@ export default function RouteMap() {
 
           {LABELS.map((l) => {
             const { x, y } = project(l.lon, l.lat);
+            const flag = FLAG_BY_LABEL[l.t];
             return (
-              <text
-                key={l.t}
-                className={`im-map-label ${l.muted ? "is-muted" : ""}`}
-                x={x}
-                y={y}
-                textAnchor="middle"
-                fontSize={l.muted ? 2.1 : 2.6}
-                letterSpacing={0.35}
-              >
-                {l.t}
-              </text>
+              <g key={l.t}>
+                {flag && (
+                  <text
+                    className={`im-map-flag ${l.muted ? "is-muted" : ""}`}
+                    x={x}
+                    y={y - 3.4}
+                    textAnchor="middle"
+                    fontSize={l.muted ? 3 : 3.8}
+                  >
+                    {flag}
+                  </text>
+                )}
+                <text
+                  className={`im-map-label ${l.muted ? "is-muted" : ""}`}
+                  x={x}
+                  y={y}
+                  textAnchor="middle"
+                  fontSize={l.muted ? 2.1 : 2.6}
+                  letterSpacing={0.35}
+                >
+                  {l.t}
+                </text>
+              </g>
             );
           })}
 

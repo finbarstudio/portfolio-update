@@ -789,76 +789,92 @@
 .imogen-page .im-map-fab.is-visible { opacity: 1; transform: none; pointer-events: auto; }
 .imogen-page .im-map-fab-icon { font-size: 14px; }
 
-/* ── trip timeline (one continuous line, grouped + labelled by country) ── */
+/* ── trip timeline (ordered segments + leader-line country labels) ──────── */
+.imogen-page .im-tl-track { position: relative; }
 .imogen-page .im-tl-bar {
   display: flex;
-  gap: 4px;
-  height: 28px;
-  border-radius: 999px;
+  gap: 1.5px;
+  height: 26px;
+  border-radius: 7px;
   overflow: hidden;
-  background: var(--bg-sunken);
+  background: var(--line);
 }
-.imogen-page .im-tl-group {
-  display: flex;
-  gap: 2px;
-  min-width: 0;
-}
-/* labels above the bar: country + the places in it, aligned to each span */
-.imogen-page .im-tl-axis {
-  display: flex;
-  gap: 4px;
-  align-items: flex-end;
-  margin-bottom: 8px;
-}
-.imogen-page .im-tl-axis-item {
+.imogen-page .im-tl-seg {
+  position: relative;
   flex-basis: 0;
-  min-width: 0;
+  flex-shrink: 1;
+  min-width: 11px;
+  display: grid;
+  place-items: center;
+  background: var(--c, var(--ink));
+}
+.imogen-page .im-tl-seg-n {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+.imogen-page .im-tl-seg.is-travel { background: #6f86c9; }
+
+/* country labels off the bar, on a short leader line; alternate above/below */
+.imogen-page .im-tl-side { position: relative; }
+.imogen-page .im-tl-side.is-above { height: 64px; }
+.imogen-page .im-tl-side.is-below { height: 58px; }
+.imogen-page .im-tl-cap {
+  position: absolute;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  width: max-content;
+  max-width: 48%;
+  text-align: center;
 }
-.imogen-page .im-tl-axis-country {
+.imogen-page .im-tl-cap.is-above { bottom: 0; }
+.imogen-page .im-tl-cap.is-below { top: 0; }
+.imogen-page .im-tl-cap-name {
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--c, var(--ink));
+  display: block;
 }
-.imogen-page .im-tl-axis-item.is-rest .im-tl-axis-country { color: #8e9aae; }
-.imogen-page .im-tl-axis-places {
-  font-size: 11px;
-  line-height: 1.3;
+.imogen-page .im-tl-cap-places {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  line-height: 1.25;
   color: var(--ink-soft);
 }
-.imogen-page .im-tl-seg {
-  flex-basis: 0;
-  flex-shrink: 1;
-  min-width: 4px;
-  background: var(--c, var(--ink));
-}
-.imogen-page .im-tl-legend { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 13px; }
-.imogen-page .im-tl-key { display: inline-flex; align-items: center; gap: 6px; }
-.imogen-page .im-tl-key-dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--ink)); }
-.imogen-page .im-tl-key-name {
+.imogen-page .im-tl-lead { width: 1.5px; height: 10px; background: var(--c, var(--ink-soft)); opacity: 0.55; margin-top: 5px; }
+.imogen-page .im-tl-cap.is-below .im-tl-lead { margin: 0 0 5px; }
+
+.imogen-page .im-tl-dates {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 10px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--ink);
+  color: var(--ink-soft);
 }
-.imogen-page .im-tl-key-n { font-family: var(--font-space-mono), ui-monospace, monospace; font-size: 10px; color: var(--ink-soft); }
-.imogen-page .im-tl-seg.is-rest { background: #8e9aae; }
-.imogen-page .im-tl-key.is-rest .im-tl-key-dot { background: #8e9aae; }
-.imogen-page .im-tl-key.is-rest .im-tl-key-name { color: var(--ink-soft); }
-.imogen-page .im-tl-total {
+.imogen-page .im-tl-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 12px;
   font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.02em;
   color: var(--ink-soft);
-  text-align: center;
-  margin-top: 16px;
 }
+.imogen-page .im-tl-keyitem { display: inline-flex; align-items: center; gap: 6px; }
+.imogen-page .im-tl-keydot { flex: 0 0 auto; width: 11px; height: 11px; border-radius: 3px; }
+.imogen-page .im-tl-keydot.is-travel { background: #6f86c9; }
 
 /* ── Ha Giang Loop hostel comparison ───────────────────────────────────── */
 .imogen-page .im-loop-intro { font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 4px; }
@@ -1081,6 +1097,17 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);
+}
+.imogen-page .im-stop-nights {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--pink-soft);
+  border-radius: 7px;
+  padding: 3px 8px;
 }
 
 /* item expand chevron — a clear little button so it's obvious items open */

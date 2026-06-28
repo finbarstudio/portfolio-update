@@ -75,12 +75,11 @@ export default function StopCard({
   }, [stop.id]);
 
   const isTravel = stop.kind === "travel";
-  const dateStr = dates
-    ? `≈ ${dates.from} – ${dates.to} · ${
-        dates.nights != null
-          ? `${dates.nights} ${dates.nights === 1 ? "night" : "nights"}`
-          : `${dates.days} days on the move`
-      }`
+  const dateStr = dates ? `≈ ${dates.from} – ${dates.to}` : null;
+  const nightsLabel = dates
+    ? dates.nights != null
+      ? `${dates.nights} ${dates.nights === 1 ? "night" : "nights"}`
+      : `${dates.days} days moving`
     : null;
 
   const hostels = stop.hostels ?? (stop.hostel ? [stop.hostel] : []);
@@ -130,6 +129,7 @@ export default function StopCard({
               <span className="im-top-star" aria-hidden="true">★</span>
             )}
             {stop.vibe && <span className="im-stop-vibe">{stop.vibe}</span>}
+            {nightsLabel && <span className="im-stop-nights">{nightsLabel}</span>}
             {dateStr && <span className="im-stop-dates">{dateStr}</span>}
           </span>
         </span>
