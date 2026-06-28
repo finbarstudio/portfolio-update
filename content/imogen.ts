@@ -855,6 +855,12 @@ export const stops: Stop[] = [
         kind: "do",
       },
       {
+        name: "Get a suit tailored",
+        note: "Hoi An is famous for its tailors, and we all got suits made, such a cool experience. Order it early in your stay so it's done and fitted before you move on.",
+        maps: "Hoi An tailors",
+        kind: "do",
+      },
+      {
         name: "Hostel drinks + a night out",
         note: "Do the hostel drinks and head out with the group on their nights. Great crowd at Cuckoo's Nest.",
         kind: "night",
