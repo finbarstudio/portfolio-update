@@ -833,8 +833,32 @@ export const stops: Stop[] = [
     country: "Vietnam",
     nights: 2,
     blurb:
-      "You roll into Hoi An at the end of the pass, through Da Nang. The two are right next to each other, so you can easily do trips back and forth between them.",
+      "Hoi An was my favourite place of the whole trip. You roll in at the end of the pass (through Da Nang), and honestly I don't think you'll want to leave. Hire a moped for sure. Do the hostel drinks and head out with the group on their nights, but make sure you get into the old town itself, the lanterns and the river, that's the real magic.",
+    hostel: {
+      name: "Cuckoo's Nest",
+      maps: "Cuckoo's Nest Hostel Hoi An",
+      rec: "must",
+      note: "Stay here. So social and such a good vibe, I genuinely don't think you'll want to leave.",
+    },
     dos: [
+      {
+        name: "Hire a moped",
+        rec: "must",
+        note: "Do it for sure. It's the best way to get around Hoi An and out to the beach and the rice paddies.",
+        kind: "do",
+      },
+      {
+        name: "The old town",
+        rec: "must",
+        note: "The heart of it: lantern-lit streets, the river, the tailors, the food. Spend your evenings here, not just at the hostel.",
+        maps: "Hoi An Ancient Town",
+        kind: "do",
+      },
+      {
+        name: "Hostel drinks + a night out",
+        note: "Do the hostel drinks and head out with the group on their nights. Great crowd at Cuckoo's Nest.",
+        kind: "night",
+      },
       {
         name: "Da Nang",
         note: "You come out of the hills and into Da Nang on the way in. It's got a bit of a tacky feel, loads of high-end resorts strung along the coast, and it was busy. I didn't actually stop, and I reckon you'll prefer Hoi An, but it looked kind of cool and I'd have gone with more time. You just drive through it into Hoi An.",
