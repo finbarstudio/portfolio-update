@@ -650,6 +650,156 @@ export const stops: Stop[] = [
       note: "After this you're set to head south down the coast.",
     },
   },
+  {
+    id: "ninh-binh",
+    kind: "place",
+    name: "Ninh Binh",
+    country: "Vietnam",
+    nights: 2,
+    blurb:
+      "First proper stop heading south, and I wouldn't skip it. Limestone karsts, rivers and caves, a bit like a greener Halong but on land. Rent a moped or a bicycle from the hostel and just explore. The real highlight, though, was the hostel.",
+    hostel: {
+      name: "Banana Tree Hostel",
+      maps: "Banana Tree Hostel Ninh Binh",
+      rating: 8,
+      note: "One of the best hostels I stayed at, genuinely. Lovely pool, right on the river, and a great spot to rent a moped or bike. Book it.",
+    },
+    dos: [
+      {
+        name: "Lying Dragon Mountain (Mua Caves)",
+        rating: 9,
+        note: "Drive your moped out and hike up to the top. Super cool, and the view over the karsts is unreal.",
+        maps: "Mua Caves Lying Dragon Mountain Ninh Binh",
+        kind: "do",
+      },
+      {
+        name: "The grottos",
+        note: "The little boat trips through the caves and karsts are lovely.",
+        maps: "Tam Coc Ninh Binh",
+        kind: "do",
+      },
+      {
+        name: "The bus karaoke (the Local Bar)",
+        rating: 9,
+        note: "Right by Banana Tree: old buses converted into karaoke bars, parked up, with locals singing their hearts out. You just hang there and walk back to the hostel. So cool.",
+        maps: "Boat Station Thai Vi Street Tam Coc Ninh Binh",
+        kind: "night",
+      },
+      {
+        name: "DUC DAT Fastfood and Drink",
+        rating: 8,
+        note: "Recommended. The family who run it were so lovely. They had 'happy water' (the homemade rice wine that becomes a running joke on the Ha Giang loop) and were thrilled to share it with us. Eat here.",
+        maps: "DUC DAT Fastfood and Drink Ninh Binh",
+        kind: "food",
+      },
+      {
+        name: "Duck Farm",
+        note: "Good food spot nearby.",
+        maps: "Duck Farm Ninh Binh",
+        kind: "food",
+      },
+      {
+        name: "Bus Bar Pub Tam Coc",
+        note: "Open late and fun. The whole hostel ends up out, just follow them.",
+        maps: "Bus bar pub Tam Coc Ninh Binh",
+        kind: "night",
+      },
+    ],
+    leg: {
+      to: "South to Phong Nha (or straight to Hue)",
+      mode: "Bus south, book on Vexere or through the hostel",
+      note: "Next is Phong Nha if you fancy it, then Hue.",
+    },
+  },
+  {
+    id: "phong-nha",
+    kind: "place",
+    name: "Phong Nha",
+    country: "Vietnam",
+    nights: 1,
+    blurb:
+      "Full honesty: I skipped this one to keep moving south, but my friends went and raved about it. It's all about the caves. Totally up to you and how your timing is looking.",
+    dos: [
+      {
+        name: "The caves",
+        note: "The whole reason to come. My friends rated it really highly.",
+        maps: "Phong Nha Ke Bang caves",
+        kind: "do",
+      },
+    ],
+    leg: {
+      to: "South to Hue",
+      mode: "Bus south",
+      note: "On to Hue, which is really about one thing (next).",
+    },
+  },
+  {
+    id: "hue",
+    kind: "place",
+    name: "Hue",
+    country: "Vietnam",
+    nights: 1,
+    blurb:
+      "Honest take: Hue was a bit boring, more of a local city than a backpacker spot. The real reason to come is to ride the Hai Van Pass out of it. So treat it as a quick one-nighter, then ride.",
+    dos: [
+      {
+        name: "Abandoned waterpark (Hồ Thuỷ Tiên)",
+        rating: 6,
+        note: "An eerie abandoned waterpark you can wander around. We ran out of time and didn't make it, but it looked cool. Up to you.",
+        maps: "Ho Thuy Tien abandoned waterpark Hue",
+        kind: "do",
+      },
+    ],
+    leg: {
+      to: "Hoi An, via the Hai Van Pass",
+      mode: "The ride (next card)",
+      note: "This is the bit you came for.",
+    },
+  },
+  {
+    id: "hai-van",
+    kind: "travel",
+    name: "The Hai Van Pass",
+    country: "Vietnam",
+    days: 1,
+    blurb:
+      "This was unreal, a 9.5/10. We took easy riders on the Ha Giang loop and never drove ourselves, so we did this one on our own bikes, and it was the best. You ride from Hue up through the mountains and back down to the coast, through Da Nang and into Hoi An. It rained on us but it was warm and just so much fun.",
+    dos: [
+      {
+        name: "Ride the pass",
+        rating: 9.5,
+        note: "Plenty of companies set it up: you ride Hue → Hoi An and they collect the bike from Hoi An at the other end. It's popular and it felt safe, I'd put the risk at about 3/10. Go with people, and convince someone to do it with you. If you'd rather not drive, you can hire a jeep and have someone drive you, but the bike is so worth it.",
+        kind: "do",
+      },
+    ],
+    leg: {
+      to: "Hoi An",
+      mode: "You arrive into Hoi An, through Da Nang",
+      note: "Once you're there you can bounce between Da Nang and Hoi An.",
+    },
+  },
+  {
+    id: "hoi-an",
+    kind: "place",
+    name: "Hoi An",
+    country: "Vietnam",
+    nights: 2,
+    blurb:
+      "You roll into Hoi An at the end of the pass, through Da Nang. The two are right next to each other, so you can easily do trips back and forth between them.",
+    dos: [
+      {
+        name: "Bounce to Da Nang",
+        note: "Da Nang and Hoi An are close and easy to go between, beaches and city one side, old town the other.",
+        maps: "Da Nang Vietnam",
+        kind: "do",
+      },
+    ],
+    leg: {
+      to: "Further south",
+      mode: "Carry on down the coast",
+      note: "Nha Trang and Ho Chi Minh City are next.",
+    },
+  },
 ];
 
 // ── The map: full intended route. Detailed points link to a stop card. ─────
@@ -666,9 +816,12 @@ export const route: RoutePoint[] = [
   { id: "ha-giang", name: "Ha Giang", country: "Vietnam", lon: 104.98, lat: 22.82, detailed: true, side: true, from: "hanoi", flip: true },
   { id: "sapa", name: "Sapa", country: "Vietnam", lon: 103.84, lat: 22.34, detailed: true, side: true, from: "hanoi", flip: true },
   { id: "halong-bay", name: "Halong Bay", country: "Vietnam", lon: 107.04, lat: 20.91, detailed: true, side: true, from: "hanoi" },
-  { id: "hue-hoi-an", n: 5, name: "Huế & Hội An", country: "Vietnam", lon: 107.9, lat: 16.2 },
-  { id: "nha-trang", n: 6, name: "Nha Trang", country: "Vietnam", lon: 109.19, lat: 12.24 },
-  { id: "hcmc", n: 7, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76 },
+  { id: "ninh-binh", n: 5, name: "Ninh Binh", country: "Vietnam", lon: 105.97, lat: 20.25, detailed: true },
+  { id: "phong-nha", n: 6, name: "Phong Nha", country: "Vietnam", lon: 106.28, lat: 17.59, detailed: true },
+  { id: "hue", n: 7, name: "Huế", country: "Vietnam", lon: 107.58, lat: 16.46, detailed: true },
+  { id: "hoi-an", n: 8, name: "Hội An", country: "Vietnam", lon: 108.34, lat: 15.88, detailed: true },
+  { id: "nha-trang", n: 9, name: "Nha Trang", country: "Vietnam", lon: 109.19, lat: 12.24 },
+  { id: "hcmc", n: 10, name: "Ho Chi Minh City", country: "Vietnam", lon: 106.66, lat: 10.76 },
 ];
 
 // ── Rough date helper ──────────────────────────────────────────────────────

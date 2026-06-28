@@ -37,8 +37,9 @@ type UItem = {
 };
 
 function recLevel(rec?: "must" | "low", rating?: number): "must" | "low" | "mid" {
+  // Finbar rates harsh: 6–7 is good, 9+ is amazing, 5 and under is weak.
   if (rec === "must" || (rating != null && rating >= 9)) return "must";
-  if (rec === "low" || (rating != null && rating <= 6)) return "low";
+  if (rec === "low" || (rating != null && rating <= 5)) return "low";
   return "mid";
 }
 
@@ -137,6 +138,7 @@ export default function StopCard({ stop, dates, badge }: { stop: Stop; dates?: S
                               <span className="im-item-dot" aria-hidden="true" />
                               <span className="im-item-title">{it.title}</span>
                             </button>
+                            {it.rating != null && <span className="im-item-rating">{it.rating}/10</span>}
                             {it.maps && (
                               <a className="im-item-map" href={mapsUrl(it.maps)} target="_blank" rel="noopener noreferrer">
                                 Map ↗

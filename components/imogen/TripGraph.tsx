@@ -2,10 +2,10 @@ import { stops, type Country } from "@/content/imogen";
 
 /**
  * TripGraph — the trip as one continuous line, split into places by how many
- * nights you spend in each, so the pacing is easy to read at a glance. Spine
- * place-stops only; side trips (Pai, Ha Giang) sit on top of this and travel
- * days aren't counted. Segments + their labels share the same flex-grow so they
- * line up.
+ * nights you spend in each. The bar shows the split; a wrapping legend names the
+ * segments (so it scales to lots of stops without the labels colliding). Spine
+ * place-stops only; side trips (Pai, Ha Giang, Sapa, Halong) sit on top and
+ * travel days aren't counted.
  */
 const COUNTRY_CLASS: Record<Country, string> = {
   Thailand: "c-thailand",
@@ -29,12 +29,13 @@ export default function TripGraph() {
           />
         ))}
       </div>
-      <div className="im-tl-keys">
+      <div className="im-tl-legend">
         {places.map((s) => (
-          <div key={s.id} className="im-tl-key" style={{ flexGrow: s.nights }}>
+          <span key={s.id} className={`im-tl-key ${COUNTRY_CLASS[s.country]}`}>
+            <span className="im-tl-key-dot" aria-hidden="true" />
             <span className="im-tl-key-name">{s.name}</span>
             <span className="im-tl-key-n">{s.nights}n</span>
-          </div>
+          </span>
         ))}
       </div>
       <p className="im-tl-total">
