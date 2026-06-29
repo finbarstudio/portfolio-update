@@ -36,11 +36,11 @@ const BATCH: Builder[] = [
       subject: "Your homes vs your website",
       body: `Hi Edward,
 
-I'm Finbar, a designer based in Brisbane. I came across Foundation Homes while looking at the best custom builders on the Sunshine Coast, and the work genuinely stopped me. Amani Palace, the Doonan and Noosa homes, six Master Builders wins including a Queensland Custom Home of the Year.
+I'm Finbar, a designer based in Brisbane. I went looking for the best custom builders on the Sunshine Coast and kept coming back to yours. Amani Palace, the Doonan and Noosa homes, six Master Builders wins including a Queensland Custom Home of the Year.
 
-Then I opened the website. It still reads 2019 and runs on an old template, and it just doesn't do the homes justice. So rather than send you a pitch, I rebuilt it.
+Then I opened the website. It still reads 2019 and runs on an old template, so it doesn't do the homes justice. Rather than send you a pitch, I rebuilt it.
 
-I put together a short page explaining what I noticed, with a working demo of your site, home, projects and about, all custom built around your own photography:
+There's a short page on what I noticed, plus a working demo (home, projects and about) built around your own photography:
 
 finbar.studio/foundation-homes
 
@@ -65,11 +65,11 @@ finbar.studio`,
       subject: "Your homes vs your website",
       body: `Hi Billy,
 
-I'm Finbar, a designer based in Brisbane. I came across Resolve while looking at the best builders on the Gold Coast, and the work genuinely stopped me. Neu Burleigh, Villa Franco, the Lowry Farmhouse, eleven Master Builders wins with five in 2025 alone.
+I'm Finbar, a designer based in Brisbane. I went looking for the best builders on the Gold Coast and yours pulled me up short. Neu Burleigh, Villa Franco, the Lowry Farmhouse, eleven Master Builders wins with five in 2025 alone.
 
-Then I opened the website. It's built like it's still 2014, and it just doesn't do the homes justice. So rather than send you a pitch, I rebuilt it.
+Then I opened the website. It's built like it's still 2014, so it doesn't do the homes justice. Rather than send you a pitch, I rebuilt it.
 
-I put together a short page explaining what I noticed, with a working demo of your site, home, projects and about, all custom built around your own photography:
+There's a short page on what I noticed, plus a working demo (home, projects and about) built around your own photography:
 
 finbar.studio/resolve-construction
 
@@ -94,11 +94,11 @@ finbar.studio`,
       subject: "Your homes vs your website",
       body: `Hi Ross,
 
-I'm Finbar, a designer based in Brisbane. I came across Ross Hogno Constructions while looking at the best builders on the Darling Downs, and the work genuinely stopped me. Twenty years of custom homes, eleven Master Builders awards, the Highfields sloping-site home.
+I'm Finbar, a designer based in Brisbane. I went looking for the best builders on the Darling Downs and yours stood out straight away. Twenty years of custom homes, eleven Master Builders awards, the Highfields sloping-site home.
 
-Then I opened the website. It's an old slider template now, and it just doesn't do the homes justice. So rather than send you a pitch, I rebuilt it.
+Then I opened the website. It's an old slider template now, so it doesn't do the homes justice. Rather than send you a pitch, I rebuilt it.
 
-I put together a short page explaining what I noticed, with a working demo of your site, home, projects and about, all custom built around your own photography:
+There's a short page on what I noticed, plus a working demo (home, projects and about) built around your own photography:
 
 finbar.studio/ross-hogno
 
@@ -123,11 +123,11 @@ finbar.studio`,
       subject: "Your homes vs your website",
       body: `Hi David and Natasha,
 
-I'm Finbar, a designer based in Brisbane. I came across David Radic Prestige Homes while looking at the best builders on the Gold Coast, and the work genuinely stopped me. The Buccaneer Residence, the Hope Island and Broadbeach waterfronts, an HIA finalist over two million.
+I'm Finbar, a designer based in Brisbane. I went looking for the best builders on the Gold Coast and your homes stopped me. The Buccaneer Residence, the Hope Island and Broadbeach waterfronts, an HIA finalist over two million.
 
-Then I opened the website. It's from around 2016 now, and it just doesn't do the homes justice. So rather than send you a pitch, I rebuilt it.
+Then I opened the website. It's from around 2016 now, so it doesn't do the homes justice. Rather than send you a pitch, I rebuilt it.
 
-I put together a short page explaining what I noticed, with a working demo of your site, home, our homes and about, all custom built around your own photography:
+There's a short page on what I noticed, plus a working demo (home, our homes and about) built around your own photography:
 
 finbar.studio/david-radic
 
@@ -152,11 +152,11 @@ finbar.studio`,
       subject: "Your homes vs your website",
       body: `Hi Gaston,
 
-I'm Finbar, a designer based in Brisbane. I came across GTO Building while looking at the best builders on the Sunshine Coast, and the work genuinely stopped me. Panorama House, the Tristania beach house, your work with Bark and the string of Master Builders wins.
+I'm Finbar, a designer based in Brisbane. I went looking for the best builders on the Sunshine Coast and kept coming back to yours. Panorama House, the Tristania beach house, your work with Bark and the string of Master Builders wins.
 
-Then I opened the website. It's a Wix template now, and it just doesn't do the homes justice. So rather than send you a pitch, I rebuilt it.
+Then I opened the website. It's a Wix template now, so it doesn't do the homes justice. Rather than send you a pitch, I rebuilt it.
 
-I put together a short page explaining what I noticed, with a working demo of your site, home, projects and about, all custom built around your own photography (and your GTO mark, which I really like):
+There's a short page on what I noticed, plus a working demo (home, projects and about) built around your own photography, and your GTO mark, which I really like:
 
 finbar.studio/gto-building
 
@@ -181,11 +181,11 @@ finbar.studio`,
       subject: "Your developments vs your website",
       body: `Hi McLean,
 
-I'm Finbar, a designer based in Brisbane. I came across HM Developments while looking at who's shaping the Sunshine Coast, and the work genuinely stopped me. The Cove at Pelican Waters, the sold-out terraces, the Caloundra projects in the pipeline.
+I'm Finbar, a designer based in Brisbane. I was looking at who's shaping the Sunshine Coast and your work kept coming up. The Cove at Pelican Waters, the sold-out terraces, the Caloundra projects in the pipeline.
 
-Then I opened the website. The footer still reads 2020 and the story's split across two sites, so it just doesn't do the work justice. Rather than send you a pitch, I rebuilt it.
+Then I opened the website. The footer still reads 2020 and the story's split across two sites, so it doesn't do the work justice. Rather than send you a pitch, I rebuilt it.
 
-I put together a short page explaining what I noticed, with a working demo of your site, home, projects and about, all custom built around your 2024 photography and your existing HM brand:
+There's a short page on what I noticed, plus a working demo (home, projects and about) built around your 2024 photography and your HM brand:
 
 finbar.studio/hm-developments
 
@@ -210,11 +210,11 @@ finbar.studio`,
       subject: "Your developments vs your website",
       body: `Hi there,
 
-I'm Finbar, a designer based in Brisbane. I came across MBC Prestige while looking at who's shaping Noosa, and the work genuinely stopped me. Forty years on the coast, the Kalani riverfront residences, the whole-floor Sunshine Beach apartments.
+I'm Finbar, a designer based in Brisbane. I was looking at who's shaping Noosa and your developments stopped me. Forty years on the coast, the Kalani riverfront residences, the whole-floor Sunshine Beach apartments.
 
-Then I opened the website. It's a 2015 build now, with most of the detail trapped in PDFs, so it just doesn't do the developments justice. Rather than send you a pitch, I rebuilt it.
+Then I opened the website. It's a 2015 build now, with most of the detail trapped in PDFs, so it doesn't do the developments justice. Rather than send you a pitch, I rebuilt it.
 
-I put together a short page explaining what I noticed, with a working demo of your site, home, projects and about, all custom built around your own photography and your existing MBC brand:
+There's a short page on what I noticed, plus a working demo (home, projects and about) built around your own photography and your MBC brand:
 
 finbar.studio/mbc-prestige
 
@@ -238,11 +238,11 @@ finbar.studio`,
       subject: "Your track record vs your website",
       body: `Hi John,
 
-I'm Finbar, a designer based in Brisbane. I came across Brisbane Prestige Property Developments while looking at the city's prestige developers, and the story stood out, forty years across complex, de-risked projects and joint ventures most people won't touch.
+I'm Finbar, a designer based in Brisbane. I was looking at the city's prestige developers and your story stood out. Forty years across complex, de-risked projects and joint ventures most people won't touch.
 
 Then I opened the website. It's a single-page free WordPress template with none of that work shown, so it really doesn't carry the reputation. Rather than send you a pitch, I rebuilt the front of it.
 
-I put together a short page explaining what I noticed, with a working demo, home and about, led by your story and your "unity is strength" philosophy. The obvious next step is a proper project portfolio, which is where most of the lift would be, and something we'd put together:
+There's a short page on what I noticed, plus a working demo (home and about) led by your story and your "unity is strength" philosophy. The obvious next step is a proper project portfolio, which is where most of the lift is and something we'd build with you:
 
 finbar.studio/bppd
 
