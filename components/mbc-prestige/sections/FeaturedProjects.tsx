@@ -7,14 +7,20 @@ const PROJECTS: Project[] = [
     title: "Kalani",
     location: "Noosaville · Gympie Terrace",
     type: "3 Riverfront Residences",
-    images: ["/mbc-prestige/projects/kalani.webp"],
+    images: [
+      "/mbc-prestige/projects/kalani.webp",
+      "/mbc-prestige/projects/kalani-2.webp",
+    ],
   },
   {
     slug: "sails",
     title: "Sails",
     location: "Sunshine Beach",
     type: "Whole-Floor Apartments",
-    images: ["/mbc-prestige/projects/sails.webp"],
+    images: [
+      "/mbc-prestige/projects/sails.webp",
+      "/mbc-prestige/projects/sails-2.webp",
+    ],
   },
   {
     slug: "oceane",

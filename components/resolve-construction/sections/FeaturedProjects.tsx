@@ -9,7 +9,11 @@ const PROJECTS: Project[] = [
     award: "MBA Individual Home Winner",
     awardYear: "24",
     type: "Prestige Waterfront Home",
-    images: ["/resolve-construction/projects/neu-burleigh.webp"],
+    images: [
+      "/resolve-construction/projects/neu-burleigh.webp",
+      "/resolve-construction/projects/neu-burleigh-2.webp",
+      "/resolve-construction/projects/neu-burleigh-3.webp",
+    ],
   },
   {
     slug: "villa-franco",
@@ -18,7 +22,11 @@ const PROJECTS: Project[] = [
     award: "MBA Individual Home Winner",
     awardYear: "25",
     type: "Prestige Custom Home",
-    images: ["/resolve-construction/projects/villa-franco.webp"],
+    images: [
+      "/resolve-construction/projects/villa-franco.webp",
+      "/resolve-construction/projects/villa-franco-2.webp",
+      "/resolve-construction/projects/villa-franco-3.webp",
+    ],
   },
   {
     slug: "sovereign-house",
@@ -27,7 +35,11 @@ const PROJECTS: Project[] = [
     award: "MBA Custom Home Winner",
     awardYear: "22",
     type: "Custom Waterfront Home",
-    images: ["/resolve-construction/projects/sovereign-house.webp"],
+    images: [
+      "/resolve-construction/projects/sovereign-house.webp",
+      "/resolve-construction/projects/sovereign-house-2.webp",
+      "/resolve-construction/projects/sovereign-house-3.webp",
+    ],
   },
   {
     slug: "lowry-farmhouse",
@@ -36,7 +48,11 @@ const PROJECTS: Project[] = [
     award: "MBA Best Use of Sloping Sites",
     awardYear: "25",
     type: "Hinterland Custom Home",
-    images: ["/resolve-construction/projects/lowry-farmhouse.webp"],
+    images: [
+      "/resolve-construction/projects/lowry-farmhouse.webp",
+      "/resolve-construction/projects/lowry-farmhouse-2.webp",
+      "/resolve-construction/projects/lowry-farmhouse-3.webp",
+    ],
   },
   {
     slug: "montego-hills",
@@ -45,7 +61,11 @@ const PROJECTS: Project[] = [
     award: "MBA Custom Home Winner",
     awardYear: "21",
     type: "Custom Home",
-    images: ["/resolve-construction/projects/montego-hills.webp"],
+    images: [
+      "/resolve-construction/projects/montego-hills.webp",
+      "/resolve-construction/projects/montego-hills-2.webp",
+      "/resolve-construction/projects/montego-hills-3.webp",
+    ],
   },
 ];
 
