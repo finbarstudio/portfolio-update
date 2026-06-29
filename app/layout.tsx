@@ -32,11 +32,15 @@ const spaceMono = Space_Mono({
 
 // Dingbat/symbol font (OFL) — quirky Unicode glyphs set inline in the
 // big-type disciplines wall on the home page. --font-dingbat in globals.
+// display:block (not swap) so the glyph slot stays invisible until the symbol
+// font is ready, instead of painting .notdef tofu boxes in the mono fallback
+// (which lacks these glyphs) and flashing a grey box / size jump. The font is
+// preloaded via the "symbols" subset, so the block period is near-instant.
 const notoSymbols = Noto_Sans_Symbols_2({
   variable: "--font-dingbat",
   subsets: ["symbols"],
   weight: ["400"],
-  display: "swap",
+  display: "block",
 });
 
 const SITE_URL = "https://www.finbar.studio";
