@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Archivo, Work_Sans } from "next/font/google";
 import "./gto-building-site.css";
 import SmoothScroll from "@/components/gto-building/SmoothScroll";
+import DemoPreloader from "@/components/DemoPreloader";
 
 // GTO Building demo. Lives outside the (site) route group, so it inherits only
 // the root <html>/<body> — none of the portfolio chrome. Its styling is scoped
@@ -37,6 +39,9 @@ export default function GtoSiteLayout({
 }) {
   return (
     <div className={`gto-building-site ${display.variable} ${body.variable}`}>
+      <DemoPreloader storageKey="gto-building:preloaded">
+        <Image src="/gto-building/logo.jpg" alt="GTO Building" width={530} height={371} priority className="w-[150px] md:w-[185px] h-auto" />
+      </DemoPreloader>
       {/* Pink brand bubble back to the GTO pitch — collapsed to an arrow,
           expands on hover to reveal the label. Styled like the main site. */}
       <a href="/gto-building" className="ld-back" aria-label="Back to finbar.studio">

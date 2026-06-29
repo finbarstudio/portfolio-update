@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Poppins, Inter } from "next/font/google";
 import "./hm-developments-site.css";
 import SmoothScroll from "@/components/hm-developments/SmoothScroll";
+import DemoPreloader from "@/components/DemoPreloader";
 
 // HM Developments demo. Lives outside the (site) route group, so it inherits
 // only the root <html>/<body> — none of the portfolio chrome. Its styling is
@@ -37,6 +39,9 @@ export default function HmSiteLayout({
 }) {
   return (
     <div className={`hm-developments-site ${display.variable} ${body.variable}`}>
+      <DemoPreloader storageKey="hm-developments:preloaded">
+        <Image src="/hm-developments/logo.png" alt="HM Developments" width={600} height={267} priority className="w-[200px] md:w-[240px] h-auto" />
+      </DemoPreloader>
       {/* Pink brand bubble back to the HM pitch — collapsed to an arrow,
           expands on hover to reveal the label. Styled like the main site. */}
       <a href="/hm-developments" className="ld-back" aria-label="Back to finbar.studio">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat, Open_Sans } from "next/font/google";
 import "./bppd-site.css";
 import SmoothScroll from "@/components/bppd/SmoothScroll";
+import DemoPreloader from "@/components/DemoPreloader";
 
 // BPPD (Brisbane Prestige Property Developments) demo. Lives outside the (site)
 // route group, so it inherits only the root <html>/<body> — none of the
@@ -37,6 +38,14 @@ export default function BppdSiteLayout({
 }) {
   return (
     <div className={`bppd-site ${display.variable} ${body.variable}`}>
+      <DemoPreloader storageKey="bppd:preloaded" bg="#050506">
+        <span
+          className="violet text-white text-center whitespace-nowrap"
+          style={{ fontSize: "clamp(1.4rem, 5vw, 2.6rem)", letterSpacing: "0.14em", fontWeight: 600 }}
+        >
+          BRISBANE&nbsp;PRESTIGE
+        </span>
+      </DemoPreloader>
       {/* Pink brand bubble back to the BPPD pitch — collapsed to an arrow,
           expands on hover to reveal the label. Styled like the main site. */}
       <a href="/bppd" className="ld-back" aria-label="Back to finbar.studio">

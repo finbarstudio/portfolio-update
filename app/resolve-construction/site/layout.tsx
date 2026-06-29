@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Jost, Lato } from "next/font/google";
 import "./resolve-construction-site.css";
 import SmoothScroll from "@/components/resolve-construction/SmoothScroll";
+import DemoPreloader from "@/components/DemoPreloader";
 
 // Resolve Construction demo. Lives outside the (site) route group, so it
 // inherits only the root <html>/<body> — none of the portfolio chrome. Its
@@ -38,6 +40,9 @@ export default function ResolveSiteLayout({
 }) {
   return (
     <div className={`resolve-construction-site ${display.variable} ${body.variable}`}>
+      <DemoPreloader storageKey="resolve-construction:preloaded">
+        <Image src="/resolve-construction/logo.png" alt="Resolve Construction" width={728} height={324} priority className="w-[260px] md:w-[320px] h-auto" />
+      </DemoPreloader>
       {/* Pink brand bubble back to the Resolve pitch — collapsed to an arrow,
           expands on hover to reveal the label. Styled like the main site. */}
       <a href="/resolve-construction" className="ld-back" aria-label="Back to finbar.studio">

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Montserrat, Inter } from "next/font/google";
 import "./foundation-homes-site.css";
 import SmoothScroll from "@/components/foundation-homes/SmoothScroll";
+import DemoPreloader from "@/components/DemoPreloader";
 
 // Foundation Homes demo. Lives outside the (site) route group, so it inherits
 // only the root <html>/<body> — none of the portfolio chrome. Its styling is
@@ -37,6 +39,9 @@ export default function FoundationSiteLayout({
 }) {
   return (
     <div className={`foundation-homes-site ${display.variable} ${body.variable}`}>
+      <DemoPreloader storageKey="foundation-homes:preloaded">
+        <Image src="/foundation-homes/logo.png" alt="Foundation Homes" width={400} height={328} priority className="w-[170px] md:w-[210px] h-auto" />
+      </DemoPreloader>
       {/* Pink brand bubble back to the Foundation pitch — collapsed to an arrow,
           expands on hover to reveal the label. Styled like the main site. */}
       <a href="/foundation-homes" className="ld-back" aria-label="Back to finbar.studio">

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Raleway, Montserrat } from "next/font/google";
 import "./david-radic-site.css";
 import SmoothScroll from "@/components/david-radic/SmoothScroll";
+import DemoPreloader from "@/components/DemoPreloader";
 
 // David Radic Prestige Homes demo. Lives outside the (site) route group, so it
 // inherits only the root <html>/<body> — none of the portfolio chrome. Its
@@ -38,6 +40,9 @@ export default function DavidRadicSiteLayout({
 }) {
   return (
     <div className={`david-radic-site ${display.variable} ${body.variable}`}>
+      <DemoPreloader storageKey="david-radic:preloaded">
+        <Image src="/david-radic/logo.png" alt="David Radic Prestige Homes" width={225} height={55} priority className="w-[230px] md:w-[280px] h-auto" />
+      </DemoPreloader>
       {/* Pink brand bubble back to the David Radic pitch — collapsed to an arrow,
           expands on hover to reveal the label. Styled like the main site. */}
       <a href="/david-radic" className="ld-back" aria-label="Back to finbar.studio">
