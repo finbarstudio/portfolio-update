@@ -64,6 +64,15 @@ export default function TopNav() {
             )}
           </Link>
         ))}
+        {/* Contact duplicates the header hug icon on purpose — a plain-text way in
+            for anyone who doesn't read the icon. Opens the drawer, no route. */}
+        <button
+          type="button"
+          className="tag tag-default"
+          onClick={() => window.dispatchEvent(new CustomEvent("contact:open"))}
+        >
+          Contact
+        </button>
         <a href={SANDBOX_HREF} target="_blank" rel="noopener noreferrer" className="tag tag-default tag-ext">
           <span className="nav-label-full">Sandbox</span>
           <span className="nav-label-short" aria-hidden="true">SB</span>
@@ -78,7 +87,7 @@ export default function TopNav() {
           aria-current={isActive("/world-cup") ? "page" : undefined}
           className={`tag tag-ext ${isActive("/world-cup") ? "tag-pink" : "tag-default"}`}
         >
-          <span className="nav-label-full">It’s coming home</span>
+          <span className="nav-label-full">WC26</span>
           <span className="nav-label-short" aria-hidden="true">WC26</span>
           <span className="nav-football" aria-hidden="true"><FootballIcon /></span>
         </Link>

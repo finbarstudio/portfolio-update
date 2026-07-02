@@ -10,9 +10,10 @@
  *   3. the intro screen "opens" — the opaque overlay fades to transparent
  *   4. the asterisk translates down to the middle-bottom of the screen
  *   5. then translates right into its slot (bottom-right of the lockup)
- *   6. FINBARSTUDIO slides in from the left to complete the logo
- *   7. scrolling unlocks
- * The resting lockup then scroll-shrinks up into the nav.
+ *   6. FINBARSTUDIO slides in from the left to complete the logo (end of phase 1)
+ *   7. scrolling unlocks, and after a short hold the page auto-glides down to the
+ *      design-text hero (#hero) — phase 2 — the lockup scroll-docking up into the
+ *      nav on the way. A manual scroll/keypress during the hold cancels the glide.
  *
  * Mobile: no preloader / no scroll-morph — a small static asterisk logo sits
  * top-right and the page content starts immediately (handled in CSS).
@@ -26,6 +27,9 @@ import { GOTO_HERO_KEY } from "./NavLogo";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 const PLAYED_KEY = "finbar-intro-played";
+// Phase 2 of the intro: how long the finished FINBARSTUDIO* lockup holds at the
+// bottom of the first screen before the page auto-glides to the design-text hero.
+const PHASE2_HOLD_MS = 850;
 
 export default function HomeIntro() {
   const lockupRef = useRef<HTMLAnchorElement>(null);
@@ -127,6 +131,29 @@ export default function HomeIntro() {
     window.scrollTo(0, 0);
 
     let finished = false;
+    let phase2Timer: number | undefined;
+    let cancelHold: (() => void) | undefined;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    // Phase 2 — after the lockup assembles, hold a beat then glide the page down to
+    // the design-text hero (#hero). The lockup scroll-docks up into the nav on the
+    // way (the fit effect above is scroll-driven). Any manual scroll/keypress during
+    // the hold cancels the glide, so we never fight a visitor who scrolls first.
+    const startPhase2 = () => {
+      const stop = () => {
+        if (phase2Timer !== undefined) { clearTimeout(phase2Timer); phase2Timer = undefined; }
+        window.removeEventListener("wheel", stop);
+        window.removeEventListener("touchstart", stop);
+        window.removeEventListener("keydown", stop);
+        cancelHold = undefined;
+      };
+      cancelHold = stop;
+      window.addEventListener("wheel", stop, { passive: true });
+      window.addEventListener("touchstart", stop, { passive: true });
+      window.addEventListener("keydown", stop);
+      phase2Timer = window.setTimeout(() => { stop(); scrollToHero(); }, PHASE2_HOLD_MS);
+    };
+
     const finish = () => {
       if (finished) return;
       finished = true;
@@ -136,9 +163,9 @@ export default function HomeIntro() {
       document.body.style.overflow = prevOverflow;
       delete document.documentElement.dataset.introLock;
       window.__lenis?.start();
+      if (!reduce) startPhase2();   // phase 2: auto-glide to the design-text hero
     };
     const failsafe = setTimeout(finish, 7000);
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
     // Size the flying asterisk to EXACTLY the slot asterisk, so it only ever
     // translates — never scales (per spec). Both draw the same polygon, so a
@@ -178,6 +205,7 @@ export default function HomeIntro() {
       .call(() => { text.classList.add("is-revealed"); }, undefined, "-=0.1");       // 6 text slides in
 
     return () => {
+      cancelHold?.();
       clearTimeout(failsafe);
       tl.kill();
       document.body.style.overflow = prevOverflow;

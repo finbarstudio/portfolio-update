@@ -276,7 +276,10 @@ export default function RootLayout({
       lang="en-AU"
       className={`${archivoNarrow.variable} ${archivo.variable} ${spaceMono.variable} ${notoSymbols.variable}`}
     >
-      <body className="bg-bg text-ink font-sans antialiased min-h-screen">
+      {/* suppressHydrationWarning: browser extensions (e.g. ColorZilla adds
+          cz-shortcut-listen) mutate <body> before hydration; suppress the
+          attribute-mismatch warning for this node only, not its children. */}
+      <body className="bg-bg text-ink font-sans antialiased min-h-screen" suppressHydrationWarning>
         {/* Bookmania (Adobe Fonts / Typekit) — H1 display serif */}
         <link rel="stylesheet" href="https://use.typekit.net/rlo3ixj.css" />
         {/* Routes bring their own chrome: portfolio routes via app/(site)/layout

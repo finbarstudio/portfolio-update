@@ -107,13 +107,16 @@ const CAP_PILLS: { name: string; href: string }[] = [
 
 function Capabilities() {
   return (
-    <section className="home-disciplines px-5 md:px-10" aria-label="Services">
-      <div className="home-disc home-cap-wrap">
-        {CAP_PILLS.map((c) => (
-          <Link key={c.name} href={c.href} className="home-cap-pill">
-            {c.name}
-          </Link>
-        ))}
+    <section className="home-disciplines px-5 md:px-10" aria-labelledby="services-title">
+      <div className="home-cap">
+        <h2 id="services-title" className="home-cap-title">How I help businesses</h2>
+        <div className="home-disc home-cap-wrap">
+          {CAP_PILLS.map((c) => (
+            <Link key={c.name} href={c.href} className="home-cap-pill">
+              {c.name}
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

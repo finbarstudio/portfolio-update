@@ -1020,7 +1020,11 @@
   /* Inactive filter chips get the same pink hover as every other link. */
   @media (hover: hover) {
     a.tag-default:hover { color: var(--pink); border-color: var(--pink); }
+    button.tag-default:hover { color: var(--pink); border-color: var(--pink); }
   }
+  /* The nav "Contact" tag is a <button> (opens the drawer, no route) — give it the
+     link's pointer cursor so it reads as clickable. */
+  button.tag { cursor: pointer; }
   /* Numeric tags (dates) — Archivo, since mono numerals read badly. */
   .tag-num     { font-family: var(--font-label); letter-spacing: 0.1em; }
 
@@ -3862,6 +3866,18 @@ body:has(.sb-root) {
 }
 @media (hover: hover) {
   .home-cap-pill:hover { color: var(--bg); background: var(--pink); border-color: var(--pink); }
+}
+/* Small eyebrow title above the capability pills ("How I help businesses"). */
+.home-cap { width: 100%; }
+.home-cap-title {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: var(--text-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-soft);
+  margin-bottom: clamp(1.75rem, 4vh, 3.25rem);
 }
 
 /* ── Shared hover-underline link ───────────────────────────────────
