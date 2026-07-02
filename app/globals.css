@@ -3750,7 +3750,7 @@ body:has(.sb-root) {
 /* SB + WC26 shortcuts — the same fixed-pin-that-docks pattern as the copyright, but
    sitting ABOVE it (bottom: 42px vs 16px) and interactive once shown. Docks into its
    slot in the footer credit, just above the copyright, on every size. */
-.sf-nav { position: relative; display: inline-block; }
+.sf-nav { position: relative; display: inline-block; margin-bottom: 1em; }   /* gap above the © when docked */
 .sf-nav-ph { visibility: hidden; display: inline-flex; gap: 0.4em; }   /* reserves the line + width */
 .sf-nav-pin {
   position: fixed;
