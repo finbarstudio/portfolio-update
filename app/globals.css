@@ -1138,23 +1138,39 @@
   }
 
   /* Progressive disclosure — secondary card meta (tags + one-liner) stays tucked
-     away until the user shows interest. The block's SPACE IS ALWAYS RESERVED so
-     the thumbnail never resizes on hover; only the text fades. Pointer devices:
-     hidden until hover/focus. Touch / no-hover devices: always shown. */
-  .hover-reveal { opacity: 1; }
+     away until hover, then reveals with a masked, staggered slide-up (the tag pills
+     reel in one by one). Each item sits in an overflow-hidden mask whose box height
+     is ALWAYS RESERVED, so the thumbnail never resizes — only the inner slides.
+     Touch / no-hover + /work: shown up front. */
+  .hr-item { overflow: hidden; }
+  .hr-item-tag { display: inline-flex; vertical-align: top; }
+  .hr-line { display: block; }
+  .hr-inner { display: inline-block; }
+  .hr-line .hr-inner { display: block; }
   @media (hover: hover) and (pointer: fine) {
-    .hover-reveal {
-      opacity: 0;
-      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    .hover-reveal .hr-inner {
+      transform: translateY(115%);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .group:hover .hover-reveal,
-    .group:focus-within .hover-reveal {
-      opacity: 1;
-    }
+    .group:hover .hover-reveal .hr-inner,
+    .group:focus-within .hover-reveal .hr-inner { transform: translateY(0); }
+    /* Stagger the tag pills as they reel in (base delay catches any 7th+ pill). */
+    .hover-reveal .hr-tags .hr-item .hr-inner { transition-delay: 0.3s; }
+    .hover-reveal .hr-tags .hr-item:nth-child(1) .hr-inner { transition-delay: 0s; }
+    .hover-reveal .hr-tags .hr-item:nth-child(2) .hr-inner { transition-delay: 0.06s; }
+    .hover-reveal .hr-tags .hr-item:nth-child(3) .hr-inner { transition-delay: 0.12s; }
+    .hover-reveal .hr-tags .hr-item:nth-child(4) .hr-inner { transition-delay: 0.18s; }
+    .hover-reveal .hr-tags .hr-item:nth-child(5) .hr-inner { transition-delay: 0.24s; }
+    .hover-reveal .hr-tags .hr-item:nth-child(6) .hr-inner { transition-delay: 0.30s; }
+    .hover-reveal .hr-line .hr-inner { transition-delay: 0.20s; }
+    /* All-projects grid (/work, id="work"): detail is shown up front; hover does
+       nothing. Higher specificity (id) wins over the rules above. */
+    #work .hover-reveal .hr-inner { transform: translateY(0); transition-delay: 0s; }
   }
-  /* All-projects grid (/work, id="work"): every card's detail is visible up front,
-     so hover changes nothing. Higher specificity (id) wins over the rules above. */
-  #work .hover-reveal { opacity: 1; }
+  /* Reduced motion: skip the slide, just show the detail. */
+  @media (prefers-reduced-motion: reduce) {
+    .hover-reveal .hr-inner { transform: translateY(0); transition: none; }
+  }
 
   /* Generous invisible hit zone — centres a small visual control inside a
      larger pointer/touch target without affecting surrounding layout. */
@@ -3731,6 +3747,42 @@ body:has(.sb-root) {
   .sf-copyright-inner { transition: none; transform: translateY(0); }
 }
 
+/* SB + WC26 shortcuts — the same fixed-pin-that-docks pattern as the copyright, but
+   sitting ABOVE it (bottom: 42px vs 16px) and interactive once shown. Docks into its
+   slot in the footer credit, just above the copyright, on every size. */
+.sf-nav { position: relative; display: inline-block; }
+.sf-nav-ph { visibility: hidden; display: inline-flex; gap: 0.4em; }   /* reserves the line + width */
+.sf-nav-pin {
+  position: fixed;
+  right: clamp(20px, 3vw, 40px);
+  bottom: 42px;
+  z-index: 45;
+  overflow: hidden;            /* mask for the slide-up reveal */
+  display: inline-block;
+  pointer-events: none;        /* the links become clickable once shown (below) */
+}
+.sf-nav-pin.is-shown { pointer-events: auto; }
+.sf-nav-pin.is-docked {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  top: auto;
+}
+.sf-nav-inner {
+  display: inline-flex;
+  gap: 0.4em;
+  transform: translateY(150%);     /* hidden beneath the mask until revealed */
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sf-nav-pin.is-shown .sf-nav-inner { transform: translateY(0); }
+/* Reduced motion: no slide, but still respect the reveal gate — the links are only
+   interactive once shown, so they must stay hidden (not just un-animated) until then,
+   or they'd paint as un-clickable controls on the home intro screen. */
+@media (prefers-reduced-motion: reduce) {
+  .sf-nav-pin.is-shown .sf-nav-inner { transition: none; transform: translateY(0); }
+  .sf-nav-pin:not(.is-shown) .sf-nav-inner { transform: translateY(150%); }
+}
+
 /* AUS/BNE live clock — mirror of the copyright but bottom-LEFT, docking into the
    footer's Brisbane column. Two stacked pink lines (location code + 24h time). */
 .sf-clock { position: relative; display: inline-block; }
@@ -4191,12 +4243,6 @@ body:has(.sb-root) {
   margin-block: -0.3em;
   color: currentColor;
   flex: 0 0 auto;
-}
-/* Truncated labels on mobile (Sandbox -> SB, It's coming home -> WC26). */
-.nav-label-short { display: none; }
-@media (max-width: 767px) {
-  .nav-label-full { display: none; }
-  .nav-label-short { display: inline; }
 }
 a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* The .tag-default hover is scoped to anchors; mirror it for this button. */

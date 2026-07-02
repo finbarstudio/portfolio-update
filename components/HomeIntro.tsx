@@ -116,14 +116,62 @@ export default function HomeIntro() {
 
   // Preloader choreography — desktop, once per browser session. Runs AFTER the fit
   // effect above (same commit, in order), so the slot is already laid out and we
-  // measure it synchronously. sessionStorage gate: plays on the first visit of the
-  // session, and does NOT replay on refresh (the browser restores your scroll
-  // position; replaying the intro there would be jarring).
+  // measure it synchronously. sessionStorage gate: the full intro plays on the
+  // first visit of the session only, and does NOT replay on refresh. On a refresh /
+  // revisit we skip the intro but still glide down to the hero (see
+  // scheduleRevisitScroll) so the visitor is never left parked on the logo screen.
   useLayoutEffect(() => {
     if (window.matchMedia(MOBILE_QUERY).matches) { setDone(true); return; }
+
+    // Refresh / revisit: never leave the visitor parked on the logo. Returns a
+    // cleanup fn. Once Lenis + the browser's scroll restoration have settled, if
+    // we're still above the hero (on the logo screen), glide down to it. Skipped
+    // when arriving via the nav logo (the GOTO_HERO effect handles that) or under
+    // reduced motion, and cancelled if the visitor scrolls first.
+    const scheduleRevisitScroll = (): (() => void) => {
+      let arrivingViaLogo = false;
+      try { arrivingViaLogo = sessionStorage.getItem(GOTO_HERO_KEY) === "1"; } catch { /* ignore */ }
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      if (arrivingViaLogo || reduceMotion) return () => {};
+
+      let tries = 0;
+      let cancelled = false;
+      let timer: number | undefined;
+      const cancel = () => {
+        cancelled = true;
+        if (timer !== undefined) clearTimeout(timer);
+        window.removeEventListener("wheel", cancel);
+        window.removeEventListener("touchstart", cancel);
+        window.removeEventListener("keydown", cancel);
+      };
+      window.addEventListener("wheel", cancel, { passive: true });
+      window.addEventListener("touchstart", cancel, { passive: true });
+      window.addEventListener("keydown", cancel);
+
+      const settle = () => {
+        if (cancelled) return;
+        // Wait for Lenis (its presence also means the route/restore scroll fired).
+        if (!window.__lenis && tries++ < 60) { timer = window.setTimeout(settle, 100); return; }
+        requestAnimationFrame(() => {
+          if (cancelled) return;
+          const hero = document.getElementById("hero");
+          if (hero) {
+            const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--menubar-h")) || 56;
+            const heroTop = hero.getBoundingClientRect().top + window.scrollY - navH - 8;
+            // Only glide if we're still above the hero (on the logo screen); if the
+            // page was restored further down, leave the visitor where they are.
+            if (window.scrollY < heroTop - 4) scrollToHero();
+          }
+          cancel();
+        });
+      };
+      timer = window.setTimeout(settle, 120);
+      return cancel;
+    };
+
     let played = false;
     try { played = !!sessionStorage.getItem(PLAYED_KEY); } catch { /* ignore */ }
-    if (played) { setDone(true); return; }
+    if (played) { setDone(true); return scheduleRevisitScroll(); }
 
     const fly = flyRef.current, star = starRef.current, slot = slotRef.current,
       text = textRef.current, screen = screenRef.current;

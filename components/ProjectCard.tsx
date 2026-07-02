@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Project } from "@/content/projects";
 import ZoomImage from "@/components/ZoomImage";
@@ -28,15 +29,28 @@ function Tag({
   return <span className={cls}>{label}</span>;
 }
 
-/* ─── Shared tag row ─────────────────────────────────────── */
+/* ─── Masked reveal item — inner slides up out of an overflow-hidden mask.
+   Its box height is always reserved (transform doesn't affect layout), so the
+   thumbnail never resizes; the reveal + stagger live in globals.css. ── */
+function HrItem({ children, block = false, className = "" }: { children: ReactNode; block?: boolean; className?: string }) {
+  const Outer = block ? "div" : "span";
+  const Inner = block ? "div" : "span";
+  return (
+    <Outer className={`hr-item ${className}`}>
+      <Inner className="hr-inner">{children}</Inner>
+    </Outer>
+  );
+}
+
+/* ─── Shared tag row (each pill masked + staggered on reveal) ─────────────── */
 function TagRow({ project }: { project: Project }) {
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className="hr-tags flex flex-wrap items-center gap-1.5">
       {project.categories.map((cat) => (
-        <Tag key={cat} label={cat} />
+        <HrItem key={cat} className="hr-item-tag"><Tag label={cat} /></HrItem>
       ))}
-      {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
-      {project.isHobby && <Tag label="Hobby project" variant="pink" />}
+      {project.isConcept && <HrItem className="hr-item-tag"><Tag label="CONCEPT" variant="pink" /></HrItem>}
+      {project.isHobby && <HrItem className="hr-item-tag"><Tag label="Hobby project" variant="pink" /></HrItem>}
     </div>
   );
 }
@@ -94,9 +108,11 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
           <div className="hover-reveal">
             <div className="space-y-3">
               <TagRow project={project} />
-              <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>
-                {project.oneLiner}
-              </p>
+              <HrItem block className="hr-line">
+                <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>
+                  {project.oneLiner}
+                </p>
+              </HrItem>
             </div>
           </div>
         </div>
@@ -157,9 +173,11 @@ export function FullCard({ project, index }: { project: Project; index: number }
           <div className="hover-reveal">
             <div className="space-y-2.5">
               <TagRow project={project} />
-              <p className="text-ink-soft leading-relaxed line-clamp-2" style={{ fontSize: "var(--text-caption)" }}>
-                {project.oneLiner}
-              </p>
+              <HrItem block className="hr-line">
+                <p className="text-ink-soft leading-relaxed line-clamp-2" style={{ fontSize: "var(--text-caption)" }}>
+                  {project.oneLiner}
+                </p>
+              </HrItem>
             </div>
           </div>
         </div>
@@ -215,9 +233,11 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
             <div className="space-y-2.5">
               <TagRow project={project} />
               {project.liveUrl && (
-                <span className="mono-label text-teal block" style={{ fontSize: "0.625rem" }}>
-                  LIVE ↗
-                </span>
+                <HrItem block className="hr-line">
+                  <span className="mono-label text-teal block" style={{ fontSize: "0.625rem" }}>
+                    LIVE ↗
+                  </span>
+                </HrItem>
               )}
             </div>
           </div>
