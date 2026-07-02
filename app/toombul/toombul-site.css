@@ -14,8 +14,9 @@
    Mobile-first: base styles target phones; min-width tweaks widen it up.
    ────────────────────────────────────────────────────────────────────────── */
 
-/* LT Remark (LyonsType) — Finbar's licensed display grotesque, served from
-   public/toombul/fonts. Pairs with the crest serif in the hybrid hero. */
+/* LT Remark (LyonsType) — the demo's display face, served from
+   public/toombul/fonts. Global pairing: LT Remark (display) + Archivo
+   (body/labels/numerals, from the root layout's --font-archivo). */
 @font-face {
   font-family: "LT Remark";
   src: url("/toombul/fonts/LTRemark-Black.woff2") format("woff2");
@@ -25,9 +26,30 @@
 }
 @font-face {
   font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-BlackItalic.woff2") format("woff2");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LT Remark";
   src: url("/toombul/fonts/LTRemark-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
   font-display: swap;
 }
 
@@ -52,10 +74,11 @@
   --maxw: 1280px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  --font-display: var(--font-chivo), sans-serif;
-  --font-hero: var(--font-barlow), "Arial Narrow", sans-serif;
-  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-fragment-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-display: "LT Remark", Georgia, serif;
+  --font-hero: "LT Remark", Georgia, serif;
+  --font-num: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
   background: var(--white);
   color: var(--ink);
@@ -243,11 +266,10 @@
   font-weight: 400;
   color: var(--gold);
 }
-/* The monument: hybrid type. LT Remark Black caps carry the line; single
-   glyphs swap into the crest's classical serif (Libre Baskerville italic,
-   the TDCC monogram voice) so the wordmark reads both modern and 1882. */
+/* The monument: hybrid type. SINCE in LT Remark Black; the 1882 numerals
+   swap to Archivo bold for a cleaner, harder date. */
 .tc-hero-monument {
-  font-family: "LT Remark", var(--font-hero), sans-serif;
+  font-family: var(--font-display);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.005em;
@@ -255,11 +277,10 @@
   line-height: 0.9;
   color: var(--white);
 }
-.tc-hero-monument .tc-g-serif {
-  font-family: var(--font-crest), Georgia, serif;
-  font-weight: 400;
-  font-style: italic;
-  letter-spacing: -0.01em;
+.tc-hero-monument .tc-g-num {
+  font-family: var(--font-num);
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 .tc-hero-title em { font-style: normal; color: var(--gold); }
 /* Their .btn voice: Fragment Mono, italic, uppercase. */
@@ -321,8 +342,8 @@
   .tc-lineage-row { grid-template-columns: 200px 1fr; gap: 32px; align-items: baseline; }
 }
 .tc-lineage-year {
-  font-family: var(--font-hero);
-  font-weight: 700;
+  font-family: var(--font-num);
+  font-weight: 800;
   text-transform: uppercase;
   font-size: clamp(28px, 3.2vw, 44px);
   line-height: 1;
@@ -419,8 +440,8 @@
 }
 .tc-stat { background: var(--white); padding: 22px 20px; }
 .tc-stat-value {
-  font-family: var(--font-hero);
-  font-weight: 700;
+  font-family: var(--font-num);
+  font-weight: 800;
   color: var(--red);
   font-size: clamp(34px, 4.2vw, 52px);
   line-height: 1;
