@@ -1137,27 +1137,24 @@
     .star-loader-draw { animation: none; stroke-dasharray: none; }
   }
 
-  /* Progressive disclosure — secondary card meta (tags) stays tucked away
-     until the user shows interest. Pointer devices only: collapse to 0fr and
-     reveal on hover/focus. Touch / no-hover devices always show it. */
-  .hover-reveal { }
+  /* Progressive disclosure — secondary card meta (tags + one-liner) stays tucked
+     away until the user shows interest. The block's SPACE IS ALWAYS RESERVED so
+     the thumbnail never resizes on hover; only the text fades. Pointer devices:
+     hidden until hover/focus. Touch / no-hover devices: always shown. */
+  .hover-reveal { opacity: 1; }
   @media (hover: hover) and (pointer: fine) {
     .hover-reveal {
-      display: grid;
-      grid-template-rows: 0fr;
       opacity: 0;
-      /* Slow, feather-soft grow so the thumbnail eases down (steals space) in
-         step with the 3D blend + pink reveal. */
-      transition: grid-template-rows 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-                  opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .hover-reveal > * { overflow: hidden; min-height: 0; }
     .group:hover .hover-reveal,
     .group:focus-within .hover-reveal {
-      grid-template-rows: 1fr;
       opacity: 1;
     }
   }
+  /* All-projects grid (/work, id="work"): every card's detail is visible up front,
+     so hover changes nothing. Higher specificity (id) wins over the rules above. */
+  #work .hover-reveal { opacity: 1; }
 
   /* Generous invisible hit zone — centres a small visual control inside a
      larger pointer/touch target without affecting surrounding layout. */
