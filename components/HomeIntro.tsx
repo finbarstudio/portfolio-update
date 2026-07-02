@@ -49,8 +49,13 @@ export default function HomeIntro() {
     try { sessionStorage.removeItem(GOTO_HERO_KEY); } catch { /* ignore */ }
     let tries = 0;
     const go = () => {
-      // Wait out the intro scroll-lock + the route-change scroll reset.
-      if (document.documentElement.dataset.introLock === "1" && tries++ < 80) {
+      // Wait out the intro scroll-lock AND Lenis init. Lenis being ready also means
+      // the route-change scroll-to-top has already fired, so we reliably land on the
+      // logo screen first and then glide DOWN to the hero, rather than firing early
+      // and getting reset to the top (which left the press stuck on the logo).
+      const introBusy = document.documentElement.dataset.introLock === "1";
+      const lenisReady = !!window.__lenis;
+      if ((introBusy || !lenisReady) && tries++ < 80) {
         setTimeout(go, 100);
         return;
       }

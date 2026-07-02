@@ -74,7 +74,7 @@ export default function TopNav() {
           Contact
         </button>
         <a href={SANDBOX_HREF} target="_blank" rel="noopener noreferrer" className="tag tag-default tag-ext">
-          <span className="nav-label-full">Sandbox</span>
+          <span className="nav-label-full">SB</span>
           <span className="nav-label-short" aria-hidden="true">SB</span>
           <span className="nav-ext-bubble" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="100%" height="100%">
