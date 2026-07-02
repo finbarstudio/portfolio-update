@@ -34,7 +34,7 @@ export default function Footer() {
         </div>
 
         <div className="tc-footer-word" aria-hidden="true">
-          TOOMBUL
+          Toombul
         </div>
 
         <div className="tc-footer-bottom">

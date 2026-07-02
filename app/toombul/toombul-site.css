@@ -123,7 +123,6 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
-  text-transform: uppercase;
   letter-spacing: 0.005em;
   line-height: 1.02;
 }
@@ -164,7 +163,6 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
-  text-transform: uppercase;
   letter-spacing: 0.03em;
   font-size: 14px;
   color: var(--blue-deep);
@@ -271,7 +269,6 @@
 .tc-hero-monument {
   font-family: var(--font-display);
   font-weight: 900;
-  text-transform: uppercase;
   letter-spacing: 0.005em;
   font-size: clamp(72px, 16vw, 264px);
   line-height: 0.9;
@@ -310,7 +307,6 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
-  text-transform: uppercase;
   font-size: clamp(30px, 4.6vw, 68px);
   line-height: 1.06;
   color: var(--blue-deep);
@@ -392,7 +388,6 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
-  text-transform: uppercase;
   font-size: clamp(30px, 4.4vw, 62px);
   line-height: 1.04;
 }
@@ -411,7 +406,6 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
-  text-transform: uppercase;
   font-size: clamp(28px, 3.6vw, 46px);
   line-height: 1.05;
   margin-top: 10px;
@@ -478,7 +472,6 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
-  text-transform: uppercase;
   font-size: 16px;
   color: var(--blue-deep);
 }
@@ -530,7 +523,6 @@
 .tc-grade-title {
   font-family: var(--font-hero);
   font-weight: 700;
-  text-transform: uppercase;
   font-size: clamp(32px, 5vw, 60px);
   line-height: 0.96;
 }
@@ -558,7 +550,6 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
-  text-transform: uppercase;
   font-size: clamp(24px, 3vw, 36px);
   line-height: 1.14;
   max-width: 18ch;
@@ -632,7 +623,6 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
-  text-transform: uppercase;
   font-size: 19px;
   color: var(--blue-deep);
 }
@@ -678,7 +668,7 @@
 }
 .tc-footer-crest { display: flex; align-items: center; gap: 12px; }
 .tc-footer-crest img { width: 48px; height: auto; }
-.tc-footer-crest-word { font-family: var(--font-display); text-transform: uppercase; font-weight: 900; font-style: italic; font-size: 16px; color: var(--white); }
+.tc-footer-crest-word { font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 16px; color: var(--white); }
 .tc-footer-crest-sub { font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; color: rgba(255, 255, 255, 0.55); margin-top: 3px; }
 .tc-footer-col-title {
   font-family: var(--font-mono);
@@ -694,7 +684,6 @@
 .tc-footer-word {
   font-family: var(--font-hero);
   font-weight: 700;
-  text-transform: uppercase;
   color: rgba(81, 133, 255, 0.14);
   font-size: clamp(64px, 16vw, 220px);
   line-height: 0.8;
