@@ -392,6 +392,38 @@
   .tc-mark img { max-width: 34vw; }
 }
 
+/* ── section four — coverflow logo marquee ────────────────────────────── */
+.tc-marquee {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--white);
+}
+.tc-marquee-track {
+  display: flex;
+  align-items: center;
+  will-change: transform;
+}
+.tc-marquee-item {
+  flex: 0 0 33.333vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+.tc-marquee-item img {
+  width: 72%;
+  max-width: 300px;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+@media (max-width: 700px) {
+  .tc-marquee-item { flex-basis: 44vw; }
+}
+
 /* ── footer ───────────────────────────────────────────────────────────── */
 .tc-footer {
   position: relative;
