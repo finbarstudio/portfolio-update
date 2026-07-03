@@ -234,7 +234,7 @@
   user-select: none;
 }
 /* ── collage editor (only active with ?edit=1) ────────────────────────── */
-.tc-collage--edit .tc-para-wrap { cursor: grab; outline: 1px dashed rgba(17, 41, 95, 0.2); }
+.tc-collage--edit .tc-para-wrap { cursor: grab; }
 .tc-collage--edit .tc-para-wrap.is-sel { outline: 2px solid var(--blue-btn); cursor: move; }
 .tc-collage--edit .tc-para { pointer-events: none; }
 .tc-h {
