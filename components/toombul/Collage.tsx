@@ -154,6 +154,14 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
         );
       })}
 
+      {/* Crest: locked, centred, not editable. */}
+      <img
+        src="/toombul/logo.svg"
+        alt="Toombul District Cricket Club crest"
+        className="tc-collage-crest"
+        draggable={false}
+      />
+
       {edit && (
         <div className="tc-editor" onPointerDown={(e) => e.stopPropagation()}>
           <div className="tc-editor-title">Collage editor</div>

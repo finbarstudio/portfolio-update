@@ -221,6 +221,18 @@
   pointer-events: none;
 }
 .tc-para--raw { image-rendering: auto; }
+/* Crest: locked, centred, full colour, above the paraphernalia. */
+.tc-collage-crest {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(160px, 18vw, 260px);
+  height: auto;
+  z-index: 3;
+  pointer-events: none;
+  user-select: none;
+}
 /* ── collage editor (only active with ?edit=1) ────────────────────────── */
 .tc-collage--edit .tc-para-wrap { cursor: grab; outline: 1px dashed rgba(17, 41, 95, 0.2); }
 .tc-collage--edit .tc-para-wrap.is-sel { outline: 2px solid var(--blue-btn); cursor: move; }
