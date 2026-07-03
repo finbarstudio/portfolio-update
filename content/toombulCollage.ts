@@ -33,13 +33,12 @@ export const collageMeta: Record<string, CollageMeta> = {
   mcdermott: { src: d("mcdermott"), alt: "Craig McDermott, Queensland and Australia" },
   healy: { src: d("healy"), alt: "Ian Healy, Queensland and Australia" },
   harris: { src: d("harris"), alt: "Ryan Harris, Queensland and Australia" },
-  symonds: { src: d("symonds"), alt: "Andrew Symonds, Queensland and Australia" },
   khawaja: { src: d("khawaja"), alt: "Usman Khawaja, Queensland and Australia" },
   marnus: { src: d("marnus"), alt: "Marnus Labuschagne, Queensland and Australia" },
   lynn: { src: d("lynn"), alt: "Chris Lynn, Queensland and Toombul junior" },
   renshaw: { src: d("renshaw"), alt: "Matthew Renshaw, Toombul junior, Queensland and Australia" },
   carseldine: { src: d("carseldine"), alt: "Lee Carseldine batting for the Queensland Bulls at the Gabba" },
-  gabba: { src: d("gabba"), alt: "The Gabba, Brisbane Cricket Ground" },
+  gabba: { src: d("gabba"), alt: "The Woolloongabba cricket ground grandstand, 1907" },
 };
 
 export type CollagePos = { key: string; x: number; y: number; w: number; rot: number };

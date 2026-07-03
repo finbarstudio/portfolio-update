@@ -149,6 +149,39 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
     return () => { cleanup(); ctx.revert(); };
   }, [edit, items.length]);
 
+  // Bitmap "boil": cycle each item's 3 dither frames (x.png / x.b1.png /
+  // x.b2.png) at a desynced ~8fps so the grain shimmers. Motion-only.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const imgs = Array.from(section.querySelectorAll<HTMLImageElement>("img.tc-para"));
+    if (!imgs.length) return;
+    const states = imgs.map((img) => {
+      const base = img.getAttribute("src") || "";
+      const frames = [base, base.replace(/\.png$/, ".b1.png"), base.replace(/\.png$/, ".b2.png")];
+      frames.slice(1).forEach((f) => { const im = new Image(); im.src = f; }); // preload
+      return { img, frames, i: 0, period: 90 + Math.random() * 70, acc: Math.random() * 160 };
+    });
+    let raf = 0;
+    let last = performance.now();
+    const loop = (t: number) => {
+      const dt = t - last; last = t;
+      for (const s of states) {
+        s.acc += dt;
+        if (s.acc >= s.period) {
+          s.acc = 0;
+          s.i = (s.i + 1) % 3;
+          s.img.src = s.frames[s.i];
+        }
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [items.length]);
+
   // Failsafe: if the entrance animation can't run for any reason, never leave
   // the pre-hidden collage blank — force everything visible after a moment.
   useEffect(() => {
