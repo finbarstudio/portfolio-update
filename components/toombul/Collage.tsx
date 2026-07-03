@@ -17,6 +17,7 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
   const [items, setItems] = useState<CollagePos[]>(layout);
   const [edit, setEdit] = useState(false);
   const [sel, setSel] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
   const [saved, setSaved] = useState<"idle" | "saving" | "ok" | "err">("idle");
   const sectionRef = useRef<HTMLElement>(null);
   const drag = useRef<Drag | null>(null);
@@ -27,6 +28,11 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
 
   const update = useCallback((key: string, patch: Partial<CollagePos>) => {
     setItems((prev) => prev.map((it) => (it.key === key ? { ...it, ...patch } : it)));
+  }, []);
+
+  const remove = useCallback((key: string) => {
+    setItems((prev) => prev.filter((it) => it.key !== key));
+    setSel((s) => (s === key ? null : s));
   }, []);
 
   const onPointerMove = useCallback((e: PointerEvent) => {
@@ -70,10 +76,11 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
       else if (e.key === "ArrowRight") { update(sel, { x: +(it.x + step).toFixed(2) }); e.preventDefault(); }
       else if (e.key === "ArrowUp") { update(sel, { y: +(it.y - step).toFixed(2) }); e.preventDefault(); }
       else if (e.key === "ArrowDown") { update(sel, { y: +(it.y + step).toFixed(2) }); e.preventDefault(); }
+      else if (e.key === "Delete" || e.key === "Backspace") { remove(sel); e.preventDefault(); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [edit, sel, items, update]);
+  }, [edit, sel, items, update, remove]);
 
   const startMove = (e: React.PointerEvent, it: CollagePos) => {
     if (!edit) return;
@@ -162,33 +169,49 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
         draggable={false}
       />
 
-      {edit && (
+      {edit && collapsed && (
+        <button className="tc-editor-chip" onClick={() => setCollapsed(false)}>
+          ▸ Editor
+        </button>
+      )}
+
+      {edit && !collapsed && (
         <div className="tc-editor" onPointerDown={(e) => e.stopPropagation()}>
-          <div className="tc-editor-title">Collage editor</div>
+          <div className="tc-editor-head">
+            <span className="tc-editor-title">Collage editor</span>
+            <button className="tc-editor-hide" onClick={() => setCollapsed(true)} title="Hide panel">
+              Hide ▾
+            </button>
+          </div>
           {selItem ? (
-            <div className="tc-editor-fields">
-              <strong>{selItem.key}</strong>
-              {(["x", "y", "w", "rot"] as const).map((f) => (
-                <label key={f}>
-                  {f}
-                  <input
-                    type="number"
-                    step={f === "rot" ? 1 : 0.1}
-                    value={selItem[f]}
-                    onChange={(e) => update(selItem.key, { [f]: +e.target.value })}
-                  />
-                </label>
-              ))}
-            </div>
+            <>
+              <div className="tc-editor-fields">
+                <strong>{selItem.key}</strong>
+                {(["x", "y", "w", "rot"] as const).map((f) => (
+                  <label key={f}>
+                    {f}
+                    <input
+                      type="number"
+                      step={f === "rot" ? 1 : 0.1}
+                      value={selItem[f]}
+                      onChange={(e) => update(selItem.key, { [f]: +e.target.value })}
+                    />
+                  </label>
+                ))}
+              </div>
+              <button className="tc-editor-del" onClick={() => remove(selItem.key)}>
+                Delete “{selItem.key}” (or press ⌫)
+              </button>
+            </>
           ) : (
-            <div className="tc-editor-hint">Click an item. Drag to move, corner = resize, top dot = rotate. Arrow keys nudge (Shift = bigger).</div>
+            <div className="tc-editor-hint">Click an item. Drag to move, corner = resize, top dot = rotate. Arrow keys nudge (Shift = bigger), ⌫ deletes.</div>
           )}
           <div className="tc-editor-row">
             <button onClick={save}>
               {saved === "saving" ? "Saving…" : saved === "ok" ? "Saved ✓" : saved === "err" ? "Failed" : "Save to file"}
             </button>
             <button onClick={copy}>Copy JSON</button>
-            <button onClick={() => setItems(layout)}>Reset</button>
+            <button onClick={() => { setItems(layout); setSel(null); }}>Reset</button>
           </div>
         </div>
       )}

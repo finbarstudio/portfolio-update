@@ -264,7 +264,27 @@
   color: var(--ink);
   cursor: default;
 }
-.tc-editor-title { font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; color: var(--blue-btn); margin-bottom: 10px; }
+.tc-editor-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.tc-editor-title { font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; color: var(--blue-btn); }
+.tc-editor-hide {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--ink-soft); background: none; border: none; cursor: pointer; padding: 2px 4px;
+}
+.tc-editor-hide:hover { color: var(--ink); }
+.tc-editor-chip {
+  position: fixed; left: 16px; bottom: 16px; z-index: 60;
+  font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.06em;
+  font-size: 11px; color: var(--white); background: var(--blue-btn);
+  border: none; border-radius: 999px; padding: 9px 15px; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(17, 41, 95, 0.28);
+}
+.tc-editor-del {
+  width: 100%; margin-bottom: 10px;
+  font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 6px; border: 1px solid var(--red); background: var(--white); color: var(--red);
+  border-radius: 6px; cursor: pointer;
+}
+.tc-editor-del:hover { background: var(--red); color: var(--white); }
 .tc-editor-hint { font-size: 12px; line-height: 1.5; color: var(--ink-soft); }
 .tc-editor-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 12px; }
 .tc-editor-fields strong { grid-column: 1 / -1; font-size: 13px; text-transform: uppercase; }
