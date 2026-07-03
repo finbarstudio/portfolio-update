@@ -2,13 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-const LINKS = [
-  { href: "/toombul#story", label: "Story" },
-  { href: "/toombul/club", label: "The Club" },
-  { href: "/toombul/merch", label: "Merch" },
-  { href: "/toombul#contact", label: "Contact" },
-];
-
 export default function Nav({ forceSolid = false }: { forceSolid?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const solid = forceSolid || scrolled;
@@ -30,13 +23,6 @@ export default function Nav({ forceSolid = false }: { forceSolid?: boolean }) {
           <small style={{ color: solid ? undefined : "rgba(255,255,255,0.75)" }}>District Cricket Club</small>
         </span>
       </a>
-      <nav className="tc-nav-links" style={{ color: solid ? "var(--ink)" : "#fff" }}>
-        {LINKS.map((l) => (
-          <a key={l.href} href={l.href}>
-            {l.label}
-          </a>
-        ))}
-      </nav>
       <a href="/toombul#contact" className="tc-cta-pill">
         Get Involved
       </a>

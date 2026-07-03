@@ -29,7 +29,6 @@ export default function Footer() {
                 {r.role}: {r.name}
               </p>
             ))}
-            <a href="#grades">Seniors · Juniors · Blasters</a>
           </div>
         </div>
 

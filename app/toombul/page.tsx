@@ -1,22 +1,16 @@
 import Nav from "@/components/toombul/Nav";
 import Footer from "@/components/toombul/Footer";
-import Hero from "@/components/toombul/sections/Hero";
-import Statement from "@/components/toombul/sections/Statement";
-import Lineage from "@/components/toombul/sections/Lineage";
-import FutureBand from "@/components/toombul/sections/FutureBand";
 
-// The home page is deliberately spare: hero monument, one statement, the
-// lineage, one look forward. Grades / community / sponsors / merch live on
-// their own pages (/toombul/club, /toombul/merch).
+// Blank rebuild scaffold: nav + three empty 100vh sections + footer.
+// Build each section into #one / #two / #three.
 export default function ToombulHome() {
   return (
     <>
-      <Nav />
+      <Nav forceSolid />
       <main>
-        <Hero />
-        <Statement />
-        <Lineage />
-        <FutureBand />
+        <section id="one" className="tc-blank" />
+        <section id="two" className="tc-blank" />
+        <section id="three" className="tc-blank" />
       </main>
       <Footer />
     </>
