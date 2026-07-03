@@ -1,5 +1,4 @@
 import Nav from "@/components/toombul/Nav";
-import Footer from "@/components/toombul/Footer";
 import Hero from "@/components/toombul/sections/Hero";
 import CollageModern from "@/components/toombul/CollageModern";
 import LogoShowcase from "@/components/toombul/LogoShowcase";
@@ -18,7 +17,6 @@ export default function ToombulHome() {
         <CollageModern layout={layout as CollagePos[]} layoutMobile={layoutMobile as CollagePos[]} />
         <LogoShowcase />
       </main>
-      <Footer />
     </>
   );
 }

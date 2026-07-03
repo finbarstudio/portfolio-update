@@ -162,7 +162,7 @@ export default function CollageModern({
 
       {/* The new mark: locked, centred. */}
       <img
-        src="/toombul/SVG/5_1.svg"
+        src="/toombul/SVG/6.svg"
         alt="Toombul Bulls, established 1882"
         className="tc-modern-logo"
         draggable={false}

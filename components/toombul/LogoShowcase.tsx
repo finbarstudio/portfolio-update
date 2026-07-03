@@ -10,13 +10,15 @@ gsap.registerPlugin(ScrollTrigger);
 // loose 3x2 (no visible grid). The section pins, and as you keep scrolling
 // the bottom-middle mark (the definitive round crest) scales up and travels
 // to the centre of the screen while the other five shrink and fade out.
+// order: 1 2 3 across the top, 4 6 5 across the bottom — 6 (the definitive
+// dark round crest) sits bottom-middle and is the finale mark.
 const MARKS = [
-  { src: "/toombul/SVG/1_1.svg", alt: "Toombul Bulls outline lockup" },
-  { src: "/toombul/SVG/2.svg", alt: "Toombul Bulls compact lockup" },
-  { src: "/toombul/SVG/3_1.svg", alt: "Toombul Bulls white colourway" },
-  { src: "/toombul/SVG/4_1.svg", alt: "Toombul Bulls round crest, outline" },
-  { src: "/toombul/SVG/5_1.svg", alt: "Toombul Bulls round crest", hero: true },
-  { src: "/toombul/SVG/6_1.svg", alt: "Toombul Bulls round crest, dark" },
+  { src: "/toombul/SVG/1.svg", alt: "Toombul Bulls lockup, red" },
+  { src: "/toombul/SVG/2.svg", alt: "Toombul Bulls lockup, outline" },
+  { src: "/toombul/SVG/3.svg", alt: "Toombul Bulls lockup, dark" },
+  { src: "/toombul/SVG/4.svg", alt: "Toombul Bulls round crest, red" },
+  { src: "/toombul/SVG/6.svg", alt: "Toombul Bulls round crest", hero: true },
+  { src: "/toombul/SVG/5.svg", alt: "Toombul Bulls round crest, outline" },
 ];
 
 export default function LogoShowcase() {
@@ -56,15 +58,19 @@ export default function LogoShowcase() {
           scrub: true,
         },
       });
-      const place = () => {
-        const hr = hero.getBoundingClientRect();
-        const dx = window.innerWidth / 2 - (hr.left + hr.width / 2);
-        const dy = window.innerHeight / 2 - (hr.top + hr.height / 2);
-        return { dx, dy };
-      };
-      // compute the travel once layout settles (ScrollTrigger refresh-safe)
+      // travel = from the mark's slot to the centre of the PINNED viewport.
+      // measure relative to the section (scroll-independent): when pinned,
+      // section top == viewport top, so the target is simply centre-of-
+      // section's first viewport minus the mark's centre-in-section.
       let dx = 0, dy = 0;
-      const measure = () => { const p = place(); dx = p.dx; dy = p.dy; };
+      const measure = () => {
+        const secR = section.getBoundingClientRect();
+        const hr = hero.getBoundingClientRect();
+        const cxIn = hr.left - secR.left + hr.width / 2;
+        const cyIn = hr.top - secR.top + hr.height / 2;
+        dx = window.innerWidth / 2 - cxIn;
+        dy = window.innerHeight / 2 - cyIn;
+      };
       measure();
       ScrollTrigger.addEventListener("refreshInit", measure);
 

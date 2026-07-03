@@ -272,7 +272,6 @@
   z-index: 11;
   pointer-events: none;
   user-select: none;
-  filter: drop-shadow(0 16px 40px rgba(66, 8, 8, 0.22));
 }
 @media (prefers-reduced-motion: no-preference) {
   .tcm-streak, .tc-modern-logo { opacity: 0; }
@@ -382,8 +381,6 @@
   height: auto;
   user-select: none;
   pointer-events: none;
-  /* soft ground shadow so the white colourways read on white */
-  filter: drop-shadow(0 3px 16px rgba(66, 8, 8, 0.14));
 }
 .tc-mark--hero { position: relative; z-index: 5; }
 @media (max-width: 700px) {
