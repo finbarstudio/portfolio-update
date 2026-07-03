@@ -17,7 +17,13 @@ type Drag =
   | { kind: "resize"; key: string; px: number; ow: number }
   | { kind: "rotate"; key: string; cx: number; cy: number; start: number; orot: number };
 
-export default function Collage({ layout }: { layout: CollagePos[] }) {
+export default function Collage({
+  layout,
+  layoutMobile,
+}: {
+  layout: CollagePos[];
+  layoutMobile?: CollagePos[];
+}) {
   const [items, setItems] = useState<CollagePos[]>(layout);
   const [edit, setEdit] = useState(false);
   const [sel, setSel] = useState<string | null>(null);
@@ -29,6 +35,17 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
   useEffect(() => {
     setEdit(new URLSearchParams(window.location.search).has("edit"));
   }, []);
+
+  // Phones get their own portrait arrangement (never while editing —
+  // the editor always works on the canonical desktop layout).
+  useEffect(() => {
+    if (!layoutMobile || edit) return;
+    const mq = window.matchMedia("(max-width: 700px)");
+    const apply = () => setItems(mq.matches ? layoutMobile : layout);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, [layout, layoutMobile, edit]);
 
   const update = useCallback((key: string, patch: Partial<CollagePos>) => {
     setItems((prev) => prev.map((it) => (it.key === key ? { ...it, ...patch } : it)));

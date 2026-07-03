@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { collageMeta, type CollagePos } from "@/content/toombulCollage";
@@ -13,8 +13,25 @@ gsap.registerPlugin(ScrollTrigger);
 // blur away from the centre, scrubbed to scroll. Cursor parallax stays.
 const clean = (key: string) => `/toombul/clean/${key}.png`;
 
-export default function CollageModern({ layout }: { layout: CollagePos[] }) {
+export default function CollageModern({
+  layout,
+  layoutMobile,
+}: {
+  layout: CollagePos[];
+  layoutMobile?: CollagePos[];
+}) {
   const sectionRef = useRef<HTMLElement>(null);
+  const [items, setItems] = useState<CollagePos[]>(layout);
+
+  // Phones get their own portrait arrangement.
+  useEffect(() => {
+    if (!layoutMobile) return;
+    const mq = window.matchMedia("(max-width: 700px)");
+    const apply = () => setItems(mq.matches ? layoutMobile : layout);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, [layout, layoutMobile]);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -81,11 +98,11 @@ export default function CollageModern({ layout }: { layout: CollagePos[] }) {
     }, section);
 
     return () => { cleanup(); ctx.revert(); };
-  }, []);
+  }, [items]);
 
   return (
     <section ref={sectionRef} id="two" className="tc-modern">
-      {layout.map((it) => {
+      {items.map((it) => {
         const meta = collageMeta[it.key];
         if (!meta) return null;
         return (

@@ -231,11 +231,9 @@
   .tc-collage:not(.tc-collage--edit) .tc-collage-crest { opacity: 0; }
 }
 
-/* Mobile/tablet: scale every collage item up so the pieces overlap and keep
-   the dense poster feel (the raw vw sizes shrink too far on small screens). */
-@media (max-width: 700px) {
-  .tc-collage, .tc-modern { --para-scale: 2.1; }
-}
+/* Tablet: scale the desktop arrangement up a touch so it keeps its density.
+   Phones use their own portrait layout (toombul-collage-mobile.json), which
+   is natively sized — no scale factor. */
 @media (min-width: 701px) and (max-width: 1100px) {
   .tc-collage, .tc-modern { --para-scale: 1.35; }
 }
@@ -267,7 +265,8 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  /* standalone translate so the GSAP scale tween can't clobber the centring */
+  translate: -50% -50%;
   width: clamp(190px, 21vw, 300px);
   height: auto;
   z-index: 11;
@@ -278,12 +277,15 @@
 @media (prefers-reduced-motion: no-preference) {
   .tcm-streak, .tc-modern-logo { opacity: 0; }
 }
-/* Crest: locked, centred, full colour, above the paraphernalia. */
+/* Crest: locked, centred, full colour, above the paraphernalia.
+   Centring uses the standalone `translate` property (NOT transform) so the
+   GSAP scale tweens can't clobber the -50%/-50% offset — that was why the
+   crest sat low. */
 .tc-collage-crest {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  translate: -50% -50%;
   width: clamp(160px, 18vw, 260px);
   height: auto;
   z-index: 3;
@@ -354,6 +356,39 @@
   border-radius: 6px; cursor: pointer;
 }
 .tc-editor-row button:hover { background: var(--pale); }
+
+/* ── section three — the identity system grid (six lockups) ───────────── */
+.tc-logogrid {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  background: var(--white);
+  gap: 1px;
+  /* hairline rules between cells without outer borders */
+  --grid-line: var(--line);
+}
+.tc-logocell {
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 0.5px var(--grid-line);
+  padding: clamp(24px, 4vw, 64px);
+}
+.tc-logocell img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  user-select: none;
+}
+@media (max-width: 700px) {
+  .tc-logogrid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+  .tc-logocell img { max-width: 170px; }
+}
 
 /* ── footer ───────────────────────────────────────────────────────────── */
 .tc-footer {
