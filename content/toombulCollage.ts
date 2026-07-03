@@ -14,7 +14,6 @@ export const collageMeta: Record<string, CollageMeta> = {
   bradman: { src: "/toombul/dither/bradman.png", alt: "Don Bradman walking off, signed photograph" },
   batsman: { src: "/toombul/dither/batsman.png", alt: "A Toombul batsman playing a shot" },
   slasher: { src: "/toombul/dither/slasher.png", alt: "Ken 'Slasher' Mackay, Toombul and Australia" },
-  stumps: { src: "/toombul/dither/stumps.png", alt: "Toombul stumps" },
 };
 
 export type CollagePos = { key: string; x: number; y: number; w: number; rot: number };
