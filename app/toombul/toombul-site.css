@@ -145,7 +145,7 @@
   .tc-reveal { opacity: 1; transform: none; transition: none; }
 }
 
-/* ── nav ──────────────────────────────────────────────────────────────── */
+/* ── nav — minimal, text only, no backgrounds ─────────────────────────── */
 .tc-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -153,18 +153,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px var(--gut);
-  transition: background-color 0.35s var(--ease), box-shadow 0.35s var(--ease), padding 0.35s var(--ease);
-}
-.tc-nav[data-solid="true"] {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 1px 0 var(--line);
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding: 22px var(--gut);
 }
 .tc-nav-brand { display: flex; align-items: center; gap: 10px; }
-.tc-nav-crest { width: 38px; height: auto; flex: none; }
 .tc-nav-word {
   font-family: var(--font-display);
   font-weight: 900;
@@ -185,15 +176,16 @@
   text-transform: uppercase;
 }
 .tc-nav-links {
-  display: none;
+  display: flex;
   align-items: center;
-  gap: clamp(18px, 2.4vw, 34px);
+  gap: clamp(16px, 2.4vw, 34px);
   font-family: var(--font-mono);
   font-style: italic;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-size: 12px;
   font-weight: 400;
+  color: var(--ink);
 }
 .tc-nav-links a { position: relative; padding: 4px 0; }
 .tc-nav-links a::after {
@@ -203,28 +195,62 @@
   transition: right 0.3s var(--ease);
 }
 .tc-nav-links a:hover::after { right: 0; }
-.tc-cta-pill {
-  font-family: var(--font-mono);
-  font-style: italic;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--white);
-  background: var(--red);
-  padding: 10px 18px;
-  border-radius: 999px;
-  transition: background-color 0.25s var(--ease), transform 0.25s var(--ease);
-  white-space: nowrap;
-}
-.tc-cta-pill:hover { background: var(--red-deep); transform: translateY(-1px); }
-@media (min-width: 860px) {
-  .tc-nav-links { display: flex; }
-}
 
 /* ── blank section scaffold — each fills a viewport, styled per rebuild ── */
 .tc-blank {
   min-height: 100svh;
+}
+
+/* ── hero collage — crest centre, dithered paraphernalia around it ─────── */
+.tc-collage {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+}
+.tc-collage-crest {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(160px, 18vw, 260px);
+  height: auto;
+  z-index: 2;
+}
+.tc-para {
+  position: absolute;
+  height: auto;
+  image-rendering: pixelated;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+}
+/* Bradman & his captain walk off toward the crest, anchored bottom right. */
+.tc-para--bradman { right: 4%; bottom: 0; width: clamp(200px, 30vw, 440px); }
+/* The urn stands mid-left. */
+.tc-para--urn { left: 7%; top: 34%; width: clamp(110px, 15vw, 220px); }
+/* Baggy green floats top right. */
+.tc-para--cap { right: 15%; top: 11%; width: clamp(100px, 13vw, 190px); }
+/* Ball top left. */
+.tc-para--ball { left: 16%; top: 13%; width: clamp(70px, 9vw, 130px); }
+/* Bat sweeps diagonally, lower left. */
+.tc-para--bat { left: 3%; bottom: 12%; width: clamp(180px, 26vw, 380px); transform: rotate(-32deg); transform-origin: center; }
+/* Keeper's gloves, bottom centre-left. */
+.tc-para--gloves { left: 34%; bottom: 6%; width: clamp(100px, 13vw, 190px); }
+/* Stumps, top centre. */
+.tc-para--stumps { left: 42%; top: 7%; width: clamp(120px, 16vw, 230px); }
+/* Advance Australia arms, mid right edge — clear of Bradman's shoulder. */
+.tc-para--arms { right: 3%; top: 33%; width: clamp(80px, 10vw, 150px); }
+
+@media (max-width: 700px) {
+  /* fewer, smaller items on phones — keep the ring readable.
+     .tc-site prefix out-ranks the `.tc-site img { display:block }` reset. */
+  .tc-site .tc-para--gloves, .tc-site .tc-para--arms { display: none; }
+  .tc-site .tc-para--bradman { width: 50vw; right: 2%; }
+  .tc-site .tc-para--bat { bottom: 6%; left: 0; width: 46vw; }
+  .tc-site .tc-para--ball { top: 16%; left: 8%; }
+  .tc-site .tc-para--stumps { top: 9%; left: 30%; width: 34vw; }
+  .tc-site .tc-para--cap { top: 22%; right: 6%; width: 30vw; }
+  .tc-site .tc-para--urn { top: 38%; left: 3%; width: 23vw; }
 }
 
 /* ── footer ───────────────────────────────────────────────────────────── */

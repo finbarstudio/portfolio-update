@@ -1,14 +1,14 @@
 import Nav from "@/components/toombul/Nav";
 import Footer from "@/components/toombul/Footer";
+import Hero from "@/components/toombul/sections/Hero";
 
-// Blank rebuild scaffold: nav + three empty 100vh sections + footer.
-// Build each section into #one / #two / #three.
+// Rebuild: hero collage + two blank 100vh sections + footer.
 export default function ToombulHome() {
   return (
     <>
-      <Nav forceSolid />
+      <Nav />
       <main>
-        <section id="one" className="tc-blank" />
+        <Hero />
         <section id="two" className="tc-blank" />
         <section id="three" className="tc-blank" />
       </main>
