@@ -37,15 +37,8 @@ export default function LogoShowcase() {
 
       if (reduced) return; // static six-up board
 
-      // entry: quiet stagger in
-      gsap.from(cells, {
-        opacity: 0,
-        y: 26,
-        duration: 0.7,
-        ease: "power3.out",
-        stagger: 0.08,
-        scrollTrigger: { trigger: section, start: "top 70%" },
-      });
+      // (no entrance tween — a gsap.from here pre-hid the five non-hero
+      // marks and the pin's layout reshuffle could strand them invisible)
 
       // the finale: pin the section, hero mark travels to screen centre and
       // grows; the other five shrink away to nothing.
