@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { collageMeta, type CollagePos } from "@/content/toombulCollage";
+
+gsap.registerPlugin(ScrollTrigger);
 
 // The paraphernalia collage. Renders items from a positions array (x/y are %
 // of the section for each item's top-left corner; w is vw; rot is degrees).
@@ -132,7 +135,9 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
         });
       });
 
-      // cursor parallax — depth scaled by item width (bigger = nearer)
+      // cursor parallax — depth scaled by item width (bigger = nearer) — and a
+      // subtle gradient-map shift near the pointer (small hue swing, the
+      // red->yellow ramp warms/cools as the cursor passes over items).
       const xs = inners.map((el) => gsap.quickTo(el, "x", { duration: 0.7, ease: "power2" }));
       const ys = inners.map((el) => gsap.quickTo(el, "y", { duration: 0.7, ease: "power2" }));
       const depth = inners.map((el) => parseFloat(el.dataset.w || "10") * 0.9);
@@ -140,9 +145,53 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
         const r = section.getBoundingClientRect();
         const nx = (e.clientX - r.left) / r.width - 0.5;
         const ny = (e.clientY - r.top) / r.height - 0.5;
-        inners.forEach((_, i) => { xs[i](-nx * depth[i]); ys[i](-ny * depth[i]); });
+        inners.forEach((el, i) => {
+          xs[i](-nx * depth[i]);
+          ys[i](-ny * depth[i]);
+          const ir = el.getBoundingClientRect();
+          const d = Math.hypot(e.clientX - (ir.left + ir.width / 2), e.clientY - (ir.top + ir.height / 2));
+          const f = Math.max(0, 1 - d / 380); // 0..1 proximity
+          el.style.filter = f > 0.01
+            ? `hue-rotate(${(-14 * f).toFixed(1)}deg) saturate(${(1 + 0.18 * f).toFixed(3)})`
+            : "";
+        });
       };
       section.addEventListener("pointermove", onMove);
+
+      // scroll scatter — leaving section one, the collage blows outward from
+      // the crest and fades, scrubbed to scroll.
+      const scatters = gsap.utils.toArray<HTMLElement>(section.querySelectorAll(".tc-para-scatter"));
+      scatters.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const ex = r.left - sr.left + r.width / 2 - cx;
+        const ey = r.top - sr.top + r.height / 2 - cy;
+        const len = Math.max(60, Math.hypot(ex, ey));
+        const ux = ex / len, uy = ey / len;
+        const push = 260 + len * 0.9;
+        gsap.to(el, {
+          x: ux * push,
+          y: uy * push,
+          opacity: 0,
+          ease: "power2.in",
+          scrollTrigger: { trigger: section, start: "top top", end: "88% top", scrub: true },
+        });
+      });
+      if (crest) {
+        // fromTo + immediateRender:false so this scrub tween doesn't record
+        // the entrance animation's mid-flight values as its start state.
+        gsap.fromTo(
+          crest,
+          { scale: 1, opacity: 1 },
+          {
+            scale: 0.6,
+            opacity: 0,
+            ease: "power2.in",
+            immediateRender: false,
+            scrollTrigger: { trigger: section, start: "top top", end: "70% top", scrub: true },
+          }
+        );
+      }
+
       cleanup = () => section.removeEventListener("pointermove", onMove);
     }, section);
 
@@ -246,23 +295,27 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
             style={{
               left: `${it.x}%`,
               top: `${it.y}%`,
-              width: `${it.w}vw`,
+              width: `calc(${it.w}vw * var(--para-scale, 1))`,
               transform: it.rot ? `rotate(${it.rot}deg)` : undefined,
-              zIndex: isSel ? 20 : 1,
+              // Bradman always rides on top of the pile.
+              zIndex: isSel ? 20 : it.key === "bradman" ? 10 : 1,
             }}
             onPointerDown={(e) => startMove(e, it)}
           >
-            {/* two animation layers: inner = entrance + mouse/scroll parallax,
-                float = idle drift; keeps GSAP off the base rotate on the wrap */}
+            {/* animation layers: inner = entrance + cursor parallax/hue,
+                scatter = scroll scatter, float = idle drift; keeps GSAP off
+                the wrap's base rotate */}
             <div className="tc-para-inner" data-w={it.w}>
-              <div className="tc-para-float">
-                <img
-                  src={meta.src}
-                  alt={meta.alt}
-                  className="tc-para"
-                  draggable={false}
-                  loading="eager"
-                />
+              <div className="tc-para-scatter">
+                <div className="tc-para-float">
+                  <img
+                    src={meta.src}
+                    alt={meta.alt}
+                    className="tc-para"
+                    draggable={false}
+                    loading="eager"
+                  />
+                </div>
               </div>
             </div>
             {isSel && (

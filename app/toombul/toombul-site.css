@@ -212,7 +212,7 @@
   transform-origin: center;
   line-height: 0;
 }
-.tc-para-inner, .tc-para-float { display: block; width: 100%; will-change: transform; }
+.tc-para-inner, .tc-para-scatter, .tc-para-float { display: block; width: 100%; will-change: transform; }
 .tc-para {
   display: block;
   width: 100%;
@@ -226,6 +226,51 @@
 @media (prefers-reduced-motion: no-preference) {
   .tc-collage:not(.tc-collage--edit) .tc-para-inner,
   .tc-collage:not(.tc-collage--edit) .tc-collage-crest { opacity: 0; }
+}
+
+/* Mobile/tablet: scale every collage item up so the pieces overlap and keep
+   the dense poster feel (the raw vw sizes shrink too far on small screens). */
+@media (max-width: 700px) {
+  .tc-collage, .tc-modern { --para-scale: 2.1; }
+}
+@media (min-width: 701px) and (max-width: 1100px) {
+  .tc-collage, .tc-modern { --para-scale: 1.35; }
+}
+
+/* ── section two — the modern register (new Bulls mark) ───────────────── */
+.tc-modern {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #420808;
+}
+.tcm-wrap {
+  position: absolute;
+  transform-origin: center;
+  line-height: 0;
+}
+.tcm-inner, .tcm-streak { display: block; width: 100%; will-change: transform, filter; }
+.tcm-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+.tc-modern-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(190px, 21vw, 300px);
+  height: auto;
+  z-index: 11;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 18px 44px rgba(0, 0, 0, 0.45));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tcm-streak, .tc-modern-logo { opacity: 0; }
 }
 /* Crest: locked, centred, full colour, above the paraphernalia. */
 .tc-collage-crest {
