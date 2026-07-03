@@ -83,6 +83,38 @@ export default function CollageModern({
         );
       }
 
+      // exit scatter — leaving section two, the pieces expand away from the
+      // mark and fade (same move as section one), scrubbed to scroll.
+      const exits = gsap.utils.toArray<HTMLElement>(section.querySelectorAll(".tcm-exit"));
+      exits.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const ex = r.left - sr.left + r.width / 2 - cx;
+        const ey = r.top - sr.top + r.height / 2 - cy;
+        const len = Math.max(60, Math.hypot(ex, ey));
+        const ux = ex / len, uy = ey / len;
+        const push = 260 + len * 0.9;
+        gsap.to(el, {
+          x: ux * push,
+          y: uy * push,
+          opacity: 0,
+          ease: "power2.in",
+          scrollTrigger: { trigger: section, start: "top top", end: "88% top", scrub: true },
+        });
+      });
+      if (logo) {
+        gsap.fromTo(
+          logo,
+          { scale: 1, opacity: 1 },
+          {
+            scale: 0.6,
+            opacity: 0,
+            ease: "power2.in",
+            immediateRender: false,
+            scrollTrigger: { trigger: section, start: "top top", end: "70% top", scrub: true },
+          }
+        );
+      }
+
       // cursor parallax — same depth mechanics as section one
       const xs = inners.map((el) => gsap.quickTo(el, "x", { duration: 0.7, ease: "power2" }));
       const ys = inners.map((el) => gsap.quickTo(el, "y", { duration: 0.7, ease: "power2" }));
@@ -118,8 +150,10 @@ export default function CollageModern({
             }}
           >
             <div className="tcm-inner" data-w={it.w}>
-              <div className="tcm-streak">
-                <img src={clean(it.key)} alt={meta.alt} className="tcm-img" draggable={false} loading="lazy" />
+              <div className="tcm-exit">
+                <div className="tcm-streak">
+                  <img src={clean(it.key)} alt={meta.alt} className="tcm-img" draggable={false} loading="lazy" />
+                </div>
               </div>
             </div>
           </div>
@@ -128,7 +162,7 @@ export default function CollageModern({
 
       {/* The new mark: locked, centred. */}
       <img
-        src="/toombul/SVG/Logo.svg"
+        src="/toombul/SVG/5_1.svg"
         alt="Toombul Bulls, established 1882"
         className="tc-modern-logo"
         draggable={false}

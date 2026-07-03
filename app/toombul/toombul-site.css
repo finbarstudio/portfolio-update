@@ -253,7 +253,7 @@
   transform-origin: center;
   line-height: 0;
 }
-.tcm-inner, .tcm-streak { display: block; width: 100%; will-change: transform, filter; }
+.tcm-inner, .tcm-exit, .tcm-streak { display: block; width: 100%; will-change: transform, filter; }
 .tcm-img {
   display: block;
   width: 100%;
@@ -357,37 +357,42 @@
 }
 .tc-editor-row button:hover { background: var(--pale); }
 
-/* ── section three — the identity system grid (six lockups) ───────────── */
-.tc-logogrid {
+/* ── section three — identity showcase (six lockups, crest finale) ─────── */
+.tc-logoshow {
   min-height: 100svh;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
   background: var(--white);
-  gap: 1px;
-  /* hairline rules between cells without outer borders */
-  --grid-line: var(--line);
+  /* generous breathing room: the marks sit small and padded in the viewport */
+  padding: clamp(48px, 9vh, 120px) clamp(40px, 8vw, 140px);
+  column-gap: clamp(24px, 5vw, 90px);
+  row-gap: clamp(24px, 6vh, 80px);
+  overflow: hidden;
 }
-.tc-logocell {
-  background: var(--white);
+.tc-mark {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 0.5px var(--grid-line);
-  padding: clamp(24px, 4vw, 64px);
+  will-change: transform, opacity;
 }
-.tc-logocell img {
+.tc-mark img {
   width: 100%;
-  max-width: 300px;
+  max-width: clamp(120px, 13.5vw, 210px);
   height: auto;
   user-select: none;
+  pointer-events: none;
+  /* soft ground shadow so the white colourways read on white */
+  filter: drop-shadow(0 3px 16px rgba(66, 8, 8, 0.14));
 }
+.tc-mark--hero { position: relative; z-index: 5; }
 @media (max-width: 700px) {
-  .tc-logogrid {
+  .tc-logoshow {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    padding: clamp(40px, 8vh, 80px) clamp(24px, 7vw, 48px);
   }
-  .tc-logocell img { max-width: 170px; }
+  .tc-mark img { max-width: 34vw; }
 }
 
 /* ── footer ───────────────────────────────────────────────────────────── */
