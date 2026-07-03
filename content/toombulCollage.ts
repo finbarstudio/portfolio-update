@@ -25,6 +25,17 @@ export const collageMeta: Record<string, CollageMeta> = {
   bradman: { src: d("bradman"), alt: "Toombul and Australia players walking off, from the club's history" },
   batsman: { src: d("batsman"), alt: "A Toombul batsman playing a shot" },
   slasher: { src: d("slasher"), alt: "Ken 'Slasher' Mackay, Toombul and Australia" },
+  // Queensland / Toombul players + the Gabba
+  tallon: { src: d("tallon"), alt: "Don Tallon, Toombul and Australia wicket-keeper" },
+  billbrown: { src: d("billbrown"), alt: "Bill Brown, Toombul and Australia" },
+  mccool: { src: d("mccool"), alt: "Colin McCool, Toombul and Australia" },
+  mcdermott: { src: d("mcdermott"), alt: "Craig McDermott, Queensland and Australia" },
+  healy: { src: d("healy"), alt: "Ian Healy, Queensland and Australia" },
+  symonds: { src: d("symonds"), alt: "Andrew Symonds, Queensland and Australia" },
+  khawaja: { src: d("khawaja"), alt: "Usman Khawaja, Queensland and Australia" },
+  marnus: { src: d("marnus"), alt: "Marnus Labuschagne, Queensland and Australia" },
+  carseldine: { src: d("carseldine"), alt: "Lee Carseldine batting for the Queensland Bulls at the Gabba" },
+  gabba: { src: d("gabba"), alt: "The Gabba, Brisbane Cricket Ground, 1936" },
 };
 
 export type CollagePos = { key: string; x: number; y: number; w: number; rot: number };
