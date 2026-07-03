@@ -201,62 +201,70 @@
   min-height: 100svh;
 }
 
-/* ── hero collage — crest centre, dithered paraphernalia around it ─────── */
+/* ── hero collage — crest + dithered paraphernalia, positions from JSON ── */
 .tc-collage {
   position: relative;
   min-height: 100svh;
   overflow: hidden;
 }
-.tc-collage-crest {
+.tc-para-wrap {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: clamp(160px, 18vw, 260px);
-  height: auto;
-  z-index: 2;
+  transform-origin: center;
+  line-height: 0;
 }
 .tc-para {
-  position: absolute;
+  display: block;
+  width: 100%;
   height: auto;
   image-rendering: pixelated;
   user-select: none;
   pointer-events: none;
-  z-index: 1;
 }
-/* Slotted layout, tuned visually on a 1440x900 rig (scratchpad L5): three
-   loose rows with even gutters, Bradman anchored bottom right. Positions
-   are % of the section; widths are vw-driven so the slots hold together. */
-/* row 1 */
-.tc-para--ball { left: 6.9%; top: 12.2%; width: clamp(64px, 9vw, 150px); }
-.tc-para--card { left: 21.5%; top: 9.4%; width: clamp(56px, 7.6vw, 128px); }
-.tc-para--stumps { left: 34%; top: 8.9%; width: clamp(120px, 18vw, 300px); }
-.tc-para--cap { left: 70.8%; top: 10.6%; width: clamp(100px, 14.9vw, 250px); }
-.tc-para--shield { left: 87.8%; top: 7.8%; width: clamp(60px, 8.7vw, 145px); }
-/* row 2 */
-.tc-para--urn { left: 6.3%; top: 36.7%; width: clamp(96px, 13.9vw, 230px); }
-.tc-para--portrait { left: 28.1%; top: 35%; width: clamp(76px, 10.4vw, 175px); }
-.tc-para--trophy { left: 66%; top: 36.7%; width: clamp(76px, 10.8vw, 180px); }
-.tc-para--arms { left: 87.2%; top: 37.8%; width: clamp(64px, 9.4vw, 155px); }
-/* row 3 */
-.tc-para--bat { left: 2.3%; top: 75.6%; width: clamp(160px, 22.9vw, 380px); transform: rotate(-35deg); transform-origin: center; }
-.tc-para--gloves { left: 40.3%; top: 73.3%; width: clamp(96px, 13.9vw, 230px); }
-.tc-para--tobyjug { left: 58.7%; top: 76.1%; width: clamp(56px, 8vw, 132px); }
-.tc-para--bradman { right: 1.4%; bottom: 0; width: clamp(220px, 29.2vw, 480px); }
-
-@media (max-width: 700px) {
-  /* fewer, smaller items on phones — keep the slots readable.
-     .tc-site prefix out-ranks the `.tc-site img { display:block }` reset. */
-  .tc-site .tc-para--card, .tc-site .tc-para--shield, .tc-site .tc-para--arms,
-  .tc-site .tc-para--gloves, .tc-site .tc-para--tobyjug, .tc-site .tc-para--trophy { display: none; }
-  .tc-site .tc-para--stumps { left: 31%; top: 8%; width: 36vw; }
-  .tc-site .tc-para--ball { left: 6%; top: 15%; width: 20vw; }
-  .tc-site .tc-para--cap { left: 66%; top: 19%; width: 27vw; }
-  .tc-site .tc-para--urn { left: 4%; top: 37%; width: 23vw; }
-  .tc-site .tc-para--portrait { left: 70%; top: 38%; width: 21vw; }
-  .tc-site .tc-para--bat { left: -2%; top: 70%; width: 42vw; }
-  .tc-site .tc-para--bradman { right: 1%; width: 52vw; }
+.tc-para--raw { image-rendering: auto; }
+/* ── collage editor (only active with ?edit=1) ────────────────────────── */
+.tc-collage--edit .tc-para-wrap { cursor: grab; outline: 1px dashed rgba(17, 41, 95, 0.2); }
+.tc-collage--edit .tc-para-wrap.is-sel { outline: 2px solid var(--blue-btn); cursor: move; }
+.tc-collage--edit .tc-para { pointer-events: none; }
+.tc-h {
+  position: absolute;
+  width: 16px; height: 16px;
+  background: var(--white);
+  border: 2px solid var(--blue-btn);
+  z-index: 30;
 }
+.tc-h-resize { right: -8px; bottom: -8px; cursor: nwse-resize; border-radius: 3px; }
+.tc-h-rotate { left: 50%; top: -30px; margin-left: -8px; cursor: grab; border-radius: 50%; }
+.tc-h-rotate::before {
+  content: ""; position: absolute; left: 50%; top: 14px;
+  width: 2px; height: 16px; background: var(--blue-btn); transform: translateX(-1px);
+}
+.tc-editor {
+  position: fixed;
+  left: 16px; bottom: 16px;
+  z-index: 60;
+  width: 260px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(17, 41, 95, 0.18);
+  padding: 14px;
+  font-family: var(--font-body);
+  color: var(--ink);
+  cursor: default;
+}
+.tc-editor-title { font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; color: var(--blue-btn); margin-bottom: 10px; }
+.tc-editor-hint { font-size: 12px; line-height: 1.5; color: var(--ink-soft); }
+.tc-editor-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 12px; }
+.tc-editor-fields strong { grid-column: 1 / -1; font-size: 13px; text-transform: uppercase; }
+.tc-editor-fields label { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; color: var(--ink-soft); }
+.tc-editor-fields input { width: 100%; font-size: 12px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 5px; }
+.tc-editor-row { display: flex; gap: 6px; margin-top: 10px; }
+.tc-editor-row button {
+  flex: 1; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 6px; border: 1px solid var(--blue-btn); background: var(--white); color: var(--blue-btn);
+  border-radius: 6px; cursor: pointer;
+}
+.tc-editor-row button:hover { background: var(--pale); }
 
 /* ── footer ───────────────────────────────────────────────────────────── */
 .tc-footer {
