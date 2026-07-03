@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 import { collageMeta, type CollagePos } from "@/content/toombulCollage";
 
 // The paraphernalia collage. Renders items from a positions array (x/y are %
@@ -82,6 +83,86 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [edit, sel, items, update, remove]);
 
+  // GSAP: entrance stagger + idle float + cursor parallax. Skipped while
+  // editing and for reduced-motion. inner layer = entrance/parallax,
+  // float layer = idle drift (kept off the wrap's base rotate).
+  useEffect(() => {
+    if (edit) return;
+    const section = sectionRef.current;
+    if (!section) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let cleanup = () => {};
+    const ctx = gsap.context(() => {
+      const inners = gsap.utils.toArray<HTMLElement>(section.querySelectorAll(".tc-para-inner"));
+      const floats = gsap.utils.toArray<HTMLElement>(section.querySelectorAll(".tc-para-float"));
+      const crest = section.querySelector<HTMLElement>(".tc-collage-crest");
+      if (!inners.length) return;
+
+      // entrance — items assemble outward from the crest
+      const sr = section.getBoundingClientRect();
+      const cx = sr.width / 2, cy = sr.height / 2;
+      const ordered = inners
+        .map((el) => {
+          const r = el.getBoundingClientRect();
+          const ex = r.left - sr.left + r.width / 2;
+          const ey = r.top - sr.top + r.height / 2;
+          return { el, dist: Math.hypot(ex - cx, ey - cy) };
+        })
+        .sort((a, b) => a.dist - b.dist);
+
+      gsap.set(inners, { opacity: 0, scale: 0.7 });
+      if (crest) gsap.set(crest, { opacity: 0, scale: 0.5 });
+      const tl = gsap.timeline();
+      if (crest) tl.to(crest, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)" }, 0.05);
+      ordered.forEach((o, i) => {
+        tl.to(o.el, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 0.15 + i * 0.03);
+      });
+
+      // idle float — gentle independent drift
+      floats.forEach((el) => {
+        gsap.to(el, {
+          y: gsap.utils.random(-8, 8),
+          rotation: gsap.utils.random(-2.2, 2.2),
+          duration: gsap.utils.random(3.5, 6.5),
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: gsap.utils.random(0, 2.5),
+        });
+      });
+
+      // cursor parallax — depth scaled by item width (bigger = nearer)
+      const xs = inners.map((el) => gsap.quickTo(el, "x", { duration: 0.7, ease: "power2" }));
+      const ys = inners.map((el) => gsap.quickTo(el, "y", { duration: 0.7, ease: "power2" }));
+      const depth = inners.map((el) => parseFloat(el.dataset.w || "10") * 0.9);
+      const onMove = (e: PointerEvent) => {
+        const r = section.getBoundingClientRect();
+        const nx = (e.clientX - r.left) / r.width - 0.5;
+        const ny = (e.clientY - r.top) / r.height - 0.5;
+        inners.forEach((_, i) => { xs[i](-nx * depth[i]); ys[i](-ny * depth[i]); });
+      };
+      section.addEventListener("pointermove", onMove);
+      cleanup = () => section.removeEventListener("pointermove", onMove);
+    }, section);
+
+    return () => { cleanup(); ctx.revert(); };
+  }, [edit, items.length]);
+
+  // Failsafe: if the entrance animation can't run for any reason, never leave
+  // the pre-hidden collage blank — force everything visible after a moment.
+  useEffect(() => {
+    if (edit) return;
+    const t = setTimeout(() => {
+      sectionRef.current
+        ?.querySelectorAll<HTMLElement>(".tc-para-inner, .tc-collage-crest")
+        .forEach((el) => {
+          if (getComputedStyle(el).opacity === "0") gsap.set(el, { opacity: 1, scale: 1 });
+        });
+    }, 2600);
+    return () => clearTimeout(t);
+  }, [edit]);
+
   const startMove = (e: React.PointerEvent, it: CollagePos) => {
     if (!edit) return;
     e.preventDefault();
@@ -134,17 +215,23 @@ export default function Collage({ layout }: { layout: CollagePos[] }) {
               top: `${it.y}%`,
               width: `${it.w}vw`,
               transform: it.rot ? `rotate(${it.rot}deg)` : undefined,
-              zIndex: isSel ? 20 : meta.z ?? 1,
+              zIndex: isSel ? 20 : 1,
             }}
             onPointerDown={(e) => startMove(e, it)}
           >
-            <img
-              src={meta.src}
-              alt={meta.alt}
-              className={`tc-para${meta.raw ? " tc-para--raw" : ""}`}
-              draggable={false}
-              loading="eager"
-            />
+            {/* two animation layers: inner = entrance + mouse/scroll parallax,
+                float = idle drift; keeps GSAP off the base rotate on the wrap */}
+            <div className="tc-para-inner" data-w={it.w}>
+              <div className="tc-para-float">
+                <img
+                  src={meta.src}
+                  alt={meta.alt}
+                  className="tc-para"
+                  draggable={false}
+                  loading="eager"
+                />
+              </div>
+            </div>
             {isSel && (
               <>
                 <span

@@ -212,6 +212,7 @@
   transform-origin: center;
   line-height: 0;
 }
+.tc-para-inner, .tc-para-float { display: block; width: 100%; will-change: transform; }
 .tc-para {
   display: block;
   width: 100%;
@@ -220,7 +221,12 @@
   user-select: none;
   pointer-events: none;
 }
-.tc-para--raw { image-rendering: auto; }
+/* Start hidden so the GSAP entrance can't flash the static frame first
+   (only when motion is allowed and we're not in the editor). */
+@media (prefers-reduced-motion: no-preference) {
+  .tc-collage:not(.tc-collage--edit) .tc-para-inner,
+  .tc-collage:not(.tc-collage--edit) .tc-collage-crest { opacity: 0; }
+}
 /* Crest: locked, centred, full colour, above the paraphernalia. */
 .tc-collage-crest {
   position: absolute;

@@ -12,7 +12,6 @@ export const collageMeta: Record<string, CollageMeta> = {
   ashesurn: { src: d("ashesurn"), alt: "The Ashes urn on its mount" },
   bat: { src: d("bat"), alt: "Cricket bat" },
   gloves: { src: d("gloves"), alt: "Wicket keeping gloves" },
-  bails: { src: d("bails"), alt: "Cricket bails" },
   stumps: { src: d("stumps"), alt: "Toombul stumps" },
   card: { src: d("card"), alt: "Vintage cricket cigarette card" },
   shield: { src: d("shield"), alt: "The Sheffield Shield, 1894 engraving" },
@@ -20,7 +19,6 @@ export const collageMeta: Record<string, CollageMeta> = {
   blazer: { src: d("blazer"), alt: "A 1937 striped cricket club blazer" },
   sweater: { src: d("sweater"), alt: "A cable-knit cricket jumper" },
   // public/toombul/touse — club photography (Toombul / Queensland)
-  team: { src: d("team"), alt: "A historic Toombul cricket team photograph" },
   bowler: { src: d("bowler"), alt: "A Toombul bowler in the delivery stride" },
   bradman: { src: d("bradman"), alt: "Toombul and Australia players walking off, from the club's history" },
   batsman: { src: d("batsman"), alt: "A Toombul batsman playing a shot" },
@@ -29,13 +27,19 @@ export const collageMeta: Record<string, CollageMeta> = {
   tallon: { src: d("tallon"), alt: "Don Tallon, Toombul and Australia wicket-keeper" },
   billbrown: { src: d("billbrown"), alt: "Bill Brown, Toombul and Australia" },
   mccool: { src: d("mccool"), alt: "Colin McCool, Toombul and Australia" },
+  grout: { src: d("grout"), alt: "Wally Grout, Toombul and Australia wicket-keeper" },
+  oxenham: { src: d("oxenham"), alt: "Ron Oxenham, Toombul and Queensland" },
+  hornibrook: { src: d("hornibrook"), alt: "Percy Hornibrook, Queensland and Australia" },
   mcdermott: { src: d("mcdermott"), alt: "Craig McDermott, Queensland and Australia" },
   healy: { src: d("healy"), alt: "Ian Healy, Queensland and Australia" },
+  harris: { src: d("harris"), alt: "Ryan Harris, Queensland and Australia" },
   symonds: { src: d("symonds"), alt: "Andrew Symonds, Queensland and Australia" },
   khawaja: { src: d("khawaja"), alt: "Usman Khawaja, Queensland and Australia" },
   marnus: { src: d("marnus"), alt: "Marnus Labuschagne, Queensland and Australia" },
+  lynn: { src: d("lynn"), alt: "Chris Lynn, Queensland and Toombul junior" },
+  renshaw: { src: d("renshaw"), alt: "Matthew Renshaw, Toombul junior, Queensland and Australia" },
   carseldine: { src: d("carseldine"), alt: "Lee Carseldine batting for the Queensland Bulls at the Gabba" },
-  gabba: { src: d("gabba"), alt: "The Gabba, Brisbane Cricket Ground, 1936" },
+  gabba: { src: d("gabba"), alt: "The Gabba, Brisbane Cricket Ground" },
 };
 
 export type CollagePos = { key: string; x: number; y: number; w: number; rot: number };
