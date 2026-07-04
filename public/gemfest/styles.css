@@ -292,8 +292,8 @@ body {
   z-index: 10;
   pointer-events: none;
   background: url("img/noise.png") repeat;
-  background-size: 160px 160px;
-  opacity: 0.14;
+  background-size: 140px 140px;
+  opacity: 0.22;
   mix-blend-mode: overlay;
 }
 

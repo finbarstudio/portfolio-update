@@ -127,19 +127,69 @@ setMask(0);
 const canvas = document.getElementById("gl");
 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+/* filmic tone mapping lets speculars blow out into a bloom-like glow */
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.25;
 
 const scene = new THREE.Scene();
+/* custom "sparkle HDRI": what a Blender artist would build — a mostly
+   DARK world with a few tiny, viciously bright emitters. Smooth metal
+   reflecting this stays dark until a face's reflection vector sweeps
+   across a hotspot, then the whole facet FLASHES. That sweep-flash is
+   the twinkle; soft studio environments can never produce it. */
+{
+  const env = new THREE.Scene();
+  // dim shell so unlit angles aren't dead black (keeps forms readable)
+  env.add(new THREE.Mesh(
+    new THREE.SphereGeometry(60, 16, 12),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(0.32, 0.35, 0.42), side: THREE.BackSide })
+  ));
+  // hot emitters: [direction xyz, radius, HDR colour multiplier]
+  const spots = [
+    [[ 0.5,  0.8,  0.4], 2.4, [70, 70, 70]],   // big key sparkle
+    [[-0.7,  0.4,  0.5], 1.1, [55, 55, 55]],
+    [[ 0.8, -0.3,  0.6], 0.9, [45, 45, 45]],
+    [[-0.4, -0.7,  0.4], 0.6, [40, 40, 40]],
+    [[ 0.1,  0.3,  0.9], 1.8, [80, 80, 80]],   // big camera-adjacent glint
+    [[-0.9, -0.1,  0.3], 0.7, [20, 45, 55]],   // cyan accent
+    [[ 0.6,  0.6, -0.2], 0.8, [60, 8, 40]],    // magenta accent
+    [[-0.2,  0.9,  0.3], 0.45, [60, 60, 60]],  // small pin
+    [[ 0.9,  0.2,  0.35], 1.4, [50, 50, 50]],
+    [[-0.55, -0.35, 0.75], 0.5, [75, 75, 75]], // tiny hot pin
+    [[ 0.25, -0.85, 0.45], 1.0, [35, 50, 60]], // cool accent
+    [[-0.15, 0.05, 0.98], 0.35, [90, 90, 90]], // pinprick dead ahead
+  ];
+  for (const [dir, rad, col] of spots) {
+    const m = new THREE.Mesh(
+      new THREE.SphereGeometry(rad, 12, 8),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color(...col) })
+    );
+    m.position.set(dir[0], dir[1], dir[2]).normalize().multiplyScalar(40);
+    env.add(m);
+  }
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(env, 0).texture;
+  pmrem.dispose();
+}
 let W = window.innerWidth, H = window.innerHeight;
 const camera = new THREE.OrthographicCamera(-W / 2, W / 2, H / 2, -H / 2, -3000, 3000);
 camera.position.z = 1000;
 
-scene.add(new THREE.AmbientLight(0xffffff, 1.15));
-const key = new THREE.DirectionalLight(0xffffff, 1.6);
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+const key = new THREE.DirectionalLight(0xffffff, 1.1);
 key.position.set(0.4, 0.7, 1);
 scene.add(key);
 const rim = new THREE.DirectionalLight(0x66d5ff, 0.5);
 rim.position.set(-0.6, -0.3, 0.6);
 scene.add(rim);
+
+/* scroll sweep light: dark until you scroll, then a bright point
+   source flies across the field close to the icons — light direction
+   differs per icon, so the glint visibly travels across the
+   constellation instead of lighting everything at once */
+const sweep = new THREE.PointLight(0xffffff, 0, 0, 2);
+sweep.position.set(0, 0, 320);
+scene.add(sweep);
 
 function sizeRenderer() {
   W = window.innerWidth; H = window.innerHeight;
@@ -147,6 +197,7 @@ function sizeRenderer() {
   camera.left = -W / 2; camera.right = W / 2;
   camera.top = H / 2; camera.bottom = -H / 2;
   camera.updateProjectionMatrix();
+  if (window.__postReady) sizePost();
 }
 sizeRenderer();
 window.addEventListener("resize", sizeRenderer);
@@ -181,6 +232,56 @@ window.addEventListener("resize", () => {
 /* ---------- build extruded prototypes from the SVGs ---------- */
 const GRAD_DARK = new THREE.Color("#1E7BF0");
 const GRAD_LIGHT = new THREE.Color("#00F0FF");
+/* pink wash swept across the WHOLE constellation (screen space):
+   injected into every icon material's shader, keyed on world position,
+   so one continuous gradient flows over the entire field while still
+   wrapping each icon's 3d surface (sides shade under the lights) */
+const PINK_DARK = new THREE.Color("#FF0099");  // true magenta, no blue lean
+const PINK_LIGHT = new THREE.Color("#FF2DB0");
+const washViewport = { value: new THREE.Vector2(window.innerWidth, window.innerHeight) };
+window.addEventListener("resize", () => washViewport.value.set(window.innerWidth, window.innerHeight));
+
+function pinkWash(mat) {
+  mat.customProgramCacheKey = () => "pinkwash"; // share one compiled program
+  mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uPinkA = { value: PINK_DARK };
+    sh.uniforms.uPinkB = { value: PINK_LIGHT };
+    sh.uniforms.uVp = washViewport;
+    sh.vertexShader = sh.vertexShader
+      .replace("#include <common>", "#include <common>\nvarying vec3 vWashPos;")
+      .replace("#include <fog_vertex>", "#include <fog_vertex>\nvWashPos = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+    sh.fragmentShader = sh.fragmentShader
+      .replace("#include <common>", "#include <common>\nvarying vec3 vWashPos;\nuniform vec3 uPinkA;\nuniform vec3 uPinkB;\nuniform vec2 uVp;")
+      .replace("#include <color_fragment>", `#include <color_fragment>
+{
+  // primary axis: 0 top-left -> 1 bottom-right
+  float tWash = clamp((vWashPos.x / uVp.x - vWashPos.y / uVp.y) + 0.5, 0.0, 1.0);
+  // secondary axis (the other diagonal) for the variation pass
+  float tCross = clamp((vWashPos.x / uVp.x + vWashPos.y / uVp.y) + 0.5, 0.0, 1.0);
+  // smooth low-frequency "random" field (~600px blobs) for organic edges
+  float vari = sin(vWashPos.x * 0.009 + 1.7) * sin(vWashPos.y * 0.011 + 0.4);
+
+  // magenta in BOTH far corners (bottom-right AND top-left), blue
+  // between: 4 alternating sections. The noise wobbles the borders.
+  float kWash = smoothstep(0.72, 0.95, tWash) + (1.0 - smoothstep(0.05, 0.28, tWash));
+  kWash = clamp(kWash + vari * 0.14, 0.0, 1.0);
+
+  vec3 washCol = mix(uPinkA, uPinkB, tWash);
+  // full replacement in the corners — partial mixes with the blue base
+  // were muddying the magenta into purple
+  diffuseColor.rgb = mix(diffuseColor.rgb, washCol, smoothstep(0.0, 0.6, kWash));
+
+  // variation overlay: linear sweep along the cross diagonal + the
+  // noise field, gently lifting/dropping each section's brightness
+  diffuseColor.rgb *= 1.0 + (tCross - 0.5) * 0.10 + vari * 0.07;
+
+  // retro print finish: fragment grain dither + colour posterisation
+  float gGrain = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+  diffuseColor.rgb += (gGrain - 0.5) * 0.09;
+  diffuseColor.rgb = floor(diffuseColor.rgb * 14.0 + 0.5) / 14.0;
+}`);
+  };
+}
 
 function isWhiteFill(fill) {
   if (!fill) return false;
@@ -200,16 +301,16 @@ function buildProto(svgData) {
     shapes.forEach((shape) => {
       const geo = new THREE.ExtrudeGeometry(shape, {
         depth: white ? 34 : 32,        // slab thickness in svg units
-        bevelEnabled: true,
-        bevelThickness: 2,
-        bevelSize: 2,
-        bevelSegments: 2,
+        bevelEnabled: false,
         curveSegments: 16,       // 5 flattened beziers into visible chords; geometry is shared by all instances so this is cheap
       });
-      const mat = new THREE.MeshLambertMaterial({
+      const mat = new THREE.MeshStandardMaterial({
         transparent: true,
         vertexColors: !white,
-        color: white ? 0xffffff : 0xffffff,
+        color: 0xffffff,
+        metalness: 0.1,
+        roughness: 0.5,
+        envMapIntensity: 0.2,
       });
       const mesh = new THREE.Mesh(geo, mat);
       if (white) mesh.position.z = 1.5;  // knockouts sit proud, avoid z-fight
@@ -249,6 +350,7 @@ function buildProto(svgData) {
    (distance / combined radii): big icons claim breathing room,
    small ones nestle close together and fill leftover pockets.  */
 const instances = [];
+const allMats = [];
 
 function makeInstances(protos) {
   // sizes: 58% small / 36% mid / 6% big — halved on phones, where the desktop
@@ -291,7 +393,13 @@ function makeInstances(protos) {
 
     const outer = new THREE.Group();               // position / scale / bob
     const inner = proto.group.clone(true);         // tumble rotation
-    inner.traverse((o) => { if (o.isMesh) o.material = o.material.clone(); });
+    inner.traverse((o) => {
+      if (o.isMesh) {
+        o.material = o.material.clone();
+        pinkWash(o.material); // constellation-wide gradient overlay
+        allMats.push(o.material);
+      }
+    });
 
     /* gradient map across the FIELD: instances in the last 10% of the
        top-left -> bottom-right diagonal pick up a touch of brand pink */
@@ -349,6 +457,134 @@ window.addEventListener("pointerleave", () => { mouse.x = 1e9; mouse.y = 1e9; })
 const HOVER_R = 150;        // influence radius (px)
 const HOVER_TILT = 0.9;     // max extra rotation (rad) at cursor centre
 
+/* ---------- glare post pipeline ----------
+   The Blender-glare approach: render the scene to a target, extract
+   pixels above a luminance threshold (the metal flashes), smear them
+   into long horizontal + vertical streaks, then composite the cross
+   flare back over the canvas. The flare draws OUTSIDE the icon
+   bounds — real light bleed, alpha handled manually so it stays
+   correct over the white page. */
+const quadCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const quadScene = new THREE.Scene();
+const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
+quadScene.add(quad);
+
+const rtScene = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType, samples: 4 });
+const rtBright = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType });
+const rtS1 = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType });
+const rtS2 = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType });
+const rtS3 = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType });
+
+const QUAD_VERT = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+
+const threshMat = new THREE.ShaderMaterial({
+  uniforms: { tDiffuse: { value: null }, uThresh: { value: 2.0 } },
+  vertexShader: QUAD_VERT,
+  fragmentShader: `
+    uniform sampler2D tDiffuse; uniform float uThresh; varying vec2 vUv;
+    void main(){
+      vec4 c = texture2D(tDiffuse, vUv);
+      float l = max(max(c.r, c.g), c.b) * c.a;
+      float k = smoothstep(uThresh, uThresh * 2.5, l);
+      gl_FragColor = vec4(c.rgb * k, k);
+    }`,
+});
+
+const streakMat = new THREE.ShaderMaterial({
+  uniforms: { tDiffuse: { value: null }, uDir: { value: new THREE.Vector2() } },
+  vertexShader: QUAD_VERT,
+  fragmentShader: `
+    uniform sampler2D tDiffuse; uniform vec2 uDir; varying vec2 vUv;
+    void main(){
+      vec3 acc = vec3(0.0); float wsum = 0.0;
+      for (int i = -14; i <= 14; i++) {
+        float w = pow(0.80, abs(float(i)));
+        acc += texture2D(tDiffuse, vUv + uDir * float(i)).rgb * w;
+        wsum += w;
+      }
+      gl_FragColor = vec4(acc / wsum, 1.0);
+    }`,
+});
+
+const copyMat = new THREE.ShaderMaterial({
+  uniforms: { tDiffuse: { value: null }, uExposure: { value: 1.25 } },
+  vertexShader: QUAD_VERT,
+  fragmentShader: `
+    uniform sampler2D tDiffuse; uniform float uExposure; varying vec2 vUv;
+    vec3 aces(vec3 x){ return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14), 0.0, 1.0); }
+    void main(){
+      vec4 c = texture2D(tDiffuse, vUv);
+      c.rgb = pow(aces(c.rgb * uExposure), vec3(1.0/2.2));
+      gl_FragColor = c;
+    }`,
+  blending: THREE.NoBlending,
+});
+
+const compMat = new THREE.ShaderMaterial({
+  uniforms: { t1: { value: null }, t2: { value: null }, t3: { value: null }, uStrength: { value: 0.3 } },
+  vertexShader: QUAD_VERT,
+  fragmentShader: `
+    uniform sampler2D t1; uniform sampler2D t2; uniform sampler2D t3; uniform float uStrength; varying vec2 vUv;
+    void main(){
+      vec3 s = texture2D(t1, vUv).rgb + texture2D(t2, vUv).rgb + texture2D(t3, vUv).rgb;
+      float l = clamp(max(max(s.r, s.g), s.b) * uStrength, 0.0, 1.0);
+      // brand-tinted flare (pure white would vanish on the white page)
+      vec3 tint = mix(vec3(0.0, 0.85, 1.0), vec3(1.0, 0.0, 0.63), clamp(vUv.x - vUv.y + 0.5, 0.0, 1.0));
+      gl_FragColor = vec4(mix(tint, vec3(1.0), 0.3), l);
+    }`,
+  transparent: true,
+  depthTest: false,
+  depthWrite: false,
+});
+
+function sizePost() {
+  const pr = renderer.getPixelRatio();
+  rtScene.setSize(Math.round(W * pr), Math.round(H * pr));
+  const qw = Math.max(2, Math.round(W * pr / 3)), qh = Math.max(2, Math.round(H * pr / 3));
+  rtBright.setSize(qw, qh); rtS1.setSize(qw, qh); rtS2.setSize(qw, qh); rtS3.setSize(qw, qh);
+}
+
+window.__postReady = true;
+sizePost();
+
+function renderPost() {
+  // 1. scene -> target
+  renderer.setRenderTarget(rtScene);
+  renderer.clear();
+  renderer.render(scene, camera);
+  // 2. bright extract (third res)
+  quad.material = threshMat;
+  threshMat.uniforms.tDiffuse.value = rtScene.texture;
+  renderer.setRenderTarget(rtBright);
+  renderer.render(quadScene, quadCam);
+  // 3. six-point star: three streak directions, 60 degrees apart
+  quad.material = streakMat;
+  streakMat.uniforms.tDiffuse.value = rtBright.texture;
+  const STEP = 2.9;
+  const dirs = [[1, 0], [0.5, 0.8660254], [-0.5, 0.8660254]];
+  const rts = [rtS1, rtS2, rtS3];
+  for (let i = 0; i < 3; i++) {
+    streakMat.uniforms.uDir.value.set(
+      (dirs[i][0] * STEP) / rtBright.width,
+      (dirs[i][1] * STEP) / rtBright.height
+    );
+    renderer.setRenderTarget(rts[i]);
+    renderer.render(quadScene, quadCam);
+  }
+  // 4. composite: exact scene copy, then the flare over it
+  renderer.setRenderTarget(null);
+  quad.material = copyMat;
+  copyMat.uniforms.tDiffuse.value = rtScene.texture;
+  renderer.render(quadScene, quadCam);
+  renderer.autoClear = false;
+  quad.material = compMat;
+  compMat.uniforms.t1.value = rtS1.texture;
+  compMat.uniforms.t2.value = rtS2.texture;
+  compMat.uniforms.t3.value = rtS3.texture;
+  renderer.render(quadScene, quadCam);
+  renderer.autoClear = true;
+}
+
 /* ---------- render loop ---------- */
 const clock = new THREE.Clock();
 gsap.ticker.add(() => {
@@ -390,7 +626,7 @@ gsap.ticker.add(() => {
     );
     for (const m of inst.mats) m.opacity = anim.op;
   }
-  renderer.render(scene, camera);
+  renderPost();
 });
 
 /* ============================================================
@@ -445,19 +681,37 @@ function buildScrub() {
     },
   });
 
-  /* small dead zone: the first ~8% of the runway scrolls without any mask or
-     grow action, so a casual first scroll doesn't immediately disturb the logo */
-  const DEAD = 0.08;
-  /* mobile: much slower, near-linear grow — power3.out front-loads the growth,
-     which reads as a shock against finger-paced scrolling. Desktop keeps the
-     snappier reveal (wheel/trackpad scrolling has its own momentum feel). */
   const scrollMask = { p: 0 };
   scrub.to(scrollMask, {
-    p: 1,
-    duration: isSmall() ? 0.88 : 0.5,
-    ease: isSmall() ? "power1.inOut" : "power3.out",
+    p: 1, duration: 0.5, ease: "power3.out",
     onUpdate: () => setMaskProgress(scrollMask.p),
-  }, DEAD);
+  }, 0);
+
+  /* shininess: matte at rest, ramps up FAST with the first bit of
+     scroll (fully shiny by ~14% of the runway), reverses on the way
+     back up */
+  const shiny = { k: 0 };
+  scrub.fromTo(shiny, { k: 0 }, {
+    k: 1, duration: 0.14, ease: "power2.out", immediateRender: false,
+    onUpdate: () => {
+      for (const m of allMats) {
+        m.metalness = 0.1 + shiny.k * 0.8;
+        m.roughness = 0.5 - shiny.k * 0.42;
+        m.envMapIntensity = 0.15 + shiny.k * 1.45;
+      }
+    },
+  }, 0);
+
+  /* sweep light: rises fast, arcs across the scene left->right as the
+     icons tumble, dies away as they fade — every surface catches a
+     moving twinkle mid-dispersal */
+  scrub.fromTo(sweep.position, { x: -W * 0.7, y: H * 0.35 }, {
+    x: W * 0.7, y: -H * 0.35, duration: 0.5, ease: "none", immediateRender: false,
+  }, 0);
+  scrub.fromTo(sweep, { intensity: 0 }, {
+    intensity: 200000, duration: 0.18, ease: "power2.in", immediateRender: false,
+  }, 0);
+  scrub.to(sweep, { intensity: 0, duration: 0.32, ease: "power2.out" }, 0.18);
 
   /* explicit from-values: this timeline is created BEFORE the intro
      plays, so plain .to() captures the pre-intro state (s: 0) as the
@@ -494,9 +748,9 @@ function buildScrub() {
   scrub.to("#stripCenter", {
     scale: isSmall() ? 2.6 : 1.45,
     transformOrigin: "50% 50%",
-    duration: 1 - DEAD,
+    duration: 1,
     ease: "none",
-  }, DEAD);
+  }, 0);
 
   /* hold: slow zoom cue so scrolling stays legible */
   scrub.to("#videoStrip", {
