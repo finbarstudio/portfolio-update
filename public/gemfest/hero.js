@@ -448,9 +448,14 @@ function buildScrub() {
   /* small dead zone: the first ~8% of the runway scrolls without any mask or
      grow action, so a casual first scroll doesn't immediately disturb the logo */
   const DEAD = 0.08;
+  /* mobile: much slower, near-linear grow — power3.out front-loads the growth,
+     which reads as a shock against finger-paced scrolling. Desktop keeps the
+     snappier reveal (wheel/trackpad scrolling has its own momentum feel). */
   const scrollMask = { p: 0 };
   scrub.to(scrollMask, {
-    p: 1, duration: 0.5, ease: "power3.out",
+    p: 1,
+    duration: isSmall() ? 0.88 : 0.5,
+    ease: isSmall() ? "power1.inOut" : "power3.out",
     onUpdate: () => setMaskProgress(scrollMask.p),
   }, DEAD);
 
