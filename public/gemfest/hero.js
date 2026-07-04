@@ -118,8 +118,8 @@ function buildProto(svgData) {
         bevelEnabled: true,
         bevelThickness: 2,
         bevelSize: 2,
-        bevelSegments: 1,
-        curveSegments: 5,
+        bevelSegments: 2,
+        curveSegments: 16,       // 5 flattened beziers into visible chords; geometry is shared by all instances so this is cheap
       });
       const mat = new THREE.MeshLambertMaterial({
         transparent: true,
