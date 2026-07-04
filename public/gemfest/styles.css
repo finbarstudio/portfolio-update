@@ -139,8 +139,19 @@ body {
   isolation: isolate;
 }
 
-/* flat mobile hero logo (desktop uses the masked-video trick instead) */
-.hero__logo-flat { display: none; }
+/* mobile clip window: a logo-shaped hole (SVG clipPath) around a
+   viewport-fixed inner layer; JS drives its size exactly like mask-size.
+   Only created (by JS) on small screens — desktop keeps the CSS mask. */
+.clip-window {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-clip-path: url(#gfLogoClip);
+  clip-path: url(#gfLogoClip);
+  will-change: width, height;
+}
+.clip-inner { position: absolute; }
 
 /* full height fits 100vh, aspect kept; the strip is centred and
    live-mirrored left + right (box-reflect) to fill the sides */
@@ -812,22 +823,10 @@ a.sf-value:hover::after,
      (same SVG, same 44vw), the constellation behaves identically, and the video
      fades in FULL-BLEED on scroll at the point desktop's mask clears the viewport. */
   .hero__video-mask {
-    -webkit-mask-image: none;
+    -webkit-mask-image: none;   /* the clip window does the shaping on mobile */
     mask-image: none;
-    opacity: 0;                 /* JS scrub fades the video layer in on scroll */
   }
   .strip-mirror { display: none; }
-  .vignette { display: none; }
-  .hero__logo-flat {
-    display: block;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 44vw;                /* = baseMask(), so the preloader handoff is seamless */
-    transform: translate(-50%, -50%);
-    z-index: 1;                 /* over the (hidden) video layer, under the icons */
-    will-change: opacity, transform;
-  }
 
   /* fullscreen backdrop-filter stacks are a jank machine on phones, and the
      sharp centre strip already covers a portrait viewport — drop them */

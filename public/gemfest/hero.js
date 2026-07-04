@@ -39,20 +39,40 @@ let s = 42;
 function rnd() { s = (s * 16807 + 19) % 2147483647; return (s & 0xfffffff) / 0x10000000 % 1; }
 
 /* ---------- mask helpers ---------- */
-/* Two possible mask hosts: the container (desktop) and the centre video itself
-   (mobile — iOS lets video escape ancestor masks). JS drives both; the CSS media
-   query decides which one actually carries a mask-image. */
-function maskHosts() {
-  const v = document.getElementById("vMain");
-  return v ? [maskEl, v] : [maskEl];
+const isSmall = () => window.innerWidth <= 760;
+
+/* Mobile clips a logo-shaped window (SVG clipPath = geometry, iOS-safe) around a
+   viewport-fixed inner layer; desktop keeps the CSS mask on the container. Both
+   are driven by the same setMask(px) so the intro + scrub don't care which. */
+const LOGO_RATIO = 342 / 1500; // logo.svg viewBox aspect
+let clipWin = null, clipInner = null;
+if (isSmall()) {
+  const strip = document.getElementById("videoStrip");
+  clipWin = document.createElement("div");
+  clipWin.className = "clip-window";
+  clipInner = document.createElement("div");
+  clipInner.className = "clip-inner";
+  clipInner.appendChild(strip);
+  clipWin.appendChild(clipInner);
+  maskEl.appendChild(clipWin);
 }
 function setMask(px) {
-  maskHosts().forEach((el) => {
-    el.style.webkitMaskSize = `${px}px`;
-    el.style.maskSize = `${px}px`;
-  });
+  if (clipWin) {
+    // window = logo-shaped hole of width px; inner counter-offsets so the video
+    // stays viewport-fixed while the hole grows (identical to mask-size math)
+    const w = px, h = px * LOGO_RATIO;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    clipWin.style.width = `${w}px`;
+    clipWin.style.height = `${h}px`;
+    clipInner.style.width = `${vw}px`;
+    clipInner.style.height = `${vh}px`;
+    clipInner.style.left = `${(w - vw) / 2}px`;
+    clipInner.style.top = `${(h - vh) / 2}px`;
+    return;
+  }
+  maskEl.style.webkitMaskSize = `${px}px`;
+  maskEl.style.maskSize = `${px}px`;
 }
-const isSmall = () => window.innerWidth <= 760;
 const baseMask = () => window.innerWidth * (isSmall() ? 0.44 : 0.72);  // logo mask much smaller on phones
 const fullMask = () => window.innerWidth * 30;
 
@@ -61,10 +81,12 @@ let maskOff = false;
 function setMaskProgress(p) {
   if (p >= MASK_OFF_AT && !maskOff) {
     maskOff = true;
-    maskHosts().forEach((el) => { el.style.webkitMaskImage = "none"; el.style.maskImage = "none"; });
+    if (clipWin) { clipWin.style.webkitClipPath = "none"; clipWin.style.clipPath = "none"; }
+    else { maskEl.style.webkitMaskImage = "none"; maskEl.style.maskImage = "none"; }
   } else if (p < MASK_OFF_AT && maskOff) {
     maskOff = false;
-    maskHosts().forEach((el) => { el.style.webkitMaskImage = ""; el.style.maskImage = ""; });
+    if (clipWin) { clipWin.style.webkitClipPath = ""; clipWin.style.clipPath = ""; }
+    else { maskEl.style.webkitMaskImage = ""; maskEl.style.maskImage = ""; }
   }
   if (!maskOff) {
     const b = baseMask();
@@ -363,12 +385,6 @@ function buildScrub() {
       op: 0, duration: 0.25, ease: "power1.in", immediateRender: false,
     }, 0.2);
   });
-
-  /* mobile: crossfade flat logo -> full-bleed video (replaces the mask grow) */
-  if (isSmall()) {
-    scrub.to("#heroLogoFlat", { opacity: 0, scale: 2.2, duration: 0.3, ease: "power1.in", immediateRender: false }, 0.05);
-    scrub.to("#videoMask", { opacity: 1, duration: 0.35, ease: "power1.in", immediateRender: false }, 0.1);
-  }
 
   /* central video grows over the mirrors across the whole scroll */
   scrub.to("#stripCenter", {
