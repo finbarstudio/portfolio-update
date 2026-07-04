@@ -24,7 +24,9 @@ const ICONS = [
   "/gemfest/SVG/Asset 10.svg", "/gemfest/SVG/Asset 11.svg", "/gemfest/SVG/Asset 12.svg",
   "/gemfest/SVG/Asset 13.svg", "/gemfest/SVG/Asset 14.svg", "/gemfest/SVG/Asset 15.svg",
   "/gemfest/SVG/Asset 17.svg", "/gemfest/SVG/Asset 18.svg", "/gemfest/SVG/Asset 19.svg",
-  "/gemfest/SVG/Asset 20.svg",
+  "/gemfest/SVG/Asset 20.svg", "/gemfest/SVG/Asset 24.svg", "/gemfest/SVG/Asset 25.svg",
+  "/gemfest/SVG/Asset 26.svg", "/gemfest/SVG/Asset 27.svg", "/gemfest/SVG/Asset 28.svg",
+  "/gemfest/SVG/Asset 29.svg", "/gemfest/SVG/Asset 30.svg",
 ];
 
 const N_ICONS = 92;
@@ -333,27 +335,40 @@ function buildScrub() {
     onUpdate: () => setMaskProgress(scrollMask.p),
   }, 0);
 
+  /* explicit from-values: this timeline is created BEFORE the intro
+     plays, so plain .to() captures the pre-intro state (s: 0) as the
+     top-of-page value and reverse scrolling collapses the icons */
   instances.forEach((inst) => {
     const total = Math.hypot(W, H) * 0.9;
     const spin = 1 + Math.floor(rnd() * 2);
     // dispersal
-    scrub.to(inst.anim, {
+    scrub.fromTo(inst.anim, { dx: 0, dy: 0, s: 1 }, {
       dx: Math.cos(inst.angle) * total,
       dy: -Math.sin(inst.angle) * total,
       s: 1.5 + rnd() * 1.2,
       duration: 0.45,
       ease: "power1.in",
+      immediateRender: false,
     }, 0);
     // 3d tumble — front-loaded
-    scrub.to(inst.anim, {
+    scrub.fromTo(inst.anim, { rx: 0, ry: 0 }, {
       rx: (rnd() > 0.5 ? 1 : -1) * spin * Math.PI * 2 * (0.5 + rnd() * 0.5),
       ry: (rnd() > 0.5 ? 1 : -1) * spin * Math.PI * 2 * (0.5 + rnd() * 0.5),
       duration: 0.45,
       ease: "power2.out",
+      immediateRender: false,
     }, 0);
     // fade late so thickness reads during the tumble
-    scrub.to(inst.anim, { op: 0, duration: 0.25, ease: "power1.in" }, 0.2);
+    scrub.fromTo(inst.anim, { op: 1 }, {
+      op: 0, duration: 0.25, ease: "power1.in", immediateRender: false,
+    }, 0.2);
   });
+
+  /* mobile: crossfade flat logo -> full-bleed video (replaces the mask grow) */
+  if (isSmall()) {
+    scrub.to("#heroLogoFlat", { opacity: 0, scale: 2.2, duration: 0.3, ease: "power1.in", immediateRender: false }, 0.05);
+    scrub.to("#videoMask", { opacity: 1, duration: 0.35, ease: "power1.in", immediateRender: false }, 0.1);
+  }
 
   /* central video grows over the mirrors across the whole scroll */
   scrub.to("#stripCenter", {

@@ -9,7 +9,7 @@
 /* <TicketCTABand> */
 function TicketCTABand({ heading, body, cta }) {
   return `
-  <section class="band" id="tickets-intro">
+  <section class="band vh-frame" id="tickets-intro">
     <div class="container band__inner">
       <h2 class="display">${heading}</h2>
       <p class="band__body">${body}</p>
@@ -38,7 +38,7 @@ function TicketList(tickets) {
       </div>
     </article>`).join("");
   return `
-  <section class="ticket-list" id="tickets">
+  <section class="ticket-list vh-frame" id="tickets">
     <div class="container">
       <div class="ticket-list__grid">${cards}</div>
       <p class="smallprint">Prices shown are placeholders — final tiers to be confirmed.</p>
@@ -55,7 +55,7 @@ function DiscoverGrid(items) {
       <span class="tile__arrow" aria-hidden="true">→</span>
     </a>`).join("");
   return `
-  <section class="discover" id="discover">
+  <section class="discover vh-frame" id="discover">
     <div class="container">
       <h2 class="display">Discover</h2>
       <div class="discover__grid">${tiles}</div>
@@ -75,7 +75,7 @@ function NewsGrid(items) {
       <span class="news-card__more" aria-hidden="true">Read →</span>
     </a>`).join("");
   return `
-  <section class="news" id="news">
+  <section class="news vh-frame" id="news">
     <div class="container">
       <h2 class="display">Latest</h2>
       <div class="news__grid">${cards}</div>
@@ -83,33 +83,49 @@ function NewsGrid(items) {
   </section>`;
 }
 
-/* <Footer> */
+/* <Footer> — full-screen bottom-anchored footer: thin rule up top,
+   open space, compact info row, giant logo running along the bottom.
+   Reveals (rule wipe + logo rise + column mask-slides) near
+   scroll-bottom. Adapted from finbar.studio's SiteFooter. */
 function Footer(f, meta) {
   const cols = f.columns.map((c) => `
-    <div class="footer__col">
-      <h4>${c.title}</h4>
-      <ul>${c.links.map((l) => `<li><a href="${l.href}">${l.label}</a></li>`).join("")}</ul>
+    <div class="sf-col sf-reveal">
+      <div class="sf-reveal-inner">
+        <span class="sf-label">${c.title}</span>
+        ${c.links.map((l) => `<a class="sf-link" href="${l.href}">${l.label}</a>`).join("")}
+      </div>
     </div>`).join("");
   const socials = f.socials.map((s) =>
-    `<a href="${s.href}" target="_blank" rel="noopener">${s.label}</a>`).join("");
+    `<a class="sf-value" href="${s.href}" target="_blank" rel="noopener">${s.label}</a>`).join("");
   return `
   <footer class="footer" id="footer">
-    <div class="container footer__inner">
-      <div class="footer__brand">
-        <p class="footer__logo">GemFest<span class="footer__year">'27</span></p>
-        <h4>${f.newsletter.heading}</h4>
-        <p class="footer__blurb">${f.newsletter.body}</p>
-        <!-- TODO: newsletter form is not wired to a backend -->
-        <form class="newsletter" onsubmit="return false">
-          <input type="email" placeholder="Email address" aria-label="Email address" required />
-          <button type="submit" class="btn btn--accent btn--small">Sign up</button>
-        </form>
+    <div class="footer-info">
+      <div class="sf-col sf-col-wide sf-reveal">
+        <div class="sf-reveal-inner">
+          <img class="footer-brandmark" src="/gemfest/SVG/logo.svg" alt="GemFest" />
+          <span class="sf-label">${f.newsletter.heading}</span>
+          <p class="sf-blurb">${f.newsletter.body}</p>
+          <!-- TODO: newsletter form is not wired to a backend -->
+          <form class="newsletter" onsubmit="return false">
+            <input type="email" placeholder="Email address" aria-label="Email address" required />
+            <button type="submit" class="btn btn--accent btn--small">Sign up</button>
+          </form>
+        </div>
       </div>
-      <div class="footer__cols">${cols}</div>
+      ${cols}
+      <div class="sf-col sf-col-end sf-reveal">
+        <div class="sf-reveal-inner">
+          <span class="sf-label">Follow</span>
+          ${socials}
+          <span class="sf-value">${meta.location}</span>
+          <span class="sf-value">${meta.dates}</span>
+          <span class="sf-label">${f.credit}</span>
+        </div>
+      </div>
     </div>
-    <div class="container footer__base">
-      <div class="footer__socials">${socials}</div>
-      <p class="footer__credit">${meta.location} · ${meta.dates} · ${f.credit}</p>
+
+    <div class="footer-mark" aria-label="GemFest '27">
+      <span class="footer-mark-text" id="footerMark">GemFest<span class="fm-year">'27</span></span>
     </div>
   </footer>`;
 }
@@ -121,6 +137,55 @@ document.getElementById("site").innerHTML =
   DiscoverGrid(CONTENT.discover) +
   NewsGrid(CONTENT.news) +
   Footer(CONTENT.footer, CONTENT.meta);
+
+/* fit the giant footer wordmark edge-to-edge (portfolio-style
+   iterative fit: converge font-size until scrollWidth fills row) */
+(function fitFooterMark() {
+  const el = document.getElementById("footerMark");
+  if (!el) return;
+  const fit = () => {
+    const parent = el.parentElement;
+    const cs = getComputedStyle(parent);
+    const avail = parent.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    if (avail <= 0) return;
+    el.style.fontSize = "100px";
+    let size = (avail / el.scrollWidth) * 100;
+    for (let i = 0; i < 4; i++) {
+      el.style.fontSize = `${Math.max(20, size)}px`;
+      const m = el.scrollWidth;
+      if (Math.abs(m - avail) <= 0.5) break;
+      size = size * (avail / m);
+    }
+  };
+  fit();
+  requestAnimationFrame(fit);
+  document.fonts?.ready.then(fit).catch(() => {});
+  window.addEventListener("resize", fit);
+})();
+
+/* footer reveal: armed (hidden) until you near the page bottom, then
+   the rule wipes, columns mask-slide up, and the giant logo rises */
+(function footerReveal() {
+  const footer = document.getElementById("footer");
+  if (!footer) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  footer.classList.add("is-armed");
+  let done = false;
+  const check = () => {
+    if (done) return;
+    const remaining = footer.getBoundingClientRect().bottom - window.innerHeight;
+    if (remaining < window.innerHeight * 0.22) {
+      done = true;
+      footer.classList.add("is-revealed");
+      window.removeEventListener("scroll", check);
+    }
+  };
+  requestAnimationFrame(() => {
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+  });
+})();
 
 /* qty controls — visual only (TODO: real cart) */
 document.getElementById("site").addEventListener("click", (e) => {
