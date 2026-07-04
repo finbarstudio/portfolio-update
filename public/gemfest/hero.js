@@ -445,11 +445,14 @@ function buildScrub() {
     },
   });
 
+  /* small dead zone: the first ~8% of the runway scrolls without any mask or
+     grow action, so a casual first scroll doesn't immediately disturb the logo */
+  const DEAD = 0.08;
   const scrollMask = { p: 0 };
   scrub.to(scrollMask, {
     p: 1, duration: 0.5, ease: "power3.out",
     onUpdate: () => setMaskProgress(scrollMask.p),
-  }, 0);
+  }, DEAD);
 
   /* explicit from-values: this timeline is created BEFORE the intro
      plays, so plain .to() captures the pre-intro state (s: 0) as the
@@ -486,9 +489,9 @@ function buildScrub() {
   scrub.to("#stripCenter", {
     scale: isSmall() ? 2.6 : 1.45,
     transformOrigin: "50% 50%",
-    duration: 1,
+    duration: 1 - DEAD,
     ease: "none",
-  }, 0);
+  }, DEAD);
 
   /* hold: slow zoom cue so scrolling stays legible */
   scrub.to("#videoStrip", {
