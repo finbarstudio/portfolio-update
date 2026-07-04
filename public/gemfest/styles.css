@@ -383,6 +383,43 @@ body {
   font-size: 0.8rem;
 }
 
+
+/* ===== real 3D buttons (desktop) =====
+   sections.js rebuilds each .btn--accent as a stack of planes at depth — true
+   extrusion in the same language as the hero icons — and tilts it toward the
+   cursor with a spring. The fake shadow slab comes off; depth is geometry.
+   Mobile keeps the cheap slab (no hover there anyway). */
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  .btn--accent.btn-3d,
+  .btn--accent.btn-3d:hover,
+  .btn--accent.btn-3d:active {
+    background: none;
+    box-shadow: none;
+    transform: none;
+    transition: none;
+    padding: 0;
+  }
+  .btn3d-core {
+    position: relative;
+    display: inline-block;
+    background: linear-gradient(135deg, #C4007A 0%, #FF0099 55%, #FF7ACB 100%);
+    border-radius: 999px;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .btn3d-label {
+    position: relative;
+    display: inline-block;
+    transform: translateZ(0.01px); /* keep the text on the top plane */
+  }
+  .btn3d-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+}
+
 .smallprint {
   font-size: 0.75rem;
   color: #8892a6;

@@ -194,3 +194,57 @@ document.getElementById("site").addEventListener("click", (e) => {
   const num = btn.parentElement.querySelector(".qty__num");
   num.textContent = Math.max(1, parseInt(num.textContent, 10) + parseInt(btn.dataset.qty, 10));
 });
+
+/* ===== real 3D buttons (desktop) =====
+   Rebuild each .btn--accent as a true extruded stack (planes at depth, like the
+   hero icons) and tilt it toward the cursor; spring back on leave. Progressive:
+   phones/no-hover keep the plain slab button. */
+(function extrudeButtons() {
+  if (!window.gsap) return;
+  if (!window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 761px)").matches) return;
+  const DEPTH = 14;   // extrusion depth, px
+  const LAYERS = 10;  // planes in the stack
+  const MAX_TILT = 22;
+
+  document.querySelectorAll(".btn--accent").forEach((btn) => {
+    const cs = getComputedStyle(btn);
+    const pad = cs.padding;
+    btn.classList.add("btn-3d");
+
+    const core = document.createElement("span");
+    core.className = "btn3d-core";
+    core.style.padding = pad;
+
+    const label = document.createElement("span");
+    label.className = "btn3d-label";
+    while (btn.firstChild) label.appendChild(btn.firstChild);
+    core.appendChild(label);
+
+    for (let i = 1; i <= LAYERS; i++) {
+      const t = i / LAYERS;
+      const l = document.createElement("span");
+      l.className = "btn3d-layer";
+      l.setAttribute("aria-hidden", "true");
+      l.style.transform = `translateZ(${(-DEPTH * t).toFixed(2)}px)`;
+      // darken toward the back so the extrusion reads like the icons' slabs
+      l.style.background = `linear-gradient(135deg, #8F0159, ${t > 0.55 ? "#5E013A" : "#A70565"})`;
+      core.appendChild(l);
+    }
+    btn.appendChild(core);
+
+    gsap.set(core, { transformPerspective: 600 });
+    const toRX = gsap.quickTo(core, "rotationX", { duration: 0.5, ease: "power3.out" });
+    const toRY = gsap.quickTo(core, "rotationY", { duration: 0.5, ease: "power3.out" });
+
+    btn.addEventListener("pointermove", (e) => {
+      const r = btn.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;  // -0.5 .. 0.5
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      toRX(-py * MAX_TILT * 2);
+      toRY(px * MAX_TILT * 2);
+    });
+    btn.addEventListener("pointerleave", () => {
+      gsap.to(core, { rotationX: 0, rotationY: 0, duration: 0.9, ease: "elastic.out(1, 0.45)" });
+    });
+  });
+})();
