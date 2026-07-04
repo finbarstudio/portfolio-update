@@ -116,7 +116,12 @@ function setMaskProgress(p) {
   }
   if (!maskOff) {
     const b = baseMask();
-    setMask(b + (fullMask() - b) * p);
+    const f = fullMask();
+    // mobile: constant RELATIVE growth (exponential). A linear px ramp over a
+    // ~68x range quadruples the window in the first few percent of scroll no
+    // matter the ease; equal multiplicative steps stay calm at the start and
+    // track the finger evenly all the way up.
+    setMask(isSmall() ? b * Math.pow(f / b, p) : b + (f - b) * p);
   }
 }
 setMask(0);
