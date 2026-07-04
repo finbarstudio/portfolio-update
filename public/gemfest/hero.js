@@ -41,7 +41,8 @@ function setMask(px) {
   maskEl.style.webkitMaskSize = `${px}px`;
   maskEl.style.maskSize = `${px}px`;
 }
-const baseMask = () => window.innerWidth * 0.72;
+const isSmall = () => window.innerWidth <= 760;
+const baseMask = () => window.innerWidth * (isSmall() ? 0.44 : 0.72);  // logo mask much smaller on phones
 const fullMask = () => window.innerWidth * 30;
 
 const MASK_OFF_AT = 0.95;

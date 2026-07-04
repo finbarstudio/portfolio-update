@@ -125,6 +125,11 @@ body {
   /* mask-size driven by JS (preloader + scroll) */
   -webkit-mask-size: 0px;
   mask-size: 0px;
+  /* force an own compositing layer: iOS Safari lets a playing <video> escape an
+     ancestor mask without this (video paints full-bleed, "mask doesn't work") */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  isolation: isolate;
 }
 
 /* full height fits 100vh, aspect kept; the strip is centred and
@@ -648,4 +653,17 @@ body {
 @media (max-width: 760px) {
   .footer__inner { grid-template-columns: 1fr; }
   .ticket { flex-direction: column; align-items: flex-start; }
+
+  /* nav: tighter type + spacing so brand + links fit a phone; links wrap
+     right-aligned if they must */
+  .nav { padding: 0.9rem 1.1rem; }
+  .nav a { font-size: 0.66rem; letter-spacing: 0.1em; }
+  .nav__links { gap: 0.85rem; flex-wrap: wrap; justify-content: flex-end; margin-left: 1rem; row-gap: 0.4rem; }
+
+  /* preloader logo: much smaller on phones */
+  .preloader__logo { width: 42vw; }
+
+  /* fullscreen backdrop-filter stacks are a jank machine on phones, and the
+     sharp centre strip already covers a portrait viewport — drop them */
+  .pblur { display: none; }
 }
