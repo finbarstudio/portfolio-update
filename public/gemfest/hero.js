@@ -43,12 +43,13 @@ function rnd() { s = (s * 16807 + 19) % 2147483647; return (s & 0xfffffff) / 0x1
 /* ---------- mask helpers ---------- */
 const isSmall = () => window.innerWidth <= 760;
 
-/* Mobile clips a logo-shaped window (SVG clipPath = geometry, iOS-safe) around a
-   viewport-fixed inner layer; desktop keeps the CSS mask on the container. Both
-   are driven by the same setMask(px) so the intro + scrub don't care which. */
+/* The logo shape is applied as an SVG clipPath window (geometry) on EVERY
+   device — CSS mask-image over live <video> is unreliable across WebKit
+   (iPhone AND iPad showed the raw unmasked stack). One code path, all sizes,
+   driven by the same setMask(px) so the intro + scrub don't care. */
 const LOGO_RATIO = 342 / 1500; // logo.svg viewBox aspect
 let clipWin = null, clipInner = null;
-if (isSmall()) {
+{
   const strip = document.getElementById("videoStrip");
   clipWin = document.createElement("div");
   clipWin.className = "clip-window";
@@ -57,6 +58,9 @@ if (isSmall()) {
   clipInner.appendChild(strip);
   clipWin.appendChild(clipInner);
   maskEl.appendChild(clipWin);
+  // the CSS mask comes off everywhere — the clip window does the shaping
+  maskEl.style.webkitMaskImage = "none";
+  maskEl.style.maskImage = "none";
 }
 function setMask(px) {
   if (clipWin) {
@@ -78,9 +82,29 @@ function setMask(px) {
 const baseMask = () => window.innerWidth * (isSmall() ? 0.44 : 0.72);  // logo mask much smaller on phones
 const fullMask = () => window.innerWidth * 30;
 
+/* ---------- adaptive strip layout ----------
+   Measures the real side gap between the 4/3 strip and the viewport
+   every resize. Wide viewports get mirrors + edge blur sized to the
+   actual gap (via --sideW); when the strip covers the screen (portrait
+   phones/tablets) the mirror layer and blur strips switch off. */
+const stickyEl = document.getElementById("heroSticky");
+function layoutStrip() {
+  const stripW = window.innerHeight * (4 / 3);
+  const sideW = (window.innerWidth - stripW) / 2;
+  if (sideW < 12) {
+    stickyEl.classList.add("no-side");
+  } else {
+    stickyEl.classList.remove("no-side");
+    stickyEl.style.setProperty("--sideW", `${Math.round(sideW)}px`);
+  }
+}
+layoutStrip();
+
 const MASK_OFF_AT = 0.95;
 let maskOff = false;
+let lastMaskP = 0;
 function setMaskProgress(p) {
+  lastMaskP = p;
   if (p >= MASK_OFF_AT && !maskOff) {
     maskOff = true;
     if (clipWin) { clipWin.style.webkitClipPath = "none"; clipWin.style.clipPath = "none"; }
@@ -126,6 +150,33 @@ function sizeRenderer() {
 }
 sizeRenderer();
 window.addEventListener("resize", sizeRenderer);
+
+/* ---------- live responsive re-layout ----------
+   On resize (debounced): re-fit the strip/mirror/blur composition,
+   re-apply the mask at its current progress against the NEW viewport,
+   and re-flow the icon constellation proportionally (positions scale
+   with the viewport, then re-clamp inside the padded bounds). */
+let prevW = W, prevH = H, resizeT;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeT);
+  resizeT = setTimeout(() => {
+    layoutStrip();
+    setMaskProgress(lastMaskP);
+    const fx = W / prevW, fy = H / prevH;
+    if (fx !== 1 || fy !== 1) {
+      const padX = Math.min(W, H) * 0.10;
+      const padY = H * 0.16;
+      for (const inst of instances) {
+        const half = inst.size / 2 + 10;
+        const bx = Math.max(1, W / 2 - padX - half);
+        const by = Math.max(1, H / 2 - padY - half);
+        inst.baseX = Math.max(-bx, Math.min(bx, inst.baseX * fx));
+        inst.baseY = Math.max(-by, Math.min(by, inst.baseY * fy));
+      }
+      prevW = W; prevH = H;
+    }
+  }, 150);
+});
 
 /* ---------- build extruded prototypes from the SVGs ---------- */
 const GRAD_DARK = new THREE.Color("#1E7BF0");
@@ -273,6 +324,7 @@ function makeInstances(protos) {
     const inst = {
       outer, inner, mats,
       baseX: x, baseY: -y,
+      size,
       pxScale: size / proto.norm,
       anim: { dx: 0, dy: 0, s: 0, rx: 0, ry: 0, rz: (rnd() * 50 - 25) * Math.PI / 180, op: 1 },
       bobAmp: 4 + rnd() * 9,
@@ -350,19 +402,38 @@ gsap.ticker.add(() => {
 const intro = gsap.timeline({ paused: true });
 
 intro
-  // 1. mask-reveal the gradient logo
-  .to(preLogo, { clipPath: "inset(0% 0 0 0)", duration: 1.1, ease: "power3.inOut" })
+  // 1. mask-reveal the gradient logo (tightened timings — control is
+  //    handed back as early as possible)
+  .to(preLogo, { clipPath: "inset(0% 0 0 0)", duration: 0.9, ease: "power3.inOut" })
   // 2. grow in place to match the video mask size (72vw), and
   //    size the (still hidden) video mask behind it to the same
   .add(() => setMask(baseMask()))
   .to(preLogo, {
+    /* match the CLIP WINDOW's real on-screen rect, not just its width:
+       the preloader centres in the viewport (fixed, full width) but the
+       clip window centres in the hero container (can differ by the
+       scrollbar width / layout offsets) — measure and correct both
+       position and scale so the handoff is pixel-aligned */
     scale: () => baseMask() / preLogo.offsetWidth, // layout width is unscaled
+    x: () => {
+      const c = clipWin.getBoundingClientRect();
+      const l = preLogo.getBoundingClientRect();
+      return (c.left + c.width / 2) - (l.left + l.width / 2);
+    },
+    y: () => {
+      const c = clipWin.getBoundingClientRect();
+      const l = preLogo.getBoundingClientRect();
+      return (c.top + c.height / 2) - (l.top + l.height / 2);
+    },
     transformOrigin: "50% 50%",
-    duration: 0.9,
+    duration: 0.7,
     ease: "power2.inOut",
-  }, "+=0.2")
+  }, "+=0.1")
   // 3. crossfade: logo -> live video through the identical shape
-  .to(preloader, { autoAlpha: 0, duration: 0.7, ease: "power2.inOut" });
+  .to(preloader, { autoAlpha: 0, duration: 0.6, ease: "power2.inOut" })
+  // unlock scroll the moment the crossfade starts landing — icons can
+  // pop in while the user is already moving
+  .add(() => lenis.start(), "-=0.3");
 
 function buildScrub() {
   const scrub = gsap.timeline({
@@ -409,9 +480,11 @@ function buildScrub() {
     }, 0.2);
   });
 
-  /* central video grows over the mirrors across the whole scroll */
+  /* central video grows over the mirrors across the whole scroll —
+     much harder zoom on mobile (portrait viewport needs the 4:3
+     strip blown up to feel full-bleed) */
   scrub.to("#stripCenter", {
-    scale: 1.45,
+    scale: isSmall() ? 2.6 : 1.45,
     transformOrigin: "50% 50%",
     duration: 1,
     ease: "none",
@@ -419,7 +492,7 @@ function buildScrub() {
 
   /* hold: slow zoom cue so scrolling stays legible */
   scrub.to("#videoStrip", {
-    scale: 1.05,
+    scale: isSmall() ? 1.1 : 1.05,
     transformOrigin: "50% 50%",
     duration: 0.5,
     ease: "none",
@@ -432,13 +505,12 @@ const svgReady = Promise.all(ICONS.map((u) => loader.loadAsync(u))).then((all) =
   const protos = all.map(buildProto);
   makeInstances(protos);
   buildScrub();
-  // 4. icons pop in (staggered scale-up) AFTER the logo has become
-  //    the mask, then 5. scrolling unlocks
+  // 4. icons pop in (staggered scale-up) overlapping the crossfade —
+  //    scroll is already unlocked by this point
   intro.to(instances.map(i => i.anim), {
-    s: 1, duration: 0.9, ease: "back.out(2.2)",
-    stagger: { each: 0.015, from: "random" },
-  }, ">-0.15");
-  intro.add(() => lenis.start());
+    s: 1, duration: 0.9, ease: "power4.out",
+    stagger: { each: 0.012, from: "random" },
+  }, ">-0.35");
 });
 
 const pageReady = document.readyState === "complete"
@@ -453,9 +525,21 @@ const vSlave = document.getElementById("vSlave");
 
 /* significantly slowed — footage is fast/strobing at native speed */
 const PLAYBACK_RATE = 0.65;
+
+/* resting frame: the raw first frame is too light to contrast the logo
+   mask, so seek to the dark blue night-stage shot (~28s). If autoplay is
+   deferred/blocked (mobile until first interaction, iOS low-power), THIS
+   is the frame sitting behind the logo; if playing, it just continues
+   from here — the loop makes the entry point irrelevant. */
+const REST_FRAME_T = 28;
 [vMain, vSlave].forEach((v) => {
   v.playbackRate = PLAYBACK_RATE;
-  v.addEventListener("loadedmetadata", () => { v.playbackRate = PLAYBACK_RATE; });
+  const prime = () => {
+    v.playbackRate = PLAYBACK_RATE;
+    if (v.currentTime < REST_FRAME_T) v.currentTime = REST_FRAME_T;
+  };
+  if (v.readyState >= 1) prime();
+  v.addEventListener("loadedmetadata", prime);
 });
 
 /* iOS: autoplay can be blocked (Low Power Mode / data saver) — retry on the

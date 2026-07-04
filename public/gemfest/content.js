@@ -19,7 +19,7 @@ const CONTENT = {
   /* ---- Section: Ticket CTA band ---- */
   ticketBand: {
     heading: "2027 Tickets",
-    body: "Weekend tickets start at £75. Parking passes and Chippenham shuttle add-ons are available at checkout. Availability moves fast — check back if your tier is gone.",
+    body: "Weekend tickets start at £75. Parking passes and Chippenham shuttle add-ons are available at checkout. Tiers do sell through, so check back if yours is gone.",
     cta: { label: "Get 2027 Tickets", href: "#" },
   },
 
@@ -36,24 +36,24 @@ const CONTENT = {
   /* ---- Section: Discover grid ---- */
   discover: [
     { tag: "Discover", heading: "What is GemFest?", href: "#" },
-    { tag: "Lineup", heading: "2027 coming soon — browse the 2026 full lineup", href: "#" },
+    { tag: "Lineup", heading: "2027 coming soon. Browse the 2026 lineup", href: "#" },
     { tag: "Info", heading: "Getting there, times & FAQs", href: "#" },
     { tag: "Get Involved", heading: "Become a Rep", href: "#" },
   ],
 
   /* ---- Section: News grid ---- */
   news: [
-    { tag: "GemFest '27", date: "June 2026", headline: "2027 dates announced — 17–20 June", slug: "#" },
+    { tag: "GemFest '27", date: "June 2026", headline: "2027 dates announced: 17–20 June", slug: "#" },
     { tag: "GemFest '27", date: "June 2026", headline: "First lineup drop coming soon", slug: "#" },
     { tag: "GemFest '27", date: "May 2026", headline: "Travel & shuttle info: how to get to Charlton Park", slug: "#" },
-    { tag: "GemFest '27", date: "May 2026", headline: "Become a rep — sell tickets, earn perks", slug: "#" },
+    { tag: "GemFest '27", date: "May 2026", headline: "Become a rep: sell tickets, earn perks", slug: "#" },
   ],
 
   /* ---- Section: Footer ---- */
   footer: {
     newsletter: {
       heading: "Get Notified",
-      body: "Lineup drops, ticket releases and news — straight to your inbox.",
+      body: "Be first to hear about lineup drops, ticket releases and news.",
       // TODO: newsletter form is visual only — no backend wired.
     },
     columns: [

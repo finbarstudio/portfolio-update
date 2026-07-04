@@ -111,6 +111,11 @@ body {
   position: relative;
 }
 
+/* mobile: shorter runway — reach the next section sooner */
+@media (max-width: 760px) {
+  .hero { height: 230vh; }
+}
+
 .hero__sticky {
   position: sticky;
   top: 0;
@@ -156,12 +161,21 @@ body {
 /* full height fits 100vh, aspect kept; the strip is centred and
    live-mirrored left + right (box-reflect) to fill the sides */
 .hero__video-strip {
+  /* transform centring (not inset+margin:auto): when the 4/3 strip is
+     WIDER than the viewport, auto margins resolve to 0 and pin it left.
+     This centres correctly at every aspect ratio. */
   position: absolute;
-  inset: 0;
-  margin: auto;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   height: 100%;
   aspect-ratio: 4 / 3; /* 1440x1080 footage */
 }
+
+/* strip covers the viewport (portrait phones/tablets): no side gap,
+   so no mirrors and no edge blur — JS toggles this */
+.no-side .strip-mirror,
+.no-side .pblur { display: none; }
 
 /* enlarged mirror layer sits behind the sharp centre */
 .strip-mirror {
@@ -213,7 +227,7 @@ body {
 /* narrow strips only over the sides — a fraction of the GPU cost
    of full-viewport backdrop layers */
 .pblur--1 { /* left, inner soft */
-  width: 17vw;
+  width: calc(var(--sideW, 12.5vw) * 1.35); /* sized to the real side gap */
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(9px);
   -webkit-mask-image: linear-gradient(to right, #000 0%, #000 45%, transparent 100%);
@@ -221,7 +235,7 @@ body {
 }
 
 .pblur--2 { /* left, outer heavy */
-  width: 8vw;
+  width: calc(var(--sideW, 12.5vw) * 0.6);
   backdrop-filter: blur(26px);
   -webkit-backdrop-filter: blur(26px);
   -webkit-mask-image: linear-gradient(to right, #000 0%, #000 55%, transparent 100%);
@@ -231,7 +245,7 @@ body {
 .pblur--3 { /* right, inner soft */
   left: auto;
   right: calc(50% - 50vw);
-  width: 17vw;
+  width: calc(var(--sideW, 12.5vw) * 1.35);
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(9px);
   -webkit-mask-image: linear-gradient(to left, #000 0%, #000 45%, transparent 100%);
@@ -241,7 +255,7 @@ body {
 .pblur--4 { /* right, outer heavy */
   left: auto;
   right: calc(50% - 50vw);
-  width: 8vw;
+  width: calc(var(--sideW, 12.5vw) * 0.6);
   backdrop-filter: blur(26px);
   -webkit-backdrop-filter: blur(26px);
   -webkit-mask-image: linear-gradient(to left, #000 0%, #000 55%, transparent 100%);
@@ -328,7 +342,7 @@ body {
 #site {
   font-family: "Clash Display", -apple-system, sans-serif;
   color: var(--dark);
-  background: #fff;
+  background: transparent; /* lets the ticket band float over the hero */
   position: relative;
   z-index: 5;
 }
@@ -389,35 +403,36 @@ body {
    extrusion in the same language as the hero icons — and tilts it toward the
    cursor with a spring. The fake shadow slab comes off; depth is geometry.
    Mobile keeps the cheap slab (no hover there anyway). */
-@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
-  .btn--accent.btn-3d,
-  .btn--accent.btn-3d:hover,
-  .btn--accent.btn-3d:active {
-    background: none;
-    box-shadow: none;
-    transform: none;
-    transition: none;
-    padding: 0;
-  }
-  .btn3d-core {
-    position: relative;
-    display: inline-block;
-    background: linear-gradient(135deg, #C4007A 0%, #FF0099 55%, #FF7ACB 100%);
-    border-radius: 999px;
-    transform-style: preserve-3d;
-    will-change: transform;
-  }
-  .btn3d-label {
-    position: relative;
-    display: inline-block;
-    transform: translateZ(0.01px); /* keep the text on the top plane */
-  }
-  .btn3d-layer {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-  }
+.btn--accent.btn-3d,
+.btn--accent.btn-3d:hover,
+.btn--accent.btn-3d:active {
+  background: none;
+  box-shadow: none;
+  transform: none;
+  transition: none;
+  padding: 0;
+}
+
+.btn3d-core {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(135deg, #C4007A 0%, #FF0099 55%, #FF7ACB 100%);
+  border-radius: 999px;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.btn3d-label {
+  position: relative;
+  display: inline-block;
+  transform: translateZ(0.01px); /* keep the text on the top plane */
+}
+
+.btn3d-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .smallprint {
@@ -426,21 +441,104 @@ body {
   margin-top: 1.25rem;
 }
 
-/* ===== Ticket CTA band ===== */
+/* ===== Ticket CTA band =====
+   No background: rides up OVER the pinned hero video (pulled up a
+   full viewport into the hero's hold), while the hero fades under it */
 .band {
-  background: #fff;
+  background: transparent;
   justify-content: center;
+  margin-top: -100vh;
+  position: relative;
+  z-index: 6;
 }
+
+/* sections after the band go back to solid white so the faded hero
+   never ghosts through */
+.ticket-list,
+.news {
+  background: #fff;
+}
+
+.discover { background: #fff; }
 
 .band__inner {
   text-align: center;
-  max-width: 760px;
+  max-width: 900px;
+}
+
+/* hero-scale heading with corner icon bunches */
+.band__head {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.band__display {
+  font-size: clamp(3.2rem, 11vw, 8.5rem);
+  margin-bottom: 0;
+}
+
+.band-bunch {
+  /* dense circular cluster: icons packed around a filled centre.
+     Anchored to the head box CORNERS with % translates, so it tracks
+     the real text bounds — including multiline wraps on mobile. */
+  position: absolute;
+  width: clamp(115px, 12vw, 182px); /* expanded: bunch breathes outward */
+  aspect-ratio: 1;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.band-bunch img {
+  position: absolute;
+  height: auto;
+  transform: translate(-50%, -50%);
+  animation: bunchFloat 5s ease-in-out infinite;
+}
+
+/* packed centre + satellites dispersing a touch further out */
+.band-bunch img:nth-child(1) { left: 50%; top: 18%; width: clamp(28px, 3.4vw, 48px); }
+.band-bunch img:nth-child(2) { left: 76%; top: 34%; width: clamp(12px, 1.5vw, 21px); animation-duration: 6.5s; animation-delay: -2s; }
+.band-bunch img:nth-child(3) { left: 70%; top: 70%; width: clamp(22px, 2.7vw, 38px); animation-duration: 5.6s; animation-delay: -1s; }
+.band-bunch img:nth-child(4) { left: 43%; top: 82%; width: clamp(8px, 1vw, 14px); animation-duration: 7.2s; animation-delay: -3.4s; }
+.band-bunch img:nth-child(5) { left: 24%; top: 64%; width: clamp(24px, 2.9vw, 42px); animation-duration: 6s; animation-delay: -4.2s; }
+.band-bunch img:nth-child(6) { left: 28%; top: 32%; width: clamp(10px, 1.2vw, 17px); animation-duration: 5.3s; animation-delay: -2.8s; }
+.band-bunch img:nth-child(7) { left: 50%; top: 48%; width: clamp(19px, 2.3vw, 33px); animation-duration: 6.8s; animation-delay: -1.6s; }
+.band-bunch img:nth-child(8) { left: 87%; top: 54%; width: clamp(11px, 1.4vw, 19px); animation-duration: 7.6s; animation-delay: -0.7s; }
+.band-bunch img:nth-child(9) { left: 13%; top: 45%; width: clamp(14px, 1.7vw, 24px); animation-duration: 5.9s; animation-delay: -3.9s; }
+
+.band-bunch--tl {
+  top: 0;
+  left: 0;
+  transform: translate(-62%, -52%) rotate(-9deg);
+}
+
+.band-bunch--br {
+  bottom: 0;
+  right: 0;
+  transform: translate(62%, 52%) rotate(7deg);
+}
+
+/* mobile: heading spans nearly the full width, so the outward corner
+   translates threw the bunches off-screen — tuck them mostly ABOVE
+   the top-left and BELOW the bottom-right instead, inside the screen */
+@media (max-width: 760px) {
+  .band-bunch { width: clamp(84px, 24vw, 116px); }
+  .band-bunch--tl { transform: translate(-16%, -62%) rotate(-9deg); }
+  .band-bunch--br { transform: translate(16%, 62%) rotate(7deg); }
+}
+
+@keyframes bunchFloat {
+  0%, 100% { translate: 0 0; rotate: -4deg; }
+  50% { translate: 0 -8px; rotate: 5deg; }
 }
 
 .band__body {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 2rem;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.65;
+  max-width: 560px;
+  margin: 0 auto 2.5rem;
 }
 
 /* ===== Ticket list ===== */
@@ -662,12 +760,13 @@ body {
   font-weight: 600;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1025px) {
   .footer-info {
     grid-template-columns: 1.6fr repeat(3, 1fr) 1.2fr;
     gap: 2rem;
   }
 }
+
 
 .sf-col {
   display: flex;
@@ -721,7 +820,15 @@ a.sf-link:hover::after,
 a.sf-value:hover::after,
 .nav__links a:hover::after { transform: scaleX(1); }
 
-.sf-value { color: var(--accent); }
+.sf-value { color: var(--dark); }
+
+.sf-socialrow {
+  display: inline-flex;
+  gap: 1rem;
+}
+
+/* the one pink moment: the newsletter heading */
+.sf-col-wide .sf-label { color: var(--accent); }
 
 .sf-blurb {
   color: #5a6478;
@@ -791,13 +898,83 @@ a.sf-value:hover::after,
   padding-bottom: 34px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1025px) {
   .sf-reveal { overflow: hidden; }
   .footer.is-armed .sf-reveal-inner { transform: translateY(115%); }
   .footer.is-armed.is-revealed .sf-reveal-inner {
     transform: translateY(0);
     transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
   }
+}
+
+/* stacked footer (phones + tablets): one centred column, everything
+   together at the bottom of the 100vh frame. Placed AFTER the base
+   footer rules so it actually wins the cascade (equal specificity). */
+@media (max-width: 1024px) {
+  .footer-info {
+    display: flex;
+    flex-direction: column;
+    /* no flex:1 stretch — the base margin-top:auto bottom-anchors the
+       block at its natural height, nothing clips past the frame */
+    align-items: center;
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.5;
+    gap: 1rem;
+  }
+  .sf-col,
+  .sf-col-end,
+  .sf-col-wide { align-items: center; text-align: center; }
+  /* the actual centring fix: reveal-inner sits BETWEEN the column and
+     its content, and "inherit" was resolving against the un-centred
+     .sf-reveal wrapper — centre it directly */
+  .sf-reveal-inner { align-items: center; text-align: center; }
+  .sf-col-end .sf-link,
+  .sf-col-end .sf-value,
+  .sf-link,
+  .sf-value { align-self: center; }
+
+  .footer-brandmark { align-self: center; margin-bottom: 0.9rem; }
+
+  /* link blocks: label above an INLINE wrapped row of links — the
+     whole band compresses to a few tight rows */
+  .sf-col:not(.sf-col-wide):not(.sf-col-end) .sf-reveal-inner {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.2rem 1rem;
+  }
+  .sf-col:not(.sf-col-wide) .sf-label {
+    flex-basis: 100%;
+    margin-bottom: 0.1rem;
+  }
+
+  /* hierarchy: BLACK titles, GREY items */
+  .sf-label { color: var(--dark); }
+  .sf-link,
+  .sf-value { color: #8892a6; }
+  /* pink only where it really matters */
+  .sf-col-wide .sf-label { color: var(--accent); }
+  .sf-socialrow { justify-content: center; }
+  /* tighter run-out into the giant wordmark */
+  .footer-info { padding-bottom: 0.75rem; }
+  .sf-reveal-inner { padding-bottom: 12px; }
+  .sf-col-wide .sf-reveal-inner { padding-bottom: 34px; } /* keep button slab room */
+
+  .newsletter { width: 100%; max-width: 320px; justify-content: center; }
+  .newsletter input { min-width: 0; flex: 1 1 150px; }
+  .sf-blurb { max-width: 30ch; }
+  .footer-mark { padding-bottom: clamp(16px, 3vh, 28px); }
+}
+
+/* tablet: nav must fit on one line — tighter tracking, smaller type,
+   slimmer gaps, no clipping */
+@media (min-width: 761px) and (max-width: 1120px) {
+  .nav { padding: 1.1rem 1.5rem; }
+  .nav a { font-size: 0.6rem; letter-spacing: 0.18em; }
+  .nav--accent .nav__brand { font-size: 0.6rem; letter-spacing: 0.18em; }
+  .nav__links { gap: 1.1rem; }
 }
 
 @media (max-width: 760px) {

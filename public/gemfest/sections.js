@@ -6,12 +6,36 @@
    TODOs. Does not touch the hero.
    ============================================================ */
 
-/* <TicketCTABand> */
+/* <TicketCTABand> — hero-scale: giant display heading with two little
+   icon bunches hugging its corners (top-left + bottom-right) */
 function TicketCTABand({ heading, body, cta }) {
   return `
   <section class="band vh-frame" id="tickets-intro">
     <div class="container band__inner">
-      <h2 class="display">${heading}</h2>
+      <div class="band__head">
+        <div class="band-bunch band-bunch--tl" aria-hidden="true">
+          <img src="/gemfest/SVG/Asset 17.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 14.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 24.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 11.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 27.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 15.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 29.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 12.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 26.svg" alt="" />
+        </div>
+        <h2 class="display band__display">${heading}</h2>
+        <div class="band-bunch band-bunch--br" aria-hidden="true">
+          <img src="/gemfest/SVG/Asset 20.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 25.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 18.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 13.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 28.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 30.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 10.svg" alt="" />
+          <img src="/gemfest/SVG/Asset 19.svg" alt="" />
+        </div>
+      </div>
       <p class="band__body">${body}</p>
       <a class="btn btn--accent" href="${cta.href}">${cta.label}</a>
     </div>
@@ -41,7 +65,7 @@ function TicketList(tickets) {
   <section class="ticket-list vh-frame" id="tickets">
     <div class="container">
       <div class="ticket-list__grid">${cards}</div>
-      <p class="smallprint">Prices shown are placeholders — final tiers to be confirmed.</p>
+      <p class="smallprint">Prices shown are placeholders. Final tiers to be confirmed.</p>
     </div>
   </section>`;
 }
@@ -116,7 +140,7 @@ function Footer(f, meta) {
       <div class="sf-col sf-col-end sf-reveal">
         <div class="sf-reveal-inner">
           <span class="sf-label">Follow</span>
-          ${socials}
+          <span class="sf-socialrow">${socials}</span>
           <span class="sf-value">${meta.location}</span>
           <span class="sf-value">${meta.dates}</span>
           <span class="sf-label">${f.credit}</span>
@@ -187,6 +211,54 @@ document.getElementById("site").innerHTML =
   });
 })();
 
+/* hero fade-out: as the ticket band scrolls up over the pinned video,
+   the whole hero (video + icons + grain) dissolves beneath it */
+if (window.gsap && window.ScrollTrigger) {
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.to("#heroSticky", {
+    opacity: 0,
+    ease: "none",
+    scrollTrigger: {
+      trigger: "#tickets-intro",
+      start: "top 90%",
+      end: "top 20%",
+      scrub: true,
+    },
+  });
+}
+
+/* ===== bunch tilt: the icon clusters on the ticket heading react in
+   3d to the cursor — subtle pitch/yaw toward it, easing off with
+   distance, springless (power3 settles) ===== */
+(function bunchTilt() {
+  if (!window.gsap) return;
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  const RADIUS = 340;   // influence range (px)
+  const TILT = 14;      // max degrees
+  const bunches = [...document.querySelectorAll(".band-bunch")].map((el) => {
+    gsap.set(el, { transformPerspective: 700 });
+    return {
+      el,
+      toRX: gsap.quickTo(el, "rotationX", { duration: 0.7, ease: "power3.out" }),
+      toRY: gsap.quickTo(el, "rotationY", { duration: 0.7, ease: "power3.out" }),
+    };
+  });
+  if (!bunches.length) return;
+  window.addEventListener("pointermove", (e) => {
+    for (const b of bunches) {
+      const r = b.el.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const dx = e.clientX - cx, dy = e.clientY - cy;
+      const d = Math.hypot(dx, dy);
+      if (d > RADIUS) { b.toRX(0); b.toRY(0); continue; }
+      const n = 1 - d / RADIUS;
+      const f = n * n * (3 - 2 * n) * TILT; // smoothstep falloff
+      b.toRX((-dy / (d || 1)) * f);
+      b.toRY((dx / (d || 1)) * f);
+    }
+  }, { passive: true });
+})();
+
 /* qty controls — visual only (TODO: real cart) */
 document.getElementById("site").addEventListener("click", (e) => {
   const btn = e.target.closest("[data-qty]");
@@ -201,10 +273,10 @@ document.getElementById("site").addEventListener("click", (e) => {
    phones/no-hover keep the plain slab button. */
 (function extrudeButtons() {
   if (!window.gsap) return;
-  if (!window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 761px)").matches) return;
+  const hoverable = window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 761px)").matches;
   const DEPTH = 14;   // extrusion depth, px
   const LAYERS = 10;  // planes in the stack
-  const MAX_TILT = 22;
+  const RANGE = 10;   // gimbal range under the cursor (deg)
 
   document.querySelectorAll(".btn--accent").forEach((btn) => {
     const cs = getComputedStyle(btn);
@@ -225,26 +297,62 @@ document.getElementById("site").addEventListener("click", (e) => {
       const l = document.createElement("span");
       l.className = "btn3d-layer";
       l.setAttribute("aria-hidden", "true");
-      l.style.transform = `translateZ(${(-DEPTH * t).toFixed(2)}px)`;
-      // darken toward the back so the extrusion reads like the icons' slabs
-      l.style.background = `linear-gradient(135deg, #8F0159, ${t > 0.55 ? "#5E013A" : "#A70565"})`;
+      /* --ext (on the core) slides the stack diagonally: deeper layers
+         shift further, so the thickness visibly grows to bottom-right */
+      l.style.transform =
+        `translate3d(calc(var(--ext, 0px) * ${t.toFixed(3)}), calc(var(--ext, 0px) * ${t.toFixed(3)}), ${(-DEPTH * t).toFixed(2)}px)`;
+      /* CONTINUOUS darkening per layer — the old two-tone split read as
+         a second, separate extrusion ("double depth") */
+      const mix = (a, b) => Math.round(a + (b - a) * t);
+      l.style.background = `rgb(${mix(167, 74)}, ${mix(5, 1)}, ${mix(101, 46)})`;
       core.appendChild(l);
     }
     btn.appendChild(core);
 
     gsap.set(core, { transformPerspective: 600 });
-    const toRX = gsap.quickTo(core, "rotationX", { duration: 0.5, ease: "power3.out" });
-    const toRY = gsap.quickTo(core, "rotationY", { duration: 0.5, ease: "power3.out" });
 
-    btn.addEventListener("pointermove", (e) => {
-      const r = btn.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;  // -0.5 .. 0.5
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      toRX(-py * MAX_TILT * 2);
-      toRY(px * MAX_TILT * 2);
-    });
-    btn.addEventListener("pointerleave", () => {
-      gsap.to(core, { rotationX: 0, rotationY: 0, duration: 0.9, ease: "elastic.out(1, 0.45)" });
-    });
+    if (hoverable) {
+      /* enter: button face stays put — the THICKNESS grows out to the
+         bottom-right. Then mouse movement gimbals + parallaxes it.
+         NOTE: reset goes through the same quickTo tweens — a separate
+         gsap.to with overwrite was KILLING the quickTo instances, which
+         is why the perspective stopped responding after the first
+         hover. */
+      const toRX = gsap.quickTo(core, "rotationX", { duration: 0.45, ease: "power3.out" });
+      const toRY = gsap.quickTo(core, "rotationY", { duration: 0.45, ease: "power3.out" });
+      const toX = gsap.quickTo(core, "x", { duration: 0.45, ease: "power3.out" });
+      const toY = gsap.quickTo(core, "y", { duration: 0.45, ease: "power3.out" });
+
+      btn.addEventListener("pointerenter", () => {
+        gsap.to(core, { "--ext": "14px", duration: 0.6, ease: "power4.inOut" });
+      });
+      btn.addEventListener("pointermove", (e) => {
+        const r = btn.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;  // -0.5 .. 0.5
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        toRX(-py * RANGE * 2.4);
+        toRY(px * RANGE * 2.4);
+        toX(px * 12);   // parallax drift with the cursor
+        toY(py * 8);
+      });
+      btn.addEventListener("pointerleave", () => {
+        toRX(0); toRY(0); toX(0); toY(0);
+        gsap.to(core, { "--ext": "0px", duration: 0.7, ease: "power4.inOut" });
+      });
+    } else {
+      /* mobile: no hover — rest in a subtle version of the pose and
+         let scroll velocity nudge the tilt, springing back on settle */
+      const REST_RX = 10, REST_RY = -10;
+      gsap.set(core, { rotationX: REST_RX, rotationY: REST_RY });
+      const toRX = gsap.quickTo(core, "rotationX", { duration: 0.6, ease: "power2.out" });
+      let lastY = window.scrollY, settle;
+      window.addEventListener("scroll", () => {
+        const dy = window.scrollY - lastY;
+        lastY = window.scrollY;
+        toRX(REST_RX + Math.max(-14, Math.min(14, dy * 0.7)));
+        clearTimeout(settle);
+        settle = setTimeout(() => toRX(REST_RX), 140);
+      }, { passive: true });
+    }
   });
 })();
