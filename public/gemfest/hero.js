@@ -37,9 +37,18 @@ let s = 42;
 function rnd() { s = (s * 16807 + 19) % 2147483647; return (s & 0xfffffff) / 0x10000000 % 1; }
 
 /* ---------- mask helpers ---------- */
+/* Two possible mask hosts: the container (desktop) and the centre video itself
+   (mobile — iOS lets video escape ancestor masks). JS drives both; the CSS media
+   query decides which one actually carries a mask-image. */
+function maskHosts() {
+  const v = document.getElementById("vMain");
+  return v ? [maskEl, v] : [maskEl];
+}
 function setMask(px) {
-  maskEl.style.webkitMaskSize = `${px}px`;
-  maskEl.style.maskSize = `${px}px`;
+  maskHosts().forEach((el) => {
+    el.style.webkitMaskSize = `${px}px`;
+    el.style.maskSize = `${px}px`;
+  });
 }
 const isSmall = () => window.innerWidth <= 760;
 const baseMask = () => window.innerWidth * (isSmall() ? 0.44 : 0.72);  // logo mask much smaller on phones
@@ -50,12 +59,10 @@ let maskOff = false;
 function setMaskProgress(p) {
   if (p >= MASK_OFF_AT && !maskOff) {
     maskOff = true;
-    maskEl.style.webkitMaskImage = "none";
-    maskEl.style.maskImage = "none";
+    maskHosts().forEach((el) => { el.style.webkitMaskImage = "none"; el.style.maskImage = "none"; });
   } else if (p < MASK_OFF_AT && maskOff) {
     maskOff = false;
-    maskEl.style.webkitMaskImage = "";
-    maskEl.style.maskImage = "";
+    maskHosts().forEach((el) => { el.style.webkitMaskImage = ""; el.style.maskImage = ""; });
   }
   if (!maskOff) {
     const b = baseMask();
@@ -167,13 +174,15 @@ function buildProto(svgData) {
 const instances = [];
 
 function makeInstances(protos) {
-  // sizes: 58% small / 36% mid / 6% big
+  // sizes: 58% small / 36% mid / 6% big — halved on phones, where the desktop
+  // px sizes read enormous against a ~390px viewport
+  const SIZE_SCALE = isSmall() ? 0.5 : 1;
   const sizes = [];
   for (let i = 0; i < N_ICONS; i++) {
     const tier = rnd();
-    sizes.push(tier < 0.58 ? 20 + rnd() * 38
+    sizes.push(SIZE_SCALE * (tier < 0.58 ? 20 + rnd() * 38
              : tier < 0.94 ? 58 + rnd() * 52
-             : 118 + rnd() * 50);
+             : 118 + rnd() * 50));
   }
   sizes.sort((a, b) => b - a);
 

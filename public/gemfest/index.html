@@ -26,7 +26,35 @@
       <a href="#">Get Involved</a>
       <a href="#">Contact</a>
     </div>
+    <button class="nav__burger" id="navBurger" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span>
+    </button>
   </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#">Tickets</a>
+    <a href="#">Become a Rep</a>
+    <a href="#">Get Involved</a>
+    <a href="#">Contact</a>
+  </div>
+  <script>
+    (function () {
+      var burger = document.getElementById("navBurger");
+      var menu = document.getElementById("mobileMenu");
+      function close() {
+        menu.classList.remove("is-open");
+        burger.setAttribute("aria-expanded", "false");
+        document.documentElement.style.overflow = "";
+      }
+      burger.addEventListener("click", function () {
+        var open = menu.classList.toggle("is-open");
+        burger.setAttribute("aria-expanded", String(open));
+        document.documentElement.style.overflow = open ? "hidden" : "";
+      });
+      menu.addEventListener("click", function (e) {
+        if (e.target.closest("a")) close();
+      });
+    })();
+  </script>
   <!-- pink year, outside the blend so it stays true #FF0099 -->
   <div class="nav nav--accent" aria-hidden="true">
     <span class="nav__brand"><span class="nav__ghost">GemFest</span><span class="nav__year">'27</span></span>

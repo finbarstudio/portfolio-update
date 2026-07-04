@@ -95,6 +95,10 @@ body {
   gap: 2rem;
 }
 
+/* burger + fullscreen menu: mobile only (see the media query) */
+.nav__burger { display: none; }
+.mobile-menu { display: none; }
+
 .nav a:hover {
   opacity: 0.6;
 }
@@ -655,14 +659,77 @@ body {
   .footer__inner { grid-template-columns: 1fr; }
   .ticket { flex-direction: column; align-items: flex-start; }
 
-  /* nav: tighter type + spacing so brand + links fit a phone; links wrap
-     right-aligned if they must */
-  .nav { padding: 0.9rem 1.1rem; }
-  .nav a { font-size: 0.66rem; letter-spacing: 0.1em; }
-  .nav__links { gap: 0.85rem; flex-wrap: wrap; justify-content: flex-end; margin-left: 1rem; row-gap: 0.4rem; }
+  /* nav collapses to a burger + fullscreen menu */
+  .nav { padding: 1rem 1.25rem; }
+  .nav__links { display: none; }
+  .nav__burger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: 0;
+    padding: 6px 2px;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .nav__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #fff; /* inverts via the nav's difference blend */
+    transition: transform 0.3s ease;
+  }
+  .nav__burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(3.5px) rotate(45deg); }
+  .nav__burger[aria-expanded="true"] span:nth-child(2) { transform: translateY(-3.5px) rotate(-45deg); }
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 99; /* under the nav (100) so the burger stays tappable as an X */
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .mobile-menu.is-open { opacity: 1; pointer-events: auto; }
+  .mobile-menu a {
+    font-family: "Clash Display", sans-serif;
+    font-weight: 700;
+    font-size: 2.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #111;
+    text-decoration: none;
+  }
 
-  /* preloader logo: much smaller on phones */
+  /* preloader logo: much smaller on phones (matches the 44vw mask handoff) */
   .preloader__logo { width: 42vw; }
+
+  /* iOS: a playing <video> escapes an ancestor's mask entirely, so on mobile the
+     logo mask moves OFF the container and ONTO the centre video element itself
+     (masks applied directly to <video> are respected). The mirror layer behind is
+     pointless on portrait (the centre strip already covers the viewport) — drop it,
+     which also removes the box-reflect copies that would otherwise show unmasked. */
+  .hero__video-mask {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .strip-mirror { display: none; }
+  .strip-center .hero__video {
+    -webkit-mask-image: url("SVG/logo.svg");
+    mask-image: url("SVG/logo.svg");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 0px;
+    mask-size: 0px;
+  }
 
   /* fullscreen backdrop-filter stacks are a jank machine on phones, and the
      sharp centre strip already covers a portrait viewport — drop them */
