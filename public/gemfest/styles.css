@@ -1,0 +1,651 @@
+/* ===== Reset ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: #111;
+  background: #fff;
+}
+
+/* ===== Preloader ===== */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preloader__logo {
+  width: min(60vw, 640px);
+  clip-path: inset(100% 0 0 0); /* mask reveal wipes up via JS */
+}
+
+/* ===== Nav ===== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  mix-blend-mode: difference; /* live negative of whatever's behind */
+  pointer-events: none;
+}
+
+.nav a {
+  pointer-events: auto;
+}
+
+/* unblended twin holding only the pink year */
+.nav--accent {
+  mix-blend-mode: normal;
+}
+
+.nav__ghost {
+  visibility: hidden; /* reserves identical spacing in each layer */
+}
+
+
+.nav a {
+  font-family: "Archivo", -apple-system, sans-serif;
+  color: #fff; /* inverts against whatever is behind via difference */
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.nav__brand {
+  font-weight: 700;
+}
+
+.nav__year {
+  color: #FF0099; /* secondary brand colour — kept out of the blend */
+  margin-left: 0.1em;
+}
+
+.nav--accent .nav__brand {
+  font-family: "Archivo", -apple-system, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.nav__links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav a:hover {
+  opacity: 0.6;
+}
+
+/* ===== Hero ===== */
+.hero {
+  height: 380vh; /* scroll runway: reveal + full-video hold */
+  position: relative;
+}
+
+.hero__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* video masked by logo */
+.hero__video-mask {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: url("SVG/logo.svg");
+  mask-image: url("SVG/logo.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  /* mask-size driven by JS (preloader + scroll) */
+  -webkit-mask-size: 0px;
+  mask-size: 0px;
+}
+
+/* full height fits 100vh, aspect kept; the strip is centred and
+   live-mirrored left + right (box-reflect) to fill the sides */
+.hero__video-strip {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: 100%;
+  aspect-ratio: 4 / 3; /* 1440x1080 footage */
+}
+
+/* enlarged mirror layer sits behind the sharp centre */
+.strip-mirror {
+  position: absolute;
+  inset: 0;
+  transform: scale(1.25);
+}
+
+.vreflect {
+  width: 100%;
+  height: 100%;
+}
+
+.vreflect--right {
+  -webkit-box-reflect: right 0;
+}
+
+.vreflect--left {
+  -webkit-box-reflect: left 0;
+}
+
+/* sharp central video, scales up over the mirrors on scroll */
+.strip-center {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  will-change: transform;
+}
+
+.hero__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* progressive blur: stacked backdrop layers, each masked so blur
+   builds from nothing mid-screen to heavy at the viewport edges */
+.pblur {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: calc(50% - 50vw); /* escape the 4/3 strip: span full viewport */
+  width: 100vw;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* narrow strips only over the sides — a fraction of the GPU cost
+   of full-viewport backdrop layers */
+.pblur--1 { /* left, inner soft */
+  width: 17vw;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 0%, #000 45%, transparent 100%);
+}
+
+.pblur--2 { /* left, outer heavy */
+  width: 8vw;
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 0%, #000 55%, transparent 100%);
+}
+
+.pblur--3 { /* right, inner soft */
+  left: auto;
+  right: calc(50% - 50vw);
+  width: 17vw;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 0%, #000 45%, transparent 100%);
+}
+
+.pblur--4 { /* right, outer heavy */
+  left: auto;
+  right: calc(50% - 50vw);
+  width: 8vw;
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 0%, #000 55%, transparent 100%);
+}
+
+/* vignette — inside the video mask so it only ever tints the video;
+   spans the full viewport, darkens AND softly blurs toward edges */
+.vignette {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%, rgba(4, 10, 30, 0.36) 100%);
+}
+
+/* WebGL icon field */
+.hero__gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* subtle bitmap grain over the hero */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: url("img/noise.png") repeat;
+  background-size: 160px 160px;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+}
+
+/* idle float */
+@keyframes float {
+  0%   { translate: 0 0; rotate: 0deg; }
+  50%  { translate: var(--fx, 0px) var(--fy, -8px); rotate: var(--fr, 3deg); }
+  100% { translate: 0 0; rotate: 0deg; }
+}
+
+/* ============================================================
+   SITE SECTIONS (below hero)
+   ============================================================ */
+:root {
+  --dark: #0A1430;
+  --accent: #FF0099;
+  --blue-1: #1E7BF0;
+  --blue-2: #00B8F5;
+  --blue-3: #00F0FF;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+#site {
+  font-family: "Archivo", -apple-system, sans-serif;
+  color: var(--dark);
+  background: #fff;
+  position: relative;
+  z-index: 5;
+}
+
+.display {
+  font-size: clamp(2.4rem, 7vw, 4.8rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+  margin-bottom: 1.2rem;
+}
+
+.btn {
+  display: inline-block;
+  font-family: "Archivo", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  padding: 1rem 2.2rem;
+  border-radius: 999px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn--accent {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn--accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(255, 0, 153, 0.35);
+}
+
+.btn--small {
+  padding: 0.65rem 1.4rem;
+  font-size: 0.8rem;
+}
+
+.smallprint {
+  font-size: 0.75rem;
+  color: #8892a6;
+  margin-top: 1.25rem;
+}
+
+/* ===== Ticket CTA band ===== */
+.band {
+  padding: clamp(4rem, 10vw, 8rem) 0;
+  background: #fff;
+}
+
+.band__inner {
+  text-align: center;
+  max-width: 760px;
+}
+
+.band__body {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+/* ===== Ticket list ===== */
+.ticket-list {
+  padding-bottom: clamp(4rem, 9vw, 7rem);
+}
+
+.ticket-list__grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.ticket {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1.5rem 1.75rem;
+  border: 2px solid var(--dark);
+  border-radius: 16px;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.ticket:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(10, 20, 48, 0.12);
+}
+
+.ticket__info h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ticket__info p {
+  font-size: 0.9rem;
+  color: #5a6478;
+  margin-top: 0.25rem;
+}
+
+.ticket__buy {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.ticket__price {
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.qty {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1.5px solid #c9d0dd;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+}
+
+.qty__btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--dark);
+}
+
+.qty__num {
+  min-width: 1.2em;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ===== Discover grid ===== */
+.discover {
+  padding: clamp(4rem, 9vw, 7rem) 0;
+  background: #f4f8ff;
+}
+
+.discover__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  min-height: 260px;
+  padding: 1.75rem;
+  border-radius: 20px;
+  text-decoration: none;
+  color: #fff;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.tile:hover { transform: translateY(-4px); }
+
+.tile--0 { background: linear-gradient(135deg, var(--blue-1), var(--blue-3)); }
+.tile--1 { background: linear-gradient(135deg, #0A1430, var(--blue-1)); }
+.tile--2 { background: linear-gradient(135deg, var(--blue-2), var(--blue-3)); }
+.tile--3 { background: linear-gradient(135deg, var(--accent), #ff66c4); }
+
+.tile__tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.tile__heading {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.tile__arrow {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 1.4rem;
+}
+
+/* ===== News grid ===== */
+.news {
+  padding: clamp(4rem, 9vw, 7rem) 0;
+}
+
+.news__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.news-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.5rem;
+  border: 2px solid var(--dark);
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--dark);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(10, 20, 48, 0.12);
+}
+
+.news-card__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.news-card__tag { color: var(--accent); }
+.news-card__date { color: #8892a6; }
+
+.news-card h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.25;
+  flex: 1;
+}
+
+.news-card__more {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ===== Footer ===== */
+.footer {
+  background: var(--dark);
+  color: #fff;
+  padding: clamp(4rem, 8vw, 6rem) 0 2rem;
+}
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 3rem;
+  padding-bottom: 3rem;
+}
+
+.footer__logo {
+  font-size: 1.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 1.5rem;
+}
+
+.footer__year { color: var(--accent); }
+
+.footer__brand h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+
+.footer__blurb {
+  font-size: 0.9rem;
+  color: #aeb8cc;
+  margin-bottom: 1.25rem;
+}
+
+.newsletter {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.newsletter input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid #3a4666;
+  background: transparent;
+  color: #fff;
+  font-family: "Archivo", sans-serif;
+}
+
+.newsletter input::placeholder { color: #7c88a5; }
+
+.footer__cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 2rem;
+}
+
+.footer__col h4 {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7c88a5;
+  margin-bottom: 1rem;
+}
+
+.footer__col ul { list-style: none; }
+
+.footer__col li { margin-bottom: 0.6rem; }
+
+.footer__col a,
+.footer__socials a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.footer__col a:hover,
+.footer__socials a:hover { color: var(--blue-3); }
+
+.footer__base {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-top: 1px solid #26314f;
+  padding-top: 1.5rem;
+}
+
+.footer__socials {
+  display: flex;
+  gap: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.footer__credit {
+  font-size: 0.78rem;
+  color: #7c88a5;
+}
+
+@media (max-width: 760px) {
+  .footer__inner { grid-template-columns: 1fr; }
+  .ticket { flex-direction: column; align-items: flex-start; }
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GemFest 2027</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/gemfest/styles.css" />
+</head>
+<body>
+
+  <!-- ===== PRELOADER ===== -->
+  <div class="preloader" id="preloader">
+    <img src="/gemfest/SVG/logo.svg" alt="GemFest" class="preloader__logo" id="preloaderLogo" />
+  </div>
+
+  <!-- ===== NAV ===== -->
+  <nav class="nav">
+    <a class="nav__brand" href="/gemfest">GemFest<span class="nav__year nav__ghost">'27</span></a>
+    <div class="nav__links">
+      <a href="#">Tickets</a>
+      <a href="#">Become a Rep</a>
+      <a href="#">Get Involved</a>
+      <a href="#">Contact</a>
+    </div>
+  </nav>
+  <!-- pink year, outside the blend so it stays true #FF0099 -->
+  <div class="nav nav--accent" aria-hidden="true">
+    <span class="nav__brand"><span class="nav__ghost">GemFest</span><span class="nav__year">'27</span></span>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero__sticky" id="heroSticky">
+
+      <!-- video masked by the logo; mirrored copies fill the sides -->
+      <div class="hero__video-mask" id="videoMask">
+        <div class="hero__video-strip" id="videoStrip">
+          <!-- enlarged mirror layer behind -->
+          <div class="strip-mirror">
+            <div class="vreflect vreflect--left">
+              <div class="vreflect vreflect--right">
+                <video id="vSlave" class="hero__video" autoplay muted loop playsinline preload="auto">
+                  <source src="/gemfest/video/hero-web.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+          </div>
+          <!-- sharp central video in front, grows on scroll -->
+          <div class="strip-center" id="stripCenter">
+            <video id="vMain" class="hero__video" autoplay muted loop playsinline preload="auto">
+              <source src="/gemfest/video/hero-web.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <!-- progressive blur: light near centre, heavier to viewport edge -->
+          <div class="pblur pblur--1" aria-hidden="true"></div>
+          <div class="pblur pblur--2" aria-hidden="true"></div>
+          <div class="pblur pblur--3" aria-hidden="true"></div>
+          <div class="pblur pblur--4" aria-hidden="true"></div>
+          <!-- vignette lives inside the mask: video-only -->
+          <div class="vignette" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <!-- WebGL icon field (real extruded 3d) -->
+      <canvas class="hero__gl" id="gl"></canvas>
+
+      <!-- subtle noise grain -->
+      <div class="grain" aria-hidden="true"></div>
+
+    </div>
+  </section>
+
+  <!-- ===== SITE SECTIONS (rendered from content.js) ===== -->
+  <main id="site"></main>
+
+  <script src="/gemfest/content.js"></script>
+  <script src="/gemfest/sections.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="/gemfest/hero.js"></script>
+</body>
+</html>
