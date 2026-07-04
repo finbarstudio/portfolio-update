@@ -20,7 +20,7 @@ const CONTENT = {
   ticketBand: {
     heading: "2027 Tickets",
     body: "Weekend tickets start at £75. Parking passes and Chippenham shuttle add-ons are available at checkout. Availability moves fast — check back if your tier is gone.",
-    cta: { label: "Get 2027 Tickets", href: "/tickets" },
+    cta: { label: "Get 2027 Tickets", href: "#" },
   },
 
   /* ---- Section: Ticket list ----
@@ -35,18 +35,18 @@ const CONTENT = {
 
   /* ---- Section: Discover grid ---- */
   discover: [
-    { tag: "Discover", heading: "What is GemFest?", href: "/discover" },
-    { tag: "Lineup", heading: "2027 coming soon — browse the 2026 full lineup", href: "/lineup" },
-    { tag: "Info", heading: "Getting there, times & FAQs", href: "/info" },
-    { tag: "Get Involved", heading: "Become a Rep", href: "/reps" },
+    { tag: "Discover", heading: "What is GemFest?", href: "#" },
+    { tag: "Lineup", heading: "2027 coming soon — browse the 2026 full lineup", href: "#" },
+    { tag: "Info", heading: "Getting there, times & FAQs", href: "#" },
+    { tag: "Get Involved", heading: "Become a Rep", href: "#" },
   ],
 
   /* ---- Section: News grid ---- */
   news: [
-    { tag: "GemFest '27", date: "June 2026", headline: "2027 dates announced — 17–20 June", slug: "/news/2027-dates-announced" },
-    { tag: "GemFest '27", date: "June 2026", headline: "First lineup drop coming soon", slug: "/news/first-lineup-drop" },
-    { tag: "GemFest '27", date: "May 2026", headline: "Travel & shuttle info: how to get to Charlton Park", slug: "/news/travel-shuttle-info" },
-    { tag: "GemFest '27", date: "May 2026", headline: "Become a rep — sell tickets, earn perks", slug: "/news/become-a-rep" },
+    { tag: "GemFest '27", date: "June 2026", headline: "2027 dates announced — 17–20 June", slug: "#" },
+    { tag: "GemFest '27", date: "June 2026", headline: "First lineup drop coming soon", slug: "#" },
+    { tag: "GemFest '27", date: "May 2026", headline: "Travel & shuttle info: how to get to Charlton Park", slug: "#" },
+    { tag: "GemFest '27", date: "May 2026", headline: "Become a rep — sell tickets, earn perks", slug: "#" },
   ],
 
   /* ---- Section: Footer ---- */
@@ -60,24 +60,24 @@ const CONTENT = {
       {
         title: "Festival",
         links: [
-          { label: "Tickets", href: "/tickets" },
-          { label: "Lineup", href: "/lineup" },
-          { label: "Info", href: "/info" },
-          { label: "Become a Rep", href: "/reps" },
-          { label: "Accessibility", href: "/accessibility" },
-          { label: "Local Community", href: "/community" },
+          { label: "Tickets", href: "#" },
+          { label: "Lineup", href: "#" },
+          { label: "Info", href: "#" },
+          { label: "Become a Rep", href: "#" },
+          { label: "Accessibility", href: "#" },
+          { label: "Local Community", href: "#" },
         ],
       },
       {
         title: "Legal",
         links: [
-          { label: "Privacy & Cookies", href: "/privacy-policy" },
-          { label: "Terms & Conditions", href: "/terms-conditions" },
+          { label: "Privacy & Cookies", href: "#" },
+          { label: "Terms & Conditions", href: "#" },
         ],
       },
       {
         title: "Support",
-        links: [{ label: "Contact", href: "/contact" }],
+        links: [{ label: "Contact", href: "#" }],
       },
     ],
     socials: [

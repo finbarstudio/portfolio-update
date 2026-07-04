@@ -34,7 +34,7 @@ function TicketList(tickets) {
           <span class="qty__num">1</span>
           <button type="button" class="qty__btn" data-qty="1">+</button>
         </div>
-        <a class="btn btn--accent btn--small" href="/tickets">Buy</a>
+        <a class="btn btn--accent btn--small" href="#">Buy</a>
       </div>
     </article>`).join("");
   return `

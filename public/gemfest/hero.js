@@ -35,7 +35,9 @@ const preloader = document.getElementById("preloader");
 const preLogo = document.getElementById("preloaderLogo");
 
 /* ---------- seeded rng ---------- */
-let s = 42;
+/* time-bucketed seed — re-rolls every 30s, so practically every visitor
+   gets their own constellation */
+let s = (Math.floor(Date.now() / 30000) % 2147483645) + 1;
 function rnd() { s = (s * 16807 + 19) % 2147483647; return (s & 0xfffffff) / 0x10000000 % 1; }
 
 /* ---------- mask helpers ---------- */
@@ -239,6 +241,27 @@ function makeInstances(protos) {
     const outer = new THREE.Group();               // position / scale / bob
     const inner = proto.group.clone(true);         // tumble rotation
     inner.traverse((o) => { if (o.isMesh) o.material = o.material.clone(); });
+
+    /* gradient map across the FIELD: instances in the last 10% of the
+       top-left -> bottom-right diagonal pick up a touch of brand pink */
+    const diag = Math.min(1, Math.max(0, ((x + W / 2) / W + (H / 2 - y) / H) / 2));
+    const pinkK = Math.max(0, (diag - 0.9) / 0.1);
+    if (pinkK > 0) {
+      const PINK = new THREE.Color("#FF0099");
+      const tint = new THREE.Color();
+      inner.traverse((o) => {
+        if (o.isMesh && o.material.vertexColors && o.geometry.attributes.color) {
+          o.geometry = o.geometry.clone();       // shared proto geometry stays blue
+          const col = o.geometry.attributes.color;
+          for (let vi = 0; vi < col.count; vi++) {
+            tint.setRGB(col.getX(vi), col.getY(vi), col.getZ(vi));
+            tint.lerp(PINK, pinkK * 0.75);
+            col.setXYZ(vi, tint.r, tint.g, tint.b);
+          }
+          col.needsUpdate = true;
+        }
+      });
+    }
     outer.add(inner);
     scene.add(outer);
 
@@ -434,6 +457,11 @@ const PLAYBACK_RATE = 0.65;
   v.playbackRate = PLAYBACK_RATE;
   v.addEventListener("loadedmetadata", () => { v.playbackRate = PLAYBACK_RATE; });
 });
+
+/* iOS: autoplay can be blocked (Low Power Mode / data saver) — retry on the
+   first touch so the logo window never sits white */
+const kickPlay = () => { [vMain, vSlave].forEach((v) => { if (v.paused) v.play().catch(() => {}); }); };
+["touchstart", "click"].forEach((t) => window.addEventListener(t, kickPlay, { once: true, passive: true }));
 
 setInterval(() => {
   if (!vMain.paused && Math.abs(vSlave.currentTime - vMain.currentTime) > 0.08) {

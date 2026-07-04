@@ -854,16 +854,26 @@ a.sf-value:hover::after,
   /* preloader logo: much smaller on phones (matches the 44vw mask handoff) */
   .preloader__logo { width: 42vw; }
 
-  /* Deterministic mobile hero: iOS masking of live video proved unreliable
-     (container masks are escaped; element masks mis-render), so phones skip the
-     masked-video trick entirely. The preloader hands off to a flat gradient logo
-     (same SVG, same 44vw), the constellation behaves identically, and the video
-     fades in FULL-BLEED on scroll at the point desktop's mask clears the viewport. */
+  /* Mobile hero: the logo-shaped clip window (SVG clipPath, geometry) does the
+     shaping — the CSS mask comes off. */
   .hero__video-mask {
-    -webkit-mask-image: none;   /* the clip window does the shaping on mobile */
+    -webkit-mask-image: none;
     mask-image: none;
   }
   .strip-mirror { display: none; }
+  .vignette { display: none; }
+
+  /* Portrait: the 4/3 strip is WIDER than the screen, and over-constrained
+     inset+margin:auto centring pins it LEFT (auto margins resolve to 0 when the
+     free space is negative) — that was the hard 3/4-screen edge. Centre by
+     transform instead. */
+  .hero__video-strip {
+    inset: auto;
+    margin: 0;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
 
   /* fullscreen backdrop-filter stacks are a jank machine on phones, and the
      sharp centre strip already covers a portrait viewport — drop them */
