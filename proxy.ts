@@ -29,7 +29,7 @@ export function proxy(request: NextRequest): NextResponse {
   // username works; only the password is checked. Rotate via a BUILDERS_PASSWORD
   // env var on the host if needed.
   if (pathname === "/builders" || pathname.startsWith("/builders/")) {
-    const expected = process.env.BUILDERS_PASSWORD || "hellofin";
+    const expected = process.env.BUILDERS_PASSWORD || "lovedev";
     const header = request.headers.get("authorization") || "";
     if (header.startsWith("Basic ")) {
       try {
