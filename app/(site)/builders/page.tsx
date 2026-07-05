@@ -95,7 +95,7 @@ const BATCH: Builder[] = [
         site: "https://calturnerarchitects.com.au",
         email: "mail@calturnerarchitects.com.au",
         linkedin: "https://au.linkedin.com/in/callumturner",
-        note: "Persimmon House (2023). Brisbane based",
+        note: "designed Peregian House, the Foundation Homes build. Now has his OWN demo + pitch, see Partners below",
       },
       {
         kind: "Design",
@@ -122,7 +122,8 @@ const BATCH: Builder[] = [
         company: "Lucas Muro Photographer",
         name: "Lucas Muro",
         site: "https://www.lucasmuro.com.au",
-        note: "shoots their Aboda-designed builds (Buderim, Peregian Beach). Contact form only",
+        email: "info@lucasmuro.com.au",
+        note: "shoots their Aboda-designed builds. Email is published on his FAQ page, not his contact page. Now has his OWN demo + pitch, see Partners below",
       },
     ],
     intel: [
@@ -171,38 +172,8 @@ Cheers,
 Finbar
 finbar.studio`,
       },
-      {
-        label: "Partner intro · Email (Cal Turner Architects)",
-        to: "mail@calturnerarchitects.com.au (attn. Callum Turner)",
-        subject: "Persimmon House",
-        body: `Hi Callum,
-
-I'm Finbar, a designer in Brisbane. I rebuilt Foundation Homes' website as a working demo, and Persimmon House, which you designed for them, features in it: finbar.studio/foundation-homes
-
-Their current site is a thin template that buries the work you design for them. If you think the demo shows the house properly, a mention to Edward would carry more weight than another email from me.
-
-Cheers,
-Finbar
-finbar.studio`,
-      },
-      {
-        label: "Partner intro · LinkedIn note (Callum Turner)",
-        to: "linkedin.com/in/callumturner · email above is the better channel now",
-        body: `Hi Callum, Finbar here, a designer in Brisbane. I rebuilt Foundation Homes' website as a working demo and Persimmon House features in it: finbar.studio/foundation-homes. If you think it shows the house well, a mention to Edward would mean a lot.`,
-      },
-      {
-        label: "Partner intro · Contact form (Lucas Muro)",
-        to: "lucasmuro.com.au contact form",
-        body: `Hi Lucas,
-
-I'm Finbar, a designer in Brisbane. I rebuilt Foundation Homes' website as a working demo, built around the photography you shot for their Aboda projects: finbar.studio/foundation-homes
-
-Your photos do the heavy lifting in it, so I wanted you to see it first. If you think it treats the work well, a mention to Edward, or to Lee and Scott at Aboda, would mean a lot.
-
-Cheers,
-Finbar
-finbar.studio`,
-      },
+      // Cal Turner + Lucas Muro intro messages moved to their own entries in
+      // the Partners section below: both now have their own demos + pitches.
       {
         label: "Round 1 · Email (sent)",
         to: "info@foundationhomes.com.au (attn. Edward Murphy)",
@@ -1375,6 +1346,159 @@ finbar.studio`,
   },
 ];
 
+// Partner prospects: the architects/photographers behind the builders' work,
+// now with their own Lindon-template demos + pitches.
+const PARTNERS: Builder[] = [
+  {
+    name: "Cal Turner Architects",
+    meta: "Brisbane · residential architect",
+    pitch: "/cal-turner",
+    pages: [
+      { label: "Home", href: "/cal-turner/site" },
+      { label: "About", href: "/cal-turner/site/about" },
+      { label: "Projects", href: "/cal-turner/site/projects" },
+    ],
+    people: [
+      {
+        name: "Callum (Cal) Turner",
+        role: "Director & registered architect (solo practice)",
+        email: "mail@calturnerarchitects.com.au",
+        linkedin: "https://au.linkedin.com/in/callumturner",
+        note: "0431 691 074. Stafford, Brisbane. M.Arch UQ, 15+ years; ex Mosaic Property Group (led their in-house architecture team)",
+      },
+    ],
+    partners: [
+      {
+        kind: "Builder",
+        company: "Foundation Homes",
+        note: "built Peregian House, his flagship. Their demo is in the batch above: the cross-sell writes itself",
+      },
+      {
+        kind: "Architect",
+        company: "Nielsen Jenkins",
+        site: "https://www.nielsenjenkins.com",
+        note: "original concept on Peregian House. Major awarded Brisbane practice",
+      },
+      {
+        kind: "Interiors",
+        company: "Trestle Studio",
+        note: "Peregian House interiors",
+      },
+      {
+        kind: "Photo",
+        company: "Alanna Jayne McTiernan",
+        note: "shot Peregian House",
+      },
+    ],
+    intel: [
+      "The site (Squarespace, 2023) is thin, not tasteless: project pages have ZERO text (no locations, stories or credits), 5 of 9 projects are render-only, the contact page still opens with Squarespace's stock 'It all begins with an idea' placeholder, and every meta description is empty.",
+      "The squarespace.com mirror domain is indexed in Google alongside the real one, splitting what little SEO exists.",
+      "His About page writing is genuinely excellent ('Architecture is just the excuse'). Compliment it honestly; the pitch is that the rest of the site should live up to it.",
+      "Personal: grew up on 10 acres outside Toowoomba; he and his wife have done 5 renos, 2 subdivisions and 2 new builds of their own. IG @calturner.architects.",
+      "No awards or press exist for the practice itself; the prestige runs through the Peregian collaborators (Nielsen Jenkins, Foundation Homes).",
+    ],
+    messages: [
+      {
+        label: "Outreach · Email",
+        to: "mail@calturnerarchitects.com.au (attn. Callum Turner)",
+        subject: "Peregian House, and your website",
+        body: `Hi Callum,
+
+I'm Finbar, a designer in Brisbane. "Architecture is just the excuse" is one of the best lines I've read on an architect's site, and Peregian House is a seriously beautiful project. But your project pages don't say a word: no locations, no stories, no credits, and the contact page still opens with Squarespace's placeholder line.
+
+Rather than write you a pitch, I rebuilt the site. There's a short note on what I noticed, plus a working three-page demo built around your projects and your wordmark:
+
+finbar.studio/cal-turner
+
+Worth a look on a desktop. And since Foundation Homes built Peregian, you might like what I made for them too: finbar.studio/foundation-homes
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Outreach · LinkedIn connection note",
+        to: "linkedin.com/in/callumturner",
+        body: `Hi Callum, Finbar here, a designer in Brisbane. Peregian House stopped me mid-scroll, so I rebuilt your website as a working demo around it: finbar.studio/cal-turner. Emailed you the longer version. Keen to hear what you think.`,
+      },
+    ],
+  },
+  {
+    name: "Lucas Muro",
+    meta: "Sunshine Coast · architectural photographer",
+    pitch: "/lucas-muro",
+    pages: [
+      { label: "Home", href: "/lucas-muro/site" },
+      { label: "About", href: "/lucas-muro/site/about" },
+      { label: "Work", href: "/lucas-muro/site/work" },
+    ],
+    people: [
+      {
+        name: "Lucas Muro",
+        role: "Architectural & interiors photographer (solo)",
+        email: "info@lucasmuro.com.au",
+        note: "0424 089 770 / office 07 5448 2337. Marcoola, Sunshine Coast. Email is on his FAQ page; the contact page itself is form-only. IG @lucasmurophotographer (~4.5k followers)",
+      },
+    ],
+    partners: [
+      {
+        kind: "Client",
+        company: "Aboda Design Group",
+        note: "7 shoots, his biggest repeat client, and Foundation Homes' design partner: the whole network loops back",
+      },
+      {
+        kind: "Client",
+        company: "Sprout Architects",
+        note: "6 shoots",
+      },
+      {
+        kind: "Client",
+        company: "Dayne Lawrie Constructions",
+        note: "5 shoots",
+      },
+      {
+        kind: "Client",
+        company: "Immackulate Homes · Koda Design",
+        note: "5 and 4 shoots. Roster also includes Qantas, Fendi, Nike, Hassell, Hyatt, Sheraton, Chris Clout Design",
+      },
+    ],
+    intel: [
+      "The site is a 2014-class Wix template untouched since Sep 2022 (sitemap lastmod), with a footer that still reads © 2004 and a 'Latest Work' page that is years old.",
+      "Hidden keyword-stuffing blocks sit on most pages (hundreds of repeated 'architectural photographer Melbourne/Sydney/Brisbane' lines): a genuine Google-penalty risk and the strongest urgency angle.",
+      "No about or bio page exists at all. Gallery captions show raw filenames (_MG_5164.jpg). The site's own JSON-LD spells it 'portifolio'. Several placeholder/broken pages (weddings, workshops, 'Review my photo shoot' links to the wrong page).",
+      "The photography itself and the client roster are the assets. For a photographer the website IS the product shot: that's the pitch in one line.",
+      "Images on the current site cap at 1500 to 2000px, soft on retina screens.",
+    ],
+    messages: [
+      {
+        label: "Outreach · Email",
+        to: "info@lucasmuro.com.au",
+        subject: "Your photos deserve a better site",
+        body: `Hi Lucas,
+
+I'm Finbar, a designer in Brisbane. Your architectural work is superb, and the client list backs it up: Aboda, Koda, Dayne Lawrie, Fendi, Qantas. But the website is an old Wix template with a © 2004 footer, gallery captions like _MG_5164.jpg, and nothing new since 2022. For a photographer, the website is the product shot.
+
+Rather than send a pitch, I rebuilt it. A short note on what I noticed, plus a working three-page demo built around your own frames:
+
+finbar.studio/lucas-muro
+
+One thing worth knowing regardless: most of your pages carry big blocks of hidden keyword text, which Google actively penalises these days. That's worth fixing even if we never talk.
+
+Have a look on a desktop. If it feels right, I'd love a chat.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Outreach · Contact form (backup if the email bounces)",
+        to: "lucasmuro.com.au contact form · or 0424 089 770",
+        body: `Hi Lucas, I'm Finbar, a designer in Brisbane. I rebuilt your website as a working demo built around your own photography: finbar.studio/lucas-muro. There's a short note there on what I noticed too, including a hidden-text SEO issue on the current site that's worth fixing either way. I'm at finbar@finbar.studio if the demo sparks anything.`,
+      },
+    ],
+  },
+];
+
 function linkHost(url: string): string {
   return url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 }
@@ -1438,11 +1562,19 @@ function PartnerLine({ p }: { p: Partner }) {
 
 function Row({ b }: { b: Builder }) {
   return (
-    <div className="border-t border-line pt-5">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-3">
-        <div className="md:col-span-5">
-          <h3 className="mono-heading text-ink">{b.name}</h3>
-          <p className="text-ink-soft mt-1" style={{ fontSize: "0.85rem" }}>{b.meta}</p>
+    <details className="border-t border-line pt-5 group">
+      <summary className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        <div className="md:col-span-5 flex items-baseline gap-3">
+          <span
+            aria-hidden="true"
+            className="mono-label text-ink-soft/60 transition-transform duration-200 group-open:rotate-90 select-none"
+          >
+            &#9656;
+          </span>
+          <span>
+            <h3 className="mono-heading text-ink inline">{b.name}</h3>
+            <p className="text-ink-soft mt-1" style={{ fontSize: "0.85rem" }}>{b.meta}</p>
+          </span>
         </div>
         <div className="md:col-span-7 flex flex-wrap items-center gap-x-4 gap-y-2">
           <a href={b.pitch} className="mono-label text-pink hover:underline">
@@ -1459,9 +1591,9 @@ function Row({ b }: { b: Builder }) {
             </a>
           ))}
         </div>
-      </div>
+      </summary>
 
-      <div className="mt-5 flex flex-col gap-4 md:max-w-[76ch]">
+      <div className="mt-5 flex flex-col gap-4 md:max-w-[76ch] md:pl-7">
         <div>
           <p className="mono-label text-ink-soft mb-2">People</p>
           <ul className="flex flex-col gap-1">
@@ -1500,7 +1632,7 @@ function Row({ b }: { b: Builder }) {
           ))}
         </div>
       </div>
-    </div>
+    </details>
   );
 }
 
@@ -1540,6 +1672,15 @@ export default async function BuildersIndexPage() {
         <p className="mono-label text-ink-soft mb-8">Earlier · 4</p>
         <div className="flex flex-col gap-10">
           {EARLIER.map((b) => (
+            <Row key={b.pitch} b={b} />
+          ))}
+        </div>
+      </section>
+
+      <section className="home-section py-10 md:py-14">
+        <p className="mono-label text-ink-soft mb-8">Partners · 2</p>
+        <div className="flex flex-col gap-10">
+          {PARTNERS.map((b) => (
             <Row key={b.pitch} b={b} />
           ))}
         </div>
