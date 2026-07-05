@@ -22,32 +22,9 @@ export function proxy(request: NextRequest): NextResponse {
   const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
   const { pathname } = request.nextUrl;
 
-  // ── Password gate for the private /builders index (HTTP Basic Auth) ─────────
-  // /builders is an unlisted, noindex reference page that server-renders the
-  // outreach emails into its HTML, so it can't be gated client-side without
-  // leaking the content. Challenge here, before the page is ever served. Any
-  // username works; only the password is checked. Rotate via a BUILDERS_PASSWORD
-  // env var on the host if needed.
-  if (pathname === "/builders" || pathname.startsWith("/builders/")) {
-    const expected = process.env.BUILDERS_PASSWORD || "lovedev";
-    const header = request.headers.get("authorization") || "";
-    if (header.startsWith("Basic ")) {
-      try {
-        const decoded = atob(header.slice(6)); // "username:password"
-        const password = decoded.slice(decoded.indexOf(":") + 1);
-        if (password === expected) return NextResponse.next();
-      } catch {
-        /* malformed header — fall through to the challenge */
-      }
-    }
-    return new NextResponse("Password required.", {
-      status: 401,
-      headers: {
-        "WWW-Authenticate": 'Basic realm="finbar.studio builders", charset="UTF-8"',
-        "Content-Type": "text/plain; charset=utf-8",
-      },
-    });
-  }
+  // NOTE: the /builders password gate moved out of here. It's now an on-screen
+  // form: app/(site)/builders/page.tsx checks the auth cookie server-side and
+  // renders Gate.tsx (unlock server action in actions.ts) when it's missing.
 
   // ── Sandbox subdomain: clean URLs (no visible /sandbox prefix) ──────────────
   if (SANDBOX_HOSTS.has(host)) {

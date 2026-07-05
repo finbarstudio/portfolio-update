@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Gate from "./Gate";
 import MessageBlock from "./MessageBlock";
 
 // Private index of every builder demo + pitch, plus the round-2 outreach kit:
@@ -1207,7 +1209,14 @@ function Row({ b }: { b: Builder }) {
   );
 }
 
-export default function BuildersIndexPage() {
+export default async function BuildersIndexPage() {
+  // On-screen password gate (cookie set by the unlock server action). The check
+  // lives here rather than in proxy.ts so the lock is a styled page, not a
+  // browser Basic Auth popup; the content below never renders without the key.
+  const expected = process.env.BUILDERS_PASSWORD || "lovedev";
+  const jar = await cookies();
+  if (jar.get("builders_key")?.value !== expected) return <Gate />;
+
   return (
     <div className="px-5 md:px-10 pb-24">
       <section className="pt-[5svh] md:pt-[7svh] pb-12 md:pb-16">
