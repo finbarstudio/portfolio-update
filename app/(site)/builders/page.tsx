@@ -93,8 +93,9 @@ const BATCH: Builder[] = [
         company: "Cal Turner Architects",
         name: "Callum Turner",
         site: "https://calturnerarchitects.com.au",
+        email: "mail@calturnerarchitects.com.au",
         linkedin: "https://au.linkedin.com/in/callumturner",
-        note: "Persimmon House (2023). Brisbane based, no email published",
+        note: "Persimmon House (2023). Brisbane based",
       },
       {
         kind: "Design",
@@ -171,8 +172,22 @@ Finbar
 finbar.studio`,
       },
       {
+        label: "Partner intro · Email (Cal Turner Architects)",
+        to: "mail@calturnerarchitects.com.au (attn. Callum Turner)",
+        subject: "Persimmon House",
+        body: `Hi Callum,
+
+I'm Finbar, a designer in Brisbane. I rebuilt Foundation Homes' website as a working demo, and Persimmon House, which you designed for them, features in it: finbar.studio/foundation-homes
+
+Their current site is a thin template that buries the work you design for them. If you think the demo shows the house properly, a mention to Edward would carry more weight than another email from me.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
         label: "Partner intro · LinkedIn note (Callum Turner)",
-        to: "linkedin.com/in/callumturner",
+        to: "linkedin.com/in/callumturner · email above is the better channel now",
         body: `Hi Callum, Finbar here, a designer in Brisbane. I rebuilt Foundation Homes' website as a working demo and Persimmon House features in it: finbar.studio/foundation-homes. If you think it shows the house well, a mention to Edward would mean a lot.`,
       },
       {
