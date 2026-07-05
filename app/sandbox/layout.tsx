@@ -22,7 +22,7 @@ const SANDBOX_DESC =
 export const metadata: Metadata = {
   metadataBase: new URL(SANDBOX_URL),
   title: {
-    default: "Sandbox · finbar✶studio — free creative tools",
+    default: "Sandbox · finbar✶studio · free creative tools",
     template: "%s · Sandbox · finbar✶studio",
   },
   description: SANDBOX_DESC,
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: SANDBOX_URL },
   openGraph: {
-    title: "Sandbox · finbar✶studio — free creative tools",
+    title: "Sandbox · finbar✶studio · free creative tools",
     description: SANDBOX_DESC,
     url: SANDBOX_URL,
     siteName: "finbar✶studio Sandbox",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sandbox · finbar✶studio — free creative tools",
+    title: "Sandbox · finbar✶studio · free creative tools",
     description: SANDBOX_DESC,
     creator: "@finbarstudio",
   },

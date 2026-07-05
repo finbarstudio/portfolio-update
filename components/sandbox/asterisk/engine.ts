@@ -240,7 +240,7 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
       currentSVG = svgText;
       buildShape();
       mesh?.rotation.set(0, 0, 0);
-      status("Loaded SVG — " + shapes.length + " shape(s).");
+      status("Loaded SVG: " + shapes.length + " shape(s).");
     } catch (e) {
       status("SVG error: " + (e as Error).message);
     }
@@ -559,11 +559,11 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
     rec.onstop = async () => {
       if (useTl) { togglePlay(false); timeline.loop = prevLoop; sync(); }
       const blob = new Blob(chunks, { type: recMime });
-      if (!blob.size) { busy(null); status("Recording produced no data — try again."); return; }
+      if (!blob.size) { busy(null); status("Recording produced no data. Try again."); return; }
       try {
         if (toMp4 && !nativeMp4) {
           // Desktop path: recorded WebM, transcode to MP4 with ffmpeg.wasm.
-          busy("Saving — transcoding to MP4 (first run downloads ffmpeg ~30 MB)…");
+          busy("Saving: transcoding to MP4 (first run downloads ffmpeg ~30 MB)…");
           downloadBlob(await toMP4(blob), "asterisk.mp4");
           status("Saved asterisk.mp4");
         } else {
@@ -578,8 +578,8 @@ export function createAsteriskEngine(canvas: HTMLCanvasElement, stage: HTMLEleme
         const ext = nativeMp4 ? "mp4" : "webm";
         downloadBlob(blob, "asterisk." + ext);
         status(toMp4 && ext === "webm"
-          ? "This browser can’t make MP4 here — saved .webm instead (" + (e as Error).message + ")."
-          : "Export issue (" + (e as Error).message + ") — saved the raw ." + ext + ".");
+          ? "This browser can’t make MP4 here, saved .webm instead (" + (e as Error).message + ")."
+          : "Export issue (" + (e as Error).message + "), saved the raw ." + ext + ".");
       } finally {
         busy(null);
       }

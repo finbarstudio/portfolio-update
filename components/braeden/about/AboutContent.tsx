@@ -59,8 +59,8 @@ function PhotoBand() {
 const RECOGNITION: [string, string][] = [
   ["2010", "First Sunshine Coast builder to win the MBA National Master Builder of the Year + National House of the Year"],
   ["5×", "House of the Year, Sunshine Coast"],
-  ["2025", "MBA Sunshine Coast — Best Individual Home + Best Residential Kitchen, for Riverside (Noosaville)"],
-  ["QLD", "Modern Thai House, Noosa Heads — MBA Queensland House of the Year"],
+  ["2025", "MBA Sunshine Coast, Best Individual Home + Best Residential Kitchen, for Riverside (Noosaville)"],
+  ["QLD", "Modern Thai House, Noosa Heads, MBA Queensland House of the Year"],
 ];
 
 function Recognition() {

@@ -6,7 +6,7 @@ import SiteFooter from "@/components/arolley/sections/SiteFooter";
 const BASE = "/a-rolley/editorial";
 
 export const metadata = {
-  title: { absolute: "Project | A Rolley & Sons — Editorial" },
+  title: { absolute: "Project | A Rolley & Sons · Editorial" },
 };
 
 export default async function ARolleyEditorialProjectDetail({ params }: { params: Promise<{ slug: string }> }) {

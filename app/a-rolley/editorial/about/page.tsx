@@ -9,7 +9,7 @@ import SiteFooter from "@/components/arolley/sections/SiteFooter";
 const BASE = "/a-rolley/editorial";
 
 export const metadata = {
-  title: { absolute: "About | A Rolley & Sons — Editorial" },
+  title: { absolute: "About | A Rolley & Sons · Editorial" },
 };
 
 export default function ARolleyEditorialAbout() {

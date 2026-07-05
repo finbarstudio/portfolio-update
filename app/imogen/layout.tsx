@@ -7,7 +7,7 @@ import PasswordGate from "@/components/imogen/PasswordGate";
 // so it inherits only the root html/body (fonts) and never gets the portfolio
 // sidebar / nav / grain. noindex: it's personal, not for search.
 export const metadata: Metadata = {
-  title: { absolute: "Imogen's Asia — a little guide" },
+  title: { absolute: "Imogen's Asia, a little guide" },
   description: "A private travel guide for a first trip through Southeast Asia.",
   robots: { index: false, follow: false },
   alternates: { canonical: undefined },

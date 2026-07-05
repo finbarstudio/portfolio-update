@@ -505,7 +505,7 @@ export default function BezierStudio() {
     const str = exportSvgString({ transparent: cfg.exportTransparent, noGrid: cfg.exportNoGrid });
     if (!str) return;
     try { await navigator.clipboard.writeText(str); setStatus("Copied SVG to clipboard"); }
-    catch { setStatus("Clipboard blocked — use Save .svg instead."); }
+    catch { setStatus("Clipboard blocked. Use Save .svg instead."); }
   }
   function saveSettings() {
     downloadBlob(new Blob([JSON.stringify({ cfg, sourceName }, null, 2)], { type: "application/json" }), "bezier-settings.json");

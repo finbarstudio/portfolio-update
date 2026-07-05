@@ -7,7 +7,7 @@ import SiteFooter from "@/components/arolley/sections/SiteFooter";
 const BASE = "/a-rolley/editorial";
 
 export const metadata = {
-  title: { absolute: "Projects | A Rolley & Sons — Editorial" },
+  title: { absolute: "Projects | A Rolley & Sons · Editorial" },
 };
 
 type P = { title: string; meta: string; src: string; ratio: string; slug: string };

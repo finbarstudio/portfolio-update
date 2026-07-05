@@ -38,7 +38,7 @@ export default function HeroChoices() {
     <>
       {/* A — Full-bleed statement */}
       <section className="bhero brd-opt" style={{ display: "grid", placeItems: "center", background: "#2b2b2e" }}>
-        <Tag label="A — Full-bleed statement" />
+        <Tag label="A · Full-bleed statement" />
         <img className="bhero-photo" src={`${P}/peregian.webp`} alt="" aria-hidden />
         <div className="bhero-scrim-radial" />
         <div className="bhero-scrim-edge" />
@@ -51,7 +51,7 @@ export default function HeroChoices() {
 
       {/* B — Split: text left, full-height image right */}
       <section className="bhero brd-opt" style={{ background: "var(--paper)" }}>
-        <Tag label="B — Split" />
+        <Tag label="B · Split" />
         <div className="bhero-split" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: "100svh" }}>
           <div style={{ display: "grid", placeItems: "center", padding: "clamp(40px,6vw,96px) var(--gutter)" }}>
             <div style={{ maxWidth: 560 }}>
@@ -70,7 +70,7 @@ export default function HeroChoices() {
 
       {/* C — Bento: a big image with two stacked tiles */}
       <section className="bhero brd-opt" style={{ background: "var(--paper)", display: "grid", placeItems: "center", padding: "clamp(26px,4.5vh,60px) var(--gutter)" }}>
-        <Tag label="C — Bento" />
+        <Tag label="C · Bento" />
         <div style={{ width: "100%", maxWidth: 1280 }}>
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gridAutoRows: "minmax(0, 1fr)", gap: "clamp(10px,1.1vw,16px)", height: "min(82vh, 820px)" }}>
             <a href="/braeden/site/projects" data-cursor="View project" className="b-bento-cell" style={{ gridRow: "span 2" }}>

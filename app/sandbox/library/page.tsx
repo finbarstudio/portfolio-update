@@ -4,7 +4,7 @@ import SandboxLinkButton from "@/components/sandbox/SandboxLinkButton";
 export const metadata: Metadata = {
   title: "Library",
   description:
-    "A reference library of effects from finbar✶studio — motion and rendering techniques worth keeping around. First up: a 1950s drum-credits roll.",
+    "A reference library of effects from finbar✶studio: motion and rendering techniques worth keeping around. First up: a 1950s drum-credits roll.",
   robots: { index: false, follow: true },
 };
 

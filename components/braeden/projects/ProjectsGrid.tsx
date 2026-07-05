@@ -57,7 +57,7 @@ export default function ProjectsGrid() {
             <BlurImage
               src={p.src}
               lqip={PROJECT_LQIP[p.src.split("/").pop()!.replace(".webp", "")] ?? ""}
-              alt={`${p.title}, ${p.location} — a Braeden Constructions home`}
+              alt={`${p.title}, ${p.location}, a Braeden Constructions home`}
               priority={i < 3}
               className="[clip-path:inset(0_0_0_0)] transition-[clip-path] duration-[320ms] ease-[cubic-bezier(0.4,0,0.1,1)] group-hover:[clip-path:inset(0_0_11rem_0)] group-hover:duration-[520ms] group-hover:ease-[cubic-bezier(0.22,1,0.36,1)]"
             />
