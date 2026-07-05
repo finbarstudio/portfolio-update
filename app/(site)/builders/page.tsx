@@ -150,6 +150,45 @@ Finbar
 finbar.studio`,
       },
       {
+        label: "Round 2 · LinkedIn connection note (Edward)",
+        to: "linkedin.com/in/edward-murphy-659036105 · profile is near-dormant, treat as a backup to email",
+        body: `Hi Edward, Finbar here, a designer in Brisbane. Amani Place looks incredible in the Finestone feature. I emailed a rebuilt version of your website a while back (finbar.studio/foundation-homes) and figured I'd connect here too.`,
+      },
+      {
+        label: "Partner intro · Email (Aboda Design Group)",
+        to: "admin@aboda.com.au (attn. Lee Foster & Scott Falconer)",
+        subject: "Your Foundation Homes projects, redesigned",
+        body: `Hi Lee and Scott,
+
+I'm Finbar, a designer in Brisbane. I recently rebuilt Foundation Homes' website as a working demo, and five of the projects in it are yours: Amani Place, Eyrie Terrace, Noosa Dunes, Tern Street and the Barnes Residence.
+
+Have a look at how they're shown: finbar.studio/foundation-homes
+
+I've emailed Edward, but a nod from you would carry more weight than anything I can write. If you think the demo does your work justice, I'd really appreciate you mentioning it to him next time you talk.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · LinkedIn note (Callum Turner)",
+        to: "linkedin.com/in/callumturner",
+        body: `Hi Callum, Finbar here, a designer in Brisbane. I rebuilt Foundation Homes' website as a working demo and Persimmon House features in it: finbar.studio/foundation-homes. If you think it shows the house well, a mention to Edward would mean a lot.`,
+      },
+      {
+        label: "Partner intro · Contact form (Lucas Muro)",
+        to: "lucasmuro.com.au contact form",
+        body: `Hi Lucas,
+
+I'm Finbar, a designer in Brisbane. I rebuilt Foundation Homes' website as a working demo, built around the photography you shot for their Aboda projects: finbar.studio/foundation-homes
+
+Your photos do the heavy lifting in it, so I wanted you to see it first. If you think it treats the work well, a mention to Edward, or to Lee and Scott at Aboda, would mean a lot.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
         label: "Round 1 · Email (sent)",
         to: "info@foundationhomes.com.au (attn. Edward Murphy)",
         subject: "Your homes vs your website",
@@ -232,6 +271,11 @@ finbar.studio`,
         label: "Round 2 · LinkedIn connection note (Billy)",
         to: "linkedin.com/in/bill-thomas-076815105",
         body: `Hi Billy, Finbar here, a designer in Brisbane. Congrats on Coastal Muse, five straight years of MB wins now. I rebuilt your website as a working demo a while back (finbar.studio/resolve-construction) and figured I'd connect properly.`,
+      },
+      {
+        label: "Round 2 · LinkedIn connection note (Zahra)",
+        to: "linkedin.com/in/zahra-glassford-35607b3b",
+        body: `Hi Zahra, Finbar here, a designer in Brisbane. Congrats on five straight years of MB wins at Resolve, and your own Women in Building award. I rebuilt the Resolve site as a working demo (finbar.studio/resolve-construction) and sent it to admin@ for Billy. Keen to hear what you think of it too.`,
       },
       {
         label: "Round 1 · Email (sent)",
@@ -322,6 +366,20 @@ finbar.studio`,
         label: "Round 2 · LinkedIn connection note (Ross)",
         to: "linkedin.com/in/ross-hogno-51247525",
         body: `Hi Ross, Finbar here, a designer in Brisbane. Saw the site's mid-update and figured I'd connect while it's in motion. I rebuilt a version of it as a working demo: finbar.studio/ross-hogno. Congrats on the Hooson Home win too.`,
+      },
+      {
+        label: "Partner intro · Email (Eco Blueprints)",
+        to: "ross@ecoblueprints.com.au · their site is down, so follow up on 0431 404 608 if it bounces",
+        subject: "The Highfields home, back online",
+        body: `Hi Ross,
+
+I'm Finbar, a designer in Brisbane. I rebuilt Ross Hogno Constructions' website as a working demo, and your 8.5-star Highfields home is part of it: finbar.studio/ross-hogno
+
+With rosshogno.com.au down to a holding page at the moment, that award-winning work isn't viewable anywhere. If you think the demo shows it properly, a word to Ross would go a long way. He knows the demo exists, but a recommendation from his designer lands differently.
+
+Cheers,
+Finbar
+finbar.studio`,
       },
       {
         label: "Round 1 · Email (sent)",
@@ -419,6 +477,30 @@ You deliberately keep your build list short, so each enquiry the site brings in 
 Cheers,
 Finbar
 finbar.studio`,
+      },
+      {
+        label: "Round 2 · LinkedIn connection note (David)",
+        to: "linkedin.com/in/david-radic-a62572220 · 2 connections, effectively dead; backup only",
+        body: `Hi David, Finbar here, a designer in Brisbane. Congrats on the HIA Custom Built Home win for Broadbeach Waters. I emailed a rebuilt version of your website to admin@ (finbar.studio/david-radic). Connecting here in case the email's buried.`,
+      },
+      {
+        label: "Partner intro · Email (BDA Architecture)",
+        to: "info@bdaarch.com.au (attn. Darren Greenaway)",
+        subject: "The Radic build, redesigned",
+        body: `Hi Darren,
+
+I'm Finbar, a designer in Brisbane. I rebuilt David Radic Prestige Homes' website as a working demo, and the luxury home you designed for them features in it: finbar.studio/david-radic
+
+David and Natasha just won the HIA Custom Built Home award and their current site doesn't even mention it. If you think the demo shows the build the way it deserves, a mention to David would carry real weight.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · LinkedIn note (Darren Greenaway)",
+        to: "linkedin.com/in/darren-greenaway-33303332",
+        body: `Hi Darren, Finbar here, a designer in Brisbane. I rebuilt David Radic Prestige Homes' website as a working demo and your BDA build features in it: finbar.studio/david-radic. If it does the work justice, a word to David would mean a lot.`,
       },
       {
         label: "Round 1 · Email (sent)",
@@ -529,6 +611,86 @@ Finbar
 finbar.studio`,
       },
       {
+        label: "Round 2 · LinkedIn connection note (Gaston)",
+        to: "linkedin.com/in/gaston-ottl-463016148 · ~19 connections; backup only",
+        body: `Hi Gaston, Finbar here, a designer in Brisbane. Congrats on the double at the Sunshine Coast awards, Shearwater and Panorama. I rebuilt your website as a working demo (finbar.studio/gto-building) and sent it to info@ too.`,
+      },
+      {
+        label: "Partner intro · Email (Bark Design Architects)",
+        to: "info@barkdesign.com.au (attn. Lindy Atkin & Stephen Guthrie)",
+        subject: "Tristania and Panorama, redesigned",
+        body: `Hi Lindy and Stephen,
+
+I'm Finbar, a designer in Brisbane. I rebuilt GTO Building's website as a working demo, and your Tristania Beach House and Panorama House carry it: finbar.studio/gto-building
+
+Panorama just won the steel-frame award and neither win shows on Gaston's current site. If you think the demo presents your houses properly, a word to Gaston would go further than another email from me.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · Email (Reitsma & Associates, also covers Foundation Homes)",
+        to: "info@reitsma.com.au (attn. Trevor Reitsma)",
+        subject: "Shearwater and the Watson Residence",
+        body: `Hi Trevor,
+
+I'm Finbar, a designer in Brisbane. Two of the builders I've been working around lean on your designs: GTO Building (Shearwater, this year's Individual Home winner) and Foundation Homes (the Watson Residence, the 2023 winner).
+
+I rebuilt both of their websites as working demos, with your projects front and centre:
+
+finbar.studio/gto-building
+finbar.studio/foundation-homes
+
+If you think either demo does the houses justice, a mention to Gaston or Edward would mean a lot. Their current sites bury the work you design for them.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · Email (Jack Gore Photo)",
+        to: "hello@jackgorephoto.com.au",
+        subject: "Your Shearwater photos, given room",
+        body: `Hi Jack,
+
+I'm Finbar, a designer in Brisbane. I rebuilt GTO Building's website as a working demo, and your Shearwater shots are the backbone of it: finbar.studio/gto-building
+
+Photos that good deserve better than the template they currently sit in, which is most of my pitch to Gaston. If you agree, a word from you would land better than ten emails from me.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · Email (CFJPhotography)",
+        to: "studio@cfjphoto.com.au (attn. Christopher Frederick Jones)",
+        subject: "Tristania Beach House",
+        body: `Hi Christopher,
+
+I'm Finbar, a designer in Brisbane. I rebuilt GTO Building's website as a working demo, and your Tristania Beach House photography features throughout: finbar.studio/gto-building
+
+Gaston's current site doesn't do those images justice, which is most of my pitch to him. If the demo treats them the way you'd want, a mention to him would mean a lot.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · Email (Aimee Dodge)",
+        to: "hello@aimeedodge.com.au",
+        subject: "Panorama House",
+        body: `Hi Aimee,
+
+I'm Finbar, a designer in Brisbane. I rebuilt GTO Building's website as a working demo, and Panorama House, which you shot, features in it: finbar.studio/gto-building
+
+The house just won the steel-frame award at the Sunshine Coast awards and the win doesn't show on Gaston's current site. If you think the demo shows your photos well, a mention to him would mean a lot.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
         label: "Round 1 · Email (sent)",
         to: "info@gtobuilding.com.au (attn. Gaston Ottl)",
         subject: "Your homes vs your website",
@@ -633,6 +795,50 @@ Almost none of it reaches your own website though. The news page hasn't moved si
 The rebuilt demo I emailed about earlier is still live: finbar.studio/hm-developments
 
 Ninety years of Henzells on the coast, fourth generation, and the biggest private project the Sunshine Coast has seen. That story deserves a site that can carry it, and I'd like to show you how the whole family of sites could hang together. Fifteen minutes, whenever suits.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · Email (Blink Living, warmest thread)",
+        to: "hello@blinkliving.com.au (attn. Nick Counsell)",
+        subject: "The Comino penthouse, and HM's website",
+        body: `Hi Nick,
+
+I'm Finbar, a designer in Brisbane. Your styling of Penthouse 2601 ended up in The Weekend Australian, and Mclean's testimonial on your case study says how much the HM side valued it.
+
+I rebuilt HM Developments' website as a working demo: finbar.studio/hm-developments. Their news page hasn't moved since 2021, so wins like that penthouse never reach their own site.
+
+You clearly have Mclean's ear. If you think the demo is worth his time, I'd really value the introduction.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · Email (OGE Group Architects)",
+        to: "info@ogegroup.com.au (attn. John Robertson)",
+        subject: "Corsica, and HM's website",
+        body: `Hi John,
+
+I'm Finbar, a designer in Brisbane. I rebuilt HM Developments' website as a working demo, and Corsica is central to it: finbar.studio/hm-developments
+
+The Cove is the biggest thing on the coast and HM's own news page hasn't moved since 2021, so the story your building anchors isn't being told. If you think the demo tells it properly, a word to Mclean would carry more weight than mine.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · Email (Catherine Schusler)",
+        to: "info@catherineschusler.com",
+        subject: "Your Corsica shoot",
+        body: `Hi Catherine,
+
+I'm Finbar, a designer in Brisbane. I rebuilt HM Developments' website as a working demo, and Corsica, which you shot for The Local Project, features in it: finbar.studio/hm-developments
+
+Work that's run in Architectural Digest shouldn't end up on a site that hasn't been updated since 2021. If the demo treats the project right, a mention to Mclean Henzell would mean a lot.
 
 Cheers,
 Finbar
@@ -756,6 +962,16 @@ Finbar
 finbar.studio`,
       },
       {
+        label: "Round 2 · LinkedIn connection note (Mark Bain)",
+        to: "linkedin.com/in/mark-bain-b687b764",
+        body: `Hi Mark, Finbar here, a designer in Brisbane. Tea Tree got a great write-up in Noosa Today. I rebuilt mbcprestige.com.au as a working demo ahead of White Sands and Oceane launching (finbar.studio/mbc-prestige). Emailed the info address, but figured it should reach you directly.`,
+      },
+      {
+        label: "Round 2 · LinkedIn connection note (David Conolly)",
+        to: "linkedin.com/in/david-conolly-4b919052",
+        body: `Hi David, Finbar here, a designer in Brisbane. I rebuilt the MBC Prestige site as a working demo (finbar.studio/mbc-prestige). Better project pages should make Tea Tree, Kalani and Sails easier to sell. Emailed you the details too.`,
+      },
+      {
         label: "Round 1 · Email (sent)",
         to: "info@mbcprestige.com.au (attn. David Conolly / Sam Walker)",
         subject: "Your developments vs your website",
@@ -854,6 +1070,56 @@ First Sunshine Coast builder to win the national title, a Queensland House of th
 Cheers,
 Finbar`,
       },
+      {
+        label: "Partner intro · Email (Chris Clout Design, also covers MBC Prestige)",
+        to: "info@chriscloutdesign.com.au (attn. Chris Clout)",
+        subject: "The Modern Thai House and Tea Tree",
+        body: `Hi Chris,
+
+I'm Finbar, a designer in Brisbane. Two builders I've rebuilt websites for are yours: Braeden Constructions (the Modern Thai House anchors the demo) and MBC Prestige (Tea Tree, after the Noosa Today write-up in December).
+
+finbar.studio/braeden
+finbar.studio/mbc-prestige
+
+Mick publishes no email at all, so you're honestly the best road to him. If you think the Braeden demo does the Thai house justice, a word to Mick, or to Mark Bain on the MBC side, would mean more than anything I can send them.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · LinkedIn note (Chloe Tozer, CLO Studios)",
+        to: "linkedin.com/in/chloe-tozer-982898232",
+        body: `Hi Chloe, Finbar here, a designer in Brisbane. I rebuilt Braeden Constructions' website as a working demo and the Modern Thai House, with CLO's interiors, anchors it: finbar.studio/braeden. If it treats the project right, a mention to Mick Devlin would mean a lot.`,
+      },
+      {
+        label: "Partner intro · Email (David Chatfield)",
+        to: "info@davidchatfield.studio",
+        subject: "Your Modern Thai House photos",
+        body: `Hi David,
+
+I'm Finbar, a designer in Brisbane. I rebuilt Braeden Constructions' website as a working demo, and your Modern Thai House photography anchors it: finbar.studio/braeden
+
+Mick has no email published anywhere, so reaching him is half the battle. If you think the demo shows your photos the way they deserve, a mention next time you talk would mean a lot.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
+      {
+        label: "Partner intro · Email (Skale Building Design)",
+        to: "info@skale.com.au (attn. Ben Thornton)",
+        subject: "Elizabeth Villas",
+        body: `Hi Ben,
+
+I'm Finbar, a designer in Brisbane. I rebuilt Braeden Constructions' website as a working demo, and Elizabeth Villas features in it: finbar.studio/braeden
+
+Mick publishes no email, so a word from someone he already works with goes further than anything I can send. If the demo reads right to you, I'd appreciate the mention.
+
+Cheers,
+Finbar
+finbar.studio`,
+      },
     ],
   },
   {
@@ -893,7 +1159,7 @@ Finbar`,
         site: "https://www.ninahansendesign.com",
         email: "ninahansendesign@icloud.com",
         linkedin: "https://www.linkedin.com/in/nina-hansen-98291930/",
-        note: "designed the CURRENT brand and site (and possibly its photos). Never disparage the site; frame as evolution. No architect or photographer is credited anywhere else, verified",
+        note: "designed the CURRENT brand and site (and possibly its photos). Never disparage the site, and do NOT ask her for an intro: the demo would replace her own work. No architect or photographer is credited anywhere else, verified",
       },
     ],
     intel: [
@@ -1016,6 +1282,20 @@ Worth a look next time you're at a desk. I'm on [your number] or finbar@finbar.s
 
 Cheers,
 Finbar`,
+      },
+      {
+        label: "Partner intro · Email (Clements Clarke Architects)",
+        to: "matthew@clementsclarke.com.au (verified live; nick@clementsclarke.com.au also works)",
+        subject: "Oriel Road, and Lindon's website",
+        body: `Hi Matthew,
+
+I'm Finbar, a designer in Brisbane. I rebuilt Lindon Homes' website as a working demo, and Oriel Road, your HIA-winning renovation with them, features in it: finbar.studio/lindon
+
+The Lindons just won two more HIA awards this year, but their site's news stops at 2021 and they publish no email, so getting the demo in front of Ashley is the hard part. If you think it does the work justice, a mention would mean a lot.
+
+Cheers,
+Finbar
+finbar.studio`,
       },
     ],
   },
@@ -1225,7 +1505,8 @@ export default async function BuildersIndexPage() {
         <p className="text-ink-soft mt-6 max-w-[62ch]" style={{ fontSize: "clamp(1rem, 1.4vw, 1.2rem)", lineHeight: 1.5 }}>
           Every demo and pitch page, plus the round-two kit: who actually runs each company, their
           verified emails and LinkedIn profiles, the architects and photographers behind their builds,
-          the freshest hooks, and ready-to-send warm messages (expand each to read or copy). Emails
+          the freshest hooks, and ready-to-send warm messages, including warm-intro asks to the
+          partners whose work anchors each demo (expand each to read or copy). Emails
           listed are published addresses only, nothing guessed; research checked against live sources
           on 5 July 2026. Noindex, unlinked, password-gated.
         </p>
