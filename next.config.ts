@@ -58,11 +58,14 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [{ source: "/contact", destination: "/about", permanent: true }];
   },
-  // GemFest: a self-contained static site living in /public/gemfest (all its
-  // internal refs are absolute /gemfest/… paths). Next doesn't serve a directory
-  // index from /public, so map the clean URL onto its index.html.
+  // GemFest + PullUp: self-contained static sites living in /public/<name> (all
+  // their internal refs are absolute /<name>/… paths). Next doesn't serve a
+  // directory index from /public, so map each clean URL onto its index.html.
   async rewrites() {
-    return [{ source: "/gemfest", destination: "/gemfest/index.html" }];
+    return [
+      { source: "/gemfest", destination: "/gemfest/index.html" },
+      { source: "/pullup", destination: "/pullup/index.html" },
+    ];
   },
 };
 
