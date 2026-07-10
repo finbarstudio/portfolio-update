@@ -45,7 +45,7 @@
      │  Change any value → ripples to every component.        │
      └─────────────────────────────────────────────────────────┘ */
   /* Retro pastel palette — warm cream ground, muted accents (NYC poster feel). */
-  --bg:         #F6EFE1;   /* warm cream page ground                      */
+  --bg:         #FCFBF9;   /* near-white page ground (was cream #F6EFE1)  */
   --ink:        #211E1A;   /* warm near-black, primary text               */
   --ink-soft:   #6E675C;   /* warm grey, secondary text (AA on cream)     */
   --line:       #E2D8C5;   /* warm hairline borders                       */
@@ -75,9 +75,9 @@
   /* ┌─────────────────────────────────────────────────────────┐
      │  SURFACE + ELEVATION TOKENS (warm, to match the cream)  │
      └─────────────────────────────────────────────────────────┘ */
-  --surface:        #F6EFE1;  /* page + chrome ground (cream)             */
+  --surface:        #FCFBF9;  /* page + chrome ground (near-white)        */
   --surface-raised: #FBF6EC;  /* cards, media tiles, panels (light cream) */
-  --surface-sunken: #EFE6D4;  /* grouped / inset regions                  */
+  --surface-sunken: #F3F1ED;  /* grouped / inset regions                  */
   --thumb-bg:       #EAE0CC;  /* shared background behind all thumbnails  */
 
   --elev-1: 0 1px 2px rgba(20,20,20,0.03), 0 2px 8px rgba(20,20,20,0.04);
@@ -371,7 +371,7 @@
     top: auto; bottom: 0; left: 0; right: 0;
     width: 100%; height: auto; max-height: 88vh;
     border-left: none; border-top: 1px solid var(--line);
-    border-radius: 16px 16px 0 0;
+    border-radius: 0;
     transform: translateY(100%);
     /* clear the home indicator on notched phones */
     padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
@@ -582,7 +582,7 @@
     align-items: center;
     gap: 0.5em;
     border: 1px solid var(--ink);
-    border-radius: 999px;
+    border-radius: 3px;
     padding: 0.46em 0.95em;
     font-family: var(--font-mono);
     font-weight: 400;
@@ -770,7 +770,7 @@
     width: clamp(230px, 25vw, 310px);
     min-height: 230px;
     display: flex;                            /* body fills height */
-    border-radius: 14px;
+    border-radius: 4px;
     overflow: hidden;
     background: transparent;                  /* no white box at rest */
     border: 1px solid transparent;            /* no outline at rest */
@@ -807,6 +807,9 @@
     pointer-events: none;                     /* hover is tracked on the card */
   }
   @media (hover: hover) {
+    /* Hover indicator (the pink reveal panels are gone): hairline border tint. */
+    .cap-card:hover,
+    .cap-card:focus-within { border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
     .cap-card:hover .cap-scene,
     .cap-card:focus-within .cap-scene { opacity: 1; }
     /* On hover the vignette is the focus: drop the descriptive text (so it's not
@@ -1002,7 +1005,7 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     padding: 0.4em 0.8em;
-    border-radius: 999px;
+    border-radius: 3px;
     border: 1px solid var(--ink);
     display: inline-block;
     line-height: 1;
@@ -1148,28 +1151,21 @@
   .hr-inner { display: inline-block; }
   .hr-line .hr-inner { display: block; }
   @media (hover: hover) and (pointer: fine) {
+    /* One quiet synchronized fade — no masked slide, no per-pill stagger.
+       Box height stays reserved by .hr-item so the layout never shifts. */
     .hover-reveal .hr-inner {
-      transform: translateY(115%);
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transition: opacity 0.35s ease;
     }
     .group:hover .hover-reveal .hr-inner,
-    .group:focus-within .hover-reveal .hr-inner { transform: translateY(0); }
-    /* Stagger the tag pills as they reel in (base delay catches any 7th+ pill). */
-    .hover-reveal .hr-tags .hr-item .hr-inner { transition-delay: 0.3s; }
-    .hover-reveal .hr-tags .hr-item:nth-child(1) .hr-inner { transition-delay: 0s; }
-    .hover-reveal .hr-tags .hr-item:nth-child(2) .hr-inner { transition-delay: 0.06s; }
-    .hover-reveal .hr-tags .hr-item:nth-child(3) .hr-inner { transition-delay: 0.12s; }
-    .hover-reveal .hr-tags .hr-item:nth-child(4) .hr-inner { transition-delay: 0.18s; }
-    .hover-reveal .hr-tags .hr-item:nth-child(5) .hr-inner { transition-delay: 0.24s; }
-    .hover-reveal .hr-tags .hr-item:nth-child(6) .hr-inner { transition-delay: 0.30s; }
-    .hover-reveal .hr-line .hr-inner { transition-delay: 0.20s; }
+    .group:focus-within .hover-reveal .hr-inner { opacity: 1; }
     /* All-projects grid (/work, id="work"): detail is shown up front; hover does
        nothing. Higher specificity (id) wins over the rules above. */
-    #work .hover-reveal .hr-inner { transform: translateY(0); transition-delay: 0s; }
+    #work .hover-reveal .hr-inner { opacity: 1; }
   }
-  /* Reduced motion: skip the slide, just show the detail. */
+  /* Reduced motion: no fade, just show the detail. */
   @media (prefers-reduced-motion: reduce) {
-    .hover-reveal .hr-inner { transform: translateY(0); transition: none; }
+    .hover-reveal .hr-inner { opacity: 1; transition: none; }
   }
 
   /* Generous invisible hit zone — centres a small visual control inside a
@@ -1259,13 +1255,19 @@
   .card-thumb {
     position: relative;
     isolation: isolate;
-    border-radius: 14px;
+    border-radius: 4px;
     overflow: hidden;
-    /* A very subtle warm tint so non-full-bleed thumbnails (3D models, carousels,
-       the logo) read as a tile against the page. Full-bleed covers hide it. */
-    background: var(--surface-sunken);
+    /* Thumbnails sit straight on the page (no sunken tile); the hairline
+       border tint below is the hover indicator. */
+    background: transparent;
     border: 1px solid transparent;           /* no outline at rest */
     transition: border-color var(--dur-fast) var(--ease);
+  }
+  @media (hover: hover) {
+    .group:hover .card-thumb,
+    .group:focus-within .card-thumb {
+      border-color: color-mix(in srgb, var(--ink) 30%, transparent);
+    }
   }
   .card-media { position: absolute; inset: 0; z-index: 1; }
 
@@ -1284,7 +1286,7 @@
     min-height: 0;
     width: 100%;
     object-fit: contain;
-    border-radius: 6px;
+    border-radius: 2px;
   }
 
   /* Logo-as-thumbnail (e.g. Lows): centred mark, gently scales up on hover while
@@ -1307,37 +1309,6 @@
   }
   .group:hover .card-logo img { transform: scale(1.06); }
   @media (prefers-reduced-motion: reduce) { .group:hover .card-logo img { transform: none; } }
-
-  /* Reveal: three colour channels, each a full-height bar scaled to 0 at rest
-     (truly invisible — no sliver) that grow horizontally from the centre with
-     staggered delays, so the leading edges separate into colour channels. */
-  /* Calm pink reveal via a synchronized scale from the centre. NOT element
-     opacity: fading an opacity layer behind the transparent WebGL thumbnails
-     promoted a compositing layer that flashed white on release. Scaling the
-     (always-opaque) channels never flashes; synchronized (no per-channel stagger)
-     keeps it calm rather than the old flashy chromatic offset. */
-  .card-reveal { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-  .card-rev {
-    position: absolute; inset: 0; border-radius: 14px;
-    transform: scale(0); transform-origin: center;
-    /* Slow, feather-soft settle on leave (~1.6s) so a mid-animation release
-       floats back gently — matches the 3D thumbnails. */
-    transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform;
-  }
-  .card-rev.c1 { background: var(--pink); }
-  .card-rev.c2 { background: var(--pink-soft); }
-  .card-rev.c3 { background: linear-gradient(105deg, var(--pink-soft), var(--pink)); }
-
-  /* Pointer/keyboard only — never on touch, so mobile taps don't fire the pink
-     reveal (the page just navigates). */
-  @media (hover: hover) {
-    .group:hover .card-rev,
-    .group:focus-within .card-rev {
-      transform: scale(1);
-      transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);   /* slow, soft on the way in */
-    }
-  }
 
   /* Hero scroll-driven fade (CSS only, no JS) */
   @supports (animation-timeline: scroll()) {
@@ -2464,7 +2435,7 @@
     align-items: stretch;
     width: 100%;
     height: 34px;
-    border-radius: 8px;
+    border-radius: 3px;
     overflow: hidden;
     color: var(--ink);
     text-align: left;
@@ -2548,7 +2519,7 @@
     align-items: stretch;
     width: 100%;
     height: 34px;
-    border-radius: 8px;
+    border-radius: 3px;
     overflow: hidden;
     color: var(--ink);
     transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
@@ -2577,7 +2548,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: 3px;
     transition: color var(--dur-fast) var(--ease);
   }
   .nav-work-toggle:hover { color: var(--pink); }
@@ -2613,7 +2584,7 @@
     display: block;
     flex: 0 0 auto;            /* keep natural height so the capped inner scrolls, not squishes */
     padding: 2.5px 10px 2.5px 39px;
-    border-radius: 8px;
+    border-radius: 3px;
     font-family: var(--font-primary);
     font-size: 12.5px;
     color: var(--ink-soft);
@@ -3905,7 +3876,7 @@ body:has(.sb-root) {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--ink);
-  border-radius: 999px;
+  border-radius: 3px;
   padding: 0.16em 0.62em 0.22em;
   line-height: 1;
   color: var(--ink);
@@ -4860,7 +4831,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   width: 100%;
   padding: 0.7em 0.85em;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 3px;
   background: transparent;
   color: var(--ink);
   font-family: var(--font-sans, inherit);

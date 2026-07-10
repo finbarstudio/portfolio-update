@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import { projects } from "@/content/projects";
-import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HomeIntro from "@/components/HomeIntro";
 import InlineIcon from "@/components/InlineIcon";
@@ -13,19 +12,25 @@ const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
   description:
-    "Finbar Skitini is a Brisbane graphic designer and web designer working in brand identity, websites, editorial and motion for businesses across Australia and the UK.",
+    "Finbar Skitini is a Brisbane web designer and developer building custom websites, with brand identity, editorial and motion design behind them, for businesses across Australia and the UK.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Studio | Brisbane Graphic & Web Design",
+    title: "Finbar Studio | Brisbane Web Design & Development",
     description:
-      "Independent graphic design and web design studio in Brisbane. Brand identity, websites, editorial and motion. Available for select freelance projects and permanent roles.",
+      "Independent web design and development studio in Brisbane. Custom-coded websites, brand identity, editorial and motion. Available for select freelance projects and permanent roles.",
     url: SITE_URL,
     type: "website",
   },
 };
 
-/* The strongest three for the homepage; the rest live in /work. */
-const SELECTED = ["tmyr", "salesmasters", "palmsmotel"];
+/* Web-first featured roster: real scroll-throughs of the LIVE sites (recorded
+   headless, shared with the case-study mac-model screens) as the thumbnails.
+   More web builds slot in as they ship; everything else lives on /work. */
+const SELECTED: { slug: string; video: string }[] = [
+  { slug: "lows-design-build", video: "/images/lows-design-build/site-scroll.mp4" },
+  { slug: "kinaya", video: "/images/kinaya/site-scroll.mp4" },
+  { slug: "momentum-mentoring", video: "/images/momentum-mentoring/site-scroll.mp4" },
+];
 
 function HomeJsonLd() {
   const jsonLd = {
@@ -33,9 +38,9 @@ function HomeJsonLd() {
     "@type": "WebPage",
     "@id": `${SITE_URL}/#webpage`,
     url: SITE_URL,
-    name: "Finbar Studio, Brisbane Graphic & Web Design",
+    name: "Finbar Studio, Brisbane Web Design & Development",
     description:
-      "Independent graphic design and web design studio in Brisbane working in brand identity, websites, editorial and motion.",
+      "Independent web design and development studio in Brisbane, also working in brand identity, editorial and motion.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#person` },
     primaryImageOfPage: `${SITE_URL}/opengraph-image`,
@@ -53,56 +58,95 @@ function HomeJsonLd() {
 
 /* ─── Disciplines: a big-type wall with dingbats set inline in the type ──────
    Glyphs come from the brand icon batch (Noto Sans Symbols 2, --font-dingbat);
-   each reels through the batch on hover (see InlineIcon). */
+   each reels through the batch on hover (see InlineIcon). Web leads. */
 function Disciplines() {
   return (
     <section id="hero" className="home-disciplines px-5 md:px-10" aria-label="What I do">
-      <MaskReveal as="h2" className="home-disc" aria-label="Brand, digital, print, social, web, editorial and whatever else your heart desires">
-        {"Brand "}
-        <InlineIcon char="✌" className="home-disc-icon" />
+      <MaskReveal as="h2" className="home-disc" aria-label="Web, digital, brand, print, social, editorial, but mainly web">
+        {"Web "}
+        <InlineIcon char="🏄" className="home-disc-icon" />
         {" Digital "}
         <InlineIcon char="🖧" className="home-disc-icon" />
+        {" Brand "}
+        <InlineIcon char="✌" className="home-disc-icon" />
         {" Print "}
         <InlineIcon char="📦" className="home-disc-icon" />
         {" Social "}
         <InlineIcon char="👪" className="home-disc-icon" />
-        {" Web "}
-        <InlineIcon char="🏄" className="home-disc-icon" />
         {" Editorial "}
-        <span className="home-disc-pink">and</span>
-        {" whatever else your heart "}
-        <InlineIcon char="🂱" className="home-disc-icon" />
-        {" desires"}
+        {"... "}
+        <span className="home-disc-pink">but mainly web</span>
       </MaskReveal>
     </section>
   );
 }
 
-/* ─── Selected work ─────────────────────────────────────────── */
+/* ─── Selected work: minimal 3-col grid of live-site scroll loops ─────────── */
+function MiniCard({
+  project,
+  video,
+  index,
+}: {
+  project: (typeof projects)[number];
+  video: string;
+  index: number;
+}) {
+  return (
+    <article className="card-animate col-span-12 sm:col-span-4 group" style={{ animationDelay: `${index * 0.03}s` }}>
+      <Link
+        href={`/case-studies/${project.slug}`}
+        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        aria-label={`View case study: ${project.name}`}
+      >
+        {/* Card matches the recording's 16:9, so the full video IS the thumb. */}
+        <div className="card-thumb relative overflow-hidden" style={{ aspectRatio: "16 / 9" }}>
+          <video
+            src={video}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label={`Scrolling preview of the ${project.name} website`}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex items-start justify-between gap-4 mt-3">
+          <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
+            {project.name}
+          </h2>
+          <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>
+            {project.date}
+          </span>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
 function SelectedWork() {
-  const picks = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean) as typeof projects;
-  let i = 0;
   return (
     <Reveal section as="section" id="top-work" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
-      <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-28">
-        {picks.map((project) => (
-          <ProjectCard key={project.slug} project={project} index={i++} />
-        ))}
+      <div className="grid grid-cols-12 gap-x-8 gap-y-12">
+        {SELECTED.map((pick, i) => {
+          const project = projects.find((p) => p.slug === pick.slug);
+          return project ? <MiniCard key={pick.slug} project={project} video={pick.video} index={i} /> : null;
+        })}
       </div>
     </Reveal>
   );
 }
 
 /* ─── What I do: category names as big inline pill-bubbles ──────
-   Same size/layout as the disciplines wall (.home-disc), but each word set in a
-   nav-style bubble, wrapping inline like a paragraph. */
+   Web leads; the design capabilities stay (graphic design roles are still on
+   the table), they just follow. */
 const CAP_PILLS: { name: string; href: string }[] = [
-  { name: "Graphic design", href: "/graphic-design" },
+  { name: "Web design & development", href: "/web-design" },
   { name: "Brand identity", href: "/work?filter=brand" },
-  { name: "Editorial & print", href: "/work?filter=editorial" },
-  { name: "Web design", href: "/web-design" },
-  { name: "Creative direction", href: "/work?filter=art" },
+  { name: "Graphic design", href: "/graphic-design" },
   { name: "Motion graphics", href: "/work?filter=motion" },
+  { name: "Editorial & print", href: "/work?filter=editorial" },
+  { name: "Creative direction", href: "/work?filter=art" },
 ];
 
 function Capabilities() {
@@ -130,7 +174,7 @@ export default function HomePage() {
           wordmark, so the semantic H1 is visually hidden but carries the key
           phrase for search + screen readers. */}
       <h1 className="sr-only">
-        finbar✶studio. Brisbane graphic design &amp; web design studio
+        finbar✶studio. Brisbane web design &amp; development studio
       </h1>
       <HomeIntro />
       <Disciplines />

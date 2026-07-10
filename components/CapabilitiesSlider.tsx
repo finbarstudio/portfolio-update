@@ -69,11 +69,6 @@ function CapabilityCard({ c, hidden }: { c: Capability; hidden?: boolean }) {
       onFocus={() => setActive(true)}
       onBlur={() => setActive(false)}
     >
-      <span className="card-reveal" aria-hidden="true">
-        <span className="card-rev c1" />
-        <span className="card-rev c2" />
-        <span className="card-rev c3" />
-      </span>
       <div className="cap-scene" aria-hidden="true">
         <CapabilityViz variant={c.variant} color={c.color} active={active} />
       </div>

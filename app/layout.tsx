@@ -1,7 +1,6 @@
 import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata, Viewport } from "next";
 import { Archivo_Narrow, Archivo, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 // Body + mono/label text. The H1 display serif is Bookmania, loaded from Adobe
@@ -48,17 +47,19 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Finbar Studio | Brisbane Graphic & Web Design",
+    default: "Finbar Studio | Brisbane Web Design & Development",
     template: "%s | Finbar Studio",
   },
   description:
-    "Brisbane graphic design and web design studio working in brand identity, websites, editorial and motion. Selected projects for businesses across Australia and the UK.",
+    "Brisbane web design and development studio building custom websites, with brand identity, editorial and motion design behind them. Selected projects for businesses across Australia and the UK.",
   applicationName: "finbar✶studio",
   authors: [{ name: "Finbar Skitini", url: SITE_URL }],
   creator: "Finbar Skitini",
   publisher: "Finbar Skitini",
   keywords: [
     "Brisbane web design",
+    "Brisbane web development",
+    "web developer Brisbane",
     "web design Brisbane",
     "Brisbane web designer",
     "website design Brisbane",
@@ -75,9 +76,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Studio | Brisbane Graphic & Web Design",
+    title: "Finbar Studio | Brisbane Web Design & Development",
     description:
-      "Brisbane graphic design and web design studio working in brand identity, websites, editorial and motion for businesses across Australia and the UK.",
+      "Brisbane web design and development studio building custom websites, with brand identity, editorial and motion design behind them, for businesses across Australia and the UK.",
     url: SITE_URL,
     siteName: "finbar✶studio",
     locale: "en_AU",
@@ -85,9 +86,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Finbar Studio | Brisbane Graphic & Web Design",
+    title: "Finbar Studio | Brisbane Web Design & Development",
     description:
-      "Brisbane graphic design and web design. Brand identity, websites, editorial and motion.",
+      "Brisbane web design and development. Custom websites, brand identity, editorial and motion.",
     creator: "@finbarstudio",
   },
   robots: {
@@ -285,24 +286,25 @@ export default function RootLayout({
         {/* Routes bring their own chrome: portfolio routes via app/(site)/layout
             (the sidebar shell); the Sandbox + embeds via their own bare layouts. */}
         {children}
-        <Script
+        {/* JSON-LD as plain inline <script> tags (the pattern the Next docs
+            recommend) — next/script beforeInteractive re-renders these on the
+            client and React warns the script "will never execute", which is
+            noise for data-only ld+json blocks. */}
+        <script
           id="ld-person"
           type="application/ld+json"
-          strategy="beforeInteractive"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: jsonLdHtml(personJsonLd) }}
         />
-        <Script
+        <script
           id="ld-website"
           type="application/ld+json"
-          strategy="beforeInteractive"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: jsonLdHtml(websiteJsonLd) }}
         />
-        <Script
+        <script
           id="ld-studio"
           type="application/ld+json"
-          strategy="beforeInteractive"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: jsonLdHtml(serviceJsonLd) }}
         />
