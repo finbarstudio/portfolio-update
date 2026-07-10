@@ -53,3 +53,33 @@ body:has(.redesign-skin) {
 body:has(.redesign-skin) .contact-drawer-panel {
   border-radius: 0;
 }
+
+/* ── Round 2: thumbnails + hover ───────────────────────────────────────────
+   Finbar: no background colour for thumbnails; hover much more minimal. */
+
+/* Thumbnails sit straight on the page: no sunken tile behind 3D models,
+   carousels or logo marks. */
+.redesign-skin .card-thumb {
+  background: transparent;
+}
+
+/* The pink panel reveal behind the media is gone entirely. */
+.redesign-skin .card-rev {
+  display: none;
+}
+
+/* Card meta (tags + one-liner): no masked slide-up, no per-pill stagger.
+   One quiet synchronized fade. Box height is still reserved by .hr-item,
+   so the layout never shifts. */
+@media (hover: hover) and (pointer: fine) {
+  .redesign-skin .hover-reveal .hr-inner {
+    transform: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    transition-delay: 0s !important;
+  }
+  .redesign-skin .group:hover .hover-reveal .hr-inner,
+  .redesign-skin .group:focus-within .hover-reveal .hr-inner {
+    opacity: 1;
+  }
+}
