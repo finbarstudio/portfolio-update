@@ -15,9 +15,9 @@ import MaskReveal from "@/components/MaskReveal";
 // public/redesign/*-scroll.mp4), recessed into the card at their full 16:10
 // aspect. More web builds slot in here as they ship; the rest stays on /work.
 const SELECTED: { slug: string; video: string }[] = [
-  { slug: "lows-design-build", video: "/redesign/lows-scroll.mp4" },
-  { slug: "kinaya", video: "/redesign/kinaya-scroll.mp4" },
-  { slug: "momentum-mentoring", video: "/redesign/momentum-scroll.mp4" },
+  { slug: "lows-design-build", video: "/images/lows-design-build/site-scroll.mp4" },
+  { slug: "kinaya", video: "/images/kinaya/site-scroll.mp4" },
+  { slug: "momentum-mentoring", video: "/images/momentum-mentoring/site-scroll.mp4" },
 ];
 
 /* Minimal grid card: a looping scroll capture of the live site, recessed
@@ -40,7 +40,7 @@ function MiniCard({
         aria-label={`View case study: ${project.name}`}
       >
         {/* Card matches the recording's 16:10, so the full video IS the thumb. */}
-        <div className="card-thumb relative overflow-hidden" style={{ aspectRatio: "16 / 10" }}>
+        <div className="card-thumb relative overflow-hidden" style={{ aspectRatio: "16 / 9" }}>
           <video
             src={video}
             autoPlay

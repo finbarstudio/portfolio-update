@@ -163,7 +163,7 @@ export const projects: Project[] = [
     logo: "/images/kinaya/Final%20Logos/Logo%20Pink%20Grey.svg",
     heroModel: {
       model: "/models/studio-display/display.gltf",
-      video: "/images/kinaya/accessibility.webm",
+      video: "/images/kinaya/site-scroll.mp4",
     },
     heroImage: { src: "/images/kinaya/desktop.png", alt: "KinAya website desktop view with structured, accessible homepage layout" },
     images: [
@@ -807,7 +807,7 @@ export const projects: Project[] = [
     liveUrl: "https://www.lowsdesignandbuild.com",
     heroModel: {
       model: "/models/studio-display/display.gltf",
-      image: "/images/lows-design-build/website-live.webp",
+      video: "/images/lows-design-build/site-scroll.mp4",
     },
     heroImage: {
       src: "/images/lows-design-build/hero.png",
@@ -885,7 +885,7 @@ export const projects: Project[] = [
     logo: "/images/momentum-mentoring/Logo2.svg",
     heroModel: {
       model: "/models/studio-display/display.gltf",
-      video: "/images/momentum-mentoring/screen.mp4",
+      video: "/images/momentum-mentoring/site-scroll.mp4",
     },
     heroImage: {
       src: "/images/momentum-mentoring/hero.webp",
