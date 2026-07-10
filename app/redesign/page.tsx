@@ -17,6 +17,7 @@ import MaskReveal from "@/components/MaskReveal";
 const SELECTED: { slug: string; video: string }[] = [
   { slug: "lows-design-build", video: "/redesign/lows-scroll.mp4" },
   { slug: "kinaya", video: "/redesign/kinaya-scroll.mp4" },
+  { slug: "momentum-mentoring", video: "/redesign/momentum-scroll.mp4" },
 ];
 
 /* Minimal grid card: a looping scroll capture of the live site, recessed
@@ -38,10 +39,8 @@ function MiniCard({
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        <div
-          className="card-thumb relative overflow-hidden flex items-center justify-center"
-          style={{ aspectRatio: "4 / 3" }}
-        >
+        {/* Card matches the recording's 16:10, so the full video IS the thumb. */}
+        <div className="card-thumb relative overflow-hidden" style={{ aspectRatio: "16 / 10" }}>
           <video
             src={video}
             autoPlay
@@ -50,8 +49,7 @@ function MiniCard({
             playsInline
             preload="metadata"
             aria-label={`Scrolling preview of the ${project.name} website`}
-            className="block max-w-[90%] max-h-[90%] object-contain"
-            style={{ borderRadius: "3px", border: "1px solid var(--line)" }}
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
         <div className="flex items-start justify-between gap-4 mt-3">
@@ -70,7 +68,7 @@ function MiniCard({
 function Disciplines() {
   return (
     <section id="hero" className="home-disciplines px-5 md:px-10" aria-label="What I do">
-      <MaskReveal as="h2" className="home-disc" aria-label="Web, digital, brand, print, social, editorial and whatever else your heart desires">
+      <MaskReveal as="h2" className="home-disc" aria-label="Web, digital, brand, print, social, editorial, but mainly web">
         {"Web "}
         <InlineIcon char="🏄" className="home-disc-icon" />
         {" Digital "}
@@ -82,10 +80,8 @@ function Disciplines() {
         {" Social "}
         <InlineIcon char="👪" className="home-disc-icon" />
         {" Editorial "}
-        <span className="home-disc-pink">and</span>
-        {" whatever else your heart "}
-        <InlineIcon char="🂱" className="home-disc-icon" />
-        {" desires"}
+        {"... "}
+        <span className="home-disc-pink">but mainly web</span>
       </MaskReveal>
     </section>
   );
