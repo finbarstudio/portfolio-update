@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { projects } from "@/content/projects";
 import Reveal from "@/components/Reveal";
@@ -11,14 +10,27 @@ import MaskReveal from "@/components/MaskReveal";
 // exists to iterate on the skin (see redesign.css). Keep the section structure
 // in sync with the real home page when it changes.
 
-// Web-first featured roster: Lows first, then KinAya, in a simple 3-col grid
-// of small static thumbnails. More web builds slot in here as they ship;
-// everything else stays on /work.
-const SELECTED = ["lows-design-build", "kinaya"];
+// Web-first featured roster: Lows first, then KinAya, in a simple 3-col grid.
+// Thumbnails are real scroll-throughs of the LIVE sites (recorded headless,
+// public/redesign/*-scroll.mp4), recessed into the card at their full 16:10
+// aspect. More web builds slot in here as they ship; the rest stays on /work.
+const SELECTED: { slug: string; video: string }[] = [
+  { slug: "lows-design-build", video: "/redesign/lows-scroll.mp4" },
+  { slug: "kinaya", video: "/redesign/kinaya-scroll.mp4" },
+];
 
-/* Minimal grid card: a small static thumbnail (no 3D, no carousel) with just
-   the name + year underneath. The skin's hover = hairline border tint. */
-function MiniCard({ project, index }: { project: (typeof projects)[number]; index: number }) {
+/* Minimal grid card: a looping scroll capture of the live site, recessed
+   inside the card (full frame visible, screen-like hairline around the video)
+   with just the name + year underneath. Skin hover = card border tint. */
+function MiniCard({
+  project,
+  video,
+  index,
+}: {
+  project: (typeof projects)[number];
+  video: string;
+  index: number;
+}) {
   return (
     <article className="card-animate col-span-12 sm:col-span-4 group" style={{ animationDelay: `${index * 0.03}s` }}>
       <Link
@@ -26,14 +38,20 @@ function MiniCard({ project, index }: { project: (typeof projects)[number]; inde
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        <div className="card-thumb relative overflow-hidden" style={{ aspectRatio: "4 / 3" }}>
-          <Image
-            src={project.heroImage.src}
-            alt={project.heroImage.alt}
-            fill
-            sizes="(max-width: 640px) 100vw, 33vw"
-            className="object-cover"
-            priority={index === 0}
+        <div
+          className="card-thumb relative overflow-hidden flex items-center justify-center"
+          style={{ aspectRatio: "4 / 3" }}
+        >
+          <video
+            src={video}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label={`Scrolling preview of the ${project.name} website`}
+            className="block max-w-[90%] max-h-[90%] object-contain"
+            style={{ borderRadius: "3px", border: "1px solid var(--line)" }}
           />
         </div>
         <div className="flex items-start justify-between gap-4 mt-3">
@@ -74,13 +92,13 @@ function Disciplines() {
 }
 
 function SelectedWork() {
-  const picks = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean) as typeof projects;
   return (
     <Reveal section as="section" id="top-work" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
       <div className="grid grid-cols-12 gap-x-8 gap-y-12">
-        {picks.map((project, i) => (
-          <MiniCard key={project.slug} project={project} index={i} />
-        ))}
+        {SELECTED.map((pick, i) => {
+          const project = projects.find((p) => p.slug === pick.slug);
+          return project ? <MiniCard key={pick.slug} project={project} video={pick.video} index={i} /> : null;
+        })}
       </div>
     </Reveal>
   );
