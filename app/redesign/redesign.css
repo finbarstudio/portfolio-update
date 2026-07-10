@@ -1,0 +1,55 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Home redesign sandbox — scoped skin overrides for /redesign.
+
+   The page is a 1:1 copy of the home page inside a `.redesign-skin` wrapper;
+   everything here overrides the existing design system WITHOUT touching the
+   live site. Iterate freely; when a direction is chosen, fold the winners
+   back into globals.css.
+
+   Round 1 (Finbar): ground much closer to white, less rounded edges.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* ── Ground: warm cream → near-white ──────────────────────────────────────
+   `--bg` cascades through --color-bg (Tailwind bg-bg), the nav, drawers and
+   the footer, so retinting the token on body covers the whole page including
+   anything portalled outside the wrapper. */
+html:has(.redesign-skin) {
+  background: #fcfbf9; /* overscroll ground */
+}
+body:has(.redesign-skin) {
+  --bg: #fcfbf9;
+  /* body's background is set from the token at build time, not via var(),
+     so restate it explicitly for the sandbox. */
+  background: var(--bg);
+}
+
+/* ── Radii: pills and cards squared off ────────────────────────────────────
+   True circles (nav-ext-bubble, football icon, dots) are untouched. */
+
+/* Pill chips → subtle 3px */
+.redesign-skin :is(.tag, .sticker-pill, .home-cap-pill) {
+  border-radius: 3px;
+}
+
+/* Project-card imagery + hover reveals: 14px/6px → 4px/2px */
+.redesign-skin .card-thumb,
+.redesign-skin .card-rev {
+  border-radius: 4px;
+}
+.redesign-skin .card-stack img {
+  border-radius: 2px;
+}
+.redesign-skin .cap-card {
+  border-radius: 4px;
+}
+
+/* Nav rows / menus / inputs */
+.redesign-skin :is(.nav-row, .nav-row-work, .nav-sub, .nav-work-toggle, .contact-input) {
+  border-radius: 3px;
+}
+
+/* Contact drawer: drop the rounded top corners */
+.redesign-skin .contact-drawer-panel,
+body:has(.redesign-skin) .contact-drawer-panel {
+  border-radius: 0;
+}
