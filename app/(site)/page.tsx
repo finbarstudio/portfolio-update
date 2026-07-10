@@ -5,8 +5,6 @@ import Script from "next/script";
 import { projects } from "@/content/projects";
 import Reveal from "@/components/Reveal";
 import HomeIntro from "@/components/HomeIntro";
-import InlineIcon from "@/components/InlineIcon";
-import MaskReveal from "@/components/MaskReveal";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -56,31 +54,6 @@ function HomeJsonLd() {
   );
 }
 
-/* ─── Disciplines: a big-type wall with dingbats set inline in the type ──────
-   Glyphs come from the brand icon batch (Noto Sans Symbols 2, --font-dingbat);
-   each reels through the batch on hover (see InlineIcon). Web leads. */
-function Disciplines() {
-  return (
-    <section id="hero" className="home-disciplines px-5 md:px-10" aria-label="What I do">
-      <MaskReveal as="h2" className="home-disc" aria-label="Web, digital, brand, print, social, editorial, but mainly web">
-        {"Web "}
-        <InlineIcon char="🏄" className="home-disc-icon" />
-        {" Digital "}
-        <InlineIcon char="🖧" className="home-disc-icon" />
-        {" Brand "}
-        <InlineIcon char="✌" className="home-disc-icon" />
-        {" Print "}
-        <InlineIcon char="📦" className="home-disc-icon" />
-        {" Social "}
-        <InlineIcon char="👪" className="home-disc-icon" />
-        {" Editorial "}
-        <span className="home-disc-pink">but</span>
-        {" mainly web"}
-      </MaskReveal>
-    </section>
-  );
-}
-
 /* ─── Selected work: minimal 3-col grid of live-site scroll loops ─────────── */
 function MiniCard({
   project,
@@ -126,7 +99,7 @@ function MiniCard({
 
 function SelectedWork() {
   return (
-    <Reveal section as="section" id="top-work" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
+    <Reveal section as="section" id="hero" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
       <div className="grid grid-cols-12 gap-x-8 gap-y-12">
         {SELECTED.map((pick, i) => {
           const project = projects.find((p) => p.slug === pick.slug);
@@ -177,7 +150,6 @@ export default function HomePage() {
         finbar✶studio. Brisbane web design &amp; development studio
       </h1>
       <HomeIntro />
-      <Disciplines />
       {/* Past this point the auto-hidden nav slides in (see LayoutShell). */}
       <div id="nav-reveal-sentinel" aria-hidden="true" />
       <SelectedWork />

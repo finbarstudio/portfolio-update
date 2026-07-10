@@ -1,5 +1,6 @@
 import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import Reveal from "@/components/Reveal";
@@ -95,14 +96,14 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(aboutJsonLd) }}
       />
 
-      {/* ── Big statement with inline icons ───────────────────── */}
+      {/* ── Big statement with inline icons + isolated portrait ── */}
       <section
-        className="min-h-[70svh] flex items-center py-16 md:py-24"
+        className="min-h-[70svh] grid grid-cols-1 md:grid-cols-12 items-center gap-x-8 gap-y-10 py-16 md:py-24"
         aria-label="Introduction"
       >
         <MaskReveal
           as="h1"
-          className="home-disc"
+          className="home-disc md:col-span-8"
           aria-label="Nice to meet you, I'm Finbar. One day I woke up and found my feet in design and I haven't moved since."
         >
           {"Nice to meet you "}
@@ -119,6 +120,16 @@ export default function AboutPage() {
           {" and I haven’t moved since "}
           <InlineIcon char="♡" className="home-disc-icon" />
         </MaskReveal>
+        <Reveal as="div" className="md:col-span-4 flex justify-center md:justify-end md:self-end">
+          <Image
+            src="/images/about/finbar.webp"
+            alt="Finbar Skitini, black and white portrait"
+            width={900}
+            height={863}
+            priority
+            className="w-[min(300px,72%)] md:w-full md:max-w-[360px] h-auto"
+          />
+        </Reveal>
       </section>
 
       {/* ── Four columns: services / clients / bio / mission ──── */}

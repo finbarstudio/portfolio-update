@@ -2,8 +2,6 @@ import Link from "next/link";
 import { projects } from "@/content/projects";
 import Reveal from "@/components/Reveal";
 import HomeIntro from "@/components/HomeIntro";
-import InlineIcon from "@/components/InlineIcon";
-import MaskReveal from "@/components/MaskReveal";
 
 // 1:1 copy of the home page (app/(site)/page.tsx) for the redesign sandbox.
 // JSON-LD + SEO metadata deliberately stripped: this page is noindex and only
@@ -65,31 +63,9 @@ function MiniCard({
   );
 }
 
-function Disciplines() {
-  return (
-    <section id="hero" className="home-disciplines px-5 md:px-10" aria-label="What I do">
-      <MaskReveal as="h2" className="home-disc" aria-label="Web, digital, brand, print, social, editorial, but mainly web">
-        {"Web "}
-        <InlineIcon char="🏄" className="home-disc-icon" />
-        {" Digital "}
-        <InlineIcon char="🖧" className="home-disc-icon" />
-        {" Brand "}
-        <InlineIcon char="✌" className="home-disc-icon" />
-        {" Print "}
-        <InlineIcon char="📦" className="home-disc-icon" />
-        {" Social "}
-        <InlineIcon char="👪" className="home-disc-icon" />
-        {" Editorial "}
-        <span className="home-disc-pink">but</span>
-        {" mainly web"}
-      </MaskReveal>
-    </section>
-  );
-}
-
 function SelectedWork() {
   return (
-    <Reveal section as="section" id="top-work" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
+    <Reveal section as="section" id="hero" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
       <div className="grid grid-cols-12 gap-x-8 gap-y-12">
         {SELECTED.map((pick, i) => {
           const project = projects.find((p) => p.slug === pick.slug);
@@ -135,7 +111,6 @@ export default function RedesignHomePage() {
         finbar✶studio. Brisbane web design &amp; development studio (redesign sandbox)
       </h1>
       <HomeIntro />
-      <Disciplines />
       <div id="nav-reveal-sentinel" aria-hidden="true" />
       <SelectedWork />
       <Capabilities />
