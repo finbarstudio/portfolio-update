@@ -68,6 +68,16 @@ body:has(.redesign-skin) .contact-drawer-panel {
   display: none;
 }
 
+/* Hover indicator: the thumbnail's existing (transparent) hairline border
+   quietly tints in — .card-thumb already transitions border-color, so this
+   is the whole effect. */
+@media (hover: hover) and (pointer: fine) {
+  .redesign-skin .group:hover .card-thumb,
+  .redesign-skin .group:focus-within .card-thumb {
+    border-color: color-mix(in srgb, var(--ink) 30%, transparent);
+  }
+}
+
 /* Card meta (tags + one-liner): no masked slide-up, no per-pill stagger.
    One quiet synchronized fade. Box height is still reserved by .hr-item,
    so the layout never shifts. */
