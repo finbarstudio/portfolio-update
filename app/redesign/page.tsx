@@ -1,6 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
 import { projects } from "@/content/projects";
-import { FeaturedCard, FullCard } from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import HomeIntro from "@/components/HomeIntro";
 import InlineIcon from "@/components/InlineIcon";
@@ -11,10 +11,43 @@ import MaskReveal from "@/components/MaskReveal";
 // exists to iterate on the skin (see redesign.css). Keep the section structure
 // in sync with the real home page when it changes.
 
-// Web-first featured roster: Lows (the rebuilt site) leads full-width, then
-// KinAya. Nothing else on the home page; the rest stays on /work.
-const FEATURED_SLUG = "lows-design-build";
-const SECOND_SLUG = "kinaya";
+// Web-first featured roster: Lows first, then KinAya, in a simple 3-col grid
+// of small static thumbnails. More web builds slot in here as they ship;
+// everything else stays on /work.
+const SELECTED = ["lows-design-build", "kinaya"];
+
+/* Minimal grid card: a small static thumbnail (no 3D, no carousel) with just
+   the name + year underneath. The skin's hover = hairline border tint. */
+function MiniCard({ project, index }: { project: (typeof projects)[number]; index: number }) {
+  return (
+    <article className="card-animate col-span-12 sm:col-span-4 group" style={{ animationDelay: `${index * 0.03}s` }}>
+      <Link
+        href={`/case-studies/${project.slug}`}
+        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        aria-label={`View case study: ${project.name}`}
+      >
+        <div className="card-thumb relative overflow-hidden" style={{ aspectRatio: "4 / 3" }}>
+          <Image
+            src={project.heroImage.src}
+            alt={project.heroImage.alt}
+            fill
+            sizes="(max-width: 640px) 100vw, 33vw"
+            className="object-cover"
+            priority={index === 0}
+          />
+        </div>
+        <div className="flex items-start justify-between gap-4 mt-3">
+          <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
+            {project.name}
+          </h2>
+          <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>
+            {project.date}
+          </span>
+        </div>
+      </Link>
+    </article>
+  );
+}
 
 function Disciplines() {
   return (
@@ -41,13 +74,13 @@ function Disciplines() {
 }
 
 function SelectedWork() {
-  const featured = projects.find((p) => p.slug === FEATURED_SLUG);
-  const second = projects.find((p) => p.slug === SECOND_SLUG);
+  const picks = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean) as typeof projects;
   return (
     <Reveal section as="section" id="top-work" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
-      <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-28">
-        {featured && <FeaturedCard project={featured} index={0} />}
-        {second && <FullCard project={second} index={1} />}
+      <div className="grid grid-cols-12 gap-x-8 gap-y-12">
+        {picks.map((project, i) => (
+          <MiniCard key={project.slug} project={project} index={i} />
+        ))}
       </div>
     </Reveal>
   );
