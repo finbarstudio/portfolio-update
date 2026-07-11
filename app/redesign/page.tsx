@@ -1,119 +1,73 @@
-import Link from "next/link";
-import { projects } from "@/content/projects";
-import Reveal from "@/components/Reveal";
 import HomeIntro from "@/components/HomeIntro";
+import Reveal from "@/components/Reveal";
+import MaskReveal from "@/components/MaskReveal";
+import SiteWindow from "@/components/home/SiteWindow";
+import WebsiteList, { type Website } from "@/components/home/WebsiteList";
 
 // 1:1 copy of the home page (app/(site)/page.tsx) for the redesign sandbox.
 // JSON-LD + SEO metadata deliberately stripped: this page is noindex and only
 // exists to iterate on the skin (see redesign.css). Keep the section structure
 // in sync with the real home page when it changes.
 
-// Web-first featured roster: Lows first, then KinAya, in a simple 3-col grid.
-// Thumbnails are real scroll-throughs of the LIVE sites (recorded headless,
-// public/redesign/*-scroll.mp4), recessed into the card at their full 16:10
-// aspect. More web builds slot in here as they ship; the rest stays on /work.
-const SELECTED: { slug: string; video: string }[] = [
-  { slug: "lows-design-build", video: "/images/lows-design-build/site-scroll.mp4" },
-  { slug: "kinaya", video: "/images/kinaya/site-scroll.mp4" },
-  { slug: "momentum-mentoring", video: "/images/momentum-mentoring/site-scroll.mp4" },
+const WEBSITES: Website[] = [
+  {
+    slug: "lows-design-build",
+    name: "Lows Design + Build",
+    url: "https://www.lowsdesignandbuild.com",
+    year: "2026",
+    bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
+    images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
+  },
+  {
+    slug: "kinaya",
+    name: "KinAya",
+    url: "https://kinaya.com.au",
+    year: "2024",
+    bio: "Full rebrand and a six-page site for an Adelaide NDIS provider, with the CMS handed over to their team and a site-wide accessibility text resizer, because their audience genuinely needs one.",
+    images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp"],
+  },
+  {
+    slug: "momentum-mentoring",
+    name: "Momentum Mentoring",
+    url: "https://momentummentoring.co",
+    year: "2024",
+    bio: "Brand and website for an NDIS mentoring provider, built to feel empowering and warm rather than clinical. Identity and site delivered as one piece of work, on a CMS the team runs themselves.",
+    images: ["/images/web/momentum-1.webp", "/images/web/momentum-2.webp", "/images/web/momentum-3.webp"],
+  },
 ];
 
-/* Minimal grid card: a looping scroll capture of the live site, recessed
-   inside the card (full frame visible, screen-like hairline around the video)
-   with just the name + year underneath. Skin hover = card border tint. */
-function MiniCard({
-  project,
-  video,
-  index,
-}: {
-  project: (typeof projects)[number];
-  video: string;
-  index: number;
-}) {
-  return (
-    <article className="card-animate col-span-12 sm:col-span-4 group" style={{ animationDelay: `${index * 0.03}s` }}>
-      <Link
-        href={`/case-studies/${project.slug}`}
-        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
-        aria-label={`View case study: ${project.name}`}
-      >
-        {/* Card matches the recording's 16:10, so the full video IS the thumb. */}
-        <div className="card-thumb relative overflow-hidden" style={{ aspectRatio: "16 / 9" }}>
-          <video
-            src={video}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label={`Scrolling preview of the ${project.name} website`}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex items-start justify-between gap-4 mt-3">
-          <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
-            {project.name}
-          </h2>
-          <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>
-            {project.date}
-          </span>
-        </div>
-      </Link>
-    </article>
-  );
-}
-
-function SelectedWork() {
-  return (
-    <Reveal section as="section" id="hero" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
-      <div className="grid grid-cols-12 gap-x-8 gap-y-12">
-        {SELECTED.map((pick, i) => {
-          const project = projects.find((p) => p.slug === pick.slug);
-          return project ? <MiniCard key={pick.slug} project={project} video={pick.video} index={i} /> : null;
-        })}
-      </div>
-    </Reveal>
-  );
-}
-
-// Web leads; the design capabilities stay (graphic design roles are still on
-// the table), they just follow.
-const CAP_PILLS: { name: string; href: string }[] = [
-  { name: "Web design & development", href: "/web-design" },
-  { name: "Brand identity", href: "/work?filter=brand" },
-  { name: "Graphic design", href: "/graphic-design" },
-  { name: "Motion graphics", href: "/work?filter=motion" },
-  { name: "Editorial & print", href: "/work?filter=editorial" },
-  { name: "Creative direction", href: "/work?filter=art" },
-];
-
-function Capabilities() {
-  return (
-    <section className="home-disciplines px-5 md:px-10" aria-labelledby="services-title">
-      <div className="home-cap">
-        <h2 id="services-title" className="home-cap-title">How I help businesses</h2>
-        <div className="home-disc home-cap-wrap">
-          {CAP_PILLS.map((c) => (
-            <Link key={c.name} href={c.href} className="home-cap-pill">
-              {c.name}
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+const WINDOW_SHOTS = WEBSITES.map((w) => ({ src: w.images[0], label: w.name }));
 
 export default function RedesignHomePage() {
   return (
     <>
-      <h1 className="sr-only">
-        finbar✶studio. Brisbane web design &amp; development studio (redesign sandbox)
-      </h1>
       <HomeIntro />
+      <section id="hero" className="px-5 md:px-10 pt-[12svh] md:pt-[16svh] pb-16 md:pb-24" aria-label="Introduction">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-12">
+          <MaskReveal as="h1" className="home-hero-display md:col-span-10">
+            A boutique web development studio, with a designer&rsquo;s eye.
+          </MaskReveal>
+          <Reveal as="div" delay={0.25} className="md:col-span-6 md:col-start-1 max-w-[54ch] self-end">
+            <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
+              finbar&#10033;studio designs and builds websites end to end. Custom code, no
+              templates, made in Brisbane for businesses anywhere.
+            </p>
+            <p className="text-ink-soft leading-relaxed mt-5" style={{ fontSize: "clamp(0.98rem, 1.3vw, 1.15rem)" }}>
+              The web work sits on years of brand and graphic design, so the site never
+              has to arrive alone. Identity, print, motion, art direction: the whole feel
+              of your brand can come from the same hand, held together by one good eye.
+            </p>
+          </Reveal>
+          <Reveal as="div" delay={0.4} className="md:col-span-4 md:col-start-9 self-end">
+            <SiteWindow shots={WINDOW_SHOTS} />
+          </Reveal>
+        </div>
+      </section>
       <div id="nav-reveal-sentinel" aria-hidden="true" />
-      <SelectedWork />
-      <Capabilities />
+      <Reveal section as="section" className="home-section no-rule px-5 md:px-10 pt-20 md:pt-28 pb-24" aria-label="Websites">
+        <p className="mono-label text-ink-soft mb-6">Websites</p>
+        <WebsiteList sites={WEBSITES} />
+      </Reveal>
     </>
   );
 }

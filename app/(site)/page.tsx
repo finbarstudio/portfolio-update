@@ -1,34 +1,57 @@
 import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata } from "next";
-import Link from "next/link";
 import Script from "next/script";
-import { projects } from "@/content/projects";
 import Reveal from "@/components/Reveal";
+import MaskReveal from "@/components/MaskReveal";
 import HomeIntro from "@/components/HomeIntro";
+import SiteWindow from "@/components/home/SiteWindow";
+import WebsiteList, { type Website } from "@/components/home/WebsiteList";
 
 const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
   description:
-    "Finbar Skitini is a Brisbane web designer and developer building custom websites, with brand identity, editorial and motion design behind them, for businesses across Australia and the UK.",
+    "finbar✶studio is a boutique web development studio in Brisbane. Custom-designed and custom-coded websites, backed by years of brand and graphic design, for businesses across Australia and the UK.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "Finbar Studio | Brisbane Web Design & Development",
     description:
-      "Independent web design and development studio in Brisbane. Custom-coded websites, brand identity, editorial and motion. Available for select freelance projects and permanent roles.",
+      "A boutique web development studio in Brisbane. Custom-designed, custom-coded websites, backed by years of brand and graphic design.",
     url: SITE_URL,
     type: "website",
   },
 };
 
-/* Web-first featured roster: real scroll-throughs of the LIVE sites (recorded
-   headless, shared with the case-study mac-model screens) as the thumbnails.
-   More web builds slot in as they ship; everything else lives on /work. */
-const SELECTED: { slug: string; video: string }[] = [
-  { slug: "lows-design-build", video: "/images/lows-design-build/site-scroll.mp4" },
-  { slug: "kinaya", video: "/images/kinaya/site-scroll.mp4" },
-  { slug: "momentum-mentoring", video: "/images/momentum-mentoring/site-scroll.mp4" },
+/* The shipped sites, newest first. Screens live in /images/web (frames pulled
+   from the live-site scroll recordings). */
+const WEBSITES: Website[] = [
+  {
+    slug: "lows-design-build",
+    name: "Lows Design + Build",
+    url: "https://www.lowsdesignandbuild.com",
+    year: "2026",
+    bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
+    images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
+  },
+  {
+    slug: "kinaya",
+    name: "KinAya",
+    url: "https://kinaya.com.au",
+    year: "2024",
+    bio: "Full rebrand and a six-page site for an Adelaide NDIS provider, with the CMS handed over to their team and a site-wide accessibility text resizer, because their audience genuinely needs one.",
+    images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp"],
+  },
+  {
+    slug: "momentum-mentoring",
+    name: "Momentum Mentoring",
+    url: "https://momentummentoring.co",
+    year: "2024",
+    bio: "Brand and website for an NDIS mentoring provider, built to feel empowering and warm rather than clinical. Identity and site delivered as one piece of work, on a CMS the team runs themselves.",
+    images: ["/images/web/momentum-1.webp", "/images/web/momentum-2.webp", "/images/web/momentum-3.webp"],
+  },
 ];
+
+const WINDOW_SHOTS = WEBSITES.map((w) => ({ src: w.images[0], label: w.name }));
 
 function HomeJsonLd() {
   const jsonLd = {
@@ -38,7 +61,7 @@ function HomeJsonLd() {
     url: SITE_URL,
     name: "Finbar Studio, Brisbane Web Design & Development",
     description:
-      "Independent web design and development studio in Brisbane, also working in brand identity, editorial and motion.",
+      "A boutique web development studio in Brisbane, backed by years of brand and graphic design.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#person` },
     primaryImageOfPage: `${SITE_URL}/opengraph-image`,
@@ -54,88 +77,42 @@ function HomeJsonLd() {
   );
 }
 
-/* ─── Selected work: minimal 3-col grid of live-site scroll loops ─────────── */
-function MiniCard({
-  project,
-  video,
-  index,
-}: {
-  project: (typeof projects)[number];
-  video: string;
-  index: number;
-}) {
+/* ─── Hero: editorial, type-led, with a small window of recent builds ─────── */
+function Hero() {
   return (
-    <article className="card-animate col-span-12 sm:col-span-4 group" style={{ animationDelay: `${index * 0.03}s` }}>
-      <Link
-        href={`/case-studies/${project.slug}`}
-        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
-        aria-label={`View case study: ${project.name}`}
-      >
-        {/* Card matches the recording's 16:9, so the full video IS the thumb. */}
-        <div className="card-thumb relative overflow-hidden" style={{ aspectRatio: "16 / 9" }}>
-          <video
-            src={video}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label={`Scrolling preview of the ${project.name} website`}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex items-start justify-between gap-4 mt-3">
-          <h2 className="mono-heading text-ink group-hover:text-pink transition-colors" style={{ fontSize: "0.8125rem" }}>
-            {project.name}
-          </h2>
-          <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>
-            {project.date}
-          </span>
-        </div>
-      </Link>
-    </article>
-  );
-}
+    <section id="hero" className="px-5 md:px-10 pt-[12svh] md:pt-[16svh] pb-16 md:pb-24" aria-label="Introduction">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-12">
+        <MaskReveal as="h1" className="home-hero-display md:col-span-10">
+          A boutique web development studio, with a designer&rsquo;s eye.
+        </MaskReveal>
 
-function SelectedWork() {
-  return (
-    <Reveal section as="section" id="hero" className="home-section no-rule px-5 md:px-10" aria-label="Selected work">
-      <div className="grid grid-cols-12 gap-x-8 gap-y-12">
-        {SELECTED.map((pick, i) => {
-          const project = projects.find((p) => p.slug === pick.slug);
-          return project ? <MiniCard key={pick.slug} project={project} video={pick.video} index={i} /> : null;
-        })}
-      </div>
-    </Reveal>
-  );
-}
+        <Reveal as="div" delay={0.25} className="md:col-span-6 md:col-start-1 max-w-[54ch] self-end">
+          <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
+            finbar&#10033;studio designs and builds websites end to end. Custom code, no
+            templates, made in Brisbane for businesses anywhere.
+          </p>
+          <p className="text-ink-soft leading-relaxed mt-5" style={{ fontSize: "clamp(0.98rem, 1.3vw, 1.15rem)" }}>
+            The web work sits on years of brand and graphic design, so the site never
+            has to arrive alone. Identity, print, motion, art direction: the whole feel
+            of your brand can come from the same hand, held together by one good eye.
+          </p>
+        </Reveal>
 
-/* ─── What I do: category names as big inline pill-bubbles ──────
-   Web leads; the design capabilities stay (graphic design roles are still on
-   the table), they just follow. */
-const CAP_PILLS: { name: string; href: string }[] = [
-  { name: "Web design & development", href: "/web-design" },
-  { name: "Brand identity", href: "/work?filter=brand" },
-  { name: "Graphic design", href: "/graphic-design" },
-  { name: "Motion graphics", href: "/work?filter=motion" },
-  { name: "Editorial & print", href: "/work?filter=editorial" },
-  { name: "Creative direction", href: "/work?filter=art" },
-];
-
-function Capabilities() {
-  return (
-    <section className="home-disciplines px-5 md:px-10" aria-labelledby="services-title">
-      <div className="home-cap">
-        <h2 id="services-title" className="home-cap-title">How I help businesses</h2>
-        <div className="home-disc home-cap-wrap">
-          {CAP_PILLS.map((c) => (
-            <Link key={c.name} href={c.href} className="home-cap-pill">
-              {c.name}
-            </Link>
-          ))}
-        </div>
+        <Reveal as="div" delay={0.4} className="md:col-span-4 md:col-start-9 self-end">
+          <SiteWindow shots={WINDOW_SHOTS} />
+        </Reveal>
       </div>
     </section>
+  );
+}
+
+/* ─── The sites ────────────────────────────────────────────── */
+function Websites() {
+  return (
+    <Reveal section as="section" className="home-section no-rule px-5 md:px-10 pt-20 md:pt-28 pb-24" aria-label="Websites">
+      <p className="mono-label text-ink-soft mb-6">Websites</p>
+      <WebsiteList sites={WEBSITES} />
+    </Reveal>
   );
 }
 
@@ -143,17 +120,11 @@ export default function HomePage() {
   return (
     <>
       <HomeJsonLd />
-      {/* Single page H1 — the design expresses the brand as the FINBARSTUDIO
-          wordmark, so the semantic H1 is visually hidden but carries the key
-          phrase for search + screen readers. */}
-      <h1 className="sr-only">
-        finbar✶studio. Brisbane web design &amp; development studio
-      </h1>
       <HomeIntro />
+      <Hero />
       {/* Past this point the auto-hidden nav slides in (see LayoutShell). */}
       <div id="nav-reveal-sentinel" aria-hidden="true" />
-      <SelectedWork />
-      <Capabilities />
+      <Websites />
     </>
   );
 }

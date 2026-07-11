@@ -72,6 +72,17 @@ const CLIENTS = [...projects]
   .sort((a, b) => a.rank - b.rank)
   .map((p) => CLIENT_NAME[p.slug] ?? p.name);
 
+// Web leads; the design capabilities stay (graphic design roles are still on
+// the table), they just follow. Moved here from the home page.
+const CAP_PILLS: { name: string; href: string }[] = [
+  { name: "Web design & development", href: "/web-design" },
+  { name: "Brand identity", href: "/work?filter=brand" },
+  { name: "Graphic design", href: "/graphic-design" },
+  { name: "Motion graphics", href: "/work?filter=motion" },
+  { name: "Editorial & print", href: "/work?filter=editorial" },
+  { name: "Creative direction", href: "/work?filter=art" },
+];
+
 export const metadata: Metadata = {
   title: { absolute: "About & Contact | Finbar Skitini, Brisbane Graphic Designer" },
   description:
@@ -178,6 +189,20 @@ export default function AboutPage() {
             to a much wider audience, because we all want to look good right?!
           </p>
         </Reveal>
+      </section>
+
+      {/* ── How I help businesses (moved here from the home page) ── */}
+      <section className="home-disciplines px-0 pt-24 md:pt-32" aria-labelledby="services-title">
+        <div className="home-cap">
+          <h2 id="services-title" className="home-cap-title">How I help businesses</h2>
+          <div className="home-disc home-cap-wrap">
+            {CAP_PILLS.map((c) => (
+              <Link key={c.name} href={c.href} className="home-cap-pill">
+                {c.name}
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
     </div>
   );

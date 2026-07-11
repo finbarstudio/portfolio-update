@@ -601,6 +601,19 @@
 
   /* Massive display type that drives the hero + section openers. */
   /* H1 — Space Mono in caps (replaces the old Bookmania display serif). */
+  /* Editorial hero (home) — Bookmania serif, mixed case, tight leading.
+     Overrides the base h1 uppercase so the serif reads properly. */
+  .home-hero-display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: -0.015em;
+    line-height: 1.04;
+    font-size: clamp(2.6rem, 6.4vw, 5.4rem);
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
   .home-display {
     font-family: var(--font-mono);
     font-weight: 700;
