@@ -32,6 +32,7 @@ const WEBSITES: Website[] = [
     year: "2026",
     bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
     images: ["/images/web/lows-1.webp"],
+    caseStudy: "/case-studies/lows-design-build",
   },
   {
     slug: "kinaya",
@@ -40,6 +41,7 @@ const WEBSITES: Website[] = [
     year: "2024",
     bio: "Full rebrand and a six-page site for an Adelaide NDIS provider, with the CMS handed over to their team and a site-wide accessibility text resizer, because their audience genuinely needs one.",
     images: ["/images/web/kinaya-1.webp"],
+    caseStudy: "/case-studies/kinaya",
   },
   {
     slug: "momentum-mentoring",
@@ -48,6 +50,7 @@ const WEBSITES: Website[] = [
     year: "2024",
     bio: "Brand and website for an NDIS mentoring provider, built to feel empowering and warm rather than clinical. Identity and site delivered as one piece of work, on a CMS the team runs themselves.",
     images: ["/images/web/momentum-1.webp"],
+    caseStudy: "/case-studies/momentum-mentoring",
   },
 ];
 
@@ -93,8 +96,7 @@ function Hero() {
           </p>
           <p className="text-ink-soft leading-relaxed mt-5" style={{ fontSize: "clamp(0.98rem, 1.3vw, 1.15rem)" }}>
             Before the web work came years of brand and graphic design, and it shows.
-            If you want the identity, the print and the motion handled too, it all
-            comes from the same hand.
+            Identity, print and motion come from the same hand as the code.
           </p>
         </Reveal>
 

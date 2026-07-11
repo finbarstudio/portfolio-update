@@ -13,6 +13,8 @@ export type Website = {
   year: string;
   bio: string;
   images: string[];
+  /** /case-studies route, when one exists */
+  caseStudy?: string;
 };
 
 export default function WebsiteList({ sites }: { sites: Website[] }) {
@@ -62,15 +64,26 @@ export default function WebsiteList({ sites }: { sites: Website[] }) {
                     <p className="text-ink-soft leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)" }}>
                       {w.bio}
                     </p>
-                    <a
-                      href={w.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mono-label text-pink hover:underline"
-                      tabIndex={isOpen ? 0 : -1}
-                    >
-                      Visit {domain} &#8599;
-                    </a>
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                      <a
+                        href={w.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mono-label text-pink hover:underline"
+                        tabIndex={isOpen ? 0 : -1}
+                      >
+                        Visit {domain} &#8599;
+                      </a>
+                      {w.caseStudy && (
+                        <a
+                          href={w.caseStudy}
+                          className="mono-label text-ink hover:text-pink transition-colors"
+                          tabIndex={isOpen ? 0 : -1}
+                        >
+                          Case study &rarr;
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <div className="md:col-span-8">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
