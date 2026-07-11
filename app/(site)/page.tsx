@@ -1,5 +1,6 @@
 import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
 import Reveal from "@/components/Reveal";
 import MaskReveal from "@/components/MaskReveal";
@@ -84,26 +85,22 @@ function HomeJsonLd() {
 function Hero() {
   return (
     <section id="hero" className="px-5 md:px-10 pt-[12svh] md:pt-[16svh] pb-16 md:pb-24" aria-label="Introduction">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-12">
-        <MaskReveal as="h1" className="home-hero-display md:col-span-10">
-          A boutique web development studio with a designer&rsquo;s eye.
-        </MaskReveal>
-
-        <Reveal as="div" delay={0.25} className="md:col-span-6 md:col-start-1 max-w-[54ch] self-end">
-          <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
-            We design and build websites start to finish, in custom code rather than
-            templates. Based in Brisbane and London, working with businesses anywhere.
-          </p>
-          <p className="text-ink-soft leading-relaxed mt-5" style={{ fontSize: "clamp(0.98rem, 1.3vw, 1.15rem)" }}>
-            Before the web work came years of brand and graphic design, and it shows.
-            Identity, print and motion come from the same hand as the code.
-          </p>
-        </Reveal>
-
-        <Reveal as="div" delay={0.4} className="md:col-span-4 md:col-start-9 self-end">
+      {/* Full-width editorial block: indented title runs straight into the
+          body copy (one paragraph, no break), window sits below on the right. */}
+      <MaskReveal as="h1" className="home-hero-display" style={{ textIndent: "clamp(3rem, 14vw, 15rem)" }}>
+        A boutique web development studio with a designer&rsquo;s eye.
+      </MaskReveal>
+      <Reveal as="p" delay={0.25} className="text-ink leading-relaxed mt-4" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
+        We design and build websites start to finish, in custom code rather than
+        templates. Based in Brisbane and London, working with businesses anywhere.
+        Before the web work came years of brand and graphic design, and it shows.
+        Identity, print and motion come from the same hand as the code.
+      </Reveal>
+      <Reveal as="div" delay={0.4} className="mt-12 md:mt-16 flex justify-end">
+        <div className="w-full md:w-[38%] md:min-w-[380px]">
           <SiteWindow shots={WINDOW_SHOTS} />
-        </Reveal>
-      </div>
+        </div>
+      </Reveal>
     </section>
   );
 }
@@ -118,6 +115,34 @@ function Websites() {
   );
 }
 
+
+/* ─── How I help businesses: category pills (also lives on /about) ── */
+const CAP_PILLS: { name: string; href: string }[] = [
+  { name: "Web design & development", href: "/web-design" },
+  { name: "Brand identity", href: "/work?filter=brand" },
+  { name: "Graphic design", href: "/graphic-design" },
+  { name: "Motion graphics", href: "/work?filter=motion" },
+  { name: "Editorial & print", href: "/work?filter=editorial" },
+  { name: "Creative direction", href: "/work?filter=art" },
+];
+
+function Capabilities() {
+  return (
+    <section className="home-disciplines px-5 md:px-10" aria-labelledby="services-title">
+      <div className="home-cap">
+        <h2 id="services-title" className="home-cap-title">How I help businesses</h2>
+        <div className="home-disc home-cap-wrap">
+          {CAP_PILLS.map((c) => (
+            <Link key={c.name} href={c.href} className="home-cap-pill">
+              {c.name}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
@@ -127,6 +152,7 @@ export default function HomePage() {
       {/* Past this point the auto-hidden nav slides in (see LayoutShell). */}
       <div id="nav-reveal-sentinel" aria-hidden="true" />
       <Websites />
+      <Capabilities />
     </>
   );
 }

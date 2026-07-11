@@ -40,11 +40,6 @@ export default function SiteWindow({ shots, interval = 2000 }: { shots: SiteShot
           />
         ))}
       </div>
-      <figcaption className="flex items-baseline justify-end mt-2">
-        <span className="meta-mono text-ink-soft/60" style={{ fontSize: "0.625rem" }}>
-          Recent builds
-        </span>
-      </figcaption>
     </figure>
   );
 }
