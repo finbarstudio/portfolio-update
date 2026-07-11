@@ -613,8 +613,10 @@
     line-height: 1.08;
     font-size: clamp(2.1rem, 5.2vw, 4.3rem);
     color: var(--ink);
-    /* fill the full measure on desktop (balance was shortening the lines) */
+    /* fill the full measure on desktop (balance was shortening the lines),
+       ragged right — never justified */
     text-wrap: normal;
+    text-align: left;
   }
 
   .home-display {

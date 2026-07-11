@@ -55,7 +55,11 @@ export default function VideoPlayer({
         muted
         playsInline
         preload={eager ? "auto" : "metadata"}
-        onLoadedData={() => { setReady(true); onReady?.(); }}
+        // Ready = actually PLAYING, not just first-frame-loaded: on slow
+        // fetches the poster used to sit there looking frozen with no
+        // indicator while the file buffered. The loader now stays up until
+        // frames are really moving.
+        onPlaying={() => { setReady(true); onReady?.(); }}
         className={className}
         style={{ width: "100%", height: "100%", objectFit: "contain", background: "transparent", display: "block", ...style }}
       />
