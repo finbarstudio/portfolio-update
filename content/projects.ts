@@ -804,6 +804,11 @@ export const projects: Project[] = [
       "The old site was a template. It looked like everyone else's and the family could not change much without help. The new one is built from scratch, so every part of it was a decision rather than a default.",
     outcome:
       "A brand that reads at any size, and a website the family owns outright and updates themselves. It also brings in work on its own: the estimate tool turns a curious visitor into a named lead before anyone picks up the phone. Steady growth in enquiries since it went live.",
+    testimonial: {
+      quote:
+        "The difference since the upgrade is night and day. The old site did the job, but this one actually looks like the company we think we are, and it has changed the kind of enquiries coming in. We are quoting bigger projects because the site holds up next to firms twice our size, and where we used to avoid sending people to the old one, now it is the first thing we share. The estimate tool has been the surprise: people price up their own job and land in our inbox as a lead before we have spoken a word.",
+      author: "The Lows family, Lows Design + Build",
+    },
     logo: "/images/lows-design-build/logomark.svg",
     cardLogo: "/images/lows-design-build/logomark.svg",
     liveUrl: "https://www.lowsdesignandbuild.com",
