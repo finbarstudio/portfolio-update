@@ -45,7 +45,7 @@
      │  Change any value → ripples to every component.        │
      └─────────────────────────────────────────────────────────┘ */
   /* Retro pastel palette — warm cream ground, muted accents (NYC poster feel). */
-  --bg:         #FCFBF9;   /* near-white page ground (was cream #F6EFE1)  */
+  --bg:         #FDF9F9;   /* near-white ground with the faintest pink cast */
   --ink:        #211E1A;   /* warm near-black, primary text               */
   --ink-soft:   #6E675C;   /* warm grey, secondary text (AA on cream)     */
   --line:       #E2D8C5;   /* warm hairline borders                       */
@@ -75,7 +75,7 @@
   /* ┌─────────────────────────────────────────────────────────┐
      │  SURFACE + ELEVATION TOKENS (warm, to match the cream)  │
      └─────────────────────────────────────────────────────────┘ */
-  --surface:        #FCFBF9;  /* page + chrome ground (near-white)        */
+  --surface:        #FDF9F9;  /* page + chrome ground (matches --bg)      */
   --surface-raised: #FBF6EC;  /* cards, media tiles, panels (light cream) */
   --surface-sunken: #F3F1ED;  /* grouped / inset regions                  */
   --thumb-bg:       #EAE0CC;  /* shared background behind all thumbnails  */
@@ -610,8 +610,11 @@
     font-weight: 700;
     text-transform: none;
     letter-spacing: -0.03em;
+    /* A mono space is a full 0.6em cell, which reads as justified-style gaps
+       at display sizes; pull the word gaps back to proportional feel. */
+    word-spacing: -0.28em;
     line-height: 1.08;
-    font-size: clamp(2.1rem, 5.2vw, 4.3rem);
+    font-size: clamp(2.3rem, 6.2vw, 5.9rem);
     color: var(--ink);
     /* fill the full measure on desktop (balance was shortening the lines),
        ragged right — never justified */
@@ -3690,6 +3693,10 @@ body:has(.sb-root) {
 .mr-mask {
   display: inline-flex;
   vertical-align: bottom;
+  /* text-indent inherits into each word's inline-flex box and pads every word
+     internally (it read as justified-style gaps). The indent belongs to the
+     h1's first line only. */
+  text-indent: 0;
   /* Vertical-only mask: clipped along the bottom so words/icons reveal as they
      rise, but left/right are open (negative insets) so wide icon glyphs and the
      hover reel are never cropped sideways. */

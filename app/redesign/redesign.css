@@ -14,10 +14,10 @@
    the footer, so retinting the token on body covers the whole page including
    anything portalled outside the wrapper. */
 html:has(.redesign-skin) {
-  background: #fcfbf9; /* overscroll ground */
+  background: #fdf9f9; /* overscroll ground */
 }
 body:has(.redesign-skin) {
-  --bg: #fcfbf9;
+  --bg: #fdf9f9;
   /* body's background is set from the token at build time, not via var(),
      so restate it explicitly for the sandbox. */
   background: var(--bg);

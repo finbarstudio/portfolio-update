@@ -46,6 +46,10 @@ export default function MaskReveal({
         if (part.trim() === "") tokens.push(" ");
         else tokens.push(<Word key={key++}>{part}</Word>);
       });
+    } else if (isValidElement(child) && child.type === "br") {
+      // Hand-set line breaks pass straight through (a br inside a word mask
+      // would collapse to nothing).
+      tokens.push(createElement("br", { key: key++ }));
     } else if (isValidElement(child)) {
       tokens.push(<Word key={key++}>{child}</Word>);
     }
