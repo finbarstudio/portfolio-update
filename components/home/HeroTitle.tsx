@@ -32,32 +32,39 @@ export default function HeroTitle() {
     const fit = () => {
       const width = root.clientWidth;
       if (!width) return;
-      root.querySelectorAll<HTMLElement>(".ht-line").forEach((line, i) => {
-        const inner = line.querySelector<HTMLElement>(".ht-inner");
-        if (!inner) return;
-        const indent = LINES[i]?.indent ? width * INDENT : 0;
-        const avail = width - indent;
-        // Transitions (even an inherited transition-delay) make font-size
-        // writes land late, which poisons the measure-set-measure loop. Kill
-        // them for the duration of the fit and force a reflow per write.
-        const prevTransition = inner.style.transition;
-        inner.style.transition = "none";
-        inner.style.fontSize = "100px";
-        void inner.offsetWidth;
+      const inners = [...root.querySelectorAll<HTMLElement>(".ht-line")].map((line, i) => ({
+        inner: line.querySelector<HTMLElement>(".ht-inner")!,
+        indent: LINES[i]?.indent ? width * INDENT : 0,
+      })).filter((x) => x.inner);
+      // ONE size for the whole block: measure every line at a reference size,
+      // take the scale that lets the WIDEST line exactly fill its measure, and
+      // apply it uniformly (the other lines rag naturally).
+      // Transitions (even an inherited transition-delay) make font-size writes
+      // land late and poison measurement, so they're disabled during the fit.
+      const prev = inners.map(({ inner }) => inner.style.transition);
+      inners.forEach(({ inner }) => { inner.style.transition = "none"; inner.style.fontSize = "100px"; });
+      void root.offsetWidth;
+      let size = Infinity;
+      inners.forEach(({ inner, indent }) => {
         const natural = inner.getBoundingClientRect().width;
-        if (natural <= 0) return;
-        let size = (avail / natural) * 100;
-        for (let k = 0; k < 3; k++) {
-          inner.style.fontSize = `${size}px`;
-          void inner.offsetWidth;
-          const measured = inner.getBoundingClientRect().width;
-          if (Math.abs(measured - avail) <= 1) break;
-          size = size * (avail / measured);
-        }
+        if (natural > 0) size = Math.min(size, ((width - indent) / natural) * 100);
+      });
+      if (!isFinite(size)) return;
+      // one refinement pass at the chosen size (letter-spacing is em-based, so
+      // width doesn't scale perfectly linearly)
+      inners.forEach(({ inner }) => { inner.style.fontSize = `${size}px`; });
+      void root.offsetWidth;
+      let scale = Infinity;
+      inners.forEach(({ inner, indent }) => {
+        const measured = inner.getBoundingClientRect().width;
+        if (measured > 0) scale = Math.min(scale, (width - indent) / measured);
+      });
+      if (isFinite(scale)) size = size * scale;
+      inners.forEach(({ inner, indent }, i) => {
         inner.style.fontSize = `${size}px`;
         inner.style.marginLeft = indent ? `${indent}px` : "0px";
         void inner.offsetWidth;
-        requestAnimationFrame(() => { inner.style.transition = prevTransition; });
+        requestAnimationFrame(() => { inner.style.transition = prev[i]; });
       });
       setFitted(true);
     };
