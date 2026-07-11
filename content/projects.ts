@@ -782,26 +782,28 @@ export const projects: Project[] = [
     tier: "full",
     rank: 8,
     seo: {
-      title: "Lows Design and Build: Branding & Web Design | Finbar Studio",
+      title: "Lows Design and Build: Brand & Custom Website | Finbar Studio",
       description:
-        "Branding and web design for a family-run design and build company in London. Logo, website, vehicle wrap and a Bromley FC sponsorship.",
+        "Brand identity and a custom-coded website for a family design and build company in South London. Next.js front end, Sanity CMS, an instant estimate tool and a preloader that draws the mark.",
     },
-    date: "2023",
-    categories: ["Brand Identity", "Web Design", "Environmental Graphics"],
+    date: "2023 to 2026",
+    categories: ["Web Design & Development", "Brand Identity"],
     skills: [
-      "Brand Identity",
       "Logo Design",
+      "Brand Identity",
       "Web Design",
-      "Environmental/Vehicle Graphics",
-      "Brand Applications",
+      "Front-End Development (Next.js)",
+      "Sanity CMS",
+      "Integrations",
+      "Motion",
     ],
     oneLiner:
-      "Full branding for a London family-run design-and-build company. Logo through to vehicle wrap, including a Bromley FC sponsorship activation.",
-    role: "Sole designer. Refined the client's sketches into a scalable geometric mark, selected the brand typeface, set colour for digital and print. Applied across Bromley FC sponsorship banners, site hoarding, social icons, the website and a vehicle wrap.",
+      "A family design and build company in South London. I made their mark, then a few years later built them the website it deserved: custom code, a CMS they run themselves, and a set of tools that actually bring work in.",
+    role: "Sole designer and developer. Refined the client's sketches into the final mark, set the type and colour, then designed and built the website end to end: front-end code, the Sanity CMS and its schema, the estimate tool, and every integration. Plus the launch content for their social channels.",
     problem:
-      "Lows needed a brand that could hold up anywhere: a football club sponsorship banner, a vehicle wrap, a website. The mark had to be readable at every scale and in every production environment.",
+      "The old site was a template. It looked like everyone else's and the family could not change much without help. The new one is built from scratch, so every part of it was a decision rather than a default.",
     outcome:
-      "Strong growth in workload since launch. The Bromley FC sponsorship pulled real results.",
+      "A brand that reads at any size, and a website the family owns outright and updates themselves. It also brings in work on its own: the estimate tool turns a curious visitor into a named lead before anyone picks up the phone. Steady growth in enquiries since it went live.",
     logo: "/images/lows-design-build/logomark.svg",
     cardLogo: "/images/lows-design-build/logomark.svg",
     liveUrl: "https://www.lowsdesignandbuild.com",
@@ -818,7 +820,7 @@ export const projects: Project[] = [
     depth: [
       {
         heading: "The mark",
-        body: "I refined the client's own sketches into a scalable geometric mark, then set a typeface and colour that hold up in print and on screen.",
+        body: "It started with the client's own sketches. I refined them into a clean geometric mark, a little house drawn in one continuous line, then set a typeface and a colour that hold up small on a phone and large on a wall. One mark, one weight of line, working the same everywhere: on Bromley FC matchday branding, on the hoarding around a live site, and later as the foundation the website was built on.",
         images: [
           {
             src: "/images/lows-design-build/logomark.svg",
@@ -826,35 +828,58 @@ export const projects: Project[] = [
             caption: "The geometric mark, refined from the client's concepts.",
             alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
           },
-        ],
-      },
-      {
-        heading: "Bromley FC sponsorship",
-        body: "The real test was a football club. The mark went onto matchday kit and a pitch-side LED banner, where it had to read from across the stadium.",
-        images: [
           {
             src: "/images/lows-design-build/bromley-fc.jpg",
             aspectRatio: "3/4",
-            caption: "The mark on club kit and matchday branding.",
+            caption: "The same mark at stadium scale: Bromley FC sponsorship.",
             alt: "Lows Design and Build Bromley FC sponsorship, brand mark on football club materials and kit",
           },
           {
-            src: "/images/lows-design-build/bromley-led-2.jpg",
-            aspectRatio: "3/4",
-            caption: "Pitch-side LED banner, brand at stadium scale.",
-            alt: "Lows Design and Build Bromley FC LED pitch-side advertising banner, brand at stadium scale",
+            src: "/images/lows-design-build/hoarding.jpg",
+            aspectRatio: "4/3",
+            caption: "And at street scale, on site hoarding.",
+            alt: "Lows Design and Build site hoarding, brand identity on construction site fence at street scale",
           },
         ],
       },
       {
-        heading: "On site",
-        body: "Closer to home, the same brand wraps the hoarding around a live construction site at street scale.",
+        heading: "Custom, not a template",
+        body: "Next.js and a hand-written front end. No page builder, no theme sitting underneath it. The whole thing loads fast, reads well on any screen, and behaves exactly how it was drawn, because nothing on the page is there by accident.",
         images: [
           {
-            src: "/images/lows-design-build/hoarding.jpg",
-            aspectRatio: "4/3",
-            caption: "Site hoarding on construction fencing.",
-            alt: "Lows Design and Build site hoarding, brand identity on construction site fence at street scale",
+            src: "/images/web/lows-1.webp",
+            aspectRatio: "16/9",
+            caption: "The home page: hand-written front end, nothing by default.",
+            alt: "Lows Design and Build website home page, custom Next.js build",
+          },
+        ],
+      },
+      {
+        heading: "A CMS they run themselves",
+        body: "The site is wired into Sanity. Projects, team, copy, pricing, the photos in every gallery: the family edits all of it from one dashboard and the site updates itself. Add a project and it appears in the grid, gets its own page, and slots into the sitemap. No developer, no waiting, no invoice for a text change. The fields are set up so they cannot break the layout: long title, short title, one photo or ten, the components hold their shape either way.",
+        images: [],
+      },
+      {
+        heading: "The animation",
+        body: "Nothing on the site fades in. It rises. Every heading, image and section comes up out of a mask as you reach it, so the page feels built rather than dropped in front of you. The entrance is a custom preloader: the house mark draws itself, then opens like a keyhole onto the home page. On project pages the title starts big over the hero, then shrinks and docks into the top corner as you scroll, turning into the nav without a cut.",
+        images: [
+          {
+            src: "/images/web/lows-1.webp",
+            video: "/images/lows-design-build/site-scroll.mp4",
+            caption: "A scroll through the live site: masked rises, docking titles.",
+            alt: "Scrolling capture of the Lows Design and Build website showing masked reveal animations",
+          },
+        ],
+      },
+      {
+        heading: "Tools that earn their place",
+        body: "An instant estimate calculator lets a visitor price their own extension or loft in about a minute; to see the figure they leave a name and an email, so every estimate lands in the client's inbox as a warm lead. Booking a call runs through Calendly, skinned to the brand in its own quiet overlay. Enquiries go straight to their inbox through Web3Forms, and a live Instagram feed keeps the site current without anyone touching it.",
+        images: [
+          {
+            src: "/images/lows-design-build/estimate.webp",
+            aspectRatio: "16/9",
+            caption: "The estimate tool: a visitor prices their own project and becomes a named lead.",
+            alt: "Lows Design and Build estimate calculator page, instant project pricing tool",
           },
         ],
       },
