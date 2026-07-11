@@ -603,6 +603,18 @@
   /* H1 — Space Mono in caps (replaces the old Bookmania display serif). */
   /* Editorial hero (home) — Bookmania serif, mixed case, tight leading.
      Overrides the base h1 uppercase so the serif reads properly. */
+  /* Fitted hero title (HeroTitle): each line is scaled to the full measure,
+     then rises out of its mask once fitted. */
+  .ht { line-height: 1.04; }
+  .ht .ht-inner {
+    transform: translateY(110%);
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ht.ht-go .ht-inner { transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .ht .ht-inner { transform: none; transition: none; }
+  }
+
   .home-hero-display {
     /* Space Mono ties the hero to the FINBARSTUDIO wordmark; mono runs wide,
        so the size steps down and the tracking tightens vs the old display. */

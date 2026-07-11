@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import Reveal from "@/components/Reveal";
-import MaskReveal from "@/components/MaskReveal";
 import HomeIntro from "@/components/HomeIntro";
+import HeroTitle from "@/components/home/HeroTitle";
 import SiteWindow from "@/components/home/SiteWindow";
 import WebsiteList, { type Website } from "@/components/home/WebsiteList";
 
@@ -97,15 +97,9 @@ function Hero() {
       {/* Full-width editorial block, sized to sit inside one viewport: the
           indented title runs straight into the body copy, and the cycling
           window is slotted inline (floated right) so the text wraps it. */}
-      {/* Hand-set breaks: a staircase rag (short, mid, long) so the mono
-          never reads as justified; the indent lands on line one only. */}
-      <MaskReveal as="h1" className="home-hero-display" style={{ textIndent: "clamp(2.5rem, 11vw, 12rem)" }}>
-        {"A boutique web"}
-        <br />
-        {"development studio"}
-        <br />
-        {"with a designer’s eye."}
-      </MaskReveal>
+      {/* Every line fitted to the full measure (footer-wordmark trick):
+          edge-to-edge type with normal word spaces, no justify gaps. */}
+      <HeroTitle />
       <Reveal as="div" delay={0.25} className="mt-5 flow-root">
         <div className="hidden sm:block float-right w-[clamp(280px,27vw,420px)] ml-6 md:ml-10 mb-4">
           <SiteWindow shots={WINDOW_SHOTS} />
