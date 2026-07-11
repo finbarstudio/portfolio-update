@@ -32,6 +32,8 @@ export interface DepthSection {
   /** Force an even N-up grid (e.g. 4 small posters in a row) instead of the
    *  default aspect-aware layout. */
   cols?: number;
+  /** two-column section: body text left, gallery right */
+  split?: boolean;
 }
 
 // One horizontal row of media (images or videos) sharing a single caption.
@@ -825,6 +827,7 @@ export const projects: Project[] = [
     depth: [
       {
         heading: "The mark",
+        split: true,
         body: "It started with the client's own sketches. I refined them into a clean geometric mark, a little house drawn in one continuous line, then set a typeface and a colour that hold up small on a phone and large on a wall. One mark, one weight of line, working the same everywhere: on Bromley FC matchday branding, on the hoarding around a live site, and later as the foundation the website was built on.",
         images: [
           {
@@ -832,18 +835,6 @@ export const projects: Project[] = [
             aspectRatio: "300/80",
             caption: "The geometric mark, refined from the client's concepts.",
             alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
-          },
-          {
-            src: "/images/lows-design-build/bromley-fc.jpg",
-            aspectRatio: "3/4",
-            caption: "The same mark at stadium scale: Bromley FC sponsorship.",
-            alt: "Lows Design and Build Bromley FC sponsorship, brand mark on football club materials and kit",
-          },
-          {
-            src: "/images/lows-design-build/hoarding.jpg",
-            aspectRatio: "4/3",
-            caption: "And at street scale, on site hoarding.",
-            alt: "Lows Design and Build site hoarding, brand identity on construction site fence at street scale",
           },
         ],
       },
@@ -871,8 +862,23 @@ export const projects: Project[] = [
           {
             src: "/images/web/lows-1.webp",
             video: "/images/lows-design-build/site-scroll.mp4",
+            aspectRatio: "16/9",
             caption: "A scroll through the live site: masked rises, docking titles.",
             alt: "Scrolling capture of the Lows Design and Build website showing masked reveal animations",
+          },
+          {
+            src: "/images/web/lows-1.webp",
+            video: "/images/lows-design-build/preloader.mp4",
+            aspectRatio: "3/2",
+            caption: "The entrance: the house mark draws itself, then opens onto the home page.",
+            alt: "Lows Design and Build preloader, the house logomark drawing itself before the page reveals",
+          },
+          {
+            src: "/images/web/lows-1.webp",
+            video: "/images/lows-design-build/project-page.mp4",
+            aspectRatio: "3/2",
+            caption: "Project cards on hover, then a title that docks itself into the nav as you scroll.",
+            alt: "Lows Design and Build project page, card hover states and the docking title animation",
           },
         ],
       },
@@ -957,6 +963,7 @@ export const projects: Project[] = [
           {
             src: "/images/web/plated-1.webp",
             video: "/images/plated-with-issy/site-scroll.mp4",
+            aspectRatio: "16/9",
             caption: "A scroll through the live site, hero to footer.",
             alt: "Scrolling capture of the Plated with Issy website showing the pinned story and gallery",
           },

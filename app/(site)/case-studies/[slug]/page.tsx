@@ -256,10 +256,26 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
         {sections.map((section, i) => (
           <Reveal as="section" key={i} y={28}>
             <h3 className="mono-heading text-pink mb-3">{section.heading}</h3>
-            <p className="text-ink leading-relaxed mb-2 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
-              {section.body}
-            </p>
-            {section.images.length > 0 && <Gallery images={section.images} cols={section.cols} />}
+            {section.split ? (
+              /* Two columns: body text left, media right (e.g. the Lows mark). */
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 items-center">
+                <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
+                  {section.body}
+                </p>
+                {section.images.length > 0 && (
+                  <div className="w-full max-w-[340px] md:justify-self-end">
+                    <Gallery images={section.images} cols={section.cols} />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <p className="text-ink leading-relaxed mb-2 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
+                  {section.body}
+                </p>
+                {section.images.length > 0 && <Gallery images={section.images} cols={section.cols} />}
+              </>
+            )}
           </Reveal>
         ))}
       </div>
