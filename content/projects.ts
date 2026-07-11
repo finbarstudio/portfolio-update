@@ -891,6 +891,115 @@ export const projects: Project[] = [
     ],
   },
 
+
+  /* 9b. Plated with Issy. Full */
+  {
+    slug: "plated-with-issy",
+    name: "Plated with Issy",
+    tier: "full",
+    rank: 13,
+    seo: {
+      title: "Plated with Issy: Brand & Custom Website | Finbar Studio",
+      description:
+        "Brand identity and a custom-coded website for a candlelit supper club. Next.js and GSAP, one continuous scroll, a polaroid gallery, and a Payload CMS Issy runs from her phone.",
+    },
+    date: "2026",
+    categories: ["Web Design & Development", "Brand Identity"],
+    skills: [
+      "Brand Identity",
+      "Art Direction",
+      "Web Design",
+      "Front-End Development (Next.js)",
+      "Motion (GSAP)",
+      "Payload CMS",
+      "Integrations",
+    ],
+    oneLiner:
+      "A supper club run by one cook. Brand and website built together: custom code front to back, one continuous scroll through an evening, and a CMS Issy updates from her phone.",
+    role: "Sole designer and developer. Identity, art direction of the photography treatment, then the site end to end: front-end code and motion, the Payload CMS and its schema, the Instagram pipeline, hosting and deployment. Admin access is locked to an allow-list and media sits in private storage served through the site.",
+    problem:
+      "Issy hosts intimate, candlelit dinners, and the brand needed to feel like the tables do: warm, hand-made, a little nostalgic. The site had to carry that feeling and still be something one cook keeps current herself, without touching code.",
+    outcome:
+      "A brand that feels like being at the table, and a website Issy owns outright and keeps current herself: photos, words and feed, without touching code. Built to grow with the supper club, every dinner she adds becomes part of the story the scroll tells.",
+    testimonial: {
+      quote:
+        "Finbar just got it, honestly. I'd send him a voice note about something I wanted changed and it would be live by the evening. He kept me in the loop the whole way through without ever drowning me in tech talk, and the site went from an idea to launched faster than I thought was possible. It feels completely like me.",
+      author: "Issy Park, Plated with Issy",
+    },
+    liveUrl: "https://www.platedwithissy.com",
+    heroModel: {
+      model: "/models/studio-display/display.gltf",
+      video: "/images/plated-with-issy/site-scroll.mp4",
+    },
+    heroImage: {
+      src: "/images/web/plated-1.webp",
+      alt: "Plated with Issy website hero, script wordmark over a candlelit dinner table",
+    },
+    images: [],
+    hasDepth: true,
+    depth: [
+      {
+        heading: "The mark",
+        body: "Two typefaces doing one job. Plated with in a fine script, ISSY in small serif capitals beside it, so the lockup reads like a signature on a menu. It sits over photography at any size, from the hero of the site down to the nav, and it never needed a logo drawn around it. The type is the mark. The palette is pulled from the dinners themselves: cream, mustard, a deep olive green. Candlelight colours.",
+        images: [
+          {
+            src: "/images/web/plated-1.webp",
+            aspectRatio: "16/9",
+            caption: "The wordmark over the hero: the type is the mark.",
+            alt: "Plated with Issy wordmark in script and serif capitals over a candlelit table photograph",
+          },
+        ],
+      },
+      {
+        heading: "One scroll, one story",
+        body: "No template underneath. Next.js and a hand-written front end, so every section is a decision and the whole site is really one continuous scroll through an evening. It opens on a full-bleed candlelit table with the wordmark drawing itself across it. From there the page is a sequence, not a stack: the story section pins while polaroid photos fan out one by one over the copy, then Issy's own polaroid grows to centre stage and the page splits into her bio. Scrolling drives all of it, and nav links glide into sections mid-animation rather than jumping, so you never land on an empty frame.",
+        images: [
+          {
+            src: "/images/web/plated-1.webp",
+            video: "/images/plated-with-issy/site-scroll.mp4",
+            caption: "A scroll through the live site, hero to footer.",
+            alt: "Scrolling capture of the Plated with Issy website showing the pinned story and gallery",
+          },
+          {
+            src: "/images/plated-with-issy/story.webp",
+            aspectRatio: "16/9",
+            caption: "The story section: polaroids fan out over the copy as it pins.",
+            alt: "Plated with Issy story section with polaroid photographs fanned over the text",
+          },
+        ],
+      },
+      {
+        heading: "The gallery",
+        body: "Past dinners run in an infinite carousel of polaroids, each titled in a handwritten pen font. Hover one and the row blurs back while that dinner's photos spread into a grid with its story beside them. It loops seamlessly and never resets; it just keeps drifting, like a table being cleared slowly.",
+        images: [
+          {
+            src: "/images/plated-with-issy/gallery.webp",
+            aspectRatio: "16/9",
+            caption: "A dinner opened out of the carousel into its grid.",
+            alt: "Plated with Issy gallery, polaroid carousel expanded into a photo grid of one dinner",
+          },
+        ],
+      },
+      {
+        heading: "Small touches",
+        body: "A two-stage preloader: the wordmark fades up over a filling line, then the curtain lifts, and it waits for the brand typefaces before showing anything so it never flashes a system font. The logo stays out of the nav on the hero, where the big wordmark owns the screen, then fades into place as you scroll past. Enquiries post straight to Issy's inbox through Web3Forms, no mail client, just book a table and a thank-you in the house type. And a branded 404: dark green, the wordmark, this dish isn't on the menu.",
+        images: [
+          {
+            src: "/images/plated-with-issy/404.webp",
+            aspectRatio: "16/9",
+            caption: "The 404. This dish isn't on the menu.",
+            alt: "Plated with Issy branded 404 page in dark olive green with the script wordmark",
+          },
+        ],
+      },
+      {
+        heading: "A CMS she runs herself",
+        body: "The site is wired into Payload, running inside the same codebase and skinned to the brand. Polaroids, captions, the story copy, the bio: Issy edits all of it and drags photos into order from one dashboard, and the fields are shaped so nothing she does can break the layout. The Instagram feed is the part I'm fondest of. She pastes a post's URL, hits save, and the photo pulls itself in and appears on the site, linked back to the post. Instagram blocks server scrapers, so making that one field work took real reverse-engineering.",
+        images: [],
+      },
+    ],
+  },
+
   /* 10. Momentum Mentoring. Gallery */
   {
     slug: "momentum-mentoring",
