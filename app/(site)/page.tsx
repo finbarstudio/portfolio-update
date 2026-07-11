@@ -83,18 +83,18 @@ function Hero() {
     <section id="hero" className="px-5 md:px-10 pt-[12svh] md:pt-[16svh] pb-16 md:pb-24" aria-label="Introduction">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-12">
         <MaskReveal as="h1" className="home-hero-display md:col-span-10">
-          A boutique web development studio, with a designer&rsquo;s eye.
+          A boutique web development studio with a designer&rsquo;s eye.
         </MaskReveal>
 
         <Reveal as="div" delay={0.25} className="md:col-span-6 md:col-start-1 max-w-[54ch] self-end">
           <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
-            finbar&#10033;studio designs and builds websites end to end. Custom code, no
-            templates, made in Brisbane for businesses anywhere.
+            finbar&#10033;studio designs and builds websites start to finish, in custom
+            code rather than templates. Based in Brisbane, working with businesses anywhere.
           </p>
           <p className="text-ink-soft leading-relaxed mt-5" style={{ fontSize: "clamp(0.98rem, 1.3vw, 1.15rem)" }}>
-            The web work sits on years of brand and graphic design, so the site never
-            has to arrive alone. Identity, print, motion, art direction: the whole feel
-            of your brand can come from the same hand, held together by one good eye.
+            Before the web work came years of brand and graphic design, and it shows.
+            If you want the identity, the print and the motion handled too, it all
+            comes from the same hand.
           </p>
         </Reveal>
 

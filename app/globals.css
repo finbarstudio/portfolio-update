@@ -604,12 +604,14 @@
   /* Editorial hero (home) — Bookmania serif, mixed case, tight leading.
      Overrides the base h1 uppercase so the serif reads properly. */
   .home-hero-display {
-    font-family: var(--font-display);
-    font-weight: 500;
+    /* Space Mono ties the hero to the FINBARSTUDIO wordmark; mono runs wide,
+       so the size steps down and the tracking tightens vs the old display. */
+    font-family: var(--font-mono);
+    font-weight: 700;
     text-transform: none;
-    letter-spacing: -0.015em;
-    line-height: 1.04;
-    font-size: clamp(2.6rem, 6.4vw, 5.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    font-size: clamp(2.1rem, 5.2vw, 4.3rem);
     color: var(--ink);
     text-wrap: balance;
   }
