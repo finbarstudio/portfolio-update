@@ -1,11 +1,9 @@
 import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import Reveal from "@/components/Reveal";
-import InlineIcon from "@/components/InlineIcon";
-import MaskReveal from "@/components/MaskReveal";
+import AboutHero from "@/components/about/AboutHero";
 import { projects } from "@/content/projects";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -107,47 +105,7 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(aboutJsonLd) }}
       />
 
-      {/* ── Big statement with inline icons over the isolated portrait ── */}
-      <section
-        className="relative min-h-[70svh] flex items-center py-16 md:py-24"
-        aria-label="Introduction"
-      >
-        {/* Portrait sits behind the type, bottom-right, grounded on the
-            section edge. Decorative here (the statement carries the intro). */}
-        <Reveal
-          as="div"
-          aria-hidden="true"
-          className="absolute inset-y-0 right-0 flex items-end justify-end pointer-events-none"
-        >
-          <Image
-            src="/images/about/finbar.webp"
-            alt=""
-            width={900}
-            height={863}
-            priority
-            className="w-[min(340px,62vw)] md:w-[clamp(320px,30vw,440px)] h-auto"
-          />
-        </Reveal>
-        <MaskReveal
-          as="h1"
-          className="home-disc relative z-10"
-          aria-label="Nice to meet you, I'm Finbar. One day I woke up and found my feet in design and I haven't moved since."
-        >
-          {"Nice to meet you "}
-          <InlineIcon char="👪" className="home-disc-icon" />
-          {" I’m "}
-          <span className="home-disc-pink">Finbar</span>
-          <InlineIcon char="⦿" className="home-disc-icon" />
-          {" one day I woke up "}
-          <InlineIcon char="❉" className="home-disc-icon" />
-          {" and found my feet "}
-          <InlineIcon char="🮲🮳" className="home-disc-icon" />
-          {" in design "}
-          <InlineIcon char="✎" className="home-disc-icon" />
-          {" and I haven’t moved since "}
-          <InlineIcon char="♡" className="home-disc-icon" />
-        </MaskReveal>
-      </section>
+      <AboutHero />
 
       {/* ── Four columns: services / clients / bio / mission ──── */}
       <section
