@@ -72,18 +72,15 @@ export default function WebsiteList({ sites }: { sites: Website[] }) {
                       Visit {domain} &#8599;
                     </a>
                   </div>
-                  <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {w.images.map((src, i) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        key={src}
-                        src={src}
-                        alt={`${w.name} website, screen ${i + 1}`}
-                        loading="lazy"
-                        className={`w-full h-auto border border-line ${i === 2 ? "hidden sm:block" : ""}`}
-                        style={{ borderRadius: "4px", aspectRatio: "16 / 9", objectFit: "cover" }}
-                      />
-                    ))}
+                  <div className="md:col-span-8">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={w.images[0]}
+                      alt={`${w.name} website, home page`}
+                      loading="lazy"
+                      className="w-full h-auto border border-line"
+                      style={{ borderRadius: "4px", aspectRatio: "16 / 9", objectFit: "cover" }}
+                    />
                   </div>
                 </div>
               </div>
