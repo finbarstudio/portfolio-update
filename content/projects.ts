@@ -1007,6 +1007,91 @@ export const projects: Project[] = [
     ],
   },
 
+
+  /* 9c. Lola Audio. Full */
+  {
+    slug: "lola-audio",
+    name: "Lola Audio",
+    tier: "full",
+    rank: 15,
+    seo: {
+      title: "Lola Audio: Interactive Audio Portfolio | Finbar Studio",
+      description:
+        "A portfolio for a composer and sound designer that opens on a working mixing desk: Web Audio stems on faders, a live waveform, and a Sanity CMS down to the sound itself.",
+    },
+    date: "2026",
+    categories: ["Web Design & Development", "Interactive Audio"],
+    skills: [
+      "Web Design",
+      "Front-End Development (Next.js)",
+      "Motion (GSAP)",
+      "Web Audio",
+      "Sanity CMS",
+      "Video Pipeline",
+      "Interaction Design",
+    ],
+    oneLiner:
+      "A portfolio for a composer and sound designer. Most portfolios show you the work; this one lets you mix it. The site opens on a working mixing desk, and everything after it is built around hearing who Lola is before you read a word about her.",
+    role: "Sole designer and developer. The interaction concept, the Web Audio engine and its sample-locked transport, the pen-draw logo animation, front-end and motion end to end, the Sanity CMS and its schema, the video pipeline, hosting and deployment.",
+    problem:
+      "A sound designer's portfolio usually shows the work silently and asks you to take the sound on trust. Lola's had to do the opposite: put her sound in your hands in the first five seconds, without turning the site into a gimmick.",
+    outcome:
+      "A portfolio that behaves like her instrument. Visitors don't read that she's a sound designer, they find out with their hands in the first five seconds. And the whole thing, words to waveforms, is hers to change from one dashboard.",
+    testimonial: {
+      quote:
+        "I kept sending over ideas that I assumed were impossible, make the faders play my stems in time, make a line of text turn into the mix, and they'd just appear on the site a day later, better than I'd pictured. It doesn't feel like a website about my work. It feels like a piece of it.",
+      author: "Lola Stoodley, composer & sound designer",
+    },
+    liveUrl: "https://www.lola-audio.com",
+    heroModel: {
+      model: "/models/studio-display/display.gltf",
+      video: "/images/lola-audio/site-scroll.mp4",
+    },
+    heroImage: {
+      src: "/images/web/lola-1.webp",
+      alt: "Lola Audio title card, a white sheet of paper with a signature logo between two working mixing-desk faders",
+    },
+    images: [],
+    hasDepth: true,
+    depth: [
+      {
+        heading: "The title card",
+        body: "The site opens on an off-black void with a single white sheet of paper: an A4 card carrying her name, her role, and a line that says commissions are open. Either side of the card sits a real mixing desk: four vertical faders with ribbed caps, tick scales, and LEDs that boot up in an analogue chase when the page loads, each bulb fractionally different in timing and warmth, the way real hardware is. Push a fader and a stem starts, bass, synths, strings, birds, each one a loop she composed. Every stem runs on one shared clock, so a fader engaged late is exactly in time with the first, and the LEDs breathe with their levels. A line of type on the card turns out to be a live waveform: idle it drifts like a sine, and the moment the music starts it draws the actual mix in fader green. There is a reset switch. It is an illuminated rocker, it thunks, and the faders glide home like a motorised desk.",
+        images: [
+          {
+            src: "/images/web/lola-1.webp",
+            video: "/images/lola-audio/site-scroll.mp4",
+            aspectRatio: "16/9",
+            caption: "The desk played live, then the scroll: the card grows until the whole screen is paper.",
+            alt: "Scrolling capture of the Lola Audio site, faders playing stems then the card growing to full screen",
+          },
+        ],
+      },
+      {
+        heading: "The preloader",
+        body: "Her logo is a signature, so it draws itself: a pen-stroke animation traced from the real mark, one continuous line for each letter, before the logo slots up into place and the desk boots.",
+        images: [],
+      },
+      {
+        heading: "The portfolio",
+        body: "Films run in a two-column grid, playing silently as you arrive at them. Each card carries a listen, the film's own sound with a small live visualiser, and while you listen, every other film blurs back so nothing competes. Watch opens the film full screen with a scrubber, volume, and nothing else on the screen but the work. As you scroll on, watched cards shrink into a thin stack of pills pinned under the logo, a rack of everything you have passed, each one still playable, each one reopening with a click without disturbing the rest. At the bottom the films fade away beneath her bio, and the contacts step back to a whisper while you browse, returning when you need them. For long-form work, fashion shows and short films, the site plays a condensed cut and offers the full version on YouTube in one click.",
+        images: [
+          {
+            src: "/images/lola-audio/portfolio.webp",
+            aspectRatio: "16/9",
+            caption: "The film grid: silent autoplay, a listen on every card, watched work stacking into pills.",
+            alt: "Lola Audio portfolio grid with film cards and audio visualisers",
+          },
+        ],
+      },
+      {
+        heading: "A CMS she runs herself",
+        body: "The site is wired into Sanity. Projects, films, posters, the running order, her bio, the contact details, and the sound. Every stem on the mixing desk, the fader labels, the click of a fader engaging, even the reset thunk and its volume are fields she can edit. So is every line of text on the title card. If she rewrites who she is, the site follows without a developer in the loop. Video is handled for the web: heavyweight masters are transcoded to fast-starting web copies so the grid stays light, and everything serves from a CDN that streams and seeks properly on every browser, phones included.",
+        images: [],
+      },
+    ],
+  },
+
   /* 10. Momentum Mentoring. Gallery */
   {
     slug: "momentum-mentoring",

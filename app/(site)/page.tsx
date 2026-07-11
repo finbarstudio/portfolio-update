@@ -45,6 +45,15 @@ const WEBSITES: Website[] = [
     caseStudy: "/case-studies/plated-with-issy",
   },
   {
+    slug: "lola-audio",
+    name: "Lola Audio",
+    url: "https://www.lola-audio.com",
+    year: "2026",
+    bio: "A portfolio for a composer and sound designer that opens on a working mixing desk: push a fader and her stems play in time, while a line of type draws the live mix. Sanity CMS down to the sound itself.",
+    images: ["/images/web/lola-1.webp"],
+    caseStudy: "/case-studies/lola-audio",
+  },
+  {
     slug: "kinaya",
     name: "KinAya",
     url: "https://kinaya.com.au",
