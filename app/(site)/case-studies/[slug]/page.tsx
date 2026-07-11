@@ -153,7 +153,9 @@ function CaseMedia({ img, full = false }: { img: ProjectImage; full?: boolean })
     return (
       <div
         className="img-wrap"
-        style={{ aspectRatio: img.aspectRatio ?? "16/9", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)" }}
+        // maxHeight none: the default 72vh clamp squeezes the box, and the
+        // contained video letterboxes inside it, reading as not-full-width.
+        style={{ aspectRatio: img.aspectRatio ?? "16/9", maxHeight: "none", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)" }}
       >
         <VideoPlayer src={img.video} poster={img.src} />
       </div>
