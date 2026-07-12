@@ -8,7 +8,8 @@
  *   2. After a longer beat the symbol (headshot clipped inside it) scales in and
  *      a wave scatters the characters out of its footprint (translate only), so
  *      they explode outward and stay there.
- *   3. The symbol rotates through a set of shapes, flipping between them.
+ *   3. The mask cycles through the brand icon batch with instant swaps,
+ *      the same glyphs (and feel) as the statement's hovering inline icons.
  *   4. Hovering the symbol REVERSES the scatter so the statement reads cleanly;
  *      leaving re-scatters it. The hover target is a fixed-size zone, so the
  *      symbol scaling can't make the pointer flicker on and off it.
@@ -18,7 +19,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import InlineIcon from "@/components/InlineIcon";
+import InlineIcon, { ICON_BATCH } from "@/components/InlineIcon";
 
 type Token = { word?: string; icon?: string; pink?: boolean };
 const TOKENS: Token[] = [
@@ -36,8 +37,8 @@ const TOKENS: Token[] = [
   { icon: "♡" },
 ];
 
-// Solid-ish brand symbols the headshot masks into; easy to re-order/swap.
-const SYMBOLS = ["●", "★", "♥", "✶", "✦"];
+// The headshot masks into the same brand icon batch the statement's inline
+// icons reel through (InlineIcon.ICON_BATCH).
 
 const PUSH_MARGIN = 28;   // px of clearance beyond the symbol's edge
 const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
@@ -46,7 +47,6 @@ const MASK_ID = "ah-symbol-mask";
 export default function AboutHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const photoRef = useRef<HTMLDivElement>(null);   // scatter target (scales in)
-  const svgRef = useRef<SVGSVGElement>(null);       // flip target (symbol swap)
   const hitRef = useRef<HTMLDivElement>(null);      // fixed-size hover zone
   const [symbol, setSymbol] = useState(0);
 
@@ -102,14 +102,11 @@ export default function AboutHero() {
     });
     const startT = window.setTimeout(() => scatter.play(), 3000);
 
-    // 3 — cycle the symbol: flip the svg edge-on, swap the glyph, flip back
+    // 3 — cycle the mask symbol: instant swaps through the batch, no flip,
+    //     exactly like the statement icons switching glyphs.
     const cycle = window.setInterval(() => {
-      const el = svgRef.current;
-      if (!el) { setSymbol((i) => (i + 1) % SYMBOLS.length); return; }
-      gsap.timeline()
-        .to(el, { scaleX: 0, duration: 0.28, ease: "power2.in", onComplete: () => setSymbol((i) => (i + 1) % SYMBOLS.length) })
-        .to(el, { scaleX: 1, duration: 0.34, ease: "power2.out" });
-    }, 3200);
+      setSymbol((i) => (i + 1) % ICON_BATCH.length);
+    }, 2800);
 
     // 4 — hover reverse, off a fixed-size zone with a guard so the symbol
     //     scaling never causes a flicker of enter/leave events.
@@ -126,7 +123,7 @@ export default function AboutHero() {
       hit.removeEventListener("pointerleave", onLeave);
       intro.kill();
       scatter.kill();
-      gsap.killTweensOf([photo, svgRef.current, ...chars]);
+      gsap.killTweensOf([photo, ...chars]);
     };
   }, []);
 
@@ -170,7 +167,7 @@ export default function AboutHero() {
         className="absolute left-1/2 top-1/2 z-20 pointer-events-none"
         style={{ width: "clamp(280px, 32vw, 440px)", aspectRatio: "1 / 1" }}
       >
-        <svg ref={svgRef} viewBox="0 0 100 100" className="w-full h-full" style={{ transformOrigin: "center center" }}>
+        <svg viewBox="0 0 100 100" className="w-full h-full">
           <defs>
             <mask id={MASK_ID}>
               <rect x="0" y="0" width="100" height="100" fill="#000" />
@@ -183,7 +180,7 @@ export default function AboutHero() {
                 fontSize="96"
                 style={{ fontFamily: "var(--font-dingbat), sans-serif" }}
               >
-                {SYMBOLS[symbol]}
+                {ICON_BATCH[symbol]}
               </text>
             </mask>
           </defs>
