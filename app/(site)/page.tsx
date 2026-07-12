@@ -103,7 +103,12 @@ function HomeJsonLd() {
 /* ─── Hero: editorial, type-led, with a small window of recent builds ─────── */
 function Hero() {
   return (
-    <section id="hero" className="px-5 md:px-10 pt-[10svh] md:pt-[12svh] pb-12 max-h-svh overflow-hidden" aria-label="Introduction">
+    <section
+      id="hero"
+      className="px-5 md:px-10 flex flex-col justify-center gap-8 md:gap-10"
+      style={{ height: "calc(100svh - var(--menubar-h, 56px))" }}
+      aria-label="Introduction"
+    >
       {/* Full-width editorial block, sized to sit inside one viewport: the
           indented title runs straight into the body copy, and the cycling
           window is slotted inline (floated right) so the text wraps it. */}
@@ -113,7 +118,7 @@ function Hero() {
       {/* 50/50 under the title: body copy + the cycling window on the left;
           a two-column nav (pages + socials) on the right, vertically centred
           in its half and right-aligned. */}
-      <Reveal as="div" delay={0.25} className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
+      <Reveal as="div" delay={0.25} className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
         <div className="flex flex-col gap-7">
           <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
             We design and build websites start to finish, in custom code rather than
@@ -124,25 +129,21 @@ function Hero() {
           <SiteWindow shots={WINDOW_SHOTS} />
         </div>
 
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-center">
+          {/* A centred cluster of pill links: pages in ink, socials in pink. */}
           <nav
-            className="grid grid-cols-2 gap-x-12 gap-y-2 text-right"
+            className="hero-links flex flex-wrap items-center justify-center content-center gap-2.5 max-w-[34ch]"
             aria-label="Site and social links"
-            style={{ fontSize: "clamp(1rem, 1.3vw, 1.2rem)" }}
           >
-            <div className="flex flex-col gap-2">
-              <Link href="/work" className="text-ink hover:text-pink transition-colors">Work</Link>
-              <Link href="/about" className="text-ink hover:text-pink transition-colors">About</Link>
-              <Link href="/web-design" className="text-ink hover:text-pink transition-colors">Web design</Link>
-              <Link href="/graphic-design" className="text-ink hover:text-pink transition-colors">Graphic design</Link>
-              <ContactCta className="text-ink hover:text-pink transition-colors text-right cursor-pointer">Contact</ContactCta>
-            </div>
-            <div className="flex flex-col gap-2">
-              <a href="https://instagram.com/finbar.studio" target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors">Instagram</a>
-              <a href="https://linkedin.com/in/finbarskitini" target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors">LinkedIn</a>
-              <a href="https://x.com/finbarstudio" target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors">X</a>
-              <a href="https://are.na/finbar-studio" target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors">Are.na</a>
-            </div>
+            <Link href="/work" className="hero-pill">Work</Link>
+            <Link href="/about" className="hero-pill">About</Link>
+            <Link href="/web-design" className="hero-pill">Web design</Link>
+            <Link href="/graphic-design" className="hero-pill">Graphic design</Link>
+            <ContactCta className="hero-pill">Contact</ContactCta>
+            <a href="https://instagram.com/finbar.studio" target="_blank" rel="noopener noreferrer" className="hero-pill hero-pill-social">Instagram</a>
+            <a href="https://linkedin.com/in/finbarskitini" target="_blank" rel="noopener noreferrer" className="hero-pill hero-pill-social">LinkedIn</a>
+            <a href="https://x.com/finbarstudio" target="_blank" rel="noopener noreferrer" className="hero-pill hero-pill-social">X</a>
+            <a href="https://are.na/finbar-studio" target="_blank" rel="noopener noreferrer" className="hero-pill hero-pill-social">Are.na</a>
           </nav>
         </div>
       </Reveal>

@@ -15,11 +15,11 @@ export function scrollToHero() {
 
   if (target && lenis) {
     // Slow, eased Lenis scroll; offset clears the fixed nav.
-    lenis.scrollTo(target, { offset: -navH - 8, duration: 1.7, easing: easeInOutCubic });
+    lenis.scrollTo(target, { offset: -navH, duration: 1.7, easing: easeInOutCubic });
     return;
   }
   if (target) {
-    const y = target.getBoundingClientRect().top + window.scrollY - navH - 8;
+    const y = target.getBoundingClientRect().top + window.scrollY - navH;
     window.scrollTo({ top: y, behavior: "smooth" });
     return;
   }

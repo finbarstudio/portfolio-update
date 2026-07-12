@@ -603,6 +603,39 @@
   /* H1 — Space Mono in caps (replaces the old Bookmania display serif). */
   /* Editorial hero (home) — Bookmania serif, mixed case, tight leading.
      Overrides the base h1 uppercase so the serif reads properly. */
+  /* Hero quick-links: chip pills clustered centre of the right half.
+     Pages in ink, socials in pink; hover inverts to a filled chip. */
+  .hero-pill {
+    font-family: var(--font-mono);
+    font-size: clamp(0.8rem, 1vw, 0.95rem);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.55em 1em;
+    border: 1px solid var(--ink);
+    border-radius: 3px;
+    color: var(--ink);
+    background: transparent;
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+      border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  }
+  .hero-pill:hover,
+  .hero-pill:focus-visible {
+    background: var(--ink);
+    color: var(--bg);
+    transform: translateY(-1px);
+  }
+  .hero-pill-social {
+    border-color: var(--pink);
+    color: var(--pink);
+  }
+  .hero-pill-social:hover,
+  .hero-pill-social:focus-visible {
+    background: var(--pink);
+    color: var(--bg);
+  }
+
   /* Fitted hero title (HeroTitle): each line is scaled to the full measure,
      then rises out of its mask once fitted. */
   .ht { line-height: 1.04; }
