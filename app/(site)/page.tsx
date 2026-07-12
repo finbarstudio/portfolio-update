@@ -5,6 +5,7 @@ import Script from "next/script";
 import Reveal from "@/components/Reveal";
 import HomeIntro from "@/components/HomeIntro";
 import HeroTitle from "@/components/home/HeroTitle";
+import ContactCta from "@/components/ContactCta";
 import SiteWindow from "@/components/home/SiteWindow";
 import WebsiteList, { type Website } from "@/components/home/WebsiteList";
 
@@ -109,18 +110,40 @@ function Hero() {
       {/* Every line fitted to the full measure (footer-wordmark trick):
           edge-to-edge type with normal word spaces, no justify gaps. */}
       <HeroTitle />
-      <Reveal as="div" delay={0.25} className="mt-5 flow-root">
-        <div className="hidden sm:block float-right w-[clamp(280px,27vw,420px)] ml-6 md:ml-10 mb-4">
+      {/* 50/50 under the title: body copy + the cycling window on the left;
+          a two-column nav (pages + socials) on the right, vertically centred
+          in its half and right-aligned. */}
+      <Reveal as="div" delay={0.25} className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
+        <div className="flex flex-col gap-7">
+          <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
+            We design and build websites start to finish, in custom code rather than
+            templates. Based in Brisbane and London, working with businesses anywhere.
+            Before the web work came years of brand and graphic design, and it shows.
+            Identity, print and motion come from the same hand as the code.
+          </p>
           <SiteWindow shots={WINDOW_SHOTS} />
         </div>
-        <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
-          We design and build websites start to finish, in custom code rather than
-          templates. Based in Brisbane and London, working with businesses anywhere.
-          Before the web work came years of brand and graphic design, and it shows.
-          Identity, print and motion come from the same hand as the code.
-        </p>
-        <div className="sm:hidden mt-8">
-          <SiteWindow shots={WINDOW_SHOTS} />
+
+        <div className="flex items-center justify-end">
+          <nav
+            className="grid grid-cols-2 gap-x-12 gap-y-2 text-right"
+            aria-label="Site and social links"
+            style={{ fontSize: "clamp(1rem, 1.3vw, 1.2rem)" }}
+          >
+            <div className="flex flex-col gap-2">
+              <Link href="/work" className="text-ink hover:text-pink transition-colors">Work</Link>
+              <Link href="/about" className="text-ink hover:text-pink transition-colors">About</Link>
+              <Link href="/web-design" className="text-ink hover:text-pink transition-colors">Web design</Link>
+              <Link href="/graphic-design" className="text-ink hover:text-pink transition-colors">Graphic design</Link>
+              <ContactCta className="text-ink hover:text-pink transition-colors text-right cursor-pointer">Contact</ContactCta>
+            </div>
+            <div className="flex flex-col gap-2">
+              <a href="https://instagram.com/finbar.studio" target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors">Instagram</a>
+              <a href="https://linkedin.com/in/finbarskitini" target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors">LinkedIn</a>
+              <a href="https://x.com/finbarstudio" target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors">X</a>
+              <a href="https://are.na/finbar-studio" target="_blank" rel="noopener noreferrer" className="text-ink hover:text-pink transition-colors">Are.na</a>
+            </div>
+          </nav>
         </div>
       </Reveal>
     </section>
