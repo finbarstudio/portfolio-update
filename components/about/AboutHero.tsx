@@ -183,14 +183,15 @@ export default function AboutHero() {
                 {ICON_BATCH[symbol]}
               </text>
             </mask>
-            {/* Pink duotone: map the b&w headshot onto the brand pink (dark
-                shadows -> #e8718b highlights). */}
+            {/* Pink duotone: light and airy. Shadows map to the brand pink
+                (#e8718b), highlights to white, so it reads pink without going
+                dark. */}
             <filter id="ah-pink" x="-40%" y="-40%" width="180%" height="180%" colorInterpolationFilters="sRGB">
               <feColorMatrix
                 type="matrix"
-                values="0.2413 0.4737 0.0920 0 0.102
-                        0.1124 0.2207 0.0429 0 0.067
-                        0.1405 0.2759 0.0536 0 0.075
+                values="0.0272 0.0534 0.0104 0 0.909
+                        0.1665 0.3270 0.0635 0 0.443
+                        0.1360 0.2671 0.0519 0 0.545
                         0      0      0      1 0"
               />
             </filter>
