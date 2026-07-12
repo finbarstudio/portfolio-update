@@ -7,6 +7,7 @@ import ZoomImage from "@/components/ZoomImage";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
 import CardThumb from "@/components/CardThumb";
+import ScrollThumb from "@/components/ScrollThumb";
 import PhoneCarousel from "@/components/PhoneCarousel";
 import MagazineCarousel from "@/components/MagazineCarousel";
 import HeroSlideshow from "@/components/HeroSlideshow";
@@ -71,7 +72,9 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
             text steals from it; the slow reveal lets the mockup ease down to
             fit (brief over-size/clip during the transition is intentional). */}
         <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
-          {project.heroPhones ? (
+          {project.scrollThumb ? (
+            <ScrollThumb src={project.scrollThumb} />
+          ) : project.heroPhones ? (
             <PhoneCarousel
               model={project.heroPhones.model}
               videos={project.heroPhones.videos}
@@ -136,7 +139,9 @@ export function FullCard({ project, index }: { project: Project; index: number }
       >
         {/* Thumbnail — flex:1 so revealed text steals from it, not extends card */}
         <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
-          {project.cardLogo ? (
+          {project.scrollThumb ? (
+            <ScrollThumb src={project.scrollThumb} />
+          ) : project.cardLogo ? (
             <div className="card-logo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={project.cardLogo} alt={`${project.name} logo`} />
@@ -201,7 +206,9 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
       >
         {/* Thumbnail — flex:1 so revealed text steals from it */}
         <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
-          {project.cardStack ? (
+          {project.scrollThumb ? (
+            <ScrollThumb src={project.scrollThumb} />
+          ) : project.cardStack ? (
             <div className="card-stack" aria-hidden="true">
               {project.cardStack.map((src) => (
                 // eslint-disable-next-line @next/next/no-img-element

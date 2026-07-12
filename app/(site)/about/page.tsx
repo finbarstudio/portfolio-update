@@ -33,12 +33,12 @@ const aboutJsonLd = {
 
 const SERVICE_GROUPS = [
   {
-    label: "Brand",
-    items: ["Logo design", "Brand identity & guidelines", "Creative direction"],
-  },
-  {
     label: "Web & digital",
     items: ["Website design & development", "CMS systems", "UI design", "Email (EDM) design"],
+  },
+  {
+    label: "Brand",
+    items: ["Logo design", "Brand identity & guidelines", "Creative direction"],
   },
   {
     label: "Print & artwork",
@@ -65,9 +65,21 @@ const NON_CLIENT_SLUGS = new Set(["palmsmotel", "london-home-show"]);
 // Some projects carry their real client's name rather than the project title.
 const CLIENT_NAME: Record<string, string> = { tmyr: "Share to Buy" };
 
+// Web builds lead the client list (web-first positioning); everything else
+// follows in rank order.
+const WEB_SLUGS = ["lows-design-build", "plated-with-issy", "lola-audio", "kinaya", "momentum-mentoring"];
 const CLIENTS = [...projects]
   .filter((p) => !p.hidden && !NON_CLIENT_SLUGS.has(p.slug))
-  .sort((a, b) => a.rank - b.rank)
+  .sort((a, b) => {
+    const aw = WEB_SLUGS.indexOf(a.slug);
+    const bw = WEB_SLUGS.indexOf(b.slug);
+    if (aw !== -1 || bw !== -1) {
+      if (aw === -1) return 1;
+      if (bw === -1) return -1;
+      return aw - bw; // both web: keep the WEB_SLUGS order
+    }
+    return a.rank - b.rank;
+  })
   .map((p) => CLIENT_NAME[p.slug] ?? p.name);
 
 // Web leads; the design capabilities stay (graphic design roles are still on

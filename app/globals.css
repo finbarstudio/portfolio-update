@@ -1184,18 +1184,17 @@
   .star-loader-track {
     fill: none;
     stroke: color-mix(in srgb, var(--pink) 16%, transparent);
-    stroke-width: 5.5;
+    stroke-width: 2.5;
     stroke-linejoin: round;
   }
   .star-loader-draw {
     fill: none;
     stroke: var(--pink);
-    stroke-width: 5.5;
+    stroke-width: 2.5;
     stroke-linejoin: round;
     stroke-linecap: round;
     stroke-dasharray: 1;
     animation: star-draw 1.5s ease-in-out infinite;
-    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--pink) 60%, transparent));
   }
   @keyframes star-draw {
     0%   { stroke-dashoffset: 1; }
