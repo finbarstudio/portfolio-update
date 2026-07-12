@@ -104,11 +104,11 @@ function FilterChips({ active }: { active?: string }) {
    Featured: full-width. Everything else (full + gallery): 2-col grid.
    When a filter is active, everything drops into the uniform 2-col grid. */
 function WorkGrid({ filter }: { filter?: string }) {
+  // Strictly newest-first. The featured tier is no longer pinned to the top:
+  // an older featured piece leading the archive read as "not sorted by date".
   const sorted = [...projects]
     .filter((p) => !p.hidden && projectMatchesFilter(p, filter))
     .sort(byNewest);
-  const featured = filter ? [] : sorted.filter((p) => p.tier === "featured");
-  const rest = filter ? sorted : sorted.filter((p) => p.tier !== "featured");
 
   let cardIndex = 0;
 
@@ -119,18 +119,9 @@ function WorkGrid({ filter }: { filter?: string }) {
       style={{ paddingBottom: "var(--space-section)" }}
       aria-label="Selected work"
     >
-      {featured.length > 0 && (
-        <div className="grid grid-cols-12 gap-x-8 gap-y-20 md:gap-y-24 mb-20 md:mb-24">
-          {featured.map((project) => {
-            const i = cardIndex++;
-            return <ProjectCard key={project.slug} project={project} index={i} />;
-          })}
-        </div>
-      )}
-
-      {rest.length > 0 ? (
+      {sorted.length > 0 ? (
         <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
-          {rest.map((project) => {
+          {sorted.map((project) => {
             const i = cardIndex++;
             return <ProjectCard key={project.slug} project={project} index={i} />;
           })}
