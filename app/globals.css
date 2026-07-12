@@ -4006,8 +4006,8 @@ body:has(.sb-root) {
 /* ── Full-screen site footer ───────────────────────────────────── */
 .site-footer {
   position: relative;
-  /* Mobile keeps the original full-viewport footer; 50svh is desktop-only
-     (squeezing it on phones crowded the info columns). */
+  /* Mobile + tablet keep the original full-viewport footer; 50svh applies
+     from desktop widths (1024px) up. */
   min-height: 560px;
   height: 100svh;
   display: flex;
@@ -4020,7 +4020,7 @@ body:has(.sb-root) {
   /* Bottom gap is owned by .site-footer-mark (so it can equal the side gutters). */
   padding-bottom: 0;
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .site-footer {
     min-height: 420px;
     height: 50svh;
