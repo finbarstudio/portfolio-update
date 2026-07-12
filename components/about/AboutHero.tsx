@@ -63,53 +63,13 @@ export default function AboutHero() {
     const ctx = gsap.context(() => {
       const chars = gsap.utils.toArray<HTMLElement>(".ah-char");
 
-      // The photo has a transparent background, so the scatter shouldn't clear
-      // its rectangular bounds — it should wrap tight to the silhouette. Sample
-      // the image's alpha into a small grid, then for any direction from the
-      // photo centre find how far the actual pixels reach (the silhouette edge).
-      const GRID = 96;
-      let alphaGrid: Uint8Array | null = null;
-      let gridW = GRID;
-      let gridH = GRID;
-      const img = new Image();
-      img.src = PHOTO_SRC;
-      img.decode().then(() => {
-        gridH = Math.round(GRID * (img.naturalHeight / img.naturalWidth)) || GRID;
-        const cv = document.createElement("canvas");
-        cv.width = gridW; cv.height = gridH;
-        const c2 = cv.getContext("2d", { willReadFrequently: true });
-        if (!c2) return;
-        c2.drawImage(img, 0, 0, gridW, gridH);
-        const data = c2.getImageData(0, 0, gridW, gridH).data;
-        alphaGrid = new Uint8Array(gridW * gridH);
-        for (let i = 0; i < gridW * gridH; i++) alphaGrid[i] = data[i * 4 + 3] > 64 ? 1 : 0;
-      }).catch(() => { /* falls back to radial clearance */ });
-
-      // Furthest opaque pixel from the centre along (ux, uy), in screen px.
-      // pw/ph = the photo's on-screen layout size (offset*, transform-immune).
-      const edgeDist = (ux: number, uy: number, pw: number, ph: number) => {
-        const maxR = Math.hypot(pw, ph) / 2;
-        if (!alphaGrid) return pw / 2; // image not decoded yet: radial fallback
-        const step = Math.max(2, pw / GRID);
-        for (let t = maxR; t > 0; t -= step) {
-          const gx = Math.round(((ux * t) / pw + 0.5) * (gridW - 1));
-          const gy = Math.round(((uy * t) / ph + 0.5) * (gridH - 1));
-          if (gx < 0 || gy < 0 || gx >= gridW || gy >= gridH) continue;
-          if (alphaGrid[gy * gridW + gx]) return t;
-        }
-        return 0;
-      };
-
       // Per-character scatter offsets, from the resting layout, so the photo's
-      // silhouette clears and the wave reads through the whole line.
+      // footprint clears and the wave reads through the whole line.
       const buildScatter = () => {
-        // offsetWidth/offsetHeight + the section centre, because the photo is
-        // gsap-scaled to 0 at rest — its bounding rect is useless here.
-        const s = section.getBoundingClientRect();
-        const cx = s.left + s.width / 2;
-        const cy = s.top + s.height / 2;
-        const pw = photo.offsetWidth;
-        const ph = photo.offsetHeight;
+        const c = photo.getBoundingClientRect();
+        const cx = c.left + c.width / 2;
+        const cy = c.top + c.height / 2;
+        const R = c.width / 2 + PUSH_MARGIN;
         return chars.map((el) => {
           const b = el.getBoundingClientRect();
           const dx = b.left + b.width / 2 - cx;
@@ -117,11 +77,10 @@ export default function AboutHero() {
           const d = Math.hypot(dx, dy) || 1;
           const ux = dx / d;
           const uy = dy / d;
-          const R = edgeDist(ux, uy, pw, ph) + PUSH_MARGIN;
-          const clear = d < R ? R - d + 34 + gsap.utils.random(10, 60) : 0;
-          const shove = 110 * Math.exp(-Math.max(d - R, 0) / 260) + gsap.utils.random(6, 22);
+          const clear = d < R ? R - d + 70 + gsap.utils.random(20, 110) : 0;
+          const shove = 150 * Math.exp(-Math.max(d - R, 0) / 320) + gsap.utils.random(6, 26);
           const out = clear + shove;
-          const side = gsap.utils.random(-0.3, 0.3) * out;
+          const side = gsap.utils.random(-0.35, 0.35) * out;
           return { el, x: ux * out - uy * side, y: uy * out + ux * side, delay: d / WAVE_SPEED };
         });
       };
@@ -145,25 +104,19 @@ export default function AboutHero() {
         ease: "power3.out", immediateRender: false,
       });
 
-      // 2 — photo scales in + scatter. Built lazily on FIRST hover so the
-      //     alpha map has decoded and the offsets wrap the real silhouette.
-      let scatter: gsap.core.Timeline | null = null;
-      const ensureScatter = () => {
-        if (scatter) return scatter;
-        scatter = gsap.timeline({ paused: true });
-        scatter.to(photo, { scale: 1, duration: 0.5, ease: "power2.out" }, 0);
-        buildScatter().forEach((s) => {
-          scatter!.to(s.el, { x: s.x, y: s.y, duration: 1.05, ease: "elastic.out(1, 0.5)" }, s.delay);
-        });
-        return scatter;
-      };
+      // 2 — photo scales in + scatter, paused so hover can reverse it
+      const scatter = gsap.timeline({ paused: true });
+      scatter.to(photo, { scale: 1, duration: 0.5, ease: "power2.out" }, 0);
+      buildScatter().forEach((s) => {
+        scatter.to(s.el, { x: s.x, y: s.y, duration: 1.05, ease: "elastic.out(1, 0.5)" }, s.delay);
+      });
 
       // 3 — plain readable text is the default; hovering the centre zone
       //     ACTIVATES the takeover (photo in, characters scatter), and leaving
       //     reverses back to text. Fixed-size zone + guard so the photo scaling
       //     never causes enter/leave flicker.
-      handlers.enter = () => { if (hovering) return; hovering = true; ensureScatter().timeScale(1).play(); };
-      handlers.leave = () => { if (!hovering) return; hovering = false; scatter?.timeScale(1.6).reverse(); };
+      handlers.enter = () => { if (hovering) return; hovering = true; scatter.timeScale(1).play(); };
+      handlers.leave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1.6).reverse(); };
     }, section);
 
     const enter = () => handlers.enter();
@@ -215,8 +168,8 @@ export default function AboutHero() {
       <div
         ref={photoRef}
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 z-20 pointer-events-none"
-        style={{ width: "clamp(300px, 34vw, 460px)", aspectRatio: PHOTO_ASPECT }}
+        className="absolute left-1/2 top-1/2 z-20 pointer-events-none overflow-hidden"
+        style={{ width: "clamp(300px, 34vw, 460px)", aspectRatio: PHOTO_ASPECT, borderRadius: "50%" }}
       >
         {/* Transparent cutout (whites in the hair fringe pre-mapped to the page
             colour), trimmed to the subject — no box, and the scatter samples
