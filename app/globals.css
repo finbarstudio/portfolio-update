@@ -267,11 +267,11 @@
 
   /* Large type stays tight so display/headings never fragment into loose lines */
   h1, h2, .display { line-height: var(--leading-tight); }
-  /* H1 — Space Mono in caps (replaces the old Bookmania display serif). */
+  /* H1 — Host Grotesk in caps (was Space Mono). */
   h1 {
-    font-family: var(--font-mono);
+    font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
     text-transform: uppercase;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
   h3 { line-height: var(--leading-snug); }
 
@@ -669,10 +669,10 @@
   }
 
   .home-display {
-    font-family: var(--font-mono);
-    font-weight: 700;
+    font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     line-height: 0.98;
     font-size: clamp(2.4rem, 7.5vw, 5.6rem);
     font-kerning: normal;
@@ -680,10 +680,10 @@
   /* H2 — sans (Archivo Narrow), so it reads as a clearly different tier to the
      serif H1. Heavier tracking + a touch smaller line. */
   .home-display-sm {
-    font-family: var(--font-primary);
-    font-weight: 700;
+    font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.01em;
     line-height: 1.0;
     font-size: clamp(1.7rem, 4vw, 2.9rem);
   }
@@ -3704,8 +3704,8 @@ body:has(.sb-root) {
 /* Centred, Space Mono caps, with the icons set inline at the font's x-height. */
 .home-disc {
   text-align: center;
-  font-family: var(--font-mono);
-  font-weight: 700;
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.01em;
   line-height: 1.04;
