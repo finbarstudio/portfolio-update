@@ -4864,8 +4864,8 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* Section titles in the home hero's big display type. */
 .contact-title {
   margin: 0;
-  font-family: var(--font-mono);
-  font-weight: 700;
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.005em;
   line-height: 1.02;
