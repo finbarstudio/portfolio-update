@@ -1095,6 +1095,13 @@
   /* The nav "Contact" tag is a <button> (opens the drawer, no route) — give it the
      link's pointer cursor so it reads as clickable. */
   button.tag { cursor: pointer; }
+  /* Touch devices: the 20px pills are too small to tap reliably. Chunkier
+     padding plus an invisible expanded hit area gets the effective target to
+     ~44px without changing the desktop look. */
+  @media (pointer: coarse) {
+    a.tag, button.tag { position: relative; padding: 0.8em 1em; }
+    a.tag::after, button.tag::after { content: ""; position: absolute; inset: -6px; }
+  }
   /* Numeric tags (dates) — Archivo, since mono numerals read badly. */
   .tag-num     { font-family: var(--font-label); letter-spacing: 0.1em; }
 
@@ -3862,6 +3869,18 @@ body:has(.sb-root) {
 .sf-copyright-pin.is-shown .sf-copyright-inner { transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {
   .sf-copyright-inner { transition: none; transform: translateY(0); }
+}
+
+/* Below the desktop breakpoint the floating clock/copyright pins cross page
+   text while scrolling (no spare margin), so give the UNDOCKED pins a soft
+   ground chip to stay legible. Docked copies sit in the footer and stay bare. */
+@media (max-width: 1023px) {
+  .sf-clock-pin:not(.is-docked) .sf-clock-inner,
+  .sf-copyright-pin:not(.is-docked) .sf-copyright-inner {
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--bg) 88%, transparent);
+    border-radius: 3px;
+  }
 }
 
 /* SB + WC26 shortcuts — the same fixed-pin-that-docks pattern as the copyright, but

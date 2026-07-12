@@ -55,7 +55,7 @@ export default function AboutHero() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let hovering = false;
     const onEnter = () => {};
-    const handlers: { enter: () => void; leave: () => void } = { enter: onEnter, leave: onEnter };
+    const handlers: { enter: () => void; leave: () => void; toggle?: () => void } = { enter: onEnter, leave: onEnter };
 
     // Scoped to the section: ctx.revert() on cleanup restores the natural inline
     // styles (readable text, no transforms), so a Strict-Mode double-invoke or
@@ -117,16 +117,30 @@ export default function AboutHero() {
       //     never causes enter/leave flicker.
       handlers.enter = () => { if (hovering) return; hovering = true; scatter.timeScale(1).play(); };
       handlers.leave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1.6).reverse(); };
+
+      // Touch devices have no hover, so the photo would never appear: after
+      // the intro settles, play the takeover automatically. Tapping the centre
+      // zone then toggles between photo and readable text.
+      if (window.matchMedia("(hover: none)").matches) {
+        gsap.delayedCall(1.4, () => handlers.enter());
+        handlers.toggle = () => { if (hovering) handlers.leave(); else handlers.enter(); };
+      }
     }, section);
 
     const enter = () => handlers.enter();
     const leave = () => handlers.leave();
-    hit.addEventListener("pointerenter", enter);
-    hit.addEventListener("pointerleave", leave);
+    const tap = () => handlers.toggle?.();
+    if (window.matchMedia("(hover: none)").matches) {
+      hit.addEventListener("click", tap);
+    } else {
+      hit.addEventListener("pointerenter", enter);
+      hit.addEventListener("pointerleave", leave);
+    }
 
     return () => {
       hit.removeEventListener("pointerenter", enter);
       hit.removeEventListener("pointerleave", leave);
+      hit.removeEventListener("click", tap);
       ctx.revert();
     };
   }, []);
