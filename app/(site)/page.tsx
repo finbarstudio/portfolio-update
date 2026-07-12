@@ -118,15 +118,19 @@ function Hero() {
       {/* 50/50 under the title: body copy + the cycling window on the left;
           a two-column nav (pages + socials) on the right, vertically centred
           in its half and right-aligned. */}
-      <Reveal as="div" delay={0.25} className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
-        <div className="flex flex-col gap-7">
-          <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)" }}>
-            We design and build websites start to finish, in custom code rather than
-            templates. Based in Brisbane and London, working with businesses anywhere.
-            Before the web work came years of brand and graphic design, and it shows.
-            Identity, print and motion come from the same hand as the code.
-          </p>
-          <SiteWindow shots={WINDOW_SHOTS} />
+      {/* Bio directly under the title: full width, sized to hold two lines. */}
+      <Reveal as="p" delay={0.2} className="text-ink leading-snug" style={{ fontSize: "clamp(0.95rem, 1.32vw, 1.22rem)" }}>
+        We design and build websites start to finish, in custom code rather than
+        templates. Based in Brisbane and London, working with businesses anywhere.
+        Before the web work came years of brand and graphic design, and it shows.
+        Identity, print and motion come from the same hand as the code.
+      </Reveal>
+
+      <Reveal as="div" delay={0.3} className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
+        <div className="flex items-center">
+          <div className="w-full">
+            <SiteWindow shots={WINDOW_SHOTS} />
+          </div>
         </div>
 
         <div className="flex items-center justify-center">
