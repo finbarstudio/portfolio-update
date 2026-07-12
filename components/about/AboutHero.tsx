@@ -52,35 +52,21 @@ export default function AboutHero() {
     const chars = Array.from(section.querySelectorAll<HTMLElement>(".ah-char"));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Radial push for every char whose box intersects the circle's final
-    // footprint. Measured from resting layout, so run before any transforms.
-    const computePushes = () => {
+    if (reduce) {
+      gsap.set(chars, { opacity: 1, yPercent: 0 });
+      gsap.set(circle, { scale: 1, opacity: 1 });
       const c = circle.getBoundingClientRect();
       const cx = c.left + c.width / 2;
       const cy = c.top + c.height / 2;
       const R = c.width / 2 + PUSH_MARGIN;
-      return chars.map((el) => {
+      chars.forEach((el) => {
         const b = el.getBoundingClientRect();
-        const ex = b.left + b.width / 2;
-        const ey = b.top + b.height / 2;
-        const dx = ex - cx;
-        const dy = ey - cy;
+        const dx = b.left + b.width / 2 - cx;
+        const dy = b.top + b.height / 2 - cy;
         const d = Math.hypot(dx, dy) || 1;
-        if (d >= R) return null;
-        const out = R - d;
-        return {
-          el,
-          x: (dx / d) * out,
-          y: (dy / d) * out,
-          r: gsap.utils.random(-9, 9), // a touch of scatter
-        };
-      }).filter(Boolean) as { el: HTMLElement; x: number; y: number; r: number }[];
-    };
-
-    if (reduce) {
-      gsap.set(chars, { opacity: 1, yPercent: 0 });
-      gsap.set(circle, { scale: 1, opacity: 1 });
-      computePushes().forEach((p) => gsap.set(p.el, { x: p.x, y: p.y }));
+        const out = (d < R ? R - d + 90 : 0) + 130 * Math.exp(-(Math.max(d - R, 0)) / 320);
+        gsap.set(el, { x: (dx / d) * out, y: (dy / d) * out });
+      });
       return;
     }
 
@@ -106,9 +92,9 @@ export default function AboutHero() {
       const cx = c.left + c.width / 2;
       const cy = c.top + c.height / 2;
       const R = c.width / 2 + PUSH_MARGIN;
-      const WAVE_SPEED = 1600; // px per second
+      const WAVE_SPEED = 1500; // px per second
       const grow = gsap.timeline();
-      grow.to(circle, { scale: 1, duration: 0.55, ease: "power2.out" }, 0);
+      grow.to(circle, { scale: 1, duration: 0.5, ease: "power2.out" }, 0);
       chars.forEach((el) => {
         const b = el.getBoundingClientRect();
         const dx = b.left + b.width / 2 - cx;
@@ -116,23 +102,28 @@ export default function AboutHero() {
         const d = Math.hypot(dx, dy) || 1;
         const ux = dx / d;
         const uy = dy / d;
+        // tangential unit vector for sideways scatter
+        const tx = -uy;
+        const ty = ux;
         const delay = d / WAVE_SPEED;
-        if (d < R) {
-          // inside the impact zone: shoved out past the rim, springs into place
-          const out = R - d;
-          grow.to(
-            el,
-            { x: ux * out, y: uy * out, duration: 1.05, ease: "elastic.out(1, 0.55)" },
-            delay
-          );
-        } else {
-          // beyond the rim: the wave passes through, a decaying kick then home
-          const kick = 30 * Math.exp(-(d - R) / 260);
-          if (kick < 1.5) return;
-          grow
-            .to(el, { x: ux * kick, y: uy * kick, duration: 0.16, ease: "power2.out" }, delay)
-            .to(el, { x: 0, y: 0, duration: 0.9, ease: "elastic.out(1, 0.45)" }, delay + 0.16);
-        }
+        // Every character clears out and STAYS out: the ones over the face are
+        // blasted well past the rim; the rest shove outward with a strength
+        // that decays with distance. A random tangential component scatters
+        // them so the explosion reads organic, not geometric.
+        const clear = d < R ? R - d + 70 + gsap.utils.random(20, 110) : 0;
+        const shove = 150 * Math.exp(-(Math.max(d - R, 0)) / 320) + gsap.utils.random(6, 26);
+        const outAmt = clear + shove;
+        const side = gsap.utils.random(-0.35, 0.35) * outAmt;
+        grow.to(
+          el,
+          {
+            x: ux * outAmt + tx * side,
+            y: uy * outAmt + ty * side,
+            duration: 1.1,
+            ease: "elastic.out(1, 0.5)",
+          },
+          delay
+        );
       });
     }, ">+0.15");
 
@@ -156,8 +147,6 @@ export default function AboutHero() {
         style={{
           width: "clamp(270px, 32vw, 430px)",
           aspectRatio: "1 / 1",
-          background: "var(--surface-sunken)",
-          border: "1px solid var(--line)",
           opacity: 0, // GSAP takes over immediately; avoids a pre-hydration flash
         }}
       >
