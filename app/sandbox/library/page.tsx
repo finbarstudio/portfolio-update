@@ -8,7 +8,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-const EFFECTS = [{ title: "Drum Credits", href: "/library/drum-credits" }];
+const EFFECTS = [
+  { title: "Drum Credits", href: "/library/drum-credits" },
+  { title: "Lens Test", href: "/library/lens-test" },
+];
 
 export default function LibraryPage() {
   return (

@@ -41,7 +41,15 @@ export default function SandboxHome() {
     const ctx = canvas.getContext("2d");
     const buf = document.createElement("canvas");
     const bctx = buf.getContext("2d");
-    if (!ctx || !bctx) return;
+    // Lens buffers (hover fisheye): crisp full-res scene + two warp passes.
+    const crisp = document.createElement("canvas");
+    const crispCtx = crisp.getContext("2d");
+    const LENS_N = 440;
+    const lensP1 = document.createElement("canvas");
+    const lensC1 = lensP1.getContext("2d");
+    const lensP2 = document.createElement("canvas");
+    const lensC2 = lensP2.getContext("2d");
+    if (!ctx || !bctx || !crispCtx || !lensC1 || !lensC2) return;
 
     const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
     let reduce = mq?.matches ?? false;
@@ -171,15 +179,47 @@ export default function SandboxHome() {
       ctx.fillStyle = BG; ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(buf, 0, 0, bw, bh, 0, 0, canvas.width, canvas.height);
 
-      // Cursor decode-lens: a crisp circular window (drawn at full res) that always
-      // shows the real wordmark through the pixelation, with a pink focus ring.
+      // Cursor lens: a clean-fisheye magnifier (the "01 clean fisheye" look from
+      // the library's lens test — k=0.3 barrel warp, 2× zoom) over the CRISP
+      // wordmark, so hovering focuses AND magnifies through the pixelation.
       if (ptr.active && !reduce) {
         const R = Math.max(96, W * 0.13);
+        // 1 — crisp scene at CSS resolution.
+        if (crisp.width !== W || crisp.height !== H) { crisp.width = W; crisp.height = H; }
+        crispCtx.setTransform(1, 0, 0, 1, 0, 0);
+        crispCtx.fillStyle = BG; crispCtx.fillRect(0, 0, W, H);
+        compose(crispCtx, now, 1, W * 2, false, -1);
+
+        // 2 — two-pass barrel resample of the R-radius square around the
+        //     cursor (source radius R/2 → 2× magnification).
+        const k = 0.3;
+        const warp = (x: number) => x * (1 - k + k * x * x);
+        const half = R / 2;
+        if (lensP1.width !== LENS_N) { lensP1.width = LENS_N; lensP1.height = LENS_N; lensP2.width = LENS_N; lensP2.height = LENS_N; }
+        lensC1.clearRect(0, 0, LENS_N, LENS_N);
+        const srcY = ptr.y - half, srcH = half * 2;
+        for (let e = 0; e < LENS_N; e++) {
+          const t0 = warp(e / (LENS_N / 2) - 1);
+          const t1 = warp((e + 1) / (LENS_N / 2) - 1);
+          const x0 = ptr.x + half * t0;
+          const x1 = ptr.x + half * t1;
+          lensC1.drawImage(crisp, x0, srcY, Math.max(x1 - x0, 0.01), srcH, e, 0, 1, LENS_N);
+        }
+        lensC2.fillStyle = BG; lensC2.fillRect(0, 0, LENS_N, LENS_N);
+        for (let e = 0; e < LENS_N; e++) {
+          const t0 = warp(e / (LENS_N / 2) - 1);
+          const t1 = warp((e + 1) / (LENS_N / 2) - 1);
+          const y0 = ((t0 + 1) / 2) * LENS_N;
+          const y1 = ((t1 + 1) / 2) * LENS_N;
+          lensC2.drawImage(lensP1, 0, y0, LENS_N, Math.max(y1 - y0, 0.01), 0, e, LENS_N, 1);
+        }
+
+        // 3 — clip the circle, draw the warped glass, pink focus ring.
         ctx.save();
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.beginPath(); ctx.arc(ptr.x, ptr.y, R, 0, Math.PI * 2); ctx.clip();
-        ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
-        compose(ctx, now, 1, W * 2, false, -1);
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(lensP2, ptr.x - R, ptr.y - R, R * 2, R * 2);
         ctx.restore();
         ctx.save();
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
