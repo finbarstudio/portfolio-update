@@ -1,24 +1,23 @@
 "use client";
 
 /**
- * AboutHero — the "Nice to meet you" statement with the headshot masked into a
- * cycling brand symbol, centred over the type.
+ * AboutHero — the "Nice to meet you" statement with an isolated photo of Finbar
+ * centred over the type.
  *
  *   1. The statement's characters rise in and the page rests as plain text.
- *   2. HOVERING the centre zone activates the takeover: the symbol (headshot
- *      clipped inside it) scales in and a wave scatters the characters out of
- *      its footprint (translate only). Leaving reverses back to plain text.
- *   3. The mask cycles through the brand icon batch with instant swaps,
- *      the same glyphs (and feel) as the statement's hovering inline icons.
- *   The hover target is a fixed-size zone, so the symbol scaling can't make
- *   the pointer flicker on and off it.
+ *   2. HOVERING the centre zone activates the takeover: the photo (a regular
+ *      head-and-shoulders cut-out on a transparent background) scales in and a
+ *      wave scatters the characters out of its footprint (translate only).
+ *      Leaving reverses back to plain text.
+ *   The hover target is a fixed-size zone, so the photo scaling can't make the
+ *   pointer flicker on and off it.
  *
- * Reduced motion: readable statement, symbol hidden, no animation.
+ * Reduced motion: readable statement, photo hidden, no animation.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import InlineIcon, { ICON_BATCH } from "@/components/InlineIcon";
+import InlineIcon from "@/components/InlineIcon";
 
 type Token = { word?: string; icon?: string; pink?: boolean };
 const TOKENS: Token[] = [
@@ -36,18 +35,13 @@ const TOKENS: Token[] = [
   { icon: "♡" },
 ];
 
-// The headshot masks into the same brand icon batch the statement's inline
-// icons reel through (InlineIcon.ICON_BATCH).
-
-const PUSH_MARGIN = 28;   // px of clearance beyond the symbol's edge
+const PUSH_MARGIN = 28;   // px of clearance beyond the photo's edge
 const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
-const MASK_ID = "ah-symbol-mask";
 
 export default function AboutHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const photoRef = useRef<HTMLDivElement>(null);   // scatter target (scales in)
   const hitRef = useRef<HTMLDivElement>(null);      // fixed-size hover zone
-  const [symbol, setSymbol] = useState(0);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -55,74 +49,82 @@ export default function AboutHero() {
     const hit = hitRef.current;
     if (!section || !photo || !hit) return;
 
-    const chars = Array.from(section.querySelectorAll<HTMLElement>(".ah-char"));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    // Per-character scatter offsets, from the resting layout, so the symbol's
-    // footprint clears and the wave reads through the whole line.
-    const buildScatter = () => {
-      const c = photo.getBoundingClientRect();
-      const cx = c.left + c.width / 2;
-      const cy = c.top + c.height / 2;
-      const R = c.width / 2 + PUSH_MARGIN;
-      return chars.map((el) => {
-        const b = el.getBoundingClientRect();
-        const dx = b.left + b.width / 2 - cx;
-        const dy = b.top + b.height / 2 - cy;
-        const d = Math.hypot(dx, dy) || 1;
-        const ux = dx / d;
-        const uy = dy / d;
-        const clear = d < R ? R - d + 70 + gsap.utils.random(20, 110) : 0;
-        const shove = 150 * Math.exp(-Math.max(d - R, 0) / 320) + gsap.utils.random(6, 26);
-        const out = clear + shove;
-        const side = gsap.utils.random(-0.35, 0.35) * out;
-        return { el, x: ux * out - uy * side, y: uy * out + ux * side, delay: d / WAVE_SPEED };
-      });
-    };
-
-    if (reduce) {
-      gsap.set(chars, { opacity: 1, yPercent: 0 });
-      gsap.set(photo, { opacity: 0 });
-      return;
-    }
-
-    gsap.set(chars, { opacity: 0, yPercent: 90 });
-    gsap.set(photo, { xPercent: -50, yPercent: -50, scale: 0, opacity: 1, transformOrigin: "center center" });
-
-    // 1 — statement rises in (once, stays)
-    const intro = gsap.timeline({ delay: 0.15 });
-    intro.to(chars, { opacity: 1, yPercent: 0, duration: 0.7, stagger: 0.012, ease: "power3.out" });
-
-    // 2 — symbol scales in + scatter, paused so hover can reverse it
-    const scatter = gsap.timeline({ paused: true });
-    scatter.to(photo, { scale: 1, duration: 0.5, ease: "power2.out" }, 0);
-    buildScatter().forEach((s) => {
-      scatter.to(s.el, { x: s.x, y: s.y, duration: 1.05, ease: "elastic.out(1, 0.5)" }, s.delay);
-    });
-
-    // 3 — cycle the mask symbol: instant swaps through the batch, no flip,
-    //     exactly like the statement icons switching glyphs.
-    const cycle = window.setInterval(() => {
-      setSymbol((i) => (i + 1) % ICON_BATCH.length);
-    }, 1200);
-
-    // 4 — FLIPPED: plain readable text is the default; hovering the centre
-    //     zone ACTIVATES the takeover (symbol in, characters scatter), and
-    //     leaving reverses back to text. Fixed-size zone + guard so the
-    //     symbol scaling never causes enter/leave flicker.
     let hovering = false;
-    const onEnter = () => { if (hovering) return; hovering = true; scatter.timeScale(1).play(); };
-    const onLeave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1.6).reverse(); };
-    hit.addEventListener("pointerenter", onEnter);
-    hit.addEventListener("pointerleave", onLeave);
+    const onEnter = () => {};
+    const handlers: { enter: () => void; leave: () => void } = { enter: onEnter, leave: onEnter };
+
+    // Scoped to the section: ctx.revert() on cleanup restores the natural inline
+    // styles (readable text, no transforms), so a Strict-Mode double-invoke or
+    // an HMR teardown can never leave the statement stuck invisible.
+    const ctx = gsap.context(() => {
+      const chars = gsap.utils.toArray<HTMLElement>(".ah-char");
+
+      // Per-character scatter offsets, from the resting layout, so the photo's
+      // footprint clears and the wave reads through the whole line.
+      const buildScatter = () => {
+        const c = photo.getBoundingClientRect();
+        const cx = c.left + c.width / 2;
+        const cy = c.top + c.height / 2;
+        const R = c.width / 2 + PUSH_MARGIN;
+        return chars.map((el) => {
+          const b = el.getBoundingClientRect();
+          const dx = b.left + b.width / 2 - cx;
+          const dy = b.top + b.height / 2 - cy;
+          const d = Math.hypot(dx, dy) || 1;
+          const ux = dx / d;
+          const uy = dy / d;
+          const clear = d < R ? R - d + 70 + gsap.utils.random(20, 110) : 0;
+          const shove = 150 * Math.exp(-Math.max(d - R, 0) / 320) + gsap.utils.random(6, 26);
+          const out = clear + shove;
+          const side = gsap.utils.random(-0.35, 0.35) * out;
+          return { el, x: ux * out - uy * side, y: uy * out + ux * side, delay: d / WAVE_SPEED };
+        });
+      };
+
+      if (reduce) {
+        gsap.set(photo, { xPercent: -50, yPercent: -50, opacity: 0 });
+        return;
+      }
+
+      gsap.set(photo, { xPercent: -50, yPercent: -50, scale: 0, opacity: 1, transformOrigin: "center center" });
+
+      // 1 — statement rises in from below (once, then rests as plain text).
+      //     .from() + immediateRender:false means the DEFAULT is the natural,
+      //     visible layout: the characters are only hidden once the tween
+      //     actually starts ticking, so if the ticker never runs (e.g. an
+      //     unfocused/headless tab) the statement simply stays readable rather
+      //     than stranded invisible.
+      const intro = gsap.timeline();
+      intro.from(chars, {
+        opacity: 0, yPercent: 90, duration: 0.7, stagger: 0.012,
+        ease: "power3.out", immediateRender: false,
+      });
+
+      // 2 — photo scales in + scatter, paused so hover can reverse it
+      const scatter = gsap.timeline({ paused: true });
+      scatter.to(photo, { scale: 1, duration: 0.5, ease: "power2.out" }, 0);
+      buildScatter().forEach((s) => {
+        scatter.to(s.el, { x: s.x, y: s.y, duration: 1.05, ease: "elastic.out(1, 0.5)" }, s.delay);
+      });
+
+      // 3 — plain readable text is the default; hovering the centre zone
+      //     ACTIVATES the takeover (photo in, characters scatter), and leaving
+      //     reverses back to text. Fixed-size zone + guard so the photo scaling
+      //     never causes enter/leave flicker.
+      handlers.enter = () => { if (hovering) return; hovering = true; scatter.timeScale(1).play(); };
+      handlers.leave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1.6).reverse(); };
+    }, section);
+
+    const enter = () => handlers.enter();
+    const leave = () => handlers.leave();
+    hit.addEventListener("pointerenter", enter);
+    hit.addEventListener("pointerleave", leave);
 
     return () => {
-      clearInterval(cycle);
-      hit.removeEventListener("pointerenter", onEnter);
-      hit.removeEventListener("pointerleave", onLeave);
-      intro.kill();
-      scatter.kill();
-      gsap.killTweensOf([photo, ...chars]);
+      hit.removeEventListener("pointerenter", enter);
+      hit.removeEventListener("pointerleave", leave);
+      ctx.revert();
     };
   }, []);
 
@@ -159,66 +161,20 @@ export default function AboutHero() {
         ))}
       </h1>
 
-      {/* Headshot masked into the current symbol, centred over the type. */}
+      {/* Isolated head-and-shoulders photo, centred over the type. */}
       <div
         ref={photoRef}
         aria-hidden="true"
         className="absolute left-1/2 top-1/2 z-20 pointer-events-none"
-        style={{ width: "clamp(280px, 32vw, 440px)", aspectRatio: "1 / 1" }}
+        style={{ width: "clamp(300px, 34vw, 460px)", aspectRatio: "1 / 1" }}
       >
-        <svg viewBox="0 0 100 100" className="w-full h-full" style={{ overflow: "visible" }}>
-          <defs>
-            {/* Generous mask region so wide/tall glyphs are never clipped. */}
-            <mask id={MASK_ID} maskUnits="userSpaceOnUse" x="-40" y="-40" width="180" height="180">
-              <rect x="-40" y="-40" width="180" height="180" fill="#000" />
-              <text
-                x="50"
-                y="52"
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill="#fff"
-                fontSize="90"
-                style={{ fontFamily: "var(--font-dingbat), sans-serif" }}
-              >
-                {ICON_BATCH[symbol]}
-              </text>
-            </mask>
-            {/* Thresholded pink: the headshot is posterised to two tones and
-                mapped onto the brand pink — dark -> pink #e8718b, light ->
-                near-white pink. A crisp two-colour portrait, not washed out. */}
-            <filter id="ah-pink" x="-40%" y="-40%" width="180%" height="180%" colorInterpolationFilters="sRGB">
-              <feColorMatrix
-                type="matrix"
-                values="0.299 0.587 0.114 0 0
-                        0.299 0.587 0.114 0 0
-                        0.299 0.587 0.114 0 0
-                        0     0     0     1 0"
-              />
-              <feComponentTransfer>
-                <feFuncR type="discrete" tableValues="0 0 0 0 0 0 0 1 1 1" />
-                <feFuncG type="discrete" tableValues="0 0 0 0 0 0 0 1 1 1" />
-                <feFuncB type="discrete" tableValues="0 0 0 0 0 0 0 1 1 1" />
-              </feComponentTransfer>
-              <feColorMatrix
-                type="matrix"
-                values="0.071 0 0 0 0.909
-                        0.487 0 0 0 0.443
-                        0.395 0 0 0 0.545
-                        0     0 0 1 0"
-              />
-            </filter>
-          </defs>
-          <image
-            href="/images/about/finbar-full.webp"
-            x="-40"
-            y="-40"
-            width="180"
-            height="180"
-            preserveAspectRatio="xMidYMid slice"
-            mask={`url(#${MASK_ID})`}
-            filter="url(#ah-pink)"
-          />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/about/finbar-cutout.webp"
+          alt="Finbar"
+          className="w-full h-full"
+          style={{ objectFit: "contain" }}
+        />
       </div>
 
       {/* Fixed-size hover zone: never scales, so no enter/leave flicker. */}
