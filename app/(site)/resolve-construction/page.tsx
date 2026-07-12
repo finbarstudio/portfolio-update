@@ -105,7 +105,7 @@ export default function ResolvePitchPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
           {STATS.map((s) => (
             <div key={s.label} className="border-t border-line pt-5">
-              <p className="text-pink font-mono leading-none" style={{ fontSize: "clamp(2.8rem, 6vw, 4.5rem)" }}>
+              <p className="text-pink leading-none" style={{ fontSize: "clamp(2.8rem, 6vw, 4.5rem)" }}>
                 {s.value}
               </p>
               <p className="mono-label text-ink mt-3 mb-2">{s.label}</p>

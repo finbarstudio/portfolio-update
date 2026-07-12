@@ -35,7 +35,7 @@
      │  To swap: change the fallback or load a new font in    │
      │  layout.tsx and update the var() reference here.       │
      └─────────────────────────────────────────────────────────┘ */
-  --font-primary: var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
+  --font-primary: var(--font-host), "Host Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-label:   var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
   /* Display serif for H1 — Bookmania, loaded from Adobe Fonts (Typekit). */
   --font-display: "bookmania", Georgia, "Times New Roman", serif;
@@ -4320,7 +4320,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 .wc-hero-title {
   margin: 0;
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--font-host), "Host Grotesk", sans-serif;
   text-transform: uppercase;
   letter-spacing: -0.03em;
   line-height: 0.82;

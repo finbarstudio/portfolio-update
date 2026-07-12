@@ -135,7 +135,7 @@ export default function ARolleyPitchPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10">
           {STATS.map((s) => (
             <div key={s.label} className="border-t border-line pt-5">
-              <p className="text-pink font-mono leading-none" style={{ fontSize: "clamp(2rem, 4.5vw, 3.4rem)" }}>
+              <p className="text-pink leading-none" style={{ fontSize: "clamp(2rem, 4.5vw, 3.4rem)" }}>
                 {s.value}
               </p>
               <p className="mono-label text-ink mt-3 mb-2">{s.label}</p>
