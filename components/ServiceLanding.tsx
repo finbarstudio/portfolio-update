@@ -21,14 +21,28 @@ export type ServiceLandingProps = {
   serviceName: string;    // schema Service name
   description: string;    // meta + schema description
   terms: string[];        // category terms a project must match to show
+  excludeSlugs?: string[]; // projects to keep off this page (e.g. web off graphic)
+};
+
+// Whole-word term match (so "ui" doesn't match "guidelines").
+const matchesTerms = (project: { categories: string[] }, terms: string[]) => {
+  const hay = project.categories.join(" ").toLowerCase();
+  return terms.some((t) => new RegExp(`\\b${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(hay));
+};
+
+// Newest year mentioned in a date ("2023 to 2026" -> 2026), for sorting.
+const newestYear = (date: string) => {
+  const years = (date.match(/\d{4}/g) ?? []).map(Number);
+  return years.length ? Math.max(...years) : 0;
 };
 
 export default function ServiceLanding({
-  slug, label, heading, intro, serviceName, description, terms,
+  slug, label, heading, intro, serviceName, description, terms, excludeSlugs = [],
 }: ServiceLandingProps) {
+  const exclude = new Set(excludeSlugs);
   const matched = [...projects]
-    .filter((p) => !p.hidden && terms.some((t) => p.categories.join(" ").toLowerCase().includes(t)))
-    .sort((a, b) => a.rank - b.rank);
+    .filter((p) => !p.hidden && !exclude.has(p.slug) && matchesTerms(p, terms))
+    .sort((a, b) => newestYear(b.date) - newestYear(a.date) || a.rank - b.rank);
 
   const jsonLd = {
     "@context": "https://schema.org",

@@ -27,6 +27,7 @@ export default function GraphicDesignPage() {
       description="Brisbane graphic design. Brand identity, logos, editorial, print and art direction for businesses across Australia and the UK."
       intro="Graphic design is the core of the studio. Brand identities, logos, editorial and print, packaging and art direction for clients in Brisbane, around Australia and in the UK. Below is a selection of graphic design work spanning identity systems, publications and campaigns."
       terms={["brand", "publication", "print", "editorial", "infographic", "information", "art direction", "cover", "packaging"]}
+      excludeSlugs={["lows-design-build", "plated-with-issy", "lola-audio", "kinaya", "momentum-mentoring"]}
     />
   );
 }

@@ -4,14 +4,14 @@ import ServiceLanding from "@/components/ServiceLanding";
 const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
-  title: { absolute: "Brisbane Web Design | Finbar Studio" },
+  title: { absolute: "Brisbane Web Design & Development | Finbar Studio" },
   description:
-    "Brisbane web design. Brand-led websites, Framer builds, CMS and UI design for businesses across Australia and the UK. See selected web projects.",
+    "Brisbane web design and development. Custom-coded, brand-led websites with a CMS clients run themselves, for businesses across Australia and the UK. See selected web projects.",
   alternates: { canonical: "/web-design" },
   openGraph: {
-    title: "Brisbane Web Design | Finbar Studio",
+    title: "Brisbane Web Design & Development | Finbar Studio",
     description:
-      "Brand-led websites, Framer builds, CMS and UI design from a Brisbane studio. Selected web projects.",
+      "Custom-coded, brand-led websites with a CMS you run yourself, from a Brisbane studio. Selected web projects.",
     url: `${SITE_URL}/web-design`,
     type: "website",
   },
@@ -22,10 +22,10 @@ export default function WebDesignPage() {
     <ServiceLanding
       slug="web-design"
       label="Service · Brisbane"
-      heading="Brisbane web design"
-      serviceName="Web Design"
-      description="Brisbane web design. Brand-led websites, Framer builds, CMS and UI design for businesses across Australia and the UK."
-      intro="I design and build websites for businesses in Brisbane and across Australia. That means brand-led sites with a clean, fast front end, content systems clients can run themselves, and the same care for type and detail that goes into the identity work. Below is a selection of web and UI projects, from full Framer builds to product interfaces."
+      heading="Brisbane web design & development"
+      serviceName="Web Design & Development"
+      description="Brisbane web design and development. Custom-coded, brand-led websites with a CMS clients run themselves, for businesses across Australia and the UK."
+      intro="I design and build websites for businesses in Brisbane and across Australia. Mostly custom-coded: hand-built front ends that load fast and behave exactly how they were drawn, wired into a CMS the client runs themselves after launch. Where they earn their place, I build the extras in too, like instant estimate tools and live social feeds. It starts with the brand, from the first sketch, and the same care for type and detail carries through to the code."
       terms={["web", "ui", "framer"]}
     />
   );
