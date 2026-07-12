@@ -13,9 +13,8 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
 const LINES: { text: string; indent?: boolean }[] = [
-  { text: "A boutique web", indent: true },
-  { text: "development studio" },
-  { text: "with a designer’s eye." },
+  { text: "A boutique web development", indent: true },
+  { text: "studio with a designer’s eye." },
 ];
 
 // Indent as a fraction of the measure (line 1 only).
