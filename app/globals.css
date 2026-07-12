@@ -3456,6 +3456,36 @@ body:has(.sb-root) {
   .sb-lens-stage { width: 100%; height: min(56dvh, calc(100dvh - 300px)); }
 }
 
+/* ─── Library: ASCII imagery ─────────────────────────────────────
+   Control strip above a full-width canvas stage; the ASCII render happens
+   in AsciiLab.tsx. Buttons share the lens picker's pill language. */
+.sb-ascii-lab { display: flex; flex-direction: column; gap: 14px; }
+.sb-ascii-controls { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; }
+.sb-ascii-group { display: flex; align-items: center; gap: 4px; }
+.sb-ascii-key {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-soft); margin-right: 6px; white-space: nowrap;
+}
+.sb-ascii-group button {
+  appearance: none; background: none; border: 1px solid transparent; border-radius: 999px;
+  padding: 4px 11px; font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; white-space: nowrap; color: var(--ink);
+}
+.sb-ascii-group button:hover { border-color: var(--ink); }
+.sb-ascii-group button.on { background: var(--ink); color: var(--bg); }
+.sb-ascii-group input[type="range"] { width: 130px; accent-color: var(--pink); }
+.sb-ascii-stage {
+  position: relative; width: 100%;
+  height: min(68dvh, calc(100dvh - 280px)); min-height: 320px;
+  background: var(--bg); border: 1px solid var(--sb-line); overflow: hidden;
+}
+.sb-ascii-stage canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; display: block;
+}
+
 /* ── Tool layout ─────────────────────────────────────────── */
 .sb-tool-head { margin-bottom: clamp(22px, 2.4vw, 32px); display: flex; flex-direction: column; gap: 7px; }
 .sb-tool-title { font-family: var(--font-mono); font-size: clamp(15px, 1.6vw, 17px); text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink); margin: 0; line-height: 1; }

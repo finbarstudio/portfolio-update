@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const EFFECTS = [
   { title: "Drum Credits", href: "/library/drum-credits" },
   { title: "Lens Test", href: "/library/lens-test" },
+  { title: "ASCII Imagery", href: "/library/ascii" },
 ];
 
 export default function LibraryPage() {
