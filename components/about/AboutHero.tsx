@@ -35,9 +35,7 @@ const TOKENS: Token[] = [
   { icon: "♡" },
 ];
 
-// Negative margin: the scatter clears LESS than the photo's radius, so the
-// headshot edge overlaps the nearest characters — deliberate.
-const PUSH_MARGIN = -48;
+const PUSH_MARGIN = 28;   // px of clearance beyond the photo's edge
 const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
 // Transparent cutout, trimmed to the subject's real bounds (900x858).
 const PHOTO_SRC = "/images/about/finbar-hero.webp";
@@ -79,7 +77,7 @@ export default function AboutHero() {
           const d = Math.hypot(dx, dy) || 1;
           const ux = dx / d;
           const uy = dy / d;
-          const clear = d < R ? R - d + 40 + gsap.utils.random(10, 70) : 0;
+          const clear = d < R ? R - d + 70 + gsap.utils.random(20, 110) : 0;
           const shove = 150 * Math.exp(-Math.max(d - R, 0) / 320) + gsap.utils.random(6, 26);
           const out = clear + shove;
           const side = gsap.utils.random(-0.35, 0.35) * out;
