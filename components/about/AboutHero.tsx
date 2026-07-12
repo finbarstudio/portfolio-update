@@ -168,9 +168,11 @@ export default function AboutHero() {
         className="absolute left-1/2 top-1/2 z-20 pointer-events-none"
         style={{ width: "clamp(300px, 34vw, 460px)", aspectRatio: "1 / 1" }}
       >
+        {/* Background is baked to the page colour (#FDF9F9), so the photo sits
+            seamlessly with no cut-out halo around the hair. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/about/finbar-cutout.webp"
+          src="/images/about/finbar-hero.webp"
           alt="Finbar"
           className="w-full h-full"
           style={{ objectFit: "contain" }}

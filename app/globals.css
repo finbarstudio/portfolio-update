@@ -4222,7 +4222,10 @@ body:has(.sb-root) {
 /* The 🫂 contact glyph (Noto Sans Symbols 2). Button reset + sized to sit with
    the social marks. */
 .top-nav-hug {
-  height: auto;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   padding: 0;
   background: none;
@@ -4230,6 +4233,14 @@ body:has(.sb-root) {
   font-family: var(--font-dingbat), system-ui, sans-serif;
   font-size: 15px;
   line-height: 1;
+}
+/* The 🫂 glyph's ink rides ~1px high and carries a large right side-bearing, so
+   it reads as high + over-padded next to the SVG marks. Nudge the ink down and
+   right to optically centre it in its slot. */
+.top-nav-hug span {
+  display: block;
+  line-height: 1;
+  transform: translate(2px, 1px);
 }
 /* Per-icon optical tuning: the solid brand glyphs read heavier than the outline
    mail/phone, so trim them down. */
