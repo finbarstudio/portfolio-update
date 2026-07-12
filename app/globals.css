@@ -4006,8 +4006,10 @@ body:has(.sb-root) {
 /* ── Full-screen site footer ───────────────────────────────────── */
 .site-footer {
   position: relative;
-  min-height: 420px;
-  height: 50svh;
+  /* Mobile keeps the original full-viewport footer; 50svh is desktop-only
+     (squeezing it on phones crowded the info columns). */
+  min-height: 560px;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   overflow: hidden;          /* clips the wordmark along the bottom */
@@ -4017,6 +4019,12 @@ body:has(.sb-root) {
   padding-top: calc(var(--menubar-h) + 6px);
   /* Bottom gap is owned by .site-footer-mark (so it can equal the side gutters). */
   padding-bottom: 0;
+}
+@media (min-width: 768px) {
+  .site-footer {
+    min-height: 420px;
+    height: 50svh;
+  }
 }
 .site-footer-rule {
   height: 1px;
