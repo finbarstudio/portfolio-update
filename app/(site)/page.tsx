@@ -74,7 +74,10 @@ const WEBSITES: Website[] = [
   },
 ];
 
-const WINDOW_SHOTS = WEBSITES.map((w) => ({ src: w.images[0], label: w.name }));
+// Only the strongest three cycle in the hero window; KinAya + Momentum stay
+// in the list (always at the bottom of the stack) but out of the featured shots.
+const WINDOW_SLUGS = new Set(["lows-design-build", "plated-with-issy", "lola-audio"]);
+const WINDOW_SHOTS = WEBSITES.filter((w) => WINDOW_SLUGS.has(w.slug)).map((w) => ({ src: w.images[0], label: w.name }));
 
 function HomeJsonLd() {
   const jsonLd = {
