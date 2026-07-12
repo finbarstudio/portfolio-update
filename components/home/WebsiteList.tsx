@@ -43,13 +43,6 @@ export default function WebsiteList({ sites }: { sites: Website[] }) {
               <span className="flex items-baseline gap-5 shrink-0">
                 <span className="mono-label text-ink-soft hidden sm:inline">{domain}</span>
                 <span className="meta-mono text-ink-soft" style={{ fontSize: "0.6875rem" }}>{w.year}</span>
-                <span
-                  aria-hidden="true"
-                  className={`mono-label text-ink-soft transition-transform duration-300 ${isOpen ? "rotate-45" : ""}`}
-                  style={{ display: "inline-block" }}
-                >
-                  +
-                </span>
               </span>
             </button>
 

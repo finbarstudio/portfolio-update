@@ -145,7 +145,6 @@ function Hero() {
 function Websites() {
   return (
     <Reveal section as="section" className="home-section no-rule px-5 md:px-10 pt-20 md:pt-28 pb-24" aria-label="Websites">
-      <p className="mono-label text-ink-soft mb-6">Websites</p>
       <WebsiteList sites={WEBSITES} />
     </Reveal>
   );
