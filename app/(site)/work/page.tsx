@@ -6,6 +6,15 @@ import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import { WORK_FILTERS, projectMatchesFilter, filterLabel } from "@/content/filters";
 
+// Newest year mentioned in a project's date ("2023 to 2026" -> 2026), for
+// sorting the grid newest-first.
+const newestYear = (date: string) => {
+  const years = (date.match(/\d{4}/g) ?? []).map(Number);
+  return years.length ? Math.max(...years) : 0;
+};
+const byNewest = (a: { date: string; rank: number }, b: { date: string; rank: number }) =>
+  newestYear(b.date) - newestYear(a.date) || a.rank - b.rank;
+
 const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
@@ -97,7 +106,7 @@ function FilterChips({ active }: { active?: string }) {
 function WorkGrid({ filter }: { filter?: string }) {
   const sorted = [...projects]
     .filter((p) => !p.hidden && projectMatchesFilter(p, filter))
-    .sort((a, b) => a.rank - b.rank);
+    .sort(byNewest);
   const featured = filter ? [] : sorted.filter((p) => p.tier === "featured");
   const rest = filter ? sorted : sorted.filter((p) => p.tier !== "featured");
 

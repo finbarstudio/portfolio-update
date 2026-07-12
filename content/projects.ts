@@ -68,7 +68,7 @@ export interface Project {
   outcome: string;
   heroImage: ProjectImage;
   heroVideo?: string;     // WebM for case study hero (looping, muted)
-  scrollThumb?: string;   // full-bleed live-site scroll video used as the /work + card thumbnail
+  webThumb?: string;      // full-bleed website preview still (matches the home page) used as the /work card thumbnail
   images: ProjectImage[];
   hasDepth: boolean;
   depth?: DepthSection[];
@@ -168,7 +168,7 @@ export const projects: Project[] = [
       model: "/models/studio-display/display.gltf",
       video: "/images/kinaya/site-scroll.mp4",
     },
-    scrollThumb: "/images/kinaya/site-scroll.mp4",
+    webThumb: "/images/web/kinaya-1.webp",
     heroImage: { src: "/images/kinaya/desktop.png", alt: "KinAya website desktop view with structured, accessible homepage layout" },
     images: [
       { src: "/images/kinaya/desktop.png", caption: "Home page: structured, readable, accessible layout across viewports.", alt: "KinAya Framer website homepage on desktop with clean navigation and NDIS branding" },
@@ -820,7 +820,7 @@ export const projects: Project[] = [
       model: "/models/studio-display/display.gltf",
       video: "/images/lows-design-build/site-scroll.mp4",
     },
-    scrollThumb: "/images/lows-design-build/site-scroll.mp4",
+    webThumb: "/images/web/lows-1.webp",
     heroImage: {
       src: "/images/lows-design-build/hero.png",
       alt: "Lows Design and Build brand identity, hero composite showing logo and brand applications",
@@ -940,7 +940,7 @@ export const projects: Project[] = [
       model: "/models/studio-display/display.gltf",
       video: "/images/plated-with-issy/site-scroll.mp4",
     },
-    scrollThumb: "/images/plated-with-issy/site-scroll.mp4",
+    webThumb: "/images/web/plated-1.webp",
     heroImage: {
       src: "/images/web/plated-1.webp",
       alt: "Plated with Issy website hero, script wordmark over a candlelit dinner table",
@@ -1051,7 +1051,7 @@ export const projects: Project[] = [
       model: "/models/studio-display/display.gltf",
       video: "/images/lola-audio/site-scroll.mp4",
     },
-    scrollThumb: "/images/lola-audio/site-scroll.mp4",
+    webThumb: "/images/web/lola-1.webp",
     heroImage: {
       src: "/images/web/lola-1.webp",
       alt: "Lola Audio title card, a white sheet of paper with a signature logo between two working mixing-desk faders",
@@ -1123,7 +1123,7 @@ export const projects: Project[] = [
       model: "/models/studio-display/display.gltf",
       video: "/images/momentum-mentoring/site-scroll.mp4",
     },
-    scrollThumb: "/images/momentum-mentoring/site-scroll.mp4",
+    webThumb: "/images/web/momentum-1.webp",
     heroImage: {
       src: "/images/momentum-mentoring/hero.webp",
       alt: "Momentum Mentoring brand identity and website for an NDIS mentoring provider",

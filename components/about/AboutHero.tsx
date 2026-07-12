@@ -183,16 +183,28 @@ export default function AboutHero() {
                 {ICON_BATCH[symbol]}
               </text>
             </mask>
-            {/* Pink duotone: light and airy. Shadows map to the brand pink
-                (#e8718b), highlights to white, so it reads pink without going
-                dark. */}
+            {/* Thresholded pink: the headshot is posterised to two tones and
+                mapped onto the brand pink — dark -> pink #e8718b, light ->
+                near-white pink. A crisp two-colour portrait, not washed out. */}
             <filter id="ah-pink" x="-40%" y="-40%" width="180%" height="180%" colorInterpolationFilters="sRGB">
               <feColorMatrix
                 type="matrix"
-                values="0.0272 0.0534 0.0104 0 0.909
-                        0.1665 0.3270 0.0635 0 0.443
-                        0.1360 0.2671 0.0519 0 0.545
-                        0      0      0      1 0"
+                values="0.299 0.587 0.114 0 0
+                        0.299 0.587 0.114 0 0
+                        0.299 0.587 0.114 0 0
+                        0     0     0     1 0"
+              />
+              <feComponentTransfer>
+                <feFuncR type="discrete" tableValues="0 0 0 0 0 0 0 1 1 1" />
+                <feFuncG type="discrete" tableValues="0 0 0 0 0 0 0 1 1 1" />
+                <feFuncB type="discrete" tableValues="0 0 0 0 0 0 0 1 1 1" />
+              </feComponentTransfer>
+              <feColorMatrix
+                type="matrix"
+                values="0.071 0 0 0 0.909
+                        0.487 0 0 0 0.443
+                        0.395 0 0 0 0.545
+                        0     0 0 1 0"
               />
             </filter>
           </defs>
