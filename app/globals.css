@@ -638,9 +638,13 @@
 
   /* Fitted hero title (HeroTitle): each line is scaled to the full measure,
      then rises out of its mask once fitted. */
-  .ht { line-height: 1.04; }
+  .ht { line-height: 1.06; }
+  /* Descender room: the masks pad below the line box (pulled back with a
+     negative margin so the rhythm doesn't change), and the hidden position
+     clears the padding so no sliver shows before the rise. */
+  .ht .ht-line { padding-bottom: 0.14em; margin-bottom: -0.14em; }
   .ht .ht-inner {
-    transform: translateY(110%);
+    transform: translateY(135%);
     transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .ht.ht-go .ht-inner { transform: translateY(0); }
