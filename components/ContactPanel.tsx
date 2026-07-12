@@ -88,7 +88,8 @@ export default function ContactPanel() {
   return (
     <div className={`contact-panel ${open ? "is-open" : ""}`} aria-hidden={!open}>
       <button className="contact-backdrop" aria-label="Close contact" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
-      <aside className="contact-drawer" role="dialog" aria-modal="true" aria-label="Get in touch">
+      {/* div, not aside: role="dialog" + aria-modal aren't valid on <aside>. */}
+      <div className="contact-drawer" role="dialog" aria-modal="true" aria-label="Get in touch">
         <button ref={closeRef} className="contact-close" aria-label="Close" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)}>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 5l14 14M19 5L5 19" /></svg>
         </button>
@@ -127,7 +128,7 @@ export default function ContactPanel() {
           )}
         </form>
         </div>
-      </aside>
+      </div>
     </div>
   );
 }

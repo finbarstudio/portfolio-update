@@ -1,0 +1,4 @@
+Contact: mailto:finbar@finbar.studio
+Expires: 2027-07-12T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.finbar.studio/.well-known/security.txt

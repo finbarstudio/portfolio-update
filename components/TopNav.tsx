@@ -46,7 +46,7 @@ export default function TopNav() {
       : pathname.startsWith(href) || (href === "/work" && pathname.startsWith("/case-studies/"));
 
   return (
-    <header className="top-nav" role="banner">
+    <header className="top-nav">
       <nav className="top-nav-inner" aria-label="Primary">
         {items.map((it) => (
           <Link

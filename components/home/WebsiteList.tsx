@@ -27,24 +27,28 @@ export default function WebsiteList({ sites }: { sites: Website[] }) {
         const domain = w.url.replace(/^https?:\/\/(www\.)?/, "");
         return (
           <article key={w.slug} className="border-t border-line">
-            <button
-              type="button"
-              onClick={() => setOpen(isOpen ? null : w.slug)}
-              aria-expanded={isOpen}
-              aria-controls={`site-${w.slug}`}
-              className="w-full flex items-baseline justify-between gap-6 py-6 md:py-8 text-left group"
-            >
-              <h3
-                className={`home-hero-display transition-colors ${isOpen ? "text-pink" : "text-ink group-hover:text-pink"}`}
-                style={{ fontSize: "clamp(1.8rem, 4vw, 3.4rem)" }}
+            {/* Heading wraps the button (the valid accordion pattern — a
+                heading inside a button fails the button content model). */}
+            <h2 className="m-0">
+              <button
+                type="button"
+                onClick={() => setOpen(isOpen ? null : w.slug)}
+                aria-expanded={isOpen}
+                aria-controls={`site-${w.slug}`}
+                className="w-full flex items-baseline justify-between gap-6 py-6 md:py-8 text-left group"
               >
-                {w.name}
-              </h3>
-              <span className="flex items-baseline gap-5 shrink-0">
-                <span className="mono-label text-ink-soft hidden sm:inline">{domain}</span>
-                <span className="meta-mono text-ink-soft" style={{ fontSize: "0.6875rem" }}>{w.year}</span>
-              </span>
-            </button>
+                <span
+                  className={`home-hero-display transition-colors ${isOpen ? "text-pink" : "text-ink group-hover:text-pink"}`}
+                  style={{ fontSize: "clamp(1.8rem, 4vw, 3.4rem)" }}
+                >
+                  {w.name}
+                </span>
+                <span className="flex items-baseline gap-5 shrink-0">
+                  <span className="mono-label text-ink-soft hidden sm:inline">{domain}</span>
+                  <span className="meta-mono text-ink-soft" style={{ fontSize: "0.6875rem" }}>{w.year}</span>
+                </span>
+              </button>
+            </h2>
 
             <div
               id={`site-${w.slug}`}

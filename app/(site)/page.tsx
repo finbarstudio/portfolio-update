@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "finbar✶studio is a boutique web development studio in Brisbane. Custom-designed and custom-coded websites, backed by years of brand and graphic design, for businesses across Australia and the UK.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Studio | Brisbane Web Design & Development",
+    title: "Brisbane Web Design & Development Studio | Finbar Studio",
     description:
       "A boutique web development studio in Brisbane. Custom-designed, custom-coded websites, backed by years of brand and graphic design.",
     url: SITE_URL,

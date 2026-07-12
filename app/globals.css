@@ -37,8 +37,8 @@
      └─────────────────────────────────────────────────────────┘ */
   --font-primary: var(--font-host), "Host Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-label:   var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
-  /* Display serif for H1 — Bookmania, loaded from Adobe Fonts (Typekit). */
-  --font-display: "bookmania", Georgia, "Times New Roman", serif;
+  /* Display serif fallback stack (Bookmania/Typekit was removed as unused). */
+  --font-display: Georgia, "Times New Roman", serif;
 
   /* ┌─────────────────────────────────────────────────────────┐
      │  BRAND COLOURS                                          │
@@ -558,22 +558,6 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-star-draw { animation: none; stroke-dasharray: none; opacity: 0.4; }
-  }
-
-  /* Kinetic hero headline — words swing up (no clip mask → no cropping). */
-  .hh-word {
-    display: inline-block;
-    vertical-align: baseline;
-    margin-right: 0.2em;
-  }
-  .hh-inner {
-    display: inline-block;
-    will-change: transform, opacity;
-    transition: color var(--dur-fast) var(--ease);
-  }
-  .hh-em { font-style: italic; }       /* the one contrast word (Bookmania italic) */
-  @media (hover: hover) {
-    .hh-word:hover .hh-inner { color: var(--pink) !important; }
   }
 
   /* 1px-outline sticker pill — the retro flyer / fruit-packaging label look. */

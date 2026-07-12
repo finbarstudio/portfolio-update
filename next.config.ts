@@ -16,6 +16,12 @@ const baseSecurityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
+  // Process isolation without breaking anything: same-origin windows only
+  // (no cross-window handles), and resources loadable from our own site
+  // (www + sandbox subdomains are the same site). COEP is deliberately
+  // omitted — it would require CORP on every third-party resource.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-site" },
 ];
 
 const nextConfig: NextConfig = {
@@ -37,6 +43,17 @@ const nextConfig: NextConfig = {
           ...baseSecurityHeaders,
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors 'none'" },
+        ],
+      },
+      // Long-lived caching for /public assets (the "Add Expires headers"
+      // audit). NOT immutable: this repo replaces images in place (web
+      // stills, headshot), so a day of freshness + a year of
+      // stale-while-revalidate keeps repeat views instant without pinning
+      // stale assets for a year.
+      {
+        source: "/(images|models)/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=31536000" },
         ],
       },
     ];

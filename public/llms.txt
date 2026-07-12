@@ -1,0 +1,22 @@
+# finbar✶studio
+
+> finbar✶studio is a boutique web development studio in Brisbane, Australia, run by
+> Finbar Skitini. Custom-designed and custom-coded websites, backed by years of brand
+> and graphic design, for businesses across Australia and the UK.
+
+Services: web design and development (custom-coded front ends with a CMS clients run
+themselves), brand identity and logo design, editorial and print, motion graphics and
+social content, art direction.
+
+## Pages
+
+- [Home](https://www.finbar.studio/): studio overview and recent website builds
+- [Web design & development](https://www.finbar.studio/web-design): the web service page — capabilities, selected web projects, FAQ
+- [Graphic design](https://www.finbar.studio/graphic-design): brand, editorial, print and motion work
+- [Selected work](https://www.finbar.studio/work): the full portfolio archive with case studies
+- [About & contact](https://www.finbar.studio/about): who Finbar is, services, clients, and how to get in touch
+
+## Contact
+
+- Email: finbar@finbar.studio
+- Location: Brisbane, QLD, Australia (clients across Australia and the UK)

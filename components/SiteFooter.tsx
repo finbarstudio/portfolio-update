@@ -149,7 +149,7 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="site-footer-mark" aria-label="finbarstudio">
+      <div className="site-footer-mark" role="img" aria-label="finbarstudio">
         <BrandWordmark ref={markRef} className="site-footer-mark-inner" />
       </div>
       {/* Mobile-only: a big full-bleed pink asterisk in place of the wordmark. */}

@@ -4,8 +4,7 @@ import { Archivo_Narrow, Archivo, Host_Grotesk, Space_Mono, Noto_Sans_Symbols_2 
 import TempusKernel from "@/components/TempusKernel";
 import "./globals.css";
 
-// Body + mono/label text. The H1 display serif is Bookmania, loaded from Adobe
-// Fonts (Typekit) via the <link> in <body>; --font-display in globals uses it.
+// Body + mono/label text.
 const archivoNarrow = Archivo_Narrow({
   variable: "--font-archivo-narrow",
   subsets: ["latin"],
@@ -42,13 +41,16 @@ const hostGrotesk = Host_Grotesk({
 // big-type disciplines wall on the home page. --font-dingbat in globals.
 // display:block (not swap) so the glyph slot stays invisible until the symbol
 // font is ready, instead of painting .notdef tofu boxes in the mono fallback
-// (which lacks these glyphs) and flashing a grey box / size jump. The font is
-// preloaded via the "symbols" subset, so the block period is near-instant.
+// (which lacks these glyphs) and flashing a grey box / size jump.
 const notoSymbols = Noto_Sans_Symbols_2({
   variable: "--font-dingbat",
   subsets: ["symbols"],
   weight: ["400"],
   display: "block",
+  // 230KB symbols file used for a handful of inline icons — by far the
+  // heaviest font on the site. Never preload it ahead of the text fonts;
+  // display:block keeps the icons invisible (not tofu) until it arrives.
+  preload: false,
 });
 
 const SITE_URL = "https://www.finbar.studio";
@@ -56,7 +58,7 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Finbar Studio | Brisbane Web Design & Development",
+    default: "Brisbane Web Design & Development Studio | Finbar Studio",
     template: "%s | Finbar Studio",
   },
   description:
@@ -85,7 +87,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Studio | Brisbane Web Design & Development",
+    title: "Brisbane Web Design & Development Studio | Finbar Studio",
     description:
       "Brisbane web design and development studio building custom websites, with brand identity, editorial and motion design behind them, for businesses across Australia and the UK.",
     url: SITE_URL,
@@ -95,7 +97,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Finbar Studio | Brisbane Web Design & Development",
+    title: "Brisbane Web Design & Development Studio | Finbar Studio",
     description:
       "Brisbane web design and development. Custom websites, brand identity, editorial and motion.",
     creator: "@finbarstudio",
@@ -293,8 +295,9 @@ export default function RootLayout({
         {/* One shared rAF loop (tempus): absorbs every native requestAnimationFrame
             — Lenis, canvas effects, R3F, GSAP — into a single ordered loop. */}
         <TempusKernel />
-        {/* Bookmania (Adobe Fonts / Typekit) — H1 display serif */}
-        <link rel="stylesheet" href="https://use.typekit.net/rlo3ixj.css" />
+        {/* Bookmania (Typekit) was removed: --font-display is referenced nowhere
+            and HeroHeadline is unmounted, so the render-blocking third-party
+            stylesheet was pure LCP cost on every page. */}
         {/* Routes bring their own chrome: portfolio routes via app/(site)/layout
             (the sidebar shell); the Sandbox + embeds via their own bare layouts. */}
         {children}
