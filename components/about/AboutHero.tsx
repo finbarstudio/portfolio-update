@@ -104,7 +104,7 @@ export default function AboutHero() {
     //     exactly like the statement icons switching glyphs.
     const cycle = window.setInterval(() => {
       setSymbol((i) => (i + 1) % ICON_BATCH.length);
-    }, 2800);
+    }, 1200);
 
     // 4 — FLIPPED: plain readable text is the default; hovering the centre
     //     zone ACTIVATES the takeover (symbol in, characters scatter), and
@@ -166,31 +166,44 @@ export default function AboutHero() {
         className="absolute left-1/2 top-1/2 z-20 pointer-events-none"
         style={{ width: "clamp(280px, 32vw, 440px)", aspectRatio: "1 / 1" }}
       >
-        <svg viewBox="0 0 100 100" className="w-full h-full">
+        <svg viewBox="0 0 100 100" className="w-full h-full" style={{ overflow: "visible" }}>
           <defs>
-            <mask id={MASK_ID}>
-              <rect x="0" y="0" width="100" height="100" fill="#000" />
+            {/* Generous mask region so wide/tall glyphs are never clipped. */}
+            <mask id={MASK_ID} maskUnits="userSpaceOnUse" x="-40" y="-40" width="180" height="180">
+              <rect x="-40" y="-40" width="180" height="180" fill="#000" />
               <text
                 x="50"
                 y="52"
                 textAnchor="middle"
                 dominantBaseline="central"
                 fill="#fff"
-                fontSize="96"
+                fontSize="90"
                 style={{ fontFamily: "var(--font-dingbat), sans-serif" }}
               >
                 {ICON_BATCH[symbol]}
               </text>
             </mask>
+            {/* Pink duotone: map the b&w headshot onto the brand pink (dark
+                shadows -> #e8718b highlights). */}
+            <filter id="ah-pink" x="-40%" y="-40%" width="180%" height="180%" colorInterpolationFilters="sRGB">
+              <feColorMatrix
+                type="matrix"
+                values="0.2413 0.4737 0.0920 0 0.102
+                        0.1124 0.2207 0.0429 0 0.067
+                        0.1405 0.2759 0.0536 0 0.075
+                        0      0      0      1 0"
+              />
+            </filter>
           </defs>
           <image
             href="/images/about/finbar-full.webp"
-            x="0"
-            y="0"
-            width="100"
-            height="100"
+            x="-40"
+            y="-40"
+            width="180"
+            height="180"
             preserveAspectRatio="xMidYMid slice"
             mask={`url(#${MASK_ID})`}
+            filter="url(#ah-pink)"
           />
         </svg>
       </div>
