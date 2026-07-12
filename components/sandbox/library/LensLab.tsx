@@ -186,6 +186,10 @@ export default function LensLab({ src }: { src: string }) {
           const cc = ch.getContext("2d")!;
           const w = N * sx;
           const h = N * (L.caX ? 1 : sy);
+          // Pre-fill with the unscaled image: the shrunk channel (scale < 1)
+          // would otherwise leave a transparent border that the multiply tint
+          // turns into a saturated ring around the lens rim.
+          cc.drawImage(warped, 0, 0);
           cc.drawImage(warped, (N - w) / 2, (N - h) / 2, w, h);
           cc.globalCompositeOperation = "multiply";
           cc.fillStyle = tint;
