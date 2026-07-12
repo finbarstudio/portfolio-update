@@ -287,7 +287,11 @@ export function WebCard({ project, index }: { project: Project; index: number })
 
 export default function ProjectCard({ project, index }: { project: Project; index: number }) {
   if (project.webThumb)            return <WebCard project={project} index={index} />;
-  if (project.tier === "featured") return <FeaturedCard project={project} index={index} />;
+  // The /work + service grids are uniform half-width tiles. The featured tier's
+  // full-width treatment is only for the home page (its own components), so a
+  // featured project renders as a normal FullCard here (fixes TMYR going
+  // full-width once it was un-pinned from the top of the archive).
+  if (project.tier === "featured") return <FullCard project={project} index={index} />;
   if (project.tier === "full")     return <FullCard project={project} index={index} />;
   return <GalleryCard project={project} index={index} />;
 }

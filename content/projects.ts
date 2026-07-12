@@ -342,7 +342,7 @@ export const projects: Project[] = [
         "How I designed and produced 15+ custom sales process playbooks for a national sales consultancy, end to end, from content writing to print-ready delivery.",
     },
     companyUrl: "https://salesmasters.com.au",
-    date: "2023–2024",
+    date: "2024–2025",
     categories: ["Publication Design", "Infographic Design", "Print"],
     skills: [
       "Publication Design",
@@ -403,7 +403,7 @@ export const projects: Project[] = [
       description:
         "Art direction, cover artwork and photography for five instrumental singles by a London guitarist stepping out from session work into solo releases.",
     },
-    date: "2023",
+    date: "2022",
     categories: ["Art Direction", "Cover Artwork", "Photography"],
     skills: [
       "Art Direction",
@@ -488,6 +488,7 @@ export const projects: Project[] = [
     name: "Compass Capability",
     tier: "full",
     rank: 14,
+    hidden: true,
     seo: {
       title: "Compass Capability: Brand Identity & Guidelines | Finbar Studio",
       description:
@@ -692,6 +693,7 @@ export const projects: Project[] = [
     name: "Copper Company",
     tier: "full",
     rank: 9,
+    hidden: true,
     seo: {
       title: "Copper Company: Rum Brand & Packaging Design | Finbar Studio",
       description:
@@ -790,7 +792,7 @@ export const projects: Project[] = [
       description:
         "Brand identity and a custom-coded website for a family design and build company in South London. Next.js front end, Sanity CMS, an instant estimate tool and a preloader that draws the mark.",
     },
-    date: "2023 to 2026",
+    date: "2026",
     categories: ["Web Design & Development", "Brand Identity"],
     skills: [
       "Logo Design",
@@ -1103,6 +1105,7 @@ export const projects: Project[] = [
     name: "Momentum Mentoring",
     tier: "gallery",
     rank: 10,
+    hidden: true,
     seo: {
       title: "Momentum Mentoring: NDIS Brand & Website | Finbar Studio",
       description:
@@ -1155,6 +1158,7 @@ export const projects: Project[] = [
     name: "TasWater",
     tier: "gallery",
     rank: 12,
+    hidden: true,
     seo: {
       title: "TasWater: Infographic & Information Design | Finbar Studio",
       description:
@@ -1205,7 +1209,7 @@ export const projects: Project[] = [
       description:
         "Print and digital event design for the UK's first affordable homes exhibition: flags, banners, stage graphics, brochures and booklets.",
     },
-    date: "2022",
+    date: "2023",
     categories: ["Event Design", "Print & Digital"],
     skills: ["Event Design", "Print Design", "Digital Campaign"],
     oneLiner:
@@ -1313,7 +1317,7 @@ export const projects: Project[] = [
       description:
         "An ongoing design and communications contract covering website management, the capability statement, and social and editorial content.",
     },
-    date: "2023",
+    date: "2024",
     categories: ["Publication Design", "Print Collateral"],
     skills: [
       "Publication Design",

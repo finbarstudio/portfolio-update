@@ -26,14 +26,6 @@ const WEBSITES: Website[] = [
     bio: "Full rebrand and a six-page site for an Adelaide NDIS provider, with the CMS handed over to their team and a site-wide accessibility text resizer, because their audience genuinely needs one.",
     images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp"],
   },
-  {
-    slug: "momentum-mentoring",
-    name: "Momentum Mentoring",
-    url: "https://momentummentoring.co",
-    year: "2024",
-    bio: "Brand and website for an NDIS mentoring provider, built to feel empowering and warm rather than clinical. Identity and site delivered as one piece of work, on a CMS the team runs themselves.",
-    images: ["/images/web/momentum-1.webp", "/images/web/momentum-2.webp", "/images/web/momentum-3.webp"],
-  },
 ];
 
 const WINDOW_SHOTS = WEBSITES.map((w) => ({ src: w.images[0], label: w.name }));

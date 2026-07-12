@@ -63,19 +63,10 @@ const WEBSITES: Website[] = [
     images: ["/images/web/kinaya-1.webp"],
     caseStudy: "/case-studies/kinaya",
   },
-  {
-    slug: "momentum-mentoring",
-    name: "Momentum Mentoring",
-    url: "https://momentummentoring.co",
-    year: "2025",
-    bio: "Brand and website for an NDIS mentoring provider, built to feel empowering and warm rather than clinical. Identity and site delivered as one piece of work, on a CMS the team runs themselves.",
-    images: ["/images/web/momentum-1.webp"],
-    caseStudy: "/case-studies/momentum-mentoring",
-  },
 ];
 
-// Only the strongest three cycle in the hero window; KinAya + Momentum stay
-// in the list (always at the bottom of the stack) but out of the featured shots.
+// Only the strongest three cycle in the hero window; KinAya stays in the list
+// (always at the bottom of the stack) but out of the featured shots.
 const WINDOW_SLUGS = new Set(["lows-design-build", "plated-with-issy", "lola-audio"]);
 const WINDOW_SHOTS = WEBSITES.filter((w) => WINDOW_SLUGS.has(w.slug)).map((w) => ({ src: w.images[0], label: w.name }));
 

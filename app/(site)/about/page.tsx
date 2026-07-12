@@ -67,7 +67,7 @@ const CLIENT_NAME: Record<string, string> = { tmyr: "Share to Buy" };
 
 // Web builds lead the client list (web-first positioning); everything else
 // follows in rank order.
-const WEB_SLUGS = ["lows-design-build", "plated-with-issy", "lola-audio", "kinaya", "momentum-mentoring"];
+const WEB_SLUGS = ["lows-design-build", "plated-with-issy", "lola-audio", "kinaya"];
 const CLIENTS = [...projects]
   .filter((p) => !p.hidden && !NON_CLIENT_SLUGS.has(p.slug))
   .sort((a, b) => {
