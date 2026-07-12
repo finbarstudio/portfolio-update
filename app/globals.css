@@ -649,15 +649,12 @@
   }
 
   .home-hero-display {
-    /* Space Mono ties the hero to the FINBARSTUDIO wordmark; mono runs wide,
-       so the size steps down and the tracking tightens vs the old display. */
-    font-family: var(--font-mono);
-    font-weight: 700;
+    /* Host Grotesk for the big titles (hero + site-list rows); the wordmark
+       and labels stay Space Mono. */
+    font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+    font-weight: 600;
     text-transform: none;
-    letter-spacing: -0.03em;
-    /* A mono space is a full 0.6em cell, which reads as justified-style gaps
-       at display sizes; pull the word gaps back to proportional feel. */
-    word-spacing: -0.28em;
+    letter-spacing: -0.02em;
     line-height: 1.08;
     font-size: clamp(2.3rem, 6.2vw, 5.9rem);
     color: var(--ink);

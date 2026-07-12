@@ -1,6 +1,6 @@
 import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata, Viewport } from "next";
-import { Archivo_Narrow, Archivo, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
+import { Archivo_Narrow, Archivo, Host_Grotesk, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
 import "./globals.css";
 
 // Body + mono/label text. The H1 display serif is Bookmania, loaded from Adobe
@@ -26,6 +26,14 @@ const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   subsets: ["latin"],
   weight: ["400", "700"],
+  display: "swap",
+});
+
+// Display grotesque for big titles (hero, site-list rows).
+const hostGrotesk = Host_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-host",
   display: "swap",
 });
 
@@ -275,7 +283,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={`${archivoNarrow.variable} ${archivo.variable} ${spaceMono.variable} ${notoSymbols.variable}`}
+      className={`${archivoNarrow.variable} ${archivo.variable} ${spaceMono.variable} ${hostGrotesk.variable} ${notoSymbols.variable}`}
     >
       {/* suppressHydrationWarning: browser extensions (e.g. ColorZilla adds
           cz-shortcut-listen) mutate <body> before hydration; suppress the
