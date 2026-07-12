@@ -72,9 +72,7 @@ export function FeaturedCard({ project, index }: { project: Project; index: numb
             text steals from it; the slow reveal lets the mockup ease down to
             fit (brief over-size/clip during the transition is intentional). */}
         <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
-          {project.webThumb ? (
-            <WebThumb src={project.webThumb} alt={`${project.name} website`} />
-          ) : project.heroPhones ? (
+          {project.heroPhones ? (
             <PhoneCarousel
               model={project.heroPhones.model}
               videos={project.heroPhones.videos}
@@ -139,9 +137,7 @@ export function FullCard({ project, index }: { project: Project; index: number }
       >
         {/* Thumbnail — flex:1 so revealed text steals from it, not extends card */}
         <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
-          {project.webThumb ? (
-            <WebThumb src={project.webThumb} alt={`${project.name} website`} />
-          ) : project.cardLogo ? (
+          {project.cardLogo ? (
             <div className="card-logo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={project.cardLogo} alt={`${project.name} logo`} />
@@ -206,9 +202,7 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
       >
         {/* Thumbnail — flex:1 so revealed text steals from it */}
         <CardThumb style={{ flex: 1, minHeight: 0, marginBottom: "var(--image-pad)" }}>
-          {project.webThumb ? (
-            <WebThumb src={project.webThumb} alt={`${project.name} website`} />
-          ) : project.cardStack ? (
+          {project.cardStack ? (
             <div className="card-stack" aria-hidden="true">
               {project.cardStack.map((src) => (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -255,7 +249,44 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
 }
 
 /* ─── Default export, picks the right variant ────────────── */
+/* ─── Web card — 16:9 site preview, matching the home page website list ─── */
+export function WebCard({ project, index }: { project: Project; index: number }) {
+  return (
+    <article className="card-animate col-span-12 sm:col-span-6 group relative" style={{ animationDelay: `${index * 0.03}s` }}>
+      <Link
+        href={`/case-studies/${project.slug}`}
+        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        aria-label={`View case study: ${project.name}`}
+      >
+        {/* 16:9 like the home preview, so the full site screenshot shows uncropped */}
+        <CardThumb style={{ aspectRatio: "16 / 9", marginBottom: "var(--image-pad)" }}>
+          <WebThumb src={project.webThumb!} alt={`${project.name} website`} />
+        </CardThumb>
+        <div className="pb-6">
+          <div className="flex items-start justify-between gap-3 mb-2.5">
+            <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">
+              {project.name}
+            </h2>
+            <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
+          </div>
+          <div className="hover-reveal">
+            <div className="space-y-2.5">
+              <TagRow project={project} />
+              <HrItem block className="hr-line">
+                <p className="text-ink-soft leading-relaxed line-clamp-2" style={{ fontSize: "var(--text-caption)" }}>
+                  {project.oneLiner}
+                </p>
+              </HrItem>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
 export default function ProjectCard({ project, index }: { project: Project; index: number }) {
+  if (project.webThumb)            return <WebCard project={project} index={index} />;
   if (project.tier === "featured") return <FeaturedCard project={project} index={index} />;
   if (project.tier === "full")     return <FullCard project={project} index={index} />;
   return <GalleryCard project={project} index={index} />;

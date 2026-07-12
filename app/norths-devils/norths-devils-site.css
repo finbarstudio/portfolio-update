@@ -1,0 +1,281 @@
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-BlackItalic.woff2") format("woff2");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Norths Devils RLFC — scoped styles for the /norths-devils demo.
+   Same recipe as the Toombul hero collage (FS-dithered paraphernalia,
+   locked central crest, GSAP entrance/float/parallax/boil) but on the
+   Devils' own palette. Class names are nd-* so nothing collides with the
+   toombul css once both routes have been visited.
+   Palette: sampled from the club crest/site (see tokens) — deep devil red
+   + near-black navy on white.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.nd-site {
+  --white: #ffffff;
+  --ink: #101820;
+  --ink-soft: #4c5560;
+  --line: #e7e2dd;
+
+  /* club colours, sampled from the crest + site css: navy / gold / sky.
+     The dither ramp (navy -> gold) is baked into the assets; these drive
+     the UI accents (editor chrome, selection, nav). */
+  --navy: #00244e;
+  --gold: #f3cd32;
+  --sky: #6ca5d9;
+  --red: #00244e;       /* selection/CTA accents inherit navy */
+  --red-deep: #011a38;
+  --blue-btn: #00244e;
+  --pale: #eaf1f8;
+
+  --gut: clamp(20px, 5.5vw, 64px);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --font-display: "LT Remark", Georgia, serif;
+  --font-num: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-body);
+  min-height: 100svh;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+.nd-site * { box-sizing: border-box; }
+.nd-site img { max-width: 100%; display: block; }
+.nd-site :where(h1, h2, h3, h4) { text-transform: none; margin: 0; }
+.nd-site a { color: inherit; text-decoration: none; }
+
+/* minimal text nav */
+.nd-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px var(--gut);
+}
+.nd-nav-word {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  font-size: 14px;
+  color: var(--navy);
+  line-height: 1.05;
+}
+.nd-nav-word small {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  font-size: 9px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+/* ── hero collage — crest + dithered paraphernalia, positions from JSON ── */
+.nd-collage {
+  position: relative;
+  min-height: 100svh;
+  /* let the scroll-scatter fly past the section edges without a hard clip
+     (horizontal stays contained by .nd-site { overflow-x: clip }) */
+  overflow: visible;
+  z-index: 2;
+}
+.nd-para-wrap {
+  position: absolute;
+  transform-origin: center;
+  line-height: 0;
+}
+.nd-para-inner, .nd-para-scatter, .nd-para-float { display: block; width: 100%; will-change: transform; }
+.nd-para {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  user-select: none;
+  pointer-events: none;
+}
+/* Start hidden so the GSAP entrance can't flash the static frame first
+   (only when motion is allowed and we're not in the editor). */
+@media (prefers-reduced-motion: no-preference) {
+  .nd-collage:not(.nd-collage--edit) .nd-para-inner,
+  .nd-collage:not(.nd-collage--edit) .nd-collage-crest { opacity: 0; }
+}
+
+/* Tablet: scale the desktop arrangement up a touch so it keeps its density.
+   Phones use their own portrait layout (toombul-collage-mobile.json), which
+   is natively sized — no scale factor. */
+@media (min-width: 701px) and (max-width: 1100px) {
+  .nd-collage, .nd-modern { --para-scale: 1.35; }
+}
+
+/* Crest: locked dead-centre of the constellation. Centring uses the
+   standalone `translate` property (NOT transform) so the GSAP scale tweens
+   can't clobber the -50%/-50% offset (same fix as the Toombul crest). */
+.nd-collage-crest {
+  /* inset+margin:auto centring (not translate/transform) — this build of
+     GSAP resets the standalone `translate` property when it takes over
+     transforms, which left the crest hanging off-centre. */
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: clamp(160px, 18vw, 260px);
+  aspect-ratio: 1;
+  height: auto;
+  z-index: 3;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── collage editor (only active with ?edit=1) ────────────────────────── */
+.nd-collage--edit .nd-para-wrap { cursor: grab; }
+.nd-collage--edit .nd-para-wrap.is-sel { outline: 2px solid var(--blue-btn); cursor: move; }
+.nd-collage--edit .nd-para { pointer-events: none; }
+.nd-h {
+  position: absolute;
+  width: 16px; height: 16px;
+  background: var(--white);
+  border: 2px solid var(--blue-btn);
+  z-index: 30;
+}
+.nd-h-resize { right: -8px; bottom: -8px; cursor: nwse-resize; border-radius: 3px; }
+.nd-h-rotate { left: 50%; top: -30px; margin-left: -8px; cursor: grab; border-radius: 50%; }
+.nd-h-rotate::before {
+  content: ""; position: absolute; left: 50%; top: 14px;
+  width: 2px; height: 16px; background: var(--blue-btn); transform: translateX(-1px);
+}
+.nd-editor {
+  position: fixed;
+  left: 16px; bottom: 16px;
+  z-index: 60;
+  width: 260px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(17, 41, 95, 0.18);
+  padding: 14px;
+  font-family: var(--font-body);
+  color: var(--ink);
+  cursor: default;
+}
+.nd-editor-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.nd-editor-title { font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; color: var(--blue-btn); }
+.nd-editor-hide {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--ink-soft); background: none; border: none; cursor: pointer; padding: 2px 4px;
+}
+.nd-editor-hide:hover { color: var(--ink); }
+.nd-editor-chip {
+  position: fixed; left: 16px; bottom: 16px; z-index: 60;
+  font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.06em;
+  font-size: 11px; color: var(--white); background: var(--blue-btn);
+  border: none; border-radius: 999px; padding: 9px 15px; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(17, 41, 95, 0.28);
+}
+.nd-editor-del {
+  width: 100%; margin-bottom: 10px;
+  font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 6px; border: 1px solid var(--red); background: var(--white); color: var(--red);
+  border-radius: 6px; cursor: pointer;
+}
+.nd-editor-del:hover { background: var(--red); color: var(--white); }
+.nd-editor-hint { font-size: 12px; line-height: 1.5; color: var(--ink-soft); }
+.nd-editor-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 12px; }
+.nd-editor-fields strong { grid-column: 1 / -1; font-size: 13px; text-transform: uppercase; }
+.nd-editor-fields label { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; color: var(--ink-soft); }
+.nd-editor-fields input { width: 100%; font-size: 12px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 5px; }
+.nd-editor-row { display: flex; gap: 6px; margin-top: 10px; }
+.nd-editor-row button {
+  flex: 1; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 6px; border: 1px solid var(--blue-btn); background: var(--white); color: var(--blue-btn);
+  border-radius: 6px; cursor: pointer;
+}
+.nd-editor-row button:hover { background: var(--pale); }
+
+/* ── section three — identity showcase (six lockups, crest finale) ─────── */
+.nd-logoshow {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  background: var(--white);
+  /* generous breathing room: the marks sit small and padded in the viewport */
+  padding: clamp(48px, 9vh, 120px) clamp(40px, 8vw, 140px);
+  column-gap: clamp(24px, 5vw, 90px);
+  row-gap: clamp(24px, 6vh, 80px);
+  overflow: hidden;
+}
+.nd-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+.nd-mark img {
+  width: 100%;
+  max-width: clamp(120px, 13.5vw, 210px);
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+.nd-mark--hero { position: relative; z-index: 5; }
+@media (max-width: 700px) {
+  .nd-logoshow {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: clamp(40px, 8vh, 80px) clamp(24px, 7vw, 48px);
+  }
+  .nd-mark img { max-width: 34vw; }
+}
+
+/* ── section four — coverflow logo marquee ────────────────────────────── */
+.nd-marquee {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--white);
+}
+.nd-marquee-track {
+  display: flex;
+  align-items: center;
+  will-change: transform;
+}
+.nd-marquee-item {
+  flex: 0 0 33.333vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+.nd-marquee-item img {
+  width: 72%;
+  max-width: 300px;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+@media (max-width: 700px) {
+  .nd-marquee-item { flex-basis: 44vw; }
+}
+
