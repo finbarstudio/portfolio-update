@@ -1,18 +1,19 @@
 "use client";
 
 /**
- * AboutHero — the "Nice to meet you" statement with the thresholded portrait
- * in a circular frame, centred BEHIND the type.
+ * AboutHero — the "Nice to meet you" statement with the isolated portrait in
+ * a circular frame, centred BEHIND the type.
  *
  * Choreography (GSAP):
- *   1. The statement's characters stagger in (masked rise, word by word).
- *   2. The portrait circle scales in from nothing at the section's centre.
- *   3. As it grows, only the characters sitting inside the circle's final
- *      footprint get pushed radially outward (with a little scatter), so the
- *      type visibly gives the portrait its space. Everything else stays put.
+ *   1. The statement's characters stagger in.
+ *   2. The circle pops in at the centre and a RIPPLE radiates outward: every
+ *      character is hit in distance order. Characters inside the circle's
+ *      footprint get shoved out past the rim and spring into place; the rest
+ *      take a decaying impulse and swing back home. Translate only, no
+ *      scale/filter/warp on the type.
  *
- * The circle also crops the cutout tight, so the portrait has no hard bottom
- * edge. Reduced motion: everything renders in its final state, no animation.
+ * The circle crops the cutout tight, so the portrait has no hard bottom edge.
+ * Reduced motion: final state, no animation.
  */
 
 import { useEffect, useRef } from "react";
@@ -79,7 +80,7 @@ export default function AboutHero() {
     if (reduce) {
       gsap.set(chars, { opacity: 1, yPercent: 0 });
       gsap.set(circle, { scale: 1, opacity: 1 });
-      computePushes().forEach((p) => gsap.set(p.el, { x: p.x, y: p.y, rotation: p.r }));
+      computePushes().forEach((p) => gsap.set(p.el, { x: p.x, y: p.y }));
       return;
     }
 
@@ -95,13 +96,43 @@ export default function AboutHero() {
       stagger: 0.012,
       ease: "power3.out",
     });
-    // 2 + 3 — the circle grows while the affected characters clear out of its way
+    // 2 — the circle grows in
+    // 3 — a ripple radiates from the centre: every character is hit in
+    //     distance order (a wave). Characters inside the circle's footprint
+    //     get shoved out and stay there (springy settle); characters beyond
+    //     it take a decaying impulse and swing back home. Translate only.
     tl.add(() => {
-      const pushes = computePushes();
+      const c = circle.getBoundingClientRect();
+      const cx = c.left + c.width / 2;
+      const cy = c.top + c.height / 2;
+      const R = c.width / 2 + PUSH_MARGIN;
+      const WAVE_SPEED = 1600; // px per second
       const grow = gsap.timeline();
-      grow.to(circle, { scale: 1, duration: 1.15, ease: "power3.inOut" }, 0);
-      pushes.forEach((p) => {
-        grow.to(p.el, { x: p.x, y: p.y, rotation: p.r, duration: 1.15, ease: "power3.inOut" }, 0);
+      grow.to(circle, { scale: 1, duration: 0.55, ease: "power2.out" }, 0);
+      chars.forEach((el) => {
+        const b = el.getBoundingClientRect();
+        const dx = b.left + b.width / 2 - cx;
+        const dy = b.top + b.height / 2 - cy;
+        const d = Math.hypot(dx, dy) || 1;
+        const ux = dx / d;
+        const uy = dy / d;
+        const delay = d / WAVE_SPEED;
+        if (d < R) {
+          // inside the impact zone: shoved out past the rim, springs into place
+          const out = R - d;
+          grow.to(
+            el,
+            { x: ux * out, y: uy * out, duration: 1.05, ease: "elastic.out(1, 0.55)" },
+            delay
+          );
+        } else {
+          // beyond the rim: the wave passes through, a decaying kick then home
+          const kick = 30 * Math.exp(-(d - R) / 260);
+          if (kick < 1.5) return;
+          grow
+            .to(el, { x: ux * kick, y: uy * kick, duration: 0.16, ease: "power2.out" }, delay)
+            .to(el, { x: 0, y: 0, duration: 0.9, ease: "elastic.out(1, 0.45)" }, delay + 0.16);
+        }
       });
     }, ">+0.15");
 
@@ -117,7 +148,7 @@ export default function AboutHero() {
       className="relative min-h-[78svh] flex items-center justify-center py-16 md:py-24 overflow-hidden"
       aria-label="Introduction"
     >
-      {/* Portrait — thresholded, circle-cropped tight, centred behind the type */}
+      {/* Portrait — isolated cutout, circle-cropped tight, behind the type */}
       <div
         ref={circleRef}
         aria-hidden="true"
@@ -132,7 +163,7 @@ export default function AboutHero() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/about/finbar-threshold.webp"
+          src="/images/about/finbar.webp"
           alt=""
           className="absolute inset-x-0 top-[8%] w-full h-auto"
           style={{ transform: "scale(1.24)", transformOrigin: "top center" }}
