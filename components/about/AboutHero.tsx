@@ -4,15 +4,14 @@
  * AboutHero — the "Nice to meet you" statement with the headshot masked into a
  * cycling brand symbol, centred over the type.
  *
- *   1. The statement's characters rise in.
- *   2. After a longer beat the symbol (headshot clipped inside it) scales in and
- *      a wave scatters the characters out of its footprint (translate only), so
- *      they explode outward and stay there.
+ *   1. The statement's characters rise in and the page rests as plain text.
+ *   2. HOVERING the centre zone activates the takeover: the symbol (headshot
+ *      clipped inside it) scales in and a wave scatters the characters out of
+ *      its footprint (translate only). Leaving reverses back to plain text.
  *   3. The mask cycles through the brand icon batch with instant swaps,
  *      the same glyphs (and feel) as the statement's hovering inline icons.
- *   4. Hovering the symbol REVERSES the scatter so the statement reads cleanly;
- *      leaving re-scatters it. The hover target is a fixed-size zone, so the
- *      symbol scaling can't make the pointer flicker on and off it.
+ *   The hover target is a fixed-size zone, so the symbol scaling can't make
+ *   the pointer flicker on and off it.
  *
  * Reduced motion: readable statement, symbol hidden, no animation.
  */
@@ -100,7 +99,6 @@ export default function AboutHero() {
     buildScatter().forEach((s) => {
       scatter.to(s.el, { x: s.x, y: s.y, duration: 1.05, ease: "elastic.out(1, 0.5)" }, s.delay);
     });
-    const startT = window.setTimeout(() => scatter.play(), 3000);
 
     // 3 — cycle the mask symbol: instant swaps through the batch, no flip,
     //     exactly like the statement icons switching glyphs.
@@ -108,16 +106,17 @@ export default function AboutHero() {
       setSymbol((i) => (i + 1) % ICON_BATCH.length);
     }, 2800);
 
-    // 4 — hover reverse, off a fixed-size zone with a guard so the symbol
-    //     scaling never causes a flicker of enter/leave events.
+    // 4 — FLIPPED: plain readable text is the default; hovering the centre
+    //     zone ACTIVATES the takeover (symbol in, characters scatter), and
+    //     leaving reverses back to text. Fixed-size zone + guard so the
+    //     symbol scaling never causes enter/leave flicker.
     let hovering = false;
-    const onEnter = () => { if (hovering) return; hovering = true; scatter.timeScale(1.6).reverse(); };
-    const onLeave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1).play(); };
+    const onEnter = () => { if (hovering) return; hovering = true; scatter.timeScale(1).play(); };
+    const onLeave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1.6).reverse(); };
     hit.addEventListener("pointerenter", onEnter);
     hit.addEventListener("pointerleave", onLeave);
 
     return () => {
-      clearTimeout(startT);
       clearInterval(cycle);
       hit.removeEventListener("pointerenter", onEnter);
       hit.removeEventListener("pointerleave", onLeave);
