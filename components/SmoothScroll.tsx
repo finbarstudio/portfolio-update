@@ -7,6 +7,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
+import Tempus from "tempus";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -31,18 +32,15 @@ export default function SmoothScroll() {
     // smooth scroll position (not the native one).
     lenis.on("scroll", ScrollTrigger.update);
 
-    let raf = 0;
-    const loop = (time: number) => {
-      lenis.raf(time);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    // Ride the shared tempus loop instead of a private rAF; order -1 runs the
+    // scroll update before default-order animation work each frame.
+    const unsubscribe = Tempus.add(({ time }) => lenis.raf(time), { order: -1, label: "lenis" });
 
     // If the home preloader is still running it locks scrolling; honour that.
     if (document.documentElement.dataset.introLock === "1") lenis.stop();
 
     return () => {
-      cancelAnimationFrame(raf);
+      unsubscribe?.();
       lenis.destroy();
       if (window.__lenis === lenis) delete window.__lenis;
     };

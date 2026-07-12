@@ -1,6 +1,7 @@
 import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata, Viewport } from "next";
 import { Archivo_Narrow, Archivo, Host_Grotesk, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
+import TempusKernel from "@/components/TempusKernel";
 import "./globals.css";
 
 // Body + mono/label text. The H1 display serif is Bookmania, loaded from Adobe
@@ -289,6 +290,9 @@ export default function RootLayout({
           cz-shortcut-listen) mutate <body> before hydration; suppress the
           attribute-mismatch warning for this node only, not its children. */}
       <body className="bg-bg text-ink font-sans antialiased min-h-screen" suppressHydrationWarning>
+        {/* One shared rAF loop (tempus): absorbs every native requestAnimationFrame
+            — Lenis, canvas effects, R3F, GSAP — into a single ordered loop. */}
+        <TempusKernel />
         {/* Bookmania (Adobe Fonts / Typekit) — H1 display serif */}
         <link rel="stylesheet" href="https://use.typekit.net/rlo3ixj.css" />
         {/* Routes bring their own chrome: portfolio routes via app/(site)/layout
