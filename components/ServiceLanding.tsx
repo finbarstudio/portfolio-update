@@ -154,7 +154,7 @@ export default function ServiceLanding({
         aria-label={`${heading} projects`}
       >
         {matched.length > 0 ? (
-          <div className="grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
+          <div className="reveal-open grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
             {matched.map((project, i) => (
               <ProjectCard key={project.slug} project={project} index={i} />
             ))}

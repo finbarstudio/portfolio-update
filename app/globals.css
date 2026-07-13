@@ -5071,3 +5071,12 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   max-width: 58ch;
   color: var(--ink);
 }
+
+/* Service landing grids (/web-design, /graphic-design): the project cards read
+   expanded by default, not only on hover. Kept UNLAYERED on purpose — a custom
+   class inside @layer components gets tree-shaken by Tailwind v4 unless the
+   class is detected in content; unlayered rules are always emitted and also win
+   the cascade over the layered `.hover-reveal .hr-inner { opacity: 0 }`. */
+@media (hover: hover) and (pointer: fine) {
+  .reveal-open .hover-reveal .hr-inner { opacity: 1; }
+}

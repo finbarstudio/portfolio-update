@@ -476,6 +476,18 @@ export default async function CaseStudyPage({
           >
             {project.name}
           </h1>
+          {/* Live-site link up top too (mirrors the one in the footer meta),
+              so visitors can reach a shipped site without scrolling first. */}
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sticker-pill is-pink mt-4 inline-flex"
+            >
+              Visit live site ↗
+            </a>
+          )}
         </div>
 
         {/* Tags — mobile: centred wrap. Desktop: right-aligned brick-wrap, ragged left.
