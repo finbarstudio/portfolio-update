@@ -33,7 +33,7 @@ const WEBSITES: Website[] = [
     url: "https://www.lowsdesignandbuild.com",
     year: "2026",
     bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
-    images: ["/images/web/lows-1.webp"],
+    images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
     caseStudy: "/case-studies/lows-design-build",
   },
   {
@@ -42,7 +42,7 @@ const WEBSITES: Website[] = [
     url: "https://www.platedwithissy.com",
     year: "2026",
     bio: "Brand and site for a candlelit supper club, built together: one continuous scroll through an evening, a polaroid gallery of past dinners, and a Payload CMS Issy runs from her phone.",
-    images: ["/images/web/plated-1.webp"],
+    images: ["/images/web/plated-1.webp", "/images/web/plated-2.webp", "/images/web/plated-3.webp", "/images/web/plated-4.webp"],
     caseStudy: "/case-studies/plated-with-issy",
   },
   {
@@ -51,7 +51,7 @@ const WEBSITES: Website[] = [
     url: "https://www.lola-audio.com",
     year: "2026",
     bio: "A portfolio for a composer and sound designer that opens on a working mixing desk: push a fader and her stems play in time, while a line of type draws the live mix. Sanity CMS down to the sound itself.",
-    images: ["/images/web/lola-1.webp"],
+    images: ["/images/web/lola-1.webp", "/images/web/lola-2.webp"],
     caseStudy: "/case-studies/lola-audio",
   },
   {
@@ -60,7 +60,7 @@ const WEBSITES: Website[] = [
     url: "https://kinaya.com.au",
     year: "2025",
     bio: "Full rebrand and a six-page site for an Adelaide NDIS provider, with the CMS handed over to their team and a site-wide accessibility text resizer, because their audience genuinely needs one.",
-    images: ["/images/web/kinaya-1.webp"],
+    images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp", "/images/web/kinaya-4.webp"],
     caseStudy: "/case-studies/kinaya",
   },
 ];

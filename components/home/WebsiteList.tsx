@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import PreviewCycle from "@/components/PreviewCycle";
 
 /* WebsiteList — the shipped-sites index. Full-width rows; clicking a row
    expands it in place to a short bio, a visit link and a strip of screens.
@@ -83,14 +84,16 @@ export default function WebsiteList({ sites }: { sites: Website[] }) {
                     </div>
                   </div>
                   <div className="md:col-span-8">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={w.images[0]}
-                      alt={`${w.name} website, home page`}
-                      loading="lazy"
-                      className="w-full h-auto border border-line"
-                      style={{ borderRadius: "4px", aspectRatio: "16 / 9", objectFit: "cover" }}
-                    />
+                    {/* Thumb: hover cycles the notable-section shots, click opens the case study. */}
+                    <a
+                      href={w.caseStudy ?? w.url}
+                      aria-label={w.caseStudy ? `${w.name} case study` : `Visit ${w.name}`}
+                      tabIndex={isOpen ? 0 : -1}
+                      className="block relative overflow-hidden border border-line focus-visible:outline-pink focus-visible:outline-2"
+                      style={{ borderRadius: "4px", aspectRatio: "16 / 9" }}
+                    >
+                      <PreviewCycle images={w.images} alt={`${w.name} website`} />
+                    </a>
                   </div>
                 </div>
               </div>

@@ -69,6 +69,7 @@ export interface Project {
   heroImage: ProjectImage;
   heroVideo?: string;     // WebM for case study hero (looping, muted)
   webThumb?: string;      // full-bleed website preview still (matches the home page) used as the /work card thumbnail
+  webShots?: string[];    // up to 4 notable-section screenshots; the card thumbnail cycles through them on hover (webThumb is shot 1)
   images: ProjectImage[];
   hasDepth: boolean;
   depth?: DepthSection[];
@@ -173,6 +174,7 @@ export const projects: Project[] = [
       video: "/images/kinaya/site-scroll.mp4",
     },
     webThumb: "/images/web/kinaya-1.webp",
+    webShots: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp", "/images/web/kinaya-4.webp"],
     brandThumb: {
       logo: "/images/kinaya/logo.svg",
       colors: ["#2F4858", "#E94E77", "#FF8AA2"],
@@ -834,6 +836,7 @@ export const projects: Project[] = [
       video: "/images/lows-design-build/site-scroll-3d.mp4",
     },
     webThumb: "/images/web/lows-1.webp",
+    webShots: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
     brandThumb: {
       logo: "/images/lows-design-build/logomark.svg",
       colors: ["#424952", "#A99E92", "#E6E0D6"],
@@ -961,6 +964,7 @@ export const projects: Project[] = [
       video: "/images/plated-with-issy/site-scroll-3d.mp4",
     },
     webThumb: "/images/web/plated-1.webp",
+    webShots: ["/images/web/plated-1.webp", "/images/web/plated-2.webp", "/images/web/plated-3.webp", "/images/web/plated-4.webp"],
     brandThumb: {
       logo: "/images/plated-with-issy/wordmark.png",
       colors: ["#3D3E2A", "#C9A24B", "#E4CE93"],
@@ -1079,6 +1083,7 @@ export const projects: Project[] = [
       video: "/images/lola-audio/site-scroll-3d.mp4",
     },
     webThumb: "/images/web/lola-1.webp",
+    webShots: ["/images/web/lola-1.webp", "/images/web/lola-2.webp"],
     heroImage: {
       src: "/images/web/lola-1.webp",
       alt: "Lola Audio title card, a white sheet of paper with a signature logo between two working mixing-desk faders",

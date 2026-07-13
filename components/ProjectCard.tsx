@@ -7,7 +7,7 @@ import ZoomImage from "@/components/ZoomImage";
 import SplineScene from "@/components/SplineScene";
 import ModelDisplay from "@/components/ModelDisplay";
 import CardThumb from "@/components/CardThumb";
-import WebThumb from "@/components/WebThumb";
+import PreviewCycle from "@/components/PreviewCycle";
 import PhoneCarousel from "@/components/PhoneCarousel";
 import MagazineCarousel from "@/components/MagazineCarousel";
 import HeroSlideshow from "@/components/HeroSlideshow";
@@ -258,9 +258,9 @@ export function WebCard({ project, index }: { project: Project; index: number })
         className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
         aria-label={`View case study: ${project.name}`}
       >
-        {/* 16:9 like the home preview, so the full site screenshot shows uncropped */}
+        {/* 16:9 like the home preview; hover cycles through notable-section shots. */}
         <CardThumb style={{ aspectRatio: "16 / 9", marginBottom: "var(--image-pad)" }}>
-          <WebThumb src={project.webThumb!} alt={`${project.name} website`} />
+          <PreviewCycle images={project.webShots ?? [project.webThumb!]} alt={`${project.name} website`} />
         </CardThumb>
         <div className="pb-6">
           <div className="flex items-start justify-between gap-3 mb-2.5">
