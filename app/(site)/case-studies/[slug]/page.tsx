@@ -456,20 +456,9 @@ export default async function CaseStudyPage({
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbJsonLd) }}
       />
-      {/* Header — mobile: stacked + centred. Desktop: logo+title left, tags right, bottom-aligned. */}
+      {/* Header — mobile: stacked + centred. Desktop: title + live link left, tags right, bottom-aligned. */}
       <header className="flex flex-col items-center text-center gap-5 mb-8 md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left md:gap-x-6 md:gap-y-4 md:mb-6">
         <div className="min-w-0 max-w-full">
-          {project.logo && (
-            <div className="mb-4 flex justify-center md:block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={project.logo}
-                alt=""
-                aria-hidden="true"
-                style={{ height: 28, width: "auto", objectFit: "contain", display: "block" }}
-              />
-            </div>
-          )}
           <h1
             className="font-bold text-ink leading-[1.02]"
             style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}

@@ -578,9 +578,15 @@
     background: var(--bg);
     transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
   }
-  .sticker-pill.is-pink { border-color: var(--pink); color: var(--pink); }
+  .sticker-pill.is-pink {
+    border-color: var(--pink);
+    color: var(--pink);
+    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  }
   @media (hover: hover) {
     a.sticker-pill:hover, button.sticker-pill:hover { color: var(--pink); border-color: var(--pink); }
+    /* Already-pink pill (e.g. the case-study "Visit live site" link): fill on hover. */
+    a.sticker-pill.is-pink:hover, button.sticker-pill.is-pink:hover { background: var(--pink); color: var(--bg); border-color: var(--pink); }
   }
 
   /* Massive display type that drives the hero + section openers. */
