@@ -285,7 +285,55 @@ export function WebCard({ project, index }: { project: Project; index: number })
   );
 }
 
-export default function ProjectCard({ project, index }: { project: Project; index: number }) {
+/* ─── Brand card — logo + colour palette, for a web project surfaced under the
+   brand filter (so it reads as brand work, not a website screenshot). ─── */
+export function BrandCard({ project, index }: { project: Project; index: number }) {
+  const b = project.brandThumb!;
+  return (
+    <article className="card-animate col-span-12 sm:col-span-6 group relative" style={{ animationDelay: `${index * 0.03}s` }}>
+      <Link
+        href={`/case-studies/${project.slug}`}
+        className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"
+        aria-label={`View case study: ${project.name}`}
+      >
+        <CardThumb style={{ aspectRatio: "16 / 9", marginBottom: "var(--image-pad)" }}>
+          <div className="brand-tile" style={{ background: b.bg }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="brand-tile-logo" src={b.logo} alt={`${project.name} logo`} />
+            <div className="brand-tile-swatches" aria-hidden="true">
+              {b.colors.map((c) => (
+                <span key={c} style={{ background: c }} />
+              ))}
+            </div>
+          </div>
+        </CardThumb>
+        <div className="pb-6">
+          <div className="flex items-start justify-between gap-3 mb-2.5">
+            <h2 className="mono-heading text-ink group-hover:text-pink transition-colors">
+              {project.name}
+            </h2>
+            <span className="meta-mono text-ink-soft whitespace-nowrap mt-px" style={{ fontSize: "0.625rem" }}>{project.date}</span>
+          </div>
+          <div className="hover-reveal">
+            <div className="space-y-2.5">
+              <TagRow project={project} />
+              <HrItem block className="hr-line">
+                <p className="text-ink-soft leading-relaxed line-clamp-2" style={{ fontSize: "var(--text-caption)" }}>
+                  {project.oneLiner}
+                </p>
+              </HrItem>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
+export default function ProjectCard({ project, index, brandView = false }: { project: Project; index: number; brandView?: boolean }) {
+  // Under the brand filter, a web project shows its brand mark + palette instead
+  // of the website screenshot.
+  if (brandView && project.brandThumb) return <BrandCard project={project} index={index} />;
   if (project.webThumb)            return <WebCard project={project} index={index} />;
   // The /work + service grids are uniform half-width tiles. The featured tier's
   // full-width treatment is only for the home page (its own components), so a

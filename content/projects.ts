@@ -77,6 +77,10 @@ export interface Project {
   logo?: string;          // Small client/brand logo. Shown in card + case study header.
   cardLogo?: string;      // When set, the home/archive card thumbnail shows this
                           // logo (centred, animates on hover) instead of media.
+  // Brand-facet thumbnail: shown INSTEAD of the web screenshot when a web
+  // project surfaces under the "brand" filter, so its card reads as brand work
+  // (its logo + colour palette) rather than a website shot.
+  brandThumb?: { logo: string; colors: string[]; bg: string };
   cardStack?: string[];   // When set, the card thumbnail stacks these images
                           // (contained, not full-bleed) — e.g. two infographics.
   liveUrl?: string;
@@ -169,6 +173,11 @@ export const projects: Project[] = [
       video: "/images/kinaya/site-scroll.mp4",
     },
     webThumb: "/images/web/kinaya-1.webp",
+    brandThumb: {
+      logo: "/images/kinaya/logo.svg",
+      colors: ["#2F4858", "#E94E77", "#FF8AA2"],
+      bg: "#FCF4F6",
+    },
     heroImage: { src: "/images/kinaya/desktop.png", alt: "KinAya website desktop view with structured, accessible homepage layout" },
     images: [
       { src: "/images/kinaya/desktop.png", caption: "Home page: structured, readable, accessible layout across viewports.", alt: "KinAya Framer website homepage on desktop with clean navigation and NDIS branding" },
@@ -823,6 +832,11 @@ export const projects: Project[] = [
       video: "/images/lows-design-build/site-scroll.mp4",
     },
     webThumb: "/images/web/lows-1.webp",
+    brandThumb: {
+      logo: "/images/lows-design-build/logomark.svg",
+      colors: ["#424952", "#A99E92", "#E6E0D6"],
+      bg: "#FFFFFF",
+    },
     heroImage: {
       src: "/images/lows-design-build/hero.png",
       alt: "Lows Design and Build brand identity, hero composite showing logo and brand applications",
@@ -943,6 +957,11 @@ export const projects: Project[] = [
       video: "/images/plated-with-issy/site-scroll.mp4",
     },
     webThumb: "/images/web/plated-1.webp",
+    brandThumb: {
+      logo: "/images/plated-with-issy/wordmark.png",
+      colors: ["#3D3E2A", "#C9A24B", "#E4CE93"],
+      bg: "#F6EEDC",
+    },
     heroImage: {
       src: "/images/web/plated-1.webp",
       alt: "Plated with Issy website hero, script wordmark over a candlelit dinner table",

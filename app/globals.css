@@ -5080,3 +5080,41 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 @media (hover: hover) and (pointer: fine) {
   .reveal-open .hover-reveal .hr-inner { opacity: 1; }
 }
+
+/* Brand-facet card tile (BrandCard): the client's logo centred on their brand
+   colour with a palette swatch row. UNLAYERED on purpose (see the Tailwind v4
+   @layer-components tree-shaking note above the .reveal-open rule). */
+.brand-tile {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.brand-tile-logo {
+  width: auto;
+  height: auto;
+  max-width: 58%;
+  max-height: 40%;
+  object-fit: contain;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.group:hover .brand-tile-logo { transform: scale(1.04); }
+.brand-tile-swatches {
+  position: absolute;
+  left: 0; right: 0; bottom: clamp(12px, 2.2vw, 20px);
+  display: flex;
+  justify-content: center;
+  gap: clamp(6px, 1vw, 10px);
+}
+.brand-tile-swatches span {
+  width: clamp(16px, 2.4vw, 24px);
+  height: clamp(16px, 2.4vw, 24px);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1.5px rgba(20, 20, 20, 0.16);
+}
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .brand-tile-logo { transform: none; }
+}
