@@ -829,7 +829,9 @@ export const projects: Project[] = [
     liveUrl: "https://www.lowsdesignandbuild.com",
     heroModel: {
       model: "/models/studio-display/display.gltf",
-      video: "/images/lows-design-build/site-scroll.mp4",
+      // Lighter re-encode for the small 3D screen; the depth section keeps the
+      // full-res site-scroll.mp4.
+      video: "/images/lows-design-build/site-scroll-3d.mp4",
     },
     webThumb: "/images/web/lows-1.webp",
     brandThumb: {
@@ -954,7 +956,9 @@ export const projects: Project[] = [
     liveUrl: "https://www.platedwithissy.com",
     heroModel: {
       model: "/models/studio-display/display.gltf",
-      video: "/images/plated-with-issy/site-scroll.mp4",
+      // Lighter re-encode for the small 3D screen; the depth section keeps the
+      // full-res site-scroll.mp4.
+      video: "/images/plated-with-issy/site-scroll-3d.mp4",
     },
     webThumb: "/images/web/plated-1.webp",
     brandThumb: {
@@ -1070,7 +1074,9 @@ export const projects: Project[] = [
     liveUrl: "https://www.lola-audio.com",
     heroModel: {
       model: "/models/studio-display/display.gltf",
-      video: "/images/lola-audio/site-scroll.mp4",
+      // Lighter re-encode for the small 3D screen; the depth section keeps the
+      // full-res site-scroll.mp4.
+      video: "/images/lola-audio/site-scroll-3d.mp4",
     },
     webThumb: "/images/web/lola-1.webp",
     heroImage: {
