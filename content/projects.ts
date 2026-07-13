@@ -1089,6 +1089,13 @@ export const projects: Project[] = [
             caption: "The film grid: silent autoplay, a listen on every card, watched work stacking into pills.",
             alt: "Lola Audio portfolio grid with film cards and audio visualisers",
           },
+          {
+            src: "/images/lola-audio/watch-poster.webp",
+            video: "/images/lola-audio/watch.mp4",
+            aspectRatio: "16/9",
+            caption: "Watch: the film full screen with a custom scrubber, and nothing else on the screen but the work.",
+            alt: "Lola Audio full-screen film player, a runway film playing with a custom timeline scrubber",
+          },
         ],
       },
       {
