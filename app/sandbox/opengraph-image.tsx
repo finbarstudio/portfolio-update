@@ -29,11 +29,11 @@ function Mark({ size: s, color = PINK }: { size: number; color?: string }) {
   );
 }
 
-// Space Mono (the wordmark face) isn't bundled with next/og, so fetch it at
-// generation time. Falls back to the default face if offline.
-async function loadSpaceMono(weight: number): Promise<ArrayBuffer | null> {
+// Faces aren't bundled with next/og, so fetch them at generation time.
+// Falls back to the default face if offline.
+async function loadGoogleFont(family: string, weight: number): Promise<ArrayBuffer | null> {
   try {
-    const css = await fetch(`https://fonts.googleapis.com/css2?family=Space+Mono:wght@${weight}`).then((r) => r.text());
+    const css = await fetch(`https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weight}`).then((r) => r.text());
     const url = css.match(/src:\s*url\((https:\/\/[^)]+)\)\s*format\(['"]?(?:woff2?|truetype|opentype)['"]?\)/)?.[1];
     if (!url) return null;
     return await fetch(url).then((r) => r.arrayBuffer());
@@ -43,8 +43,14 @@ async function loadSpaceMono(weight: number): Promise<ArrayBuffer | null> {
 }
 
 export default async function SandboxOpengraphImage() {
-  const [mono700, mono400] = await Promise.all([loadSpaceMono(700), loadSpaceMono(400)]);
+  // Host Grotesk = the canonical wordmark; Space Mono stays for the SANDBOX title.
+  const [host700, mono700, mono400] = await Promise.all([
+    loadGoogleFont("Host Grotesk", 700),
+    loadGoogleFont("Space Mono", 700),
+    loadGoogleFont("Space Mono", 400),
+  ]);
   const fonts = [
+    host700 && { name: "Host Grotesk", data: host700, weight: 700 as const, style: "normal" as const },
     mono700 && { name: "Space Mono", data: mono700, weight: 700 as const, style: "normal" as const },
     mono400 && { name: "Space Mono", data: mono400, weight: 400 as const, style: "normal" as const },
   ].filter(Boolean) as { name: string; data: ArrayBuffer; weight: 400 | 700; style: "normal" }[];
@@ -78,7 +84,7 @@ export default async function SandboxOpengraphImage() {
           }}
         >
           {/* Brand wordmark */}
-          <div style={{ display: "flex", alignItems: "center", fontSize: 34, fontWeight: 700, letterSpacing: "-0.01em", textTransform: "uppercase", lineHeight: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", fontFamily: "Host Grotesk, sans-serif", fontSize: 34, fontWeight: 700, letterSpacing: "-0.02em", textTransform: "uppercase", lineHeight: 1 }}>
             FINBARSTUDIO
             <div style={{ display: "flex", marginLeft: 6 }}>
               <Mark size={26} />

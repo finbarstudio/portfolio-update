@@ -3956,15 +3956,18 @@ body:has(.sb-root) {
    the asterisk as Space Mono's own * glyph (.brand-wordmark-star) for clean
    inline spacing at small sizes. */
 .brand-wordmark {
-  font-family: var(--font-mono);
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 /* The pink asterisk after the wordmark. A real Space Mono glyph (not an SVG) so
    it stays on the baseline and keeps its spacing at any size — the old inline
    SVG broke both at the ~9-11px footer-credit size. */
 .brand-wordmark-star {
+  /* Keep the small inline * as Space Mono's own glyph (tuned baseline/spacing at
+     ~9-11px), even though the letters are now Host Grotesk. */
+  font-family: var(--font-mono);
   color: var(--pink, #e8718b);
 }
 

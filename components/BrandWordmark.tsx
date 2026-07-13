@@ -2,7 +2,7 @@ import { forwardRef, type Ref } from "react";
 import { ASTERISK_POINTS } from "./brand-asterisk";
 
 /**
- * BrandWordmark — the canonical logo, used everywhere: FINBARSTUDIO (Space Mono,
+ * BrandWordmark — the canonical logo, used everywhere: FINBARSTUDIO (Host Grotesk,
  * caps, no space) with the pink brand asterisk (SVG polygon) on the end.
  * Styling lives in the .brand-wordmark / .brand-wordmark-mark token. */
 const BrandWordmark = forwardRef<HTMLSpanElement, { className?: string; markRef?: Ref<HTMLSpanElement> }>(

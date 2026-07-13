@@ -7,7 +7,7 @@ import { ASTERISK_POINTS } from "@/components/brand-asterisk";
  * Next.js auto-emits this as the `og:image` / `twitter:image` for every route
  * that doesn't set its own (home, about). Case studies override it with their
  * hero image in `generateMetadata`. Generated at 1200×630 on the cream brand
- * ground, built around the canonical logo: FINBARSTUDIO in Space Mono caps,
+ * ground, built around the canonical logo: FINBARSTUDIO in Host Grotesk caps,
  * no space, the brand asterisk on the end.
  */
 
@@ -32,12 +32,12 @@ function Mark({ size: s, color = PINK }: { size: number; color?: string }) {
   );
 }
 
-// Space Mono (the wordmark face) isn't bundled with next/og, so fetch it from
+// The wordmark and label faces aren't bundled with next/og, so fetch them from
 // Google Fonts at generation time. Falls back to the default face if offline.
-async function loadSpaceMono(weight: number): Promise<ArrayBuffer | null> {
+async function loadGoogleFont(family: string, weight: number): Promise<ArrayBuffer | null> {
   try {
     const css = await fetch(
-      `https://fonts.googleapis.com/css2?family=Space+Mono:wght@${weight}`
+      `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weight}`
     ).then((r) => r.text());
     const url = css.match(
       /src:\s*url\((https:\/\/[^)]+)\)\s*format\(['"]?(?:woff2?|truetype|opentype)['"]?\)/
@@ -50,8 +50,14 @@ async function loadSpaceMono(weight: number): Promise<ArrayBuffer | null> {
 }
 
 export default async function OpengraphImage() {
-  const [mono700, mono400] = await Promise.all([loadSpaceMono(700), loadSpaceMono(400)]);
+  // Host Grotesk = the wordmark face; Space Mono stays for the mono caps labels.
+  const [host700, mono700, mono400] = await Promise.all([
+    loadGoogleFont("Host Grotesk", 700),
+    loadGoogleFont("Space Mono", 700),
+    loadGoogleFont("Space Mono", 400),
+  ]);
   const fonts = [
+    host700 && { name: "Host Grotesk", data: host700, weight: 700 as const, style: "normal" as const },
     mono700 && { name: "Space Mono", data: mono700, weight: 700 as const, style: "normal" as const },
     mono400 && { name: "Space Mono", data: mono400, weight: 400 as const, style: "normal" as const },
   ].filter(Boolean) as { name: string; data: ArrayBuffer; weight: 400 | 700; style: "normal" }[];
@@ -77,7 +83,8 @@ export default async function OpengraphImage() {
           style={{
             display: "flex",
             alignItems: "center",
-            fontSize: 88,
+            fontFamily: "Host Grotesk, sans-serif",
+            fontSize: 92,
             fontWeight: 700,
             letterSpacing: "-0.02em",
             textTransform: "uppercase",
