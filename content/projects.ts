@@ -833,7 +833,7 @@ export const projects: Project[] = [
       model: "/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
       // full-res site-scroll.mp4.
-      video: "/images/lows-design-build/site-scroll-3d.mp4",
+      video: "/images/lows-design-build/site-scroll-3d.mp4?v=2",
     },
     webThumb: "/images/web/lows-1.webp",
     webShots: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
@@ -885,7 +885,7 @@ export const projects: Project[] = [
         images: [
           {
             src: "/images/web/lows-1.webp",
-            video: "/images/lows-design-build/site-scroll.mp4",
+            video: "/images/lows-design-build/site-scroll.mp4?v=2",
             aspectRatio: "16/9",
             caption: "A scroll through the live site: masked rises, docking titles.",
             alt: "Scrolling capture of the Lows Design and Build website showing masked reveal animations",
@@ -961,7 +961,7 @@ export const projects: Project[] = [
       model: "/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
       // full-res site-scroll.mp4.
-      video: "/images/plated-with-issy/site-scroll-3d.mp4",
+      video: "/images/plated-with-issy/site-scroll-3d.mp4?v=2",
     },
     webThumb: "/images/web/plated-1.webp",
     webShots: ["/images/web/plated-1.webp", "/images/web/plated-2.webp", "/images/web/plated-3.webp", "/images/web/plated-4.webp"],
@@ -995,7 +995,7 @@ export const projects: Project[] = [
         images: [
           {
             src: "/images/web/plated-1.webp",
-            video: "/images/plated-with-issy/site-scroll.mp4",
+            video: "/images/plated-with-issy/site-scroll.mp4?v=2",
             aspectRatio: "16/9",
             caption: "A scroll through the live site, hero to footer.",
             alt: "Scrolling capture of the Plated with Issy website showing the pinned story and gallery",
@@ -1080,7 +1080,7 @@ export const projects: Project[] = [
       model: "/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
       // full-res site-scroll.mp4.
-      video: "/images/lola-audio/site-scroll-3d.mp4",
+      video: "/images/lola-audio/site-scroll-3d.mp4?v=2",
     },
     webThumb: "/images/web/lola-1.webp",
     webShots: ["/images/web/lola-1.webp", "/images/web/lola-2.webp"],
@@ -1097,7 +1097,7 @@ export const projects: Project[] = [
         images: [
           {
             src: "/images/web/lola-1.webp",
-            video: "/images/lola-audio/site-scroll.mp4",
+            video: "/images/lola-audio/site-scroll.mp4?v=2",
             aspectRatio: "16/9",
             caption: "The desk played live, then the scroll: the card grows until the whole screen is paper.",
             alt: "Scrolling capture of the Lola Audio site, faders playing stems then the card growing to full screen",

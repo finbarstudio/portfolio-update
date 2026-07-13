@@ -46,14 +46,15 @@ const nextConfig: NextConfig = {
         ],
       },
       // Long-lived caching for /public assets (the "Add Expires headers"
-      // audit). NOT immutable: this repo replaces images in place (web
-      // stills, headshot), so a day of freshness + a year of
-      // stale-while-revalidate keeps repeat views instant without pinning
-      // stale assets for a year.
+      // audit). NOT immutable: this repo replaces images/videos in place, so a
+      // day of freshness + a day of stale-while-revalidate keeps repeat views
+      // instant while capping worst-case staleness at ~2 days. When a replaced
+      // asset must appear immediately (e.g. a re-recorded case-study video),
+      // bump a ?v= query on its reference to bust already-cached copies.
       {
         source: "/(images|models)/:path*",
         headers: [
-          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=31536000" },
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=86400" },
         ],
       },
     ];
