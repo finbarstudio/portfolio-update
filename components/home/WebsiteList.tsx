@@ -60,16 +60,27 @@ export default function WebsiteList({ sites }: { sites: Website[] }) {
             >
               <div className="overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-6 pb-10 md:pb-14">
-                  <div className="md:col-span-4 flex flex-col gap-5">
+                  <div className="md:col-span-4 flex flex-col gap-8">
                     <p className="text-ink-soft leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)" }}>
                       {w.bio}
                     </p>
                     {w.quote && (
-                      <figure className="m-0 border-l-2 border-pink pl-4">
-                        <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)" }}>
-                          &ldquo;{w.quote.text}&rdquo;
-                        </blockquote>
-                        <figcaption className="mono-label text-ink-soft mt-2">{w.quote.author}</figcaption>
+                      <figure className="m-0">
+                        {/* Quote in an outlined box; the speech mark sits on the
+                            top outline with a bg-masked gap breaking the border. */}
+                        <div className="relative border border-line" style={{ borderRadius: "6px", padding: "30px 24px 22px" }}>
+                          <span
+                            aria-hidden="true"
+                            className="absolute left-1/2 top-0"
+                            style={{ transform: "translate(-50%, -52%)", background: "var(--bg)", padding: "0 10px", color: "var(--pink)", fontFamily: "var(--font-display), Georgia, serif", fontSize: "clamp(40px, 4vw, 48px)", lineHeight: 1 }}
+                          >
+                            &ldquo;
+                          </span>
+                          <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)" }}>
+                            {w.quote.text}
+                          </blockquote>
+                        </div>
+                        <figcaption className="mono-label text-ink-soft mt-3 text-center">&mdash; {w.quote.author}</figcaption>
                       </figure>
                     )}
                     <div className="flex flex-col items-center gap-2.5 pt-1">
