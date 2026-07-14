@@ -33,7 +33,7 @@ const WEBSITES: Website[] = [
     url: "https://www.lowsdesignandbuild.com",
     year: "2026",
     bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
-    images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
+    images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp", "/images/web/lows-4.webp"],
     caseStudy: "/case-studies/lows-design-build",
   },
   {
@@ -51,7 +51,7 @@ const WEBSITES: Website[] = [
     url: "https://www.lola-audio.com",
     year: "2026",
     bio: "A portfolio for a composer and sound designer that opens on a working mixing desk: push a fader and her stems play in time, while a line of type draws the live mix. Sanity CMS down to the sound itself.",
-    images: ["/images/web/lola-1.webp", "/images/web/lola-2.webp"],
+    images: ["/images/web/lola-1.webp", "/images/web/lola-2.webp", "/images/web/lola-3.webp"],
     caseStudy: "/case-studies/lola-audio",
   },
   {

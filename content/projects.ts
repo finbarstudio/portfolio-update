@@ -836,7 +836,7 @@ export const projects: Project[] = [
       video: "/images/lows-design-build/site-scroll-3d.mp4?v=2",
     },
     webThumb: "/images/web/lows-1.webp",
-    webShots: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
+    webShots: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp", "/images/web/lows-4.webp"],
     brandThumb: {
       logo: "/images/lows-design-build/logomark.svg",
       colors: ["#424952", "#A99E92", "#E6E0D6"],
@@ -1083,7 +1083,7 @@ export const projects: Project[] = [
       video: "/images/lola-audio/site-scroll-3d.mp4?v=2",
     },
     webThumb: "/images/web/lola-1.webp",
-    webShots: ["/images/web/lola-1.webp", "/images/web/lola-2.webp"],
+    webShots: ["/images/web/lola-1.webp", "/images/web/lola-2.webp", "/images/web/lola-3.webp"],
     heroImage: {
       src: "/images/web/lola-1.webp",
       alt: "Lola Audio title card, a white sheet of paper with a signature logo between two working mixing-desk faders",
