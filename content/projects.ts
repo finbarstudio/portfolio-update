@@ -1072,7 +1072,7 @@ export const projects: Project[] = [
       "A portfolio that behaves like her instrument. Visitors don't read that she's a sound designer, they find out with their hands in the first five seconds. And the whole thing, words to waveforms, is hers to change from one dashboard.",
     testimonial: {
       quote:
-        "I kept sending over ideas that I assumed were impossible, make the faders play my stems in time, make a line of text turn into the mix, and they'd just appear on the site a day later, better than I'd pictured. It doesn't feel like a website about my work. It feels like a piece of it.",
+        "Finbar is reliable, fast and really easy to work with. He was able to translate the brief of a sound-based website into something aesthetically beautiful and totally original. I'm so impressed and would genuinely recommend him to anyone.",
       author: "Lola Stoodley, composer & sound designer",
     },
     liveUrl: "https://www.lola-audio.com",
