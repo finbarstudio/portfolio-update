@@ -35,6 +35,10 @@ const WEBSITES: Website[] = [
     bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
     images: ["/images/web/lows-1.webp?v=2", "/images/web/lows-2.webp?v=2", "/images/web/lows-3.webp?v=2", "/images/web/lows-4.webp?v=2"],
     caseStudy: "/case-studies/lows-design-build",
+    quote: {
+      text: "…it has changed the kind of enquiries coming in. We are quoting bigger projects because the site holds up next to firms twice our size.",
+      author: "The Lows family, Lows Design + Build",
+    },
   },
   {
     slug: "plated-with-issy",
@@ -44,6 +48,10 @@ const WEBSITES: Website[] = [
     bio: "Brand and site for a candlelit supper club, built together: one continuous scroll through an evening, a polaroid gallery of past dinners, and a Payload CMS Issy runs from her phone.",
     images: ["/images/web/plated-1.webp", "/images/web/plated-2.webp", "/images/web/plated-3.webp", "/images/web/plated-4.webp"],
     caseStudy: "/case-studies/plated-with-issy",
+    quote: {
+      text: "Finbar just got it… the site went from an idea to launched faster than I thought was possible. It feels completely like me.",
+      author: "Issy Park, Plated with Issy",
+    },
   },
   {
     slug: "lola-audio",
@@ -53,6 +61,10 @@ const WEBSITES: Website[] = [
     bio: "A portfolio for a composer and sound designer that opens on a working mixing desk: push a fader and her stems play in time, while a line of type draws the live mix. Sanity CMS down to the sound itself.",
     images: ["/images/web/lola-1.webp", "/images/web/lola-2.webp", "/images/web/lola-3.webp"],
     caseStudy: "/case-studies/lola-audio",
+    quote: {
+      text: "Finbar is reliable, fast and really easy to work with… something aesthetically beautiful and totally original.",
+      author: "Lola Stoodley, composer & sound designer",
+    },
   },
   {
     slug: "kinaya",
@@ -62,6 +74,10 @@ const WEBSITES: Website[] = [
     bio: "Full rebrand and a six-page site for an Adelaide NDIS provider, with the CMS handed over to their team and a site-wide accessibility text resizer, because their audience genuinely needs one.",
     images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp", "/images/web/kinaya-4.webp"],
     caseStudy: "/case-studies/kinaya",
+    quote: {
+      text: "The branding and website genuinely felt like one vision… he was thinking beyond just aesthetics… we felt confident managing the site ourselves after his walkthrough.",
+      author: "Aryan Sareen, KinAya",
+    },
   },
 ];
 

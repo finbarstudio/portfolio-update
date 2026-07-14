@@ -16,6 +16,8 @@ export type Website = {
   images: string[];
   /** /case-studies route, when one exists */
   caseStudy?: string;
+  /** Short verbatim pull-quote (ellipsis for cuts, [] for inferred words). */
+  quote?: { text: string; author: string };
 };
 
 export default function WebsiteList({ sites }: { sites: Website[] }) {
@@ -62,6 +64,14 @@ export default function WebsiteList({ sites }: { sites: Website[] }) {
                     <p className="text-ink-soft leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)" }}>
                       {w.bio}
                     </p>
+                    {w.quote && (
+                      <figure className="m-0 border-l-2 border-pink pl-4">
+                        <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)" }}>
+                          &ldquo;{w.quote.text}&rdquo;
+                        </blockquote>
+                        <figcaption className="mono-label text-ink-soft mt-2">{w.quote.author}</figcaption>
+                      </figure>
+                    )}
                     <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                       <a
                         href={w.url}
