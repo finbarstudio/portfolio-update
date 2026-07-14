@@ -5127,24 +5127,3 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 @media (prefers-reduced-motion: reduce) {
   .group:hover .brand-tile-logo { transform: none; }
 }
-
-/* PreviewCycle dots — tiny progress pips bottom-centre of a cycling web thumb.
-   UNLAYERED (Tailwind v4 @layer-components purge, as with .brand-tile). */
-.preview-cycle-dots {
-  position: absolute;
-  left: 0; right: 0; bottom: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-.preview-cycle:hover .preview-cycle-dots { opacity: 1; }
-.preview-cycle-dots span {
-  width: 6px; height: 6px; border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 0 0 1px rgba(20, 20, 20, 0.18);
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-.preview-cycle-dots span.is-on { background: var(--pink); transform: scale(1.25); }

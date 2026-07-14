@@ -836,7 +836,7 @@ export const projects: Project[] = [
       video: "/images/lows-design-build/site-scroll-3d.mp4?v=2",
     },
     webThumb: "/images/web/lows-1.webp",
-    webShots: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp", "/images/web/lows-4.webp"],
+    webShots: ["/images/web/lows-1.webp?v=2", "/images/web/lows-2.webp?v=2", "/images/web/lows-3.webp?v=2", "/images/web/lows-4.webp?v=2"],
     brandThumb: {
       logo: "/images/lows-design-build/logomark.svg",
       colors: ["#424952", "#A99E92", "#E6E0D6"],

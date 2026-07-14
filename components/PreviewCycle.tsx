@@ -53,13 +53,6 @@ export default function PreviewCycle({
           style={{ opacity: idx === i ? 1 : 0 }}
         />
       ))}
-      {images.length > 1 && (
-        <div className="preview-cycle-dots" aria-hidden="true">
-          {images.map((src, idx) => (
-            <span key={src} className={idx === i ? "is-on" : ""} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
