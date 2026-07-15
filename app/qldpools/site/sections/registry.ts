@@ -2,6 +2,7 @@ import type { Section } from "./kit";
 import { optionsReviews } from "./options/reviews";
 import { optionsServices } from "./options/services";
 import { optionsWhy } from "./options/why";
+import { optionsWhyGrid } from "./options/why-grid";
 import { optionsGallery } from "./options/gallery";
 import { optionsTestimonials } from "./options/testimonials";
 import { optionsBlog } from "./options/blog";
@@ -18,7 +19,9 @@ export type Gallery = { slug: string; label: string; blurb: string; options: Sec
 export const GALLERIES: Gallery[] = [
   { slug: "reviews", label: "Reviews strip", blurb: "The Google trust band under the hero", options: optionsReviews },
   { slug: "services", label: "Services", blurb: "Complete Pool Solutions, 9 services", options: optionsServices },
-  { slug: "why", label: "Why choose us", blurb: "The Proof, Not the Pitch, 5 reasons", options: optionsWhy },
+  // 1-25 the first set; 26-35 the horizontal-grid follow-up (big text + icons,
+  // less scroll) Finbar asked for after reviewing 3 and 7.
+  { slug: "why", label: "Why choose us", blurb: "The Proof, Not the Pitch (26-35 = horizontal grid set)", options: [...optionsWhy, ...optionsWhyGrid] },
   { slug: "gallery", label: "Gallery", blurb: "Recent Pool Installations", options: optionsGallery },
   { slug: "testimonials", label: "Testimonials", blurb: "What Our Customers Say", options: optionsTestimonials },
   { slug: "blog", label: "Blog", blurb: "Latest Pool Insights & Projects", options: optionsBlog },

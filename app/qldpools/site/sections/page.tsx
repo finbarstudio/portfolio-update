@@ -30,6 +30,26 @@ export default function SectionsIndex() {
       <ul className="mt-12 m-0 p-0 list-none border-t border-black/10">
         <li>
           <Link
+            href="/qldpools/site/logos"
+            className="group flex items-baseline justify-between gap-6 py-5 border-b border-black/10"
+          >
+            <span className="flex items-baseline gap-5">
+              <span className="qpi-caps text-[var(--qpi-ink)]/35 text-[10px] tabular-nums">LOGO</span>
+              <span
+                className="qpi-display text-[var(--qpi-ink)] group-hover:text-[var(--qpi-blue)] transition-colors"
+                style={{ fontSize: "clamp(1.1rem, 2vw, 1.6rem)" }}
+              >
+                Arch wordmarks
+              </span>
+              <span className="text-[var(--qpi-ink)]/45 hidden sm:inline" style={{ fontSize: "0.9rem" }}>
+                30 text logos built on the arch
+              </span>
+            </span>
+            <span className="qpi-caps text-[var(--qpi-blue)] text-[10px]">30</span>
+          </Link>
+        </li>
+        <li>
+          <Link
             href="/qldpools/site/heroes"
             className="group flex items-baseline justify-between gap-6 py-5 border-b border-black/10"
           >
