@@ -3,17 +3,23 @@
 import { useEffect, useState } from "react";
 
 /**
- * Picking chrome for the hero gallery: a fixed counter that tracks which hero
- * is on screen, and a tap-to-jump number grid. Arrow keys / j·k step through.
- * Operates purely on the DOM (frames carry .qpi-hero-frame + data-index), so
- * the hero nodes themselves stay server-rendered.
+ * Picking chrome shared by the QPI option galleries (heroes + sections): a
+ * fixed counter tracking which option is on screen, and a tap-to-jump number
+ * grid. Arrow keys / j·k step through. Operates purely on the DOM (frames carry
+ * `selector` + data-index) so the option nodes stay server-rendered.
  */
-export default function HeroesChrome({ total }: { total: number }) {
+export default function GalleryChrome({
+  total,
+  selector = ".qpi-hero-frame",
+}: {
+  total: number;
+  selector?: string;
+}) {
   const [current, setCurrent] = useState(1);
   const [open, setOpen] = useState(false);
 
   const jump = (i: number) => {
-    const el = document.querySelectorAll<HTMLElement>(".qpi-hero-frame")[i];
+    const el = document.querySelectorAll<HTMLElement>(selector)[i];
     if (!el) return;
     const w = window as unknown as { __lenis?: { scrollTo: (t: HTMLElement) => void } };
     if (w.__lenis) w.__lenis.scrollTo(el);
@@ -22,7 +28,7 @@ export default function HeroesChrome({ total }: { total: number }) {
   };
 
   useEffect(() => {
-    const frames = Array.from(document.querySelectorAll<HTMLElement>(".qpi-hero-frame"));
+    const frames = Array.from(document.querySelectorAll<HTMLElement>(selector));
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -32,11 +38,11 @@ export default function HeroesChrome({ total }: { total: number }) {
           }
         });
       },
-      { threshold: 0.5 },
+      { threshold: 0.35 },
     );
     frames.forEach((f) => io.observe(f));
     return () => io.disconnect();
-  }, []);
+  }, [selector]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -58,7 +64,7 @@ export default function HeroesChrome({ total }: { total: number }) {
       <button
         onClick={() => setOpen((o) => !o)}
         className="fixed bottom-4 right-4 z-[120] rounded-full bg-black/75 text-white px-4 py-2 text-xs tabular-nums backdrop-blur"
-        aria-label="Toggle hero index"
+        aria-label="Toggle option index"
       >
         {String(current).padStart(3, "0")} / {total}
       </button>

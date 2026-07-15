@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
-import HeroesChrome from "./HeroesChrome";
+import GalleryChrome from "@/components/qldpools/GalleryChrome";
 import type { Hero } from "./kit";
 import { familyA } from "./families/a";
 import { familyB } from "./families/b";
@@ -36,7 +36,7 @@ export default function HeroGallery() {
   const flat = GROUPS.flatMap((g) => g.heroes.map((h) => ({ ...h, group: g.label })));
   return (
     <div className="bg-white">
-      <HeroesChrome total={flat.length} />
+      <GalleryChrome total={flat.length} selector=".qpi-hero-frame" />
       {flat.map((h, i) => (
         <div
           key={i}
