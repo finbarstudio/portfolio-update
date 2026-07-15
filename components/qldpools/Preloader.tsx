@@ -118,14 +118,18 @@ export default function Preloader() {
     };
 
     let raf = 0;
-    const t0 = performance.now();
-    const frame = (now: number) => {
-      const t = now - t0;
-      render(t);
-      if (t >= endAll) {
-        finish();
-        return;
-      }
+    let cancelled = false;
+    const start = () => {
+      const t0 = performance.now();
+      const frame = (now: number) => {
+        const t = now - t0;
+        render(t);
+        if (t >= endAll) {
+          finish();
+          return;
+        }
+        raf = requestAnimationFrame(frame);
+      };
       raf = requestAnimationFrame(frame);
     };
 
@@ -136,10 +140,29 @@ export default function Preloader() {
     // the SVG curtain is settled — drop the opaque backdrop so the cut can see
     // through to the hero
     root.style.background = "transparent";
-    raf = requestAnimationFrame(frame);
-    const failsafe = window.setTimeout(finish, endAll + 900);
+
+    // Don't open the cut onto a blank frame: hold the plain white curtain until
+    // the hero <img> has decoded (its base64 blur paints instantly underneath,
+    // so even the timeout path shows the sunset colours, just softer). Capped
+    // wait so a slow connection can't stall the entrance.
+    const heroImg = document.querySelector<HTMLImageElement>("img[data-qpi-hero]");
+    const decoded =
+      heroImg && !heroImg.complete
+        ? heroImg.decode().catch(() => {})
+        : Promise.resolve();
+    const capped = new Promise<void>((r) => {
+      window.setTimeout(r, 1800);
+    });
+    Promise.race([decoded, capped]).then(() => {
+      if (cancelled) return;
+      start();
+    });
+
+    // Absolute fail-safe: curtain always comes down, decode wait included.
+    const failsafe = window.setTimeout(finish, endAll + 2800);
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(raf);
       ro.disconnect();
       window.clearTimeout(failsafe);
