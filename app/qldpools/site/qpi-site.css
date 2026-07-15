@@ -1,147 +1,234 @@
-/* QLD Pool Installs demo — scoped styles.
-   Everything lives under .qpi-site so nothing leaks into the portfolio.
-   Palette is a starting point (pool blues on warm white); refine in the
-   design pass. */
+/* ──────────────────────────────────────────────────────────────────────────
+   QLD Pool Installs demo — scoped styles. Ported from the Lindon Homes demo
+   (archive/builders-outreach/app/lindon/site/lindon-site.css) and reskinned:
+   Outfit everywhere (loaded via next/font in layout.tsx as --font-qpi), deep
+   pool navy for ink, their blue as the accent. Everything is scoped under
+   `.qpi-site` so nothing leaks into the portfolio; the Lenis helper classes
+   are the standard global ones and only apply while a demo page is mounted.
+   This file is imported only by app/qldpools/site/layout.tsx.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* ── Root wrapper: tokens + base type, scoped to the demo subtree ── */
 
 .qpi-site {
-  --qpi-navy: #0b2a4a;
-  --qpi-blue: #1173b8;
-  --qpi-aqua: #9fdcee;
-  --qpi-paper: #f8f7f3;
-  --qpi-font: var(--font-qpi), system-ui, sans-serif;
+  --qpi-ink: #0b2a4a;   /* deep pool navy — default text + dark sections */
+  --qpi-blue: #1173b8;  /* their brand blue — accents/hover */
+  --qpi-black: #061a30; /* near-black hover */
+  --white: #ffffff;
 
-  font-family: var(--qpi-font);
-  background: var(--qpi-paper);
-  color: var(--qpi-navy);
+  background: var(--white);
+  color: var(--qpi-ink);
+  font-family: var(--font-qpi), system-ui, sans-serif;
   min-height: 100svh;
+  overflow-x: hidden;
 }
 
-/* The portfolio's globals.css uppercases headings and sets Host Grotesk on
-   them; undo both inside the demo so it reads as its own site. */
-.qpi-site h1,
-.qpi-site h2,
-.qpi-site h3,
-.qpi-site h4 {
-  font-family: var(--qpi-font);
+/* Headings + display text — Outfit, sentence case (the portfolio's globals
+   uppercase h1–h4 and set Host Grotesk; undo both inside the demo). */
+.qpi-site :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-qpi), system-ui, sans-serif;
   text-transform: none;
-}
-
-/* ── Nav ─────────────────────────────────────────────────────── */
-.qpi-nav {
-  position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 18px clamp(20px, 4vw, 48px);
-}
-
-.qpi-logo {
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  color: var(--qpi-navy);
-  text-decoration: none;
-  white-space: nowrap;
-}
-.qpi-logo span { color: var(--qpi-blue); }
-
-.qpi-nav-links {
-  display: flex;
-  align-items: center;
-  gap: clamp(14px, 2.2vw, 30px);
-}
-.qpi-nav-links a {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--qpi-navy);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-.qpi-nav-links a:hover { color: var(--qpi-blue); }
-@media (max-width: 767px) {
-  .qpi-nav-links { display: none; }
-}
-
-.qpi-nav-cta {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--qpi-paper);
-  background: var(--qpi-blue);
-  text-decoration: none;
-  padding: 0.7em 1.4em;
-  border-radius: 999px;
-  white-space: nowrap;
-  transition: background 0.15s ease;
-}
-.qpi-nav-cta:hover { background: var(--qpi-navy); }
-
-/* ── Hero ────────────────────────────────────────────────────── */
-.qpi-hero {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 clamp(20px, 4vw, 48px);
-}
-
-.qpi-hero-kicker {
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--qpi-blue);
-  margin-bottom: 20px;
-}
-
-.qpi-hero-title {
+  letter-spacing: normal;
   font-weight: 700;
-  font-size: clamp(2.4rem, 6vw, 5rem);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  max-width: 18ch;
-  text-wrap: balance;
 }
 
-.qpi-hero-sub {
-  margin-top: 24px;
-  font-size: clamp(1rem, 1.4vw, 1.2rem);
-  line-height: 1.5;
-  max-width: 48ch;
-  color: color-mix(in srgb, var(--qpi-navy) 72%, transparent);
+/* Wordmark / display treatment — heavy Outfit caps */
+.qpi-site .qpi-display {
+  font-family: var(--font-qpi), system-ui, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-/* ── Back-to-finbar.studio bubble ────────────────────────────── */
-.qpi-back {
+/* Small caps label treatment (nav links, cursor bubble, stat chips) */
+.qpi-site .qpi-caps {
+  font-family: var(--font-qpi), system-ui, sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.qpi-site section {
+  position: relative;
+}
+
+/* ── "Back to finbar.studio" tab — fixed, middle-left, above the demo nav ── */
+
+.qpi-site .qpi-back {
   position: fixed;
-  left: 18px;
-  bottom: 18px;
-  z-index: 30;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 80;
   display: inline-flex;
   align-items: center;
-  gap: 0;
+  height: 42px;
+  /* Pill collapses to a 42px circle; expands rightward on hover. The brand
+     pink + Space Mono caps mirror the main finbar.studio site. */
   background: var(--pink, #e8718b);
-  color: #fff;
+  color: var(--bg, #f6efe1);
   border-radius: 999px;
-  padding: 10px 14px;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-mono, var(--font-space-mono, monospace));
   font-size: 11px;
-  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
   text-decoration: none;
-  max-width: 42px;
   overflow: hidden;
+  box-shadow: 0 4px 14px rgba(6, 26, 48, 0.18);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.qpi-site .qpi-back:hover {
+  transform: translateY(-50%) scale(1.03);
+  box-shadow: 0 6px 18px rgba(6, 26, 48, 0.26);
+}
+.qpi-site .qpi-back-arrow {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  line-height: 1;
+}
+.qpi-site .qpi-back-text {
+  max-width: 0;
+  opacity: 0;
   white-space: nowrap;
-  transition: max-width 0.35s ease, gap 0.35s ease;
+  overflow: hidden;
+  padding-right: 0;
+  transition: max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease,
+    padding-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.qpi-back:hover,
-.qpi-back:focus-visible {
+.qpi-site .qpi-back:hover .qpi-back-text,
+.qpi-site .qpi-back:focus-visible .qpi-back-text {
   max-width: 260px;
-  gap: 8px;
+  opacity: 1;
+  padding-right: 1.2rem;
 }
-.qpi-back-arrow { line-height: 1; }
-.qpi-back-text { line-height: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .qpi-site .qpi-back,
+  .qpi-site .qpi-back-text {
+    transition: none;
+  }
+}
+
+/* ── Lenis smooth scroll (global helper classes; only active on demo pages) ── */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ── Footer (demo-specific .qf-* classes; consume .qpi-site vars) ── */
+
+.qf {
+  position: relative;
+  min-height: 560px;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--white);
+  color: var(--qpi-ink);
+  padding-top: calc(3.5rem + 6px);
+  font-family: var(--font-qpi), system-ui, sans-serif;
+}
+
+.qf-rule {
+  height: 1px;
+  background: var(--qpi-ink);
+  margin: 0 clamp(20px, 3vw, 40px);
+  transform-origin: left;
+}
+
+.qf-info {
+  margin-top: auto;
+  padding: 0 clamp(20px, 3vw, 40px) clamp(22px, 3.5vh, 48px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: end;
+  gap: 1.6rem 1.5rem;
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+}
+
+@media (min-width: 768px) {
+  .qf-info {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+}
+
+.qf-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.qf-col-end {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.qf-mask {
+  overflow: hidden;
+}
+.qf-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+}
+
+.qf-label {
+  font-family: var(--font-qpi), system-ui, sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 9px;
+  color: var(--qpi-blue);
+  margin-bottom: 0.4em;
+}
+.qf-value {
+  color: var(--qpi-ink);
+}
+.qf-link {
+  color: var(--qpi-ink);
+  text-decoration: none;
+  transition: color 0.25s;
+}
+.qf-link:hover {
+  color: var(--qpi-blue);
+}
+
+/* finbar credit — canonical wordmark (ink text + pink asterisk) */
+.qf-credit {
+  display: inline-flex; align-items: center; gap: 0.4em; flex-wrap: wrap;
+  margin-top: 0.5em; opacity: 0.7;
+}
+.qf-foot-mark { font-size: 9px; color: var(--qpi-ink); }
+
+.qf-mark {
+  width: 100%;
+  padding: 0 clamp(16px, 2.6vw, 34px) clamp(8px, 1.4vw, 18px);
+  line-height: 0.82;
+  overflow: hidden;
+}
+.qf-mark-inner {
+  display: inline-block;
+  width: max-content;
+  white-space: nowrap;
+  color: var(--qpi-ink);
+  letter-spacing: 0.02em;
+  font-size: clamp(2rem, 11vw, 16rem);
+}

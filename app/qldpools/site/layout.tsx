@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./qpi-site.css";
+import SmoothScroll from "@/components/qldpools/SmoothScroll";
 
 // The QLD Pool Installs demo. Lives outside the (site) route group, so it
 // inherits only the root <html>/<body> — none of the portfolio chrome. Its own
-// styling is scoped under `.qpi-site` (see qpi-site.css). noindex: a private
-// demo Finbar sends, reachable from the /qldpools pitch, kept out of search
-// and the sitemap. Same shape as the old Lindon demo scaffold.
+// styling is scoped under `.qpi-site` (see qpi-site.css) and it runs its own
+// Lenis instance via SmoothScroll. noindex: a private demo Finbar sends,
+// reachable from the /qldpools pitch, kept out of search and the sitemap.
+// Structure ported from the Lindon Homes demo, reskinned to QPI's DNA.
 export const metadata: Metadata = {
   title: {
     absolute: "QLD Pool Installs | Fibreglass & Concrete Pools, South East Queensland",
@@ -34,13 +36,13 @@ export default function QpiSiteLayout({
 }) {
   return (
     <div className={`qpi-site ${outfit.variable}`}>
-      {/* Pink brand bubble back to the pitch — collapsed to an arrow, expands
-          on hover. Same pattern as the other demo builds. */}
+      {/* Pink brand tab back to the pitch — collapsed to a circle mid-left,
+          expands on hover. Same pattern as the other demo builds. */}
       <a href="/qldpools" className="qpi-back" aria-label="Back to finbar.studio">
         <span className="qpi-back-arrow" aria-hidden="true">&larr;</span>
         <span className="qpi-back-text">back to finbar.studio</span>
       </a>
-      {children}
+      <SmoothScroll>{children}</SmoothScroll>
     </div>
   );
 }
