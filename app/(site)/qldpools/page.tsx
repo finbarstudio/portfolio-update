@@ -167,7 +167,8 @@ export default function QldPoolsPage() {
           <div className="md:col-span-5 flex flex-col justify-center">
             <p className="text-ink" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)", lineHeight: 1.55 }}>
               Lows, a family design and build firm in London. Same job as yours: turn lookers into
-              enquiries.
+              enquiries. I also coded them a custom estimate tool, so visitors price up their own
+              job and land in the inbox as a lead. You could have the pool version.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <a href={LOWS_LIVE} target="_blank" rel="noopener noreferrer" className="pitch-cta pitch-cta-pink">
@@ -199,9 +200,10 @@ export default function QldPoolsPage() {
       <Reveal as="section" section className="home-section py-16 md:py-24" aria-label="Your demo">
         <div className="text-center flex flex-col items-center">
           <h2 className="home-display-sm">And I started yours.</h2>
-          <p className="text-ink mt-5 max-w-[44ch]" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)", lineHeight: 1.5 }}>
+          <p className="text-ink mt-5 max-w-[48ch]" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)", lineHeight: 1.5 }}>
             Rather stay put? I already rebuilt your home page as a demo, custom code, designed
-            around your pools.
+            around your pools. It&rsquo;s a quick proof of concept, not the finished standard. Lows
+            shows how far the real thing goes.
           </p>
           <Link href={DEMO_HREF} className="pitch-cta pitch-cta-pink mt-7">
             View your demo &rarr;

@@ -29,6 +29,15 @@ export default function Nav({
 } = {}) {
   const [revealed, setRevealed] = useState(immediate);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Past the hero the page is white — flip the bar to solid white + ink links.
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.75);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (immediate) return;
@@ -66,15 +75,16 @@ export default function Nav({
     };
   }, [menuOpen]);
 
-  const linkClass =
-    "qpi-caps text-white/80 text-[10px] hover:text-white transition-colors whitespace-nowrap";
+  const linkClass = scrolled
+    ? "qpi-caps text-[var(--qpi-ink)]/75 text-[10px] hover:text-[var(--qpi-blue)] transition-colors whitespace-nowrap"
+    : "qpi-caps text-white/80 text-[10px] hover:text-white transition-colors whitespace-nowrap";
 
   return (
     <>
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-700 ease-out ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-[transform,background-color] duration-700 ease-out ${
         revealed ? "translate-y-0" : "-translate-y-full"
-      }`}
+      } ${scrolled ? "bg-white/95 backdrop-blur-sm" : ""}`}
     >
       <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center h-16 px-5 md:px-8">
         {/* Left — desktop links; on mobile the logo sits here (top-left) */}
@@ -129,12 +139,12 @@ export default function Nav({
           >
             <span
               className={`block h-px transition-all duration-300 ${
-                menuOpen ? "w-6 rotate-45 translate-y-[3px] bg-[var(--qpi-ink)]" : "w-6 bg-white"
+                menuOpen ? "w-6 rotate-45 translate-y-[3px] bg-[var(--qpi-ink)]" : `w-6 ${scrolled ? "bg-[var(--qpi-ink)]" : "bg-white"}`
               }`}
             />
             <span
               className={`block h-px transition-all duration-300 ${
-                menuOpen ? "w-6 -rotate-45 -translate-y-[3px] bg-[var(--qpi-ink)]" : "w-4 bg-white"
+                menuOpen ? "w-6 -rotate-45 -translate-y-[3px] bg-[var(--qpi-ink)]" : `w-4 ${scrolled ? "bg-[var(--qpi-ink)]" : "bg-white"}`
               }`}
             />
           </button>
