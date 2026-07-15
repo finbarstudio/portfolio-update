@@ -232,3 +232,25 @@ html.lenis body {
   letter-spacing: 0.02em;
   font-size: clamp(2rem, 11vw, 16rem);
 }
+
+/* ── Hero CTA pill — white on the dark hero, blue on hover ── */
+.qpi-site .qpi-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-qpi), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--qpi-ink);
+  background: var(--white);
+  padding: 0.95em 1.7em;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.qpi-site .qpi-cta:hover {
+  background: var(--qpi-blue);
+  color: var(--white);
+  transform: translateY(-1px);
+}

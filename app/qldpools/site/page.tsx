@@ -1,17 +1,16 @@
 import Nav from "@/components/qldpools/Nav";
-import HomeHeader from "@/components/qldpools/sections/HomeHeader";
-import FeaturedProjects from "@/components/qldpools/sections/FeaturedProjects";
-import SiteFooter from "@/components/qldpools/sections/SiteFooter";
-import ViewCursor from "@/components/qldpools/ViewCursor";
+import Preloader from "@/components/qldpools/Preloader";
+import Hero from "@/components/qldpools/sections/Hero";
 
+/* QLD Pool Installs demo — hero pass. Preloader (logo-cutout zoom, Lows
+   pattern) over a full-viewport after-dark hero with staggered text, plus the
+   nav. Sections below the fold come next. */
 export default function Home() {
   return (
     <main className="bg-white">
-      <Nav />
-      <ViewCursor />
-      <HomeHeader />
-      <FeaturedProjects />
-      <SiteFooter />
+      <Preloader />
+      <Nav showLogo />
+      <Hero />
     </main>
   );
 }

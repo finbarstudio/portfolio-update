@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from "react";
 
+/* Transparent nav over the full-bleed hero: white links + their white logo
+   centre. Slides in once the preloader's zoom lands (qpi:intro-done). The
+   mobile menu is a solid white overlay, so the hamburger flips to ink while
+   it's open. */
+
 const LEFT = [
   { label: "Pool Range", href: "#" },
   { label: "Concrete Pools", href: "#" },
@@ -36,6 +41,11 @@ export default function Nav({
     const onScroll = () => {
       if (window.scrollY > 40) reveal();
     };
+    const w = window as unknown as { __qpiPreloaderLifted?: boolean };
+    if (w.__qpiPreloaderLifted) {
+      reveal();
+      return;
+    }
     window.addEventListener("qpi:intro-done", reveal);
     window.addEventListener("scroll", onScroll, { passive: true });
     const fallback = window.setTimeout(reveal, 5500);
@@ -56,16 +66,16 @@ export default function Nav({
   }, [menuOpen]);
 
   const linkClass =
-    "qpi-caps text-[var(--qpi-ink)]/70 text-[10px] hover:text-[var(--qpi-blue)] transition-colors whitespace-nowrap";
+    "qpi-caps text-white/80 text-[10px] hover:text-white transition-colors whitespace-nowrap";
 
   return (
     <>
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm transition-transform duration-700 ease-out ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-700 ease-out ${
         revealed ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center h-14 px-5 md:px-8">
+      <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center h-16 px-5 md:px-8">
         {/* Left — desktop links; on mobile the logo sits here (top-left) */}
         <div className="flex items-center">
           <ul className="hidden md:flex items-center gap-7">
@@ -78,22 +88,22 @@ export default function Nav({
             ))}
           </ul>
           {showLogo && (
-            <a
-              href="/qldpools/site"
-              className="md:hidden qpi-caps text-[var(--qpi-ink)] hover:text-[var(--qpi-blue)] transition-colors text-sm whitespace-nowrap"
-            >
-              QLD&nbsp;POOL&nbsp;INSTALLS
+            <a href="/qldpools/site" className="md:hidden" aria-label="QLD Pool Installs, home">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/qldpools/logo-white.png" alt="" className="h-9 w-auto" />
             </a>
           )}
         </div>
 
-        {/* Centre — desktop logo (on home the travelling logo lands here) */}
+        {/* Centre — their logo (white cut of their own mark) */}
         {showLogo ? (
           <a
             href="/qldpools/site"
-            className="hidden md:block justify-self-center qpi-caps text-[var(--qpi-ink)] hover:text-[var(--qpi-blue)] transition-colors text-sm whitespace-nowrap"
+            className="hidden md:block justify-self-center"
+            aria-label="QLD Pool Installs, home"
           >
-            QLD&nbsp;POOL&nbsp;INSTALLS
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/qldpools/logo-white.png" alt="" className="h-11 w-auto" />
           </a>
         ) : (
           <div className="hidden md:block w-px justify-self-center" />
@@ -119,13 +129,13 @@ export default function Nav({
             className="md:hidden w-8 h-8 flex flex-col items-end justify-center gap-[5px] relative z-[60]"
           >
             <span
-              className={`block h-px bg-[var(--qpi-ink)] transition-all duration-300 ${
-                menuOpen ? "w-6 rotate-45 translate-y-[3px]" : "w-6"
+              className={`block h-px transition-all duration-300 ${
+                menuOpen ? "w-6 rotate-45 translate-y-[3px] bg-[var(--qpi-ink)]" : "w-6 bg-white"
               }`}
             />
             <span
-              className={`block h-px bg-[var(--qpi-ink)] transition-all duration-300 ${
-                menuOpen ? "w-6 -rotate-45 -translate-y-[3px]" : "w-4"
+              className={`block h-px transition-all duration-300 ${
+                menuOpen ? "w-6 -rotate-45 -translate-y-[3px] bg-[var(--qpi-ink)]" : "w-4 bg-white"
               }`}
             />
           </button>
