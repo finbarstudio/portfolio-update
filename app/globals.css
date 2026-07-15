@@ -5136,3 +5136,30 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 @media (prefers-reduced-motion: reduce) {
   .group:hover .brand-tile-logo { transform: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   QUOTE BOX — the canonical testimonial treatment (see AGENTS.md
+   "Design tokens & canonical classes"). Outlined box with a serif
+   speech mark breaking the top border; attribution sits OUTSIDE the
+   box (compose: `.mono-label text-ink-soft mt-3 text-center`).
+   Used on the home site list and prospect pitch pages. Unlayered on
+   purpose — Tailwind v4 tree-shakes custom classes inside @layer.
+   ═══════════════════════════════════════════════════════════════ */
+.quote-box {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 30px 24px 22px;
+}
+.quote-box-mark {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -52%);
+  background: var(--bg);
+  padding: 0 10px;
+  color: var(--pink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(40px, 4vw, 48px);
+  line-height: 1;
+}

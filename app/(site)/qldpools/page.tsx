@@ -167,19 +167,24 @@ export default function QldPoolsPage() {
           </div>
           <div className="md:col-span-7">
             <p className="text-ink" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)", lineHeight: 1.55 }}>
-              Lows Design + Build, a family-run design and build firm in London. Same trade-adjacent
-              world as yours: real projects, real photos, and a site that has to turn lookers into
-              enquiries. Here&rsquo;s what they said after launch.
+              Lows Design + Build, a family-run design and build firm in London. Same world as
+              yours: real jobs, real photos, and a site that has to turn lookers into enquiries.
+              Here&rsquo;s what they said after launch.
             </p>
-            <blockquote className="border-l-[3px] border-pink pl-5 mt-8 max-w-[58ch]">
-              <p className="text-ink" style={{ fontSize: "clamp(1rem, 1.4vw, 1.2rem)", lineHeight: 1.55 }}>
-                &ldquo;&hellip;it has changed the kind of enquiries coming in. We are quoting bigger
-                projects because the site holds up next to firms twice our size&hellip; The estimate
-                tool has been the surprise: people price up their own job and land in our inbox as a
-                lead before we have spoken a word.&rdquo;
-              </p>
-              <footer className="mono-label text-ink-soft mt-4">&mdash; The Lows family, Lows Design + Build</footer>
-            </blockquote>
+            {/* Canonical .quote-box token (globals.css): outlined box, serif
+                mark breaking the top border, name outside. */}
+            <figure className="m-0 mt-9 max-w-[58ch]">
+              <div className="quote-box">
+                <span aria-hidden="true" className="quote-box-mark">&ldquo;</span>
+                <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(1rem, 1.4vw, 1.2rem)" }}>
+                  &hellip;it has changed the kind of enquiries coming in. We are quoting bigger
+                  projects because the site holds up next to firms twice our size&hellip; The
+                  estimate tool has been the surprise: people price up their own job and land in
+                  our inbox as a lead before we have spoken a word.
+                </blockquote>
+              </div>
+              <figcaption className="mono-label text-ink-soft mt-3 text-center">&mdash; The Lows family, Lows Design + Build</figcaption>
+            </figure>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a href={LOWS_LIVE} target="_blank" rel="noopener noreferrer" className="pitch-cta pitch-cta-ghost">
                 lowsdesignandbuild.com &nearr;
@@ -195,7 +200,7 @@ export default function QldPoolsPage() {
       {/* ── 05 · What you get, and what it costs ──────────────── */}
       <Reveal as="section" section className="home-section py-24 md:py-36 grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-8" aria-label="The offer">
         <div className="md:col-span-4">
-          <h2 className="home-display-sm">The offer, plainly.</h2>
+          <h2 className="home-display-sm">What you get, and what it costs.</h2>
         </div>
         <div className="md:col-span-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">

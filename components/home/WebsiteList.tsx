@@ -66,14 +66,10 @@ export default function WebsiteList({ sites }: { sites: Website[] }) {
                     </p>
                     {w.quote && (
                       <figure className="m-0">
-                        {/* Quote in an outlined box; the speech mark sits on the
-                            top outline with a bg-masked gap breaking the border. */}
-                        <div className="relative border border-line" style={{ borderRadius: "6px", padding: "30px 24px 22px" }}>
-                          <span
-                            aria-hidden="true"
-                            className="absolute left-1/2 top-0"
-                            style={{ transform: "translate(-50%, -52%)", background: "var(--bg)", padding: "0 10px", color: "var(--pink)", fontFamily: "var(--font-display), Georgia, serif", fontSize: "clamp(40px, 4vw, 48px)", lineHeight: 1 }}
-                          >
+                        {/* Canonical .quote-box token (globals.css): outlined box,
+                            serif mark breaking the top border, name outside. */}
+                        <div className="quote-box">
+                          <span aria-hidden="true" className="quote-box-mark">
                             &ldquo;
                           </span>
                           <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)" }}>
