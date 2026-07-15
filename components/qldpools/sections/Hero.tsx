@@ -50,15 +50,15 @@ export default function Hero() {
       {/* Centred: headline + accolades, nothing else */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-5">
         <h1
-          className="text-white font-bold"
-          style={{ fontSize: "clamp(2.3rem, 5.2vw, 4.9rem)", lineHeight: 1.05, letterSpacing: "-0.02em" }}
+          className="text-white font-bold max-w-[16ch]"
+          style={{ fontSize: "clamp(2.2rem, 4.8vw, 4.5rem)", lineHeight: 1.06, letterSpacing: "-0.02em" }}
         >
-          <WordReveal text="New Pool Builds" delay={150} />
+          <WordReveal text="Queensland's Premium Pool Builders" delay={150} />
           <span
-            className="block font-medium text-white/90 mt-2"
-            style={{ fontSize: "clamp(1.2rem, 2.4vw, 2.1rem)", letterSpacing: "-0.01em" }}
+            className="block font-medium text-white/90 mt-3 mx-auto max-w-[38ch]"
+            style={{ fontSize: "clamp(1.05rem, 1.8vw, 1.5rem)", letterSpacing: "-0.01em", lineHeight: 1.35 }}
           >
-            <WordReveal text="Ready in as little as 4 Weeks" delay={550} stagger={90} />
+            <WordReveal text="Fibreglass & concrete pool installations across Brisbane, Gold Coast & Sunshine Coast." delay={650} stagger={60} />
           </span>
         </h1>
 

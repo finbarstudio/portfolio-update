@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import BadgeLogo from "@/components/qldpools/BadgeLogo";
 
-/* Transparent nav over the full-bleed hero: white links + their white logo
-   centre. Slides in once the preloader's zoom lands (qpi:intro-done). The
+/* Transparent nav over the full-bleed hero: white links + their wave logo
+   centre (white cut on the hero, original colours once the bar goes white). Slides in once the preloader's zoom lands (qpi:intro-done). The
    mobile menu is a solid white overlay, so the hamburger flips to ink while
    it's open. */
 
@@ -100,7 +99,8 @@ export default function Nav({
           </ul>
           {showLogo && (
             <a href="/qldpools/site" className="md:hidden" aria-label="QLD Pool Installs, home">
-              <BadgeLogo className="h-12 w-auto" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={scrolled ? "/qldpools/logo.png" : "/qldpools/logo-white.png"} alt="" className="h-9 w-auto" />
             </a>
           )}
         </div>
@@ -112,7 +112,8 @@ export default function Nav({
             className="hidden md:block justify-self-center"
             aria-label="QLD Pool Installs, home"
           >
-            <BadgeLogo className="h-14 w-auto" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={scrolled ? "/qldpools/logo.png" : "/qldpools/logo-white.png"} alt="" className="h-11 w-auto" />
           </a>
         ) : (
           <div className="hidden md:block w-px justify-self-center" />
