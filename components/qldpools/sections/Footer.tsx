@@ -1,4 +1,5 @@
-import { FOOTER, PHONE, PHONE_HREF, EMAIL, LOGO_DARK } from "@/app/qldpools/site/sections/kit";
+import { FOOTER, PHONE, PHONE_HREF, EMAIL } from "@/app/qldpools/site/sections/kit";
+import ArchLogo from "@/components/qldpools/ArchLogo";
 
 /**
  * Footer — gallery option 4, "Minimal Centred": logo centred, one line of
@@ -9,8 +10,7 @@ import { FOOTER, PHONE, PHONE_HREF, EMAIL, LOGO_DARK } from "@/app/qldpools/site
 export default function Footer() {
   return (
     <footer className="relative w-full bg-white py-24 md:py-32 px-6 text-center">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-10 w-auto mx-auto mb-10" />
+      <ArchLogo variant="stacked" height={92} className="mx-auto mb-10" />
       <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-10">
         {FOOTER.nav.map((n) => (
           <a

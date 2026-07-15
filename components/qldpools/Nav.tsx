@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ArchLogo from "@/components/qldpools/ArchLogo";
 
-/* Transparent nav over the full-bleed hero: white links + their wave logo
-   centre (white cut on the hero, original colours once the bar goes white). Slides in once the preloader's zoom lands (qpi:intro-done). The
-   mobile menu is a solid white overlay, so the hamburger flips to ink while
-   it's open. */
+/* Nav: the arch logo (option 3) in an inline lockup, so the whole name reads
+   across the bar. Hero 76 is a WHITE ground, so the mark and links stay ink the
+   whole way down (an earlier build flipped them white over a full-bleed photo
+   hero, which left the logo invisible once the hero went white). Past the hero
+   the bar itself goes solid white so the links keep their footing over content.
+   Slides in when the preloader's zoom lands (qpi:intro-done). */
 
 const LEFT = [
   { label: "Pool Range", href: "#" },
@@ -74,9 +77,8 @@ export default function Nav({
     };
   }, [menuOpen]);
 
-  const linkClass = scrolled
-    ? "qpi-caps text-[var(--qpi-ink)]/75 text-[10px] hover:text-[var(--qpi-blue)] transition-colors whitespace-nowrap"
-    : "qpi-caps text-white/80 text-[10px] hover:text-white transition-colors whitespace-nowrap";
+  const linkClass =
+    "qpi-caps text-[var(--qpi-ink)]/75 text-[10px] hover:text-[var(--qpi-blue)] transition-colors whitespace-nowrap";
 
   return (
     <>
@@ -99,21 +101,19 @@ export default function Nav({
           </ul>
           {showLogo && (
             <a href="/qldpools/site" className="md:hidden" aria-label="QLD Pool Installs, home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={scrolled ? "/qldpools/logo.png" : "/qldpools/logo-white.png"} alt="" className="h-9 w-auto" />
+              <ArchLogo variant="inline" height={30} tone="dark" />
             </a>
           )}
         </div>
 
-        {/* Centre — their logo (white cut of their own mark) */}
+        {/* Centre — the arch logo */}
         {showLogo ? (
           <a
             href="/qldpools/site"
             className="hidden md:block justify-self-center"
             aria-label="QLD Pool Installs, home"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={scrolled ? "/qldpools/logo.png" : "/qldpools/logo-white.png"} alt="" className="h-11 w-auto" />
+            <ArchLogo variant="inline" height={34} tone="dark" />
           </a>
         ) : (
           <div className="hidden md:block w-px justify-self-center" />
@@ -140,12 +140,12 @@ export default function Nav({
           >
             <span
               className={`block h-px transition-all duration-300 ${
-                menuOpen ? "w-6 rotate-45 translate-y-[3px] bg-[var(--qpi-ink)]" : `w-6 ${scrolled ? "bg-[var(--qpi-ink)]" : "bg-white"}`
+                menuOpen ? "w-6 rotate-45 translate-y-[3px] bg-[var(--qpi-ink)]" : "w-6 bg-[var(--qpi-ink)]"
               }`}
             />
             <span
               className={`block h-px transition-all duration-300 ${
-                menuOpen ? "w-6 -rotate-45 -translate-y-[3px] bg-[var(--qpi-ink)]" : `w-4 ${scrolled ? "bg-[var(--qpi-ink)]" : "bg-white"}`
+                menuOpen ? "w-6 -rotate-45 -translate-y-[3px] bg-[var(--qpi-ink)]" : "w-4 bg-[var(--qpi-ink)]"
               }`}
             />
           </button>
