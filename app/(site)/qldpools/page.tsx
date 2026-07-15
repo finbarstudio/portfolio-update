@@ -105,6 +105,36 @@ export default function QldPoolsPage() {
           </div>
         </div>
 
+        <h3 className="mono-heading text-pink mb-3">
+          Seen on your site <span className="text-ink-soft normal-case">· headlines captured while the fonts load</span>
+        </h3>
+        <p className="text-ink mb-7 max-w-[62ch]" style={{ fontSize: "clamp(1rem, 1.4vw, 1.2rem)", lineHeight: 1.5 }}>
+          Clients can tell. Times New Roman is the browser&rsquo;s fallback font, it shows whenever
+          something in the back end breaks or lags, and it makes your work look cheap. That&rsquo;s a
+          disservice to it.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-6 mb-16">
+          {[
+            { src: "/qldpools/tnr-range.webp", w: 1200, h: 264, cap: "/pool-range" },
+            { src: "/qldpools/tnr-concrete.webp", w: 1200, h: 296, cap: "/concrete-pools" },
+            { src: "/qldpools/tnr-brisbane.webp", w: 1200, h: 283, cap: "/service-areas/brisbane" },
+          ].map((s) => (
+            <figure key={s.src} className="m-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={s.src}
+                width={s.w}
+                height={s.h}
+                loading="lazy"
+                alt={`A headline on qldpoolinstalls.com.au${s.cap} rendering in the fallback serif`}
+                className="w-full h-auto border border-line"
+                style={{ borderRadius: "4px" }}
+              />
+              <figcaption className="mono-label text-ink-soft mt-2">qldpoolinstalls.com.au{s.cap}</figcaption>
+            </figure>
+          ))}
+        </div>
+
         <h3 className="mono-heading text-pink mb-6">
           The numbers <span className="text-ink-soft normal-case">· every link runs the test live on your site</span>
         </h3>
