@@ -5,9 +5,10 @@ import MaskReveal from "@/components/MaskReveal";
 import ContactCta from "@/components/ContactCta";
 
 // Private pitch page for QLD Pool Installs. Reachable by URL only, kept out of
-// the index, the sitemap and the public nav. Deliberately SHORT — four scannable
-// blocks (hook, the AI-site analysis, the demo + Lows proof, the offer) for a
-// reader who won't sit through paragraphs. Detail happens on the phone.
+// the index, the sitemap and the public nav. Deliberately SHORT and scannable —
+// hook, the AI-site analysis (tells as a list, numbers as tiles), the Lows
+// proof, their demo, the offer. Layout varies per block on purpose so it never
+// reads as heading-left/paragraph-right five times. Detail happens on the phone.
 export const metadata: Metadata = {
   title: { absolute: "For QLD Pool Installs · Finbar Studio" },
   description:
@@ -25,6 +26,12 @@ const REPORTS = {
   pagespeed: "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fqldpoolinstalls.com.au%2F",
   observatory: "https://developer.mozilla.org/en-US/observatory/analyze?host=qldpoolinstalls.com.au",
 };
+
+const TELLS = [
+  "Lovable's own tracking scripts are still in the code.",
+  "The page arrives empty and builds itself afterwards.",
+  "Headlines flash Times New Roman while the real font loads.",
+];
 
 const STATS = [
   {
@@ -68,28 +75,39 @@ export default function QldPoolsPage() {
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link href={DEMO_HREF} className="pitch-cta pitch-cta-pink">
-              See the demo &rarr;
+              See your demo &rarr;
             </Link>
             <ContactCta className="pitch-cta pitch-cta-ghost">Talk to me</ContactCta>
           </div>
         </Reveal>
       </section>
 
-      {/* ── 2 · The analysis ──────────────────────────────────── */}
+      {/* ── 2 · The analysis — lead left, tells as a numbered list right,
+             numbers as tiles across the full width below ────────── */}
       <Reveal as="section" section className="home-section py-16 md:py-24" aria-label="The analysis">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-5 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-8 mb-14">
           <div className="md:col-span-5">
             <h2 className="home-display-sm">Your site was built by AI.</h2>
-          </div>
-          <div className="md:col-span-7">
-            <p className="text-ink" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)", lineHeight: 1.55 }}>
-              I analysed it. It was made with Lovable, an AI website generator. The tells:
-              Lovable&rsquo;s own tracking scripts are still in the code, the page arrives empty and
-              builds itself afterwards, and the headlines flash Times New Roman while the real font
-              loads. The numbers back it up, and every link below runs the test live on your site.
+            <p className="text-ink-soft mt-5 max-w-[38ch]" style={{ fontSize: "clamp(1rem, 1.4vw, 1.2rem)", lineHeight: 1.5 }}>
+              I analysed it. It was made with Lovable, an AI website generator.
             </p>
           </div>
+          <div className="md:col-span-6 md:col-start-7">
+            <h3 className="mono-heading text-pink mb-2">The tells</h3>
+            <ol className="m-0 p-0 list-none">
+              {TELLS.map((t, i) => (
+                <li key={t} className="flex items-baseline gap-4 border-t border-line py-3.5">
+                  <span className="mono-label text-ink-soft shrink-0">0{i + 1}</span>
+                  <span className="text-ink" style={{ fontSize: "clamp(1rem, 1.3vw, 1.15rem)", lineHeight: 1.45 }}>{t}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
+
+        <h3 className="mono-heading text-pink mb-6">
+          The numbers <span className="text-ink-soft normal-case">· every link runs the test live on your site</span>
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-8">
           {STATS.map((s) => (
             <div key={s.label} className="border-t border-line pt-5">
@@ -111,43 +129,57 @@ export default function QldPoolsPage() {
         </div>
       </Reveal>
 
-      {/* ── 3 · The demo + proof ──────────────────────────────── */}
-      <Reveal as="section" section className="home-section py-16 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-5" aria-label="The demo">
-        <div className="md:col-span-5">
-          <h2 className="home-display-sm">So I built you one.</h2>
-        </div>
-        <div className="md:col-span-7">
-          <p className="text-ink" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)", lineHeight: 1.55 }}>
-            A proper home page in custom code, designed around your pools. And here&rsquo;s a
-            finished site I did for Lows, a construction company in London, so you can see the
-            standard.
-          </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link href={DEMO_HREF} className="pitch-cta pitch-cta-pink">
-              View your demo &rarr;
-            </Link>
-            <a href={LOWS_LIVE} target="_blank" rel="noopener noreferrer" className="pitch-cta pitch-cta-ghost">
-              lowsdesignandbuild.com ↗
-            </a>
-            <Link href={LOWS_CASE} className="pitch-cta pitch-cta-ghost">
-              Lows case study
-            </Link>
-          </div>
-          {/* Canonical .quote-box token (globals.css) */}
-          <figure className="m-0 mt-10 max-w-[56ch]">
-            <div className="quote-box">
-              <span aria-hidden="true" className="quote-box-mark">&ldquo;</span>
-              <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.3vw, 1.15rem)" }}>
-                &hellip;it has changed the kind of enquiries coming in. We are quoting bigger
-                projects because the site holds up next to firms twice our size.
-              </blockquote>
+      {/* ── 3 · The Lows proof — heading across the top, copy + buttons
+             left, the quote box sitting beside them ─────────────── */}
+      <Reveal as="section" section className="home-section py-16 md:py-24" aria-label="Recent work">
+        <h2 className="home-display-sm mb-8 md:mb-10">Here&rsquo;s one I finished.</h2>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-8">
+          <div className="md:col-span-5 flex flex-col justify-center">
+            <p className="text-ink" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)", lineHeight: 1.55 }}>
+              Lows, a family design and build firm in London. Same job as yours: turn lookers into
+              enquiries.
+            </p>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <a href={LOWS_LIVE} target="_blank" rel="noopener noreferrer" className="pitch-cta pitch-cta-pink">
+                lowsdesignandbuild.com ↗
+              </a>
+              <Link href={LOWS_CASE} className="pitch-cta pitch-cta-ghost">
+                Case study
+              </Link>
             </div>
-            <figcaption className="mono-label text-ink-soft mt-3 text-center">&mdash; The Lows family, Lows Design + Build</figcaption>
-          </figure>
+          </div>
+          <div className="md:col-span-6 md:col-start-7">
+            {/* Canonical .quote-box token (globals.css) */}
+            <figure className="m-0">
+              <div className="quote-box">
+                <span aria-hidden="true" className="quote-box-mark">&ldquo;</span>
+                <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.3vw, 1.15rem)" }}>
+                  &hellip;it has changed the kind of enquiries coming in. We are quoting bigger
+                  projects because the site holds up next to firms twice our size.
+                </blockquote>
+              </div>
+              <figcaption className="mono-label text-ink-soft mt-3 text-center">&mdash; The Lows family, Lows Design + Build</figcaption>
+            </figure>
+          </div>
         </div>
       </Reveal>
 
-      {/* ── 4 · The offer ─────────────────────────────────────── */}
+      {/* ── 3b · Their demo — a short centred interlude for readers who
+             won't click away to Lows ────────────────────────────── */}
+      <Reveal as="section" section className="home-section py-16 md:py-24" aria-label="Your demo">
+        <div className="text-center flex flex-col items-center">
+          <h2 className="home-display-sm">And I started yours.</h2>
+          <p className="text-ink mt-5 max-w-[44ch]" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.3rem)", lineHeight: 1.5 }}>
+            Rather stay put? I already rebuilt your home page as a demo, custom code, designed
+            around your pools.
+          </p>
+          <Link href={DEMO_HREF} className="pitch-cta pitch-cta-pink mt-7">
+            View your demo &rarr;
+          </Link>
+        </div>
+      </Reveal>
+
+      {/* ── 4 · The offer — price as the heading, one-line tiles ── */}
       <Reveal as="section" section className="home-section no-rule py-16 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-8" aria-label="The offer">
         <div className="md:col-span-5">
           <h2 className="home-display-sm">$600, then $20 a month. Cancel anytime.</h2>
@@ -180,7 +212,7 @@ export default function QldPoolsPage() {
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <ContactCta className="pitch-cta pitch-cta-pink">Talk to me</ContactCta>
             <Link href={DEMO_HREF} className="pitch-cta pitch-cta-ghost">
-              See the demo &rarr;
+              See your demo &rarr;
             </Link>
           </div>
           <p className="mono-label text-ink-soft mt-8">Finbar Skitini · finbar.studio</p>
