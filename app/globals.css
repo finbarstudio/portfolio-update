@@ -5033,8 +5033,11 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .contact-chat:disabled { opacity: 0.5; cursor: default; }
 
 /* ═══════════════════════════════════════════════════════════════
-   LINDON — private pitch page (/lindon)
+   PITCH — private prospect pitch pages (/qldpools, ex-/lindon…)
+   Old .lindon-* names kept as co-selectors so archived pages restore
+   without edits.
    ═══════════════════════════════════════════════════════════════ */
+.pitch-cta,
 .lindon-cta {
   display: inline-flex;
   align-items: center;
@@ -5052,20 +5055,26 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
     color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
+.pitch-cta:hover,
 .lindon-cta:hover { transform: translateY(-1px); }
+.pitch-cta-pink,
 .lindon-cta-pink {
   background: var(--pink);
   border-color: var(--pink);
   color: var(--bg);
 }
+.pitch-cta-pink:hover,
 .lindon-cta-pink:hover { filter: brightness(1.04); }
+.pitch-cta-ghost,
 .lindon-cta-ghost {
   background: transparent;
   color: var(--ink);
 }
+.pitch-cta-ghost:hover,
 .lindon-cta-ghost:hover { border-color: var(--pink); color: var(--pink); }
 
 /* Demo call-out panel */
+.pitch-demo-card,
 .lindon-demo-card {
   border: 1px solid var(--line);
   border-radius: 14px;

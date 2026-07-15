@@ -1,0 +1,147 @@
+/* QLD Pool Installs demo — scoped styles.
+   Everything lives under .qpi-site so nothing leaks into the portfolio.
+   Palette is a starting point (pool blues on warm white); refine in the
+   design pass. */
+
+.qpi-site {
+  --qpi-navy: #0b2a4a;
+  --qpi-blue: #1173b8;
+  --qpi-aqua: #9fdcee;
+  --qpi-paper: #f8f7f3;
+  --qpi-font: var(--font-qpi), system-ui, sans-serif;
+
+  font-family: var(--qpi-font);
+  background: var(--qpi-paper);
+  color: var(--qpi-navy);
+  min-height: 100svh;
+}
+
+/* The portfolio's globals.css uppercases headings and sets Host Grotesk on
+   them; undo both inside the demo so it reads as its own site. */
+.qpi-site h1,
+.qpi-site h2,
+.qpi-site h3,
+.qpi-site h4 {
+  font-family: var(--qpi-font);
+  text-transform: none;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────── */
+.qpi-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px clamp(20px, 4vw, 48px);
+}
+
+.qpi-logo {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--qpi-navy);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.qpi-logo span { color: var(--qpi-blue); }
+
+.qpi-nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.2vw, 30px);
+}
+.qpi-nav-links a {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--qpi-navy);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.qpi-nav-links a:hover { color: var(--qpi-blue); }
+@media (max-width: 767px) {
+  .qpi-nav-links { display: none; }
+}
+
+.qpi-nav-cta {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--qpi-paper);
+  background: var(--qpi-blue);
+  text-decoration: none;
+  padding: 0.7em 1.4em;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.qpi-nav-cta:hover { background: var(--qpi-navy); }
+
+/* ── Hero ────────────────────────────────────────────────────── */
+.qpi-hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 clamp(20px, 4vw, 48px);
+}
+
+.qpi-hero-kicker {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--qpi-blue);
+  margin-bottom: 20px;
+}
+
+.qpi-hero-title {
+  font-weight: 700;
+  font-size: clamp(2.4rem, 6vw, 5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.qpi-hero-sub {
+  margin-top: 24px;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.5;
+  max-width: 48ch;
+  color: color-mix(in srgb, var(--qpi-navy) 72%, transparent);
+}
+
+/* ── Back-to-finbar.studio bubble ────────────────────────────── */
+.qpi-back {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--pink, #e8718b);
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  max-width: 42px;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width 0.35s ease, gap 0.35s ease;
+}
+.qpi-back:hover,
+.qpi-back:focus-visible {
+  max-width: 260px;
+  gap: 8px;
+}
+.qpi-back-arrow { line-height: 1; }
+.qpi-back-text { line-height: 1; }
