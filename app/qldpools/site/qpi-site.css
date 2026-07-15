@@ -11,12 +11,13 @@
 /* ── Root wrapper: tokens + base type, scoped to the demo subtree ── */
 
 .qpi-site {
-  /* Palette sampled from their own logo (the wave is cyan-teal, not navy).
-     Lighter than the old navy per Finbar, and still accessible on white:
-     ink 11.3:1, blue 4.67:1 (AA small text), aqua is for dark grounds only. */
-  --qpi-ink: #1E3F4A;   /* logo's darkest teal-slate — default text + dark sections */
-  --qpi-blue: #1A7E9B;  /* logo's mid cyan-blue — accents/hover */
-  --qpi-aqua: #4CC2D4;  /* logo's brightest — accents ON dark only (5.35:1 on ink) */
+  /* Palette pulled from their logo's gradient. Tuned to that gradient's blue
+     lean (blue channel sits ~30 above green in their #277492/#208DB1 samples);
+     the first pass sat at +11, which read green. Still accessible on white:
+     ink 11.4:1, blue 4.9:1 (AA small text). Aqua is for dark grounds only. */
+  --qpi-ink: #193C5A;   /* deep blue from the gradient — default text + dark sections */
+  --qpi-blue: #1878A6;  /* the gradient's mid blue — accents/hover */
+  --qpi-aqua: #4CC2D4;  /* logo's brightest cyan — accents ON dark only */
   --qpi-black: #061a30; /* near-black hover */
   --white: #ffffff;
 
