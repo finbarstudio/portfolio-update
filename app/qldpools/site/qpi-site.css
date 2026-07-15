@@ -11,8 +11,12 @@
 /* ── Root wrapper: tokens + base type, scoped to the demo subtree ── */
 
 .qpi-site {
-  --qpi-ink: #0b2a4a;   /* deep pool navy — default text + dark sections */
-  --qpi-blue: #1173b8;  /* their brand blue — accents/hover */
+  /* Palette sampled from their own logo (the wave is cyan-teal, not navy).
+     Lighter than the old navy per Finbar, and still accessible on white:
+     ink 11.3:1, blue 4.67:1 (AA small text), aqua is for dark grounds only. */
+  --qpi-ink: #1E3F4A;   /* logo's darkest teal-slate — default text + dark sections */
+  --qpi-blue: #1A7E9B;  /* logo's mid cyan-blue — accents/hover */
+  --qpi-aqua: #4CC2D4;  /* logo's brightest — accents ON dark only (5.35:1 on ink) */
   --qpi-black: #061a30; /* near-black hover */
   --white: #ffffff;
 

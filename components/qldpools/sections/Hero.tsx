@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import WordReveal from "@/components/qldpools/WordReveal";
 import IntroFade from "@/components/qldpools/IntroFade";
+import Parallax from "@/components/qldpools/anim/Parallax";
 
 /**
  * Hero — gallery option 76, "Arch Mask on White": their dusk shot masked into a
@@ -98,15 +99,18 @@ export default function Hero() {
           opacity: landed ? 1 : 0,
         }}
       >
-        <Image
-          src="/qldpools/hero.jpg"
-          alt="A pool at dusk, lit from below, looking out over the water"
-          fill
-          sizes="100vw"
-          quality={90}
-          className="object-cover"
-          style={{ objectPosition: "center 40%" }}
-        />
+        {/* Once landed, the arch image drifts against the scroll */}
+        <Parallax amount={12} className="h-full w-full">
+          <Image
+            src="/qldpools/hero.jpg"
+            alt="A pool at dusk, lit from below, looking out over the water"
+            fill
+            sizes="100vw"
+            quality={90}
+            className="object-cover"
+            style={{ objectPosition: "center 40%" }}
+          />
+        </Parallax>
       </div>
 
       {/* Type beneath the arch */}
