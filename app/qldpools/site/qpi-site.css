@@ -25,7 +25,19 @@
   color: var(--qpi-ink);
   font-family: var(--font-qpi), system-ui, sans-serif;
   min-height: 100svh;
-  overflow-x: hidden;
+  /* `clip`, NOT `hidden`: overflow-x:hidden forces overflow-y to compute as
+     `auto`, which makes this element a scroll container — and any position:
+     sticky inside then sticks to THIS box (which never scrolls) instead of the
+     viewport. That silently broke the Services heading. `clip` still clips the
+     horizontal bleed but creates no scrollport, so sticky works again. */
+  overflow-x: clip;
+}
+
+/* ── Shared gutter — every section uses the SAME left/right margin so the
+      page has one consistent edge from top to bottom. ── */
+.qpi-site .qpi-gutter {
+  padding-left: clamp(20px, 4vw, 56px);
+  padding-right: clamp(20px, 4vw, 56px);
 }
 
 /* Headings + display text — Outfit, sentence case (the portfolio's globals
