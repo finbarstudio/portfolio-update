@@ -33,6 +33,17 @@
   overflow-x: clip;
 }
 
+/* ── Hero fill mask — a white panel that covers the arch and then collapses
+      UPWARD (origin top), so the photo is revealed from the bottom up like
+      water rising. Default is collapsed, so with JS off (or reduced motion)
+      the photo simply shows and the arch is never left empty. GSAP owns the
+      transform from here; React never writes it, so a re-render can't stomp it. ── */
+.qpi-site .qpi-fill-mask {
+  transform: scaleY(0);
+  transform-origin: center top;
+  will-change: transform;
+}
+
 /* ── Shared gutter — every section uses the SAME left/right margin so the
       page has one consistent edge from top to bottom. ── */
 .qpi-site .qpi-gutter {

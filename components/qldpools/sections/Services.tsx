@@ -16,7 +16,10 @@ gsap.registerPlugin(ScrollTrigger);
  * Client requests baked in:
  *  1. The heading column is sticky at md+ (top: 96px — nav height + breathing
  *     room) so it stays in view while the long list scrolls past. Off at
- *     mobile widths, where the column stacks normally.
+ *     mobile widths, where the column stacks normally. The sticky box lives
+ *     on an INNER block inside a column that stretches to the row's full
+ *     height (grid default align-items: stretch — no `items-start`), so it
+ *     has real travel instead of unpinning the moment its own content ends.
  *  2. Both the heading block and the service rows stagger in on scroll via
  *     the shared Reveal primitive.
  *  3. A thin "waterline" beneath the heading draws in left-to-right as the
@@ -73,101 +76,106 @@ export default function Services() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14"
+      className="relative w-full bg-white py-16 md:py-24 qpi-gutter"
       aria-label="Services"
     >
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.4fr] gap-12 md:gap-20 md:items-start">
-        {/* Heading column — sticky at md+ so it stays pinned while the list scrolls past */}
-        <Reveal as="div" className="md:sticky md:top-24">
-          <p className="qpi-caps" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {SERVICES_INTRO.kicker}
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-x-10 gap-y-10">
+        {/* Heading column — stretches to the row's full height (grid default
+            align-items: stretch) so the sticky INNER block has real travel */}
+        <div className="md:col-span-5">
+          <Reveal as="div" className="md:sticky md:top-24">
+            <p className="qpi-caps" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+              {SERVICES_INTRO.kicker}
+            </p>
 
-          <div className="relative mt-5">
-            <h2
-              className="qpi-display text-balance"
+            <div className="relative mt-4">
+              <h2
+                className="qpi-display text-balance"
+                style={{
+                  color: "var(--qpi-ink)",
+                  fontSize: "clamp(1.875rem, 3.6vw, 2.875rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                {SERVICES_INTRO.heading}
+              </h2>
+
+              {/* Waterline — pool-flavoured touch: draws in on entry, sways gently while in view */}
+              <svg
+                ref={waterlineRef}
+                aria-hidden="true"
+                viewBox="0 0 300 20"
+                className="mt-4 w-40 md:w-48"
+                style={{ height: 14, display: "block", willChange: "transform" }}
+              >
+                <path
+                  d="M0,11 C36,4 72,18 108,11 C144,4 180,18 216,11 C252,4 270,15 300,10"
+                  fill="none"
+                  stroke="var(--qpi-blue)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  opacity={0.22}
+                />
+                <path
+                  ref={drawPathRef}
+                  d="M0,10 C36,17 72,3 108,10 C144,17 180,3 216,10 C252,17 270,6 300,11"
+                  fill="none"
+                  stroke="var(--qpi-blue)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  pathLength={1}
+                  strokeDasharray={1}
+                  style={{ strokeDashoffset: 0 }}
+                />
+              </svg>
+            </div>
+
+            <p
+              className="text-pretty mt-4"
               style={{
                 color: "var(--qpi-ink)",
-                fontSize: "clamp(1.875rem, 3.6vw, 2.875rem)",
-                lineHeight: 1.05,
+                opacity: 0.6,
+                fontSize: "0.9375rem",
+                lineHeight: 1.6,
+                maxWidth: 380,
               }}
             >
-              {SERVICES_INTRO.heading}
-            </h2>
-
-            {/* Waterline — pool-flavoured touch: draws in on entry, sways gently while in view */}
-            <svg
-              ref={waterlineRef}
-              aria-hidden="true"
-              viewBox="0 0 300 20"
-              className="mt-4 w-40 md:w-48"
-              style={{ height: 14, display: "block", willChange: "transform" }}
-            >
-              <path
-                d="M0,11 C36,4 72,18 108,11 C144,4 180,18 216,11 C252,4 270,15 300,10"
-                fill="none"
-                stroke="var(--qpi-blue)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                opacity={0.22}
-              />
-              <path
-                ref={drawPathRef}
-                d="M0,10 C36,17 72,3 108,10 C144,17 180,3 216,10 C252,17 270,6 300,11"
-                fill="none"
-                stroke="var(--qpi-blue)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                pathLength={1}
-                strokeDasharray={1}
-                style={{ strokeDashoffset: 0 }}
-              />
-            </svg>
-          </div>
-
-          <p
-            className="text-pretty mt-5"
-            style={{
-              color: "var(--qpi-ink)",
-              opacity: 0.6,
-              fontSize: "0.9375rem",
-              lineHeight: 1.65,
-              maxWidth: 380,
-            }}
-          >
-            {SERVICES_INTRO.sub}
-          </p>
-        </Reveal>
+              {SERVICES_INTRO.sub}
+            </p>
+          </Reveal>
+        </div>
 
         {/* Services list — numbered rows, hairline dividers */}
-        <Reveal as="div" selector=".s-row" stagger={0.06}>
-          {SERVICES.map((s, i) => (
-            <div
-              key={s.title}
-              className={`s-row flex items-start gap-6 py-6 border-b border-[var(--qpi-ink)]/15 ${
-                i === 0 ? "border-t" : ""
-              }`}
-            >
-              <span
-                className="qpi-caps flex-shrink-0"
-                style={{ color: "var(--qpi-blue)", fontSize: 11, paddingTop: 3 }}
+        <div className="md:col-span-7">
+          <Reveal as="div" selector=".s-row" stagger={0.06}>
+            {SERVICES.map((s, i) => (
+              <div
+                key={s.title}
+                className={`s-row flex items-start gap-5 py-5 md:py-9 border-b border-[var(--qpi-ink)]/15 ${
+                  i === 0 ? "border-t" : ""
+                }`}
               >
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <div>
-                <h3 style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}>
-                  {s.title}
-                </h3>
-                <p
-                  className="text-pretty mt-2"
-                  style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.6 }}
+                <span
+                  className="qpi-caps flex-shrink-0"
+                  style={{ color: "var(--qpi-blue)", fontSize: 11, paddingTop: 3 }}
                 >
-                  {s.body}
-                </p>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}>
+                    {s.title}
+                  </h3>
+                  <p
+                    className="text-pretty mt-2"
+                    style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.6 }}
+                  >
+                    {s.body}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </Reveal>
+            ))}
+          </Reveal>
+        </div>
       </div>
     </section>
   );

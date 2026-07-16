@@ -14,7 +14,7 @@ import { GALLERY_INTRO, GALLERY_IMGS, TESTIMONIALS, AREAS } from "@/app/qldpools
  * fully legible resting state on touch devices.
  */
 
-const TILES = GALLERY_IMGS.slice(0, 6).map((src, i) => ({
+const TILES = GALLERY_IMGS.slice(0, 3).map((src, i) => ({
   src,
   area: AREAS[i % AREAS.length],
   review: TESTIMONIALS[i % TESTIMONIALS.length].short,
@@ -22,11 +22,11 @@ const TILES = GALLERY_IMGS.slice(0, 6).map((src, i) => ({
 
 export default function Gallery() {
   return (
-    <section className="qg relative w-full bg-white py-20 md:py-28">
+    <section className="qg relative w-full bg-white qpi-gutter py-16 md:py-20">
       <style>{css}</style>
 
-      <div className="mx-auto max-w-[1200px] px-6 md:px-12">
-        <div className="mb-14 flex flex-wrap items-end justify-between gap-6 md:mb-16">
+      <div className="mx-auto max-w-[1200px]">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-6 md:mb-12">
           <div>
             <p className="qpi-caps mb-3 text-[11px]" style={{ color: "var(--qpi-blue)" }}>
               {GALLERY_INTRO.kicker}
@@ -90,7 +90,7 @@ const css = `
   overflow: hidden;
   background: var(--qpi-ink);
   border-radius: 9999px 9999px 6px 6px;
-  height: clamp(240px, 30vw, 360px);
+  height: clamp(200px, 22vw, 300px);
 }
 
 .qg-review {
@@ -119,7 +119,7 @@ const css = `
     transition: transform 550ms cubic-bezier(0.65, 0, 0.35, 1), opacity 420ms ease 60ms;
   }
   .qg-tile:hover .qg-arch {
-    height: calc(clamp(240px, 30vw, 360px) * 0.82);
+    height: calc(clamp(200px, 22vw, 300px) * 0.82);
   }
   .qg-tile:hover .qg-review {
     height: 3.6em;

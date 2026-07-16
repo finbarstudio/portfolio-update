@@ -9,9 +9,9 @@ import ArchLogo from "@/components/qldpools/ArchLogo";
  */
 export default function Footer() {
   return (
-    <footer className="relative w-full bg-white py-24 md:py-32 px-6 text-center">
-      <ArchLogo variant="stacked" height={92} className="mx-auto mb-10" />
-      <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-10">
+    <footer className="relative w-full bg-white qpi-gutter text-center min-h-svh flex flex-col justify-center py-16 md:py-20">
+      <ArchLogo variant="stacked" height={92} className="mx-auto mb-8" />
+      <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-8">
         {FOOTER.nav.map((n) => (
           <a
             key={n}
@@ -29,7 +29,7 @@ export default function Footer() {
       <p className="mt-2" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: "0.875rem" }}>
         {EMAIL}
       </p>
-      <p className="mt-16" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: "0.75rem" }}>
+      <p className="mt-12" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: "0.75rem" }}>
         © 2026 QLD Pool Installs · Site by finbar.studio
       </p>
     </footer>

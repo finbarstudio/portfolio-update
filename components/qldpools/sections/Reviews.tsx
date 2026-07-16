@@ -153,12 +153,12 @@ export default function Reviews() {
   const current = TESTIMONIALS[index] ?? TESTIMONIALS[0];
 
   return (
-    <section className="relative w-full bg-white py-14 px-6 md:px-14">
+    <section className="relative w-full bg-white qpi-gutter py-24 md:py-32">
       <h2 className="sr-only">{REVIEW_STATS.heading}</h2>
-      <div className="mx-auto grid grid-cols-1 md:grid-cols-2 gap-10" style={{ maxWidth: 1080 }}>
+      <div className="mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12" style={{ maxWidth: 1080 }}>
         {/* Rating panel — static, unaffected by rotation */}
         <div
-          className="flex flex-col items-center justify-center text-center p-10"
+          className="flex flex-col items-center justify-center text-center p-10 md:p-12"
           style={{ background: "rgba(0,0,0,0.02)" }}
         >
           <p

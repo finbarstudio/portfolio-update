@@ -19,13 +19,16 @@ const BLUE = "var(--qpi-blue)";
  */
 export default function Blog() {
   return (
-    <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14" aria-label="Blog">
-      <div className="max-w-2xl mx-auto text-center mb-20">
+    <section
+      className="relative w-full bg-white qpi-gutter min-h-svh flex flex-col justify-center py-12 md:py-16"
+      aria-label="Blog"
+    >
+      <div className="max-w-2xl mx-auto text-center mb-10">
         <p className="qpi-caps" style={{ color: BLUE, fontSize: 11 }}>
           {BLOG_INTRO.kicker}
         </p>
         <h2
-          className="qpi-display text-balance mt-4"
+          className="qpi-display text-balance mt-3"
           style={{ color: INK, fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}
         >
           {BLOG_INTRO.heading}
@@ -35,10 +38,10 @@ export default function Blog() {
       <Reveal
         selector=".b-card"
         stagger={0.08}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto w-full"
       >
         {POSTS.map((p, i) => (
-          <div key={p.title} className="b-card group" style={{ marginTop: i % 2 === 1 ? 40 : 0 }}>
+          <div key={p.title} className="b-card group" style={{ marginTop: i % 2 === 1 ? 24 : 0 }}>
             <div
               className="relative aspect-[3/4] overflow-hidden mb-5 rounded-none transition-[border-radius] duration-[600ms] ease-[cubic-bezier(0.65,0,0.35,1)] group-hover:rounded-t-full"
             >
