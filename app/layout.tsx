@@ -13,7 +13,7 @@ const archivoNarrow = Archivo_Narrow({
   display: "swap",
 });
 
-// Archivo (variable weight) — the World Cup ENGLAND wordmark; weight reacts to
+// Archivo (variable weight) — the numeral/body face for the demo sites; weight reacts to
 // the cursor via font-variation-settings.
 const archivo = Archivo({
   variable: "--font-archivo",

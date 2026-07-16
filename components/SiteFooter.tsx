@@ -130,7 +130,6 @@ export default function SiteFooter() {
             <span className="sf-loc">
               <span className="sf-label">ENG/LON</span>
               <EngFlag />
-              <span className="sf-note">(it’s coming home)</span>
             </span>
             <LiveTime tz="Europe/London" />
           </div>
