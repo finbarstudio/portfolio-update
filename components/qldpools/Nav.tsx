@@ -101,7 +101,7 @@ export default function Nav({
         revealed ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center h-16 px-5 md:px-8">
+      <div className="qpi-gutter-nav flex md:grid md:grid-cols-[1fr_auto_1fr] items-center h-16">
         {/* Left — desktop links; on mobile the logo sits here (top-left) */}
         <div className="flex items-center">
           <ul className="hidden md:flex items-center gap-7">

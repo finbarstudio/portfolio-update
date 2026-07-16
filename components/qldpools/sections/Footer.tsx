@@ -12,10 +12,10 @@ import { FOOTER, LICENCES, PHONE, PHONE_HREF, EMAIL, LOGO_DARK, TAGLINE } from "
  */
 export default function Footer() {
   return (
-    <footer className="qpi-sec-foot qpi-gutter relative w-full bg-white flex flex-col justify-end pt-16 pb-7 md:pt-20 md:pb-8">
+    <footer className="qpi-sec-foot qpi-gutter-nav relative w-full bg-white flex flex-col justify-end pt-16 pb-7 md:pt-20 md:pb-8">
       <div
         className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between gap-5 pb-6"
-        style={{ borderBottom: "2px solid var(--qpi-ink)" }}
+        style={{ borderBottom: "1px solid var(--qpi-ink)" }}
       >
         <div>
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -72,6 +72,20 @@
   padding-right: clamp(20px, 4vw, 56px);
 }
 
+/* ── The narrow gutter — the nav's edge, and the footer's with it. ──
+   The nav rides closer to the edge than the sections do, and the footer is its
+   bookend at the other end of the page, so they share one inset: the footer's
+   rule starts and ends exactly under the nav's logo and links.
+
+   Same shape as .qpi-gutter, just a tighter ceiling. Derived from vw rather
+   than the nav's old fixed px-5/md:px-8, which stepped at a breakpoint instead
+   of tracking the viewport. It resolves identically where the nav used to sit
+   (20px on mobile, 32px from 800px up), so this is the same edge, now fluid. */
+.qpi-site .qpi-gutter-nav {
+  padding-left: clamp(20px, 4vw, 32px);
+  padding-right: clamp(20px, 4vw, 32px);
+}
+
 /* Headings + display text — Outfit, sentence case (the portfolio's globals
    uppercase h1–h4 and set Host Grotesk; undo both inside the demo). */
 .qpi-site :is(h1, h2, h3, h4, h5, h6) {
