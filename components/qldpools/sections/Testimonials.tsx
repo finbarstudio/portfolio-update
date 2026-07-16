@@ -15,7 +15,7 @@ import { TESTIMONIALS_INTRO, TESTIMONIALS, GALLERY_IMGS } from "@/app/qldpools/s
 export default function Testimonials() {
   return (
     <section
-      className="relative w-full overflow-hidden py-24 md:py-32"
+      className="relative flex min-h-svh w-full flex-col justify-center overflow-hidden py-16 md:py-20"
       aria-label="Testimonials"
     >
       {/* Full-bleed background photo — deliberately NOT inside the gutter,

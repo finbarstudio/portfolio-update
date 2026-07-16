@@ -2,12 +2,13 @@
 
 import Reveal from "@/components/qldpools/anim/Reveal";
 import Parallax from "@/components/qldpools/anim/Parallax";
-import { GALLERY_INTRO, GALLERY_IMGS, TESTIMONIALS, AREAS } from "@/app/qldpools/site/sections/kit";
+import { GALLERY_IMGS, TESTIMONIALS, AREAS } from "@/app/qldpools/site/sections/kit";
 
 /**
  * Gallery — ported from options/gallery.tsx entry 17 ("Arch-Topped 3-Up"):
  * arch-cropped photo tiles (border-radius on the top corners only) under a
- * centred heading. Adds the hover interaction the client asked for: the arch
+ * No heading here on purpose: the work speaks, and a single "View all
+ * projects" button follows the tiles. Adds the hover the client asked for: the arch
  * crops up from the bottom, the area label moves into the space that opens,
  * and a verbatim one-line Google review slides up from a mask underneath.
  * Pure CSS (:hover), so it costs nothing on scroll and degrades cleanly to a
@@ -22,32 +23,13 @@ const TILES = GALLERY_IMGS.slice(0, 3).map((src, i) => ({
 
 export default function Gallery() {
   return (
-    <section className="qg relative w-full bg-white qpi-gutter py-16 md:py-20">
+    <section
+      className="qg relative flex w-full flex-col justify-center bg-white qpi-gutter min-h-svh py-16 md:py-20"
+      aria-label="Recent pool installations"
+    >
       <style>{css}</style>
 
       <div className="mx-auto max-w-[1200px]">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-6 md:mb-12">
-          <div>
-            <p className="qpi-caps mb-3 text-[11px]" style={{ color: "var(--qpi-blue)" }}>
-              {GALLERY_INTRO.kicker}
-            </p>
-            <h2
-              className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-            >
-              {GALLERY_INTRO.heading}
-            </h2>
-          </div>
-          <div className="flex flex-wrap items-center gap-6 md:max-w-[360px]">
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: 14, lineHeight: 1.6 }}>
-              {GALLERY_INTRO.sub}
-            </p>
-            <a href="#" className="qg-cta qpi-caps shrink-0 text-[10px]">
-              {GALLERY_INTRO.cta} &rarr;
-            </a>
-          </div>
-        </div>
-
         <Reveal
           as="div"
           selector=".g-tile"
@@ -79,6 +61,12 @@ export default function Gallery() {
             </div>
           ))}
         </Reveal>
+
+        <div className="mt-12 flex justify-center md:mt-14">
+          <a href="#" className="qg-cta qpi-caps text-[10px]">
+            View all projects &rarr;
+          </a>
+        </div>
       </div>
     </section>
   );
