@@ -17,27 +17,20 @@ import BrandWordmarkStacked from "./BrandWordmarkStacked";
 const SANDBOX_HREF = "https://sandbox.finbar.studio";
 const PIN_BOTTOM = 42; // matches .sf-nav-pin { bottom: 42px } — sits above the ©
 
-function Pills({ interactive, tab }: { interactive: boolean; tab: number }) {
-  const sandbox = (
-    <>
-      {/* The stacked wordmark is the sandbox's logo — it's our sandbox, and the
-          block reads as a mark at pill size where the full lockup wouldn't. */}
-      <BrandWordmarkStacked className="sf-nav-mark" />
-      <span>SB</span>
-      <span className="nav-ext-bubble" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="100%" height="100%">
-          <path d="M8 16L16 8M9.5 8H16v6.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </span>
-    </>
-  );
+/**
+ * The sandbox link is now the mark and nothing else — no pill, no "SB", no
+ * arrow bubble. At 3rem the stacked wordmark carries it on its own, and the
+ * accessible name lives on the link rather than in visible text.
+ */
+function SandboxLink({ interactive, tab }: { interactive: boolean; tab: number }) {
+  const mark = <BrandWordmarkStacked className="sf-nav-mark" />;
   if (!interactive) {
     // Placeholder: reserves the line + width, never interactive.
-    return <span className="tag tag-default tag-ext">{sandbox}</span>;
+    return <span className="sf-nav-link">{mark}</span>;
   }
   return (
-    <a href={SANDBOX_HREF} target="_blank" rel="noopener noreferrer" className="tag tag-default tag-ext" tabIndex={tab} aria-label="Sandbox (opens in a new tab)">
-      {sandbox}
+    <a href={SANDBOX_HREF} target="_blank" rel="noopener noreferrer" className="sf-nav-link" tabIndex={tab} aria-label="Sandbox (opens in a new tab)">
+      {mark}
     </a>
   );
 }
@@ -87,11 +80,11 @@ export default function FooterNav() {
     <span className="sf-nav" ref={anchorRef}>
       {/* Reserves the line + width in the footer credit (above the copyright). */}
       <span className="sf-nav-ph" aria-hidden="true">
-        <Pills interactive={false} tab={-1} />
+        <SandboxLink interactive={false} tab={-1} />
       </span>
       <span className={`sf-nav-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
         <span className="sf-nav-inner">
-          <Pills interactive tab={shown ? 0 : -1} />
+          <SandboxLink interactive tab={shown ? 0 : -1} />
         </span>
       </span>
     </span>

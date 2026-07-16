@@ -21,7 +21,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ASTERISK_POINTS, ASTERISK_PERIMETER } from "./brand-asterisk";
+import { MARK_VIEWBOX } from "./brand-mark";
 import BrandMark from "./BrandMark";
 import { scrollToHero } from "@/lib/scroll";
 import { GOTO_HERO_KEY } from "./NavLogo";
@@ -37,7 +37,6 @@ export default function HomeIntro() {
   const textRef = useRef<HTMLSpanElement>(null);
   const slotRef = useRef<HTMLSpanElement>(null);
   const flyRef = useRef<HTMLDivElement>(null);
-  const starRef = useRef<SVGPolygonElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
   const screenRef = useRef<HTMLDivElement>(null);
   const [done, setDone] = useState(false);
@@ -175,9 +174,9 @@ export default function HomeIntro() {
     try { played = !!sessionStorage.getItem(PLAYED_KEY); } catch { /* ignore */ }
     if (played) { setDone(true); return scheduleRevisitScroll(); }
 
-    const fly = flyRef.current, star = starRef.current, slot = slotRef.current,
+    const fly = flyRef.current, slot = slotRef.current,
       text = textRef.current, screen = screenRef.current, mark = markRef.current;
-    if (!fly || !star || !slot || !text || !screen || !mark) { setDone(true); return; }
+    if (!fly || !slot || !text || !screen || !mark) { setDone(true); return; }
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -231,14 +230,25 @@ export default function HomeIntro() {
       fly.style.height = `${sRect0.width}px`;
     }
 
-    // Exact polygon perimeter (viewBox units) as the dash length — smooth trace
-    // that completes fully (getTotalLength under-measured, leaving it short).
-    const dash = ASTERISK_PERIMETER;
     gsap.set(fly, { xPercent: -50, yPercent: -50, x: 0, y: 0, opacity: 1 });
-    // The outline only ever draws the silhouette — the fill is the gradient
-    // mark fading up underneath it (see .intro-fly-mark), not a flat colour.
-    gsap.set(star, { strokeDasharray: dash, strokeDashoffset: reduce ? 0 : dash });
-    gsap.set(mark, { opacity: reduce ? 1 : 0 });
+
+    // The mark's six shapes, innermost first. MARK_SHAPES paints outer-to-inner
+    // (tips down to the centre dot, so the dot lands on top), so reversing the
+    // painted order walks from the middle out — which is the direction the
+    // pulse travels.
+    const layers = [...mark.querySelectorAll<SVGElement>("polygon, path, circle")].reverse();
+
+    // Every layer scales from the MARK's centre, not from its own bounding box —
+    // otherwise each ring would bloom around itself and the shape would break
+    // apart instead of growing out of the middle. The viewBox is square, so its
+    // centre is the centre dot's own cx/cy.
+    const vb = MARK_VIEWBOX.split(" ").map(Number);
+    const centre = `${vb[2] / 2} ${vb[3] / 2}`;
+    gsap.set(layers, {
+      svgOrigin: centre,
+      scale: reduce ? 1 : 0,
+      opacity: reduce ? 1 : 0,
+    });
     gsap.set(screen, { opacity: 1 });
 
     // Translation deltas (fly centre → slot centre), measured after sizing.
@@ -255,9 +265,11 @@ export default function HomeIntro() {
     }
 
     const tl = gsap.timeline({ onComplete: () => { clearTimeout(failsafe); finish(); } });
-    tl.to(star, { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" })       // 1 trace
-      .to(mark, { opacity: 1, duration: 0.45, ease: "power1.out" })                  // 2 the mark fills the outline
-      .to(screen, { opacity: 0, duration: 0.6, ease: "power2.inOut" }, "+=0.1")      // 3 screen opens
+    // 1 the mark pulses itself into being, one layer at a time, centre → tips.
+    //   back.out overshoots slightly so each ring lands with a beat rather than
+    //   easing flat, which is what makes it read as a pulse.
+    tl.to(layers, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)", stagger: 0.085 })
+      .to(screen, { opacity: 0, duration: 0.6, ease: "power2.inOut" }, "+=0.15")     // 2 screen opens
       .to(fly, { y: dy, duration: 0.55, ease: "power3.inOut" }, "-=0.15")            // 4 down to middle-bottom
       .to(fly, { x: dx, duration: 0.6, ease: "power3.inOut" }, "+=0.05")             // 5 right to the slot
       .call(() => { text.classList.add("is-revealed"); }, undefined, "-=0.1");       // 6 text slides in
@@ -277,10 +289,8 @@ export default function HomeIntro() {
       {!done && <div ref={screenRef} className="intro-screen" aria-hidden="true" />}
       {!done && (
         <div ref={flyRef} className="intro-fly" aria-hidden="true">
-          <svg viewBox="0 0 100 100" className="intro-fly-star">
-            <polygon ref={starRef} points={ASTERISK_POINTS} vectorEffect="non-scaling-stroke" />
-          </svg>
-          {/* The logo itself, sitting inside the line the outline just drew. */}
+          {/* The logo itself. Its six shapes are the animation — see the
+              timeline: they pulse in from the centre dot out to the tips. */}
           <span ref={markRef} className="intro-fly-mark">
             <BrandMark />
           </span>

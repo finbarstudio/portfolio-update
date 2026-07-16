@@ -10,8 +10,12 @@ This version has breaking changes, APIs, conventions, and file structure may all
 `--ink` (the near-black). That's the whole system.
 
 The two darks do different jobs: **`--pink-deep` is the brand speaking** (the
-logo, and H1s via `.display-brand`), **`--ink` is for reading** (body, H2 and
-below, UI). Default to `--ink` unless the thing you're colouring IS the brand.
+logo, and section-title H2s), **`--ink` is for reading** (body, H1s, small
+labels, UI). Default to `--ink` unless the thing you're colouring IS the brand.
+
+Note the tier: **H1 is ink, H2 is dark red** (Finbar's call). A page title is
+the first thing you read, so it wants the reading colour; the section titles
+under it carry the brand dark.
 
 `--pink-2` … `--pink-5` are **tertiary**: they exist to build the logomark and
 `--brand-gradient`, not to colour UI. Reaching for one of them for a heading or
@@ -42,7 +46,7 @@ Two mechanics to know:
 | `.pitch-demo-card` | Pink-tinted outlined call-out panel around a demo link | Pitch pages |
 | `.mono-label` / `.mono-heading` | Space Mono small-caps labels (11px/12px) | Everywhere |
 | `.home-display` / `.home-display-sm` / `.home-hero-display` | Display headings (Host Grotesk, uppercase) | Home, pitch pages, service pages |
-| `.display-brand` | Colours an H1 the brand dark (`--pink-deep`) instead of the reading ink. H1 only — H2 and below stay `--ink`. | Home hero, service landings, case-study titles |
+| `.display-brand` | Colours a section title the brand dark (`--pink-deep`). **H2, not H1** — H1s stay `--ink`. The display-H2 tier already takes it via its own classes (`.contact-title`, `.outcomes-title`, `.delivered-title`, `.kinaya-section-name`); use the class for inline-styled H2s. Small mono H2s (`.mono-heading`) stay ink. | Service-landing H2s |
 | `.hero-pill` (+ `.hero-pill-social`) | Home-hero nav pills (pages ink, socials pink) | Home hero |
 | `.home-cap-pill` | "How I help businesses" capability pills | Home, /about |
 | `.tag` (+ `.tag-default`, `.tag-ext`) | Small tag chips | Case studies, work filters, contact |

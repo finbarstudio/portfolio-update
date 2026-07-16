@@ -1547,7 +1547,7 @@
     line-height: 1.05;
     letter-spacing: -0.005em;
     text-transform: uppercase;
-    color: var(--ink);
+    color: var(--pink-deep);
   }
   .delivered-list {
     list-style: none;
@@ -1586,7 +1586,7 @@
     line-height: 1.05;
     letter-spacing: -0.005em;
     text-transform: uppercase;
-    color: var(--ink);
+    color: var(--pink-deep);
   }
   .outcomes-intro {
     max-width: 64ch;
@@ -1686,7 +1686,7 @@
     line-height: 1.05;
     letter-spacing: -0.005em;
     text-transform: uppercase;
-    color: var(--ink);
+    color: var(--pink-deep);
   }
 
   /* Packer showcase — numbered workstream sections. */
@@ -3737,30 +3737,15 @@ body:has(.sb-root) {
   pointer-events: none;
   opacity: 0; /* GSAP sets opacity:1 when animation starts; prevents SSR flash */
 }
-.intro-fly-star { width: 100%; height: auto; display: block; overflow: visible; }
-/* The real gradient mark, stacked exactly over the traced outline. The outline
-   and the mark are the same silhouette in the same square box (brand-asterisk
-   is the artwork's outer polygon normalised to 0-100), so inset:0 registers
-   them pixel-for-pixel: the line finishes drawing, the mark fades up inside it,
-   and the outline never has to move. GSAP owns the opacity. */
+/* The gradient mark IS the intro now: its six shapes pulse in from the centre
+   dot out to the tips (the timeline lives in HomeIntro). Nothing is set to
+   hidden here — GSAP owns each layer's scale + opacity, and it sets the start
+   state before the first paint, so there's no flash of a finished logo. */
 .intro-fly-mark {
-  position: absolute;
-  inset: 0;
   display: block;
-  opacity: 0;
   pointer-events: none;
 }
-.intro-fly-mark svg { width: 100%; height: auto; display: block; }
-/* Crisp 1px outline, sharp mitred points (the brand mark), no glow. dash +
-   fill-opacity are driven by GSAP (see HomeIntro). */
-.intro-fly-star polygon {
-  fill: var(--pink);
-  fill-opacity: 0;
-  stroke: var(--pink);
-  stroke-width: 1;
-  stroke-linejoin: miter;
-  stroke-linecap: butt;
-}
+.intro-fly-mark svg { width: 100%; height: auto; display: block; overflow: visible; }
 
 /* ── Intro chrome: hide the nav over the intro/disciplines, slide it in from the
    left once you scroll past (home only; driven by [data-intro-active] on <html>).
@@ -4501,7 +4486,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   letter-spacing: 0.005em;
   line-height: 1.02;
   font-size: clamp(1.9rem, 5.2vw, 2.7rem);
-  color: var(--ink);
+  color: var(--pink-deep);
   padding-right: 0.6em;
   text-align: justify;
   text-align-last: left;
@@ -4696,31 +4681,41 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 
 /* ── .display-brand ───────────────────────────────────────────────
-   An H1 in the brand's own dark instead of the reading ink. The palette's two
-   darks split by job: --ink is for reading (body, H2 and below, UI), while
-   --pink-deep is the brand's voice — the logo, and the H1 that introduces a
-   page. Use it on a page's own H1 (home hero, service landings, case-study
-   titles); leave every heading under it on --ink so the tiers stay distinct.
+   A section title in the brand's own dark instead of the reading ink.
 
-   Unlayered on purpose, and last in the file: .home-hero-display sets
-   color: var(--ink) from inside a cascade layer, and an unlayered rule beats a
-   layered one no matter the specificity — so this lands without !important. */
+   H2, NOT H1 — Finbar's call. H1s stay --ink: a page's own title is the thing
+   you read first, so it wants the reading colour. It's the section titles
+   underneath that carry the brand dark, which breaks the page into blocks by
+   colour rather than by size alone.
+
+   The display-H2 tier already takes it via its own classes (.contact-title,
+   .outcomes-title, .delivered-title, .kinaya-section-name). Use this class for
+   H2s styled inline instead, like the service landings'. Leave the small mono
+   H2s (.mono-heading — privacy sections, project-card titles) on --ink: they're
+   labels, not section titles, and the card titles already hover to --pink.
+
+   Unlayered on purpose, and last in the file: an unlayered rule beats a layered
+   one no matter the specificity, so this overrides a Tailwind utility or a
+   layered class colour without !important. */
 .display-brand { color: var(--pink-deep); }
 
 /* ── .sf-nav-mark ─────────────────────────────────────────────────
-   The stacked wordmark as the sandbox link's logo, inline in the footer pill.
-   Sized off the pill's own type so the three parts stay locked together at any
-   size. Height leads and width follows: the block is wider than it is tall
-   (531:427), unlike the square asterisk.
+   The sandbox link IS the stacked wordmark: no pill, no "SB", no arrow bubble.
+   At 3rem it's big enough to read as FIN/BAR/STU/DIO on its own, which is what
+   earns it the right to stand alone (at the old pill size each letter was ~2.5px
+   and the block collapsed into smudges).
 
-   2em, not the 1.3em that would match the ext bubble beside it: the mark is
-   four rows of letters, so at bubble size each letter is ~2.5px and the whole
-   thing collapses into three smudges. 2em is the smallest that still reads as
-   FIN/BAR/STU/DIO. Much past this and the pill stops being a pill. */
+   Height leads and width follows: the block is wider than it is tall (531:427),
+   unlike the square asterisk. Fixed rem, not em, now that there's no type
+   beside it to stay locked to. */
 .sf-nav-mark {
-  height: 2em;
+  height: 3rem;
   width: auto;
   display: block;
-  flex: 0 0 auto;
-  margin-right: 0.55em;
+}
+/* The link itself is now just a box around the mark — no border, no padding. */
+.sf-nav-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
 }

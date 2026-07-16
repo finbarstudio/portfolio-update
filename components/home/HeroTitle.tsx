@@ -86,7 +86,7 @@ export default function HeroTitle() {
   return (
     <h1
       ref={rootRef}
-      className={`home-hero-display display-brand ht ${fitted ? "ht-go" : ""}`}
+      className={`home-hero-display ht ${fitted ? "ht-go" : ""}`}
       aria-label="A boutique web development studio with a designer's eye."
     >
       {LINES.map((l, i) => (

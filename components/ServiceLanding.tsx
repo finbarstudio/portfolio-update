@@ -129,7 +129,7 @@ export default function ServiceLanding({
       {/* 1 — intro */}
       <section className="px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14">
         <p className="mono-label text-ink-soft mb-4">{label}</p>
-        <h1 className="font-bold display-brand leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
+        <h1 className="font-bold text-ink leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
           {heading}
         </h1>
         <p className="text-ink-soft mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
@@ -198,7 +198,7 @@ export default function ServiceLanding({
       {/* 6 — CTA + crawlable NAP */}
       <section className="px-5 md:px-10 pb-24 md:pb-32" aria-label="Start a project">
         <div className="border-t border-line pt-10 max-w-3xl">
-          <h2 className="font-bold text-ink leading-[1.05]" style={{ fontSize: "var(--text-h2, clamp(1.6rem, 3vw, 2.6rem))", letterSpacing: "-0.01em" }}>
+          <h2 className="font-bold display-brand leading-[1.05]" style={{ fontSize: "var(--text-h2, clamp(1.6rem, 3vw, 2.6rem))", letterSpacing: "-0.01em" }}>
             {ctaHeading}
           </h2>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-6">
