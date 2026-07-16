@@ -19,23 +19,31 @@ export const metadata: Metadata = {
   alternates: { canonical: undefined },
 };
 
-// FONT EXPERIMENT (Finbar, trying faces on the demo): Junicode, self-hosted from
-// the official release (psb1558/Junicode-font v2.226, SIL OFL, see fonts/OFL.txt).
-// Subset to latin with the wdth/ENLA axes pinned off, ~104KB per style, weight
-// axis 300-700 live. NOTE this is a serif, which cuts against the pitch's own
-// premise (their Times/Playfair headlines are the thing we argue reads cheap) —
-// kept here only to look at. To go back to the sans, restore the Outfit import +
-// this block from git (commit before this one) and the whole demo follows, since
-// everything reads --font-qpi.
-const junicode = localFont({
+// FONT DIRECTION (Finbar, 70s Miami pool vibe): General Sans for the body,
+// Britney for the headers. Two tokens so the two faces move independently:
+//   --font-qpi          body  → General Sans
+//   --font-qpi-display  header → Britney (see below)
+//
+// General Sans — Frode Helland / Indian Type Foundry, via Fontshare, free for
+// commercial use (fonts/GeneralSans-FFL.txt). The variable woff2 is the whole
+// latin set at ~37KB, so it ships whole, no subsetting; weight axis 200-700 live.
+const generalSans = localFont({
   src: [
-    { path: "./fonts/JunicodeVF-Roman.subset.woff2", weight: "300 700", style: "normal" },
-    { path: "./fonts/JunicodeVF-Italic.subset.woff2", weight: "300 700", style: "italic" },
+    { path: "./fonts/GeneralSans-Variable.woff2", weight: "200 700", style: "normal" },
+    { path: "./fonts/GeneralSans-VariableItalic.woff2", weight: "200 700", style: "italic" },
   ],
   variable: "--font-qpi",
   display: "swap",
-  fallback: ["Georgia", "Times New Roman", "serif"],
+  fallback: ["system-ui", "sans-serif"],
 });
+
+// Britney (the header face) is NOT wired yet. Every free "Britney" is a
+// personal-use-only demo, and this demo becomes a real commercial site if the
+// pitch lands, so it needs a purchased licence + the actual file. Until Finbar
+// drops that in, --font-qpi-display falls back to General Sans (see qpi-site.css)
+// so the headers are heavier General Sans rather than broken. When the licensed
+// Britney arrives: add a second localFont here with variable --font-qpi-display
+// and the header token in qpi-site.css picks it up with no other change.
 
 export default function QpiSiteLayout({
   children,
@@ -43,7 +51,7 @@ export default function QpiSiteLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`qpi-site ${junicode.variable}`}>
+    <div className={`qpi-site ${generalSans.variable}`}>
       {/* Pink brand tab back to the pitch — collapsed to a circle mid-left,
           expands on hover. Same pattern as the other demo builds. */}
       <a href="/qldpools" className="qpi-back" aria-label="Back to finbar.studio">

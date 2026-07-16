@@ -1,31 +1,41 @@
 "use client";
 
 /**
- * LoaderThree — the brand loading spinner.
+ * BrandLoader — the one loading icon, everywhere.
  *
- * The finbar✶studio six-pointed star, drawn as two stacked outlines: a faint
- * static "track" and a glowing pink stroke that draws itself around the star on
- * a loop while the whole mark slowly rotates. CSS-only (no animation library),
- * matching the wordmark + favicon star exactly via the shared STAR_POINTS.
+ * It's the preloader in miniature: the gradient mark's six shapes pulse from the
+ * centre dot out to the tips, on a loop. The home intro plays that same move
+ * once through GSAP; here it's a CSS keyframe so a tiny spinner carries no JS.
  *
- * Drop it into any positioned container; it centres itself.
+ * There is ONE place to amend the look: the `.brand-loader` block in globals.css
+ * (its `--brand-loader-*` tokens set the speed and the stagger). Every loading
+ * state on the site routes through here — image placeholders (ClientImage),
+ * route skeletons (loading.tsx), 3D/model loaders — so a change here changes all
+ * of them. `LoaderThree` is kept as an alias so existing call sites don't move.
  */
 
-import { ASTERISK_POINTS } from "@/components/brand-asterisk";
+import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 
-export function LoaderThree({ size = 46 }: { size?: number }) {
+export function BrandLoader({ size = 46 }: { size?: number }) {
   return (
-    <span className="star-loader" aria-label="Loading" role="status">
-      <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
-        <polygon className="star-loader-track" points={ASTERISK_POINTS} />
-        <polygon
-          className="star-loader-draw"
-          points={ASTERISK_POINTS}
-          pathLength={1}
-        />
+    <span className="brand-loader" aria-label="Loading" role="status">
+      <svg viewBox={MARK_VIEWBOX} width={size} height={size} aria-hidden="true">
+        {MARK_SHAPES.map((s, i) => {
+          // Centre-out: the centre dot is painted last (on top), so the pulse
+          // starts there and travels to the tips. --layer is the distance from
+          // the centre, driving each shape's animation-delay in the CSS.
+          const layer = MARK_SHAPES.length - 1 - i;
+          const style = { "--layer": layer } as React.CSSProperties;
+          if (s.tag === "polygon") return <polygon key={i} points={s.points} fill={s.fill} style={style} />;
+          if (s.tag === "circle") return <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={s.fill} style={style} />;
+          return <path key={i} d={s.d} fill={s.fill} style={style} />;
+        })}
       </svg>
     </span>
   );
 }
 
-export default LoaderThree;
+/** Legacy name — every existing call site imports LoaderThree. */
+export const LoaderThree = BrandLoader;
+
+export default BrandLoader;

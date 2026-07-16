@@ -1186,12 +1186,29 @@
     );
     animation: skeleton-sweep 1.6s var(--ease) infinite;
   }
+  /* In-FLOW skeleton bar — for text lines / chips in a route skeleton, where the
+     placeholder sizes itself (width/height) rather than filling a positioned
+     parent. Same pulse as .skeleton, but it takes up its own space in the
+     layout (the absolute .skeleton contributes no height). */
+  .skel-line {
+    display: block;
+    border-radius: 4px;
+    background: var(--surface-sunken);
+    animation: skeleton-pulse 1.6s var(--ease) infinite;
+  }
 
-  /* ── Star loader (LoaderThree) ──────────────────────────────────
-     The brand ✶ drawn as a glowing pink stroke that traces itself on a loop
-     while the whole mark slowly rotates. Centres itself in any positioned
-     parent (e.g. the .skeleton placeholder it sits inside). */
-  .star-loader {
+  /* ── Brand loader (BrandLoader / LoaderThree) ───────────────────
+     THE one loading icon. The gradient mark's six shapes pulse from the centre
+     dot out to the tips, on a loop — the home preloader in miniature. Every
+     loading state routes through the BrandLoader component, and every timing
+     knob is these two tokens, so this block is the SINGLE place to amend how
+     loading feels across the whole site. Centres itself in a positioned parent
+     (e.g. the .skeleton placeholder it sits inside). */
+  .brand-loader {
+    /* ↓ amend the pulse here — nothing else needs touching ↓ */
+    --brand-loader-dur: 1.6s;      /* one full pulse cycle           */
+    --brand-loader-stagger: 0.12s; /* delay from one ring to the next */
+
     position: absolute;
     inset: 0;
     display: grid;
@@ -1199,32 +1216,23 @@
     z-index: 1;
     pointer-events: none;
   }
-  .star-loader svg {
-    overflow: visible;
+  .brand-loader svg { overflow: visible; }
+  /* Each of the six shapes scales about the MARK's centre (the viewBox centre,
+     via transform-box: view-box), so they bloom out of the middle rather than
+     each around its own box. --layer (0 at the centre dot) staggers them out. */
+  .brand-loader svg > * {
+    transform-box: view-box;
+    transform-origin: center;
+    animation: brand-loader-pulse var(--brand-loader-dur) ease-in-out infinite;
+    animation-delay: calc(var(--layer, 0) * var(--brand-loader-stagger));
+    will-change: transform, opacity;
   }
-  .star-loader-track {
-    fill: none;
-    stroke: color-mix(in srgb, var(--pink) 16%, transparent);
-    stroke-width: 2.5;
-    stroke-linejoin: round;
-  }
-  .star-loader-draw {
-    fill: none;
-    stroke: var(--pink);
-    stroke-width: 2.5;
-    stroke-linejoin: round;
-    stroke-linecap: round;
-    stroke-dasharray: 1;
-    animation: star-draw 1.5s ease-in-out infinite;
-  }
-  @keyframes star-draw {
-    0%   { stroke-dashoffset: 1; }
-    45%  { stroke-dashoffset: 0; }
-    55%  { stroke-dashoffset: 0; }
-    100% { stroke-dashoffset: -1; }
+  @keyframes brand-loader-pulse {
+    0%, 100% { transform: scale(0.28); opacity: 0.3; }
+    40%, 60% { transform: scale(1);    opacity: 1; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .star-loader-draw { animation: none; stroke-dasharray: none; }
+    .brand-loader svg > * { animation: none; transform: none; opacity: 1; }
   }
 
   /* Progressive disclosure — secondary card meta (tags + one-liner) stays tucked
@@ -3260,13 +3268,15 @@ body:has(.sb-root) {
   color: var(--ink-soft); font-family: var(--font-mono); font-size: 11px;
   letter-spacing: 0.18em; text-transform: uppercase; pointer-events: none;
 }
+/* Positioned box for the shared BrandLoader (which fills it, absolute inset:0)
+   — the pulse itself lives on .brand-loader; here we only size it + add glow. */
 .sb-loader-mark {
-  width: 40px; height: 40px; overflow: visible;
+  position: relative;
+  width: 40px; height: 40px;
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--pink) 45%, transparent));
-  animation: sb-loader-fade 0.85s var(--ease) infinite;
 }
 .sb-loader-label { animation: sb-loader-fade 0.85s var(--ease) infinite; }
-/* The shared "flash": the pulse the nav tabs use while a tap is in flight. */
+/* The shared text "flash": in-flight nav tabs + index pills pulse their label. */
 @keyframes sb-loader-fade { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.95; } }
 
 /* Index pill buttons: flash the label while the tap is pending (same mechanic). */
@@ -3686,9 +3696,9 @@ body:has(.sb-root) {
   white-space: nowrap;
   line-height: 0.82;
   font-size: clamp(2rem, 13vw, 16rem); /* fallback before JS fit */
-  /* The logo is the brand speaking, so it takes the brand's own dark rather
-     than the reading ink. Same call in .nav-logo and .site-footer-mark-inner. */
-  color: var(--pink-deep);
+  /* Wordmark letters read in ink (the mark's gradient asterisk carries the
+     brand colour on its own). Same call in .nav-logo and .site-footer-mark-inner. */
+  color: var(--ink);
   will-change: transform;
 }
 /* The wordmark's text reveals via clip-path (GSAP); the slot ✳ holds the spot. */
@@ -4013,7 +4023,7 @@ body:has(.sb-root) {
   align-items: center;
   z-index: 60;
   font-size: 18px;
-  color: var(--pink-deep);
+  color: var(--ink);
   line-height: 1;
 }
 /* On home, desktop shows HomeIntro's animated lockup — hide the static one. */
@@ -4230,9 +4240,9 @@ body:has(.sb-root) {
   align-items: baseline;
   width: max-content;
   white-space: nowrap;
-  /* Overrides .site-footer's uniform ink: the wordmark is the logo, so it
-     takes the brand dark while the footer's text stays a reading colour. */
-  color: var(--pink-deep);
+  /* The giant footer wordmark reads in ink, like the rest of the footer text
+     (the gradient asterisk is what carries the brand colour). */
+  color: var(--ink);
   font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
   /* Pull left by Space Mono's cap side-bearing so the "F" ink kisses the left
      gutter (the JS fit pushes the asterisk to the right gutter to match). */
@@ -4701,15 +4711,13 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 
 /* ── .sf-nav-mark ─────────────────────────────────────────────────
    The sandbox link IS the stacked wordmark: no pill, no "SB", no arrow bubble.
-   At 3rem it's big enough to read as FIN/BAR/STU/DIO on its own, which is what
-   earns it the right to stand alone (at the old pill size each letter was ~2.5px
-   and the block collapsed into smudges).
+   2em (Finbar's call) — smaller than it stood at first, still large enough to
+   read as FIN/BAR/STU/DIO.
 
    Height leads and width follows: the block is wider than it is tall (531:427),
-   unlike the square asterisk. Fixed rem, not em, now that there's no type
-   beside it to stay locked to. */
+   unlike the square asterisk. em, so it tracks the footer credit's own type. */
 .sf-nav-mark {
-  height: 3rem;
+  height: 2em;
   width: auto;
   display: block;
 }

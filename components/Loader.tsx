@@ -5,8 +5,8 @@
  *
  * Fills its parent (which carries the aspect ratio of the incoming media), so
  * the placeholder matches the exact geometry of the piece that's loading: a
- * soft pulse/shimmer (see `.skeleton` in globals.css) with the finbar✶studio
- * star spinner (LoaderThree) centred on top.
+ * soft pulse/shimmer (see `.skeleton` in globals.css) with the brand loading
+ * pulse (BrandLoader, imported as LoaderThree) centred on top.
  *
  * `size` is retained for call-site compatibility but no longer used.
  */

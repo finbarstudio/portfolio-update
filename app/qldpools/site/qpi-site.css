@@ -22,6 +22,13 @@
   --qpi-black: #061a30; /* near-black hover */
   --white: #ffffff;
 
+  /* Two faces (see layout.tsx): --font-qpi is the body (General Sans);
+     --font-qpi-display is the header. The header is meant to be Britney once the
+     licensed file lands; until then it falls through to the body face here, so
+     headings are heavier General Sans rather than broken. Swapping the header is
+     then one localFont in layout.tsx + repointing this one line. */
+  --font-qpi-display: var(--font-qpi);
+
   background: var(--white);
   color: var(--qpi-ink);
   font-family: var(--font-qpi), system-ui, sans-serif;
@@ -87,18 +94,18 @@
   padding-right: clamp(20px, 4vw, 32px);
 }
 
-/* Headings + display text — the demo face, sentence case (the portfolio's globals
-   uppercase h1–h4 and set Host Grotesk; undo both inside the demo). */
+/* Headings + display text — the HEADER face, sentence case (the portfolio's
+   globals uppercase h1–h4 and set Host Grotesk; undo both inside the demo). */
 .qpi-site :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--font-qpi), system-ui, sans-serif;
+  font-family: var(--font-qpi-display), system-ui, sans-serif;
   text-transform: none;
   letter-spacing: normal;
   font-weight: 700;
 }
 
-/* Wordmark / display treatment — heavy demo-face caps */
+/* Wordmark / display treatment — the HEADER face, heavy caps */
 .qpi-site .qpi-display {
-  font-family: var(--font-qpi), system-ui, sans-serif;
+  font-family: var(--font-qpi-display), system-ui, sans-serif;
   font-weight: 700;
   text-transform: uppercase;
 }
