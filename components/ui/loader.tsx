@@ -16,10 +16,13 @@
 
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 
-export function BrandLoader({ size = 46 }: { size?: number }) {
+export function BrandLoader({ size = 46 }: { size?: number | "fluid" }) {
+  // "fluid" fills the positioned parent — used decoratively (the 404's pulse
+  // row) where the mark should scale with its cell rather than sit at 46px.
+  const dim = size === "fluid" ? "100%" : size;
   return (
     <span className="brand-loader" aria-label="Loading" role="status">
-      <svg viewBox={MARK_VIEWBOX} width={size} height={size} aria-hidden="true">
+      <svg viewBox={MARK_VIEWBOX} width={dim} height={dim} aria-hidden="true">
         {MARK_SHAPES.map((s, i) => {
           // Centre-out: the centre dot is painted last (on top), so the pulse
           // starts there and travels to the tips. --layer is the distance from

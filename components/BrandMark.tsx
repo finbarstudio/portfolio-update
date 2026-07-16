@@ -27,9 +27,13 @@ export default function BrandMark({
       aria-label={title}
     >
       {MARK_SHAPES.map((s, i) => {
-        if (s.tag === "polygon") return <polygon key={i} points={s.points} fill={s.fill} />;
-        if (s.tag === "circle") return <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={s.fill} />;
-        return <path key={i} d={s.d} fill={s.fill} />;
+        // --layer = distance from the centre dot (painted last, so layer 0).
+        // Inert on its own; CSS pulse rules (.mark-pulse, the footer's slow
+        // breathe) use it to stagger the shapes centre-out.
+        const style = { "--layer": MARK_SHAPES.length - 1 - i } as React.CSSProperties;
+        if (s.tag === "polygon") return <polygon key={i} points={s.points} fill={s.fill} style={style} />;
+        if (s.tag === "circle") return <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={s.fill} style={style} />;
+        return <path key={i} d={s.d} fill={s.fill} style={style} />;
       })}
     </svg>
   );

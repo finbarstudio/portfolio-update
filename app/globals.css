@@ -86,6 +86,12 @@
   --pink-5:     #6F192C;   /* tertiary: gradient step only                */
   --pink-deep:  #510415;   /* ★ CORE — the dark pink, the mark's centre   */
   --brand-gradient: linear-gradient(160deg, #E96D89 0%, #CB5872 22%, #AC435B 44%, #8E2E43 64%, #6F192C 82%, #510415 100%);
+
+  /* THE pulse token — one clock for every pulsing mark (loaders, the 404
+     zeros, the footer asterisk) and the Book-a-call colour swing. Edit here,
+     everything moves together. */
+  --brand-loader-dur: 1.6s;      /* one full bloom-hold-collapse cycle  */
+  --brand-loader-stagger: 0.12s; /* delay from one layer to the next    */
   --pink-soft:  #F6C9D1;   /* light wash of the accent (reveals, fills)   */
 
   --teal:       #6FAE9F;   /* SECONDARY, dusty sage-teal                  */
@@ -1085,7 +1091,9 @@
     font-size: var(--text-tag);    /* 10px, lighter weight */
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 0.4em 0.8em;
+    /* 0.5em sides — the popup socials' internal spacing, adopted as THE mini
+       button spacing everywhere (nav pills, hover tips, tags). */
+    padding: 0.4em 0.5em;
     border-radius: 3px;
     border: 1px solid var(--ink);
     display: inline-block;
@@ -1205,10 +1213,7 @@
      loading feels across the whole site. Centres itself in a positioned parent
      (e.g. the .skeleton placeholder it sits inside). */
   .brand-loader {
-    /* ↓ amend the pulse here — nothing else needs touching ↓ */
-    --brand-loader-dur: 1.6s;      /* one full pulse cycle           */
-    --brand-loader-stagger: 0.12s; /* delay from one ring to the next */
-
+    /* Timing comes from the :root pulse token (--brand-loader-*). */
     position: absolute;
     inset: 0;
     display: grid;
@@ -1217,22 +1222,83 @@
     pointer-events: none;
   }
   .brand-loader svg { overflow: visible; }
+  /* .mark-pulse is the DECORATIVE cousin: same centre-out pulse on a plain
+     BrandMark, sized by its own box rather than filling a parent, with
+     --mark-delay to offset whole marks (the 404's ripple row). Shapes in a
+     bare BrandMark carry no --layer, so those pulse as one. */
+  .mark-pulse {
+    position: relative;
+    display: block;
+  }
+  /* ── 404 hover: 404 → 4000000004 ─────────────────────────────
+     The h1 is a full-width flex line. The zero slot (.notfound-zeros) is a
+     clipped row of pulsing marks exactly one mark wide at rest — you read
+     "404". Hovering stretches the slot to the full line: the 4s slide out to
+     the edges and the clipped marks surface one by one as the edge passes
+     them, each pulsing a beat behind the last. */
+  .notfound-line { width: 100%; }
+  .notfound-zeros {
+    width: 0.9em;                 /* one mark + its margins = the "0" */
+    overflow: hidden;
+    display: flex;
+    /* center, not space-evenly: with the row clipped to one mark, center
+       spills the overflow EQUALLY both sides (space-* falls back to start in
+       Chrome), so the resting zero is the MIDDLE mark and the unmask radiates
+       outward. Distribution at full width comes from the cells' flex-grow. */
+    justify-content: center;
+    transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .notfound-line:hover .notfound-zeros { width: 100%; }
+  /* The pulse never stops — the resting zero is already alive, and hovering
+     only unmasks the rest of the row mid-beat. */
+  /* The gradient mark standing in as each zero. Inside the zeros row the
+     cells GROW to share the expanded line evenly (the square svg letterboxes
+     itself centred, so the marks stay round and just space out). */
+  .notfound-zero {
+    width: 0.78em;
+    height: 0.78em;
+    margin: 0 0.06em;
+    display: block;
+    flex: 0 0 auto;
+  }
+  .notfound-zeros .notfound-zero { flex: 1 0 0.78em; }
+  @media (prefers-reduced-motion: reduce) {
+    .notfound-zeros { transition: none; }
+  }
+  .mark-pulse svg { width: 100%; height: 100%; display: block; overflow: visible; }
   /* Each of the six shapes scales about the MARK's centre (the viewBox centre,
      via transform-box: view-box), so they bloom out of the middle rather than
-     each around its own box. --layer (0 at the centre dot) staggers them out. */
-  .brand-loader svg > * {
+     each around its own box. --layer (0 at the centre dot) staggers them out;
+     --mark-delay shifts a whole mark (used by the 404 row's ripple). */
+  .brand-loader svg > *,
+  .mark-pulse svg > * {
     transform-box: view-box;
     transform-origin: center;
     animation: brand-loader-pulse var(--brand-loader-dur) ease-in-out infinite;
-    animation-delay: calc(var(--layer, 0) * var(--brand-loader-stagger));
+    animation-delay: calc(var(--layer, 0) * var(--brand-loader-stagger) + var(--mark-delay, 0s));
     will-change: transform, opacity;
   }
   @keyframes brand-loader-pulse {
-    0%, 100% { transform: scale(0.28); opacity: 0.3; }
-    40%, 60% { transform: scale(1);    opacity: 1; }
+    0%   { transform: scale(0);   opacity: 0; }
+    36%  { transform: scale(1.1); opacity: 1; }  /* back.out-style overshoot */
+    46%  { transform: scale(1); }
+    72%  { transform: scale(1);   opacity: 1; }  /* hold assembled */
+    100% { transform: scale(0);   opacity: 0; }  /* collapse into the next beat */
   }
+  /* The outermost layer (first in paint order, the primary-pink silhouette)
+     DEFINES the mark's final size, so it never swells past it — overshooting
+     made the whole mark read too big before settling. Inner layers keep the
+     swell; the boundary doesn't. */
+  @keyframes brand-loader-pulse-outer {
+    0%   { transform: scale(0); opacity: 0; }
+    36%  { transform: scale(1); opacity: 1; }
+    72%  { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0); opacity: 0; }
+  }
+  .brand-loader svg > :first-child,
+  .mark-pulse svg > :first-child { animation-name: brand-loader-pulse-outer; }
   @media (prefers-reduced-motion: reduce) {
-    .brand-loader svg > * { animation: none; transform: none; opacity: 1; }
+    .brand-loader svg > *, .mark-pulse svg > * { animation: none; transform: none; opacity: 1; }
   }
 
   /* Progressive disclosure — secondary card meta (tags + one-liner) stays tucked
@@ -3838,7 +3904,9 @@ body:has(.sb-root) {
 }
 
 /* In-type accent word (e.g. "and") picked out in the brand pink. */
-.home-disc-pink { color: var(--pink); }
+/* The FINBAR highlight in the About hero — the brand dark, not the light
+   accent (it's the name; the icons around it keep the main pink). */
+.home-disc-pink { color: var(--pink-deep); }
 
 /* Word-by-word reveal: each word/icon sits in a mask and slides up into view
    (see MaskReveal). */
@@ -3910,37 +3978,47 @@ body:has(.sb-root) {
 /* SB + WC26 shortcuts — the same fixed-pin-that-docks pattern as the copyright, but
    sitting ABOVE it (bottom: 42px vs 16px) and interactive once shown. Docks into its
    slot in the footer credit, just above the copyright, on every size. */
-.sf-nav { position: relative; display: inline-block; margin-bottom: 1em; }   /* gap above the © when docked */
-.sf-nav-ph { visibility: hidden; display: inline-flex; gap: 0.4em; }   /* reserves the line + width */
-.sf-nav-pin {
+/* Bottom-right CTA pin (BookCall). Same mechanics the old sandbox link used:
+   fixed above the © while scrolling, docking into its reserved footer line at
+   the bottom. The slot's job changed — it converts now. */
+.sf-cta { position: relative; display: inline-block; margin-bottom: 1em; }   /* gap above the © when docked */
+.sf-cta-ph { visibility: hidden; display: inline-flex; gap: 0.4em; }   /* reserves the line + width */
+.sf-cta-pin {
   position: fixed;
   right: clamp(20px, 3vw, 40px);
   bottom: 42px;
   z-index: 45;
   overflow: hidden;            /* mask for the slide-up reveal */
   display: inline-block;
-  pointer-events: none;        /* the links become clickable once shown (below) */
+  pointer-events: none;        /* the button becomes clickable once shown (below) */
 }
-.sf-nav-pin.is-shown { pointer-events: auto; }
-.sf-nav-pin.is-docked {
+.sf-cta-pin.is-shown { pointer-events: auto; }
+/* While the contact popup is open the pin bows out entirely — otherwise it
+   sits as a blurred pink lump behind the sheet. Fades back on close. */
+.sf-cta-pin { transition: opacity 0.25s var(--ease); }
+body:has(.contact-panel.is-open) .sf-cta-pin {
+  opacity: 0;
+  pointer-events: none;
+}
+.sf-cta-pin.is-docked {
   position: absolute;
   bottom: 0;
   right: 0;
   top: auto;
 }
-.sf-nav-inner {
+.sf-cta-inner {
   display: inline-flex;
   gap: 0.4em;
   transform: translateY(150%);     /* hidden beneath the mask until revealed */
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.sf-nav-pin.is-shown .sf-nav-inner { transform: translateY(0); }
-/* Reduced motion: no slide, but still respect the reveal gate — the links are only
-   interactive once shown, so they must stay hidden (not just un-animated) until then,
-   or they'd paint as un-clickable controls on the home intro screen. */
+.sf-cta-pin.is-shown .sf-cta-inner { transform: translateY(0); }
+/* Reduced motion: no slide, but still respect the reveal gate — the button is only
+   interactive once shown, so it must stay hidden (not just un-animated) until then,
+   or it'd paint as an un-clickable control on the home intro screen. */
 @media (prefers-reduced-motion: reduce) {
-  .sf-nav-pin.is-shown .sf-nav-inner { transition: none; transform: translateY(0); }
-  .sf-nav-pin:not(.is-shown) .sf-nav-inner { transform: translateY(150%); }
+  .sf-cta-pin.is-shown .sf-cta-inner { transition: none; transform: translateY(0); }
+  .sf-cta-pin:not(.is-shown) .sf-cta-inner { transform: translateY(150%); }
 }
 
 /* AUS/BNE live clock — mirror of the copyright but bottom-LEFT, docking into the
@@ -4334,7 +4412,9 @@ body:has(.sb-root) {
 }
 .top-nav-social-item {
   /* Normalise by HEIGHT (not a fixed square) so non-square marks — the wide
-     Are.na logo especially — read at the same optical size as the rest. */
+     Are.na logo especially — read at the same optical size as the rest.
+     position: relative anchors each icon's .nav-tip dropdown. */
+  position: relative;
   height: 14px;
   display: inline-flex;
   align-items: center;
@@ -4343,29 +4423,70 @@ body:has(.sb-root) {
   transition: color var(--dur-fast) var(--ease);
 }
 .top-nav-social-item:hover { color: var(--pink); }
-.top-nav-social-item svg { height: 14px; width: auto; display: block; }
-/* The 🫂 contact glyph (Noto Sans Symbols 2). Button reset + sized to sit with
-   the social marks. */
-.top-nav-hug {
-  height: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  padding: 0;
-  background: none;
-  cursor: pointer;
-  font-family: var(--font-dingbat), system-ui, sans-serif;
-  font-size: 15px;
-  line-height: 1;
+/* Socials centre their dropdown under the icon; the reveal keeps the centring
+   in the same transform. (The sandbox flask overrides this to right-align —
+   it's the row's last item, hard against the viewport edge.) */
+.top-nav-social-item .nav-tip {
+  left: 50%;
+  right: auto;
+  transform: translate(-50%, -4px);
 }
-/* The 🫂 glyph's ink rides ~1px high and carries a large right side-bearing, so
-   it reads as high + over-padded next to the SVG marks. Nudge the ink down and
-   right to optically centre it in its slot. */
-.top-nav-hug span {
-  display: block;
+.top-nav-social-item:hover .nav-tip,
+.top-nav-social-item:focus-visible .nav-tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.top-nav-social-item svg { height: 14px; width: auto; display: block; }
+/* Sandbox flask — the row's last item, set apart from the socials by a bigger
+   gap and the accent colour (the socials are ink → pink on hover; this is pink
+   → deep). position: relative anchors the .nav-tip dropdown. */
+.top-nav-sandbox {
+  position: relative;
+  margin-left: clamp(10px, 1.6vw, 22px);
+  color: var(--pink);
+}
+.top-nav-sandbox:hover,
+.top-nav-sandbox:focus-visible { color: var(--pink-deep); }
+.top-nav-sandbox svg { height: 15px; }
+/* The little dropdown label under each icon. Pure CSS: hidden by default,
+   drops in on hover/focus. Styled on the SAME token as the nav pills (.tag:
+   mono 400, 10px, 0.06em tracking, 3px radius, hairline ink border) so the
+   nav speaks one language; only the bg fill differs, so it reads over page
+   content. */
+.nav-tip {
+  position: absolute;
+  top: calc(100% + 9px);
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  padding: 0.4em 0.5em;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-tag);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   line-height: 1;
-  transform: translate(2px, 1px);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
+}
+/* The flask is the row's last item, hard against the viewport edge — its tip
+   right-aligns (double class beats the centred socials rule below). */
+.top-nav-social-item.top-nav-sandbox .nav-tip {
+  left: auto;
+  right: -4px;
+  transform: translateY(-4px);
+}
+.top-nav-social-item.top-nav-sandbox:hover .nav-tip,
+.top-nav-social-item.top-nav-sandbox:focus-visible .nav-tip {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-tip { transition: none; transform: none; }
 }
 /* Per-icon optical tuning: the solid brand glyphs read heavier than the outline
    mail/phone, so trim them down. */
@@ -4433,46 +4554,303 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   inset: 0;
   z-index: 300;
   pointer-events: none;
-  --contact-drawer-w: min(440px, 92vw);
   --contact-reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --contact-reveal-dur: 0.9s;
+  --contact-reveal-dur: 0.6s;
+  /* One inset shared by the sheet AND the frame-trace svg, so the traced line
+     sits exactly on the sheet's edge. */
+  --contact-inset: clamp(10px, 2.2vw, 32px);
 }
 .contact-panel.is-open { pointer-events: auto; }
-/* Backdrop wipes in from the left to meet the drawer in the middle. It only
-   needs to reach the drawer's left edge — the strip behind the drawer is
-   hidden — so the dark edge and the drawer's edge travel to the same seam on
-   the SAME duration/easing and arrive together (no side lags). */
+/* Minimal blur, no tint (Finbar's call): the page stays legible behind — the
+   deep-pink sheet carries all the weight, the backdrop just softens. */
 .contact-backdrop {
   position: absolute;
   inset: 0;
   border: 0;
   padding: 0;
-  background: color-mix(in srgb, var(--ink) 38%, transparent);
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path var(--contact-reveal-dur) var(--contact-reveal-ease);
+  background: transparent;
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  opacity: 0;
+  transition: opacity 0.45s var(--contact-reveal-ease);
   cursor: pointer;
 }
-.contact-panel.is-open .contact-backdrop { clip-path: inset(0 var(--contact-drawer-w) 0 0); }
-/* Drawer wipes in from the right. */
-.contact-drawer {
+.contact-panel.is-open .contact-backdrop { opacity: 1; }
+/* The sheet: an inset panel in the brand's dark pink — everything builds
+   inside it. Two columns: the contact rail, then the Cal booker.
+
+   It GROWS FROM THE CLICK POINT: --contact-ox/oy are set by ContactPanel from
+   the trigger's click coordinates (Contact pill top-left, Book-a-call pin
+   bottom-right, a page CTA anywhere), and the clip-path circle opens out from
+   that spot. 141% covers the far corner from any origin. The insets/paddings
+   are deliberately tight so the booker column stays wide enough for Cal's
+   side-by-side month view — starve it and Cal silently degrades to the
+   one-column scroller. */
+.contact-sheet {
   position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: var(--contact-drawer-w);
-  background: var(--bg);
-  color: var(--ink);
-  border-left: 1px solid var(--line);
-  box-shadow: -24px 0 70px rgba(0, 0, 0, 0.10);
+  inset: var(--contact-inset);
+  display: grid;
+  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(14px, 2vw, 32px);
+  padding: clamp(16px, 2.2vw, 36px);
+  /* Transparent: the COLOUR arrives as the .contact-fill rings, not as the
+     sheet itself. */
+  background: transparent;
+  border-radius: 6px;
+  color: var(--bg);
+  opacity: 0;
+  transition: opacity 0.3s var(--contact-reveal-ease);
+}
+.contact-panel.is-open .contact-sheet { opacity: 1; }
+/* The fill: concentric rounded-rects in the frame's own shape, popping in
+   from the CENTRE out to the frame after the trace — the icon's bloom, in
+   blinds. Same colour throughout, so the maroon reads as spreading outward
+   in beats. */
+.contact-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  overflow: hidden;   /* the rings' pop overshoot never pokes past the frame */
+  pointer-events: none;
+  --fill-step: 0.22s;   /* how long each ramp colour holds before the next */
+}
+.contact-fill-ring {
+  position: absolute;
+  inset: calc((5 - var(--ring, 0)) * 8.4%);
+  background: var(--pink-deep);
+  border-radius: 6px;
+  opacity: 0;
+  transform: scale(0.72);
+  /* Smallest ring on TOP: later (bigger) rings land BEHIND the earlier ones,
+     so the whole ramp stays visible as concentric bands while it assembles —
+     the logo's layering. */
+  z-index: calc(6 - var(--ring, 0));
+}
+/* Each ring wears one step of the mark's ramp (the logo animation's own
+   colours). Later rings paint over earlier ones, so the fill reads as a
+   stepped wipe deepening outward — and the OUTERMOST ring is what the panel
+   ends as, which is why the ramp runs main pink at the centre down to the
+   brand dark at the frame. */
+.contact-fill-ring:nth-child(1) { background: var(--pink); }
+.contact-fill-ring:nth-child(2) { background: var(--pink-2); }
+.contact-fill-ring:nth-child(3) { background: var(--pink-3); }
+.contact-fill-ring:nth-child(4) { background: var(--pink-4); }
+.contact-fill-ring:nth-child(5) { background: var(--pink-5); }
+.contact-fill-ring:nth-child(6) { background: var(--pink-deep); }
+.contact-panel.is-open .contact-fill-ring {
+  /* Two acts: bloom in on the ramp beat, then — once the whole gradient has
+     assembled — every band fades away together, leaving only the outer
+     (bg-coloured) ring as the panel. */
+  animation:
+    contact-ring-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+    contact-ring-fade 0.45s ease-out forwards;
+  animation-delay: calc(0.6s + var(--ring, 0) * var(--fill-step)), 2.25s;
+}
+/* The outermost ring defines the final silhouette (no overshoot) and is the
+   one that STAYS — it is the panel's colour. */
+.contact-panel.is-open .contact-fill-ring:last-child {
+  animation: contact-ring-in-outer 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(0.6s + var(--ring, 0) * var(--fill-step));
+}
+@keyframes contact-ring-fade {
+  to { opacity: 0; }
+}
+@keyframes contact-ring-in {
+  0%   { opacity: 0; transform: scale(0.72); }
+  62%  { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes contact-ring-in-outer {
+  0%   { opacity: 0; transform: scale(0.72); }
+  100% { opacity: 1; transform: scale(1); }
+}
+/* Content sits above the fill (the close button keeps its absolute pin). */
+.contact-rail, .contact-cal-col { position: relative; z-index: 1; }
+.contact-sheet .contact-close { z-index: 1; }
+/* The outline that announces the fill: a 1px line TRACING the sheet's actual
+   frame — same inset, same rounded corners — then the colour floods in behind
+   it. Sits under the sheet, so the flood swallows the line as it lands. */
+.contact-trace {
+  /* An svg is a replaced element: with inset alone, width:auto resolves to
+     its INTRINSIC 300x150, not the stretch — so size it explicitly off the
+     shared inset. */
+  position: absolute;
+  top: var(--contact-inset);
+  left: var(--contact-inset);
+  width: calc(100% - 2 * var(--contact-inset));
+  height: calc(100% - 2 * var(--contact-inset));
+  overflow: visible;
+  pointer-events: none;
+}
+.contact-trace-rect {
+  x: 0.5px;
+  y: 0.5px;
+  width: calc(100% - 1px);
+  height: calc(100% - 1px);
+  rx: 6px;
+  fill: none;
+  stroke: var(--pink-deep);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;   /* fully undrawn at rest */
+  opacity: 0;
+}
+.contact-panel.is-open .contact-trace-rect {
+  opacity: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.1s linear;
+}
+/* Content flips light on the dark ground. The display titles take the page
+   colour (their usual pink-deep would vanish into the panel). */
+.contact-sheet .contact-title { color: var(--bg); }
+.contact-sheet .contact-close { color: var(--pink-soft); }
+.contact-sheet .contact-close:hover { color: var(--pink); }
+.contact-sheet .contact-sent { color: var(--bg); }
+.contact-sheet .contact-input { border-color: transparent; }
+/* The Direct group floats centred (x and y) in the space between the lede
+   and the note form. */
+.contact-direct {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(16px, 2.4vh, 26px);
-  padding: clamp(28px, 5vw, 48px);
-  overflow-y: auto;
-  clip-path: inset(0 0 0 100%);
-  transition: clip-path var(--contact-reveal-dur) var(--contact-reveal-ease);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
-.contact-panel.is-open .contact-drawer { clip-path: inset(0 0 0 0); }
+/* Stacked: email + phone first, the social pills in a row beneath, all in
+   the page white. */
+.contact-direct .contact-details {
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.contact-direct .contact-socials {
+  justify-content: center;
+  max-width: none;
+}
+/* Shrink-wrap and centre the two links (an anchor was stretching to the
+   column and pinning its text left of centre). */
+.contact-direct .contact-primary { align-items: center; }
+.contact-sheet .contact-link { color: var(--bg); }
+.contact-sheet .contact-socials .tag-default {
+  border-color: color-mix(in srgb, var(--bg) 65%, transparent);
+  color: var(--bg);
+}
+/* The lede's mobile variant only exists in the stacked layout. */
+.contact-lede-mobile { display: none; }
+/* The rail's lede line under the title. */
+.contact-lede {
+  margin: 0;
+  color: color-mix(in srgb, var(--bg) 78%, transparent);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  max-width: 34ch;
+}
+/* Group labels: DIRECT / OR SEND A NOTE / OR BOOK A CALL. */
+.contact-col-label {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pink-soft);
+}
+/* Left rail: the old drawer's contents, stacked — everything centred. */
+.contact-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(14px, 2.2vh, 24px);
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: clamp(6px, 1.6vh, 18px);
+}
+/* Centred children that must still span the rail (the form + its fields). */
+.contact-rail .contact-bottom,
+.contact-rail .contact-form { width: 100%; }
+/* The base .contact-title justifies; in the popup it centres like the rest. */
+.contact-sheet .contact-title {
+  text-align: center;
+  text-align-last: center;
+  padding-right: 0;
+}
+.contact-cal-col .contact-col-label { text-align: center; }
+/* The popup sets the title a step smaller than the drawer did — two columns
+   share the screen now, and the big cut crowded the rail. */
+.contact-sheet .contact-title {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+/* The booker column: a light inset card on the deep-pink panel, same 3px
+   token radius. The embed keeps its own default look inside (reskinning its
+   internals through ui vars caused hover glitches — only the brand colour is
+   themed now). */
+.contact-cal-col {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* Same top inset as the rail, so the BOOK A CALL label sits level with the
+     title's cap height rhythm. */
+  padding-top: clamp(6px, 1.6vh, 18px);
+}
+.contact-cal {
+  position: relative;   /* the brand Loader fills this while Cal boots */
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border-radius: 6px;
+  /* No card, no padding: the booker fills the column edge to edge (the
+     iframe carries its own ground), clipped to the token radius. */
+  background: transparent;
+  padding: 0;
+}
+/* The forced badge hide: Cal's plan gate ignores hideBranding and the badge
+   is cross-origin, so no CSS reaches it. The badge renders as the LAST thing
+   inside the iframe, so clipping the iframe's bottom band removes it wherever
+   the iframe happens to end (a cover strip pinned to the column bottom kept
+   missing it — the iframe's bottom floats higher than the column's). */
+.contact-cal iframe {
+  clip-path: inset(0 0 68px 0);
+  margin-bottom: -68px;   /* the clipped band shouldn't reserve scroll space */
+}
+/* Centre the cropped booker in the popup space: cap the card at the booker's
+   natural width and let auto margins centre it in the column. */
+.contact-cal {
+  width: min(100%, 920px);
+  align-self: center;
+}
+/* Mobile: one column, the whole sheet scrolls; give the booker real height. */
+@media (max-width: 860px) {
+  /* Stacked: a plain flex column, not a grid — the grid's auto rows were
+     equalising against the sheet's fixed height and letting the rail's
+     content overflow its row into the booker. Flex heights are natural and
+     the sheet scrolls. */
+  .contact-sheet {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    gap: 24px;
+  }
+  /* Nothing shrinks in the stack: the sheet's height is fixed by its inset,
+     so without these the flex column compresses the rail (and the Direct
+     group inside it) instead of letting the sheet scroll. */
+  .contact-rail { overflow-y: visible; flex: 0 0 auto; min-height: auto; }
+  .contact-cal-col { flex: 0 0 auto; min-height: auto; }
+  .contact-direct { flex: 0 0 auto; }
+  .contact-cal { min-height: 72svh; flex: 0 0 auto; }
+  /* Phone/tablet: direct contact + booking only — the note form earns its
+     place on desktop, in the stack it's just scroll. (Double selector: the
+     base .contact-bottom rule sits later in the file and ties on specificity,
+     so it wins source order otherwise.) */
+  .contact-rail .contact-bottom { display: none; }
+  .contact-lede-desktop { display: none; }
+  .contact-lede-mobile { display: inline; }
+}
 /* Bare, small close — no container. */
 .contact-close {
   position: absolute;
@@ -4505,11 +4883,14 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .contact-reveal {
   clip-path: inset(0 0 100% 0);
   transition: clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: calc(0.28s + var(--i, 0) * 0.07s);
+  transition-delay: calc(2.7s + var(--i, 0) * 0.08s);
 }
 .contact-panel.is-open .contact-reveal { clip-path: inset(0 0 0 0); }
+/* Closing reverses everything immediately (no stagger hold), so the sheet's
+   shrink and its contents leave together instead of cutting. */
+.contact-panel:not(.is-open) .contact-reveal { transition-delay: 0s; }
 @media (prefers-reduced-motion: reduce) {
-  .contact-backdrop, .contact-drawer, .contact-reveal { transition: none; }
+  .contact-backdrop, .contact-sheet, .contact-reveal { transition: none; }
 }
 /* Email + phone share one token (mono, regular weight) — like the footer. */
 /* Email + phone beside a 2×2 pill grid, socials pinned right. */
@@ -4528,7 +4909,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* Socials: 2×2 grid of pills, aligned right. */
 /* Socials: pills packed tight (hug their text), wrapping right-aligned. */
 .contact-socials { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: flex-end; align-content: flex-start; flex: 0 0 auto; max-width: 150px; }
-.contact-socials .tag { padding: 0.4em 0.5em; white-space: nowrap; }
+.contact-socials .tag { white-space: nowrap; }
 /* SAY HI title + form grouped and pushed to the bottom of the drawer. */
 .contact-bottom { display: flex; flex-direction: column; gap: 0.6rem; margin-top: auto; }
 .contact-form { display: flex; flex-direction: column; gap: 0.6rem; }
@@ -4537,7 +4918,9 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   padding: 0.7em 0.85em;
   border: 1px solid var(--line);
   border-radius: 3px;
-  background: transparent;
+  /* Solid fill — on the popup's blurred backdrop a transparent field reads as
+     an empty outline floating on noise. */
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans, inherit);
   font-size: 0.95rem;
@@ -4709,21 +5092,56 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
    layered class colour without !important. */
 .display-brand { color: var(--pink-deep); }
 
-/* ── .sf-nav-mark ─────────────────────────────────────────────────
-   The sandbox link IS the stacked wordmark: no pill, no "SB", no arrow bubble.
-   2em (Finbar's call) — smaller than it stood at first, still large enough to
-   read as FIN/BAR/STU/DIO.
-
-   Height leads and width follows: the block is wider than it is tall (531:427),
-   unlike the square asterisk. em, so it tracks the footer credit's own type. */
-.sf-nav-mark {
-  height: 2em;
-  width: auto;
-  display: block;
+/* ── .book-call-pill ──────────────────────────────────────────────
+   The conversion CTA: the sticker-pill silhouette, but FILLED pink by default
+   (an outline pill reads as navigation; this one asks for the click). Hover
+   deepens to the brand dark. Unlayered so it beats the layered
+   button.sticker-pill:hover outline rules without !important. */
+.book-call-pill {
+  /* Static, in the brand dark (no pulsing — the animated versions read as
+     noise). Hover lifts to the main pink. Host Grotesk, the display face,
+     instead of the base pill's mono — it's a headline act, not a label. */
+  background: var(--pink-deep);
+  border-color: var(--pink-deep);
+  color: var(--bg);
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  cursor: pointer;
+  /* Bigger than the base pill — it's the conversion path, it should read
+     from across the room. */
+  font-size: 0.9rem;
+  padding: 0.8em 1.5em;
 }
-/* The link itself is now just a box around the mark — no border, no padding. */
-.sf-nav-link {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
+@media (hover: hover) {
+  button.book-call-pill:hover {
+    background: var(--pink);
+    border-color: var(--pink);
+    color: var(--bg);
+  }
+}
+
+/* ── Footer asterisk pulse ────────────────────────────────────────
+   The giant footer wordmark's mark runs the FULL loader animation — bloom from
+   the centre, hold, collapse, repeat — slowed right down so it reads as a
+   living logo rather than a spinner. Layers ripple centre-out via each shape's
+   --layer. Footer only; the nav logo stays still.
+   UNLAYERED on purpose (house rule): inside @layer components this rule was
+   tree-shaken out of the build even with both class names in scanned content. */
+.site-footer-mark-inner .brand-wordmark-asterisk > * {
+  transform-box: view-box;
+  transform-origin: center;
+  /* The shared pulse token x5: scaling duration AND stagger together keeps
+     the exact 404 choreography, just far slower — a giant mark at loader
+     tempo is a lot of motion for an accessibility-sensitive corner of every
+     page. reduced-motion kills it entirely below. */
+  animation: brand-loader-pulse calc(var(--brand-loader-dur) * 5) ease-in-out infinite;
+  animation-delay: calc(var(--layer, 0) * var(--brand-loader-stagger) * 5);
+}
+.site-footer-mark-inner .brand-wordmark-asterisk > :first-child {
+  animation-name: brand-loader-pulse-outer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-footer-mark-inner .brand-wordmark-asterisk > *,
+  .site-footer-mark-inner .brand-wordmark-asterisk > :first-child { animation: none; transform: none; opacity: 1; }
 }

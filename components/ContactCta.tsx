@@ -19,7 +19,7 @@ export default function ContactCta({
     <button
       type="button"
       className={className}
-      onClick={() => window.dispatchEvent(new CustomEvent("contact:open"))}
+      onClick={(e) => window.dispatchEvent(new CustomEvent("contact:open", { detail: { x: e.clientX, y: e.clientY } }))}
     >
       {children}
     </button>

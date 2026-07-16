@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import BrandStar from "@/components/BrandStar";
-import HeroStar from "@/components/HeroStar";
+import BrandMark from "@/components/BrandMark";
 
 export const metadata: Metadata = {
-  title: "Page not found | Finbar Studio",
+  // Bare name — the root layout's title template appends "| Finbar Studio"
+  // (the old hardcoded suffix rendered it twice in the tab).
+  title: "Page not found",
   robots: { index: false, follow: true },
 };
 
-/* 404 — on-brand: the big serif "4 ✶ 4" with the brand star as the zero, the
-   self-tracing background star, and a way back. Renders inside the root layout,
-   so the sidebar stays put. */
+/* 404 — reads as a plain centred "404" (the gradient mark as the zero) until
+   you hover the line: the 4s slide to the viewport edges and pulsing marks
+   surface between them, 404 becoming 4000000004. Replaced the deprecated
+   six-pointed BrandStar + self-tracing HeroStar. */
+
+// Odd count on purpose: the row is centre-justified, so the middle mark is
+// the resting "0" and hovering unmasks outward from it in both directions.
+const ZERO_COUNT = 13;
+
 export default function NotFound() {
   return (
     <section
@@ -18,16 +25,27 @@ export default function NotFound() {
       style={{ minHeight: "calc(100vh - var(--menubar-h))" }}
       aria-label="Page not found"
     >
-      <HeroStar />
+      <div className="relative z-10 flex flex-col items-center text-center">
+        <p className="mono-label text-ink-soft mb-7">Page not found</p>
 
-      <div className="relative z-10">
-        <span className="sticker-pill is-pink mb-7 inline-flex">
-          <span className="status-dot" aria-hidden="true" /> Page not found
-        </span>
-
-        <h1 className="home-display text-ink flex items-center" aria-label="404">
+        {/* Hover stretches the zero slot across the line: the 4s slide to the
+            viewport edges and the clipped marks surface one by one, each a
+            pulsing zero — 404 becomes 4000000004. */}
+        <h1 className="notfound-line home-display text-ink flex items-center justify-center" aria-label="404">
           <span aria-hidden="true">4</span>
-          <BrandStar size="0.78em" style={{ color: "var(--pink)", margin: "0 0.06em" }} />
+          <span className="notfound-zeros" aria-hidden="true">
+            {Array.from({ length: ZERO_COUNT }).map((_, i) => (
+              <span
+                key={i}
+                className="mark-pulse notfound-zero"
+                // Delay by distance from the centre mark, so the pulse (which
+                // never stops) radiates the same way the unmask travels.
+                style={{ "--mark-delay": `${Math.abs(i - (ZERO_COUNT - 1) / 2) * 0.13}s` } as React.CSSProperties}
+              >
+                <BrandMark />
+              </span>
+            ))}
+          </span>
           <span aria-hidden="true">4</span>
         </h1>
 
@@ -36,9 +54,10 @@ export default function NotFound() {
           here&rsquo;s the way back.
         </p>
 
-        <div className="flex flex-wrap gap-x-6 gap-y-3 mt-9">
-          <Link href="/" className="home-link">Back home →</Link>
-          <Link href="/work" className="home-link">View work →</Link>
+        {/* Boxed, on the same token as the nav pills. */}
+        <div className="flex flex-wrap justify-center gap-3 mt-9">
+          <Link href="/" className="tag tag-default">Back home →</Link>
+          <Link href="/work" className="tag tag-default">View work →</Link>
         </div>
       </div>
     </section>

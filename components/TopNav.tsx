@@ -38,6 +38,17 @@ const socials = [
   { label: "Are.na", cls: "is-arena", href: "https://are.na/finbar-studio", icon: <ArenaIcon /> },
 ];
 
+/* The sandbox flask — experiments live there. Stroke-based so it sits with the
+   other line marks at nav size. */
+function FlaskIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" width="100%" height="100%">
+      <path d="M9.4 3h5.2M10.3 3v5.4L5.5 17.5A2.35 2.35 0 0 0 7.7 20.7h8.6a2.35 2.35 0 0 0 2.2-3.2L13.7 8.4V3" />
+      <path d="M7.6 14.5h8.8" />
+    </svg>
+  );
+}
+
 export default function TopNav() {
   const pathname = usePathname();
   const isActive = (href: string) =>
@@ -66,22 +77,13 @@ export default function TopNav() {
         <button
           type="button"
           className="tag tag-default"
-          onClick={() => window.dispatchEvent(new CustomEvent("contact:open"))}
+          onClick={(e) => window.dispatchEvent(new CustomEvent("contact:open", { detail: { x: e.clientX, y: e.clientY } }))}
         >
           Contact
         </button>
       </nav>
 
       <div className="top-nav-social">
-        <button
-          type="button"
-          aria-label="Get in touch"
-          title="Get in touch"
-          className="top-nav-social-item top-nav-hug"
-          onClick={() => window.dispatchEvent(new CustomEvent("contact:open"))}
-        >
-          <span aria-hidden="true">{"\u{1FAC2}"}</span>
-        </button>
         {socials.map((s) => (
           <a
             key={s.href}
@@ -89,12 +91,28 @@ export default function TopNav() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={s.label}
-            title={s.label}
             className={`top-nav-social-item ${s.cls}`}
           >
             {s.icon}
+            {/* Same dropdown label the sandbox flask carries. No title attr —
+                the native tooltip would double up with this one. */}
+            <span className="nav-tip" aria-hidden="true">{s.label}</span>
           </a>
         ))}
+        {/* Sandbox — furthest right, set apart from the socials with its own gap
+            and the accent colour (it's ours, they're elsewhere). The old 🫂
+            contact glyph lived here; contact still has the nav pill, and the
+            footer's Book-a-call is now the main conversion path. */}
+        <a
+          href="https://sandbox.finbar.studio"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Sandbox (opens in a new tab)"
+          className="top-nav-social-item top-nav-sandbox"
+        >
+          <FlaskIcon />
+          <span className="nav-tip" aria-hidden="true">Sandbox</span>
+        </a>
       </div>
     </header>
   );

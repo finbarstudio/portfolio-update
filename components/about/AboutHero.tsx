@@ -4,11 +4,13 @@
  * AboutHero — the "Nice to meet you" statement with an isolated photo of Finbar
  * centred over the type.
  *
- *   1. The statement's characters rise in and the page rests as plain text.
- *   2. HOVERING the centre zone activates the takeover: the photo (a regular
- *      head-and-shoulders cut-out on a transparent background) scales in and a
- *      wave scatters the characters out of its footprint (translate only).
- *      Leaving reverses back to plain text.
+ *   1. The statement mask-reveals WORD by word from the bottom (Finbar's call:
+ *      not the old per-character rise, a per-word mask), then rests as plain
+ *      text.
+ *   2. HOVERING the centre zone activates the takeover: the photo (a b/w
+ *      cutout on a transparent ground) scales in and a wave scatters the
+ *      characters out of its footprint (translate only). Leaving reverses
+ *      back to plain text.
  *   The hover target is a fixed-size zone, so the photo scaling can't make the
  *   pointer flicker on and off it.
  *
@@ -37,9 +39,11 @@ const TOKENS: Token[] = [
 
 const PUSH_MARGIN = 28;   // px of clearance beyond the photo's edge
 const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
-// Transparent cutout, trimmed to the subject's real bounds (900x858).
-const PHOTO_SRC = "/images/about/finbar-hero.webp";
-const PHOTO_ASPECT = "900 / 858";
+// The plain b/w portrait, circle-cropped by the container. NOT a cutout:
+// machine isolation (macOS Vision) chopped the hair flat against the disc and
+// left a colour bar — Finbar's call is the honest photo disc instead.
+const PHOTO_SRC = "/images/about/finbar-long-hair.webp";
+const PHOTO_ASPECT = "1 / 1";
 
 export default function AboutHero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -69,6 +73,11 @@ export default function AboutHero() {
         const c = photo.getBoundingClientRect();
         const cx = c.left + c.width / 2;
         const cy = c.top + c.height / 2;
+        // NOTE this measures the rect while the photo sits at scale(0), so R is
+        // effectively just PUSH_MARGIN and characters get only the gentle
+        // exponential shove — that IS the wave Finbar likes. A "fixed" version
+        // using offsetWidth pushed the text a full disc-radius away and he
+        // called it off: characters brushing the photo's edge is the design.
         const R = c.width / 2 + PUSH_MARGIN;
         return chars.map((el) => {
           const b = el.getBoundingClientRect();
@@ -92,16 +101,23 @@ export default function AboutHero() {
 
       gsap.set(photo, { xPercent: -50, yPercent: -50, scale: 0, opacity: 1, transformOrigin: "center center" });
 
-      // 1 — statement rises in from below (once, then rests as plain text).
-      //     .from() + immediateRender:false means the DEFAULT is the natural,
-      //     visible layout: the characters are only hidden once the tween
-      //     actually starts ticking, so if the ticker never runs (e.g. an
-      //     unfocused/headless tab) the statement simply stays readable rather
-      //     than stranded invisible.
-      const intro = gsap.timeline();
-      intro.from(chars, {
-        opacity: 0, yPercent: 90, duration: 0.7, stagger: 0.012,
-        ease: "power3.out", immediateRender: false,
+      // 1 — entrance: each WORD mask-reveals from the bottom, staggered along
+      //     the statement. The mask is a clip-path on the word wrapper (never
+      //     overflow: hidden — that changes an inline-block's baseline and
+      //     shifts the whole line), and it's cleared when the intro lands so
+      //     the hover scatter can fly characters out of the word boxes.
+      //     .from() + immediateRender:false keeps the natural visible layout
+      //     as the default: if the ticker never runs (unfocused/headless tab)
+      //     the statement stays readable rather than stranded mid-mask.
+      const words = gsap.utils.toArray<HTMLElement>(".ah-word");
+      gsap.set(words, { clipPath: "inset(0% -0.1em -0.06em -0.1em)" });
+      const intro = gsap.timeline({
+        onComplete: () => gsap.set(words, { clearProps: "clipPath" }),
+      });
+      words.forEach((w, i) => {
+        intro.from(w.querySelectorAll(".ah-char"), {
+          yPercent: 115, duration: 0.65, ease: "power3.out", immediateRender: false,
+        }, i * 0.04);
       });
 
       // 2 — photo scales in + scatter, paused so hover can reverse it
@@ -115,14 +131,21 @@ export default function AboutHero() {
       //     ACTIVATES the takeover (photo in, characters scatter), and leaving
       //     reverses back to text. Fixed-size zone + guard so the photo scaling
       //     never causes enter/leave flicker.
-      handlers.enter = () => { if (hovering) return; hovering = true; scatter.timeScale(1).play(); };
+      handlers.enter = () => {
+        if (hovering) return;
+        hovering = true;
+        // Hovering mid-entrance: land the intro instantly (which also clears
+        // the word masks via its onComplete) so the scatter is never clipped.
+        if (intro.progress() < 1) intro.progress(1);
+        scatter.timeScale(1).play();
+      };
       handlers.leave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1.6).reverse(); };
 
-      // Touch devices have no hover, so the photo would never appear: after
-      // the intro settles, play the takeover automatically. Tapping the centre
-      // zone then toggles between photo and readable text.
+      // Touch devices have no hover, so the photo would never appear: play the
+      // takeover automatically once the word reveal has landed. Tapping the
+      // centre zone then toggles photo <-> readable text.
       if (window.matchMedia("(hover: none)").matches) {
-        gsap.delayedCall(1.4, () => handlers.enter());
+        gsap.delayedCall(1.8, () => handlers.enter());
         handlers.toggle = () => { if (hovering) handlers.leave(); else handlers.enter(); };
       }
     }, section);
@@ -157,12 +180,18 @@ export default function AboutHero() {
       >
         {TOKENS.map((t, i) => (
           <span key={i}>
+            {/* .ah-word doubles as the entrance mask: the intro clips each word
+                to its own box while its characters rise in from below (see the
+                timeline), then the clip is cleared so the hover scatter can fly
+                characters out of it freely. */}
             {t.icon ? (
-              <span className="ah-char inline-block will-change-transform">
-                <InlineIcon char={t.icon} className="home-disc-icon" />
+              <span className="ah-word inline-block">
+                <span className="ah-char inline-block will-change-transform">
+                  <InlineIcon char={t.icon} className="home-disc-icon" />
+                </span>
               </span>
             ) : (
-              <span className="inline-block whitespace-nowrap" aria-hidden="true">
+              <span className="ah-word inline-block whitespace-nowrap" aria-hidden="true">
                 {[...(t.word as string)].map((ch, j) => (
                   <span
                     key={j}
@@ -183,17 +212,20 @@ export default function AboutHero() {
         ref={photoRef}
         aria-hidden="true"
         className="absolute left-1/2 top-1/2 z-20 pointer-events-none overflow-hidden"
-        style={{ width: "clamp(300px, 34vw, 460px)", aspectRatio: PHOTO_ASPECT, borderRadius: "50%" }}
+        style={{
+          width: "clamp(300px, 34vw, 460px)",
+          aspectRatio: PHOTO_ASPECT,
+          borderRadius: "50%",
+        }}
       >
-        {/* Transparent cutout (whites in the hair fringe pre-mapped to the page
-            colour), trimmed to the subject — no box, and the scatter samples
-            this image's alpha to wrap the silhouette. */}
+        {/* The photo fills the disc edge to edge — its own light ground reads
+            as the circle's colour, so no backing fill is needed. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={PHOTO_SRC}
           alt="Finbar"
           className="w-full h-full"
-          style={{ objectFit: "contain" }}
+          style={{ objectFit: "cover" }}
         />
       </div>
 

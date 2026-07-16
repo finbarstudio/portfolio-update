@@ -1,41 +1,39 @@
 "use client";
 
 /**
- * FooterNav — the SB (Sandbox) shortcut, relocated out of the top nav.
+ * BookCall — the conversion path. A pink "Book a call" pill pinned bottom-right
+ * (the slot the sandbox link used to hold; sandbox now lives in the top nav),
+ * opening the Cal.com overlay.
  *
- * Mirrors FooterCopyright: a fixed pin sitting bottom-right ABOVE the copyright
- * while you scroll, arriving with a masked slide-up, then docking into its slot in
- * the footer credit (just above the copyright) once you reach the bottom. A hidden
- * placeholder reserves its line in the footer so the copyright sits neatly beneath.
- * Unlike the copyright this is a link, so the pin is interactive once shown.
+ * Pin mechanics inherited from the old FooterNav: fixed bottom-right ABOVE the
+ * copyright while you scroll, arriving with a masked slide-up, then docking
+ * into its reserved line in the footer credit at the bottom. A hidden
+ * placeholder keeps the line so the copyright sits neatly beneath.
+ *
+ * Clicking dispatches the same "contact:open" event the nav's Contact pill
+ * uses — the merged popup (ContactPanel) holds the Cal booker, the form and
+ * the direct links, so every path converges on one surface.
  */
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import BrandWordmarkStacked from "./BrandWordmarkStacked";
 
-const SANDBOX_HREF = "https://sandbox.finbar.studio";
-const PIN_BOTTOM = 42; // matches .sf-nav-pin { bottom: 42px } — sits above the ©
+const PIN_BOTTOM = 42; // matches .sf-cta-pin { bottom: 42px } — sits above the ©
 
-/**
- * The sandbox link is now the mark and nothing else — no pill, no "SB", no
- * arrow bubble. At 3rem the stacked wordmark carries it on its own, and the
- * accessible name lives on the link rather than in visible text.
- */
-function SandboxLink({ interactive, tab }: { interactive: boolean; tab: number }) {
-  const mark = <BrandWordmarkStacked className="sf-nav-mark" />;
+function Pill({ interactive, tab, onOpen }: { interactive: boolean; tab: number; onOpen?: (e: React.MouseEvent) => void }) {
+  const inner = <>Book a call</>;
   if (!interactive) {
     // Placeholder: reserves the line + width, never interactive.
-    return <span className="sf-nav-link">{mark}</span>;
+    return <span className="sticker-pill book-call-pill">{inner}</span>;
   }
   return (
-    <a href={SANDBOX_HREF} target="_blank" rel="noopener noreferrer" className="sf-nav-link" tabIndex={tab} aria-label="Sandbox (opens in a new tab)">
-      {mark}
-    </a>
+    <button type="button" className="sticker-pill book-call-pill" tabIndex={tab} onClick={onOpen}>
+      {inner}
+    </button>
   );
 }
 
-export default function FooterNav() {
+export default function BookCall() {
   const pathname = usePathname();
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [shown, setShown] = useState(false);
@@ -77,14 +75,18 @@ export default function FooterNav() {
   }, [pathname]);
 
   return (
-    <span className="sf-nav" ref={anchorRef}>
+    <span className="sf-cta" ref={anchorRef}>
       {/* Reserves the line + width in the footer credit (above the copyright). */}
-      <span className="sf-nav-ph" aria-hidden="true">
-        <SandboxLink interactive={false} tab={-1} />
+      <span className="sf-cta-ph" aria-hidden="true">
+        <Pill interactive={false} tab={-1} />
       </span>
-      <span className={`sf-nav-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
-        <span className="sf-nav-inner">
-          <SandboxLink interactive tab={shown ? 0 : -1} />
+      <span className={`sf-cta-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
+        <span className="sf-cta-inner">
+          <Pill
+            interactive
+            tab={shown ? 0 : -1}
+            onOpen={(e) => window.dispatchEvent(new CustomEvent("contact:open", { detail: { x: e.clientX, y: e.clientY } }))}
+          />
         </span>
       </span>
     </span>

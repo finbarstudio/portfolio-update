@@ -13,7 +13,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import BrandWordmark from "./BrandWordmark";
 import FooterCopyright from "./FooterCopyright";
-import FooterNav from "./FooterNav";
+import BookCall from "./BookCall";
 import FooterClock from "./FooterClock";
 import LiveTime from "./LiveTime";
 import { EngFlag } from "./Flags";
@@ -142,7 +142,7 @@ export default function SiteFooter() {
           </div>
         </div>
         <div className="sf-col sf-col-end">
-          <FooterNav />
+          <BookCall />
           <FooterCopyright year={year} />
           <span className="sf-value">Design &amp; build finbarstudio</span>
         </div>
