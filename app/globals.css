@@ -4706,3 +4706,21 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
    color: var(--ink) from inside a cascade layer, and an unlayered rule beats a
    layered one no matter the specificity — so this lands without !important. */
 .display-brand { color: var(--pink-deep); }
+
+/* ── .sf-nav-mark ─────────────────────────────────────────────────
+   The stacked wordmark as the sandbox link's logo, inline in the footer pill.
+   Sized off the pill's own type so the three parts stay locked together at any
+   size. Height leads and width follows: the block is wider than it is tall
+   (531:427), unlike the square asterisk.
+
+   2em, not the 1.3em that would match the ext bubble beside it: the mark is
+   four rows of letters, so at bubble size each letter is ~2.5px and the whole
+   thing collapses into three smudges. 2em is the smallest that still reads as
+   FIN/BAR/STU/DIO. Much past this and the pill stops being a pill. */
+.sf-nav-mark {
+  height: 2em;
+  width: auto;
+  display: block;
+  flex: 0 0 auto;
+  margin-right: 0.55em;
+}

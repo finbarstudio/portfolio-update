@@ -12,6 +12,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import BrandWordmarkStacked from "./BrandWordmarkStacked";
 
 const SANDBOX_HREF = "https://sandbox.finbar.studio";
 const PIN_BOTTOM = 42; // matches .sf-nav-pin { bottom: 42px } — sits above the ©
@@ -19,6 +20,9 @@ const PIN_BOTTOM = 42; // matches .sf-nav-pin { bottom: 42px } — sits above th
 function Pills({ interactive, tab }: { interactive: boolean; tab: number }) {
   const sandbox = (
     <>
+      {/* The stacked wordmark is the sandbox's logo — it's our sandbox, and the
+          block reads as a mark at pill size where the full lockup wouldn't. */}
+      <BrandWordmarkStacked className="sf-nav-mark" />
       <span>SB</span>
       <span className="nav-ext-bubble" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="100%" height="100%">
