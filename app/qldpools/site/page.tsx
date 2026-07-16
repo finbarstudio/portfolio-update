@@ -9,22 +9,24 @@ import Blog from "@/components/qldpools/sections/Blog";
 import Footer from "@/components/qldpools/sections/Footer";
 
 /* QLD Pool Installs demo, assembled from the options Finbar picked:
-   hero 76 (arch on white, with the preloader's cutout zooming out into it),
-   reviews 15, services 2, gallery 17, testimonials 16, blog 8, footer 4.
+   hero 76, gallery 17, reviews 15, services (redesigned as a tall grid),
+   testimonials 16, blog 8, footer 4.
 
-   Still to slot in once he picks from the newer batches: Why choose us (he is
-   reviewing the horizontal-grid set, 26-35), FAQ and the contact CTA. Their
-   real page order is hero > reviews > services > why > gallery > testimonials
-   > blog > faq > cta > footer, so those drop straight into the gaps. */
+   Order is his: the work comes first, then the proof, then what we offer.
+   The gap between sections is set once in qpi-site.css (.qpi-page), so the
+   whole page breathes consistently rather than each section guessing.
+
+   Still to slot in once he picks from the newer batches: Why choose us (the
+   horizontal-grid set, 26-35), FAQ and the contact CTA. */
 export default function Home() {
   return (
-    <main className="bg-white">
+    <main className="qpi-page bg-white">
       <Preloader />
       <Nav showLogo />
       <Hero />
+      <Gallery />
       <Reviews />
       <Services />
-      <Gallery />
       <Testimonials />
       <Blog />
       <Footer />

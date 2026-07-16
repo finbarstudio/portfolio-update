@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ArchLogo from "@/components/qldpools/ArchLogo";
 
-/* Nav: the arch logo (option 3) in an inline lockup, so the whole name reads
-   across the bar. Hero 76 is a WHITE ground, so the mark and links stay ink the
-   whole way down (an earlier build flipped them white over a full-bleed photo
-   hero, which left the logo invisible once the hero went white). Past the hero
-   the bar itself goes solid white so the links keep their footing over content.
-   Slides in when the preloader's zoom lands (qpi:intro-done). */
+/* Nav: their own wave logo, no background bar, minimal.
+   The hero starts white and ends as a full-bleed photo, so the mark and links
+   flip ink -> white exactly while that photo covers the viewport, and back to
+   ink over the white sections below. Tracking the hero's own geometry (rather
+   than a fixed scroll threshold) keeps it right at any viewport height.
+   Slides in when the intro lands. */
 
 const LEFT = [
   { label: "Pool Range", href: "#" },
@@ -31,14 +30,28 @@ export default function Nav({
 } = {}) {
   const [revealed, setRevealed] = useState(immediate);
   const [menuOpen, setMenuOpen] = useState(false);
-  // Past the hero the page is white — flip the bar to solid white + ink links.
-  const [scrolled, setScrolled] = useState(false);
+  // True only while the hero's photo has grown to cover the viewport.
+  const [onImage, setOnImage] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.75);
+    const hero = document.getElementById("qpi-hero");
+    if (!hero) return;
+    const onScroll = () => {
+      const r = hero.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // The arch finishes growing one viewport into the hero; the sticky inner
+      // holds the photo until the hero's bottom passes the fold.
+      const grown = -r.top > vh * 0.5;
+      const stillPinned = r.bottom > vh;
+      setOnImage(grown && stillPinned);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -77,15 +90,16 @@ export default function Nav({
     };
   }, [menuOpen]);
 
-  const linkClass =
-    "qpi-caps text-[var(--qpi-ink)]/75 text-[10px] hover:text-[var(--qpi-blue)] transition-colors whitespace-nowrap";
+  const linkClass = `qpi-caps text-[10px] whitespace-nowrap transition-colors duration-500 ${
+    onImage ? "text-white/85 hover:text-white" : "text-[var(--qpi-ink)]/75 hover:text-[var(--qpi-blue)]"
+  }`;
 
   return (
     <>
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-[transform,background-color] duration-700 ease-out ${
         revealed ? "translate-y-0" : "-translate-y-full"
-      } ${scrolled ? "bg-white/95 backdrop-blur-sm" : ""}`}
+      }`}
     >
       <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center h-16 px-5 md:px-8">
         {/* Left — desktop links; on mobile the logo sits here (top-left) */}
@@ -101,19 +115,29 @@ export default function Nav({
           </ul>
           {showLogo && (
             <a href="/qldpools/site" className="md:hidden" aria-label="QLD Pool Installs, home">
-              <ArchLogo variant="inline" height={30} tone="dark" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={onImage ? "/qldpools/logo-white.png" : "/qldpools/logo.png"}
+                alt=""
+                className="h-8 w-auto transition-opacity duration-500"
+              />
             </a>
           )}
         </div>
 
-        {/* Centre — the arch logo */}
+        {/* Centre — their wave logo */}
         {showLogo ? (
           <a
             href="/qldpools/site"
             className="hidden md:block justify-self-center"
             aria-label="QLD Pool Installs, home"
           >
-            <ArchLogo variant="inline" height={34} tone="dark" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={onImage ? "/qldpools/logo-white.png" : "/qldpools/logo.png"}
+              alt=""
+              className="h-10 w-auto transition-opacity duration-500"
+            />
           </a>
         ) : (
           <div className="hidden md:block w-px justify-self-center" />
@@ -140,12 +164,16 @@ export default function Nav({
           >
             <span
               className={`block h-px transition-all duration-300 ${
-                menuOpen ? "w-6 rotate-45 translate-y-[3px] bg-[var(--qpi-ink)]" : "w-6 bg-[var(--qpi-ink)]"
+                menuOpen
+                  ? "w-6 rotate-45 translate-y-[3px] bg-[var(--qpi-ink)]"
+                  : `w-6 ${onImage ? "bg-white" : "bg-[var(--qpi-ink)]"}`
               }`}
             />
             <span
               className={`block h-px transition-all duration-300 ${
-                menuOpen ? "w-6 -rotate-45 -translate-y-[3px] bg-[var(--qpi-ink)]" : "w-4 bg-[var(--qpi-ink)]"
+                menuOpen
+                  ? "w-6 -rotate-45 -translate-y-[3px] bg-[var(--qpi-ink)]"
+                  : `w-4 ${onImage ? "bg-white" : "bg-[var(--qpi-ink)]"}`
               }`}
             />
           </button>
