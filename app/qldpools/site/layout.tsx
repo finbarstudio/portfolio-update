@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import "./qpi-site.css";
 import SmoothScroll from "@/components/qldpools/SmoothScroll";
 
@@ -19,14 +19,22 @@ export const metadata: Metadata = {
   alternates: { canonical: undefined },
 };
 
-// Outfit is the strongest face already in their brand mix — keeps the demo
-// feeling like *their* site, not a house template. (Their Playfair/Times
-// headlines are the thing we're pitching against, so no serif here.)
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+// FONT EXPERIMENT (Finbar, trying faces on the demo): Junicode, self-hosted from
+// the official release (psb1558/Junicode-font v2.226, SIL OFL, see fonts/OFL.txt).
+// Subset to latin with the wdth/ENLA axes pinned off, ~104KB per style, weight
+// axis 300-700 live. NOTE this is a serif, which cuts against the pitch's own
+// premise (their Times/Playfair headlines are the thing we argue reads cheap) —
+// kept here only to look at. To go back to the sans, restore the Outfit import +
+// this block from git (commit before this one) and the whole demo follows, since
+// everything reads --font-qpi.
+const junicode = localFont({
+  src: [
+    { path: "./fonts/JunicodeVF-Roman.subset.woff2", weight: "300 700", style: "normal" },
+    { path: "./fonts/JunicodeVF-Italic.subset.woff2", weight: "300 700", style: "italic" },
+  ],
   variable: "--font-qpi",
   display: "swap",
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
 export default function QpiSiteLayout({
@@ -35,7 +43,7 @@ export default function QpiSiteLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`qpi-site ${outfit.variable}`}>
+    <div className={`qpi-site ${junicode.variable}`}>
       {/* Pink brand tab back to the pitch — collapsed to a circle mid-left,
           expands on hover. Same pattern as the other demo builds. */}
       <a href="/qldpools" className="qpi-back" aria-label="Back to finbar.studio">

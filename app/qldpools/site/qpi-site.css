@@ -1,7 +1,8 @@
 /* ──────────────────────────────────────────────────────────────────────────
    QLD Pool Installs demo — scoped styles. Ported from the Lindon Homes demo
    (archive/builders-outreach/app/lindon/site/lindon-site.css) and reskinned:
-   Outfit everywhere (loaded via next/font in layout.tsx as --font-qpi), deep
+   the demo face (loaded via next/font in layout.tsx as --font-qpi) everywhere,
+   deep
    pool navy for ink, their blue as the accent. Everything is scoped under
    `.qpi-site` so nothing leaks into the portfolio; the Lenis helper classes
    are the standard global ones and only apply while a demo page is mounted.
@@ -86,7 +87,7 @@
   padding-right: clamp(20px, 4vw, 32px);
 }
 
-/* Headings + display text — Outfit, sentence case (the portfolio's globals
+/* Headings + display text — the demo face, sentence case (the portfolio's globals
    uppercase h1–h4 and set Host Grotesk; undo both inside the demo). */
 .qpi-site :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-qpi), system-ui, sans-serif;
@@ -95,7 +96,7 @@
   font-weight: 700;
 }
 
-/* Wordmark / display treatment — heavy Outfit caps */
+/* Wordmark / display treatment — heavy demo-face caps */
 .qpi-site .qpi-display {
   font-family: var(--font-qpi), system-ui, sans-serif;
   font-weight: 700;
