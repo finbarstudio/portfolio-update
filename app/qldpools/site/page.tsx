@@ -1,5 +1,4 @@
 import Nav from "@/components/qldpools/Nav";
-import Preloader from "@/components/qldpools/Preloader";
 import Hero from "@/components/qldpools/sections/Hero";
 import Reviews from "@/components/qldpools/sections/Reviews";
 import Services from "@/components/qldpools/sections/Services";
@@ -9,8 +8,12 @@ import Blog from "@/components/qldpools/sections/Blog";
 import Footer from "@/components/qldpools/sections/Footer";
 
 /* QLD Pool Installs demo, assembled from the options Finbar picked:
-   hero 76, gallery 17, reviews 15, services (redesigned as a tall grid),
+   hero 76, gallery 17, reviews 44 scattering into 42, services 22,
    testimonials 16, blog 8, footer 4.
+
+   No preloader: the page arrives and staggers itself in (the Hero calls
+   markIntroDone once fonts are ready, which is what the nav and the word
+   reveals wait on).
 
    Order is his: the work comes first, then the proof, then what we offer.
    The gap between sections is set once in qpi-site.css (.qpi-page), so the
@@ -21,7 +24,6 @@ import Footer from "@/components/qldpools/sections/Footer";
 export default function Home() {
   return (
     <main className="qpi-page bg-white">
-      <Preloader />
       <Nav showLogo />
       <Hero />
       <Gallery />

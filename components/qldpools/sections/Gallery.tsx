@@ -24,7 +24,7 @@ const TILES = GALLERY_IMGS.slice(0, 3).map((src, i) => ({
 export default function Gallery() {
   return (
     <section
-      className="qg relative flex w-full flex-col justify-center bg-white qpi-gutter min-h-svh py-16 md:py-20"
+      className="qg qpi-sec-work relative flex w-full flex-col justify-center bg-white qpi-gutter min-h-svh py-16 md:py-20"
       aria-label="Recent pool installations"
     >
       <style>{css}</style>

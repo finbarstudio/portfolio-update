@@ -1,30 +1,35 @@
 "use client";
 
 /**
- * Reviews — ported from options/reviews.tsx entry 15, "Rating Panel + Featured
- * Quote" (the design the client picked): a rating panel on the left, one
- * featured review on the right. This build adds what the client asked for on
- * top of that layout: explicit Google attribution, auto-rotation through all
- * six reviews, initials avatars, and click-through to their Google listing.
+ * Reviews — the client's pick, built as a scroll-driven MORPH between two of
+ * the options from app/qldpools/site/sections/options/reviews2.tsx:
  *
- * Real API path (for when this moves off the static kit array):
- * - Google Places API (New) "Place Details" can return author displayName,
- *   real photoUri, a link to the review, rating and relativePublishTimeDescription.
- * - It requires a Google Cloud API key with billing enabled, and it returns a
- *   MAXIMUM OF 5 reviews (not all 41), chosen by Google.
- * - Google's terms require showing their attribution and not caching review
- *   content long-term.
- * - So the shape here (avatar + name + text + link) is deliberately
- *   API-ready: swap the kit array for a server route that calls Place Details
- *   and the component works unchanged.
+ *   RESTING (opens the section) — entry index 18, "Star Sunburst" (gallery 44)
+ *   END (settles as you scroll)  — entry index 16, "Oversized Quotation Mark" (gallery 42)
+ *
+ * As the visitor scrolls through the section, the sunburst's stars + stat
+ * block scatter outward, rotate slightly and fade, while the quote-card's
+ * pieces arrive from scattered offsets into their resting positions — one
+ * scrubbed GSAP ScrollTrigger timeline drives both halves at once.
+ *
+ * Content is real, verbatim Google reviews from REVIEW_STATS/TESTIMONIALS in
+ * the shared kit — nothing here is invented or reworded. The Google "G" mark
+ * and attribution link (kept from the previous rotating-panel build) are the
+ * one exception to the demo's palette rule; Google's terms require them
+ * alongside review content.
  */
 
 import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { REVIEW_STATS, TESTIMONIALS } from "@/app/qldpools/site/sections/kit";
 
+gsap.registerPlugin(ScrollTrigger);
+
 const GOOGLE_REVIEWS_URL = "https://www.google.com/search?q=QLD+Pool+Installs+reviews";
-const ROTATE_MS = 5000;
-const FADE_MS = 500;
+const FEATURED = TESTIMONIALS[4]; // Cathy W — same review the "Oversized Quotation Mark" option featured
+const SUNBURST_STARS = 12;
+const R44_PIECES = SUNBURST_STARS + 1; // 12 stars + the centre stat block
 
 function Star({ color, size = 14 }: { color: string; size?: number }) {
   return (
@@ -52,8 +57,8 @@ function StarRow({
   );
 }
 
-/* Google's real "G" mark, shown in Google's own brand colours (the one
- * exception to the demo's palette rule; their terms require it). */
+/* Google's real "G" mark, in Google's own brand colours — the one exception
+ * to the demo's palette rule; their terms require it beside review content. */
 function GoogleMark({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 18 18" aria-hidden="true">
@@ -65,57 +70,108 @@ function GoogleMark({ size = 18 }: { size?: number }) {
   );
 }
 
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+function GoogleAttribution() {
+  return (
+    <a
+      href={GOOGLE_REVIEWS_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Read QLD Pool Installs reviews on Google, opens in a new tab"
+      className="inline-flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+      style={{ outlineColor: "var(--qpi-blue)" }}
+    >
+      <GoogleMark size={16} />
+      <span className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.65, fontSize: 10 }}>
+        Google Reviews
+      </span>
+    </a>
+  );
 }
 
-/* Built so a real photo can drop straight in later: pass `photoUrl` (e.g.
- * from Places API's photoUri) and it renders an <img>; otherwise it falls
- * back to an initials avatar on var(--qpi-blue). */
-function ReviewAvatar({ name, photoUrl, size = 44 }: { name: string; photoUrl?: string; size?: number }) {
-  if (photoUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={photoUrl}
-        alt=""
-        width={size}
-        height={size}
-        className="rounded-full object-cover flex-shrink-0"
-        style={{ width: size, height: size }}
-      />
-    );
-  }
+/* ── Layout 44 · Star Sunburst — the RESTING state ── */
+function SunburstLayout() {
   return (
-    <span
-      aria-hidden="true"
-      className="qpi-caps flex items-center justify-center rounded-full flex-shrink-0"
-      style={{
-        width: size,
-        height: size,
-        background: "var(--qpi-blue)",
-        color: "#fff",
-        fontSize: size * 0.36,
-        letterSpacing: 0,
-      }}
-    >
-      {initials(name)}
-    </span>
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 20 }}>
+      <div
+        className="relative flex items-center justify-center"
+        style={{ width: "min(70vw, 420px)", height: "clamp(260px, 36vh, 360px)" }}
+      >
+        {Array.from({ length: SUNBURST_STARS }).map((_, i) => {
+          const angle = (360 / SUNBURST_STARS) * i;
+          const rad = (angle * Math.PI) / 180;
+          const px = Math.cos(rad) * 120;
+          const py = Math.sin(rad) * 120;
+          return (
+            <div
+              key={i}
+              className="absolute"
+              style={{ left: `calc(50% + ${px}px - 7px)`, top: `calc(50% + ${py}px - 7px)` }}
+            >
+              <div className="r44-piece">
+                <Star color="var(--qpi-blue)" size={14} />
+              </div>
+            </div>
+          );
+        })}
+        <div className="r44-piece flex flex-col items-center text-center">
+          <p className="qpi-display" style={{ color: "var(--qpi-ink)", fontSize: "clamp(2rem, 4vw, 2.75rem)", lineHeight: 1 }}>
+            {REVIEW_STATS.rating}
+          </p>
+          <p className="qpi-caps mt-2" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: 10 }}>
+            {REVIEW_STATS.word} &middot; {REVIEW_STATS.count}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Layout 42 · Oversized Quotation Mark — the END state ── */
+function QuoteLayout() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 10 }}>
+      <div className="relative mx-auto text-center" style={{ maxWidth: 700 }}>
+        <p
+          aria-hidden="true"
+          className="r42-piece qpi-display absolute"
+          style={{
+            color: "var(--qpi-blue)",
+            opacity: 0.12,
+            fontSize: "clamp(6rem, 14vw, 11rem)",
+            lineHeight: 1,
+            top: "-2.6rem",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+          }}
+        >
+          &ldquo;
+        </p>
+        <div className="relative">
+          <p className="r42-piece" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.25rem, 2.6vw, 1.75rem)", lineHeight: 1.4, fontWeight: 600 }}>
+            {FEATURED.quote}
+          </p>
+          <p className="r42-piece qpi-caps mt-5" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {FEATURED.name}
+          </p>
+          <div className="r42-piece flex items-center justify-center gap-2 mt-4">
+            <StarRow size={11} />
+            <span className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: 9 }}>
+              {REVIEW_STATS.rating} &middot; {REVIEW_STATS.count}
+            </span>
+          </div>
+          <div className="r42-piece flex justify-center mt-4">
+            <GoogleAttribution />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default function Reviews() {
-  const [index, setIndex] = useState(0);
-  const [fading, setFading] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const swapTimeout = useRef<number | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -125,131 +181,112 @@ export default function Reviews() {
     return () => mq.removeEventListener?.("change", onChange);
   }, []);
 
-  const goTo = (next: number) => {
-    if (next === index) return;
-    if (swapTimeout.current) window.clearTimeout(swapTimeout.current);
-    setFading(true);
-    swapTimeout.current = window.setTimeout(() => {
-      setIndex(next);
-      setFading(false);
-    }, FADE_MS);
-  };
-
   useEffect(() => {
-    if (reducedMotion || paused) return;
-    const intervalId = window.setInterval(() => {
-      goTo((index + 1) % TESTIMONIALS.length);
-    }, ROTATE_MS);
-    return () => window.clearInterval(intervalId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reducedMotion, paused, index]);
+    if (reducedMotion) return;
+    if (!sectionRef.current) return;
 
-  useEffect(() => {
-    return () => {
-      if (swapTimeout.current) window.clearTimeout(swapTimeout.current);
-    };
-  }, []);
+    const ctx = gsap.context(() => {
+      // Layout 42 starts scattered + hidden — applied here, never in the
+      // JSX, so a visitor without JS still sees it in its normal, legible
+      // resting state (stacked under the sunburst, but present and legible).
+      gsap.set(".r42-piece", {
+        opacity: 0,
+        x: (i: number) => (i % 2 === 0 ? -1 : 1) * (36 + i * 16),
+        y: (i: number) => (i % 2 === 0 ? 1 : -1) * (26 + i * 12),
+        scale: 0.95,
+      });
 
-  const current = TESTIMONIALS[index] ?? TESTIMONIALS[0];
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "+=120%",
+          scrub: 0.5,
+        },
+      });
+
+      // Sunburst scatters outward, wobbles, fades.
+      tl.to(
+        ".r44-piece",
+        {
+          x: (i: number) => Math.round(Math.cos((i * (360 / R44_PIECES) * Math.PI) / 180) * 90),
+          y: (i: number) => Math.round(Math.sin((i * (360 / R44_PIECES) * Math.PI) / 180) * 90),
+          rotation: (i: number) => (i % 2 === 0 ? 10 : -10),
+          opacity: 0,
+          scale: 0.9,
+          stagger: { each: 0.025, from: "center" },
+          ease: "power2.in",
+        },
+        0
+      );
+
+      // Quote card lands into place, overlapping the scatter.
+      tl.to(
+        ".r42-piece",
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          stagger: { each: 0.03, from: "center" },
+          ease: "power3.out",
+        },
+        0.2
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [reducedMotion]);
+
+  if (reducedMotion) {
+    return (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <h2 className="sr-only">{REVIEW_STATS.heading}</h2>
+        <div className="relative mx-auto text-center" style={{ maxWidth: 700 }}>
+          <p
+            aria-hidden="true"
+            className="qpi-display absolute"
+            style={{
+              color: "var(--qpi-blue)",
+              opacity: 0.12,
+              fontSize: "clamp(6rem, 14vw, 11rem)",
+              lineHeight: 1,
+              top: "-2.6rem",
+              left: 0,
+              right: 0,
+              textAlign: "center",
+            }}
+          >
+            &ldquo;
+          </p>
+          <div className="relative">
+            <p style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.25rem, 2.6vw, 1.75rem)", lineHeight: 1.4, fontWeight: 600 }}>
+              {FEATURED.quote}
+            </p>
+            <p className="qpi-caps mt-5" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+              {FEATURED.name}
+            </p>
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <StarRow size={11} />
+              <span className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: 9 }}>
+                {REVIEW_STATS.rating} &middot; {REVIEW_STATS.count}
+              </span>
+            </div>
+            <div className="flex justify-center mt-4">
+              <GoogleAttribution />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="relative flex w-full flex-col justify-center bg-white qpi-gutter min-h-svh py-16 md:py-20">
+    <section ref={sectionRef} className="qpi-gutter relative w-full bg-white min-h-[220vh]">
       <h2 className="sr-only">{REVIEW_STATS.heading}</h2>
-      <div className="mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12" style={{ maxWidth: 1080 }}>
-        {/* Rating panel — static, unaffected by rotation */}
-        <div
-          className="flex flex-col items-center justify-center text-center p-10 md:p-12"
-          style={{ background: "rgba(0,0,0,0.02)" }}
-        >
-          <p
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(3rem, 5vw, 4rem)", lineHeight: 1 }}
-          >
-            {REVIEW_STATS.rating}
-          </p>
-          <div style={{ marginTop: 12 }}>
-            <StarRow size={18} />
-          </div>
-          <p className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: 10, marginTop: 10 }}>
-            {REVIEW_STATS.word} &middot; {REVIEW_STATS.count}
-          </p>
-          <div className="flex items-center gap-2 mt-4">
-            <GoogleMark size={16} />
-            <span className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.65, fontSize: 10 }}>
-              Google Reviews
-            </span>
-          </div>
-        </div>
-
-        {/* Featured, rotating review */}
-        <div
-          className="flex flex-col justify-center"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-        >
-          <a
-            href={GOOGLE_REVIEWS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Read ${current.name}'s review of QLD Pool Installs on Google, opens in a new tab`}
-            className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-            style={{ outlineColor: "var(--qpi-blue)" }}
-            onFocus={() => setPaused(true)}
-            onBlur={() => setPaused(false)}
-          >
-            <div
-              aria-live="polite"
-              style={{
-                opacity: fading ? 0 : 1,
-                transform: fading ? "translateY(6px)" : "translateY(0)",
-                transition: reducedMotion ? "none" : `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`,
-              }}
-            >
-              <p
-                style={{
-                  color: "var(--qpi-ink)",
-                  fontSize: "clamp(1rem, 1.6vw, 1.1875rem)",
-                  lineHeight: 1.6,
-                }}
-              >
-                &ldquo;{current.quote}&rdquo;
-              </p>
-              <div className="flex items-center gap-3 mt-5">
-                <ReviewAvatar name={current.name} />
-                <div>
-                  <p className="qpi-caps" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-                    {current.name}
-                  </p>
-                  <div style={{ marginTop: 4 }}>
-                    <StarRow size={11} gap={2} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </a>
-
-          {/* Dots — jump to a specific review, kept outside the link so we
-              never nest interactive elements. */}
-          <div className="flex items-center gap-2 mt-6" role="group" aria-label="Choose a review to show">
-            {TESTIMONIALS.map((t, i) => (
-              <button
-                key={t.name}
-                type="button"
-                onClick={() => goTo(i)}
-                aria-label={`Show review from ${t.name}`}
-                aria-current={i === index}
-                className="rounded-full"
-                style={{
-                  width: i === index ? 18 : 7,
-                  height: 7,
-                  background: "var(--qpi-blue)",
-                  opacity: i === index ? 1 : 0.3,
-                  transition: reducedMotion ? "none" : "width 200ms ease, opacity 200ms ease",
-                }}
-              />
-            ))}
-          </div>
-        </div>
+      <div className="sticky top-0 h-svh flex flex-col justify-center overflow-hidden">
+        <SunburstLayout />
+        <QuoteLayout />
       </div>
     </section>
   );

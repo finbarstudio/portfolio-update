@@ -34,14 +34,19 @@
 }
 
 /* ── Section rhythm — one gap, set once, so the page breathes consistently
-      instead of each section inventing its own margin. The hero is excluded:
-      its photo runs to the fold and the next section should meet it. ── */
+      instead of each section inventing its own margin. ── */
 .qpi-site .qpi-page > section + section,
 .qpi-site .qpi-page > footer {
   margin-top: clamp(88px, 14vh, 200px);
 }
-.qpi-site .qpi-page > #qpi-hero + section {
-  margin-top: 0;
+/* The work leads the page, so it gets real air above it and sits closer to
+   what follows (Finbar: "too much space below featured projects and too little
+   above it"). */
+.qpi-site .qpi-page > .qpi-sec-work {
+  margin-top: clamp(120px, 18vh, 240px);
+}
+.qpi-site .qpi-page > .qpi-sec-work + section {
+  margin-top: clamp(40px, 6vh, 84px);
 }
 
 /* ── Hero fill mask — a white panel that covers the arch and then collapses
