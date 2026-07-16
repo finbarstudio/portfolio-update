@@ -1,474 +1,82 @@
 import { FAQ_INTRO, FAQS, PHONE, PHONE_HREF, GALLERY_IMGS, type Section } from "../kit";
 
 /**
- * FAQ / "Frequently Asked Questions" — 25 distinct design directions for
- * the closing objection-handling block. Every question and answer is
- * verbatim from FAQS; no copy is invented beyond structural glyphs (row
- * numbers, "Q."/"A." labels) and the literal "Still have questions?" prompt
- * paired with PHONE. Server rendered, static, no hooks — accordions use
- * native <details>/<summary> only. Numbered label chip is added by the
- * gallery wrapper, so every z-index in here stays <= 40.
+ * FAQ / "Frequently Asked Questions" — full wipe, round three. All prior
+ * experiments (the 45 options previously in this file + faq2.tsx) are
+ * retired; every layout below is a new structural idea, none reused. Every
+ * question and answer is verbatim from FAQS. Accordions are native
+ * <details>/<summary> only (no JS). Every root is locked to one 100vh
+ * viewport, vertically centred, white ground, ink/blue/aqua for inner
+ * blocks only. The gallery wrapper adds a z-50 label chip, so nothing here
+ * exceeds z-40.
  */
+
+const CHEVRON = (
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 20 20"
+    className="size-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
+    style={{ color: "var(--qpi-blue)" }}
+  >
+    <path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const PLUS = (
+  <svg aria-hidden="true" viewBox="0 0 20 20" className="size-4 shrink-0" style={{ color: "var(--qpi-blue)" }}>
+    <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" className="group-open:hidden" />
+    <path d="M4 10h12" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" className="hidden group-open:block" />
+  </svg>
+);
+
+function num(i: number) {
+  return String(i + 1).padStart(2, "0");
+}
+
 export const optionsFaq: Section[] = [
-  // 1 · Classic accordion, all closed, hairline rules, + marker right
+  // 1 · Interview transcript — Q: / A: labels, generous line-height, one continuous column.
   {
-    name: "Classic Accordion",
+    name: "Interview Transcript",
     node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "clamp(0.9375rem, 1.3vw, 1.0625rem)", lineHeight: 1.65, maxWidth: 620 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-3xl">
-          {FAQS.map((f, i) => (
-            <details
-              key={f.q}
-              className="group"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-6 py-6 cursor-pointer"
-                style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}
-              >
-                <span>{f.q}</span>
-                <span
-                  aria-hidden="true"
-                  className="shrink-0 transition-transform duration-300 group-open:rotate-45"
-                  style={{ color: "var(--qpi-blue)", fontSize: 22, lineHeight: 1 }}
-                >
-                  +
-                </span>
-              </summary>
-              <p className="text-pretty pb-6 pr-10" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                {f.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 2 · First item open by default, chevron marker, generous padding
-  {
-    name: "First-Open Chevron",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-16 mx-auto text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5 mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "clamp(0.9375rem, 1.3vw, 1.0625rem)", lineHeight: 1.65, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-3xl mx-auto">
-          {FAQS.map((f, i) => (
-            <details key={f.q} open={i === 0} className="group" style={{ borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-8 py-8 cursor-pointer"
-                style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.125rem" }}
-              >
-                <span>{f.q}</span>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
-                  className="shrink-0 transition-transform duration-300 group-open:rotate-180"
-                  style={{ width: 18, height: 18, color: "var(--qpi-blue)" }}
-                >
-                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </summary>
-              <p className="text-pretty pb-8 pr-10" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.7, maxWidth: 640 }}>
-                {f.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 3 · Two columns: heading block left, accordion right
-  {
-    name: "Heading Left Split",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-[1200px] mx-auto grid md:grid-cols-[340px_1fr] gap-12 md:gap-20 items-start">
-          <div>
-            <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 3.2vw, 2.5rem)", lineHeight: 1.1 }}>
-              {FAQ_INTRO.heading}
-            </h2>
-            <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-              {FAQ_INTRO.sub}
-            </p>
-          </div>
-          <div>
-            {FAQS.map((f, i) => (
-              <details
-                key={f.q}
-                className="group"
-                style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-              >
-                <summary
-                  className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-6 py-5 cursor-pointer"
-                  style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1rem" }}
-                >
-                  <span>{f.q}</span>
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 transition-transform duration-300 group-open:rotate-45"
-                    style={{ color: "var(--qpi-blue)", fontSize: 20, lineHeight: 1 }}
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="text-pretty pb-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                  {f.a}
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <p className="qpi-caps text-[11px]" style={{ color: "var(--qpi-blue)" }}>{FAQ_INTRO.heading}</p>
+          <div className="mt-6 flex flex-col gap-5">
+            {FAQS.slice(0, 4).map((f) => (
+              <div key={f.q}>
+                <p className="flex gap-3 text-[15px] leading-snug" style={{ color: "var(--qpi-ink)" }}>
+                  <span className="qpi-caps shrink-0 text-[11px]" style={{ color: "var(--qpi-blue)" }}>Q</span>
+                  <span className="font-semibold">{f.q}</span>
                 </p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 4 · All expanded: Q navy bold, A grey beneath, thin rules between
-  {
-    name: "Expanded Navy Ledger",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14 mx-auto text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5 mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-3xl mx-auto">
-          {FAQS.map((f, i) => (
-            <div key={f.q} className="py-7" style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-              <h3 style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}>{f.q}</h3>
-              <p className="text-pretty mt-3" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.9375rem", lineHeight: 1.65, maxWidth: 640 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 5 · Numbered (01-08) Q&A ledger, numbers in blue, all expanded
-  {
-    name: "Numbered Blue Ledger",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 620 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-3xl">
-          {FAQS.map((f, i) => (
-            <div
-              key={f.q}
-              className="flex gap-6 py-7"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <span className="qpi-caps shrink-0" style={{ color: "var(--qpi-blue)", fontSize: 12, paddingTop: 3 }}>
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <div>
-                <h3 style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}>{f.q}</h3>
-                <p className="text-pretty mt-3" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.9375rem", lineHeight: 1.65, maxWidth: 600 }}>
-                  {f.a}
+                <p className="mt-1.5 flex gap-3 text-[14px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>
+                  <span className="qpi-caps shrink-0 text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>A</span>
+                  <span>{f.a}</span>
                 </p>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 6 · Two-column grid of Q&A pairs, no accordion, hairline top rules
-  {
-    name: "Two-Column Static Grid",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-16 mx-auto text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5 mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-12">
-          {FAQS.map((f) => (
-            <div key={f.q} className="pt-6" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-              <h3 style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}>{f.q}</h3>
-              <p className="text-pretty mt-3" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 7 · Big-type questions, answers small and indented far right
-  {
-    name: "Big Question, Small Answer",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-16">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-        </div>
-        <div className="max-w-[1100px]">
-          {FAQS.map((f, i) => (
-            <div key={f.q} className="py-9 grid grid-cols-1 md:grid-cols-[1fr_360px] gap-4 md:gap-10 items-start" style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-              <h3 className="text-balance" style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "clamp(1.375rem, 2.4vw, 1.875rem)", lineHeight: 1.15 }}>
-                {f.q}
-              </h3>
-              <p className="text-pretty md:justify-self-end" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.8125rem", lineHeight: 1.65, maxWidth: 340 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 8 · Navy full-bleed band, white type, accordion with white rules
-  {
-    name: "Navy Full-Bleed Accordion",
-    node: (
-      <section className="relative w-full py-20 md:py-28 px-6 md:px-14" style={{ background: "var(--qpi-ink)" }}>
-        <div className="max-w-2xl mb-14 mx-auto text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "#fff", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5 mx-auto" style={{ color: "#fff", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-3xl mx-auto">
-          {FAQS.map((f, i) => (
-            <details key={f.q} open={i === 0} className="group" style={{ borderBottom: "1px solid rgba(255,255,255,0.2)" }}>
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-6 py-7 cursor-pointer"
-                style={{ color: "#fff", fontWeight: 700, fontSize: "1.0625rem" }}
-              >
-                <span>{f.q}</span>
-                <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ fontSize: 22, lineHeight: 1, color: "#fff" }}>
-                  +
-                </span>
-              </summary>
-              <p className="text-pretty pb-7 pr-10" style={{ color: "#fff", opacity: 0.65, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                {f.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 9 · Q as a large blue heading, A in a narrow measure column beneath
-  {
-    name: "Blue Heading Column",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-16">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-2xl flex flex-col gap-14">
-          {FAQS.map((f) => (
-            <div key={f.q}>
-              <h3 className="text-balance" style={{ color: "var(--qpi-blue)", fontWeight: 700, fontSize: "clamp(1.25rem, 2.2vw, 1.625rem)", lineHeight: 1.2 }}>
-                {f.q}
-              </h3>
-              <p className="text-pretty mt-4" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.7, maxWidth: 440 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 10 · Compact: tight rows, small type, dense rules, very restrained
-  {
-    name: "Compact Dense Rows",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mx-auto mb-10 text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.125rem)", lineHeight: 1.1 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-        </div>
-        <div className="max-w-xl mx-auto">
-          {FAQS.map((f, i) => (
-            <details
-              key={f.q}
-              className="group"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-4 py-3.5 cursor-pointer"
-                style={{ color: "var(--qpi-ink)", fontWeight: 600, fontSize: "0.8125rem" }}
-              >
-                <span>{f.q}</span>
-                <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 15, lineHeight: 1 }}>
-                  +
-                </span>
-              </summary>
-              <p className="text-pretty pb-3.5 pr-8" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.75rem", lineHeight: 1.6 }}>
-                {f.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 11 · Accordion inside a bordered card, one open
-  {
-    name: "Bordered Card Accordion",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14 mx-auto text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5 mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-3xl mx-auto px-6 md:px-10" style={{ border: "1px solid rgba(11,42,74,0.2)" }}>
-          {FAQS.map((f, i) => (
-            <details key={f.q} open={i === 1} className="group" style={{ borderBottom: i === FAQS.length - 1 ? undefined : "1px solid rgba(11,42,74,0.15)" }}>
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-6 py-6 cursor-pointer"
-                style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1rem" }}
-              >
-                <span>{f.q}</span>
-                <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 20, lineHeight: 1 }}>
-                  +
-                </span>
-              </summary>
-              <p className="text-pretty pb-6" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                {f.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 12 · Heading centred, accordion centred with a max-width measure
-  {
-    name: "Centered Measure Accordion",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-xl mx-auto mb-14 text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 2.875rem)", lineHeight: 1.1 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-xl mx-auto">
-          {FAQS.map((f, i) => (
-            <details
-              key={f.q}
-              className="group"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-5 py-5 cursor-pointer text-center"
-                style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "0.9375rem" }}
-              >
-                <span>{f.q}</span>
-                <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 18, lineHeight: 1 }}>
-                  +
-                </span>
-              </summary>
-              <p className="text-pretty pb-5" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.875rem", lineHeight: 1.65 }}>
-                {f.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 13 · Photo left half, FAQ accordion right half
-  {
-    name: "Photo Split Accordion",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-[1200px] mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-start">
-          <div className="flex flex-col gap-8">
-            <div style={{ aspectRatio: "4 / 5", overflow: "hidden" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={GALLERY_IMGS[4]} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-            <div>
-              <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.2vw, 2.375rem)", lineHeight: 1.1 }}>
-                {FAQ_INTRO.heading}
-              </h2>
-              <p className="text-pretty mt-4" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                {FAQ_INTRO.sub}
-              </p>
-            </div>
+            ))}
           </div>
-          <div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 2 · Zebra ink-stripe accordion — alternating tinted rows, first open.
+  {
+    name: "Zebra Ink Stripe Accordion",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem,3vw,2.25rem)", lineHeight: 1.08 }}>
+            {FAQ_INTRO.heading}
+          </h2>
+          <div className="mt-6">
             {FAQS.map((f, i) => (
-              <details
-                key={f.q}
-                open={i === 2}
-                className="group"
-                style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-              >
-                <summary
-                  className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-5 py-5 cursor-pointer"
-                  style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "0.9375rem" }}
-                >
-                  <span>{f.q}</span>
-                  <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 18, lineHeight: 1 }}>
-                    +
-                  </span>
+              <details key={f.q} className="group" {...(i === 0 ? { open: true } : {})} style={{ background: i % 2 === 0 ? "rgba(25,60,90,0.04)" : "transparent" }}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-5 px-4 py-3.5 cursor-pointer">
+                  <span className="text-[14px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                  {CHEVRON}
                 </summary>
-                <p className="text-pretty pb-5" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.875rem", lineHeight: 1.6 }}>
-                  {f.a}
-                </p>
+                <p className="px-4 pb-4 text-[13.5px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
               </details>
             ))}
           </div>
@@ -477,192 +85,131 @@ export const optionsFaq: Section[] = [
     ),
   },
 
-  // 14 · Alternating: question left / answer right across a wide grid
+  // 3 · Bilateral spine split — questions list left of a centre rule, one answer floats right.
   {
-    name: "Alternating Row Grid",
+    name: "Bilateral Spine Split",
     node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-16">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-[1200px]">
-          {FAQS.map((f, i) => (
-            <div
-              key={f.q}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-16 py-8"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <h3 className="text-balance" style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1.3 }}>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-8 md:grid-cols-[1fr_1px_1fr]">
+          <ul className="m-0 flex list-none flex-col gap-3 p-0 text-right">
+            {FAQS.map((f) => (
+              <li key={f.q} className="text-[13.5px] font-semibold leading-snug" style={{ color: "var(--qpi-ink)" }}>
                 {f.q}
-              </h3>
-              <p className="text-pretty" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.7 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
+              </li>
+            ))}
+          </ul>
+          <div className="hidden md:block" style={{ background: "rgba(25,60,90,0.12)" }} />
+          <div>
+            <p className="qpi-caps text-[10px]" style={{ color: "var(--qpi-blue)" }}>Featured answer</p>
+            <p className="mt-2 text-[15px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{FAQS[0].q}</p>
+            <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{FAQS[0].a}</p>
+          </div>
         </div>
       </section>
     ),
   },
 
-  // 15 · Numbered big index left (a column of 01-08), the questions listed right
+  // 4 · Confidence ledger — check-marked rows with a tabular index.
   {
-    name: "Big Index Column",
+    name: "Confidence Ledger",
     node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-16">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem,3vw,2.25rem)", lineHeight: 1.08 }}>
             {FAQ_INTRO.heading}
           </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
+          <div className="mt-6 border-t" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group border-b" style={{ borderColor: "rgba(25,60,90,0.12)" }} {...(i === 2 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex items-center gap-4 py-3.5 cursor-pointer">
+                  <span className="qpi-caps tabular-nums text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.35 }}>{num(i)}</span>
+                  <svg aria-hidden="true" viewBox="0 0 20 20" className="size-4 shrink-0" style={{ color: "var(--qpi-blue)" }}>
+                    <path d="M4 10.5 8 14.5 16 5.5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <span className="text-[14px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                </summary>
+                <p className="pb-3.5 pl-14 text-[13.5px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
-        <div className="max-w-[1100px]">
-          {FAQS.map((f, i) => (
-            <div
-              key={f.q}
-              className="grid grid-cols-[64px_1fr] md:grid-cols-[120px_1fr] gap-4 md:gap-10 py-8 items-start"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <span style={{ color: "var(--qpi-blue)", fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1 }}>
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <div>
-                <h3 className="text-balance" style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem", lineHeight: 1.3 }}>
+      </section>
+    ),
+  },
+
+  // 5 · Split-flap board — dark numeral chips per row, answer opens in a lighter panel.
+  {
+    name: "Split-Flap Board",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <p className="qpi-caps text-[11px]" style={{ color: "var(--qpi-blue)" }}>{FAQ_INTRO.heading}</p>
+          <div className="mt-5 flex flex-col gap-1.5">
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group" {...(i === 1 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center gap-3 rounded-md px-3 py-2.5" style={{ background: "var(--qpi-ink)" }}>
+                  <span className="qpi-caps flex size-6 shrink-0 items-center justify-center rounded-sm text-[10px] tabular-nums text-white" style={{ background: "var(--qpi-blue)" }}>
+                    {num(i)}
+                  </span>
+                  <span className="text-[13.5px] font-semibold text-white">{f.q}</span>
+                </summary>
+                <p className="rounded-b-md px-3 py-3 text-[13px] leading-relaxed" style={{ background: "rgba(25,60,90,0.05)", color: "var(--qpi-ink)", opacity: 0.75 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 6 · Cover story + index — one full answer featured, the rest as a quiet closed index.
+  {
+    name: "Cover Story + Index",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-10 md:grid-cols-[1.2fr_1fr]">
+          <div>
+            <p className="qpi-caps text-[10px]" style={{ color: "var(--qpi-blue)" }}>Most asked</p>
+            <h2 className="qpi-display mt-3 text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem,3vw,2.1rem)", lineHeight: 1.1 }}>
+              {FAQS[0].q}
+            </h2>
+            <p className="mt-4 text-[14.5px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{FAQS[0].a}</p>
+          </div>
+          <div className="border-t pt-4" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            <p className="qpi-caps text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>More questions</p>
+            <ul className="m-0 mt-3 flex list-none flex-col gap-2.5 p-0">
+              {FAQS.slice(1).map((f) => (
+                <li key={f.q} className="border-b pb-2.5 text-[13px] font-semibold leading-snug" style={{ borderColor: "rgba(25,60,90,0.08)", color: "var(--qpi-ink)" }}>
                   {f.q}
-                </h3>
-                <p className="text-pretty mt-3" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.875rem", lineHeight: 1.65, maxWidth: 560 }}>
-                  {f.a}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 16 · Off-white ground, accordion with generous 32px+ vertical padding per row
-  {
-    name: "Off-White Generous Rows",
-    node: (
-      <section className="relative w-full py-20 md:py-28 px-6 md:px-14" style={{ background: "rgba(11,42,74,0.035)" }}>
-        <div className="max-w-2xl mb-16 mx-auto text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5 mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-3xl mx-auto">
-          {FAQS.map((f, i) => (
-            <details
-              key={f.q}
-              className="group"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-6 py-9 cursor-pointer"
-                style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}
-              >
-                <span>{f.q}</span>
-                <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 22, lineHeight: 1 }}>
-                  +
-                </span>
-              </summary>
-              <p className="text-pretty pb-9 pr-10" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                {f.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 17 · Questions only as a scannable list, answers as small footnotes beneath each
-  {
-    name: "Footnote List",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-2xl">
-          {FAQS.map((f, i) => (
-            <div key={f.q} className="pt-6 pb-2" style={{ borderTop: i === 0 ? undefined : "1px solid rgba(11,42,74,0.1)" }}>
-              <p style={{ color: "var(--qpi-ink)", fontWeight: 600, fontSize: "1rem", lineHeight: 1.4 }}>{f.q}</p>
-              <p className="text-pretty mt-2 mb-5" style={{ color: "var(--qpi-ink)", opacity: 0.45, fontSize: "0.8125rem", lineHeight: 1.6, maxWidth: 520 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 18 · Split: heading + phone CTA sticky-feel left, accordion right
-  {
-    name: "Sticky CTA Split",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-[1200px] mx-auto grid md:grid-cols-[320px_1fr] gap-12 md:gap-16 items-start">
-          <div>
-            <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.2vw, 2.375rem)", lineHeight: 1.1 }}>
-              {FAQ_INTRO.heading}
-            </h2>
-            <p className="text-pretty mt-4" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-              {FAQ_INTRO.sub}
-            </p>
-            <a
-              href={PHONE_HREF}
-              className="mt-8 inline-flex items-center gap-3"
-              style={{ color: "var(--qpi-blue)", fontWeight: 700, fontSize: "1.0625rem", textDecoration: "none" }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ width: 18, height: 18 }}>
-                <path
-                  d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.2 2.2Z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              {PHONE}
-            </a>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 7 · Radio presets — pill-shaped summaries stacked, one tuned open.
+  {
+    name: "Radio Presets",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem,3vw,2.25rem)", lineHeight: 1.08 }}>
+            {FAQ_INTRO.heading}
+          </h2>
+          <div className="mt-6 flex flex-col gap-2.5">
             {FAQS.map((f, i) => (
-              <details
-                key={f.q}
-                className="group"
-                style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-              >
+              <details key={f.q} className="group" {...(i === 3 ? { open: true } : {})}>
                 <summary
-                  className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-6 py-6 cursor-pointer"
-                  style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1rem" }}
+                  className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center justify-between gap-4 rounded-full px-5 py-3 group-open:rounded-2xl"
+                  style={{ border: "1px solid rgba(25,60,90,0.18)" }}
                 >
-                  <span>{f.q}</span>
-                  <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 20, lineHeight: 1 }}>
-                    +
-                  </span>
+                  <span className="text-[13.5px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                  {PLUS}
                 </summary>
-                <p className="text-pretty pb-6" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                  {f.a}
-                </p>
+                <p className="px-5 pb-3 pt-1.5 text-[13px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
               </details>
             ))}
           </div>
@@ -671,76 +218,222 @@ export const optionsFaq: Section[] = [
     ),
   },
 
-  // 19 · Every question with a hanging blue "Q." and answers a hanging "A."
+  // 8 · Blueprint annotation — dotted leader lines connect numeral to question.
   {
-    name: "Hanging Q & A Labels",
+    name: "Blueprint Annotation",
     node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-16">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-2xl flex flex-col gap-10">
-          {FAQS.map((f) => (
-            <div key={f.q}>
-              <div className="flex gap-4">
-                <span aria-hidden="true" style={{ color: "var(--qpi-blue)", fontWeight: 700, fontSize: "1.0625rem", width: 24, flexShrink: 0 }}>
-                  Q.
-                </span>
-                <p style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem", lineHeight: 1.4 }}>{f.q}</p>
-              </div>
-              <div className="flex gap-4 mt-3">
-                <span aria-hidden="true" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontWeight: 700, fontSize: "0.9375rem", width: 24, flexShrink: 0 }}>
-                  A.
-                </span>
-                <p className="text-pretty" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                  {f.a}
-                </p>
-              </div>
-            </div>
-          ))}
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <p className="qpi-caps text-[11px]" style={{ color: "var(--qpi-blue)" }}>{FAQ_INTRO.heading}</p>
+          <div className="mt-5 flex flex-col gap-3.5">
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group" {...(i === 0 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-baseline gap-3">
+                  <span className="qpi-caps tabular-nums text-[10px]" style={{ color: "var(--qpi-blue)" }}>{num(i)}</span>
+                  <span className="h-px flex-1 self-center" style={{ borderTop: "1px dotted rgba(25,60,90,0.3)" }} />
+                  <span className="text-[13.5px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                </summary>
+                <p className="mt-1.5 ml-10 text-[13px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
     ),
   },
 
-  // 20 · Full-width rows where the open state shows a blue left border
+  // 9 · Chat bubble duo — Q/A rendered as opposing bubbles for two questions, list beneath.
   {
-    name: "Blue Left-Border Rows",
+    name: "Chat Bubble Duo",
     node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-xl">
+          <div className="flex flex-col gap-3">
+            {FAQS.slice(0, 2).map((f) => (
+              <div key={f.q} className="flex flex-col gap-1.5">
+                <p className="qpi-display self-end rounded-2xl rounded-br-sm px-4 py-2.5 text-[13.5px] leading-snug text-white" style={{ background: "var(--qpi-blue)", maxWidth: "80%", textTransform: "none", fontWeight: 600 }}>
+                  {f.q}
+                </p>
+                <p className="self-start rounded-2xl rounded-bl-sm px-4 py-2.5 text-[13px] leading-relaxed" style={{ background: "rgba(25,60,90,0.05)", color: "var(--qpi-ink)", opacity: 0.8, maxWidth: "85%" }}>
+                  {f.a}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="qpi-caps mt-6 text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>Also asked</p>
+          <ul className="m-0 mt-2 flex list-none flex-wrap gap-2 p-0">
+            {FAQS.slice(2).map((f) => (
+              <li key={f.q} className="rounded-full px-3.5 py-1.5 text-[12px] font-medium" style={{ border: "1px solid rgba(25,60,90,0.15)", color: "var(--qpi-ink)" }}>
+                {f.q.length > 34 ? `${f.q.slice(0, 34)}…` : f.q}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ),
+  },
+
+  // 10 · Dossier cards — 2x4 bordered card grid, two open by default.
+  {
+    name: "Dossier Card Grid",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-3xl">
+          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.4rem,2.6vw,1.9rem)", lineHeight: 1.1 }}>
             {FAQ_INTRO.heading}
           </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
+          <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group rounded-lg p-3.5" style={{ border: "1px solid rgba(25,60,90,0.14)" }} {...(i < 2 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center justify-between gap-3">
+                  <span className="text-[12.5px] font-semibold leading-snug" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                  {CHEVRON}
+                </summary>
+                <p className="mt-2 text-[12px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 11 · Negative-space monolith — one enormous open question, rest hidden as a thin footnote line.
+  {
+    name: "Negative Space Monolith",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl text-center">
+          <p className="qpi-caps text-[11px]" style={{ color: "var(--qpi-blue)" }}>Frequently asked</p>
+          <h2 className="qpi-display mt-6 text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem,4.5vw,3.25rem)", lineHeight: 1.05 }}>
+            {FAQS[0].q}
+          </h2>
+          <p className="mx-auto mt-6 max-w-lg text-[14.5px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{FAQS[0].a}</p>
+          <p className="mt-10 text-[12px]" style={{ color: "var(--qpi-ink)", opacity: 0.45 }}>
+            {FAQS.slice(1, 5).map((f) => f.q.split(" ").slice(0, 3).join(" ")).join(" · ")}
           </p>
         </div>
-        <div className="max-w-3xl">
+      </section>
+    ),
+  },
+
+  // 12 · Ink punch tiles — oversized index numerals reversed on ink squares, answer to the right.
+  {
+    name: "Punch Tile Index",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <div className="flex flex-col gap-2.5">
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group flex" {...(i === 4 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex w-full cursor-pointer items-start gap-4">
+                  <span className="qpi-display flex size-9 shrink-0 items-center justify-center rounded-sm text-[13px] text-white" style={{ background: "var(--qpi-ink)" }}>
+                    {i + 1}
+                  </span>
+                  <span className="mt-1.5 text-[13.5px] font-semibold leading-snug" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                </summary>
+                <p className="mt-1.5 pl-[52px] text-[13px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 13 · Contents-page rule — heading left, questions as a dot-leader table of contents.
+  {
+    name: "Dot Leader Contents",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto grid w-full max-w-2xl grid-cols-1 gap-6 md:grid-cols-[0.7fr_1.3fr]">
+          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem,3vw,2.25rem)", lineHeight: 1.08 }}>
+            {FAQ_INTRO.heading}
+          </h2>
+          <div>
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group border-b" style={{ borderColor: "rgba(25,60,90,0.1)" }} {...(i === 1 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-baseline gap-3 py-2.5">
+                  <span className="text-[13.5px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                  <span className="flex-1" style={{ borderBottom: "1px dotted rgba(25,60,90,0.3)" }} />
+                  <span className="qpi-caps tabular-nums text-[10px]" style={{ color: "var(--qpi-blue)" }}>{num(i)}</span>
+                </summary>
+                <p className="pb-2.5 text-[12.5px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 14 · Blue reversed panel — whole block on the accent blue, white accordions.
+  {
+    name: "Blue Reversed Panel",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl rounded-2xl px-6 py-8 md:px-10 md:py-10" style={{ background: "var(--qpi-blue)" }}>
+          <h2 className="qpi-display text-balance text-white" style={{ fontSize: "clamp(1.4rem,2.6vw,1.9rem)", lineHeight: 1.1 }}>
+            {FAQ_INTRO.heading}
+          </h2>
+          <div className="mt-5">
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group border-t border-white/20" {...(i === 0 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center justify-between gap-4 py-2.5">
+                  <span className="text-[13px] font-semibold text-white">{f.q}</span>
+                  <span aria-hidden="true" className="qpi-caps text-[16px] text-white/70 group-open:hidden">+</span>
+                  <span aria-hidden="true" className="qpi-caps hidden text-[16px] text-white/70 group-open:block">–</span>
+                </summary>
+                <p className="pb-2.5 text-[12.5px] leading-relaxed text-white/75">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 15 · Vertical rule tabs — thin left rail of numerals, single answer panel swaps by scroll position (static: shows first).
+  {
+    name: "Rail Tab Reader",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full max-w-2xl gap-6">
+          <div className="flex shrink-0 flex-col gap-3 border-r pr-4" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {FAQS.map((f, i) => (
+              <span key={f.q} className="qpi-caps tabular-nums text-[10px]" style={{ color: i === 0 ? "var(--qpi-blue)" : "var(--qpi-ink)", opacity: i === 0 ? 1 : 0.35 }}>
+                {num(i)}
+              </span>
+            ))}
+          </div>
+          <div>
+            <p className="qpi-caps text-[10px]" style={{ color: "var(--qpi-blue)" }}>{FAQ_INTRO.heading}</p>
+            <h3 className="mt-2 text-[17px] font-semibold leading-snug" style={{ color: "var(--qpi-ink)" }}>{FAQS[0].q}</h3>
+            <p className="mt-3 text-[14px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{FAQS[0].a}</p>
+            <p className="mt-6 text-[11.5px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{FAQS.length - 1} more questions below</p>
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 16 · Underline rows, no boxes — pure typographic rhythm, heading centred above.
+  {
+    name: "Underline Rhythm",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl text-center">
+          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem,3vw,2.25rem)", lineHeight: 1.08 }}>
+            {FAQ_INTRO.heading}
+          </h2>
+        </div>
+        <div className="mx-auto mt-6 w-full max-w-xl">
           {FAQS.map((f, i) => (
-            <details
-              key={f.q}
-              open={i === 1 || i === 4}
-              className="group border-l-[3px] open:border-[var(--qpi-blue)] transition-colors duration-300"
-              style={{ borderLeftColor: i === 1 || i === 4 ? undefined : "transparent", borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-6 py-6 pl-6 cursor-pointer"
-                style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}
-              >
-                <span>{f.q}</span>
-                <span aria-hidden="true" className="shrink-0 mr-2 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 22, lineHeight: 1 }}>
-                  +
-                </span>
+            <details key={f.q} className="group" {...(i === 5 ? { open: true } : {})}>
+              <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center justify-center gap-2 py-3 text-center underline decoration-1 underline-offset-4" style={{ color: "var(--qpi-ink)", textDecorationColor: "rgba(25,60,90,0.25)" }}>
+                <span className="text-[14px] font-semibold">{f.q}</span>
               </summary>
-              <p className="text-pretty pb-6 pl-6 pr-10" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                {f.a}
-              </p>
+              <p className="mx-auto max-w-md pb-3 text-center text-[13px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
             </details>
           ))}
         </div>
@@ -748,193 +441,105 @@ export const optionsFaq: Section[] = [
     ),
   },
 
-  // 21 · Two accordions side by side (4 questions each)
+  // 17 · Aqua-flecked dark card — ink ground, aqua numerals, compact accordion.
   {
-    name: "Twin Accordions",
+    name: "Aqua-Flecked Dark Card",
     node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14 mx-auto text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5 mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl rounded-2xl px-6 py-8 md:px-10 md:py-10" style={{ background: "var(--qpi-ink)" }}>
+          <p className="qpi-caps text-[11px]" style={{ color: "var(--qpi-aqua)" }}>{FAQ_INTRO.heading}</p>
+          <div className="mt-5 flex flex-col gap-1">
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group" {...(i === 6 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center gap-3 py-2.5">
+                  <span className="qpi-caps tabular-nums text-[10px]" style={{ color: "var(--qpi-aqua)" }}>{num(i)}</span>
+                  <span className="text-[13px] font-semibold text-white">{f.q}</span>
+                </summary>
+                <p className="pb-2.5 pl-8 text-[12.5px] leading-relaxed text-white/65">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 18 · Editorial pull-quote lead — the sub copy set large as a pull-quote, accordion beneath compact.
+  {
+    name: "Pull-Quote Lead",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <p className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.25rem,2.4vw,1.7rem)", lineHeight: 1.25, textTransform: "none", fontWeight: 600 }}>
             {FAQ_INTRO.sub}
           </p>
+          <div className="mt-6 border-t" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {FAQS.map((f, i) => (
+              <details key={f.q} className="group border-b" style={{ borderColor: "rgba(25,60,90,0.1)" }} {...(i === 0 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center justify-between gap-4 py-2.5">
+                  <span className="text-[13px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                  {CHEVRON}
+                </summary>
+                <p className="pb-2.5 text-[12.5px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
-        <div className="max-w-[1200px] mx-auto grid md:grid-cols-2 gap-x-16">
-          {[FAQS.slice(0, 4), FAQS.slice(4, 8)].map((col, c) => (
-            <div key={c}>
-              {col.map((f, i) => (
-                <details
-                  key={f.q}
-                  open={i === 0}
-                  className="group"
-                  style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-                >
-                  <summary
-                    className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-5 py-6 cursor-pointer"
-                    style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "0.9375rem" }}
-                  >
-                    <span>{f.q}</span>
-                    <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 18, lineHeight: 1 }}>
-                      +
-                    </span>
+      </section>
+    ),
+  },
+
+  // 19 · Photo corner + list — one project thumbnail anchors the corner, questions run as a tight list.
+  {
+    name: "Photo Corner Anchor",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full max-w-2xl gap-6">
+          <div className="hidden shrink-0 overflow-hidden rounded-xl sm:block" style={{ width: 140, height: 180 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[4]} alt="Recent pool installation" className="h-full w-full object-cover" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.25rem,2.4vw,1.7rem)", lineHeight: 1.1 }}>
+              {FAQ_INTRO.heading}
+            </h2>
+            <div className="mt-4">
+              {FAQS.slice(0, 5).map((f, i) => (
+                <details key={f.q} className="group border-t" style={{ borderColor: "rgba(25,60,90,0.1)" }} {...(i === 2 ? { open: true } : {})}>
+                  <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center justify-between gap-3 py-2">
+                    <span className="text-[12.5px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                    {CHEVRON}
                   </summary>
-                  <p className="text-pretty pb-6" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.875rem", lineHeight: 1.6 }}>
-                    {f.a}
-                  </p>
+                  <p className="pb-2 text-[12px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
                 </details>
               ))}
             </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 22 · Editorial: heading huge across the top, Q&As as newspaper columns
-  {
-    name: "Editorial Newspaper Columns",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <h2 className="qpi-display text-balance mb-14 max-w-[1100px]" style={{ color: "var(--qpi-ink)", fontSize: "clamp(2.25rem, 6vw, 5rem)", lineHeight: 0.98 }}>
-          {FAQ_INTRO.heading}
-        </h2>
-        <div className="max-w-[1300px] columns-1 md:columns-2 lg:columns-3 gap-10">
-          {FAQS.map((f) => (
-            <div key={f.q} className="mb-10" style={{ breakInside: "avoid" }}>
-              <h3 className="text-balance" style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1rem", lineHeight: 1.35 }}>
-                {f.q}
-              </h3>
-              <p className="text-pretty mt-3" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.8125rem", lineHeight: 1.6 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 23 · Minimal: no rules at all, pure spacing rhythm, all expanded
-  {
-    name: "Minimal Rhythm",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-xl mx-auto flex flex-col gap-16">
-          <div className="text-center">
-            <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 2.75rem)", lineHeight: 1.1 }}>
-              {FAQ_INTRO.heading}
-            </h2>
-            <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-              {FAQ_INTRO.sub}
-            </p>
           </div>
-          {FAQS.map((f) => (
-            <div key={f.q} className="text-center">
-              <h3 className="text-balance" style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.125rem", lineHeight: 1.35 }}>
-                {f.q}
-              </h3>
-              <p className="text-pretty mt-4 mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.9375rem", lineHeight: 1.7, maxWidth: 460 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
         </div>
       </section>
     ),
   },
 
-  // 24 · Card grid 2x4, each card a Q&A, 1px navy borders
+  // 20 · Phone-anchored close — accordion above, giant tappable phone number as the exit line.
   {
-    name: "Bordered Card Grid",
+    name: "Phone-Anchored Close",
     node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14 mx-auto text-center">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5 mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 560 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div
-          className="max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2"
-          style={{ border: "1px solid rgba(11,42,74,0.25)" }}
-        >
-          {FAQS.map((f, i) => (
-            <div
-              key={f.q}
-              className="p-8"
-              style={{
-                borderRight: i % 2 === 0 ? "1px solid rgba(11,42,74,0.25)" : undefined,
-                borderTop: i < 2 ? undefined : "1px solid rgba(11,42,74,0.25)",
-              }}
-            >
-              <h3 className="text-balance" style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1rem", lineHeight: 1.35 }}>
-                {f.q}
-              </h3>
-              <p className="text-pretty mt-3" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.875rem", lineHeight: 1.6 }}>
-                {f.a}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 25 · Accordion + a small "Still have questions? {PHONE}" row pinned at the bottom
-  {
-    name: "Accordion + Contact Row",
-    node: (
-      <section className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="max-w-2xl mb-14">
-          <h2 className="qpi-display text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.875rem, 4vw, 3rem)", lineHeight: 1.05 }}>
-            {FAQ_INTRO.heading}
-          </h2>
-          <p className="text-pretty mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "1rem", lineHeight: 1.6, maxWidth: 620 }}>
-            {FAQ_INTRO.sub}
-          </p>
-        </div>
-        <div className="max-w-3xl">
-          {FAQS.map((f, i) => (
-            <details
-              key={f.q}
-              open={i === 0}
-              className="group"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <summary
-                className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-6 py-6 cursor-pointer"
-                style={{ color: "var(--qpi-ink)", fontWeight: 700, fontSize: "1.0625rem" }}
-              >
-                <span>{f.q}</span>
-                <span aria-hidden="true" className="shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: "var(--qpi-blue)", fontSize: 22, lineHeight: 1 }}>
-                  +
-                </span>
-              </summary>
-              <p className="text-pretty pb-6 pr-10" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65 }}>
-                {f.a}
-              </p>
-            </details>
-          ))}
-          <div className="mt-4 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem" }}>Still have questions?</p>
-            <a
-              href={PHONE_HREF}
-              className="inline-flex items-center gap-3"
-              style={{ color: "var(--qpi-blue)", fontWeight: 700, fontSize: "1.0625rem", textDecoration: "none" }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ width: 18, height: 18 }}>
-                <path
-                  d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.2 2.2Z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-2xl">
+          <div className="border-b" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {FAQS.slice(0, 4).map((f, i) => (
+              <details key={f.q} className="group border-t" style={{ borderColor: "rgba(25,60,90,0.12)" }} {...(i === 1 ? { open: true } : {})}>
+                <summary className="list-none [&::-webkit-details-marker]:hidden flex cursor-pointer items-center justify-between gap-4 py-3">
+                  <span className="text-[13.5px] font-semibold" style={{ color: "var(--qpi-ink)" }}>{f.q}</span>
+                  {PLUS}
+                </summary>
+                <p className="pb-3 text-[13px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col items-start gap-1">
+            <span className="qpi-caps text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.45 }}>Still have questions</span>
+            <a href={PHONE_HREF} className="qpi-display text-[clamp(1.75rem,4.5vw,2.75rem)] leading-none" style={{ color: "var(--qpi-blue)" }}>
               {PHONE}
             </a>
           </div>

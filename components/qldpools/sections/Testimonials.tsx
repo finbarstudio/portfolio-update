@@ -4,9 +4,10 @@ import Reveal from "@/components/qldpools/anim/Reveal";
 import { TESTIMONIALS_INTRO, TESTIMONIALS, GALLERY_IMGS } from "@/app/qldpools/site/sections/kit";
 
 /**
- * Testimonials — "Scattered Review Deck" (app/qldpools/site/sections/options/
- * testimonials2.tsx, entry 4 / gallery option 29). Five real Google reviews
- * as overlapping, rotated cards, scattered like a dropped deck.
+ * Testimonials — "Scattered Review Deck", Finbar's testimonials option 29. (The
+ * option set it came from has since been retired; see git history for
+ * `options/testimonials2.tsx`.) Five real Google reviews as overlapping,
+ * rotated cards, scattered like a dropped deck.
  *
  * Rotation lives on an inner wrapper, never on the ".t-item" element itself:
  * Reveal writes its own transform (y/opacity) onto ".t-item", and a baked

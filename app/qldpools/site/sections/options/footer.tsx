@@ -1,830 +1,570 @@
-import { FOOTER, AREAS, LICENCES, PHONE, PHONE_HREF, EMAIL, LOGO_DARK, LOGO_WHITE, TAGLINE, type Section } from "../kit";
+import { FOOTER, AREAS, LICENCES, PHONE, PHONE_HREF, EMAIL, LOGO_DARK, LOGO_WHITE, TAGLINE, GALLERY_IMGS, type Section } from "../kit";
 
 /**
- * Footer — 25 distinct design directions for the site footer. Each entry is
- * a standalone <footer> built only from FOOTER, AREAS, LICENCES, PHONE,
- * PHONE_HREF, EMAIL, LOGO_DARK, LOGO_WHITE and TAGLINE.
+ * Footer — full wipe, round three. All prior experiments (the 45 options
+ * previously in this file + footer2.tsx) are retired; every layout below is
+ * a new structural idea. Two fixes from his review of the earlier set: the
+ * footer read "much too narrow" (fixed here — every option runs the full
+ * gutter width, inner max-width 1400px+ or none at all, justify-between
+ * layouts pushed to the true edges instead of centred narrow columns), and
+ * it had "way too much bottom space, up against bottom" (fixed by keeping
+ * the root's own py-16/md:py-20 as the only air, never adding more beneath
+ * the content). Every root is a <footer>, one 100vh viewport, vertically
+ * centred, white ground, ink/blue/aqua for inner blocks only. Every option
+ * keeps the "Site by finbar.studio" credit and the literal "© 2026 QLD Pool
+ * Installs" copyright line.
  */
+
+function Credit({ tone = "ink" }: { tone?: "ink" | "white" }) {
+  const c = tone === "white" ? "text-white/45" : "text-[var(--qpi-ink)]/45";
+  return (
+    <p className={`text-[11px] ${c}`}>
+      © 2026 QLD Pool Installs · Site by finbar.studio
+    </p>
+  );
+}
+
 export const optionsFooter: Section[] = [
-  // 1 · Giant wordmark fitted huge across the bottom, info row above
+  // 1 · Three-belt rows — logo/tagline, nav spread edge to edge, legal, each a full-width band.
   {
-    name: "Giant Wordmark",
+    name: "Three-Belt Rows",
     node: (
-      <footer className="relative w-full" style={{ background: "var(--qpi-ink)" }}>
-        <div className="px-6 md:px-14 pt-16 pb-8">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10 pb-12" style={{ borderBottom: "1px solid rgba(255,255,255,0.15)" }}>
-            <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-10 w-auto mb-4" />
-              <p className="text-pretty" style={{ color: "#fff", opacity: 0.55, fontSize: "0.875rem", lineHeight: 1.6, maxWidth: 320 }}>
-                {FOOTER.blurb}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-x-12 gap-y-6">
-              <div>
-                <p className="qpi-caps mb-3" style={{ color: "#fff", opacity: 0.4, fontSize: 10 }}>Contact</p>
-                <a href={PHONE_HREF} className="block" style={{ color: "#fff", fontSize: "0.9375rem", textDecoration: "none" }}>{PHONE}</a>
-                <a href={`mailto:${EMAIL}`} className="block mt-1" style={{ color: "#fff", opacity: 0.7, fontSize: "0.9375rem", textDecoration: "none" }}>{EMAIL}</a>
-              </div>
-              <div>
-                <p className="qpi-caps mb-3" style={{ color: "#fff", opacity: 0.4, fontSize: 10 }}>Navigate</p>
-                {FOOTER.nav.slice(0, 3).map((n) => (
-                  <a key={n} href="#" className="block mt-1 first:mt-0" style={{ color: "#fff", opacity: 0.7, fontSize: "0.9375rem", textDecoration: "none" }}>{n}</a>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="px-6 md:px-14 overflow-hidden">
-          <p
-            className="qpi-display"
-            style={{ color: "#fff", opacity: 0.9, fontSize: "clamp(3.5rem, 14vw, 11rem)", lineHeight: 0.85, letterSpacing: "-0.02em", whiteSpace: "nowrap" }}
-          >
-            QLD POOL INSTALLS
-          </p>
-        </div>
-        <div className="px-6 md:px-14 py-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
-          <p style={{ color: "#fff", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "#fff", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 2 · Navy ground, four columns, thin top rule
-  {
-    name: "Four Column Navy",
-    node: (
-      <footer className="relative w-full py-16 md:py-20 px-6 md:px-14" style={{ background: "var(--qpi-ink)", borderTop: "1px solid var(--qpi-blue)" }}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 pb-12">
-          <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-9 w-auto mb-4" />
-            <p className="text-pretty" style={{ color: "#fff", opacity: 0.5, fontSize: "0.8125rem", lineHeight: 1.6 }}>{FOOTER.blurb}</p>
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "#fff", opacity: 0.4, fontSize: 10 }}>Navigate</p>
-            {FOOTER.nav.map((n) => (
-              <a key={n} href="#" className="block mb-2" style={{ color: "#fff", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "#fff", opacity: 0.4, fontSize: 10 }}>Service Areas</p>
-            {AREAS.map((a) => (
-              <p key={a} className="mb-2" style={{ color: "#fff", opacity: 0.7, fontSize: "0.875rem" }}>{a}</p>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "#fff", opacity: 0.4, fontSize: 10 }}>Get In Touch</p>
-            <a href={PHONE_HREF} className="block mb-2" style={{ color: "#fff", fontSize: "0.875rem", textDecoration: "none" }}>{PHONE}</a>
-            <a href={`mailto:${EMAIL}`} className="block mb-4" style={{ color: "#fff", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{EMAIL}</a>
-            <p style={{ color: "#fff", opacity: 0.4, fontSize: "0.75rem" }}>{LICENCES.qbcc}</p>
-            <p style={{ color: "#fff", opacity: 0.4, fontSize: "0.75rem" }}>{LICENCES.nsw}</p>
-          </div>
-        </div>
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }}>
-          <p style={{ color: "#fff", opacity: 0.35, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "#fff", opacity: 0.35, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 3 · White ground, logo left, three columns right, hairline rules
-  {
-    name: "White, Logo Left",
-    node: (
-      <footer className="relative w-full bg-white py-16 md:py-20 px-6 md:px-14">
-        <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr_1fr] gap-10 pb-10" style={{ borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-          <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-9 w-auto mb-4" />
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.8125rem" }}>{TAGLINE}</p>
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-            {FOOTER.nav.map((n) => (
-              <a key={n} href="#" className="block mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Areas</p>
-            {AREAS.map((a) => (
-              <p key={a} className="mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem" }}>{a}</p>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Contact</p>
-            <a href={PHONE_HREF} className="block mb-2" style={{ color: "var(--qpi-ink)", fontSize: "0.875rem", textDecoration: "none" }}>{PHONE}</a>
-            <a href={`mailto:${EMAIL}`} style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{EMAIL}</a>
-          </div>
-        </div>
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · {LICENCES.qbcc}</p>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 4 · Minimal: logo centred, one line of nav, contact beneath, vast whitespace
-  {
-    name: "Minimal Centred",
-    node: (
-      <footer className="relative w-full bg-white py-24 md:py-32 px-6 text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-10 w-auto mx-auto mb-10" />
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-10">
-          {FOOTER.nav.map((n) => (
-            <a key={n} href="#" className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: 11, textDecoration: "none" }}>{n}</a>
-          ))}
-        </div>
-        <a href={PHONE_HREF} style={{ color: "var(--qpi-ink)", fontSize: "1rem", textDecoration: "none" }}>{PHONE}</a>
-        <p className="mt-2" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: "0.875rem" }}>{EMAIL}</p>
-        <p className="mt-16" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
-      </footer>
-    ),
-  },
-
-  // 5 · Split: big TAGLINE left, columns right, on navy
-  {
-    name: "Split Tagline",
-    node: (
-      <footer className="relative w-full py-20 md:py-28 px-6 md:px-14" style={{ background: "var(--qpi-ink)" }}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-14 pb-14" style={{ borderBottom: "1px solid rgba(255,255,255,0.15)" }}>
-          <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-9 w-auto mb-8" />
-            <h2 className="qpi-display text-balance" style={{ color: "#fff", fontSize: "clamp(1.75rem, 3.6vw, 2.75rem)", lineHeight: 1.05 }}>
-              {TAGLINE}
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 gap-10">
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "#fff", opacity: 0.4, fontSize: 10 }}>Navigate</p>
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" className="block mb-2" style={{ color: "#fff", opacity: 0.75, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-              ))}
-            </div>
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "#fff", opacity: 0.4, fontSize: 10 }}>Contact</p>
-              <a href={PHONE_HREF} className="block mb-2" style={{ color: "#fff", fontSize: "0.875rem", textDecoration: "none" }}>{PHONE}</a>
-              <a href={`mailto:${EMAIL}`} className="block" style={{ color: "#fff", opacity: 0.75, fontSize: "0.875rem", textDecoration: "none" }}>{EMAIL}</a>
-            </div>
-          </div>
-        </div>
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p style={{ color: "#fff", opacity: 0.35, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "#fff", opacity: 0.35, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 6 · Blue band footer, white type, two columns and a big phone number
-  {
-    name: "Blue Band",
-    node: (
-      <footer className="relative w-full py-20 md:py-24 px-6 md:px-14" style={{ background: "var(--qpi-blue)" }}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end pb-12" style={{ borderBottom: "1px solid rgba(255,255,255,0.25)" }}>
-          <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-9 w-auto mb-6" />
-            <p className="qpi-caps mb-2" style={{ color: "#fff", opacity: 0.75, fontSize: 10 }}>Call us today</p>
-            <a href={PHONE_HREF} className="qpi-display block" style={{ color: "#fff", fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1, textDecoration: "none" }}>
-              {PHONE}
-            </a>
-          </div>
-          <div className="grid grid-cols-2 gap-8">
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "#fff", opacity: 0.65, fontSize: 10 }}>Navigate</p>
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" className="block mb-2" style={{ color: "#fff", fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-              ))}
-            </div>
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "#fff", opacity: 0.65, fontSize: 10 }}>Areas</p>
-              {AREAS.slice(0, 5).map((a) => (
-                <p key={a} className="mb-2" style={{ color: "#fff", fontSize: "0.875rem" }}>{a}</p>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p style={{ color: "#fff", opacity: 0.7, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "#fff", opacity: 0.7, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 7 · Contact-led: enormous tappable phone number as the anchor, nav small beneath
-  {
-    name: "Enormous Phone Anchor",
-    node: (
-      <footer className="relative w-full bg-white py-20 md:py-28 px-6 text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-9 w-auto mx-auto mb-10" />
-        <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>Ready to Start Your Pool Project?</p>
-        <a
-          href={PHONE_HREF}
-          className="qpi-display block text-balance"
-          style={{ color: "var(--qpi-ink)", fontSize: "clamp(2.5rem, 9vw, 6rem)", lineHeight: 0.95, textDecoration: "none" }}
-        >
-          {PHONE}
-        </a>
-        <a href={`mailto:${EMAIL}`} className="block mt-4" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.9375rem", textDecoration: "none" }}>
-          {EMAIL}
-        </a>
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mt-14 pt-10" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          {FOOTER.nav.map((n) => (
-            <a key={n} href="#" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.8125rem", textDecoration: "none" }}>{n}</a>
-          ))}
-        </div>
-        <p className="mt-10" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
-      </footer>
-    ),
-  },
-
-  // 8 · Three columns with AREAS as a wrapped list of pills
-  {
-    name: "Area Pills",
-    node: (
-      <footer className="relative w-full bg-white py-16 md:py-24 px-6 md:px-14">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12" style={{ borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-          <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-9 w-auto mb-4" />
-            <p className="text-pretty" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.8125rem", lineHeight: 1.6 }}>{FOOTER.blurb}</p>
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-            {FOOTER.nav.map((n) => (
-              <a key={n} href="#" className="block mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Servicing</p>
-            <div className="flex flex-wrap gap-2">
-              {AREAS.map((a) => (
-                <span
-                  key={a}
-                  style={{
-                    color: "var(--qpi-ink)",
-                    fontSize: "0.75rem",
-                    padding: "6px 12px",
-                    border: "1px solid rgba(11,42,74,0.25)",
-                    borderRadius: 999,
-                  }}
-                >
-                  {a}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 9 · Off-white, logo top-centre, everything centred, generous rhythm
-  {
-    name: "Off-White Centred Rhythm",
-    node: (
-      <footer className="relative w-full py-24 md:py-32 px-6 text-center" style={{ background: "#f5f2ee" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-11 w-auto mx-auto mb-12" />
-        <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-12">
-          {FOOTER.nav.map((n) => (
-            <a key={n} href="#" style={{ color: "var(--qpi-ink)", fontSize: "0.9375rem", textDecoration: "none" }}>{n}</a>
-          ))}
-        </div>
-        <div className="mx-auto mb-12" style={{ width: 40, height: 1, background: "var(--qpi-blue)" }} />
-        <p style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem" }}>{PHONE} · {EMAIL}</p>
-        <p className="mt-3" style={{ color: "var(--qpi-ink)", opacity: 0.45, fontSize: "0.8125rem" }}>{AREAS.join(" · ")}</p>
-        <p className="mt-14" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
-      </footer>
-    ),
-  },
-
-  // 10 · Ledger: each column headed by a qpi-caps label, tight rules between rows
-  {
-    name: "Column Ledger",
-    node: (
-      <footer className="relative w-full bg-white py-16 md:py-24 px-6 md:px-14">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-x-10">
-          <div className="mb-10 md:mb-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-9 w-auto" />
-          </div>
-          <div>
-            <p className="qpi-caps pb-3" style={{ color: "var(--qpi-blue)", fontSize: 10, borderBottom: "1px solid var(--qpi-ink)" }}>Navigate</p>
-            {FOOTER.nav.map((n) => (
-              <a key={n} href="#" className="block py-3" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem", textDecoration: "none", borderBottom: "1px solid rgba(11,42,74,0.1)" }}>{n}</a>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps pb-3" style={{ color: "var(--qpi-blue)", fontSize: 10, borderBottom: "1px solid var(--qpi-ink)" }}>Areas</p>
-            {AREAS.map((a) => (
-              <p key={a} className="py-3" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem", borderBottom: "1px solid rgba(11,42,74,0.1)" }}>{a}</p>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps pb-3" style={{ color: "var(--qpi-blue)", fontSize: 10, borderBottom: "1px solid var(--qpi-ink)" }}>Contact</p>
-            <a href={PHONE_HREF} className="block py-3" style={{ color: "var(--qpi-ink)", fontSize: "0.8125rem", textDecoration: "none", borderBottom: "1px solid rgba(11,42,74,0.1)" }}>{PHONE}</a>
-            <a href={`mailto:${EMAIL}`} className="block py-3" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem", textDecoration: "none", borderBottom: "1px solid rgba(11,42,74,0.1)" }}>{EMAIL}</a>
-          </div>
-        </div>
-        <div className="pt-8 mt-8 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 11 · Big logo image large on white with columns beneath
-  {
-    name: "Big Logo Header",
-    node: (
-      <footer className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14 text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-16 md:h-20 w-auto mx-auto mb-16" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 max-w-4xl mx-auto text-left pt-12" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-            {FOOTER.nav.map((n) => (
-              <a key={n} href="#" className="block mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Areas</p>
-            {AREAS.slice(0, 5).map((a) => (
-              <p key={a} className="mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem" }}>{a}</p>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Contact</p>
-            <a href={PHONE_HREF} className="block mb-2" style={{ color: "var(--qpi-ink)", fontSize: "0.875rem", textDecoration: "none" }}>{PHONE}</a>
-            <a href={`mailto:${EMAIL}`} style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{EMAIL}</a>
-          </div>
-        </div>
-        <p className="mt-16" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
-      </footer>
-    ),
-  },
-
-  // 12 · Navy with a white inner card holding the columns
-  {
-    name: "Navy, White Inner Card",
-    node: (
-      <footer className="relative w-full py-16 md:py-24 px-6 md:px-14" style={{ background: "var(--qpi-ink)" }}>
-        <div className="max-w-6xl mx-auto bg-white p-8 sm:p-12 md:p-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-10" style={{ borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-            <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-9 w-auto mb-4" />
-              <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.8125rem" }}>{TAGLINE}</p>
-            </div>
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" className="block mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem", textDecoration: "none" }}>{n}</a>
-              ))}
-            </div>
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Areas</p>
-              {AREAS.slice(0, 5).map((a) => (
-                <p key={a} className="mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem" }}>{a}</p>
-              ))}
-            </div>
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Contact</p>
-              <a href={PHONE_HREF} className="block mb-2" style={{ color: "var(--qpi-ink)", fontSize: "0.8125rem", textDecoration: "none" }}>{PHONE}</a>
-              <a href={`mailto:${EMAIL}`} style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem", textDecoration: "none" }}>{EMAIL}</a>
-            </div>
-          </div>
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-          </div>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 13 · Two-tier: dark upper band (nav + contact), light lower bar (licences + credit)
-  {
-    name: "Two-Tier Band",
-    node: (
-      <footer className="relative w-full">
-        <div className="py-16 md:py-20 px-6 md:px-14" style={{ background: "var(--qpi-ink)" }}>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-10">
-            <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-9 w-auto mb-4" />
-              <a href={PHONE_HREF} style={{ color: "#fff", fontSize: "1.125rem", textDecoration: "none" }}>{PHONE}</a>
-            </div>
-            <div className="flex flex-wrap gap-x-8 gap-y-3">
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" className="qpi-caps" style={{ color: "#fff", opacity: 0.65, fontSize: 11, textDecoration: "none" }}>{n}</a>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="py-6 px-6 md:px-14 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ background: "#f5f2ee" }}>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.75rem" }}>{LICENCES.qbcc} · {LICENCES.nsw}</p>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 14 · Areas-forward: the 7 AREAS as a big list, contact compact at the side
-  {
-    name: "Areas Forward",
-    node: (
-      <footer className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-14">
-          <div>
-            <p className="qpi-caps mb-6" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>Where We Build</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-              {AREAS.map((a, i) => (
-                <p
-                  key={a}
-                  className="qpi-display py-3"
-                  style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.375rem, 2.6vw, 2rem)", lineHeight: 1.1, borderTop: i < 2 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-                >
-                  {a}
-                </p>
-              ))}
-            </div>
-          </div>
-          <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-8 w-auto mb-8" />
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Contact</p>
-            <a href={PHONE_HREF} className="block mb-2" style={{ color: "var(--qpi-ink)", fontSize: "0.9375rem", textDecoration: "none" }}>{PHONE}</a>
-            <a href={`mailto:${EMAIL}`} className="block mb-8" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.9375rem", textDecoration: "none" }}>{EMAIL}</a>
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-            {FOOTER.nav.map((n) => (
-              <a key={n} href="#" className="block mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-            ))}
-          </div>
-        </div>
-        <div className="mt-16 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 15 · Wordmark left at large scale, nav and contact right-aligned opposite it
-  {
-    name: "Wordmark vs Nav",
-    node: (
-      <footer className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-10 pb-14" style={{ borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-          <p className="qpi-display" style={{ color: "var(--qpi-ink)", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 0.95, letterSpacing: "-0.02em" }}>
-            QLD POOL<br />INSTALLS
-          </p>
-          <div className="text-right">
-            <div className="flex flex-wrap md:justify-end gap-x-6 gap-y-2 mb-6">
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-              ))}
-            </div>
-            <a href={PHONE_HREF} style={{ color: "var(--qpi-ink)", fontSize: "1.0625rem", textDecoration: "none" }}>{PHONE}</a>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.875rem" }}>{EMAIL}</p>
-          </div>
-        </div>
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 16 · Licences-forward: QBCC + NSW numbers given real prominence
-  {
-    name: "Licences Forward",
-    node: (
-      <footer className="relative w-full py-20 md:py-28 px-6 md:px-14" style={{ background: "var(--qpi-ink)" }}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-14">
-          <div className="p-8" style={{ border: "1px solid rgba(255,255,255,0.2)" }}>
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Queensland Licence</p>
-            <p className="qpi-display" style={{ color: "#fff", fontSize: "clamp(1.375rem, 2.4vw, 1.875rem)" }}>{LICENCES.qbcc}</p>
-          </div>
-          <div className="p-8" style={{ border: "1px solid rgba(255,255,255,0.2)" }}>
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>NSW Licence</p>
-            <p className="qpi-display" style={{ color: "#fff", fontSize: "clamp(1.375rem, 2.4vw, 1.875rem)" }}>{LICENCES.nsw}</p>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 pt-10" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
-          <div className="flex items-center gap-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-8 w-auto" />
-            <span style={{ color: "#fff", opacity: 0.4, fontSize: "0.8125rem" }}>{FOOTER.warranty}</span>
-          </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {FOOTER.nav.map((n) => (
-              <a key={n} href="#" style={{ color: "#fff", opacity: 0.65, fontSize: "0.8125rem", textDecoration: "none" }}>{n}</a>
-            ))}
-          </div>
-        </div>
-        <p className="mt-10" style={{ color: "#fff", opacity: 0.35, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
-      </footer>
-    ),
-  },
-
-  // 17 · Compact single-row footer: logo, nav inline, phone, credit, one hairline
-  {
-    name: "Compact Single Row",
-    node: (
-      <footer className="relative w-full bg-white py-6 px-6 md:px-14" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full max-w-none flex-col gap-5">
+          <div className="flex flex-col items-start justify-between gap-3 border-t pt-5 sm:flex-row sm:items-center" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
-            <div className="hidden md:flex items-center gap-5">
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" style={{ color: "var(--qpi-ink)", opacity: 0.65, fontSize: "0.8125rem", textDecoration: "none" }}>{n}</a>
-              ))}
-            </div>
+            <span className="text-[13px]" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{TAGLINE}</span>
           </div>
-          <div className="flex items-center gap-5">
-            <a href={PHONE_HREF} style={{ color: "var(--qpi-ink)", fontSize: "0.875rem", textDecoration: "none" }}>{PHONE}</a>
-            <span style={{ color: "var(--qpi-ink)", opacity: 0.3, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</span>
-            <span style={{ color: "var(--qpi-ink)", opacity: 0.3, fontSize: "0.75rem" }}>Site by finbar.studio</span>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="qpi-caps text-[11px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
+            ))}
+          </div>
+          <div className="flex flex-col items-start justify-between gap-2 border-t pt-5 sm:flex-row sm:items-center" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            <Credit />
+            <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.45 }}>{LICENCES.qbcc}</span>
           </div>
         </div>
       </footer>
     ),
   },
 
-  // 18 · Editorial: FOOTER.blurb set large as the lead, columns small beneath
+  // 2 · Mega nav marquee row — logo left, nav spread large, contact right, one wide line.
   {
-    name: "Editorial Blurb Lead",
+    name: "Mega Nav Marquee Row",
     node: (
-      <footer className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <p
-          className="qpi-display text-balance mb-16"
-          style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 4vw, 3.25rem)", lineHeight: 1.15, maxWidth: 900 }}
-        >
-          {FOOTER.blurb}
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 pt-10" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          <div>
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full max-w-none flex-col gap-8">
+          <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-8 w-auto" />
+            <a href={PHONE_HREF} className="qpi-display text-[clamp(1.25rem,2.6vw,1.9rem)] leading-none" style={{ color: "var(--qpi-blue)" }}>{PHONE}</a>
           </div>
-          <div>
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-            {FOOTER.nav.slice(0, 3).map((n) => (
-              <a key={n} href="#" className="block mb-1.5" style={{ color: "var(--qpi-ink)", opacity: 0.65, fontSize: "0.8125rem", textDecoration: "none" }}>{n}</a>
+          <nav className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3 border-t pt-6" style={{ borderColor: "rgba(25,60,90,0.12)" }} aria-label="Footer">
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="qpi-display" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1rem,2vw,1.4rem)" }}>{item}</span>
             ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>More</p>
-            {FOOTER.nav.slice(3).map((n) => (
-              <a key={n} href="#" className="block mb-1.5" style={{ color: "var(--qpi-ink)", opacity: 0.65, fontSize: "0.8125rem", textDecoration: "none" }}>{n}</a>
-            ))}
-          </div>
-          <div>
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Contact</p>
-            <a href={PHONE_HREF} className="block mb-1.5" style={{ color: "var(--qpi-ink)", fontSize: "0.8125rem", textDecoration: "none" }}>{PHONE}</a>
-            <span style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: "0.75rem" }}>Site by finbar.studio</span>
+          </nav>
+          <div className="flex items-center justify-between border-t pt-4" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            <Credit />
+            <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc} · {LICENCES.nsw}</span>
           </div>
         </div>
       </footer>
     ),
   },
 
-  // 19 · Grid with a navy block holding the warranty text as a feature cell
+  // 3 · Directory columns wide — five equal columns spanning the full width.
   {
-    name: "Warranty Feature Cell",
+    name: "Directory Columns Wide",
     node: (
-      <footer className="relative w-full bg-white py-16 md:py-24 px-6 md:px-14">
-        <div className="grid grid-cols-1 md:grid-cols-3" style={{ border: "1px solid rgba(11,42,74,0.15)" }}>
-          <div className="p-10 flex flex-col justify-center" style={{ background: "var(--qpi-ink)", gridColumn: "span 1" }}>
-            <p className="qpi-caps mb-3" style={{ color: "#fff", opacity: 0.55, fontSize: 10 }}>Our Promise</p>
-            <p className="text-pretty" style={{ color: "#fff", fontSize: "0.9375rem", lineHeight: 1.6 }}>{FOOTER.warranty}</p>
-          </div>
-          <div className="p-10" style={{ borderLeft: "1px solid rgba(11,42,74,0.15)" }}>
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto grid w-full max-w-none grid-cols-2 gap-x-6 gap-y-8 border-t pt-8 sm:grid-cols-3 md:grid-cols-5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+          <div className="col-span-2 sm:col-span-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-8 w-auto mb-6" />
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-            {FOOTER.nav.map((n) => (
-              <a key={n} href="#" className="block mb-1.5" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem", textDecoration: "none" }}>{n}</a>
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <p className="mt-3 max-w-[22ch] text-[12px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{FOOTER.blurb}</p>
+          </div>
+          <div>
+            <p className="qpi-caps text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>Navigate</p>
+            <ul className="m-0 mt-2.5 flex list-none flex-col gap-1.5 p-0">
+              {FOOTER.nav.slice(0, 3).map((item) => (
+                <li key={item} className="text-[12.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="qpi-caps text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>More</p>
+            <ul className="m-0 mt-2.5 flex list-none flex-col gap-1.5 p-0">
+              {FOOTER.nav.slice(3).map((item) => (
+                <li key={item} className="text-[12.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="qpi-caps text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>Contact</p>
+            <a href={PHONE_HREF} className="mt-2.5 block text-[12.5px]" style={{ color: "var(--qpi-ink)" }}>{PHONE}</a>
+            <a href={`mailto:${EMAIL}`} className="mt-1 block text-[12.5px]" style={{ color: "var(--qpi-ink)" }}>{EMAIL}</a>
+          </div>
+        </div>
+        <div className="mx-auto mt-8 flex w-full max-w-none items-center justify-between border-t pt-4" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+          <Credit />
+          <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc}</span>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 4 · Contact bar full bleed — ink bar, phone/email/licences spread wide.
+  {
+    name: "Contact Bar Full Bleed",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="w-full rounded-2xl px-6 py-6 md:px-10 md:py-8" style={{ background: "var(--qpi-ink)" }}>
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <a href={PHONE_HREF} className="qpi-display text-[clamp(1.1rem,2.2vw,1.6rem)] leading-none text-white">{PHONE}</a>
+            <a href={`mailto:${EMAIL}`} className="text-[13px] text-white/70">{EMAIL}</a>
+            <span className="text-[11px] text-white/50">{LICENCES.qbcc}</span>
+            <span className="text-[11px] text-white/50">{LICENCES.nsw}</span>
+          </div>
+        </div>
+        <div className="mx-auto mt-6 flex w-full max-w-none flex-wrap items-center justify-between gap-3">
+          <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Footer">
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="qpi-caps text-[10.5px]" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{item}</span>
+            ))}
+          </nav>
+          <Credit />
+        </div>
+      </footer>
+    ),
+  },
+
+  // 5 · Split baseline wide — logo/tagline flush left, legal/credit flush right, one baseline.
+  {
+    name: "Split Baseline Wide",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full max-w-none flex-col items-start justify-between gap-8 border-t pt-8 md:flex-row md:items-end" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+          <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <p className="mt-3 text-[13px]" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{TAGLINE}</p>
+          </div>
+          <nav className="flex flex-wrap gap-x-5 gap-y-2 md:mb-1" aria-label="Footer">
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="qpi-caps text-[10.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
+            ))}
+          </nav>
+          <div className="text-left md:text-right">
+            <Credit />
+            <p className="mt-1 text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc} · {LICENCES.nsw}</p>
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 6 · Areas full-width ticker row — AREAS spread edge to edge as one justified line.
+  {
+    name: "Areas Full Width Row",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <a href={PHONE_HREF} className="text-[13px] font-semibold" style={{ color: "var(--qpi-blue)" }}>{PHONE}</a>
+          </div>
+          <div className="mt-6 flex w-full flex-wrap items-center justify-between gap-y-2 border-y py-4" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {AREAS.map((area) => (
+              <span key={area} className="qpi-caps text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{area}</span>
             ))}
           </div>
-          <div className="p-10" style={{ borderLeft: "1px solid rgba(11,42,74,0.15)" }}>
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Contact</p>
-            <a href={PHONE_HREF} className="block mb-2" style={{ color: "var(--qpi-ink)", fontSize: "0.9375rem", textDecoration: "none" }}>{PHONE}</a>
-            <a href={`mailto:${EMAIL}`} className="block mb-6" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{EMAIL}</a>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
+          <div className="mt-4 flex items-center justify-between">
+            <Credit />
+            <nav className="hidden gap-x-5 sm:flex" aria-label="Footer">
+              {FOOTER.nav.slice(0, 4).map((item) => (
+                <span key={item} className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.55 }}>{item}</span>
+              ))}
+            </nav>
           </div>
         </div>
       </footer>
     ),
   },
 
-  // 20 · Stacked: nav as big type list, contact and licences as fine print beneath
+  // 7 · Nav + legal two-row wide stack, warranty banner between.
   {
-    name: "Stacked Big Nav",
+    name: "Warranty Banner Wide Stack",
     node: (
-      <footer className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-8 w-auto mb-14" />
-        <div className="mb-16">
-          {FOOTER.nav.map((n, i) => (
-            <a
-              key={n}
-              href="#"
-              className="qpi-display block"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 5vw, 3.25rem)", lineHeight: 1.3, textDecoration: "none", opacity: i === 0 ? 1 : 0.85 }}
-            >
-              {n}
-            </a>
-          ))}
-        </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-8" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          <div>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.8125rem" }}>{PHONE} · {EMAIL}</p>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>{LICENCES.qbcc} · {LICENCES.nsw}</p>
-          </div>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 21 · Full-bleed navy with the wordmark cropped/bleeding off the bottom edge
-  {
-    name: "Bleeding Wordmark",
-    node: (
-      <footer className="relative w-full overflow-hidden" style={{ background: "var(--qpi-ink)" }}>
-        <div className="px-6 md:px-14 pt-16 pb-4">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10">
-            <div className="flex items-center gap-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-9 w-auto" />
-            </div>
-            <div className="flex flex-wrap gap-x-8 gap-y-3">
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" className="qpi-caps" style={{ color: "#fff", opacity: 0.6, fontSize: 11, textDecoration: "none" }}>{n}</a>
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          <nav className="flex flex-wrap items-center justify-between gap-4 pb-6" aria-label="Footer">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              {FOOTER.nav.map((item) => (
+                <span key={item} className="qpi-caps text-[10.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
               ))}
             </div>
+          </nav>
+          <div className="w-full rounded-xl px-5 py-4 text-center md:px-8" style={{ background: "var(--qpi-blue)" }}>
+            <p className="text-[12.5px] leading-relaxed text-white/90">{FOOTER.warranty}</p>
           </div>
-        </div>
-        <p
-          aria-hidden="true"
-          className="qpi-display"
-          style={{
-            color: "#fff",
-            opacity: 0.08,
-            fontSize: "clamp(6rem, 22vw, 16rem)",
-            lineHeight: 0.8,
-            letterSpacing: "-0.02em",
-            whiteSpace: "nowrap",
-            marginTop: 20,
-            marginBottom: "-8%",
-            textAlign: "center",
-          }}
-        >
-          POOL INSTALLS
-        </p>
-        <div className="relative px-6 md:px-14 py-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
-          <p style={{ color: "#fff", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "#fff", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
+          <div className="mt-5 flex items-center justify-between">
+            <Credit />
+            <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc}</span>
+          </div>
         </div>
       </footer>
     ),
   },
 
-  // 22 · Two columns only: brand + blurb left, everything else right
+  // 8 · Aqua underline wide bar — thin aqua rule, three-part row beneath.
   {
-    name: "Two Columns Only",
+    name: "Aqua Underline Wide Bar",
     node: (
-      <footer className="relative w-full bg-white py-20 md:py-28 px-6 md:px-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-14">
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          <div className="h-[3px] w-full" style={{ background: "var(--qpi-aqua)" }} />
+          <div className="mt-7 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Footer">
+              {FOOTER.nav.map((item) => (
+                <span key={item} className="qpi-caps text-[10.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
+              ))}
+            </nav>
+            <a href={PHONE_HREF} className="text-[13px] font-semibold" style={{ color: "var(--qpi-blue)" }}>{PHONE}</a>
+          </div>
+          <div className="mt-6 flex items-center justify-between border-t pt-4" style={{ borderColor: "rgba(25,60,90,0.1)" }}>
+            <Credit />
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 9 · Numbered nav strip wide — nav items with tabular index, dividers, one edge-to-edge row.
+  {
+    name: "Numbered Nav Strip Wide",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+          <div className="mt-6 flex w-full flex-wrap items-center gap-x-8 gap-y-3 border-y py-5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {FOOTER.nav.map((item, i) => (
+              <span key={item} className="flex items-baseline gap-2">
+                <span className="qpi-caps tabular-nums text-[10px]" style={{ color: "var(--qpi-blue)" }}>{String(i + 1).padStart(2, "0")}</span>
+                <span className="text-[13px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
+              </span>
+            ))}
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <Credit />
+            <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc} · {LICENCES.nsw}</span>
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 10 · Big contact duo, wide nav beneath.
+  {
+    name: "Big Contact Duo Wide",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          <div className="grid grid-cols-1 gap-4 border-b pb-6 sm:grid-cols-2" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            <div>
+              <span className="qpi-caps text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>Call</span>
+              <a href={PHONE_HREF} className="qpi-display mt-1 block text-[clamp(1.5rem,3vw,2.1rem)] leading-none" style={{ color: "var(--qpi-blue)" }}>{PHONE}</a>
+            </div>
+            <div>
+              <span className="qpi-caps text-[10px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>Email</span>
+              <a href={`mailto:${EMAIL}`} className="qpi-display mt-1 block text-[clamp(1.5rem,3vw,2.1rem)] leading-none" style={{ color: "var(--qpi-ink)" }}>{EMAIL}</a>
+            </div>
+          </div>
+          <nav className="mt-5 flex flex-wrap items-center justify-between gap-4" aria-label="Footer">
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="qpi-caps text-[10.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
+            ))}
+          </nav>
+          <div className="mt-5 flex items-center justify-between border-t pt-4" style={{ borderColor: "rgba(25,60,90,0.1)" }}>
+            <Credit />
+            <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc}</span>
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 11 · Grid manifest wide — dense CSS grid, tabular index, edge to edge.
+  {
+    name: "Grid Manifest Wide",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto grid w-full max-w-none grid-cols-1 gap-x-8 gap-y-6 border-t pt-6 sm:grid-cols-4" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+          <div className="sm:col-span-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <p className="mt-3 max-w-[30ch] text-[12px] leading-relaxed" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{FOOTER.warranty}</p>
+          </div>
+          <div>
+            <span className="qpi-caps tabular-nums text-[10px]" style={{ color: "var(--qpi-blue)" }}>01 · Nav</span>
+            <ul className="m-0 mt-2 flex list-none flex-col gap-1.5 p-0">
+              {FOOTER.nav.slice(0, 3).map((item) => (
+                <li key={item} className="text-[12px]" style={{ color: "var(--qpi-ink)" }}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <span className="qpi-caps tabular-nums text-[10px]" style={{ color: "var(--qpi-blue)" }}>02 · Contact</span>
+            <a href={PHONE_HREF} className="mt-2 block text-[12px]" style={{ color: "var(--qpi-ink)" }}>{PHONE}</a>
+            <a href={`mailto:${EMAIL}`} className="mt-1 block text-[12px]" style={{ color: "var(--qpi-ink)" }}>{EMAIL}</a>
+          </div>
+        </div>
+        <div className="mx-auto mt-6 flex w-full max-w-none items-center justify-between border-t pt-4" style={{ borderColor: "rgba(25,60,90,0.1)" }}>
+          <Credit />
+          <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc} · {LICENCES.nsw}</span>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 12 · Full-width rule ladder — stacked hairline bands, one idea per band.
+  {
+    name: "Full-Width Rule Ladder",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full max-w-none flex-col">
+          <div className="flex items-center justify-between border-t py-3.5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-6 w-auto" />
+            <span className="text-[12px]" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{TAGLINE}</span>
+          </div>
+          <div className="flex flex-wrap justify-between gap-3 border-t py-3.5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="qpi-caps text-[10.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-between gap-3 border-t py-3.5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {AREAS.slice(0, 5).map((area) => (
+              <span key={area} className="text-[11.5px]" style={{ color: "var(--qpi-ink)", opacity: 0.55 }}>{area}</span>
+            ))}
+          </div>
+          <div className="flex items-center justify-between border-t border-b py-3.5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            <Credit />
+            <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc}</span>
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 13 · Bold nav right, quiet legal left, one wide asymmetric row.
+  {
+    name: "Bold Nav Right Wide Row",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full max-w-none flex-col items-start justify-between gap-8 border-t pt-8 md:flex-row md:items-center" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-9 w-auto mb-5" />
-            <p className="text-pretty" style={{ color: "var(--qpi-ink)", opacity: 0.6, fontSize: "0.9375rem", lineHeight: 1.65, maxWidth: 380 }}>
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-6 w-auto" />
+            <Credit />
+            <p className="mt-1 text-[10.5px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc} · {LICENCES.nsw}</p>
+          </div>
+          <nav className="flex flex-wrap justify-end gap-x-7 gap-y-2" aria-label="Footer">
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="qpi-display" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1rem,1.8vw,1.3rem)" }}>{item}</span>
+            ))}
+          </nav>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 14 · Suburb belt — AREAS run as one long baseline of headline text, edge to edge.
+  {
+    name: "Suburb Belt",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+          <p className="qpi-display mt-6 text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.25rem,3.2vw,2.1rem)", lineHeight: 1.15 }}>
+            {AREAS.join("  ·  ")}
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t pt-5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Footer">
+              {FOOTER.nav.map((item) => (
+                <span key={item} className="text-[12px]" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{item}</span>
+              ))}
+            </nav>
+            <Credit />
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 15 · Two-tone wide split — ink left half, white right half, full height.
+  {
+    name: "Two-Tone Wide Split",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto grid w-full max-w-none grid-cols-1 overflow-hidden rounded-2xl md:grid-cols-2">
+          <div className="flex flex-col justify-center gap-3 p-7 md:p-9" style={{ background: "var(--qpi-ink)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <p className="text-[13px] text-white/70">{TAGLINE}</p>
+          </div>
+          <div className="flex flex-col justify-center gap-3 p-7 md:p-9">
+            <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Footer">
+              {FOOTER.nav.map((item) => (
+                <span key={item} className="qpi-caps text-[10.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
+              ))}
+            </nav>
+            <div className="mt-2 flex items-center justify-between">
+              <Credit />
+              <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc}</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 16 · Full-bleed nav wall — nav items very large, wrapping full width like an index.
+  {
+    name: "Full-Bleed Nav Wall",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1 border-b pb-6" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="qpi-display" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem,4.5vw,3rem)", lineHeight: 1.1 }}>{item}</span>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-6 w-auto" />
+            <Credit />
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 17 · Compact wide utility bar — a slim dense single row, minimal height, no gap below content.
+  {
+    name: "Compact Wide Utility Bar",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full max-w-none flex-wrap items-center justify-between gap-4 rounded-lg px-5 py-3.5" style={{ border: "1px solid rgba(25,60,90,0.14)" }}>
+          <div className="flex items-center gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-5 w-auto" />
+            <span className="hidden text-[11px] sm:inline" style={{ color: "var(--qpi-ink)", opacity: 0.5 }}>{LICENCES.qbcc}</span>
+          </div>
+          <nav className="flex flex-wrap gap-x-4 gap-y-1" aria-label="Footer">
+            {FOOTER.nav.map((item) => (
+              <span key={item} className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{item}</span>
+            ))}
+          </nav>
+          <Credit />
+        </div>
+      </footer>
+    ),
+  },
+
+  // 18 · Licence strip wide — QBCC/NSW licences prominent as a full-bleed strip.
+  {
+    name: "Licence Strip Wide",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-7 w-auto" />
+            <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Footer">
+              {FOOTER.nav.map((item) => (
+                <span key={item} className="qpi-caps text-[10.5px]" style={{ color: "var(--qpi-ink)" }}>{item}</span>
+              ))}
+            </nav>
+          </div>
+          <div className="mt-6 flex w-full flex-col gap-2 rounded-xl px-5 py-4 sm:flex-row sm:items-center sm:justify-between" style={{ background: "var(--qpi-ink)" }}>
+            <span className="qpi-caps text-[11px] text-white/85">{LICENCES.qbcc}</span>
+            <span className="qpi-caps text-[11px] text-white/85">{LICENCES.nsw}</span>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <Credit />
+            <a href={PHONE_HREF} className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.6 }}>{PHONE}</a>
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 19 · Photo backdrop wide footer — dimmed project photo behind, content spanning full width.
+  {
+    name: "Photo Backdrop Wide Footer",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="relative w-full overflow-hidden rounded-2xl">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={GALLERY_IMGS[8]} alt="Pool installation project" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(6,26,48,0.88), rgba(6,26,48,0.72))" }} />
+          <div className="relative flex flex-col gap-6 px-6 py-8 md:px-9 md:py-10">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={LOGO_WHITE} alt="QLD Pool Installs" className="h-7 w-auto" />
+              <a href={PHONE_HREF} className="qpi-display text-[clamp(1.1rem,2.2vw,1.6rem)] leading-none text-white">{PHONE}</a>
+            </div>
+            <nav className="flex flex-wrap gap-x-5 gap-y-2 border-t border-white/20 pt-5" aria-label="Footer">
+              {FOOTER.nav.map((item) => (
+                <span key={item} className="qpi-caps text-[10.5px] text-white/80">{item}</span>
+              ))}
+            </nav>
+            <div className="flex items-center justify-between">
+              <Credit tone="white" />
+              <span className="text-[11px] text-white/50">{LICENCES.qbcc}</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    ),
+  },
+
+  // 20 · Blurb-led wide close — the FOOTER.blurb set large across full width, contact row beneath.
+  {
+    name: "Blurb-Led Wide Close",
+    node: (
+      <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full max-w-none">
+          <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+            <p className="qpi-display max-w-2xl text-balance" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.3rem,2.8vw,2rem)", lineHeight: 1.15 }}>
               {FOOTER.blurb}
             </p>
-            <p className="mt-6" style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>{LICENCES.qbcc}</p>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>{LICENCES.nsw}</p>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-end gap-14">
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" className="block mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
-              ))}
-            </div>
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Contact</p>
-              <a href={PHONE_HREF} className="block mb-2" style={{ color: "var(--qpi-ink)", fontSize: "0.875rem", textDecoration: "none" }}>{PHONE}</a>
-              <a href={`mailto:${EMAIL}`} style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{EMAIL}</a>
-            </div>
-          </div>
-        </div>
-        <div className="mt-16 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 23 · Centred wordmark with nav in a ring/row above and legal below
-  {
-    name: "Centred Ring",
-    node: (
-      <footer className="relative w-full bg-white py-20 md:py-28 px-6 text-center">
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-10">
-          {FOOTER.nav.map((n) => (
-            <a key={n} href="#" className="qpi-caps" style={{ color: "var(--qpi-blue)", fontSize: 11, textDecoration: "none" }}>{n}</a>
-          ))}
-        </div>
-        <p className="qpi-display" style={{ color: "var(--qpi-ink)", fontSize: "clamp(2rem, 5vw, 3.75rem)", lineHeight: 1, letterSpacing: "-0.01em" }}>
-          QLD POOL INSTALLS*
-        </p>
-        <p className="mt-5" style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: "0.9375rem" }}>{PHONE} · {EMAIL}</p>
-        <div className="max-w-md mx-auto mt-12 pt-6" style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>{LICENCES.qbcc} · {LICENCES.nsw}</p>
-          <p className="mt-2" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 24 · Warranty-led: the warranty line as a wide quiet statement across the top
-  {
-    name: "Warranty Statement Lead",
-    node: (
-      <footer className="relative w-full bg-white">
-        <div className="py-10 px-6 md:px-14 text-center" style={{ background: "#f5f2ee" }}>
-          <p className="text-pretty mx-auto" style={{ color: "var(--qpi-ink)", opacity: 0.65, fontSize: "0.9375rem", lineHeight: 1.6, maxWidth: 720 }}>
-            {FOOTER.warranty}
-          </p>
-        </div>
-        <div className="py-16 md:py-20 px-6 md:px-14">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 pb-10" style={{ borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-            <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-9 w-auto" />
-            </div>
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Navigate</p>
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" className="block mb-2" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem", textDecoration: "none" }}>{n}</a>
-              ))}
-            </div>
-            <div>
-              <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>Contact</p>
-              <a href={PHONE_HREF} className="block mb-2" style={{ color: "var(--qpi-ink)", fontSize: "0.8125rem", textDecoration: "none" }}>{PHONE}</a>
-              <a href={`mailto:${EMAIL}`} style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.8125rem", textDecoration: "none" }}>{EMAIL}</a>
-            </div>
-          </div>
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs</p>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: "0.75rem" }}>Site by finbar.studio</p>
-          </div>
-        </div>
-      </footer>
-    ),
-  },
-
-  // 25 · Blue rule motif: a thick blue rule separating a white top from a navy bottom
-  {
-    name: "Blue Rule Split",
-    node: (
-      <footer className="relative w-full">
-        <div className="bg-white pt-16 md:pt-20 pb-10 px-6 md:px-14">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-9 w-auto" />
-            <div className="flex flex-wrap gap-x-8 gap-y-3">
-              {FOOTER.nav.map((n) => (
-                <a key={n} href="#" style={{ color: "var(--qpi-ink)", opacity: 0.7, fontSize: "0.875rem", textDecoration: "none" }}>{n}</a>
+            <img src={LOGO_DARK} alt="QLD Pool Installs" className="h-8 w-auto shrink-0" />
+          </div>
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t pt-5" style={{ borderColor: "rgba(25,60,90,0.12)" }}>
+            <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Footer">
+              {FOOTER.nav.map((item) => (
+                <span key={item} className="text-[12px]" style={{ color: "var(--qpi-ink)", opacity: 0.65 }}>{item}</span>
               ))}
+            </nav>
+            <div className="flex items-center gap-5">
+              <span className="text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.4 }}>{LICENCES.qbcc}</span>
+              <Credit />
             </div>
           </div>
-        </div>
-        <div style={{ height: 6, background: "var(--qpi-blue)" }} />
-        <div className="py-8 px-6 md:px-14 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ background: "var(--qpi-ink)" }}>
-          <p style={{ color: "#fff", opacity: 0.7, fontSize: "0.8125rem" }}>{PHONE} · {EMAIL}</p>
-          <p style={{ color: "#fff", opacity: 0.5, fontSize: "0.75rem" }}>© 2026 QLD Pool Installs · Site by finbar.studio</p>
         </div>
       </footer>
     ),

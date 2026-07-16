@@ -4,8 +4,9 @@ import Reveal from "@/components/qldpools/anim/Reveal";
 import { GALLERY_IMGS, AREAS, TESTIMONIALS } from "@/app/qldpools/site/sections/kit";
 
 /**
- * Gallery — ported from options/gallery2.tsx entry 4 ("Scattered Polaroid
- * Stack"): five real project photos loosely overlapping at varied
+ * Gallery — the "Scattered Polaroid Stack" Finbar picked as gallery option 29
+ * (the option set it came from has since been retired, see git history for
+ * `options/gallery2.tsx`): five real project photos loosely overlapping at varied
  * rotations, like prints tipped out of an envelope. No heading here on
  * purpose — the client had this stripped before and wants it to stay that
  * way. The work speaks, a small caption sits in each polaroid's own white

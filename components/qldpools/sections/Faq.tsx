@@ -4,8 +4,8 @@ import { FAQ_INTRO, FAQS } from "@/app/qldpools/site/sections/kit";
 import Reveal from "@/components/qldpools/anim/Reveal";
 
 /**
- * FAQ — "Facing Spread" (gallery #27), ported faithfully from
- * app/qldpools/site/sections/options/faq2.tsx (entry index 1). A book-spread
+ * FAQ — "Facing Spread", Finbar's faq option 27. (The option set it came from
+ * has since been retired; see git history for `options/faq2.tsx`.) A book-spread
  * of native <details>/<summary> accordions: 4 questions left, 4 right, a
  * hairline spine down the centre like an open FAQ book. Rows stagger in via
  * Reveal; if JS never runs the content is simply visible (no reliance on

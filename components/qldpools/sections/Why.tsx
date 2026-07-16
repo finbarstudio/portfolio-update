@@ -8,8 +8,9 @@ import { WHY_INTRO, REASONS, LICENCES } from "@/app/qldpools/site/sections/kit";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Why — "Huge Number 2x2" (app/qldpools/site/sections/options/why-grid.tsx,
- * entry 9 / gallery option 34). A giant "2,500+" anchors the left third; the
+ * Why — "Huge Number 2x2", Finbar's why option 34. (The option set it came from
+ * has since been retired; see git history for `options/why-grid.tsx`.)
+ * A giant "2,500+" anchors the left third; the
  * remaining four reasons sit as a 2x2 icon grid on the right.
  *
  * Client note: "animate the number" — it counts up from 0 once the section

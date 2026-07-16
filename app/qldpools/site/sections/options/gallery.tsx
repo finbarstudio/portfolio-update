@@ -1,517 +1,273 @@
-import { GALLERY_INTRO, GALLERY_IMGS, AREAS, type Section } from "../kit";
+import { GALLERY_INTRO, GALLERY_IMGS, AREAS, TESTIMONIALS, type Section } from "../kit";
 
 /**
- * Gallery / "Recent Pool Installations" - 25 distinct design options for the
- * work-showcase section. Server-rendered, no hooks, no client JS. Colours
- * limited to white, var(--qpi-ink), var(--qpi-blue), and opacity variants.
+ * Gallery / "Recent Pool Installations" — THIRD batch, fully replacing the
+ * previous 25 rejected experiments. 20 fresh design directions, each a single
+ * min-h-svh, vertically centred viewport on a white ground. Server-rendered
+ * only: no hooks, no client directive, no event handlers. Colours limited to
+ * white, var(--qpi-ink), var(--qpi-blue), var(--qpi-aqua) (dark grounds
+ * only), and opacity variants of those.
  */
+
+const IMG_ALT = "A pool installed by QLD Pool Installs";
+
 export const optionsGallery: Section[] = [
-  // 1 · Clean 3-up grid of 4:3 crops, heading above left-aligned.
+  // 1 · Extreme scale contrast — one dominant tall image with a small square
+  // counterpoint tucked over its bottom-right corner, framed in white.
   {
-    name: "Clean 3-Up Grid",
+    name: "Scale Collision",
     node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <div className="flex items-end justify-between flex-wrap gap-6 mb-12">
-            <div>
-              <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-                {GALLERY_INTRO.kicker}
-              </p>
-              <h2
-                className="qpi-display"
-                style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-              >
-                {GALLERY_INTRO.heading}
-              </h2>
-            </div>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: 14, maxWidth: 320, lineHeight: 1.6 }}>
-              {GALLERY_INTRO.sub}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {GALLERY_IMGS.slice(0, 6).map((src) => (
-              <div key={src} style={{ aspectRatio: "4 / 3", overflow: "hidden", background: "var(--qpi-ink)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={src}
-                  alt="A pool installed by QLD Pool Installs"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 2 · Masonry-feel: mixed tall/wide tiles in a 4-column CSS columns layout.
-  {
-    name: "Masonry Columns",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 text-center mb-12">
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-        </div>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
         <div
-          className="px-6 md:px-12"
-          style={{ columnCount: 4, columnGap: 16, maxWidth: 1280, margin: "0 auto" }}
+          className="mx-auto grid w-full grid-cols-1 md:grid-cols-[1.2fr_1fr] items-center gap-10 md:gap-14"
+          style={{ maxWidth: 1080 }}
         >
-          {GALLERY_IMGS.slice(0, 10).map((src, i) => (
+          <div className="relative mx-auto w-full" style={{ maxWidth: 440 }}>
             <div
-              key={src}
               style={{
-                breakInside: "avoid",
-                marginBottom: 16,
-                aspectRatio: i % 3 === 0 ? "3 / 4" : "4 / 3",
+                aspectRatio: "4 / 5",
                 overflow: "hidden",
                 background: "var(--qpi-ink)",
+                maxHeight: "clamp(320px, 52vh, 480px)",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt="A pool installed by QLD Pool Installs"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+              <img src={GALLERY_IMGS[1]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
             </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 3 · One large feature image + a strip of small thumbs beneath.
-  {
-    name: "Feature + Thumb Strip",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div className="text-center mb-10">
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-              {GALLERY_INTRO.kicker}
-            </p>
-            <h2
-              className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-            >
-              {GALLERY_INTRO.heading}
-            </h2>
-          </div>
-          <div style={{ aspectRatio: "16 / 9", overflow: "hidden", background: "var(--qpi-ink)", marginBottom: 16 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={GALLERY_IMGS[0]}
-              alt="A pool installed by QLD Pool Installs"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-            {GALLERY_IMGS.slice(1, 6).map((src) => (
-              <div key={src} style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={src}
-                  alt="A pool installed by QLD Pool Installs"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 4 · Full-bleed edge-to-edge 2-up, no padding, captions overlaid.
-  {
-    name: "Full-Bleed 2-Up",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 text-center mb-10">
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          {GALLERY_IMGS.slice(0, 2).map((src, i) => (
-            <div key={src} className="relative" style={{ aspectRatio: "4 / 5", overflow: "hidden", background: "var(--qpi-ink)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt="A pool installed by QLD Pool Installs"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-              <div
-                className="absolute"
-                style={{
-                  left: 20,
-                  bottom: 20,
-                  background: "rgba(255,255,255,0.92)",
-                  padding: "8px 16px",
-                }}
-              >
-                <p className="qpi-caps" style={{ color: "var(--qpi-ink)", fontSize: 10 }}>
-                  {AREAS[i % AREAS.length]}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 5 · Offset grid: alternating vertical offsets for a designed stagger.
-  {
-    name: "Staggered Offset Grid",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white overflow-hidden">
-        <div className="px-6 md:px-12 mb-14" style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-        </div>
-        <div
-          className="px-6 md:px-12 grid grid-cols-2 sm:grid-cols-4 gap-6"
-          style={{ maxWidth: 1280, margin: "0 auto" }}
-        >
-          {GALLERY_IMGS.slice(0, 4).map((src, i) => (
             <div
-              key={src}
+              className="absolute"
               style={{
-                aspectRatio: "3 / 4",
+                width: "34%",
+                aspectRatio: "1 / 1",
                 overflow: "hidden",
                 background: "var(--qpi-ink)",
-                marginTop: i % 2 === 1 ? 48 : 0,
+                right: "-10%",
+                bottom: "-10%",
+                border: "6px solid #fff",
+                boxShadow: "0 14px 28px rgba(25,60,90,0.24)",
+                zIndex: 10,
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt="A pool installed by QLD Pool Installs"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+              <img src={GALLERY_IMGS[6]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
             </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 6 · Mosaic: a 2x2 large + 4 small in a bento arrangement.
-  {
-    name: "Bento Mosaic",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div className="text-center mb-12">
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-              {GALLERY_INTRO.kicker}
-            </p>
-            <h2
-              className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-            >
-              {GALLERY_INTRO.heading}
-            </h2>
           </div>
-          <div
-            className="grid grid-cols-4 gap-4"
-            style={{ gridTemplateRows: "repeat(2, minmax(160px, 1fr))" }}
-          >
-            <div style={{ gridColumn: "span 2", gridRow: "span 2", overflow: "hidden", background: "var(--qpi-ink)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={GALLERY_IMGS[0]} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-            {GALLERY_IMGS.slice(1, 5).map((src) => (
-              <div key={src} style={{ overflow: "hidden", background: "var(--qpi-ink)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 7 · Static "carousel" row: images in a horizontal row bleeding off the right edge.
-  {
-    name: "Bleeding Carousel Row",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white overflow-hidden">
-        <div className="px-6 md:px-12 mb-10 flex items-end justify-between flex-wrap gap-4" style={{ maxWidth: 1280, margin: "0 auto" }}>
           <div>
             <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
               {GALLERY_INTRO.kicker}
             </p>
             <h2
-              className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
+              className="qpi-display mb-4"
+              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.4vw, 2.75rem)", lineHeight: 1.05 }}
             >
               {GALLERY_INTRO.heading}
             </h2>
-          </div>
-          <p className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: 10 }}>
-            {GALLERY_IMGS.length} Projects
-          </p>
-        </div>
-        <div className="flex gap-5 pl-6 md:pl-12" style={{ overflow: "hidden" }}>
-          {GALLERY_IMGS.slice(0, 5).map((src) => (
-            <div
-              key={src}
-              style={{
-                flex: "0 0 auto",
-                width: "min(70vw, 420px)",
-                aspectRatio: "4 / 3",
-                overflow: "hidden",
-                background: "var(--qpi-ink)",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-          ))}
-          <div style={{ flex: "0 0 auto", width: 1 }} />
-        </div>
-      </section>
-    ),
-  },
-
-  // 8 · Framed: each image inset with a wide white mat and a thin navy rule.
-  {
-    name: "White Mat Frames",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div className="text-center mb-12">
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-              {GALLERY_INTRO.kicker}
-            </p>
-            <h2
-              className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-            >
-              {GALLERY_INTRO.heading}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {GALLERY_IMGS.slice(0, 3).map((src, i) => (
-              <div key={src}>
-                <div
-                  style={{
-                    border: "1px solid rgba(11,42,74,0.15)",
-                    padding: 10,
-                  }}
-                >
-                  <div style={{ aspectRatio: "4 / 3", overflow: "hidden", background: "var(--qpi-ink)" }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-                  </div>
-                </div>
-                <div style={{ width: 24, height: 1, background: "var(--qpi-blue)", margin: "14px auto 8px" }} />
-                <p className="qpi-caps text-center" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: 10 }}>
-                  {AREAS[i % AREAS.length]}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 9 · Navy ground, images in a tight 3-up with white type above.
-  {
-    name: "Navy Ground 3-Up",
-    node: (
-      <section className="relative w-full py-20 md:py-28" style={{ background: "var(--qpi-ink)" }}>
-        <div className="px-6 md:px-12" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div className="text-center mb-12">
-            <p className="qpi-caps mb-3" style={{ color: "#fff", opacity: 0.6, fontSize: 11 }}>
-              {GALLERY_INTRO.kicker}
-            </p>
-            <h2
-              className="qpi-display"
-              style={{ color: "#fff", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-            >
-              {GALLERY_INTRO.heading}
-            </h2>
-            <p style={{ color: "#fff", opacity: 0.55, fontSize: 14, marginTop: 16, maxWidth: 460, marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
-              {GALLERY_INTRO.sub}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1">
-            {GALLERY_IMGS.slice(0, 3).map((src) => (
-              <div key={src} style={{ aspectRatio: "4 / 3", overflow: "hidden" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 10 · Big single hero-ish image with the heading overlaid, thumbs below.
-  {
-    name: "Overlaid Heading + Thumbs",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div className="relative" style={{ aspectRatio: "21 / 9", overflow: "hidden", background: "var(--qpi-ink)", marginBottom: 20 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={GALLERY_IMGS[0]} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-            <div className="absolute inset-0" style={{ background: "rgba(11,42,74,0.42)" }} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
-              <p className="qpi-caps mb-3" style={{ color: "#fff", opacity: 0.85, fontSize: 11 }}>
-                {GALLERY_INTRO.kicker}
-              </p>
-              <h2
-                className="qpi-display"
-                style={{ color: "#fff", fontSize: "clamp(1.75rem, 4vw, 3.25rem)", lineHeight: 1.05 }}
-              >
-                {GALLERY_INTRO.heading}
-              </h2>
-            </div>
-          </div>
-          <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-            {GALLERY_IMGS.slice(1, 7).map((src) => (
-              <div key={src} style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 11 · 5-up thin strip of tall portrait crops, heading centred above.
-  {
-    name: "Portrait Strip 5-Up",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="text-center px-6 mb-12">
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-        </div>
-        <div className="px-6 md:px-12 grid grid-cols-5 gap-2" style={{ maxWidth: 1280, margin: "0 auto" }}>
-          {GALLERY_IMGS.slice(0, 5).map((src) => (
-            <div key={src} style={{ aspectRatio: "2 / 3", overflow: "hidden", background: "var(--qpi-ink)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 12 · Captioned index: image left, area label + number right, as ledger rows.
-  {
-    name: "Ledger Index Rows",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div className="mb-12">
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-              {GALLERY_INTRO.kicker}
-            </p>
-            <h2
-              className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-            >
-              {GALLERY_INTRO.heading}
-            </h2>
-          </div>
-          {GALLERY_IMGS.slice(0, 5).map((src, i) => (
-            <div
-              key={src}
-              className="flex items-center gap-6 py-5"
-              style={{ borderTop: i === 0 ? "1px solid rgba(11,42,74,0.15)" : undefined, borderBottom: "1px solid rgba(11,42,74,0.15)" }}
-            >
-              <div style={{ width: 120, height: 80, flexShrink: 0, overflow: "hidden", background: "var(--qpi-ink)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-              <p className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.35, fontSize: 11, flexShrink: 0 }}>
-                0{i + 1}
-              </p>
-              <p style={{ color: "var(--qpi-ink)", fontSize: 16, fontWeight: 600, flex: 1 }}>
-                {AREAS[i % AREAS.length]}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 13 · Two columns: heading + CTA sticky-feel left, tall image stack right.
-  {
-    name: "Sticky Heading, Image Stack",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-10" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div>
-            <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-              {GALLERY_INTRO.kicker}
-            </p>
-            <h2
-              className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 4vw, 3.25rem)", lineHeight: 1.05, marginBottom: 20 }}
-            >
-              {GALLERY_INTRO.heading}
-            </h2>
-            <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: 15, lineHeight: 1.7, maxWidth: 380, marginBottom: 28 }}>
+            <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
               {GALLERY_INTRO.sub}
             </p>
             <span className="qpi-cta" style={{ background: "var(--qpi-ink)", color: "#fff" }}>
               {GALLERY_INTRO.cta}
             </span>
           </div>
-          <div className="flex flex-col gap-4">
-            {GALLERY_IMGS.slice(0, 3).map((src) => (
-              <div key={src} style={{ aspectRatio: "16 / 9", overflow: "hidden", background: "var(--qpi-ink)" }}>
+        </div>
+      </section>
+    ),
+  },
+
+  // 2 · Asymmetric off-grid placement — three images, three different
+  // widths, three different vertical anchors, no overlap, big air between.
+  {
+    name: "Off-Grid Trio",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-10 md:mb-14" style={{ maxWidth: 620 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div
+          className="mx-auto flex w-full items-stretch justify-between gap-6 md:gap-10"
+          style={{ maxWidth: 1100, height: "clamp(240px, 34vh, 340px)" }}
+        >
+          <div style={{ width: "36%", alignSelf: "flex-start", height: "72%", overflow: "hidden", background: "var(--qpi-ink)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[0]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div style={{ width: "24%", alignSelf: "center", height: "58%", overflow: "hidden", background: "var(--qpi-ink)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[5]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div style={{ width: "28%", alignSelf: "flex-end", height: "84%", overflow: "hidden", background: "var(--qpi-ink)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[9]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 3 · One ultra-wide letterbox image with a vertical, rotated caption
+  // running along its left outside edge like a spine label.
+  {
+    name: "Letterbox Index",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto w-full text-center mb-8" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div className="mx-auto flex w-full items-stretch gap-4 md:gap-6" style={{ maxWidth: 1100 }}>
+          <div className="flex items-center justify-center" style={{ flex: "0 0 auto" }}>
+            <p
+              className="qpi-caps"
+              style={{
+                color: "var(--qpi-ink)",
+                opacity: 0.45,
+                fontSize: 10,
+                letterSpacing: "0.2em",
+                writingMode: "vertical-rl",
+                transform: "rotate(180deg)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {AREAS[2]}
+            </p>
+          </div>
+          <div
+            style={{
+              flex: 1,
+              aspectRatio: "32 / 9",
+              overflow: "hidden",
+              background: "var(--qpi-ink)",
+              maxHeight: "clamp(200px, 32vh, 320px)",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[2]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 4 · 80/20 split screen — a wide image column, a thin vertical-type
+  // column carrying the kicker, heading and CTA rotated on-edge.
+  {
+    name: "Eighty Twenty",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex w-full items-stretch" style={{ maxWidth: 1200, height: "clamp(320px, 52vh, 480px)" }}>
+          <div style={{ width: "80%", overflow: "hidden", background: "var(--qpi-ink)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[3]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div className="flex flex-col items-center justify-between" style={{ width: "20%", padding: "28px 12px" }}>
+            <p
+              className="qpi-caps"
+              style={{
+                color: "var(--qpi-blue)",
+                fontSize: 11,
+                letterSpacing: "0.2em",
+                writingMode: "vertical-rl",
+                transform: "rotate(180deg)",
+              }}
+            >
+              {GALLERY_INTRO.kicker}
+            </p>
+            <h2
+              className="qpi-display"
+              style={{
+                color: "var(--qpi-ink)",
+                fontSize: "clamp(1rem, 1.8vw, 1.375rem)",
+                lineHeight: 1.15,
+                writingMode: "vertical-rl",
+                transform: "rotate(180deg)",
+              }}
+            >
+              {GALLERY_INTRO.heading}
+            </h2>
+            <span className="qpi-cta" style={{ background: "var(--qpi-ink)", color: "#fff" }}>
+              {GALLERY_INTRO.cta}
+            </span>
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 5 · A single panoramic image bleeding off only the right physical edge,
+  // heading sitting alone in the whitespace above it.
+  {
+    name: "Single Edge Bleed",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mb-8 md:mb-10" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div
+          style={{
+            aspectRatio: "21 / 9",
+            overflow: "hidden",
+            background: "var(--qpi-ink)",
+            maxHeight: "clamp(220px, 34vh, 340px)",
+            marginRight: "calc(-1 * clamp(20px, 4vw, 56px))",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={GALLERY_IMGS[10]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+        </div>
+      </section>
+    ),
+  },
+
+  // 6 · One dominant feature image with a slim vertical rail of three
+  // stacked thumbnails running alongside it.
+  {
+    name: "Rail & Feature",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-8 md:mb-10" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div className="mx-auto flex w-full gap-3" style={{ maxWidth: 1100, height: "clamp(280px, 44vh, 400px)" }}>
+          <div style={{ flex: 1, overflow: "hidden", background: "var(--qpi-ink)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[4]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div className="flex flex-col gap-3" style={{ width: "18%" }}>
+            {GALLERY_IMGS.slice(11, 14).map((src) => (
+              <div key={src} style={{ flex: 1, overflow: "hidden", background: "var(--qpi-ink)" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
+                <img src={src} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
               </div>
             ))}
           </div>
@@ -520,137 +276,37 @@ export const optionsGallery: Section[] = [
     ),
   },
 
-  // 14 · Full-bleed mosaic with zero gaps (seamless tiles).
+  // 7 · A horizontal row where each image's width steps up in a clear
+  // rhythm, left to right, all sharing the same baseline.
   {
-    name: "Seamless Full-Bleed Mosaic",
+    name: "Staircase Rhythm",
     node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 text-center mb-10">
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-8 md:mb-10" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
             {GALLERY_INTRO.kicker}
           </p>
           <h2
             className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
           >
             {GALLERY_INTRO.heading}
           </h2>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-5">
-          {GALLERY_IMGS.slice(0, 10).map((src) => (
-            <div key={src} style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 15 · Wide 16:9 stack, one per row, generous vertical spacing, editorial.
-  {
-    name: "Editorial Wide Stack",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 text-center mb-16" style={{ maxWidth: 700, margin: "0 auto 4rem" }}>
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05, marginBottom: 16 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-          <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: 15, lineHeight: 1.7 }}>{GALLERY_INTRO.sub}</p>
-        </div>
-        <div className="px-6 md:px-16 flex flex-col gap-16" style={{ maxWidth: 1100, margin: "0 auto" }}>
-          {GALLERY_IMGS.slice(0, 3).map((src, i) => (
-            <div key={src}>
-              <div style={{ aspectRatio: "16 / 9", overflow: "hidden", background: "var(--qpi-ink)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-              <p className="qpi-caps mt-4" style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: 10 }}>
-                {AREAS[i % AREAS.length]}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 16 · Grid with one cell replaced by a navy block holding the CTA.
-  {
-    name: "CTA-in-Grid",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {GALLERY_IMGS.slice(0, 5).map((src) => (
-              <div key={src} style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-            ))}
+        <div className="mx-auto flex items-end gap-3 md:gap-4" style={{ maxWidth: 1100 }}>
+          {[14, 19, 24, 30].map((w, i) => (
             <div
-              className="flex flex-col items-start justify-center px-6"
-              style={{ aspectRatio: "1 / 1", background: "var(--qpi-ink)" }}
+              key={GALLERY_IMGS[i]}
+              style={{
+                width: `${w}%`,
+                aspectRatio: "3 / 4",
+                overflow: "hidden",
+                background: "var(--qpi-ink)",
+                maxHeight: "clamp(180px, 30vh, 280px)",
+              }}
             >
-              <p className="qpi-caps mb-2" style={{ color: "#fff", opacity: 0.6, fontSize: 10 }}>
-                {GALLERY_INTRO.kicker}
-              </p>
-              <h2
-                className="qpi-display"
-                style={{ color: "#fff", fontSize: "clamp(1.125rem, 2vw, 1.5rem)", lineHeight: 1.15, marginBottom: 16 }}
-              >
-                {GALLERY_INTRO.heading}
-              </h2>
-              <span className="qpi-caps" style={{ color: "var(--qpi-blue)", fontSize: 10, letterSpacing: "0.14em" }}>
-                {GALLERY_INTRO.cta} &rarr;
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 17 · Arch-topped image crops (border-radius on top corners) in a 3-up.
-  {
-    name: "Arch-Topped 3-Up",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 text-center mb-14">
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-        </div>
-        <div className="px-6 md:px-12 grid grid-cols-1 sm:grid-cols-3 gap-8" style={{ maxWidth: 1100, margin: "0 auto" }}>
-          {GALLERY_IMGS.slice(0, 3).map((src, i) => (
-            <div key={src} className="text-center">
-              <div
-                style={{
-                  aspectRatio: "3 / 4",
-                  overflow: "hidden",
-                  background: "var(--qpi-ink)",
-                  borderRadius: "999px 999px 8px 8px",
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-              <p className="qpi-caps mt-4" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: 10 }}>
-                {AREAS[i % AREAS.length]}
-              </p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={GALLERY_IMGS[i]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
             </div>
           ))}
         </div>
@@ -658,37 +314,92 @@ export const optionsGallery: Section[] = [
     ),
   },
 
-  // 18 · Circle crops in a row, heading beneath.
+  // 8 · Three ultra-tall slivers with generous gaps between them, a quiet,
+  // spare composition.
   {
-    name: "Circle Row",
+    name: "Sliver Trio",
     node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <div className="flex justify-center flex-wrap gap-6 mb-14">
-            {GALLERY_IMGS.slice(0, 5).map((src) => (
-              <div
-                key={src}
-                style={{
-                  width: "clamp(96px, 16vw, 160px)",
-                  height: "clamp(96px, 16vw, 160px)",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  background: "var(--qpi-ink)",
-                  flexShrink: 0,
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-            ))}
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-10 md:mb-12" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div className="mx-auto flex justify-center gap-10 md:gap-16" style={{ maxWidth: 900 }}>
+          {[GALLERY_IMGS[0], GALLERY_IMGS[7], GALLERY_IMGS[12]].map((src) => (
+            <div
+              key={src}
+              style={{ width: "18%", aspectRatio: "2 / 5", overflow: "hidden", background: "var(--qpi-ink)", maxHeight: "clamp(220px, 36vh, 340px)" }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </section>
+    ),
+  },
+
+  // 9 · A small, single centred image swimming in vast whitespace, the
+  // heading doing the compositional weight above it.
+  {
+    name: "Whisper Frame",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center" style={{ maxWidth: 620 }}>
+          <p className="qpi-caps mb-4" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display mb-8 md:mb-10"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 4vw, 3rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+          <div className="mx-auto" style={{ width: "22%", minWidth: 140, aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[13]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
           </div>
-          <div className="text-center">
+          <p
+            className="mt-8 md:mt-10"
+            style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: 15, lineHeight: 1.7, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}
+          >
+            {GALLERY_INTRO.sub}
+          </p>
+        </div>
+      </section>
+    ),
+  },
+
+  // 10 · Heading typography overlapping the boundary between the white
+  // ground and an image panel, using a blend mode so it reads on both.
+  {
+    name: "Text Through Image",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="relative mx-auto w-full" style={{ maxWidth: 1140, height: "clamp(300px, 46vh, 440px)" }}>
+          <div className="absolute inset-y-0 right-0" style={{ width: "56%", overflow: "hidden", background: "var(--qpi-ink)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[8]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div className="absolute left-0" style={{ top: "50%", transform: "translateY(-50%)", zIndex: 10, width: "78%" }}>
             <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
               {GALLERY_INTRO.kicker}
             </p>
             <h2
               className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
+              style={{
+                color: "#fff",
+                mixBlendMode: "exclusion",
+                fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
+                lineHeight: 0.98,
+              }}
             >
               {GALLERY_INTRO.heading}
             </h2>
@@ -698,116 +409,135 @@ export const optionsGallery: Section[] = [
     ),
   },
 
-  // 19 · Overlapping images (slight negative margins, layered z-index) collage.
+  // 11 · A single dominant image with a raised white quote card overlapping
+  // only its bottom edge.
   {
-    name: "Overlapping Collage",
+    name: "Quote & Frame",
     node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 text-center mb-16">
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-        </div>
-        <div className="relative flex justify-center items-center" style={{ maxWidth: 900, margin: "0 auto", height: "clamp(280px, 40vw, 420px)" }}>
-          <div
-            className="absolute"
-            style={{ width: "42%", aspectRatio: "4 / 3", overflow: "hidden", background: "var(--qpi-ink)", left: "6%", top: "8%", zIndex: 10, boxShadow: "0 12px 32px rgba(11,42,74,0.18)" }}
-          >
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="relative mx-auto w-full" style={{ maxWidth: 760 }}>
+          <div style={{ aspectRatio: "4 / 3", overflow: "hidden", background: "var(--qpi-ink)", maxHeight: "clamp(280px, 44vh, 420px)" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={GALLERY_IMGS[0]} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
+            <img src={GALLERY_IMGS[9]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
           </div>
           <div
-            className="absolute"
-            style={{ width: "46%", aspectRatio: "4 / 3", overflow: "hidden", background: "var(--qpi-ink)", left: "30%", top: "26%", zIndex: 20, boxShadow: "0 12px 32px rgba(11,42,74,0.22)" }}
+            className="mx-auto"
+            style={{
+              width: "84%",
+              transform: "translateY(-40%)",
+              background: "#fff",
+              padding: "24px 28px",
+              boxShadow: "0 18px 36px rgba(25,60,90,0.2)",
+            }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={GALLERY_IMGS[1]} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-          </div>
-          <div
-            className="absolute"
-            style={{ width: "40%", aspectRatio: "4 / 3", overflow: "hidden", background: "var(--qpi-ink)", right: "6%", top: "4%", zIndex: 15, boxShadow: "0 12px 32px rgba(11,42,74,0.18)" }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={GALLERY_IMGS[2]} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
+            <p style={{ color: "var(--qpi-ink)", fontSize: "clamp(1rem, 1.8vw, 1.25rem)", lineHeight: 1.5, marginBottom: 10 }}>
+              &ldquo;{TESTIMONIALS[2].short}&rdquo;
+            </p>
+            <p className="qpi-caps" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>
+              {TESTIMONIALS[2].name}
+            </p>
           </div>
         </div>
       </section>
     ),
   },
 
-  // 20 · 4-up small grid + a big feature to its right.
+  // 12 · A single row of squares that step up then down in size, a
+  // deliberate visual "bump" centred on the middle image.
   {
-    name: "Small Grid + Big Feature",
+    name: "Uneven Squares",
     node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div className="mb-12">
-            <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-10 md:mb-12" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div className="mx-auto flex items-end justify-center gap-4 md:gap-6" style={{ maxWidth: 1000 }}>
+          {[70, 96, 130, 96, 70].map((size, i) => (
+            <div
+              key={GALLERY_IMGS[i]}
+              style={{
+                width: `clamp(${size - 20}px, ${size / 8}vw, ${size}px)`,
+                aspectRatio: "1 / 1",
+                overflow: "hidden",
+                background: "var(--qpi-ink)",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={GALLERY_IMGS[i]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </section>
+    ),
+  },
+
+  // 13 · One portrait image pulled up above its own block via negative
+  // margin, pinned right, with heading and kicker in the space beneath it.
+  {
+    name: "Corner Anchor",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="relative mx-auto w-full" style={{ maxWidth: 1100 }}>
+          <div
+            className="ml-auto"
+            style={{
+              width: "44%",
+              aspectRatio: "3 / 4",
+              overflow: "hidden",
+              background: "var(--qpi-ink)",
+              marginTop: "calc(-1 * clamp(24px, 6vh, 64px))",
+              maxHeight: "clamp(260px, 44vh, 420px)",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[11]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div className="mt-8" style={{ maxWidth: 420 }}>
+            <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
               {GALLERY_INTRO.kicker}
             </p>
             <h2
               className="qpi-display"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
+              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
             >
               {GALLERY_INTRO.heading}
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="grid grid-cols-2 gap-4" style={{ gridColumn: "span 1" }}>
-              {GALLERY_IMGS.slice(0, 4).map((src) => (
-                <div key={src} style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-                </div>
-              ))}
-            </div>
-            <div style={{ gridColumn: "span 2", overflow: "hidden", background: "var(--qpi-ink)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={GALLERY_IMGS[4]} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" style={{ minHeight: 320 }} />
-            </div>
-          </div>
         </div>
       </section>
     ),
   },
 
-  // 21 · Alternating image / area-label rows, very minimal, hairline rules.
+  // 14 · Two ultra-wide letterboxed images stacked with a thin hairline
+  // gap, a quiet panoramic pairing.
   {
-    name: "Alternating Minimal Rows",
+    name: "Panorama Pair",
     node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 text-center mb-14">
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-8 md:mb-10" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
             {GALLERY_INTRO.kicker}
           </p>
           <h2
             className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
           >
             {GALLERY_INTRO.heading}
           </h2>
         </div>
-        <div style={{ borderTop: "1px solid rgba(11,42,74,0.15)" }}>
-          {GALLERY_IMGS.slice(0, 4).map((src, i) => (
-            <div key={src}>
-              {i % 2 === 0 ? (
-                <div className="px-6 md:px-12 py-8" style={{ aspectRatio: "21 / 9", overflow: "hidden", background: "var(--qpi-ink)", borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-                </div>
-              ) : (
-                <div className="px-6 md:px-12 py-10 flex items-center justify-center" style={{ borderBottom: "1px solid rgba(11,42,74,0.15)" }}>
-                  <p className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.4, fontSize: 12, letterSpacing: "0.2em" }}>
-                    {AREAS[i % AREAS.length]}
-                  </p>
-                </div>
-              )}
+        <div className="mx-auto flex flex-col gap-1" style={{ maxWidth: 1000 }}>
+          {[GALLERY_IMGS[3], GALLERY_IMGS[14]].map((src) => (
+            <div key={src} style={{ aspectRatio: "32 / 9", overflow: "hidden", background: "var(--qpi-ink)", maxHeight: "clamp(120px, 18vh, 170px)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
             </div>
           ))}
         </div>
@@ -815,129 +545,243 @@ export const optionsGallery: Section[] = [
     ),
   },
 
-  // 22 · Duotone-blue treated grid (grayscale + blue multiply overlay per tile).
+  // 15 · A huge portrait image shifted off-centre to the right, heading and
+  // CTA filling the negative space it leaves on the left.
   {
-    name: "Duotone Blue Grid",
+    name: "Shifted Portrait",
     node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 text-center mb-12">
-          <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-        </div>
-        <div className="px-6 md:px-12 grid grid-cols-2 sm:grid-cols-4 gap-3" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          {GALLERY_IMGS.slice(0, 8).map((src) => (
-            <div key={src} className="relative" style={{ aspectRatio: "4 / 3", overflow: "hidden", background: "var(--qpi-ink)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt="A pool installed by QLD Pool Installs"
-                className="w-full h-full object-cover"
-                loading="lazy"
-                style={{ filter: "grayscale(1) contrast(1.05)" }}
-              />
-              <div className="absolute inset-0" style={{ background: "var(--qpi-blue)", opacity: 0.42, mixBlendMode: "multiply" }} />
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 23 · Image grid inside a navy full-bleed band with a white inner margin.
-  {
-    name: "Navy Band, White Margin",
-    node: (
-      <section className="relative w-full py-20 md:py-28" style={{ background: "var(--qpi-ink)" }}>
-        <div className="text-center mb-10 px-6">
-          <p className="qpi-caps mb-3" style={{ color: "#fff", opacity: 0.6, fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-          <h2
-            className="qpi-display"
-            style={{ color: "#fff", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-        </div>
-        <div className="px-8 md:px-16" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div style={{ background: "#fff", padding: "clamp(12px, 2vw, 24px)" }}>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {GALLERY_IMGS.slice(0, 3).map((src) => (
-                <div key={src} style={{ aspectRatio: "4 / 3", overflow: "hidden", background: "var(--qpi-ink)" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    ),
-  },
-
-  // 24 · Heading huge across the top, images as a dense 5-column contact sheet.
-  {
-    name: "Contact Sheet",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 mb-10" style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <h2
-            className="qpi-display"
-            style={{ color: "var(--qpi-ink)", fontSize: "clamp(2.5rem, 7vw, 5.5rem)", lineHeight: 0.95, letterSpacing: "-0.02em" }}
-          >
-            {GALLERY_INTRO.heading}
-          </h2>
-          <p className="qpi-caps mt-4" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-            {GALLERY_INTRO.kicker}
-          </p>
-        </div>
-        <div className="px-6 md:px-12 grid grid-cols-3 sm:grid-cols-5 gap-2" style={{ maxWidth: 1280, margin: "0 auto" }}>
-          {GALLERY_IMGS.map((src) => (
-            <div key={src} style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-          ))}
-        </div>
-      </section>
-    ),
-  },
-
-  // 25 · Split: one enormous tall image left (full height of section), 2x2 grid right.
-  {
-    name: "Split: Tall Left, 2x2 Right",
-    node: (
-      <section className="relative w-full py-20 md:py-28 bg-white">
-        <div className="px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-6" style={{ maxWidth: 1200, margin: "0 auto" }}>
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div
+          className="mx-auto grid w-full grid-cols-1 md:grid-cols-[1fr_1.1fr] items-center gap-10"
+          style={{ maxWidth: 1100 }}
+        >
           <div>
             <p className="qpi-caps mb-3" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
               {GALLERY_INTRO.kicker}
             </p>
             <h2
-              className="qpi-display mb-6"
-              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.5vw, 3rem)", lineHeight: 1.05 }}
+              className="qpi-display mb-4"
+              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.75rem, 3.4vw, 2.75rem)", lineHeight: 1.05 }}
             >
               {GALLERY_INTRO.heading}
             </h2>
-            <div style={{ aspectRatio: "3 / 4", overflow: "hidden", background: "var(--qpi-ink)" }}>
+            <p style={{ color: "var(--qpi-ink)", opacity: 0.55, fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
+              {GALLERY_INTRO.sub}
+            </p>
+            <span className="qpi-cta" style={{ background: "var(--qpi-ink)", color: "#fff" }}>
+              {GALLERY_INTRO.cta}
+            </span>
+          </div>
+          <div
+            className="ml-auto"
+            style={{ width: "82%", aspectRatio: "4 / 5", overflow: "hidden", background: "var(--qpi-ink)", maxHeight: "clamp(320px, 52vh, 480px)" }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[6]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+        </div>
+      </section>
+    ),
+  },
+
+  // 16 · Four uniform images placed along a diagonal line, each stepping
+  // further right and down than the last.
+  {
+    name: "Diagonal Cascade",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-10 md:mb-12" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div className="relative mx-auto w-full" style={{ maxWidth: 900, height: "clamp(220px, 32vh, 300px)" }}>
+          {GALLERY_IMGS.slice(0, 4).map((src, i) => (
+            <div
+              key={src}
+              className="absolute"
+              style={{
+                left: `${i * 22}%`,
+                top: `${i * 20}%`,
+                width: "22%",
+                aspectRatio: "1 / 1",
+                overflow: "hidden",
+                background: "var(--qpi-ink)",
+                zIndex: 10 + i,
+              }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={GALLERY_IMGS[0]} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
+              <img src={src} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </section>
+    ),
+  },
+
+  // 17 · A small square anchor image left, a wide 16:9 image right filling
+  // the remaining width, an asymmetric 30/70-feel pairing.
+  {
+    name: "Wide Then Narrow",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto flex items-end gap-4 md:gap-6" style={{ maxWidth: 1100 }}>
+          <div style={{ width: "22%", aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)", maxHeight: "clamp(160px, 24vh, 220px)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[12]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+              {GALLERY_INTRO.kicker}
+            </p>
+            <h2
+              className="qpi-display mb-4"
+              style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.25rem, 2.6vw, 1.875rem)", lineHeight: 1.1 }}
+            >
+              {GALLERY_INTRO.heading}
+            </h2>
+            <div style={{ aspectRatio: "16 / 9", overflow: "hidden", background: "var(--qpi-ink)", maxHeight: "clamp(200px, 30vh, 280px)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={GALLERY_IMGS[13]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6" style={{ alignContent: "end" }}>
-            {GALLERY_IMGS.slice(1, 5).map((src) => (
-              <div key={src} style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
+        </div>
+      </section>
+    ),
+  },
+
+  // 18 · Captions treated as an oversized ghost numeral sitting behind and
+  // peeking out from each image's top-left corner.
+  {
+    name: "Numbered Frame Row",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-10 md:mb-12" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div className="mx-auto grid grid-cols-4 gap-8 md:gap-10" style={{ maxWidth: 1000 }}>
+          {GALLERY_IMGS.slice(0, 4).map((src, i) => (
+            <div key={src} className="relative">
+              <p
+                className="qpi-display absolute"
+                style={{
+                  color: "var(--qpi-ink)",
+                  opacity: 0.08,
+                  fontSize: "clamp(3rem, 8vw, 5.5rem)",
+                  lineHeight: 1,
+                  left: -10,
+                  top: -18,
+                  zIndex: 0,
+                }}
+              >
+                0{i + 1}
+              </p>
+              <div style={{ position: "relative", aspectRatio: "4 / 5", overflow: "hidden", background: "var(--qpi-ink)", zIndex: 10 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="A pool installed by QLD Pool Installs" className="w-full h-full object-cover" loading="lazy" />
+                <img src={src} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+      </section>
+    ),
+  },
+
+  // 19 · Five squares in a single row with dramatically uneven gaps between
+  // them, spacing itself carrying the rhythm rather than size.
+  {
+    name: "Breathing Grid",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-10 md:mb-12" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div className="mx-auto flex items-center justify-center" style={{ maxWidth: 1100 }}>
+          {[
+            { src: GALLERY_IMGS[0], ml: 0 },
+            { src: GALLERY_IMGS[1], ml: 8 },
+            { src: GALLERY_IMGS[2], ml: 64 },
+            { src: GALLERY_IMGS[3], ml: 12 },
+            { src: GALLERY_IMGS[4], ml: 72 },
+          ].map((item) => (
+            <div
+              key={item.src}
+              style={{
+                width: "clamp(90px, 13vw, 150px)",
+                aspectRatio: "1 / 1",
+                overflow: "hidden",
+                background: "var(--qpi-ink)",
+                marginLeft: item.ml,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={item.src} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </section>
+    ),
+  },
+
+  // 20 · A single hairline-bordered ribbon strip holding one image on one
+  // side and a large-set testimonial quote on the other.
+  {
+    name: "Testimonial Ribbon",
+    node: (
+      <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+        <div className="mx-auto text-center mb-10 md:mb-12" style={{ maxWidth: 560 }}>
+          <p className="qpi-caps mb-2" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+            {GALLERY_INTRO.kicker}
+          </p>
+          <h2
+            className="qpi-display"
+            style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.05 }}
+          >
+            {GALLERY_INTRO.heading}
+          </h2>
+        </div>
+        <div
+          className="mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-10"
+          style={{
+            maxWidth: 1100,
+            borderTop: "1px solid rgba(25,60,90,0.15)",
+            borderBottom: "1px solid rgba(25,60,90,0.15)",
+            padding: "clamp(20px, 4vh, 40px) 0",
+          }}
+        >
+          <div style={{ width: "100%", maxWidth: 420, aspectRatio: "16 / 9", overflow: "hidden", background: "var(--qpi-ink)", flexShrink: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={GALLERY_IMGS[5]} alt={IMG_ALT} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: "var(--qpi-ink)", fontWeight: 600, fontSize: "clamp(1.25rem, 2.6vw, 1.875rem)", lineHeight: 1.3 }}>
+              &ldquo;{TESTIMONIALS[0].short}&rdquo;
+            </p>
+            <p className="qpi-caps mt-4" style={{ color: "var(--qpi-blue)", fontSize: 10 }}>
+              {TESTIMONIALS[0].name}
+            </p>
           </div>
         </div>
       </section>

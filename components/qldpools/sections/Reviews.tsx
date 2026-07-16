@@ -1,11 +1,12 @@
 "use client";
 
 /**
- * Reviews — the client's pick, built as a scroll-driven MORPH between two of
- * the options from app/qldpools/site/sections/options/reviews2.tsx:
+ * Reviews — the client's pick, built as a scroll-driven MORPH between two of his
+ * chosen options. (The option set they came from has since been retired; see git
+ * history for `options/reviews2.tsx`.)
  *
- *   RESTING (opens the section) — entry index 18, "Star Sunburst" (gallery 44)
- *   END (settles as you scroll)  — entry index 16, "Oversized Quotation Mark" (gallery 42)
+ *   RESTING (opens the section) — "Star Sunburst" (his reviews option 44)
+ *   END (settles as you scroll)  — "Oversized Quotation Mark" (his option 42)
  *
  * As the visitor scrolls through the section, the sunburst's stars + stat
  * block scatter outward, rotate slightly and fade, while the quote-card's

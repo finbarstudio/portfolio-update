@@ -1,8 +1,8 @@
 import { CTA, PHONE, PHONE_HREF, EMAIL, HERO_SRC, GALLERY_IMGS, AREAS } from "@/app/qldpools/site/sections/kit";
 
 /**
- * Contact CTA — "Porthole Form" (gallery #43), ported from
- * app/qldpools/site/sections/options/cta2.tsx (entry index 17). The client
+ * Contact CTA — "Porthole Form", Finbar's cta option 43. (The option set it came
+ * from has since been retired; see git history for `options/cta2.tsx`.) The client
  * called this one out specifically, but flagged the original porthole form
  * as too minimal ("need more contact form info allowed"). The porthole
  * photo + overlapping circular quick-call plate stays intact as the visual

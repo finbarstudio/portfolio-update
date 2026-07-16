@@ -1,8 +1,9 @@
 import { FOOTER, LICENCES, PHONE, PHONE_HREF, EMAIL, LOGO_DARK, TAGLINE } from "@/app/qldpools/site/sections/kit";
 
 /**
- * Footer — "Single Rule Minimal" (gallery #33), ported faithfully from
- * app/qldpools/site/sections/options/footer2.tsx (entry index 7): one
+ * Footer — "Single Rule Minimal", Finbar's footer option 33. (The option set it
+ * came from has since been retired; see git history for `options/footer2.tsx`.)
+ * One
  * hairline rule beneath a logo / nav / contact row, everything else
  * collapsed to a single centred line. Per the client's note ("i need 33 but
  * with license plates" = include the licence numbers as text, not
