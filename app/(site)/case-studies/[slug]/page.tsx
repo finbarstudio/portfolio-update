@@ -460,7 +460,7 @@ export default async function CaseStudyPage({
       <header className="flex flex-col items-center text-center gap-5 mb-8 md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left md:gap-x-6 md:gap-y-4 md:mb-6">
         <div className="min-w-0 max-w-full">
           <h1
-            className="font-bold text-ink leading-[1.02]"
+            className="font-bold display-brand leading-[1.02]"
             style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}
           >
             {project.name}

@@ -62,15 +62,29 @@
   --sand:       #d8c8b1;
   --umber:      #221c16;
 
-  /* Brand ramp, taken from the gradient logomark artwork (Brand/SVG). Light to
-     dark: --pink is the main, --pink-deep the secondary, and the four between
-     them are the gradient steps the mark itself is built from. */
-  --pink:       #E96D89;   /* ★ PRIMARY accent, from the mark's tips       */
-  --pink-2:     #CB5872;   /* gradient step                                */
-  --pink-3:     #AC435B;   /* gradient step                                */
-  --pink-4:     #8E2E43;   /* gradient step                                */
-  --pink-5:     #6F192C;   /* gradient step                                */
-  --pink-deep:  #510415;   /* ★ SECONDARY, the mark's centre               */
+  /* ── THE PALETTE IS FOUR COLOURS ───────────────────────────────
+     Everything on this site is built from exactly four:
+
+       --bg         the ground (near-white, faintest pink cast)
+       --pink-deep  the dark pink, from the mark's centre
+       --pink       the main pink, from the mark's tips
+       --ink        the warm near-black
+
+     --pink-deep and --ink are BOTH dark, and they do different jobs:
+     --pink-deep is the brand's own dark (the logo, H1 display headings),
+     --ink is the reading colour (body, H2 and below, UI). Reach for --ink
+     unless the thing you're colouring IS the brand speaking.
+
+     Everything below this line is TERTIARY. --pink-2 … --pink-5 exist to
+     build the mark and --brand-gradient out of, not to colour UI with:
+     if you're picking one of them for a heading or a border, you want
+     --pink or --pink-deep instead. */
+  --pink:       #E96D89;   /* ★ CORE — the main pink, the mark's tips     */
+  --pink-2:     #CB5872;   /* tertiary: gradient step only                */
+  --pink-3:     #AC435B;   /* tertiary: gradient step only                */
+  --pink-4:     #8E2E43;   /* tertiary: gradient step only                */
+  --pink-5:     #6F192C;   /* tertiary: gradient step only                */
+  --pink-deep:  #510415;   /* ★ CORE — the dark pink, the mark's centre   */
   --brand-gradient: linear-gradient(160deg, #E96D89 0%, #CB5872 22%, #AC435B 44%, #8E2E43 64%, #6F192C 82%, #510415 100%);
   --pink-soft:  #F6C9D1;   /* light wash of the accent (reveals, fills)   */
 
@@ -172,6 +186,7 @@
   --color-ink-soft:       var(--ink-soft);
   --color-line:           var(--line);
   --color-pink:           var(--pink);
+  --color-pink-deep:      var(--pink-deep);
   --color-teal:           var(--teal);
   --color-surface:        var(--surface);
   --color-surface-raised: var(--surface-raised);
@@ -3671,7 +3686,9 @@ body:has(.sb-root) {
   white-space: nowrap;
   line-height: 0.82;
   font-size: clamp(2rem, 13vw, 16rem); /* fallback before JS fit */
-  color: var(--ink);
+  /* The logo is the brand speaking, so it takes the brand's own dark rather
+     than the reading ink. Same call in .nav-logo and .site-footer-mark-inner. */
+  color: var(--pink-deep);
   will-change: transform;
 }
 /* The wordmark's text reveals via clip-path (GSAP); the slot ✳ holds the spot. */
@@ -3721,6 +3738,19 @@ body:has(.sb-root) {
   opacity: 0; /* GSAP sets opacity:1 when animation starts; prevents SSR flash */
 }
 .intro-fly-star { width: 100%; height: auto; display: block; overflow: visible; }
+/* The real gradient mark, stacked exactly over the traced outline. The outline
+   and the mark are the same silhouette in the same square box (brand-asterisk
+   is the artwork's outer polygon normalised to 0-100), so inset:0 registers
+   them pixel-for-pixel: the line finishes drawing, the mark fades up inside it,
+   and the outline never has to move. GSAP owns the opacity. */
+.intro-fly-mark {
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+}
+.intro-fly-mark svg { width: 100%; height: auto; display: block; }
 /* Crisp 1px outline, sharp mitred points (the brand mark), no glow. dash +
    fill-opacity are driven by GSAP (see HomeIntro). */
 .intro-fly-star polygon {
@@ -3998,7 +4028,7 @@ body:has(.sb-root) {
   align-items: center;
   z-index: 60;
   font-size: 18px;
-  color: var(--ink);
+  color: var(--pink-deep);
   line-height: 1;
 }
 /* On home, desktop shows HomeIntro's animated lockup — hide the static one. */
@@ -4215,6 +4245,9 @@ body:has(.sb-root) {
   align-items: baseline;
   width: max-content;
   white-space: nowrap;
+  /* Overrides .site-footer's uniform ink: the wordmark is the logo, so it
+     takes the brand dark while the footer's text stays a reading colour. */
+  color: var(--pink-deep);
   font-size: clamp(2rem, 11vw, 16rem);  /* fallback before the JS fit */
   /* Pull left by Space Mono's cap side-bearing so the "F" ink kisses the left
      gutter (the JS fit pushes the asterisk to the right gutter to match). */
@@ -4661,3 +4694,15 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   font-size: clamp(40px, 4vw, 48px);
   line-height: 1;
 }
+
+/* ── .display-brand ───────────────────────────────────────────────
+   An H1 in the brand's own dark instead of the reading ink. The palette's two
+   darks split by job: --ink is for reading (body, H2 and below, UI), while
+   --pink-deep is the brand's voice — the logo, and the H1 that introduces a
+   page. Use it on a page's own H1 (home hero, service landings, case-study
+   titles); leave every heading under it on --ink so the tiers stay distinct.
+
+   Unlayered on purpose, and last in the file: .home-hero-display sets
+   color: var(--ink) from inside a cascade layer, and an unlayered rule beats a
+   layered one no matter the specificity — so this lands without !important. */
+.display-brand { color: var(--pink-deep); }

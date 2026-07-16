@@ -129,7 +129,7 @@ export default function ServiceLanding({
       {/* 1 — intro */}
       <section className="px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14">
         <p className="mono-label text-ink-soft mb-4">{label}</p>
-        <h1 className="font-bold text-ink leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
+        <h1 className="font-bold display-brand leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
           {heading}
         </h1>
         <p className="text-ink-soft mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
