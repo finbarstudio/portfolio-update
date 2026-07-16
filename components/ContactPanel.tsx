@@ -115,8 +115,6 @@ export default function ContactPanel() {
     }
   }, []);
 
-  const rv = (i: number) => ({ "--i": i } as React.CSSProperties);
-
   return (
     <div className={`contact-panel ${open ? "is-open" : ""}`} aria-hidden={!open}>
       <button className="contact-backdrop" aria-label="Close contact" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
@@ -135,13 +133,13 @@ export default function ContactPanel() {
             <span key={i} className="contact-fill-ring" style={{ "--ring": i } as React.CSSProperties} />
           ))}
         </div>
-        <button ref={closeRef} className="contact-close contact-reveal" style={rv(5)} aria-label="Close" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)}>
+        <button ref={closeRef} className="contact-close contact-reveal rv-close" aria-label="Close" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)}>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 5l14 14M19 5L5 19" /></svg>
         </button>
 
         <div className="contact-rail">
-        <h2 className="contact-title contact-reveal" style={rv(0)}>Hiring or have a project?</h2>
-        <p className="contact-lede contact-reveal" style={rv(1)}>
+        <h2 className="contact-title contact-reveal rv-0">Hiring or have a project?</h2>
+        <p className="contact-lede contact-reveal rv-1">
           <span className="contact-lede-desktop">
             Three ways in: reach me direct, send a note with the form, or book
             a call on the right.
@@ -151,7 +149,7 @@ export default function ContactPanel() {
           </span>
         </p>
 
-        <div className="contact-direct contact-reveal" style={rv(2)}>
+        <div className="contact-direct contact-reveal rv-2">
         <p className="contact-col-label">Direct</p>
         <div className="contact-details">
           <div className="contact-primary">
@@ -168,7 +166,7 @@ export default function ContactPanel() {
         </div>
         </div>
 
-        <div className="contact-bottom contact-reveal" style={rv(3)}>
+        <div className="contact-bottom contact-reveal rv-3">
           <p className="contact-col-label">Send a note</p>
           <form className="contact-form" onSubmit={onSubmit}>
           {status === "sent" ? (
@@ -191,7 +189,7 @@ export default function ContactPanel() {
         {/* The booker. Mounted on first open, kept mounted after, so a second
             open lands on an already-loaded calendar. Until Cal reports ready
             it's OUR loading pulse on the card, not Cal's default spinner. */}
-        <div className="contact-cal-col contact-reveal" style={rv(4)}>
+        <div className="contact-cal-col contact-reveal rv-4">
           <p className="contact-col-label">Book a call</p>
           {stacked ? (
             /* Small screens: straight to Cal's own booking page — their
