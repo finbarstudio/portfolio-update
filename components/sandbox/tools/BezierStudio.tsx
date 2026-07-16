@@ -75,7 +75,7 @@ function defaultCfg(): Cfg {
     margin: 56, padding: 64, zoom: 100,
     frame: true, cornerTicks: true, vignette: 0.35,
     showCurve: true, curveColor: "#F6EFE1", curveWeight: 3, curveOpacity: 1,
-    glow: true, glowColor: "#E8718B", glowIntensity: 55,
+    glow: true, glowColor: "#E96D89", glowIntensity: 55,
     fillShape: false, fillColor: "#F6C9D1", fillOpacity: 0.1,
     showAnchors: true, showControls: true, showHandles: true, nodeScale: 1,
     anchorShape: "Square", anchorFill: "#211E1A", anchorStroke: "#F6EFE1", anchorSize: 16, anchorWeight: 3, anchorRotate: 0,

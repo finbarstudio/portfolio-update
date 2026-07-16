@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { ASTERISK_POINTS } from "@/components/brand-asterisk";
+import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 
 /**
  * Site-wide social share card (Open Graph + Twitter).
@@ -20,14 +20,22 @@ export const contentType = "image/png";
 const BG = "#F6EFE1";
 const INK = "#211E1A";
 const INK_SOFT = "#6F6A60";
-const PINK = "#E8718B";
+const PINK = "#E96D89";
 
 // The brand asterisk, shared with the favicon/app icons so the mark is identical
 // everywhere. See @/components/brand-asterisk.
-function Mark({ size: s, color = PINK }: { size: number; color?: string }) {
+function Mark({ size: s }: { size: number }) {
   return (
-    <svg width={s} height={s} viewBox="0 0 100 100">
-      <polygon points={ASTERISK_POINTS} fill={color} />
+    <svg width={s} height={s} viewBox={MARK_VIEWBOX}>
+      {MARK_SHAPES.map((sh, i) =>
+        sh.tag === "polygon" ? (
+          <polygon key={i} points={sh.points} fill={sh.fill} />
+        ) : sh.tag === "circle" ? (
+          <circle key={i} cx={sh.cx} cy={sh.cy} r={sh.r} fill={sh.fill} />
+        ) : (
+          <path key={i} d={sh.d} fill={sh.fill} />
+        ),
+      )}
     </svg>
   );
 }

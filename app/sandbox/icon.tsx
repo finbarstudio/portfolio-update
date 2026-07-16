@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { ASTERISK_POINTS } from "@/components/brand-asterisk";
+import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 
 /**
  * Sandbox favicon — the pink brand asterisk on the sandbox's dark "screen"
@@ -24,8 +24,16 @@ export default function Icon() {
           justifyContent: "center",
         }}
       >
-        <svg width={22} height={22} viewBox="0 0 100 100">
-          <polygon points={ASTERISK_POINTS} fill="#E8718B" />
+        <svg width={22} height={22} viewBox={MARK_VIEWBOX}>
+          {MARK_SHAPES.map((sh, i) =>
+            sh.tag === "polygon" ? (
+              <polygon key={i} points={sh.points} fill={sh.fill} />
+            ) : sh.tag === "circle" ? (
+              <circle key={i} cx={sh.cx} cy={sh.cy} r={sh.r} fill={sh.fill} />
+            ) : (
+              <path key={i} d={sh.d} fill={sh.fill} />
+            ),
+          )}
         </svg>
       </div>
     ),

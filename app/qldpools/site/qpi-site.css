@@ -108,7 +108,7 @@
   height: 42px;
   /* Pill collapses to a 42px circle; expands rightward on hover. The brand
      pink + Space Mono caps mirror the main finbar.studio site. */
-  background: var(--pink, #e8718b);
+  background: var(--pink, #e96d89);
   color: var(--bg, #f6efe1);
   border-radius: 999px;
   font-family: var(--font-mono, var(--font-space-mono, monospace));

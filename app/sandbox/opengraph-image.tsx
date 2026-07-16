@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { ASTERISK_POINTS } from "@/components/brand-asterisk";
+import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 
 /**
  * Sandbox social share card (Open Graph + Twitter), 1200×630.
@@ -19,12 +19,20 @@ const BG = "#1C1C1C";
 const GROUND = "#211E1A";
 const INK = "#F6EFE1";
 const INK_SOFT = "#9C9486";
-const PINK = "#E8718B";
+const PINK = "#E96D89";
 
-function Mark({ size: s, color = PINK }: { size: number; color?: string }) {
+function Mark({ size: s }: { size: number }) {
   return (
-    <svg width={s} height={s} viewBox="0 0 100 100">
-      <polygon points={ASTERISK_POINTS} fill={color} />
+    <svg width={s} height={s} viewBox={MARK_VIEWBOX}>
+      {MARK_SHAPES.map((sh, i) =>
+        sh.tag === "polygon" ? (
+          <polygon key={i} points={sh.points} fill={sh.fill} />
+        ) : sh.tag === "circle" ? (
+          <circle key={i} cx={sh.cx} cy={sh.cy} r={sh.r} fill={sh.fill} />
+        ) : (
+          <path key={i} d={sh.d} fill={sh.fill} />
+        ),
+      )}
     </svg>
   );
 }

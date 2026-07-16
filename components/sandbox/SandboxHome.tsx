@@ -25,7 +25,7 @@ const RIGHT = "STUDIO";
 const SLOT = "*"; // internal sentinel for the asterisk slot (never drawn as text)
 
 const INK = "#F6EFE1";
-const PINK = "#E8718B";
+const PINK = "#E96D89";
 const BG = "#211E1A";
 
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);

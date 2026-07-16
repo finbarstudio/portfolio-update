@@ -62,7 +62,16 @@
   --sand:       #d8c8b1;
   --umber:      #221c16;
 
-  --pink:       #E8718B;   /* ★ PRIMARY accent, pastel coral-rose         */
+  /* Brand ramp, taken from the gradient logomark artwork (Brand/SVG). Light to
+     dark: --pink is the main, --pink-deep the secondary, and the four between
+     them are the gradient steps the mark itself is built from. */
+  --pink:       #E96D89;   /* ★ PRIMARY accent, from the mark's tips       */
+  --pink-2:     #CB5872;   /* gradient step                                */
+  --pink-3:     #AC435B;   /* gradient step                                */
+  --pink-4:     #8E2E43;   /* gradient step                                */
+  --pink-5:     #6F192C;   /* gradient step                                */
+  --pink-deep:  #510415;   /* ★ SECONDARY, the mark's centre               */
+  --brand-gradient: linear-gradient(160deg, #E96D89 0%, #CB5872 22%, #AC435B 44%, #8E2E43 64%, #6F192C 82%, #510415 100%);
   --pink-soft:  #F6C9D1;   /* light wash of the accent (reveals, fills)   */
 
   --teal:       #6FAE9F;   /* SECONDARY, dusty sage-teal                  */
@@ -3974,7 +3983,7 @@ body:has(.sb-root) {
   /* Keep the small inline * as Space Mono's own glyph (tuned baseline/spacing at
      ~9-11px), even though the letters are now Host Grotesk. */
   font-family: var(--font-mono);
-  color: var(--pink, #e8718b);
+  color: var(--pink, #e96d89);
 }
 
 /* Persistent resting logo on non-home pages — centred in the nav (matching where

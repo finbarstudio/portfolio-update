@@ -1,4 +1,4 @@
-import { ASTERISK_POINTS } from "@/components/brand-asterisk";
+import BrandMark from "@/components/BrandMark";
 
 /**
  * SandboxLoader — the brand mark, flashing. Uses the SAME pulse the nav tabs use
@@ -10,9 +10,7 @@ import { ASTERISK_POINTS } from "@/components/brand-asterisk";
 export default function SandboxLoader({ label = "Loading" }: { label?: string }) {
   return (
     <div className="sb-loader" role="status" aria-live="polite" aria-label={label}>
-      <svg className="sb-loader-mark" viewBox="0 0 100 100" aria-hidden="true">
-        <polygon points={ASTERISK_POINTS} fill="var(--pink)" />
-      </svg>
+      <BrandMark className="sb-loader-mark" />
       {label && <span className="sb-loader-label">{label}</span>}
     </div>
   );

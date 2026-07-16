@@ -32,7 +32,7 @@ export default function EmbedWatermark() {
           }}
         >
           finbar
-          <BrandStar size="0.78em" style={{ color: "#E8718B", margin: "0 0.06em" }} />
+          <BrandStar size="0.78em" style={{ color: "#E96D89", margin: "0 0.06em" }} />
           studio
         </span>
       </div>

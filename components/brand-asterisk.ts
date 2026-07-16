@@ -1,46 +1,19 @@
 /**
- * The brand asterisk as a traceable polygon — an eight-spoked asterisk with
- * flat (rectangular) spoke tips, ≈ the U+1F7BE mark (not a pointed star). In a
- * 0–100 viewBox. Built from 8 spokes: each contributes two flat-tip corners
- * with a small notch between, so the outline reads as a chunky asterisk.
+ * The brand asterisk OUTLINE, as a single polygon in a 0-100 box.
+ *
+ * Taken from the outermost shape of the real artwork (Brand/SVG/Gradient
+ * Logomark.svg, its `cls-3` polygon) and normalised from that 831.88 box to the
+ * 0-100 one every consumer already expects, so this silhouette matches the logo
+ * exactly. Outline ONLY: the full six-step gradient mark lives in
+ * components/brand-mark.ts and renders through <BrandMark />.
+ *
+ * Use this where the shape must be stroked, drawn, tweened or parsed into
+ * coordinates (the home intro's draw-on, the loaders, the sandbox toys). Use
+ * BrandMark wherever the logo is simply shown.
  */
-function buildAsterisk(): string {
-  const cx = 50, cy = 50;
-  const R = 48;     // spoke length (tip radius)
-  const w = 8;      // spoke half-width
-  const ri = 13;    // notch radius between spokes
-  const spokes = 8;
-  const pts: string[] = [];
-  for (let i = 0; i < spokes; i++) {
-    const a = (Math.PI / 4) * i - Math.PI / 2;   // spoke centreline (start up)
-    const ca = Math.cos(a), sa = Math.sin(a);
-    const tx = cx + R * ca, ty = cy + R * sa;     // tip centre
-    const px = -sa, py = ca;                       // unit perpendicular
-    // flat tip: trailing corner, then leading corner
-    pts.push(`${(tx - w * px).toFixed(2)},${(ty - w * py).toFixed(2)}`);
-    pts.push(`${(tx + w * px).toFixed(2)},${(ty + w * py).toFixed(2)}`);
-    // notch on the bisector with the next spoke
-    const an = a + Math.PI / spokes;
-    pts.push(`${(cx + ri * Math.cos(an)).toFixed(2)},${(cy + ri * Math.sin(an)).toFixed(2)}`);
-  }
-  return pts.join(" ");
-}
 
-export const ASTERISK_POINTS = buildAsterisk();
+export const ASTERISK_POINTS =
+  "41.67,0.00 58.33,0.00 55.18,37.49 79.46,8.75 91.25,20.54 62.51,44.82 100.00,41.67 100.00,58.33 62.51,55.18 91.25,79.46 79.46,91.25 55.18,62.51 58.33,100.00 41.67,100.00 44.82,62.51 20.54,91.25 8.75,79.46 37.49,55.18 0.00,58.33 0.00,41.67 37.49,44.82 8.75,20.54 20.54,8.75 44.82,37.49 41.67,0.00";
 
-/**
- * Exact perimeter of the polygon in viewBox (0–100) units, including the closing
- * edge. Used as the stroke-dasharray for the preloader trace — getTotalLength()
- * under-measures polygons (it can omit the closing segment), which left the
- * outline a few % short; this is exact, so the trace draws smoothly and finishes.
- */
-export const ASTERISK_PERIMETER = (() => {
-  const coords = ASTERISK_POINTS.trim().split(/\s+/).map((p) => p.split(",").map(Number));
-  let len = 0;
-  for (let i = 0; i < coords.length; i++) {
-    const [x1, y1] = coords[i];
-    const [x2, y2] = coords[(i + 1) % coords.length];
-    len += Math.hypot(x2 - x1, y2 - y1);
-  }
-  return len;
-})();
+/** Perimeter in the 0-100 box, for stroke-dash draw-on animations. */
+export const ASTERISK_PERIMETER = 735.3342;

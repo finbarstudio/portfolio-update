@@ -17,7 +17,7 @@ import FooterNav from "./FooterNav";
 import FooterClock from "./FooterClock";
 import LiveTime from "./LiveTime";
 import { EngFlag } from "./Flags";
-import { ASTERISK_POINTS } from "./brand-asterisk";
+import BrandMark from "./BrandMark";
 
 export default function SiteFooter() {
   // Deterministic initial year (matches SSR), then corrected on the client.
@@ -153,9 +153,9 @@ export default function SiteFooter() {
       </div>
       {/* Mobile-only: a big full-bleed pink asterisk in place of the wordmark. */}
       <div className="site-footer-asterisk" aria-hidden="true">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-          <polygon points={ASTERISK_POINTS} fill="var(--pink)" />
-        </svg>
+        {/* .site-footer-asterisk svg is already styled; BrandMark renders its
+            own svg, so it picks that up. */}
+        <BrandMark />
       </div>
     </footer>
   );
