@@ -17,11 +17,9 @@ gsap.registerPlugin(ScrollTrigger);
  * We call markIntroDone() ourselves once the fonts are ready, which is the
  * signal the nav and the word reveals were already waiting on.
  *
- * On scroll the arch grows until the photo is the screen. Two deliberate
- * details Finbar asked for:
- *  - it eases OUT, so the last stretch into full bleed is the slow part
- *  - the corner radius never resolves to 0. It lands at 4rem, so the page keeps
- *    a softly rounded top edge for good.
+ * On scroll the arch grows until the photo is the screen, easing OUT so the
+ * last stretch into full bleed is the slow part, and resolving to square
+ * corners.
  * The type sits above the photo in z-order (the arch slides under it), settles
  * centred on the image, then drifts against the photo as you keep going.
  *
@@ -37,8 +35,8 @@ const TAGLINE = "Queensland's Premium Pool Builders";
 const ARCH_W = "clamp(220px, 38vw, 380px)";
 const ARCH_H = "clamp(300px, 52vh, 480px)";
 const ARCH_RADIUS = "9999px 9999px 0 0";
-/** Where the growth stops. Apple-ish. The page keeps this rounded top for good. */
-const END_RADIUS = "4rem 4rem 0 0";
+/** The growth resolves fully square: he tried the rounded top edge and didn't want it. */
+const END_RADIUS = "0 0 0 0";
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -123,13 +121,13 @@ export default function Hero() {
         height: () => sticky.clientHeight,
         borderRadius: END_RADIUS,
         ease: "power2.out",
-        scrollTrigger: { trigger: section, start: "top top", end: "+=110%", scrub: 0.5 },
+        scrollTrigger: { trigger: section, start: "top top", end: "+=75%", scrub: 0.5 },
       });
       // Scrim rises under the type so white copy holds on the photo.
       gsap.to(scrim, {
         opacity: 1,
         ease: "none",
-        scrollTrigger: { trigger: section, start: "top+=15% top", end: "+=55%", scrub: 0.5 },
+        scrollTrigger: { trigger: section, start: "top+=10% top", end: "+=40%", scrub: 0.5 },
       });
       // The type settles centred on the image as the photo arrives...
       gsap.to(text, {
@@ -138,7 +136,7 @@ export default function Hero() {
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=110%",
+          end: "+=75%",
           scrub: 0.5,
           invalidateOnRefresh: true,
         },
@@ -146,13 +144,13 @@ export default function Hero() {
       gsap.to(".qpi-hero-title", {
         color: "#ffffff",
         ease: "none",
-        scrollTrigger: { trigger: section, start: "top+=20% top", end: "+=40%", scrub: 0.5 },
+        scrollTrigger: { trigger: section, start: "top+=15% top", end: "+=30%", scrub: 0.5 },
       });
       // ...then keeps drifting against the photo for the rest of the hero.
       gsap.to(text, {
         yPercent: -55,
         ease: "none",
-        scrollTrigger: { trigger: section, start: "top+=110% top", end: "bottom bottom", scrub: 0.5 },
+        scrollTrigger: { trigger: section, start: "top+=75% top", end: "bottom bottom", scrub: 0.5 },
       });
       // The photo is oversized and drifts the other way, so there is more of the
       // picture to see than the frame ever shows at once.
@@ -197,7 +195,7 @@ export default function Hero() {
       ref={sectionRef}
       id="qpi-hero"
       className="relative w-full"
-      style={{ height: "300vh" }}
+      style={{ height: "190vh" }}
       aria-label="Introduction"
     >
       <div ref={stickyRef} className="sticky top-0 h-svh w-full overflow-hidden bg-white">

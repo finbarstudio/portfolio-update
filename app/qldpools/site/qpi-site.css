@@ -35,9 +35,14 @@
 
 /* ── Section rhythm — one gap, set once, so the page breathes consistently
       instead of each section inventing its own margin. ── */
-.qpi-site .qpi-page > section + section,
-.qpi-site .qpi-page > footer {
+.qpi-site .qpi-page > section + section {
   margin-top: clamp(88px, 14vh, 200px);
+}
+/* The closing run needs less air, not more: each of these already carries a
+   full viewport of its own padding, so the standard gap read as dead space. */
+.qpi-site .qpi-page > .qpi-sec-cta,
+.qpi-site .qpi-page > .qpi-sec-foot {
+  margin-top: clamp(24px, 4vh, 56px);
 }
 /* The work leads the page, so it gets real air above it and sits closer to
    what follows (Finbar: "too much space below featured projects and too little

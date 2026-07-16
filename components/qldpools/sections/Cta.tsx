@@ -25,7 +25,7 @@ function fieldType(label: string): "text" | "tel" | "email" {
 
 export default function Cta() {
   return (
-    <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+    <section className="qpi-sec-cta qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
       <div className="mx-auto grid w-full max-w-4xl grid-cols-1 md:grid-cols-[240px_1fr] items-center gap-10 md:gap-14">
         {/* Porthole visual */}
         <div className="relative mx-auto md:mx-0" style={{ width: "min(220px, 55vw)" }}>

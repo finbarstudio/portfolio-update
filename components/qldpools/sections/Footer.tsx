@@ -11,9 +11,9 @@ import { FOOTER, LICENCES, PHONE, PHONE_HREF, EMAIL, LOGO_DARK, TAGLINE } from "
  */
 export default function Footer() {
   return (
-    <footer className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
+    <footer className="qpi-sec-foot qpi-gutter relative w-full bg-white flex flex-col justify-end pt-16 pb-7 md:pt-20 md:pb-8">
       <div
-        className="mx-auto flex w-full max-w-4xl flex-col sm:flex-row sm:items-center sm:justify-between gap-5 pb-6"
+        className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between gap-5 pb-6"
         style={{ borderBottom: "2px solid var(--qpi-ink)" }}
       >
         <div>
@@ -38,11 +38,11 @@ export default function Footer() {
         </div>
       </div>
 
-      <p className="mx-auto mt-4 w-full max-w-4xl text-center text-[10.5px] text-[var(--qpi-ink)]/40">
+      <p className="mt-4 w-full text-center text-[10.5px] text-[var(--qpi-ink)]/40">
         {LICENCES.qbcc} · {LICENCES.nsw}
       </p>
 
-      <div className="mx-auto mt-3 flex w-full max-w-4xl items-center justify-center gap-2 text-[11px] text-[var(--qpi-ink)]/40">
+      <div className="mt-3 flex w-full items-center justify-center gap-2 text-[11px] text-[var(--qpi-ink)]/40">
         © 2026 QLD Pool Installs
         <span aria-hidden="true">·</span>
         Site by finbar.studio

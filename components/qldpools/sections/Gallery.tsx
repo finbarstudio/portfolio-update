@@ -61,13 +61,11 @@ export default function Gallery() {
                   left: pos.left,
                   top: pos.top,
                   width: "20%",
-                  background: "#fff",
-                  padding: "8px 8px 10px",
-                  boxShadow: "0 14px 26px rgba(25,60,90,0.22)",
                   transform: `rotate(${pos.rot}deg)`,
                   zIndex: pos.z,
                 }}
               >
+                <div className="g-card">
                 <div style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -88,6 +86,7 @@ export default function Gallery() {
                 >
                   {isFeatured ? <>&ldquo;{FEATURED_REVIEW}&rdquo;</> : tile.area}
                 </p>
+                </div>
               </div>
             );
           })}
@@ -104,6 +103,27 @@ export default function Gallery() {
 }
 
 const css = `
+/* The print itself. Lives on an inner element so the hover scale is CSS-only:
+   Reveal writes GSAP transforms onto .g-tile, and an inline transform there
+   would beat a CSS :hover rule. Slight outline so the whites separate. */
+.g-card {
+  background: #fff;
+  padding: 8px 8px 10px;
+  border: 1px solid rgba(25, 60, 90, 0.16);
+  box-shadow: 0 14px 26px rgba(25, 60, 90, 0.22);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .g-card {
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .g-tile:hover { z-index: 40; }
+  .g-tile:hover .g-card {
+    transform: scale(1.08);
+    box-shadow: 0 28px 54px rgba(25, 60, 90, 0.3);
+  }
+}
+
 .qg-cta {
   display: inline-flex;
   align-items: center;

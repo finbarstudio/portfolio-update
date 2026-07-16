@@ -29,7 +29,6 @@ gsap.registerPlugin(ScrollTrigger);
 const GOOGLE_REVIEWS_URL = "https://www.google.com/search?q=QLD+Pool+Installs+reviews";
 const FEATURED = TESTIMONIALS[4]; // Cathy W — same review the "Oversized Quotation Mark" option featured
 const SUNBURST_STARS = 12;
-const R44_PIECES = SUNBURST_STARS + 1; // 12 stars + the centre stat block
 
 function Star({ color, size = 14 }: { color: string; size?: number }) {
   return (
@@ -88,6 +87,11 @@ function GoogleAttribution() {
   );
 }
 
+/* Radius each star sits at when resting — kept as a constant (rather than
+ * re-derived) so the scatter tween can scale distance travelled by this same
+ * radius per the "further out stars travel further" note. */
+const STAR_RADIUS = 120;
+
 /* ── Layout 44 · Star Sunburst — the RESTING state ── */
 function SunburstLayout() {
   return (
@@ -97,23 +101,29 @@ function SunburstLayout() {
         style={{ width: "min(70vw, 420px)", height: "clamp(260px, 36vh, 360px)" }}
       >
         {Array.from({ length: SUNBURST_STARS }).map((_, i) => {
+          // Each star's own placement angle — baked onto the node as a data
+          // attribute so the scatter tween can read back the SAME angle a
+          // star was placed at, rather than recomputing a different formula.
           const angle = (360 / SUNBURST_STARS) * i;
           const rad = (angle * Math.PI) / 180;
-          const px = Math.cos(rad) * 120;
-          const py = Math.sin(rad) * 120;
+          const px = Math.cos(rad) * STAR_RADIUS;
+          const py = Math.sin(rad) * STAR_RADIUS;
           return (
             <div
               key={i}
               className="absolute"
               style={{ left: `calc(50% + ${px}px - 7px)`, top: `calc(50% + ${py}px - 7px)` }}
             >
-              <div className="r44-piece">
+              {/* Placement (left/top) lives on this outer node; GSAP only
+               * ever animates the inner node's transform, so the two never
+               * fight over the same property. */}
+              <div className="r44-star" data-angle={angle} data-radius={STAR_RADIUS}>
                 <Star color="var(--qpi-blue)" size={14} />
               </div>
             </div>
           );
         })}
-        <div className="r44-piece flex flex-col items-center text-center">
+        <div className="r44-center flex flex-col items-center text-center">
           <p className="qpi-display" style={{ color: "var(--qpi-ink)", fontSize: "clamp(2rem, 4vw, 2.75rem)", lineHeight: 1 }}>
             {REVIEW_STATS.rating}
           </p>
@@ -126,41 +136,41 @@ function SunburstLayout() {
   );
 }
 
-/* ── Layout 42 · Oversized Quotation Mark — the END state ── */
+/* ── Layout 42 · Oversized Quotation Mark — the END state ──
+ * Top-left anchored: the oversized mark sits at the top-left corner of the
+ * quote block and the block itself reads left-aligned, not centred. */
 function QuoteLayout() {
   return (
     <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 10 }}>
-      <div className="relative mx-auto text-center" style={{ maxWidth: 700 }}>
+      <div className="relative mx-auto text-left" style={{ maxWidth: 700 }}>
         <p
           aria-hidden="true"
           className="r42-piece qpi-display absolute"
           style={{
             color: "var(--qpi-blue)",
             opacity: 0.12,
-            fontSize: "clamp(6rem, 14vw, 11rem)",
+            fontSize: "clamp(5rem, 11vw, 8.5rem)",
             lineHeight: 1,
-            top: "-2.6rem",
-            left: 0,
-            right: 0,
-            textAlign: "center",
+            top: "-2.2rem",
+            left: "-0.35rem",
           }}
         >
           &ldquo;
         </p>
-        <div className="relative">
+        <div className="relative" style={{ paddingTop: "1.5rem" }}>
           <p className="r42-piece" style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.25rem, 2.6vw, 1.75rem)", lineHeight: 1.4, fontWeight: 600 }}>
             {FEATURED.quote}
           </p>
           <p className="r42-piece qpi-caps mt-5" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
             {FEATURED.name}
           </p>
-          <div className="r42-piece flex items-center justify-center gap-2 mt-4">
+          <div className="r42-piece flex items-center justify-start gap-2 mt-4">
             <StarRow size={11} />
             <span className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: 9 }}>
               {REVIEW_STATS.rating} &middot; {REVIEW_STATS.count}
             </span>
           </div>
-          <div className="r42-piece flex justify-center mt-4">
+          <div className="r42-piece flex justify-start mt-4">
             <GoogleAttribution />
           </div>
         </div>
@@ -205,22 +215,60 @@ export default function Reviews() {
         },
       });
 
-      // Sunburst scatters outward, wobbles, fades.
+      // Sequential, never overlapping: the sunburst fully scatters and
+      // clears over the first ~55% of the scroll, THEN the testimonial
+      // arrives from ~60%. Gap between 0.55 and 0.6 keeps the two layers
+      // from ever being visible on top of each other mid-scrub.
+      const SCATTER_END = 0.55;
+      const QUOTE_START = 0.6;
+
+      // Each star scatters OUTWARD along its own placement angle (baked as
+      // data-angle/data-radius on the node) — never a separately-computed
+      // formula — so it travels dead away from the sunburst's centre.
+      // Distance scales with the star's own radius, so stars further out
+      // travel further.
       tl.to(
-        ".r44-piece",
+        ".r44-star",
         {
-          x: (i: number) => Math.round(Math.cos((i * (360 / R44_PIECES) * Math.PI) / 180) * 90),
-          y: (i: number) => Math.round(Math.sin((i * (360 / R44_PIECES) * Math.PI) / 180) * 90),
+          x: (_i: number, target: Element) => {
+            const el = target as HTMLElement;
+            const angle = Number(el.dataset.angle);
+            const radius = Number(el.dataset.radius) || STAR_RADIUS;
+            const rad = (angle * Math.PI) / 180;
+            return Math.round(Math.cos(rad) * radius * 0.85);
+          },
+          y: (_i: number, target: Element) => {
+            const el = target as HTMLElement;
+            const angle = Number(el.dataset.angle);
+            const radius = Number(el.dataset.radius) || STAR_RADIUS;
+            const rad = (angle * Math.PI) / 180;
+            return Math.round(Math.sin(rad) * radius * 0.85);
+          },
           rotation: (i: number) => (i % 2 === 0 ? 10 : -10),
           opacity: 0,
           scale: 0.9,
+          duration: SCATTER_END,
           stagger: { each: 0.025, from: "center" },
           ease: "power2.in",
         },
         0
       );
 
-      // Quote card lands into place, overlapping the scatter.
+      // Centre rating block has no placement angle of its own — it just
+      // settles back and fades in place as the stars fly outward from it.
+      tl.to(
+        ".r44-center",
+        {
+          y: -12,
+          opacity: 0,
+          scale: 0.85,
+          duration: SCATTER_END,
+          ease: "power2.in",
+        },
+        0
+      );
+
+      // Quote card only starts arriving once the scatter has fully cleared.
       tl.to(
         ".r42-piece",
         {
@@ -228,10 +276,11 @@ export default function Reviews() {
           y: 0,
           opacity: 1,
           scale: 1,
+          duration: 1 - QUOTE_START,
           stagger: { each: 0.03, from: "center" },
           ease: "power3.out",
         },
-        0.2
+        QUOTE_START
       );
     }, sectionRef);
 
@@ -242,37 +291,35 @@ export default function Reviews() {
     return (
       <section className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20">
         <h2 className="sr-only">{REVIEW_STATS.heading}</h2>
-        <div className="relative mx-auto text-center" style={{ maxWidth: 700 }}>
+        <div className="relative mx-auto text-left" style={{ maxWidth: 700 }}>
           <p
             aria-hidden="true"
             className="qpi-display absolute"
             style={{
               color: "var(--qpi-blue)",
               opacity: 0.12,
-              fontSize: "clamp(6rem, 14vw, 11rem)",
+              fontSize: "clamp(5rem, 11vw, 8.5rem)",
               lineHeight: 1,
-              top: "-2.6rem",
-              left: 0,
-              right: 0,
-              textAlign: "center",
+              top: "-2.2rem",
+              left: "-0.35rem",
             }}
           >
             &ldquo;
           </p>
-          <div className="relative">
+          <div className="relative" style={{ paddingTop: "1.5rem" }}>
             <p style={{ color: "var(--qpi-ink)", fontSize: "clamp(1.25rem, 2.6vw, 1.75rem)", lineHeight: 1.4, fontWeight: 600 }}>
               {FEATURED.quote}
             </p>
             <p className="qpi-caps mt-5" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
               {FEATURED.name}
             </p>
-            <div className="flex items-center justify-center gap-2 mt-4">
+            <div className="flex items-center justify-start gap-2 mt-4">
               <StarRow size={11} />
               <span className="qpi-caps" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: 9 }}>
                 {REVIEW_STATS.rating} &middot; {REVIEW_STATS.count}
               </span>
             </div>
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-start mt-4">
               <GoogleAttribution />
             </div>
           </div>
