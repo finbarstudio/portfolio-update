@@ -4842,7 +4842,29 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   .contact-rail { overflow-y: visible; flex: 0 0 auto; min-height: auto; }
   .contact-cal-col { flex: 0 0 auto; min-height: auto; }
   .contact-direct { flex: 0 0 auto; }
-  .contact-cal { min-height: 72svh; flex: 0 0 auto; }
+  /* No embedded booker in the stack (see ContactPanel) — the link button
+     replaces it, so no nested scroll containers. */
+  /* Double selector: .book-call-pill's unlayered base sits later in the file
+     and ties on specificity otherwise (same trap as the hidden form). */
+  .contact-cal-col .contact-cal-link {
+    display: inline-flex;
+    justify-content: center;
+    align-self: center;
+    padding: 1em 2.2em;
+    font-size: 1rem;
+    margin-top: 0.2rem;
+    /* Inverted on the maroon — the pill's usual deep fill vanishes into the
+       panel here. */
+    background: var(--bg);
+    border-color: var(--bg);
+    color: var(--pink-deep);
+  }
+  /* The stacked sheet hugs its content instead of holding a page of empty
+     maroon under the button (top-anchored; bottom releases). */
+  .contact-sheet {
+    bottom: auto;
+    max-height: calc(100% - 2 * var(--contact-inset));
+  }
   /* Phone/tablet: direct contact + booking only — the note form earns its
      place on desktop, in the stack it's just scroll. (Double selector: the
      base .contact-bottom rule sits later in the file and ties on specificity,

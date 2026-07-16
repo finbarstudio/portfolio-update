@@ -43,12 +43,25 @@ export default function ContactPanel() {
   const [everOpened, setEverOpened] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [calReady, setCalReady] = useState(false);
+  // Stacked layouts (phone/tablet) don't embed the booker at all — Cal's tall
+  // mobile column inside the fixed sheet made nested scrolling fight itself
+  // and run off screen. They get a link to Cal's own page instead, which
+  // handles small screens properly. Matches the CSS stack breakpoint.
+  const [stacked, setStacked] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const onOpen = () => { setOpen(true); setEverOpened(true); };
     window.addEventListener("contact:open", onOpen as EventListener);
     return () => window.removeEventListener("contact:open", onOpen as EventListener);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 860px)");
+    const update = () => setStacked(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
@@ -180,10 +193,24 @@ export default function ContactPanel() {
             it's OUR loading pulse on the card, not Cal's default spinner. */}
         <div className="contact-cal-col contact-reveal" style={rv(4)}>
           <p className="contact-col-label">Book a call</p>
-          <div className="contact-cal">
-            {everOpened && !calReady && <Loader />}
-            {everOpened && <CalEmbed onReady={() => setCalReady(true)} />}
-          </div>
+          {stacked ? (
+            /* Small screens: straight to Cal's own booking page — their
+               mobile layout, not our iframe wrestling it. */
+            <a
+              href="https://cal.com/finbar.studio/intro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sticker-pill book-call-pill contact-cal-link"
+              tabIndex={open ? 0 : -1}
+            >
+              Pick a time ↗
+            </a>
+          ) : (
+            <div className="contact-cal">
+              {everOpened && !calReady && <Loader />}
+              {everOpened && <CalEmbed onReady={() => setCalReady(true)} />}
+            </div>
+          )}
         </div>
       </div>
     </div>
