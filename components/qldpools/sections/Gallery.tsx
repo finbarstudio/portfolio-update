@@ -1,65 +1,96 @@
 "use client";
 
 import Reveal from "@/components/qldpools/anim/Reveal";
-import Parallax from "@/components/qldpools/anim/Parallax";
-import { GALLERY_IMGS, TESTIMONIALS, AREAS } from "@/app/qldpools/site/sections/kit";
+import { GALLERY_IMGS, AREAS, TESTIMONIALS } from "@/app/qldpools/site/sections/kit";
 
 /**
- * Gallery — ported from options/gallery.tsx entry 17 ("Arch-Topped 3-Up"):
- * arch-cropped photo tiles (border-radius on the top corners only) under a
- * No heading here on purpose: the work speaks, and a single "View all
- * projects" button follows the tiles. Adds the hover the client asked for: the arch
- * crops up from the bottom, the area label moves into the space that opens,
- * and a verbatim one-line Google review slides up from a mask underneath.
- * Pure CSS (:hover), so it costs nothing on scroll and degrades cleanly to a
- * fully legible resting state on touch devices.
+ * Gallery — ported from options/gallery2.tsx entry 4 ("Scattered Polaroid
+ * Stack"): five real project photos loosely overlapping at varied
+ * rotations, like prints tipped out of an envelope. No heading here on
+ * purpose — the client had this stripped before and wants it to stay that
+ * way. The work speaks, a small caption sits in each polaroid's own white
+ * border (an area name for four of them, a verbatim one-line Google review
+ * on the print riding highest in the stack), and a single "View all
+ * projects" button follows. No parallax on the photos: a scattered, rotated
+ * stack already has plenty of its own visual movement, so a scroll-scrub on
+ * top of five different rotation angles reads as noisy rather than premium.
  */
 
-const TILES = GALLERY_IMGS.slice(0, 3).map((src, i) => ({
+const STACK = GALLERY_IMGS.slice(0, 5).map((src, i) => ({
   src,
   area: AREAS[i % AREAS.length],
-  review: TESTIMONIALS[i % TESTIMONIALS.length].short,
 }));
+
+const POLAROIDS = [
+  { left: "6%", top: "4%", rot: -8, z: 10 },
+  { left: "24%", top: "-2%", rot: 5, z: 20 },
+  { left: "42%", top: "8%", rot: -3, z: 30 },
+  { left: "60%", top: "-4%", rot: 7, z: 20 },
+  { left: "76%", top: "6%", rot: -6, z: 10 },
+];
+
+// The print riding highest in the stack (index 2, z:30) carries a verbatim
+// review instead of an area name.
+const FEATURED_INDEX = 2;
+const FEATURED_REVIEW = TESTIMONIALS[2].short;
 
 export default function Gallery() {
   return (
     <section
-      className="qg qpi-sec-work relative flex w-full flex-col justify-center bg-white qpi-gutter min-h-svh py-16 md:py-20"
+      className="qpi-sec-work qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20"
       aria-label="Recent pool installations"
     >
       <style>{css}</style>
 
-      <div className="mx-auto max-w-[1200px]">
+      <div className="mx-auto w-full max-w-[900px]">
         <Reveal
           as="div"
           selector=".g-tile"
           variant="water"
           stagger={0.09}
-          className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 md:grid-cols-3 md:gap-x-10"
+          className="relative mx-auto w-full max-w-[760px] h-[clamp(260px,38vh,380px)]"
         >
-          {TILES.map((tile) => (
-            <div key={tile.src} className="g-tile qg-tile text-center">
-              <div className="qg-arch">
-                <Parallax amount={12} className="h-full w-full">
+          {STACK.map((tile, i) => {
+            const pos = POLAROIDS[i];
+            const isFeatured = i === FEATURED_INDEX;
+            return (
+              <div
+                key={tile.src}
+                className="g-tile absolute"
+                style={{
+                  left: pos.left,
+                  top: pos.top,
+                  width: "20%",
+                  background: "#fff",
+                  padding: "8px 8px 10px",
+                  boxShadow: "0 14px 26px rgba(25,60,90,0.22)",
+                  transform: `rotate(${pos.rot}deg)`,
+                  zIndex: pos.z,
+                }}
+              >
+                <div style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--qpi-ink)" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={tile.src}
                     alt={`A pool installed by QLD Pool Installs in ${tile.area}`}
-                    className="h-full w-full object-cover object-top"
+                    className="w-full h-full object-cover"
                     loading="lazy"
                   />
-                </Parallax>
+                </div>
+                <p
+                  className={isFeatured ? "mt-2 text-center" : "qpi-caps mt-2 text-center"}
+                  style={{
+                    color: "var(--qpi-ink)",
+                    opacity: isFeatured ? 0.85 : 0.5,
+                    fontSize: isFeatured ? 9 : 8,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {isFeatured ? <>&ldquo;{FEATURED_REVIEW}&rdquo;</> : tile.area}
+                </p>
               </div>
-
-              <p className="qg-title qpi-caps mt-5 text-[11px]" style={{ color: "var(--qpi-ink)", opacity: 0.7 }}>
-                {tile.area}
-              </p>
-
-              <div className="qg-review mx-auto w-full max-w-[240px]">
-                <p className="qg-review-text">&ldquo;{tile.review}&rdquo;</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </Reveal>
 
         <div className="mt-12 flex justify-center md:mt-14">
@@ -73,51 +104,6 @@ export default function Gallery() {
 }
 
 const css = `
-.qg-arch {
-  position: relative;
-  overflow: hidden;
-  background: var(--qpi-ink);
-  border-radius: 9999px 9999px 6px 6px;
-  height: clamp(200px, 22vw, 300px);
-}
-
-.qg-review {
-  overflow: hidden;
-  height: 0;
-}
-
-.qg-review-text {
-  padding-top: 0.85em;
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--qpi-ink);
-  opacity: 0;
-  transform: translateY(100%);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .qg-arch {
-    transition: height 600ms cubic-bezier(0.65, 0, 0.35, 1);
-  }
-  .qg-review {
-    transition: height 600ms cubic-bezier(0.65, 0, 0.35, 1);
-  }
-  .qg-review-text {
-    transition: transform 550ms cubic-bezier(0.65, 0, 0.35, 1), opacity 420ms ease 60ms;
-  }
-  .qg-tile:hover .qg-arch {
-    height: calc(clamp(200px, 22vw, 300px) * 0.82);
-  }
-  .qg-tile:hover .qg-review {
-    height: 3.6em;
-  }
-  .qg-tile:hover .qg-review-text {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .qg-cta {
   display: inline-flex;
   align-items: center;

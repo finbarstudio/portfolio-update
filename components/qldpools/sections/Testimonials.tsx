@@ -1,61 +1,66 @@
 "use client";
 
-import Parallax from "@/components/qldpools/anim/Parallax";
 import Reveal from "@/components/qldpools/anim/Reveal";
 import { TESTIMONIALS_INTRO, TESTIMONIALS, GALLERY_IMGS } from "@/app/qldpools/site/sections/kit";
 
 /**
- * Testimonials — gallery option 16, "Floating Card on Photo": a full-bleed
- * dusk shot with a single white quote card floating over it.
+ * Testimonials — "Scattered Review Deck" (app/qldpools/site/sections/options/
+ * testimonials2.tsx, entry 4 / gallery option 29). Five real Google reviews
+ * as overlapping, rotated cards, scattered like a dropped deck.
  *
- * Client asked for parallax on the photo, so the background now drifts
- * against the scroll inside the shared Parallax frame instead of sitting
- * pinned as a plain absolute <img>. Reveal staggers the card in on scroll.
+ * Rotation lives on an inner wrapper, never on the ".t-item" element itself:
+ * Reveal writes its own transform (y/opacity) onto ".t-item", and a baked
+ * rotate() on that same node would get clobbered by GSAP's transform. The
+ * outer ".t-item" only carries position + z-index; the inner div carries the
+ * card's background, border, shadow and rotation.
  */
+
+const CARDS = [
+  { t: TESTIMONIALS[0], rot: -6, top: 10, left: "4%", w: 300 },
+  { t: TESTIMONIALS[1], rot: 4, top: 60, left: "30%", w: 320 },
+  { t: TESTIMONIALS[2], rot: -3, top: 0, left: "58%", w: 300 },
+  { t: TESTIMONIALS[3], rot: 7, top: 190, left: "12%", w: 300 },
+  { t: TESTIMONIALS[4], rot: -8, top: 220, left: "62%", w: 300 },
+] as const;
+
 export default function Testimonials() {
   return (
     <section
-      className="relative flex min-h-svh w-full flex-col justify-center overflow-hidden py-16 md:py-20"
+      className="qpi-gutter relative w-full bg-white min-h-svh flex flex-col justify-center py-16 md:py-20"
       aria-label="Testimonials"
     >
-      {/* Full-bleed background photo — deliberately NOT inside the gutter,
-          it should run edge to edge. Only the card below respects it. */}
-      <div className="absolute inset-0">
-        <Parallax amount={12} className="h-full w-full">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={GALLERY_IMGS[4]}
-            alt="A pool installed by QLD Pool Installs, lit at dusk"
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-        </Parallax>
-      </div>
-      <div className="absolute inset-0" style={{ background: "rgba(11,42,74,0.35)" }} />
-
-      <div className="relative z-10 qpi-gutter">
-        <Reveal selector=".t-item" stagger={0.09} className="mx-auto max-w-[640px]">
-          <div className="t-item bg-white p-10 md:p-14">
-            <p className="qpi-caps mb-6" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
-              {TESTIMONIALS_INTRO.kicker}
-            </p>
-            <p
-              className="text-balance"
-              style={{
-                color: "var(--qpi-ink)",
-                fontSize: "clamp(1.375rem, 2.6vw, 2rem)",
-                lineHeight: 1.4,
-                fontWeight: 600,
-              }}
+      <p className="qpi-caps mb-10 text-center" style={{ color: "var(--qpi-blue)", fontSize: 11 }}>
+        {TESTIMONIALS_INTRO.kicker} &nbsp;&middot;&nbsp; 5.0 on Google
+      </p>
+      <Reveal selector=".t-item" stagger={0.09}>
+        <div className="relative mx-auto w-full max-w-[1100px]" style={{ height: 460 }}>
+          {CARDS.map((c, i) => (
+            <div
+              key={c.t.name}
+              className="t-item absolute"
+              style={{ top: c.top, left: c.left, width: c.w, zIndex: 10 + i }}
             >
-              &ldquo;{TESTIMONIALS[2].short}&rdquo;
-            </p>
-            <p className="qpi-caps mt-7" style={{ color: "var(--qpi-ink)", opacity: 0.5, fontSize: 11 }}>
-              {TESTIMONIALS[2].name}
-            </p>
-          </div>
-        </Reveal>
-      </div>
+              <div
+                className="p-6"
+                style={{
+                  background: "#fff",
+                  border: "1px solid rgba(25,60,90,0.18)",
+                  boxShadow: "0 14px 30px rgba(25,60,90,0.12)",
+                  transform: `rotate(${c.rot}deg)`,
+                }}
+              >
+                <p style={{ color: "var(--qpi-blue)", fontSize: 12, letterSpacing: "0.08em" }} aria-label="5 out of 5 stars">
+                  ★★★★★
+                </p>
+                <p style={{ color: "var(--qpi-ink)", opacity: 0.8, fontSize: 13, lineHeight: 1.55, marginTop: 10 }}>{c.t.short}</p>
+                <p className="qpi-caps mt-4" style={{ color: "var(--qpi-ink)", opacity: 0.45, fontSize: 9 }}>
+                  {c.t.name}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Reveal>
     </section>
   );
 }
