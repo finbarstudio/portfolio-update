@@ -36,7 +36,7 @@ const CAL_NS = "book-call"; // must match CalEmbed's namespace for the event hoo
 const STEPS = [
   { n: "01", text: "A 15-minute call about your business." },
   { n: "02", text: "Your homepage redesigned as a real concept, within a week." },
-  { n: "03", text: "Love it? The full site gets built, live in about two weeks. Don’t? Keep the concept, no hard feelings." },
+  { n: "03", text: "Love it? If one page is all you need, it's yours: free, hosted, live. A full site with the bells and whistles is a paid build, live in about two weeks. Don't? Keep the concept, no hard feelings." },
 ];
 
 const PROOF = [
@@ -51,6 +51,7 @@ const INCLUDES = [
   "Custom animation",
   "A CMS you edit yourself",
   "Integrations like booking and custom calculators",
+  "Hosting handled",
   "Full handover",
   "Live in about two weeks",
 ];
@@ -206,13 +207,20 @@ export default function FreeRedesign() {
         </section>
 
         {/* ── What a full build includes ───────────────────────── */}
+        {/* Honest pricing shape: the one-page redesign is free, hosting
+            included. The full site is where it becomes paid work. */}
         <section className="fr-section" aria-label="What a full build includes">
-          <p className="mono-label text-ink-soft fr-kicker">If you go ahead, the full build includes</p>
+          <p className="mono-label text-ink-soft fr-kicker">Want the full site? That&rsquo;s a paid build, and it includes</p>
           <ul className="fr-includes">
             {INCLUDES.map((item) => (
               <li key={item} className="fr-include">{item}</li>
             ))}
           </ul>
+          <p className="fr-note">
+            And if one page is all you need, the redesigned homepage stays
+            free, hosting included. The paid conversation only starts when you
+            want the full site.
+          </p>
         </section>
 
         {/* ── Testimonials (slots hide gracefully while quotes land) ── */}
