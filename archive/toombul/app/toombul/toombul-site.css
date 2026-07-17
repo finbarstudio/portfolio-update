@@ -1,0 +1,515 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Toombul District Cricket Club — scoped styles for the /toombul demo.
+   Everything lives under `.tc-site` so nothing leaks into the portfolio.
+
+   REBUILD SCAFFOLD: nav + three blank 100vh sections + footer. Section styles
+   are built fresh per section. Design system kept: LT Remark (display, never
+   set in all caps) + Archivo (body / labels / numerals, from the root
+   layout's --font-archivo). Colours from Toombul's own crest + live theme:
+   blues #5185FF / #0F4CDB / #11295F, pale #E2EBFF, crest red #DD3748, gold
+   #FFDB30, on a white ground.
+   Mobile-first: base styles target phones; min-width tweaks widen it up.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* LT Remark (LyonsType) — the demo's display face, self-hosted. */
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-BlackItalic.woff2") format("woff2");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LT Remark";
+  src: url("/toombul/fonts/LTRemark-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+.tc-site {
+  --white: #ffffff;
+  --panel: #f2f5fd;
+  --panel-line: #dfe7f7;
+  --ink: #11295f;
+  --ink-soft: #4d5a7d;
+  --line: #dfe7f7;
+
+  --blue: #5185ff;
+  --blue-btn: #0f4cdb;
+  --blue-deep: #11295f;
+  --blue-ink: #0a2257;
+  --pale: #e2ebff;
+  --red: #dd3748;
+  --red-deep: #a92433;
+  --gold: #ffdb30;
+
+  --gut: clamp(20px, 5.5vw, 64px);
+  --maxw: 1280px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --font-display: "LT Remark", Georgia, serif;
+  --font-num: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100svh;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.tc-site * { box-sizing: border-box; }
+.tc-site img { max-width: 100%; display: block; }
+
+/* Undo the portfolio's global h1 uppercase without out-ranking our own
+   heading classes — :where() keeps specificity at zero. */
+.tc-site :where(h1, h2, h3, h4) { text-transform: none; margin: 0; }
+.tc-site p { margin: 0; }
+.tc-site a { color: inherit; text-decoration: none; }
+
+.tc-wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-left: var(--gut);
+  padding-right: var(--gut);
+}
+
+/* Small tracked label — Archivo caps (never LT Remark). */
+.tc-eyebrow {
+  font-family: var(--font-mono);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--blue-btn);
+}
+
+/* Pill button. */
+.tc-btn {
+  font-family: var(--font-mono);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+  font-weight: 400;
+  padding: 13px 26px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.tc-btn--red { background: var(--red); color: var(--white); }
+.tc-btn--red:hover { background: var(--red-deep); transform: translateY(-1px); }
+.tc-btn--ghost { background: transparent; color: var(--white); border-color: rgba(255, 255, 255, 0.5); }
+.tc-btn--ghost:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.8); }
+
+/* ── reveal primitive ─────────────────────────────────────────────────── */
+.tc-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.tc-reveal[data-shown="true"] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .tc-reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── nav — minimal, text only, no backgrounds ─────────────────────────── */
+.tc-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px var(--gut);
+}
+.tc-nav-brand { display: flex; align-items: center; gap: 10px; }
+.tc-nav-word {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  font-size: 14px;
+  color: var(--blue-deep);
+  line-height: 1.05;
+}
+.tc-nav-word small {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  font-size: 9px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+.tc-nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 34px);
+  font-family: var(--font-mono);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.tc-nav-links a { position: relative; padding: 4px 0; }
+.tc-nav-links a::after {
+  content: "";
+  position: absolute; left: 0; right: 100%; bottom: 0;
+  height: 2px; background: var(--red);
+  transition: right 0.3s var(--ease);
+}
+.tc-nav-links a:hover::after { right: 0; }
+
+/* ── blank section scaffold — each fills a viewport, styled per rebuild ── */
+.tc-blank {
+  min-height: 100svh;
+}
+
+/* ── hero collage — crest + dithered paraphernalia, positions from JSON ── */
+.tc-collage {
+  position: relative;
+  min-height: 100svh;
+  /* let the scroll-scatter fly past the section edges without a hard clip
+     (horizontal stays contained by .tc-site { overflow-x: clip }) */
+  overflow: visible;
+  z-index: 2;
+}
+.tc-para-wrap {
+  position: absolute;
+  transform-origin: center;
+  line-height: 0;
+}
+.tc-para-inner, .tc-para-scatter, .tc-para-float { display: block; width: 100%; will-change: transform; }
+.tc-para {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  user-select: none;
+  pointer-events: none;
+}
+/* Start hidden so the GSAP entrance can't flash the static frame first
+   (only when motion is allowed and we're not in the editor). */
+@media (prefers-reduced-motion: no-preference) {
+  .tc-collage:not(.tc-collage--edit) .tc-para-inner,
+  .tc-collage:not(.tc-collage--edit) .tc-collage-crest { opacity: 0; }
+}
+
+/* Tablet: scale the desktop arrangement up a touch so it keeps its density.
+   Phones use their own portrait layout (toombul-collage-mobile.json), which
+   is natively sized — no scale factor. */
+@media (min-width: 701px) and (max-width: 1100px) {
+  .tc-collage, .tc-modern { --para-scale: 1.35; }
+}
+
+/* ── section two — the modern register (new Bulls mark) ───────────────── */
+.tc-modern {
+  position: relative;
+  min-height: 100svh;
+  /* visible so section one's scattering pieces from above aren't cut at the
+     boundary, and the stream-in isn't clipped at the top edge */
+  overflow: visible;
+  z-index: 1;
+  background: #ffffff;
+}
+.tcm-wrap {
+  position: absolute;
+  transform-origin: center;
+  line-height: 0;
+}
+.tcm-inner, .tcm-exit, .tcm-streak { display: block; width: 100%; will-change: transform, filter; }
+.tcm-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+.tc-modern-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* standalone translate so the GSAP scale tween can't clobber the centring */
+  translate: -50% -50%;
+  width: clamp(190px, 21vw, 300px);
+  height: auto;
+  z-index: 11;
+  pointer-events: none;
+  user-select: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tcm-streak, .tc-modern-logo { opacity: 0; }
+}
+/* Crest: locked, centred, full colour, above the paraphernalia.
+   Centring uses the standalone `translate` property (NOT transform) so the
+   GSAP scale tweens can't clobber the -50%/-50% offset — that was why the
+   crest sat low. */
+.tc-collage-crest {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: clamp(160px, 18vw, 260px);
+  height: auto;
+  z-index: 3;
+  pointer-events: none;
+  user-select: none;
+}
+/* ── collage editor (only active with ?edit=1) ────────────────────────── */
+.tc-collage--edit .tc-para-wrap { cursor: grab; }
+.tc-collage--edit .tc-para-wrap.is-sel { outline: 2px solid var(--blue-btn); cursor: move; }
+.tc-collage--edit .tc-para { pointer-events: none; }
+.tc-h {
+  position: absolute;
+  width: 16px; height: 16px;
+  background: var(--white);
+  border: 2px solid var(--blue-btn);
+  z-index: 30;
+}
+.tc-h-resize { right: -8px; bottom: -8px; cursor: nwse-resize; border-radius: 3px; }
+.tc-h-rotate { left: 50%; top: -30px; margin-left: -8px; cursor: grab; border-radius: 50%; }
+.tc-h-rotate::before {
+  content: ""; position: absolute; left: 50%; top: 14px;
+  width: 2px; height: 16px; background: var(--blue-btn); transform: translateX(-1px);
+}
+.tc-editor {
+  position: fixed;
+  left: 16px; bottom: 16px;
+  z-index: 60;
+  width: 260px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(17, 41, 95, 0.18);
+  padding: 14px;
+  font-family: var(--font-body);
+  color: var(--ink);
+  cursor: default;
+}
+.tc-editor-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.tc-editor-title { font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; color: var(--blue-btn); }
+.tc-editor-hide {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--ink-soft); background: none; border: none; cursor: pointer; padding: 2px 4px;
+}
+.tc-editor-hide:hover { color: var(--ink); }
+.tc-editor-chip {
+  position: fixed; left: 16px; bottom: 16px; z-index: 60;
+  font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.06em;
+  font-size: 11px; color: var(--white); background: var(--blue-btn);
+  border: none; border-radius: 999px; padding: 9px 15px; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(17, 41, 95, 0.28);
+}
+.tc-editor-del {
+  width: 100%; margin-bottom: 10px;
+  font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 6px; border: 1px solid var(--red); background: var(--white); color: var(--red);
+  border-radius: 6px; cursor: pointer;
+}
+.tc-editor-del:hover { background: var(--red); color: var(--white); }
+.tc-editor-hint { font-size: 12px; line-height: 1.5; color: var(--ink-soft); }
+.tc-editor-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 12px; }
+.tc-editor-fields strong { grid-column: 1 / -1; font-size: 13px; text-transform: uppercase; }
+.tc-editor-fields label { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; color: var(--ink-soft); }
+.tc-editor-fields input { width: 100%; font-size: 12px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 5px; }
+.tc-editor-row { display: flex; gap: 6px; margin-top: 10px; }
+.tc-editor-row button {
+  flex: 1; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 6px; border: 1px solid var(--blue-btn); background: var(--white); color: var(--blue-btn);
+  border-radius: 6px; cursor: pointer;
+}
+.tc-editor-row button:hover { background: var(--pale); }
+
+/* ── section three — identity showcase (six lockups, crest finale) ─────── */
+.tc-logoshow {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  background: var(--white);
+  /* generous breathing room: the marks sit small and padded in the viewport */
+  padding: clamp(48px, 9vh, 120px) clamp(40px, 8vw, 140px);
+  column-gap: clamp(24px, 5vw, 90px);
+  row-gap: clamp(24px, 6vh, 80px);
+  overflow: hidden;
+}
+.tc-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+.tc-mark img {
+  width: 100%;
+  max-width: clamp(120px, 13.5vw, 210px);
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+.tc-mark--hero { position: relative; z-index: 5; }
+@media (max-width: 700px) {
+  .tc-logoshow {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: clamp(40px, 8vh, 80px) clamp(24px, 7vw, 48px);
+  }
+  .tc-mark img { max-width: 34vw; }
+}
+
+/* ── section four — coverflow logo marquee ────────────────────────────── */
+.tc-marquee {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--white);
+}
+.tc-marquee-track {
+  display: flex;
+  align-items: center;
+  will-change: transform;
+}
+.tc-marquee-item {
+  flex: 0 0 33.333vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+.tc-marquee-item img {
+  width: 72%;
+  max-width: 300px;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+@media (max-width: 700px) {
+  .tc-marquee-item { flex-basis: 44vw; }
+}
+
+/* ── footer ───────────────────────────────────────────────────────────── */
+.tc-footer {
+  position: relative;
+  background: var(--blue-ink);
+  color: rgba(255, 255, 255, 0.86);
+  padding: clamp(48px, 8vh, 88px) 0 28px;
+  overflow: hidden;
+}
+.tc-footer-top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  padding-bottom: clamp(32px, 6vh, 56px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+@media (min-width: 780px) {
+  .tc-footer-top { grid-template-columns: 1.3fr 1fr 1fr; }
+}
+.tc-footer-crest { display: flex; align-items: center; gap: 12px; }
+.tc-footer-crest img { width: 48px; height: auto; }
+.tc-footer-crest-word { font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 16px; color: var(--white); }
+.tc-footer-crest-sub { font-family: var(--font-mono); font-style: italic; text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; color: rgba(255, 255, 255, 0.55); margin-top: 3px; }
+.tc-footer-col-title {
+  font-family: var(--font-mono);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+.tc-footer-col a, .tc-footer-col p { display: block; font-size: 14px; line-height: 1.8; color: rgba(255, 255, 255, 0.78); }
+.tc-footer-col a:hover { color: var(--white); }
+.tc-footer-word {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: rgba(81, 133, 255, 0.14);
+  font-size: clamp(64px, 16vw, 220px);
+  line-height: 0.8;
+  letter-spacing: -0.01em;
+  text-align: center;
+  padding: clamp(20px, 4vh, 36px) 0 0;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.tc-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.45);
+  padding-top: 18px;
+}
+
+.tc-back-pill {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--red);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10.5px;
+  font-weight: 400;
+  padding: 10px 14px;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+.tc-back-pill-text {
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: max-width 0.35s var(--ease), opacity 0.25s var(--ease);
+}
+.tc-back-pill:hover .tc-back-pill-text { max-width: 160px; opacity: 1; }

@@ -1,0 +1,1456 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Imogen's Asia guide — scoped styles. Everything under `.imogen-page` so it
+   can't leak into the portfolio. No `@import "tailwindcss"` / `@theme` here —
+   the root build already ships the utilities; this is plain CSS variables +
+   classes. Fonts come from the root layout (--font-archivo / --font-space-mono /
+   --font-display). Loaded only by app/imogen/layout.tsx.
+   Mobile-first: base styles target phones; a couple of min-width tweaks widen
+   it on larger screens.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.imogen-page {
+  /* warm, friendly palette (in the brand family, a touch lighter) */
+  --bg: #f7f1e5;
+  --bg-raised: #fdfaf3;
+  --bg-sunken: #efe6d3;
+  --ink: #241f1a;
+  --ink-soft: #6c645a;
+  --line: #e6dcc8;
+  --pink: #e96d89;
+  --pink-soft: #f7d3da;
+
+  /* country accents */
+  --c-thailand: #d99a3a;
+  --c-laos: #4fa284;
+  --c-vietnam: #d9644e;
+
+  --maxw: 680px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --star: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  /* gold star with a white outline ring (8-way) + soft shadow, via filter so the fill stays gold */
+  --star-filter: drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff)
+    drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff)
+    drop-shadow(1.1px 1.1px 0 #fff) drop-shadow(-1.1px 1.1px 0 #fff)
+    drop-shadow(1.1px -1.1px 0 #fff) drop-shadow(-1.1px -1.1px 0 #fff)
+    drop-shadow(0 2px 5px rgba(36, 31, 26, 0.5));
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100svh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.imogen-page * { box-sizing: border-box; }
+
+/* country tint helpers */
+.imogen-page .c-thailand { --c: var(--c-thailand); }
+.imogen-page .c-laos { --c: var(--c-laos); }
+.imogen-page .c-vietnam { --c: var(--c-vietnam); }
+
+/* ── type ──────────────────────────────────────────────────────────────── */
+.imogen-page .im-eyebrow {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pink);
+}
+.imogen-page .im-mono {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+}
+.imogen-page .im-serif {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+.imogen-page h1,
+.imogen-page h2,
+.imogen-page h3 { margin: 0; }
+.imogen-page a { color: inherit; }
+
+/* ── sticky top bar ────────────────────────────────────────────────────── */
+.imogen-page .im-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.imogen-page .im-bar-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+  font-weight: 700;
+}
+.imogen-page .im-bar-name b { color: var(--pink); font-weight: 700; }
+.imogen-page .im-bar-link {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.imogen-page .im-bar-link:hover { color: var(--pink); border-color: var(--pink); }
+
+/* ── shared container ──────────────────────────────────────────────────── */
+.imogen-page .im-wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 18px;
+}
+.imogen-page .im-section { padding: 46px 0; }
+.imogen-page .im-section + .im-section { border-top: 1px solid var(--line); }
+.imogen-page .im-section-label {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+}
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.imogen-page .im-hero { padding: 30px 0 40px; }
+.imogen-page .im-hero h1 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 13vw, 4.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  margin: 14px 0 6px;
+}
+.imogen-page .im-hero h1 em {
+  font-style: italic;
+  color: var(--pink);
+}
+.imogen-page .im-hero-dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 14px;
+  margin: 8px 0 20px;
+  background: var(--bg-raised);
+}
+.imogen-page .im-hero-dates .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pink); }
+.imogen-page .im-hero-intro {
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--ink);
+  max-width: 38ch;
+}
+.imogen-page .im-route-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+.imogen-page .im-chip {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--c, var(--ink));
+  color: var(--c, var(--ink));
+  border-radius: 999px;
+  padding: 5px 11px;
+  white-space: nowrap;
+}
+
+/* ── route map ─────────────────────────────────────────────────────────── */
+.imogen-page .im-map-cap {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 14px;
+  text-align: center;
+}
+.imogen-page .im-map {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+.imogen-page .im-map svg { width: 100%; height: auto; display: block; overflow: visible; }
+.imogen-page .im-map-country path { stroke-width: 1; vector-effect: non-scaling-stroke; }
+.imogen-page .im-map-label {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  fill: var(--ink-soft);
+  opacity: 0.65;
+}
+.imogen-page .im-map-route {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.5;
+}
+.imogen-page .im-map-route.is-boat {
+  stroke-dasharray: 2 6;
+  opacity: 0.4;
+}
+/* HTML pins overlaid on the SVG */
+.imogen-page .im-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.imogen-page .im-pin-dot {
+  position: relative;
+  flex: 0 0 auto;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--c, var(--ink));
+  box-shadow: 0 2px 6px rgba(36, 31, 26, 0.25);
+  border: 2px solid var(--bg-raised);
+}
+/* 9/10 stops: a gold STAR pin, with the same cream outline + shadow as the circles */
+.imogen-page .im-pin.is-top { z-index: 3; }
+.imogen-page .im-pin.is-top .im-pin-dot {
+  width: 27px;
+  height: 27px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #fff;
+  font-size: 10px;
+  filter: drop-shadow(0 2px 4px rgba(36, 31, 26, 0.45));
+}
+/* Layered star: a larger white star behind (the outline) + the gold star on
+   top, both behind the number. drop-shadow chains read as no outline at all, so
+   the ring is a real second shape instead. */
+.imogen-page .im-pin.is-top .im-pin-dot::before,
+.imogen-page .im-pin.is-top .im-pin-dot::after {
+  content: "";
+  position: absolute;
+  clip-path: var(--star);
+}
+.imogen-page .im-pin.is-top .im-pin-dot::before { inset: 0; z-index: -1; background: #e3a82a; }
+.imogen-page .im-pin.is-top .im-pin-dot::after { inset: -3px; z-index: -2; background: #fff; }
+.imogen-page .im-pin.is-top .im-pin-star { display: none; } /* the pin itself is the star */
+.imogen-page .im-pin.is-planned .im-pin-dot {
+  background: var(--bg-raised);
+  color: var(--c, var(--ink-soft));
+  border: 2px dashed var(--c, var(--line));
+  box-shadow: none;
+}
+.imogen-page .im-pin-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--bg-raised) 88%, transparent);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.imogen-page .im-pin.is-planned .im-pin-name { color: var(--ink-soft); }
+.imogen-page .im-pin.is-side .im-pin-dot {
+  width: 18px;
+  height: 18px;
+  background: var(--bg-raised);
+  border: 2px dashed var(--c, var(--ink-soft));
+  box-shadow: none;
+}
+.imogen-page .im-pin.flip { flex-direction: row-reverse; }
+.imogen-page a.im-pin:active .im-pin-dot { transform: scale(0.92); }
+
+/* ── app cards ─────────────────────────────────────────────────────────── */
+.imogen-page .im-apps { display: grid; gap: 12px; }
+.imogen-page .im-app {
+  display: block;
+  text-decoration: none;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 16px 17px;
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.imogen-page .im-app:hover { border-color: var(--pink); transform: translateY(-1px); }
+.imogen-page .im-app-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.imogen-page .im-app-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.imogen-page .im-app-go {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+.imogen-page .im-app-tag {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.imogen-page .im-app-note { font-size: 14.5px; line-height: 1.55; margin-top: 9px; color: var(--ink); }
+
+/* ── tips ──────────────────────────────────────────────────────────────── */
+.imogen-page .im-tips { display: grid; gap: 18px; margin-top: 22px; }
+.imogen-page .im-tip-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 19px;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+.imogen-page .im-tip-body { font-size: 15px; line-height: 1.58; color: var(--ink); }
+
+/* ── stop cards ────────────────────────────────────────────────────────── */
+.imogen-page .im-stops { display: grid; gap: 22px; }
+.imogen-page .im-stop {
+  scroll-margin-top: 72px;
+  background: var(--bg-raised);
+  border: 1px solid var(--c, var(--line));
+  border-radius: 18px;
+  padding: 20px 18px 22px;
+}
+.imogen-page .im-stop.is-open {
+  box-shadow: 0 1px 0 var(--c, var(--ink)) inset, 0 0 0 1px var(--c, var(--ink));
+}
+/* subtle full-card highlight for a 10/10 */
+.imogen-page .im-stop.is-top {
+  background-image: linear-gradient(180deg, rgba(23, 122, 62, 0.09), transparent 170px);
+  box-shadow: 0 8px 26px -14px rgba(23, 122, 62, 0.6);
+}
+.imogen-page .im-stop.is-top.is-open {
+  box-shadow: 0 0 0 1px var(--c, var(--ink)), 0 8px 26px -14px rgba(23, 122, 62, 0.6);
+}
+.imogen-page .im-stop.is-travel {
+  background: var(--bg-sunken);
+  border-style: dashed;
+}
+/* optional / not-fully-done stops: greyed off until you open them */
+.imogen-page .im-stop.is-muted { opacity: 0.58; border-color: var(--line); }
+.imogen-page .im-stop.is-muted.is-open { opacity: 1; }
+.imogen-page .im-stop.is-muted .im-stop-num { background: var(--ink-soft); }
+.imogen-page .im-stop.is-muted .im-stop-country { background: var(--ink-soft); }
+.imogen-page .im-stop-optional {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+/* muted map pins + legend rows — solid grey, not transparent */
+.imogen-page .im-pin.is-muted .im-pin-dot { background: #b4ab9c; }
+.imogen-page .im-map-legend li.is-muted { color: var(--ink-soft); }
+.imogen-page .im-map-legend li.is-muted .im-leg-dot { background: #b4ab9c; }
+.imogen-page .im-stop-head {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+.imogen-page .im-stop-num {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--c, var(--ink));
+}
+.imogen-page .im-stop.is-travel .im-stop-num {
+  background: var(--bg-raised);
+  color: var(--c, var(--ink));
+  border: 2px dashed var(--c, var(--line));
+}
+.imogen-page .im-stop-headtext { flex: 1; min-width: 0; }
+.imogen-page .im-stop-name {
+  display: block;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.5rem, 6.5vw, 1.9rem);
+  line-height: 1.04;
+}
+.imogen-page .im-stop-headtext { display: block; }
+.imogen-page .im-stop-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 7px;
+}
+.imogen-page .im-stop-country {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--c, var(--ink));
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.imogen-page .im-stop-side {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c, var(--ink));
+  border: 1px solid var(--c, var(--ink));
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.imogen-page .im-stop-dates {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-stop-blurb { font-size: 15.5px; line-height: 1.6; margin-top: 14px; }
+
+.imogen-page .im-block { margin-top: 18px; }
+.imogen-page .im-block-label {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+/* stay block */
+.imogen-page .im-stay {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 14px;
+}
+.imogen-page .im-stay-name { font-weight: 700; font-size: 16px; }
+.imogen-page .im-stay-room {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--pink-soft);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+.imogen-page .im-stay-note { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 9px; }
+.imogen-page .im-stay-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+/* do list */
+.imogen-page .im-dos { display: grid; gap: 10px; }
+.imogen-page .im-do {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+.imogen-page .im-do:first-child { border-top: none; padding-top: 2px; }
+.imogen-page .im-do-mark {
+  flex: 0 0 auto;
+  font-size: 15px;
+  line-height: 1.5;
+  width: 1.4em;
+  text-align: center;
+}
+.imogen-page .im-do-body { flex: 1; min-width: 0; }
+.imogen-page .im-do-name { font-weight: 600; font-size: 15.5px; }
+.imogen-page .im-do-name .im-tagword {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.imogen-page .im-tag-food { color: var(--c-thailand); }
+.imogen-page .im-tag-night { color: var(--pink); }
+.imogen-page .im-tag-optional { color: var(--ink-soft); }
+.imogen-page .im-do-note { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 2px; }
+.imogen-page .im-do-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 7px; }
+
+/* next-leg block */
+.imogen-page .im-leg {
+  margin-top: 18px;
+  border-top: 1px dashed var(--line);
+  padding-top: 15px;
+}
+.imogen-page .im-leg-to { font-weight: 700; font-size: 15px; }
+.imogen-page .im-leg-mode { font-size: 14.5px; line-height: 1.5; margin-top: 4px; }
+.imogen-page .im-leg-note { font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); margin-top: 6px; }
+
+/* small link button */
+.imogen-page .im-linkbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--bg-raised);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 7px 13px;
+  min-height: 36px;
+  transition: color 0.18s var(--ease), border-color 0.18s var(--ease), background 0.18s var(--ease);
+}
+.imogen-page .im-linkbtn:hover { color: var(--pink); border-color: var(--pink); }
+.imogen-page .im-linkbtn.is-primary { background: var(--pink); border-color: var(--pink); color: #fff; }
+.imogen-page .im-linkbtn.is-primary:hover { background: #df5d7a; }
+.imogen-page .im-linkbtn.is-quiet {
+  border-color: var(--line);
+  color: var(--ink-soft);
+  background: transparent;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.imogen-page .im-linkbtn.is-quiet:hover { color: var(--pink); border-color: var(--pink); }
+
+/* ── footer ────────────────────────────────────────────────────────────── */
+.imogen-page .im-foot {
+  padding: 50px 0 70px;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+.imogen-page .im-foot-more {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-foot-note {
+  max-width: 30rem;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.imogen-page .im-foot-sign {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 22px;
+  line-height: 1.3;
+  margin-top: 22px;
+}
+.imogen-page .im-foot-by {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 20px;
+}
+.imogen-page .im-foot-by a { color: var(--pink); text-decoration: none; }
+
+/* ── reveal ────────────────────────────────────────────────────────────── */
+.imogen-page .im-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.imogen-page .im-reveal[data-shown="true"] { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .imogen-page .im-reveal { opacity: 1; transform: none; transition: none; }
+  .imogen-page * { scroll-behavior: auto !important; }
+}
+
+/* ── wider screens: a bit more air, never sprawling ────────────────────── */
+@media (min-width: 720px) {
+  .imogen-page .im-section { padding: 64px 0; }
+  .imogen-page .im-apps { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── muted (off-route) country label on the big map ────────────────────── */
+.imogen-page .im-map-label.is-muted { opacity: 0.4; }
+
+/* ── hostel locator (little drawn map in the Stay block) ───────────────── */
+.imogen-page .im-stay-top { display: flex; gap: 12px; align-items: flex-start; }
+.imogen-page .im-stay-loc {
+  flex: 0 0 92px;
+  width: 92px;
+  height: 92px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  display: block;
+}
+.imogen-page .im-loc-svg { width: 100%; height: 100%; display: block; }
+.imogen-page .im-stay-main { flex: 1; min-width: 0; }
+
+/* ── safety callout ────────────────────────────────────────────────────── */
+.imogen-page .im-safety {
+  background: #fbe9e4;
+  border: 1px solid var(--c-vietnam);
+  border-left: 4px solid var(--c-vietnam);
+  border-radius: 14px;
+  padding: 18px 18px 20px;
+}
+.imogen-page .im-safety-title { font-size: 20px; color: #b4452f; margin-bottom: 6px; }
+.imogen-page .im-safety-body { font-size: 14.5px; line-height: 1.6; margin-top: 10px; }
+.imogen-page .im-safety-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+/* ── password lock ─────────────────────────────────────────────────────── */
+.imogen-page .im-lock { min-height: 100svh; display: grid; place-items: center; padding: 24px; }
+.imogen-page .im-lock-card {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 34px 24px 28px;
+}
+.imogen-page .im-lock-title { font-size: clamp(2rem, 9vw, 2.6rem); margin: 8px 0 8px; }
+.imogen-page .im-lock-sub { font-size: 15px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 20px; }
+.imogen-page .im-lock-input {
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  margin-bottom: 10px;
+  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  text-align: center;
+}
+.imogen-page .im-lock-input:focus { outline: none; border-color: var(--pink); }
+.imogen-page .im-lock-input.is-err { border-color: #c2473b; }
+.imogen-page .im-lock-btn {
+  width: 100%;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pink);
+  color: #fff;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.2s var(--ease);
+}
+.imogen-page .im-lock-btn:hover { background: #df5d7a; }
+.imogen-page .im-lock-err { color: var(--c-vietnam); font-size: 13px; margin-top: 12px; }
+.imogen-page .im-lock-hint {
+  color: var(--ink-soft);
+  font-size: 12px;
+  margin-top: 16px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}
+
+/* ── extra hostel option (a second "good option") ──────────────────────── */
+.imogen-page .im-stay-opt.is-more {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* ── waypoint pin (passed through, not a stay) ─────────────────────────── */
+.imogen-page .im-pin.is-waypoint .im-pin-dot {
+  width: 13px;
+  height: 13px;
+  background: var(--ink-soft);
+  border: 2px solid var(--bg-raised);
+  box-shadow: none;
+}
+.imogen-page .im-pin.is-waypoint .im-pin-name { color: var(--ink-soft); }
+
+/* ── trip graph (time in each place) ───────────────────────────────────── */
+.imogen-page .im-graph { display: grid; gap: 16px; }
+.imogen-page .im-graph-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.imogen-page .im-graph-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.imogen-page .im-graph-val {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.imogen-page .im-graph-track {
+  display: block;
+  height: 12px;
+  background: var(--bg-sunken);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.imogen-page .im-graph-bar {
+  display: block;
+  height: 100%;
+  background: var(--c, var(--ink));
+  border-radius: 999px;
+}
+.imogen-page .im-graph-bar.is-side { opacity: 0.4; }
+.imogen-page .im-graph-note { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-top: 16px; }
+
+/* ── map legend (names live here, not crowding the map) ────────────────── */
+.imogen-page .im-map-key {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 14px 0 0;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-map-key-item { display: inline-flex; align-items: center; gap: 5px; }
+.imogen-page .im-map-key-star {
+  flex: none;
+  position: relative;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  clip-path: var(--star);
+  filter: drop-shadow(0 1px 1.5px rgba(36, 31, 26, 0.35));
+}
+.imogen-page .im-map-key-star::before {
+  content: "";
+  position: absolute;
+  inset: 1.6px;
+  background: #e3a82a;
+  clip-path: var(--star);
+}
+.imogen-page .im-map-key-grey { width: 11px; height: 11px; border-radius: 50%; background: var(--ink-soft); opacity: 0.5; }
+.imogen-page .im-map-legend {
+  list-style: none;
+  padding: 0;
+  margin: 12px auto 0;
+  max-width: 460px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  justify-content: center;
+}
+.imogen-page .im-leg-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.imogen-page .im-leg-link.is-static { color: var(--ink-soft); }
+.imogen-page .im-leg-dot {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--c, var(--ink));
+}
+.imogen-page .im-leg-dot.is-side {
+  background: var(--bg-raised);
+  color: var(--c, var(--ink-soft));
+  border: 1.5px dashed var(--c, var(--line));
+}
+.imogen-page .im-leg-dot.is-waypoint { width: 12px; height: 12px; background: var(--ink-soft); }
+.imogen-page .im-leg-dot.is-planned {
+  background: var(--bg-raised);
+  color: var(--c, var(--ink-soft));
+  border: 1.5px dashed var(--c, var(--line));
+}
+/* 9/10 stops: the numbered dot itself becomes a gold star (same layered
+   outline as the map pins), so the number sits inside the star. */
+.imogen-page .im-leg-dot.is-top {
+  position: relative;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  filter: drop-shadow(0 1px 1.5px rgba(36, 31, 26, 0.3));
+}
+.imogen-page .im-leg-dot.is-top::before,
+.imogen-page .im-leg-dot.is-top::after {
+  content: "";
+  position: absolute;
+  clip-path: var(--star);
+}
+.imogen-page .im-leg-dot.is-top::before { inset: 0; z-index: -1; background: #e3a82a; }
+.imogen-page .im-leg-dot.is-top::after { inset: -2.5px; z-index: -2; background: #fff; }
+
+/* floating "jump to the map" button */
+.imogen-page .im-map-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 18px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 15px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 8px 22px -8px rgba(36, 31, 26, 0.55);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.imogen-page .im-map-fab.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+.imogen-page .im-map-fab-icon { font-size: 14px; }
+
+/* ── trip timeline (ordered segments + leader-line country labels) ──────── */
+.imogen-page .im-tl-track { position: relative; }
+.imogen-page .im-tl-bar {
+  display: flex;
+  gap: 1.5px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--line);
+}
+.imogen-page .im-tl-seg {
+  position: relative;
+  flex-basis: 0;
+  flex-shrink: 1;
+  min-width: 11px;
+  display: grid;
+  place-items: center;
+  background: var(--c, var(--ink));
+}
+/* round only the bar ends (no overflow:hidden, so tooltips can escape) */
+.imogen-page .im-tl-seg:first-child { border-top-left-radius: 7px; border-bottom-left-radius: 7px; }
+.imogen-page .im-tl-seg:last-child { border-top-right-radius: 7px; border-bottom-right-radius: 7px; }
+.imogen-page .im-tl-seg-n {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+.imogen-page .im-tl-seg.is-travel { background: #6f86c9; }
+
+/* country labels off the bar, on a short leader line; alternate above/below */
+.imogen-page .im-tl-side { position: relative; }
+.imogen-page .im-tl-side.is-above { height: 64px; }
+.imogen-page .im-tl-side.is-below { height: 58px; }
+.imogen-page .im-tl-cap {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: max-content;
+  max-width: 48%;
+  text-align: center;
+}
+.imogen-page .im-tl-cap.is-above { bottom: 0; }
+.imogen-page .im-tl-cap.is-below { top: 0; }
+.imogen-page .im-tl-cap-name {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--c, var(--ink));
+  display: block;
+}
+.imogen-page .im-tl-cap-places {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  line-height: 1.25;
+  color: var(--ink-soft);
+}
+.imogen-page .im-tl-lead { width: 1.5px; height: 10px; background: var(--c, var(--ink-soft)); opacity: 0.55; margin-top: 5px; }
+.imogen-page .im-tl-cap.is-below .im-tl-lead { margin: 0 0 5px; }
+
+.imogen-page .im-tl-dates {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-tl-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 12px;
+  margin: 16px auto 0;
+  max-width: 22rem;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-align: center;
+}
+.imogen-page .im-tl-keyitem { display: inline-flex; align-items: center; gap: 6px; }
+.imogen-page .im-tl-keydot { flex: 0 0 auto; width: 11px; height: 11px; border-radius: 3px; }
+.imogen-page .im-tl-keydot.is-travel { background: #6f86c9; }
+
+/* hover/focus a block to name it, with a little pointer down to the block */
+.imogen-page .im-tl-segtip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s var(--ease), transform 0.15s var(--ease);
+  z-index: 10;
+}
+.imogen-page .im-tl-segtip small { font-size: 8.5px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.06em; }
+.imogen-page .im-tl-segtip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--ink);
+}
+.imogen-page .im-tl-seg:hover .im-tl-segtip,
+.imogen-page .im-tl-seg:focus-within .im-tl-segtip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* date leaders running all the way up to the bar ends */
+.imogen-page .im-tl-dates { margin-top: 0; }
+.imogen-page .im-tl-date { display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
+.imogen-page .im-tl-date.is-end { align-items: flex-end; }
+.imogen-page .im-tl-date-lead { width: 1.5px; height: 15px; background: var(--ink-soft); opacity: 0.55; }
+.imogen-page .im-tl-date span:last-child,
+.imogen-page .im-tl-date { padding-top: 0; }
+
+/* ── Ha Giang Loop hostel comparison ───────────────────────────────────── */
+.imogen-page .im-loop-intro { font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 4px; }
+.imogen-page .im-loop-row { padding: 13px 0; border-top: 1px solid var(--line); }
+.imogen-page .im-loop-row:first-of-type { border-top: none; }
+.imogen-page .im-loop-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.imogen-page .im-loop-name { font-weight: 700; font-size: 15px; }
+.imogen-page .im-loop-pick {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--pink);
+  border-radius: 999px;
+  padding: 2px 7px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.imogen-page .im-loop-price {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.imogen-page .im-loop-party {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 7px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-loop-party i { font-style: normal; color: var(--line); font-size: 11px; }
+.imogen-page .im-loop-party i.on { color: var(--pink); }
+.imogen-page .im-loop-meta {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+}
+.imogen-page .im-loop-note { font-size: 13.5px; line-height: 1.5; color: var(--ink); margin-top: 6px; }
+
+/* ── stop accordion (collapsible stops + items, filters, rec colours) ──── */
+.imogen-page .im-stop-chev {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--c, var(--line));
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--c, var(--ink));
+  background: var(--bg);
+}
+.imogen-page .im-stop.is-open .im-stop-chev { background: var(--c, var(--ink)); color: #fff; }
+.imogen-page .im-stop-body { margin-top: 2px; }
+
+/* when a stop is open, keep its header (and close button) stuck at the top */
+.imogen-page .im-stop.is-open .im-stop-head {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: var(--bg-raised);
+  margin: -4px 0 0;
+  padding: 10px 0 8px;
+  box-shadow: 0 6px 10px -8px rgba(36, 31, 26, 0.3);
+}
+.imogen-page .im-stop.is-travel.is-open .im-stop-head { background: var(--bg-sunken); }
+
+/* filters */
+.imogen-page .im-filters { display: flex; flex-wrap: wrap; gap: 7px; margin: 18px 0 2px; }
+.imogen-page .im-filter {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink-soft);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.imogen-page .im-filter.is-active { border-color: var(--c, var(--ink)); color: #fff; background: var(--c, var(--ink)); }
+
+/* groups */
+.imogen-page .im-grp { margin-top: 16px; }
+.imogen-page .im-grp-label {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+
+/* hint that items open */
+.imogen-page .im-tap-hint {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c, var(--ink-soft));
+  margin: 0 0 10px;
+}
+
+/* items — score-led list, rating is the lead UI element */
+.imogen-page .im-items { display: grid; gap: 6px; }
+.imogen-page .im-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+.imogen-page .im-item:not(.is-open):hover { border-color: var(--c, var(--ink)); background-color: var(--bg-sunken); }
+.imogen-page .im-item.is-open { border-color: var(--c, var(--ink)); }
+/* subtle highlight on a 10/10 item card */
+.imogen-page .im-item.is-top {
+  border-color: rgba(23, 122, 62, 0.45);
+  background-image: linear-gradient(180deg, rgba(23, 122, 62, 0.08), transparent);
+}
+.imogen-page .im-item.is-star.is-top {
+  border-color: #e0bd6f;
+  background-image: linear-gradient(180deg, rgba(200, 146, 46, 0.12), transparent);
+}
+.imogen-page .im-item-row { display: flex; align-items: center; gap: 8px; padding-right: 10px; }
+.imogen-page .im-item-toggle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 4px 9px 9px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+/* the prominent score tile */
+.imogen-page .im-item-score {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--bg-sunken);
+  color: var(--ink);
+}
+.imogen-page .im-item-score.is-empty { background: transparent; color: var(--ink-soft); box-shadow: inset 0 0 0 1px var(--line); }
+/* top items (9/10) get the same gold star icon as the map, with the number in it */
+.imogen-page .im-item-score.is-topstar {
+  width: 36px;
+  height: 36px;
+  border-radius: 0;
+  background: #e3a82a;
+  color: #fff;
+  clip-path: var(--star);
+  filter: var(--star-filter);
+}
+.imogen-page .im-top-star { flex: 0 0 auto; color: #c8922e; font-size: 16px; line-height: 1; }
+.imogen-page .im-item-title { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.imogen-page .im-item.rec-low .im-item-title { color: var(--ink-soft); font-weight: 500; }
+.imogen-page .im-item-map {
+  flex: 0 0 auto;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: var(--bg);
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+.imogen-page .im-item-map:hover { color: #fff; background: var(--pink); border-color: var(--pink); }
+.imogen-page .im-item-detail { padding: 0 12px 13px 54px; }
+.imogen-page .im-item-note { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 2px; }
+.imogen-page .im-item-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+/* small images in the detail, tap to enlarge */
+.imogen-page .im-item-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.imogen-page .im-stop-thumbs { margin-top: 0; margin-bottom: 14px; }
+.imogen-page .im-stop-thumbs .im-item-thumb { width: 96px; height: 96px; }
+.imogen-page .im-item-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  cursor: zoom-in;
+  background: var(--bg-sunken);
+  transition: transform 0.15s var(--ease);
+}
+.imogen-page .im-item-thumb:hover { transform: scale(1.03); }
+/* video thumbnail (a button wrapping a <video> first-frame + play badge) */
+.imogen-page button.im-item-thumb.is-video { padding: 0; overflow: hidden; position: relative; background: #000; display: block; }
+.imogen-page .im-item-thumb.is-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.imogen-page .im-thumb-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 16px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+.imogen-page .im-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 16, 12, 0.82);
+  cursor: zoom-out;
+  animation: imFade 0.18s ease;
+}
+@keyframes imFade { from { opacity: 0; } to { opacity: 1; } }
+.imogen-page .im-lightbox img,
+.imogen-page .im-lightbox video {
+  max-width: 100%;
+  max-height: 86vh;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+.imogen-page .im-lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.imogen-page .im-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.imogen-page .im-lightbox-nav.is-prev { left: 12px; }
+.imogen-page .im-lightbox-nav.is-next { right: 12px; }
+.imogen-page .im-lightbox-count {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* place overview tags (collapsed card) — rating is a filled colour tile */
+.imogen-page .im-stop-rating {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  border-radius: 7px;
+  padding: 3px 8px;
+}
+.imogen-page .im-stop-vibe {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.imogen-page .im-stop-nights {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--pink-soft);
+  border-radius: 7px;
+  padding: 3px 8px;
+}
+
+/* item expand chevron — a clear little button so it's obvious items open */
+.imogen-page .im-item-chev {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--ink-soft);
+  transition: background 0.15s var(--ease), color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.imogen-page .im-item.is-open .im-item-chev {
+  background: var(--c, var(--ink));
+  border-color: var(--c, var(--ink));
+  color: #fff;
+}
+
+/* tip back-link chip inside an item */
+.imogen-page .im-item-tiplink {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pink);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--pink) 45%, transparent);
+}
+.imogen-page .im-item-tiplink:hover { color: var(--ink); }
+
+/* collapsible whole-section (Apps, Things I learnt, A heads-up, …) */
+.imogen-page .im-coll { scroll-margin-top: 16px; }
+.imogen-page .im-coll-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.imogen-page .im-coll-head .im-section-label { margin: 0; }
+.imogen-page .im-coll-chev {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+.imogen-page .im-coll.is-open .im-coll-chev { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.imogen-page .im-coll-body { margin-top: 16px; }
+
+/* filter label */
+.imogen-page .im-filter-label {
+  align-self: center;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-right: 2px;
+}
+
+/* gold-star item (the single standout) */
+.imogen-page .im-item.is-star { border-color: #e0bd6f; }
+.imogen-page .im-item.is-star .im-item-title { color: #a9781d; }
+
+/* highlights strip (the 9s and 10s, near the top) */
+.imogen-page .im-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.imogen-page .im-hl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-raised);
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.imogen-page .im-hl:hover {
+  border-color: var(--pink);
+  transform: translateY(-1px);
+}
+.imogen-page .im-hl-label { font-size: 14px; font-weight: 600; }
+.imogen-page .im-hl-rating {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+.imogen-page .im-hl.is-star { border-color: #e0bd6f; background: #fbf3df; }
+.imogen-page .im-hl.is-star .im-hl-label { color: #a9781d; }
