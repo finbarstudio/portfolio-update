@@ -36,7 +36,7 @@ const WEBSITES: Website[] = [
     images: ["/images/web/lows-1.webp?v=2", "/images/web/lows-2.webp?v=2", "/images/web/lows-3.webp?v=2", "/images/web/lows-4.webp?v=2"],
     caseStudy: "/case-studies/lows-design-build",
     quote: {
-      text: "…it has changed the kind of enquiries coming in. We are quoting bigger projects because the site holds up next to firms twice our size.",
+      text: "He has completely transformed our online presence and taken it to the next level.",
       author: "The Lows family, Lows Design + Build",
     },
   },

@@ -185,8 +185,8 @@ export default function QldPoolsPage() {
               <div className="quote-box">
                 <span aria-hidden="true" className="quote-box-mark">&ldquo;</span>
                 <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.3vw, 1.15rem)" }}>
-                  &hellip;it has changed the kind of enquiries coming in. We are quoting bigger
-                  projects because the site holds up next to firms twice our size.
+                  We’re genuinely delighted with the end result and wouldn’t hesitate to
+                  recommend Finbar to anyone looking for a professional, high-quality website.
                 </blockquote>
               </div>
               <figcaption className="mono-label text-ink-soft mt-3 text-center">&mdash; The Lows family, Lows Design + Build</figcaption>

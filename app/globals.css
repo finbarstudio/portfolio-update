@@ -1589,6 +1589,9 @@
     letter-spacing: -0.005em;
     color: var(--ink);
     margin: 0;
+    /* Testimonials are verbatim — the Lows one arrives in paragraphs, and the
+       \n\n in the data should render as paragraphs, not collapse. */
+    white-space: pre-line;
   }
   .testimonial-author {
     display: block;
