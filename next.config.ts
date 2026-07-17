@@ -71,11 +71,9 @@ const nextConfig: NextConfig = {
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  // Contact was merged into /about (with a quick-contact drawer site-wide).
-  // Preserve the old URL's link equity with a permanent redirect.
-  async redirects() {
-    return [{ source: "/contact", destination: "/about", permanent: true }];
-  },
+  // NOTE: /contact used to 308 to /about (contact once lived there). It's a
+  // real page again — if a browser cached the old permanent redirect it will
+  // keep bouncing until its cache expires; a hard refresh clears it.
   // GemFest + PullUp: self-contained static sites living in /public/<name> (all
   // their internal refs are absolute /<name>/… paths). Next doesn't serve a
   // directory index from /public, so map each clean URL onto its index.html.

@@ -14,8 +14,10 @@
  * it emails you each submission). Without it the form opens a pre-filled email.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import ContactDirect from "./ContactDirect";
+import ContactNoteForm from "./ContactNoteForm";
 import Loader from "./Loader";
 
 // The Cal.com iframe embed. The native @calcom/atoms BookerEmbed was tried and
@@ -24,24 +26,12 @@ import Loader from "./Loader";
 // they ship React 19 support.
 const CalEmbed = dynamic(() => import("./CalEmbed"), { ssr: false, loading: () => null });
 
-const EMAIL = "finbar@finbar.studio";
-const PHONE = "+61412796630";
-const PHONE_DISPLAY = "+61 412 796 630";
-const W3F_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY;
 
-const SOCIALS = [
-  { label: "Instagram", href: "https://instagram.com/finbar.studio" },
-  { label: "X", href: "https://x.com/finbarstudio" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/finbarskitini" },
-  { label: "Are.na", href: "https://are.na/finbar-studio" },
-];
 
-type Status = "idle" | "sending" | "sent" | "error";
 
 export default function ContactPanel() {
   const [open, setOpen] = useState(false);
   const [everOpened, setEverOpened] = useState(false);
-  const [status, setStatus] = useState<Status>("idle");
   const [calReady, setCalReady] = useState(false);
   // Stacked layouts (phone/tablet) don't embed the booker at all — Cal's tall
   // mobile column inside the fixed sheet made nested scrolling fight itself
@@ -79,42 +69,6 @@ export default function ContactPanel() {
     };
   }, [open]);
 
-  const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const data = new FormData(form);
-    const name = String(data.get("name") || "");
-    const email = String(data.get("email") || "");
-    const message = String(data.get("message") || "");
-
-    if (W3F_KEY) {
-      setStatus("sending");
-      try {
-        const res = await fetch("https://api.web3forms.com/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({
-            access_key: W3F_KEY,
-            subject: `Say hi from ${name || "the site"}`,
-            from_name: name || "finbar.studio",
-            name, email, message,
-          }),
-        });
-        const json = await res.json().catch(() => ({}));
-        if (res.ok && json.success !== false) {
-          setStatus("sent");
-          form.reset();
-        } else {
-          console.error("Web3Forms error:", json);
-          setStatus("error");
-        }
-      } catch (err) { console.error("Web3Forms fetch error:", err); setStatus("error"); }
-    } else {
-      const body = `Hi Finbar,%0D%0A%0D%0A${encodeURIComponent(message)}%0D%0A%0D%0A${encodeURIComponent(name)}%0D%0A${encodeURIComponent(email)}`;
-      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(`Say hi from ${name || "the site"}`)}&body=${body}`;
-    }
-  }, []);
-
   return (
     <div className={`contact-panel ${open ? "is-open" : ""}`} aria-hidden={!open}>
       <button className="contact-backdrop" aria-label="Close contact" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
@@ -150,39 +104,12 @@ export default function ContactPanel() {
         </p>
 
         <div className="contact-direct contact-reveal rv-2">
-        <p className="contact-col-label">Direct</p>
-        <div className="contact-details">
-          <div className="contact-primary">
-            <a href={`mailto:${EMAIL}`} className="contact-link u-underline">{EMAIL}</a>
-            <a href={`tel:${PHONE}`} className="contact-link u-underline tabular-nums">{PHONE_DISPLAY}</a>
-          </div>
-          <div className="contact-socials">
-            {SOCIALS.map((s) => (
-              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={open ? 0 : -1} className="tag tag-default">
-                {s.label}
-              </a>
-            ))}
-          </div>
-        </div>
+          <ContactDirect tabbable={open} />
         </div>
 
         <div className="contact-bottom contact-reveal rv-3">
           <p className="contact-col-label">Send a note</p>
-          <form className="contact-form" onSubmit={onSubmit}>
-          {status === "sent" ? (
-            <p className="contact-sent">Thanks, I’ll be in touch.</p>
-          ) : (
-            <>
-              <input className="contact-input" name="name" type="text" placeholder="Name" autoComplete="name" tabIndex={open ? 0 : -1} required />
-              <input className="contact-input" name="email" type="email" placeholder="Email" autoComplete="email" tabIndex={open ? 0 : -1} required />
-              <textarea className="contact-input contact-textarea" name="message" placeholder="Say hi…" rows={3} tabIndex={open ? 0 : -1} required />
-              {status === "error" && <p className="contact-err">Something went wrong. Try email instead.</p>}
-              <button type="submit" className="tag tag-pink contact-chat" tabIndex={open ? 0 : -1} disabled={status === "sending"}>
-                {status === "sending" ? "Sending…" : "Send"}
-              </button>
-            </>
-          )}
-        </form>
+          <ContactNoteForm tabbable={open} />
         </div>
         </div>
 

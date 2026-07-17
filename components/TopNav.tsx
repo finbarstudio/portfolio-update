@@ -72,15 +72,17 @@ export default function TopNav() {
             )}
           </Link>
         ))}
-        {/* Contact duplicates the header hug icon on purpose — a plain-text way in
-            for anyone who doesn't read the icon. Opens the drawer, no route. */}
-        <button
-          type="button"
-          className="tag tag-default"
-          onClick={(e) => window.dispatchEvent(new CustomEvent("contact:open", { detail: { x: e.clientX, y: e.clientY } }))}
-        >
-          Contact
-        </button>
+        {/* Opens the contact popup — except on /contact, where the page IS the
+            contact surface and the button would just be noise. */}
+        {pathname !== "/contact" && (
+          <button
+            type="button"
+            className="tag tag-default"
+            onClick={(e) => window.dispatchEvent(new CustomEvent("contact:open", { detail: { x: e.clientX, y: e.clientY } }))}
+          >
+            Contact
+          </button>
+        )}
       </nav>
 
       <div className="top-nav-social">

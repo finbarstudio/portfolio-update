@@ -5210,3 +5210,79 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   .site-footer-mark-inner .brand-wordmark-asterisk > *,
   .site-footer-mark-inner .brand-wordmark-asterisk > :first-child { animation: none; transform: none; opacity: 1; }
 }
+
+/* ── /contact — the contact surface as a standing page ────────────
+   One deep-pink viewport, no scroll anywhere (fixed inset-0), the popup's
+   content revealing after the page's own preloader (the brand pulse on the
+   same maroon). Chrome: the nav (flipped light) and a © line. */
+html:has(.contact-skin) { background: var(--pink-deep); }
+.contact-skin {
+  position: fixed;
+  inset: 0;
+  background: var(--pink-deep);
+  color: var(--bg);
+  overflow: hidden;
+}
+/* Nav flips light on the maroon. The sandbox flask keeps its pink (reads
+   fine); the dropdown tips keep their cream card. */
+.contact-skin .top-nav-inner .tag-default {
+  border-color: color-mix(in srgb, var(--bg) 70%, transparent);
+  color: var(--bg);
+}
+.contact-skin .top-nav-social-item { color: var(--bg); }
+.contact-skin .top-nav-social-item.top-nav-sandbox { color: var(--pink); }
+.contact-skin .nav-logo { color: var(--bg); }
+/* The popup's two-column shape, as page layout. */
+.contact-page-main {
+  position: absolute;
+  inset: 0;
+  padding: calc(var(--menubar-h) + 10px) clamp(16px, 3vw, 44px) clamp(44px, 7vh, 72px);
+  display: grid;
+  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(14px, 2vw, 32px);
+}
+/* Content reveals AFTER the preloader hands over — same wipe the popup uses,
+   page-paced delays. */
+.contact-skin.is-ready .contact-reveal {
+  animation: contact-reveal-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.contact-skin.is-ready .rv-0 { animation-delay: 0.15s; }
+.contact-skin.is-ready .rv-1 { animation-delay: 0.23s; }
+.contact-skin.is-ready .rv-2 { animation-delay: 0.31s; }
+.contact-skin.is-ready .rv-3 { animation-delay: 0.39s; }
+.contact-skin.is-ready .rv-4 { animation-delay: 0.47s; }
+/* The page's preloader: the pulse alone on the maroon, fading out once fonts
+   and the opening beat are done. */
+.contact-preloader {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: var(--pink-deep);
+  display: grid;
+  place-items: center;
+  transition: opacity 0.45s var(--ease);
+}
+.contact-preloader.is-done { opacity: 0; pointer-events: none; }
+.contact-preloader-mark { position: relative; width: 72px; height: 72px; }
+/* The one sticky bottom element: the © line, pinned bottom-right. */
+.contact-page-cr {
+  position: absolute;
+  right: clamp(20px, 3vw, 40px);
+  bottom: 14px;
+  z-index: 10;
+  color: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+@media (max-width: 860px) {
+  .contact-page-main {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;   /* safety on short landscape phones; invisible if it fits */
+    gap: 24px;
+    padding-inline: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-skin.is-ready .contact-reveal { animation: none; clip-path: inset(0 0 0 0); }
+  .contact-preloader { transition: none; }
+}
