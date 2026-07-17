@@ -2,41 +2,43 @@
    Imogen's Asia guide — scoped styles. Everything under `.imogen-page` so it
    can't leak into the portfolio. No `@import "tailwindcss"` / `@theme` here —
    the root build already ships the utilities; this is plain CSS variables +
-   classes. Fonts come from the root layout (--font-archivo / --font-space-mono /
-   --font-display). Loaded only by app/imogen/layout.tsx.
+   classes. Fonts come from the root layout (--font-sans / --font-space-mono).
+   Palette is the studio's own four tokens (--bg / --ink / --pink / --pink-deep,
+   plus the derived --ink-soft / --line) — no separate travel palette.
    Mobile-first: base styles target phones; a couple of min-width tweaks widen
    it on larger screens.
    ────────────────────────────────────────────────────────────────────────── */
 
 .imogen-page {
-  /* warm, friendly palette (in the brand family, a touch lighter) */
-  --bg: #f7f1e5;
-  --bg-raised: #fdfaf3;
-  --bg-sunken: #efe6d3;
-  --ink: #241f1a;
-  --ink-soft: #6c645a;
-  --line: #e6dcc8;
-  --pink: #e96d89;
-  --pink-soft: #f7d3da;
+  /* studio palette, scoped locally so this route never depends on load order */
+  --bg: #FDF9F9;
+  --bg-raised: #FDF9F9;
+  --bg-sunken: rgba(226, 216, 197, 0.28);
+  --ink: #211E1A;
+  --ink-soft: #6E675C;
+  --line: #E2D8C5;
+  --pink: #E96D89;
+  --pink-deep: #510415;
+  --pink-soft: rgba(233, 109, 137, 0.16);
 
-  /* country accents */
-  --c-thailand: #d99a3a;
-  --c-laos: #4fa284;
-  --c-vietnam: #d9644e;
+  /* country accents collapse into the studio palette */
+  --c-thailand: var(--pink);
+  --c-laos: var(--pink-deep);
+  --c-vietnam: var(--ink);
 
   --maxw: 680px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --star: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  /* gold star with a white outline ring (8-way) + soft shadow, via filter so the fill stays gold */
-  --star-filter: drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff)
-    drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff)
-    drop-shadow(1.1px 1.1px 0 #fff) drop-shadow(-1.1px 1.1px 0 #fff)
-    drop-shadow(1.1px -1.1px 0 #fff) drop-shadow(-1.1px -1.1px 0 #fff)
-    drop-shadow(0 2px 5px rgba(36, 31, 26, 0.5));
+  /* star with a cream outline ring (8-way) + soft shadow, via filter so the fill stays pink */
+  --star-filter: drop-shadow(1.5px 0 0 #FDF9F9) drop-shadow(-1.5px 0 0 #FDF9F9)
+    drop-shadow(0 1.5px 0 #FDF9F9) drop-shadow(0 -1.5px 0 #FDF9F9)
+    drop-shadow(1.1px 1.1px 0 #FDF9F9) drop-shadow(-1.1px 1.1px 0 #FDF9F9)
+    drop-shadow(1.1px -1.1px 0 #FDF9F9) drop-shadow(-1.1px -1.1px 0 #FDF9F9)
+    drop-shadow(0 2px 5px rgba(33, 30, 26, 0.5));
 
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   min-height: 100svh;
@@ -65,7 +67,7 @@
   font-family: var(--font-space-mono), ui-monospace, monospace;
 }
 .imogen-page .im-serif {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.05;
@@ -134,7 +136,7 @@
 /* ── hero ──────────────────────────────────────────────────────────────── */
 .imogen-page .im-hero { padding: 30px 0 40px; }
 .imogen-page .im-hero h1 {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: clamp(2.6rem, 13vw, 4.4rem);
   line-height: 0.98;
@@ -241,12 +243,12 @@
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
-  color: #fff;
+  color: var(--bg);
   background: var(--c, var(--ink));
-  box-shadow: 0 2px 6px rgba(36, 31, 26, 0.25);
+  box-shadow: 0 2px 6px rgba(33, 30, 26, 0.25);
   border: 2px solid var(--bg-raised);
 }
-/* 9/10 stops: a gold STAR pin, with the same cream outline + shadow as the circles */
+/* 9/10 stops: a pink STAR pin, with the same cream outline + shadow as the circles */
 .imogen-page .im-pin.is-top { z-index: 3; }
 .imogen-page .im-pin.is-top .im-pin-dot {
   width: 27px;
@@ -255,11 +257,11 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  color: #fff;
+  color: var(--bg);
   font-size: 10px;
-  filter: drop-shadow(0 2px 4px rgba(36, 31, 26, 0.45));
+  filter: drop-shadow(0 2px 4px rgba(33, 30, 26, 0.45));
 }
-/* Layered star: a larger white star behind (the outline) + the gold star on
+/* Layered star: a larger cream star behind (the outline) + the pink star on
    top, both behind the number. drop-shadow chains read as no outline at all, so
    the ring is a real second shape instead. */
 .imogen-page .im-pin.is-top .im-pin-dot::before,
@@ -268,8 +270,8 @@
   position: absolute;
   clip-path: var(--star);
 }
-.imogen-page .im-pin.is-top .im-pin-dot::before { inset: 0; z-index: -1; background: #e3a82a; }
-.imogen-page .im-pin.is-top .im-pin-dot::after { inset: -3px; z-index: -2; background: #fff; }
+.imogen-page .im-pin.is-top .im-pin-dot::before { inset: 0; z-index: -1; background: var(--pink); }
+.imogen-page .im-pin.is-top .im-pin-dot::after { inset: -3px; z-index: -2; background: #FDF9F9; }
 .imogen-page .im-pin.is-top .im-pin-star { display: none; } /* the pin itself is the star */
 .imogen-page .im-pin.is-planned .im-pin-dot {
   background: var(--bg-raised);
@@ -336,7 +338,7 @@
 /* ── tips ──────────────────────────────────────────────────────────────── */
 .imogen-page .im-tips { display: grid; gap: 18px; margin-top: 22px; }
 .imogen-page .im-tip-title {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans);
   font-size: 19px;
   line-height: 1.15;
   margin-bottom: 4px;
@@ -357,11 +359,11 @@
 }
 /* subtle full-card highlight for a 10/10 */
 .imogen-page .im-stop.is-top {
-  background-image: linear-gradient(180deg, rgba(23, 122, 62, 0.09), transparent 170px);
-  box-shadow: 0 8px 26px -14px rgba(23, 122, 62, 0.6);
+  background-image: linear-gradient(180deg, rgba(81, 4, 21, 0.09), transparent 170px);
+  box-shadow: 0 8px 26px -14px rgba(81, 4, 21, 0.6);
 }
 .imogen-page .im-stop.is-top.is-open {
-  box-shadow: 0 0 0 1px var(--c, var(--ink)), 0 8px 26px -14px rgba(23, 122, 62, 0.6);
+  box-shadow: 0 0 0 1px var(--c, var(--ink)), 0 8px 26px -14px rgba(81, 4, 21, 0.6);
 }
 .imogen-page .im-stop.is-travel {
   background: var(--bg-sunken);
@@ -383,9 +385,9 @@
   padding: 2px 7px;
 }
 /* muted map pins + legend rows — solid grey, not transparent */
-.imogen-page .im-pin.is-muted .im-pin-dot { background: #b4ab9c; }
+.imogen-page .im-pin.is-muted .im-pin-dot { background: var(--ink-soft); }
 .imogen-page .im-map-legend li.is-muted { color: var(--ink-soft); }
-.imogen-page .im-map-legend li.is-muted .im-leg-dot { background: #b4ab9c; }
+.imogen-page .im-map-legend li.is-muted .im-leg-dot { background: var(--ink-soft); }
 .imogen-page .im-stop-head {
   display: flex;
   align-items: center;
@@ -409,7 +411,7 @@
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 15px;
   font-weight: 700;
-  color: #fff;
+  color: var(--bg);
   background: var(--c, var(--ink));
 }
 .imogen-page .im-stop.is-travel .im-stop-num {
@@ -420,7 +422,7 @@
 .imogen-page .im-stop-headtext { flex: 1; min-width: 0; }
 .imogen-page .im-stop-name {
   display: block;
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans);
   font-size: clamp(1.5rem, 6.5vw, 1.9rem);
   line-height: 1.04;
 }
@@ -437,7 +439,7 @@
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--bg);
   background: var(--c, var(--ink));
   border-radius: 999px;
   padding: 3px 9px;
@@ -558,8 +560,8 @@
   transition: color 0.18s var(--ease), border-color 0.18s var(--ease), background 0.18s var(--ease);
 }
 .imogen-page .im-linkbtn:hover { color: var(--pink); border-color: var(--pink); }
-.imogen-page .im-linkbtn.is-primary { background: var(--pink); border-color: var(--pink); color: #fff; }
-.imogen-page .im-linkbtn.is-primary:hover { background: #df5d7a; }
+.imogen-page .im-linkbtn.is-primary { background: var(--pink); border-color: var(--pink); color: var(--bg); }
+.imogen-page .im-linkbtn.is-primary:hover { background: var(--pink-deep); }
 .imogen-page .im-linkbtn.is-quiet {
   border-color: var(--line);
   color: var(--ink-soft);
@@ -590,7 +592,7 @@
   color: var(--ink-soft);
 }
 .imogen-page .im-foot-sign {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-sans);
   font-size: 22px;
   line-height: 1.3;
   margin-top: 22px;
@@ -644,13 +646,13 @@
 
 /* ── safety callout ────────────────────────────────────────────────────── */
 .imogen-page .im-safety {
-  background: #fbe9e4;
+  background: var(--bg-sunken);
   border: 1px solid var(--c-vietnam);
   border-left: 4px solid var(--c-vietnam);
   border-radius: 14px;
   padding: 18px 18px 20px;
 }
-.imogen-page .im-safety-title { font-size: 20px; color: #b4452f; margin-bottom: 6px; }
+.imogen-page .im-safety-title { font-size: 20px; color: var(--ink); margin-bottom: 6px; }
 .imogen-page .im-safety-body { font-size: 14.5px; line-height: 1.6; margin-top: 10px; }
 .imogen-page .im-safety-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 
@@ -676,11 +678,11 @@
   background: var(--bg);
   color: var(--ink);
   margin-bottom: 10px;
-  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   text-align: center;
 }
 .imogen-page .im-lock-input:focus { outline: none; border-color: var(--pink); }
-.imogen-page .im-lock-input.is-err { border-color: #c2473b; }
+.imogen-page .im-lock-input.is-err { border-color: var(--ink); }
 .imogen-page .im-lock-btn {
   width: 100%;
   font-family: var(--font-space-mono), ui-monospace, monospace;
@@ -691,12 +693,12 @@
   border: none;
   border-radius: 10px;
   background: var(--pink);
-  color: #fff;
+  color: var(--bg);
   cursor: pointer;
   min-height: 44px;
   transition: background 0.2s var(--ease);
 }
-.imogen-page .im-lock-btn:hover { background: #df5d7a; }
+.imogen-page .im-lock-btn:hover { background: var(--pink-deep); }
 .imogen-page .im-lock-err { color: var(--c-vietnam); font-size: 13px; margin-top: 12px; }
 .imogen-page .im-lock-hint {
   color: var(--ink-soft);
@@ -781,15 +783,15 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  background: #fff;
+  background: #FDF9F9;
   clip-path: var(--star);
-  filter: drop-shadow(0 1px 1.5px rgba(36, 31, 26, 0.35));
+  filter: drop-shadow(0 1px 1.5px rgba(33, 30, 26, 0.35));
 }
 .imogen-page .im-map-key-star::before {
   content: "";
   position: absolute;
   inset: 1.6px;
-  background: #e3a82a;
+  background: var(--pink);
   clip-path: var(--star);
 }
 .imogen-page .im-map-key-grey { width: 11px; height: 11px; border-radius: 50%; background: var(--ink-soft); opacity: 0.5; }
@@ -824,7 +826,7 @@
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 10px;
   font-weight: 700;
-  color: #fff;
+  color: var(--bg);
   background: var(--c, var(--ink));
 }
 .imogen-page .im-leg-dot.is-side {
@@ -838,15 +840,15 @@
   color: var(--c, var(--ink-soft));
   border: 1.5px dashed var(--c, var(--line));
 }
-/* 9/10 stops: the numbered dot itself becomes a gold star (same layered
+/* 9/10 stops: the numbered dot itself becomes a pink star (same layered
    outline as the map pins), so the number sits inside the star. */
 .imogen-page .im-leg-dot.is-top {
   position: relative;
   border: none;
   border-radius: 0;
   background: transparent;
-  color: #fff;
-  filter: drop-shadow(0 1px 1.5px rgba(36, 31, 26, 0.3));
+  color: var(--bg);
+  filter: drop-shadow(0 1px 1.5px rgba(33, 30, 26, 0.3));
 }
 .imogen-page .im-leg-dot.is-top::before,
 .imogen-page .im-leg-dot.is-top::after {
@@ -854,8 +856,8 @@
   position: absolute;
   clip-path: var(--star);
 }
-.imogen-page .im-leg-dot.is-top::before { inset: 0; z-index: -1; background: #e3a82a; }
-.imogen-page .im-leg-dot.is-top::after { inset: -2.5px; z-index: -2; background: #fff; }
+.imogen-page .im-leg-dot.is-top::before { inset: 0; z-index: -1; background: var(--pink); }
+.imogen-page .im-leg-dot.is-top::after { inset: -2.5px; z-index: -2; background: #FDF9F9; }
 
 /* floating "jump to the map" button */
 .imogen-page .im-map-fab {
@@ -875,7 +877,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  box-shadow: 0 8px 22px -8px rgba(36, 31, 26, 0.55);
+  box-shadow: 0 8px 22px -8px rgba(33, 30, 26, 0.55);
   opacity: 0;
   transform: translateY(10px);
   pointer-events: none;
@@ -909,10 +911,10 @@
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 10px;
   font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  color: var(--bg);
+  text-shadow: 0 1px 1px rgba(33, 30, 26, 0.25);
 }
-.imogen-page .im-tl-seg.is-travel { background: #6f86c9; }
+.imogen-page .im-tl-seg.is-travel { background: var(--ink-soft); }
 
 /* country labels off the bar, on a short leader line; alternate above/below */
 .imogen-page .im-tl-side { position: relative; }
@@ -974,7 +976,7 @@
 }
 .imogen-page .im-tl-keyitem { display: inline-flex; align-items: center; gap: 6px; }
 .imogen-page .im-tl-keydot { flex: 0 0 auto; width: 11px; height: 11px; border-radius: 3px; }
-.imogen-page .im-tl-keydot.is-travel { background: #6f86c9; }
+.imogen-page .im-tl-keydot.is-travel { background: var(--ink-soft); }
 
 /* hover/focus a block to name it, with a little pointer down to the block */
 .imogen-page .im-tl-segtip {
@@ -1033,7 +1035,7 @@
   font-size: 9px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--bg);
   background: var(--pink);
   border-radius: 999px;
   padding: 2px 7px;
@@ -1082,7 +1084,7 @@
   color: var(--c, var(--ink));
   background: var(--bg);
 }
-.imogen-page .im-stop.is-open .im-stop-chev { background: var(--c, var(--ink)); color: #fff; }
+.imogen-page .im-stop.is-open .im-stop-chev { background: var(--c, var(--ink)); color: var(--bg); }
 .imogen-page .im-stop-body { margin-top: 2px; }
 
 /* when a stop is open, keep its header (and close button) stuck at the top */
@@ -1093,7 +1095,7 @@
   background: var(--bg-raised);
   margin: -4px 0 0;
   padding: 10px 0 8px;
-  box-shadow: 0 6px 10px -8px rgba(36, 31, 26, 0.3);
+  box-shadow: 0 6px 10px -8px rgba(33, 30, 26, 0.3);
 }
 .imogen-page .im-stop.is-travel.is-open .im-stop-head { background: var(--bg-sunken); }
 
@@ -1112,7 +1114,7 @@
   color: var(--ink-soft);
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.imogen-page .im-filter.is-active { border-color: var(--c, var(--ink)); color: #fff; background: var(--c, var(--ink)); }
+.imogen-page .im-filter.is-active { border-color: var(--c, var(--ink)); color: var(--bg); background: var(--c, var(--ink)); }
 
 /* groups */
 .imogen-page .im-grp { margin-top: 16px; }
@@ -1147,12 +1149,12 @@
 .imogen-page .im-item.is-open { border-color: var(--c, var(--ink)); }
 /* subtle highlight on a 10/10 item card */
 .imogen-page .im-item.is-top {
-  border-color: rgba(23, 122, 62, 0.45);
-  background-image: linear-gradient(180deg, rgba(23, 122, 62, 0.08), transparent);
+  border-color: rgba(81, 4, 21, 0.45);
+  background-image: linear-gradient(180deg, rgba(81, 4, 21, 0.08), transparent);
 }
 .imogen-page .im-item.is-star.is-top {
-  border-color: #e0bd6f;
-  background-image: linear-gradient(180deg, rgba(200, 146, 46, 0.12), transparent);
+  border-color: var(--pink);
+  background-image: linear-gradient(180deg, rgba(81, 4, 21, 0.12), transparent);
 }
 .imogen-page .im-item-row { display: flex; align-items: center; gap: 8px; padding-right: 10px; }
 .imogen-page .im-item-toggle {
@@ -1185,17 +1187,17 @@
   color: var(--ink);
 }
 .imogen-page .im-item-score.is-empty { background: transparent; color: var(--ink-soft); box-shadow: inset 0 0 0 1px var(--line); }
-/* top items (9/10) get the same gold star icon as the map, with the number in it */
+/* top items (9/10) get the same pink star icon as the map, with the number in it */
 .imogen-page .im-item-score.is-topstar {
   width: 36px;
   height: 36px;
   border-radius: 0;
-  background: #e3a82a;
-  color: #fff;
+  background: var(--pink);
+  color: var(--bg);
   clip-path: var(--star);
   filter: var(--star-filter);
 }
-.imogen-page .im-top-star { flex: 0 0 auto; color: #c8922e; font-size: 16px; line-height: 1; }
+.imogen-page .im-top-star { flex: 0 0 auto; color: var(--pink-deep); font-size: 16px; line-height: 1; }
 .imogen-page .im-item-title { font-size: 15px; font-weight: 600; line-height: 1.3; }
 .imogen-page .im-item.rec-low .im-item-title { color: var(--ink-soft); font-weight: 500; }
 .imogen-page .im-item-map {
@@ -1212,7 +1214,7 @@
   background: var(--bg);
   transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease);
 }
-.imogen-page .im-item-map:hover { color: #fff; background: var(--pink); border-color: var(--pink); }
+.imogen-page .im-item-map:hover { color: var(--bg); background: var(--pink); border-color: var(--pink); }
 .imogen-page .im-item-detail { padding: 0 12px 13px 54px; }
 .imogen-page .im-item-note { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 2px; }
 .imogen-page .im-item-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -1233,16 +1235,16 @@
 }
 .imogen-page .im-item-thumb:hover { transform: scale(1.03); }
 /* video thumbnail (a button wrapping a <video> first-frame + play badge) */
-.imogen-page button.im-item-thumb.is-video { padding: 0; overflow: hidden; position: relative; background: #000; display: block; }
+.imogen-page button.im-item-thumb.is-video { padding: 0; overflow: hidden; position: relative; background: var(--ink); display: block; }
 .imogen-page .im-item-thumb.is-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .imogen-page .im-thumb-play {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  color: #fff;
+  color: var(--bg);
   font-size: 16px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 1px 4px rgba(33, 30, 26, 0.7);
   pointer-events: none;
 }
 .imogen-page .im-lightbox {
@@ -1252,7 +1254,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(20, 16, 12, 0.82);
+  background: rgba(33, 30, 26, 0.82);
   cursor: zoom-out;
   animation: imFade 0.18s ease;
 }
@@ -1262,7 +1264,7 @@
   max-width: 100%;
   max-height: 86vh;
   border-radius: 10px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 40px rgba(33, 30, 26, 0.4);
 }
 .imogen-page .im-lightbox-close {
   position: absolute;
@@ -1272,8 +1274,8 @@
   height: 38px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: rgba(253, 249, 249, 0.15);
+  color: var(--bg);
   font-size: 16px;
   cursor: pointer;
 }
@@ -1285,8 +1287,8 @@
   height: 44px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
+  background: rgba(253, 249, 249, 0.16);
+  color: var(--bg);
   font-size: 26px;
   line-height: 1;
   cursor: pointer;
@@ -1303,7 +1305,7 @@
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 12px;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(253, 249, 249, 0.85);
 }
 
 /* place overview tags (collapsed card) — rating is a filled colour tile */
@@ -1312,7 +1314,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #fff;
+  color: var(--bg);
   border-radius: 7px;
   padding: 3px 8px;
 }
@@ -1354,7 +1356,7 @@
 .imogen-page .im-item.is-open .im-item-chev {
   background: var(--c, var(--ink));
   border-color: var(--c, var(--ink));
-  color: #fff;
+  color: var(--bg);
 }
 
 /* tip back-link chip inside an item */
@@ -1416,9 +1418,9 @@
   margin-right: 2px;
 }
 
-/* gold-star item (the single standout) */
-.imogen-page .im-item.is-star { border-color: #e0bd6f; }
-.imogen-page .im-item.is-star .im-item-title { color: #a9781d; }
+/* pink-star item (the single standout) */
+.imogen-page .im-item.is-star { border-color: var(--pink); }
+.imogen-page .im-item.is-star .im-item-title { color: var(--pink-deep); }
 
 /* highlights strip (the 9s and 10s, near the top) */
 .imogen-page .im-highlights {
@@ -1448,9 +1450,9 @@
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #fff;
+  color: var(--bg);
   border-radius: 6px;
   padding: 2px 6px;
 }
-.imogen-page .im-hl.is-star { border-color: #e0bd6f; background: #fbf3df; }
-.imogen-page .im-hl.is-star .im-hl-label { color: #a9781d; }
+.imogen-page .im-hl.is-star { border-color: var(--pink); background: var(--pink-soft); }
+.imogen-page .im-hl.is-star .im-hl-label { color: var(--pink-deep); }

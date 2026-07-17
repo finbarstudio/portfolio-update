@@ -1299,20 +1299,19 @@ export function imgSlug(s: string): string {
 }
 
 /**
- * Rating → colour. A green-to-red scale tuned to Finbar's harsh /10
- * (9–10 amazing, 6–8 good, 5 and under weak). Drives the rating tiles.
+ * Rating → colour. Studio palette only (pink-deep / pink / ink-soft / ink),
+ * darkest-to-neutral tuned to Finbar's harsh /10 (9–10 amazing, 6–8 good, 5
+ * and under weak). Drives the rating tiles; the exact number is always shown
+ * alongside so the colour is a glance-cue, not the only signal.
  */
 export function ratingColor(rating?: number): string | null {
   if (rating == null) return null;
-  if (rating >= 10) return "#0c6b3f"; // deep emerald — perfect
-  if (rating >= 9) return "#3fa44f"; // green — amazing
-  if (rating >= 8) return "#8fb43a"; // lime — great
-  if (rating >= 7) return "#ccb52f"; // yellow — good
-  if (rating >= 6) return "#d9962a"; // amber — fine
-  if (rating >= 5) return "#d2792f"; // orange — weak
-  return "#c2473b"; // red — poor
+  if (rating >= 9) return "#510415"; // pink-deep — amazing/perfect
+  if (rating >= 7) return "#E96D89"; // pink — great/good
+  if (rating >= 5) return "#6E675C"; // ink-soft — fine/weak
+  return "#211E1A"; // ink — poor
 }
-export const STAR_COLOR = "#c8922e"; // gold — the single standout (Dinh)
+export const STAR_COLOR = "#510415"; // pink-deep — the single standout (Dinh)
 
 /** Flag emoji per country, for tasteful little accents. */
 export const COUNTRY_FLAG: Record<Country, string> = {

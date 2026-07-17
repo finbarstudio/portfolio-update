@@ -20,10 +20,10 @@ export type CountryShape = { id: string; paths: string[]; fill: string };
 
 // Route countries get their accent; Cambodia is muted context (off-route).
 export const COUNTRIES: CountryShape[] = [
-  { id: "thailand", paths: TH_PATHS, fill: "#d99a3a" },
-  { id: "laos", paths: LA_PATHS, fill: "#4fa284" },
-  { id: "vietnam", paths: VN_PATHS, fill: "#d9644e" },
-  { id: "cambodia", paths: KH_PATHS, fill: "#bfa06a" },
+  { id: "thailand", paths: TH_PATHS, fill: "#E96D89" },
+  { id: "laos", paths: LA_PATHS, fill: "#510415" },
+  { id: "vietnam", paths: VN_PATHS, fill: "#211E1A" },
+  { id: "cambodia", paths: KH_PATHS, fill: "#6E675C" },
 ];
 
 // Country labels, placed by lon/lat (projected at render).

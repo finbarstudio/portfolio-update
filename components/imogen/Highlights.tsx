@@ -23,7 +23,7 @@ export default function Highlights({ items }: { items: Highlight[] }) {
           <span className="im-hl-label">{h.label}</span>
           <span
             className="im-hl-rating"
-            style={{ background: h.star ? STAR_COLOR : ratingColor(h.rating) ?? undefined, color: "#fff" }}
+            style={{ background: h.star ? STAR_COLOR : ratingColor(h.rating) ?? undefined, color: "var(--bg)" }}
           >
             ★ {h.rating}/10
           </span>

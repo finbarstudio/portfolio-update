@@ -13,6 +13,15 @@ const FLAG_BY_LABEL: Record<string, string> = {
   CAMBODIA: "🇰🇭",
 };
 
+// Studio-palette fill per country, overriding geo.ts's own (off-palette) fill
+// field — Cambodia is off-route context, so it stays a neutral ink-soft wash.
+const COUNTRY_FILL: Record<string, string> = {
+  thailand: "var(--c-thailand, var(--pink))",
+  laos: "var(--c-laos, var(--pink-deep))",
+  vietnam: "var(--c-vietnam, var(--ink))",
+  cambodia: "var(--ink-soft)",
+};
+
 /**
  * RouteMap — the big map, drawn on Finbar's traced SE Asia outlines (geo.ts /
  * sea-geo.ts). Pins are projected from real lon/lat by project(). To stay
@@ -47,9 +56,9 @@ export default function RouteMap() {
                 <path
                   key={i}
                   d={d}
-                  fill={c.fill}
+                  fill={COUNTRY_FILL[c.id] ?? "var(--ink-soft)"}
                   fillOpacity={c.id === "cambodia" ? 0.12 : 0.16}
-                  stroke={c.fill}
+                  stroke={COUNTRY_FILL[c.id] ?? "var(--ink-soft)"}
                   strokeOpacity={c.id === "cambodia" ? 0.35 : 0.5}
                 />
               ))}

@@ -153,7 +153,7 @@ export default function StopCard({
             {stop.rating != null && (
               <span
                 className="im-stop-rating"
-                style={{ background: ratingColor(stop.rating) ?? undefined, color: "#fff" }}
+                style={{ background: ratingColor(stop.rating) ?? undefined, color: "var(--bg)" }}
               >
                 {stop.rating}/10
               </span>
@@ -222,7 +222,7 @@ export default function StopCard({
                                   it.star || (it.rating != null && it.rating >= 10)
                                     ? undefined
                                     : it.rating != null
-                                      ? { background: ratingColor(it.rating) ?? undefined, color: "#fff" }
+                                      ? { background: ratingColor(it.rating) ?? undefined, color: "var(--bg)" }
                                       : undefined
                                 }
                                 aria-hidden="true"
