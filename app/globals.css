@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   finbar✶studio, Global Styles & Master Design Control Panel
+   Finbar Studio, Global Styles & Master Design Control Panel
 
    ╔═══════════════════════════════════════════════════════════╗
    ║  MASTER CSS, EDIT HERE TO RESTYLE THE ENTIRE SITE       ║
@@ -3219,6 +3219,12 @@
     margin-left: calc(-1 * var(--sidebar-w));
     width: 100vw;
     transition: margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* Inset variant (/about): the section lives INSIDE a padded container there,
+     so the home full-bleed hack pushed it 40px off-centre. Stay in flow. */
+  .home-disciplines.is-inset {
+    margin-left: 0;
+    width: 100%;
   }
 }
 /* Centred, Space Mono caps, with the icons set inline at the font's x-height. */

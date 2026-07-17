@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Selected Work | Finbar Studio",
     description:
-      "Branding, web design, publication and motion projects from finbar✶studio, a Brisbane creative practice.",
+      "Branding, web design, publication and motion projects from Finbar Studio, a Brisbane creative practice.",
     url: "/work",
     type: "website",
   },

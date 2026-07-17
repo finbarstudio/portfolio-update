@@ -4,7 +4,7 @@ import SandboxLinkButton from "@/components/sandbox/SandboxLinkButton";
 export const metadata: Metadata = {
   title: "Mockups",
   description:
-    "3D mockup tools from finbar✶studio. Drop in your media and export looping video, stills, GIFs or an embed.",
+    "3D mockup tools from Finbar Studio. Drop in your media and export looping video, stills, GIFs or an embed.",
 };
 
 // Only the live tools, titles only.

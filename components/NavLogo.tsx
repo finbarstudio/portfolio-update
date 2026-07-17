@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * NavLogo — the persistent finbar✶studio wordmark in the nav.
+ * NavLogo — the persistent Finbar Studio wordmark in the nav.
  *
  * Visibility (CSS, via the .is-home modifier):
  *   - desktop home: hidden (HomeIntro's animated lockup shows instead)

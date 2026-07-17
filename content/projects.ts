@@ -1,5 +1,5 @@
 /**
- * finbar✶studio, Project Content
+ * Finbar Studio, Project Content
  * All copy, images, dates, tags, and case study content lives here.
  * Edit this file to update anything on the site.
  *
@@ -23,6 +23,7 @@ export interface ProjectImage {
   alt: string;
   video?: string;     // WebM path. If set, renders as a looping video.
   aspectRatio?: string; // Override the default 16/9 frame (e.g. "1/1" for square covers).
+  half?: boolean;     // Force a half column even when the ratio is wide enough to full-span.
 }
 
 export interface DepthSection {
@@ -870,14 +871,15 @@ export const projects: Project[] = [
             src: "/images/web/lows-1.webp",
             video: "/images/lows-design-build/old-site-scroll.mp4",
             aspectRatio: "4/3",
-            caption: "For comparison: the old template site, top to bottom.",
+            caption: "BEFORE: the OLD site they came with, a stock template, top to bottom.",
             alt: "Scrolling capture of the previous Lows Design and Build website, a standard template design",
           },
           {
-            src: "/images/web/lows-1.webp",
-            aspectRatio: "16/9",
-            caption: "The home page: hand-written front end, nothing by default.",
-            alt: "Lows Design and Build website home page, custom Next.js build",
+            src: "/images/lows-design-build/logomark.svg",
+            aspectRatio: "300/80",
+            half: true,
+            caption: "The mark the new build is set around.",
+            alt: "Lows Design and Build logo, the geometric house mark",
           },
         ],
       },

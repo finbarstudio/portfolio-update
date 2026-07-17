@@ -15,7 +15,7 @@ export const viewport: Viewport = {
 };
 
 const SANDBOX_DESC =
-  "Free in-browser creative tools from finbar✶studio: Bezier Studio, a 3D SVG studio, phone and Mac mockup generators, and an effects library. Export crisp SVG, PNG, video, GIF or an embed.";
+  "Free in-browser creative tools from Finbar Studio: Bezier Studio, a 3D SVG studio, phone and Mac mockup generators, and an effects library. Export crisp SVG, PNG, video, GIF or an embed.";
 
 // metadataBase points at the subdomain so OG/Twitter image + canonical URLs all
 // resolve to sandbox.finbar.studio (the host the Sandbox is actually served on),
@@ -23,11 +23,11 @@ const SANDBOX_DESC =
 export const metadata: Metadata = {
   metadataBase: new URL(SANDBOX_URL),
   title: {
-    default: "Sandbox · finbar✶studio · free creative tools",
-    template: "%s · Sandbox · finbar✶studio",
+    default: "Sandbox · Finbar Studio · free creative tools",
+    template: "%s · Sandbox · Finbar Studio",
   },
   description: SANDBOX_DESC,
-  applicationName: "finbar✶studio Sandbox",
+  applicationName: "Finbar Studio Sandbox",
   category: "Design tools",
   keywords: [
     "free design tools",
@@ -40,16 +40,16 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: SANDBOX_URL },
   openGraph: {
-    title: "Sandbox · finbar✶studio · free creative tools",
+    title: "Sandbox · Finbar Studio · free creative tools",
     description: SANDBOX_DESC,
     url: SANDBOX_URL,
-    siteName: "finbar✶studio Sandbox",
+    siteName: "Finbar Studio Sandbox",
     locale: "en_AU",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sandbox · finbar✶studio · free creative tools",
+    title: "Sandbox · Finbar Studio · free creative tools",
     description: SANDBOX_DESC,
     creator: "@finbarstudio",
   },
@@ -68,7 +68,7 @@ const tool = (pos: number, name: string, description: string, path: string) => (
     applicationCategory: "DesignApplication",
     operatingSystem: "Web",
     offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
-    author: { "@type": "Organization", name: "finbar✶studio", url: "https://www.finbar.studio" },
+    author: { "@type": "Organization", name: "Finbar Studio", url: "https://www.finbar.studio" },
   },
 });
 
@@ -79,14 +79,14 @@ const JSON_LD = {
       "@type": "WebSite",
       "@id": `${SANDBOX_URL}/#website`,
       url: SANDBOX_URL,
-      name: "finbar✶studio Sandbox",
-      description: "Free in-browser creative tools from finbar✶studio.",
+      name: "Finbar Studio Sandbox",
+      description: "Free in-browser creative tools from Finbar Studio.",
       inLanguage: "en-AU",
-      publisher: { "@type": "Organization", name: "finbar✶studio", url: "https://www.finbar.studio" },
+      publisher: { "@type": "Organization", name: "Finbar Studio", url: "https://www.finbar.studio" },
     },
     {
       "@type": "ItemList",
-      name: "finbar✶studio Sandbox tools",
+      name: "Finbar Studio Sandbox tools",
       itemListElement: [
         tool(1, "Bezier Studio", "Visualise an SVG's bezier curves, anchors and control handles as a styleable specimen, then export SVG, PNG, video or GIF.", "/bezier"),
         tool(2, "3D SVG Studio", "Extrude an SVG into 3D, light it, keyframe it on a timeline and export video, a transparent PNG or an embed.", "/asterisk"),

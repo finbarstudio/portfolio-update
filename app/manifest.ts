@@ -8,8 +8,8 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "finbar✶studio · Finbar Skitini",
-    short_name: "finbar✶studio",
+    name: "Finbar Studio · Finbar Skitini",
+    short_name: "Finbar Studio",
     description:
       "Brisbane graphic design and web design studio. Brand identity, websites, publication and motion design.",
     start_url: "/",

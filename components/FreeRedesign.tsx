@@ -41,7 +41,7 @@ const STEPS = [
 const PROOF = [
   { src: "/images/web/lows-1.webp", alt: "Lows Design and Build homepage", caption: "Lows Design + Build, family builders in London", href: "/case-studies/lows-design-build" },
   { src: "/images/web/plated-1.webp", alt: "Plated with Issy homepage", caption: "Plated with Issy, a candlelit supper club", href: "/case-studies/plated-with-issy" },
-  { src: "/images/web/kinaya-1.webp", alt: "KinAya homepage", caption: "KinAya, wellness brand and store", href: "/case-studies/kinaya" },
+  { src: "/images/web/kinaya-1.webp", alt: "KinAya homepage", caption: "KinAya, Adelaide-based NDIS support specialists", href: "/case-studies/kinaya" },
   { src: "/images/web/lola-1.webp", alt: "Lola Audio homepage", caption: "Lola Audio, a portfolio you can mix", href: "/case-studies/lola-audio" },
 ];
 

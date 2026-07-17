@@ -157,7 +157,7 @@ function CaseMedia({ img, full = false }: { img: ProjectImage; full?: boolean })
         // contained video letterboxes inside it, reading as not-full-width.
         style={{ aspectRatio: img.aspectRatio ?? "16/9", maxHeight: "none", marginTop: "var(--image-pad)", marginBottom: "var(--image-pad)" }}
       >
-        <VideoPlayer src={img.video} poster={img.src} />
+        <VideoPlayer src={img.video} />
       </div>
     );
   }
@@ -208,9 +208,11 @@ function Gallery({ images, cols }: { images: ProjectImage[]; cols?: number }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
       {images.map((img, i) => {
-        const full = ratioOf(img.aspectRatio) >= 1.6;
+        // half: an explicit opt-out of the wide-ratio full-span (e.g. a flat
+        // logo strip paired beside a tall video). Centre it in its row.
+        const full = img.half ? false : ratioOf(img.aspectRatio) >= 1.6;
         return (
-          <Reveal as="figure" key={i} y={24} delay={(i % 2) * 0.06} className={full ? "md:col-span-2" : "min-w-0"}>
+          <Reveal as="figure" key={i} y={24} delay={(i % 2) * 0.06} className={full ? "md:col-span-2" : "min-w-0 self-center"}>
             <CaseMedia img={img} full={full} />
             {img.caption && <Caption text={img.caption} />}
           </Reveal>
@@ -551,7 +553,7 @@ export default async function CaseStudyPage({
               <SplineScene scene={project.heroSpline} />
             ) : project.heroVideo ? (
               <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
-                <VideoPlayer src={project.heroVideo} poster={project.heroImage.src} />
+                <VideoPlayer src={project.heroVideo} />
               </div>
             ) : (
               <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>

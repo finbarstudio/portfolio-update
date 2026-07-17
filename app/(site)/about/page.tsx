@@ -162,7 +162,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── How I help businesses (moved here from the home page) ── */}
-      <section className="home-disciplines px-0 pt-24 md:pt-32" aria-labelledby="services-title">
+      <section className="home-disciplines is-inset px-0 pt-24 md:pt-32" aria-labelledby="services-title">
         <div className="home-cap">
           <h2 id="services-title" className="home-cap-title">How I help businesses</h2>
           <div className="home-disc home-cap-wrap">

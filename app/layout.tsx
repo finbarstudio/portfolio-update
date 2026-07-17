@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   },
   description:
     "Brisbane web design and development studio building custom websites, with brand identity, editorial and motion design behind them. Selected projects for businesses across Australia and the UK.",
-  applicationName: "finbar✶studio",
+  applicationName: "Finbar Studio",
   authors: [{ name: "Finbar Skitini", url: SITE_URL }],
   creator: "Finbar Skitini",
   publisher: "Finbar Skitini",
@@ -83,7 +83,7 @@ export const metadata: Metadata = {
     description:
       "Brisbane web design and development studio building custom websites, with brand identity, editorial and motion design behind them, for businesses across Australia and the UK.",
     url: SITE_URL,
-    siteName: "finbar✶studio",
+    siteName: "Finbar Studio",
     locale: "en_AU",
     type: "website",
   },
@@ -109,7 +109,7 @@ export const metadata: Metadata = {
   // (favicon.ico, icon.tsx, apple-icon.tsx) — no manual list needed.
   appleWebApp: {
     capable: true,
-    title: "finbar✶studio",
+    title: "Finbar Studio",
     statusBarStyle: "default",
   },
   // The site uses explicit tel:/mailto: links, so stop iOS Safari from
@@ -177,7 +177,7 @@ const personJsonLd = {
     "@type": "Offer",
     itemOffered: { "@type": "Service", name },
   })),
-  brand: { "@type": "Brand", name: "finbar✶studio" },
+  brand: { "@type": "Brand", name: "Finbar Studio" },
   nationality: { "@type": "Country", name: "United Kingdom" },
   alumniOf: [
     { "@type": "EducationalOrganization", name: "Ravensbourne University London" },
@@ -204,7 +204,7 @@ const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "@id": `${SITE_URL}/#website`,
-  name: "finbar✶studio",
+  name: "Finbar Studio",
   alternateName: "Finbar Skitini Portfolio",
   url: SITE_URL,
   inLanguage: "en-AU",
@@ -219,8 +219,8 @@ const serviceJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   "@id": `${SITE_URL}/#studio`,
-  name: "finbar✶studio",
-  alternateName: "Finbar Studio",
+  name: "Finbar Studio",
+  alternateName: "finbar.studio",
   description:
     "Brisbane graphic design and web design studio. Brand identity, websites, editorial and motion for businesses across Australia and the UK.",
   url: SITE_URL,

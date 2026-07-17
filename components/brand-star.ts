@@ -1,5 +1,5 @@
 /**
- * The finbar✶studio brand mark — the solid six-pointed star (U+2726 ✶).
+ * The Finbar Studio brand mark — the solid six-pointed star (U+2726 ✶).
  *
  * SVG polygon point list, normalised to a 0–100 viewBox and drawn point-up.
  * Single source of truth shared by the wordmark logo, favicon, app icons, OG

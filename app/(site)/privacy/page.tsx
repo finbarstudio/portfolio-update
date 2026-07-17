@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description: "How finbar✶studio handles your data, what's collected, why, and your rights.",
+  description: "How Finbar Studio handles your data, what's collected, why, and your rights.",
   alternates: { canonical: "/privacy" },
   robots: { index: true, follow: true },
 };
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
         <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>Last updated {UPDATED}.</p>
 
         <p>
-          This site is run by Finbar Skitini, trading as finbar✶studio, a graphic designer based in
+          This site is run by Finbar Skitini, trading as Finbar Studio, a graphic designer based in
           Brisbane, Australia. This page explains what data I collect, why, and what you can do
           about it. I keep the collection deliberately small.
         </p>

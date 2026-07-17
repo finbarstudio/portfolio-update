@@ -1,4 +1,4 @@
-finbar✶studio Sandbox — suggestions
+Finbar Studio Sandbox — suggestions
 ===================================
 Feature/tool ideas submitted via the "Suggest" box in the sandbox.
 New entries are appended below when the site runs locally (npm run dev).

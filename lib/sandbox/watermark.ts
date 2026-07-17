@@ -1,5 +1,5 @@
 /**
- * watermark — the finbar✶studio mark stamped onto every exported frame.
+ * watermark — the Finbar Studio mark stamped onto every exported frame.
  *
  * MVP is free but always watermarked: a large, centred wordmark at ~30% opacity
  * (using the real brand star, not a font glyph) plus a subtle finbar.studio

@@ -1,7 +1,7 @@
 import BrandStar from "@/components/BrandStar";
 
 /**
- * The forced watermark for live embeds: a large, centred finbar✶studio wordmark
+ * The forced watermark for live embeds: a large, centred Finbar Studio wordmark
  * at ~30% opacity (the real brand star, not a glyph) plus a subtle clickable
  * finbar.studio backlink in the bottom-right. Mirrors the export watermark.
  */

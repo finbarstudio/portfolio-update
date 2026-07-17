@@ -5,18 +5,19 @@ import Loader from "./Loader";
 
 // Looping muted video, plays only while visible in the viewport.
 // Uses IntersectionObserver instead of autoPlay so off-screen videos
-// don't buffer memory. preload="metadata" fetches just enough for
-// the poster frame without pulling the full file.
+// don't buffer memory. preload="metadata" fetches just enough to start
+// quickly without pulling the full file.
+//
+// While buffering: the brand loader over a plain grey box — never over a
+// poster image (a still behind the pulsing mark read as "loaded but frozen").
 export default function VideoPlayer({
   src,
-  poster,
   className = "",
   style,
   onReady,
   eager,
 }: {
   src: string;
-  poster?: string;
   className?: string;
   style?: React.CSSProperties;
   onReady?: () => void;
@@ -45,23 +46,39 @@ export default function VideoPlayer({
   }, []);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        // The empty loading frame: ink at 8% reads as a quiet grey on the cream.
+        background: ready ? "transparent" : "rgba(33, 30, 26, 0.08)",
+      }}
+    >
       {!ready && <Loader bare />}
       <video
         ref={ref}
         src={src}
-        poster={poster}
         loop
         muted
         playsInline
         preload={eager ? "auto" : "metadata"}
         // Ready = actually PLAYING, not just first-frame-loaded: on slow
-        // fetches the poster used to sit there looking frozen with no
-        // indicator while the file buffered. The loader now stays up until
+        // fetches the frame used to sit there looking frozen with no
+        // indicator while the file buffered. The loader stays up until
         // frames are really moving.
         onPlaying={() => { setReady(true); onReady?.(); }}
         className={className}
-        style={{ width: "100%", height: "100%", objectFit: "contain", background: "transparent", display: "block", ...style }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          background: "transparent",
+          display: "block",
+          opacity: ready ? 1 : 0,
+          transition: "opacity 0.3s ease",
+          ...style,
+        }}
       />
     </div>
   );

@@ -13,11 +13,11 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   title: "Store",
   description:
-    "Digital products from finbar✶studio. Tools and templates drawn from client work, by a Brisbane graphic designer.",
+    "Digital products from Finbar Studio. Tools and templates drawn from client work, by a Brisbane graphic designer.",
   alternates: { canonical: "/store" },
   openGraph: {
     title: "Store | Finbar Studio",
-    description: "Digital products and tools from finbar✶studio.",
+    description: "Digital products and tools from Finbar Studio.",
     url: "/store",
     type: "website",
   },
@@ -39,7 +39,7 @@ export default async function StorePage() {
         "@type": "Product",
         name: product.name,
         description: fb.tagline,
-        brand: { "@type": "Brand", name: "finbar✶studio" },
+        brand: { "@type": "Brand", name: "Finbar Studio" },
         offers: {
           "@type": "Offer",
           ...(priceLabel ? { price: priceLabel.replace(/[^0-9.]/g, "") } : {}),

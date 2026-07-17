@@ -11,7 +11,7 @@ import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
  * the canonical FINBARSTUDIO wordmark + the pink brand asterisk.
  */
 
-export const alt = "finbar✶studio Sandbox, free creative tools: Bezier Studio, 3D SVG Studio, mockup generators.";
+export const alt = "Finbar Studio Sandbox, free creative tools: Bezier Studio, 3D SVG Studio, mockup generators.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

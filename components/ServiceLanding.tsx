@@ -3,6 +3,7 @@ import Script from "next/script";
 import Link from "next/link";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
+import ContactCta from "@/components/ContactCta";
 
 /**
  * ServiceLanding — a focused service landing page (e.g. /web-design,
@@ -202,12 +203,14 @@ export default function ServiceLanding({
             {ctaHeading}
           </h2>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-6">
-            <a href="mailto:finbar@finbar.studio" className="tag tag-pink">Start a project ↗</a>
+            {/* Opens the global contact/book-a-call panel, not a mailto. */}
+            <ContactCta className="tag tag-pink">Start a project ↗</ContactCta>
             <Link href="/work" className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>See more work</Link>
           </div>
           <address className="not-italic text-ink-soft mt-8 leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
-            finbar✶studio — Brisbane, QLD, Australia. Working with clients across Australia and the UK.{" "}
-            <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>
+            Finbar Studio, Brisbane, QLD, Australia. Working with clients across Australia and the UK.{" "}
+            <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>{" "}
+            <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>
           </address>
         </div>
       </section>

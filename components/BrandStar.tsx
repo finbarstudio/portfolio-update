@@ -1,10 +1,10 @@
 import { STAR_POINTS } from "@/components/brand-star";
 
 /**
- * BrandStar — the finbar✶studio mark as an inline SVG, replacing the unreliable
+ * BrandStar — the Finbar Studio mark as an inline SVG, replacing the unreliable
  * ✶ glyph (which renders differently per system font) in the wordmark. Inherits
  * colour via `currentColor` and sits on the text baseline, so it behaves like a
- * letter inside "finbar✶studio".
+ * letter inside "Finbar Studio".
  */
 export default function BrandStar({
   size = "0.78em",
