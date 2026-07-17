@@ -1,3 +1,4 @@
+import "./pitch.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";

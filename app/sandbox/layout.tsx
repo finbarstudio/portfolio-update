@@ -1,3 +1,4 @@
+import "./sandbox.css";
 import type { Metadata, Viewport } from "next";
 import SandboxNav from "@/components/sandbox/SandboxNav";
 import SandboxTransition from "@/components/sandbox/SandboxTransition";
