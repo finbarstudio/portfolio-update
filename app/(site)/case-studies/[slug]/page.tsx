@@ -208,11 +208,9 @@ function Gallery({ images, cols }: { images: ProjectImage[]; cols?: number }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
       {images.map((img, i) => {
-        // half: an explicit opt-out of the wide-ratio full-span (e.g. a flat
-        // logo strip paired beside a tall video). Centre it in its row.
-        const full = img.half ? false : ratioOf(img.aspectRatio) >= 1.6;
+        const full = ratioOf(img.aspectRatio) >= 1.6;
         return (
-          <Reveal as="figure" key={i} y={24} delay={(i % 2) * 0.06} className={full ? "md:col-span-2" : "min-w-0 self-center"}>
+          <Reveal as="figure" key={i} y={24} delay={(i % 2) * 0.06} className={full ? "md:col-span-2" : "min-w-0"}>
             <CaseMedia img={img} full={full} />
             {img.caption && <Caption text={img.caption} />}
           </Reveal>
@@ -261,13 +259,15 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
           <Reveal as="section" key={i} y={28}>
             <h3 className="mono-heading text-pink mb-3">{section.heading}</h3>
             {section.split ? (
-              /* Two columns: body text left, media right (e.g. the Lows mark). */
+              /* Two columns: body text left, media right (e.g. the Lows mark).
+                 Logos sit in a 340px slot; a video (e.g. the old-site scroll)
+                 gets the whole half column. */
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 items-center">
                 <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
                   {section.body}
                 </p>
                 {section.images.length > 0 && (
-                  <div className="w-full max-w-[340px] md:justify-self-end">
+                  <div className={`w-full ${section.images.some((im) => im.video) ? "" : "max-w-[340px]"} md:justify-self-end`}>
                     <Gallery images={section.images} cols={section.cols} />
                   </div>
                 )}
