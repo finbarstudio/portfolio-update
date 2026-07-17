@@ -10,7 +10,7 @@
  * scrolls vertically through it — so near the top and bottom of frame the type
  * bows and foreshortens, exactly like a camera filming a real printed drum.
  *
- * Text uses the site tokens resolved at runtime: --font-primary (Archivo Narrow)
+ * Text uses the site tokens resolved at runtime: --font-primary (Host Grotesk)
  * for display/names, --font-mono (Space Mono) for tracked caps labels, and the
  * sandbox --ink / --ink-soft / --pink colours.
  */

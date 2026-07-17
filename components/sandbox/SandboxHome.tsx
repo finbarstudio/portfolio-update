@@ -86,8 +86,8 @@ export default function SandboxHome() {
       const markSlot = fontPx * 1.18; // total horizontal room the asterisk occupies
       const cy = H / 2 + fontPx * 0.04;
 
-      // Layout slots from the true (Archivo Narrow) metrics so the line never shifts.
-      c.font = `600 ${fontPx}px 'Archivo Narrow', ui-sans-serif, sans-serif`;
+      // Layout slots from the true (Host Grotesk) metrics so the line never shifts.
+      c.font = `600 ${fontPx}px 'Host Grotesk', ui-sans-serif, sans-serif`;
       const chars = [...LEFT, SLOT, ...RIGHT];
       const adv = chars.map((ch) => (ch === SLOT ? markSlot : c.measureText(ch).width + tracking));
       const total = adv.reduce((a, b) => a + b, 0);
@@ -115,12 +115,12 @@ export default function SandboxHome() {
         if (locked && scramble && cx > headX - adv[i] * 1.4) {
           // just crossed by the head → pink "click" + underline wipe
           c.fillStyle = PINK;
-          c.font = `600 ${fontPx}px 'Archivo Narrow', ui-sans-serif, sans-serif`;
+          c.font = `600 ${fontPx}px 'Host Grotesk', ui-sans-serif, sans-serif`;
           c.fillText(ch, cx, cy);
           c.fillRect(cx - adv[i] * 0.4, cy + fontPx * 0.48, adv[i] * 0.8, Math.max(1, fontPx * 0.045));
         } else if (locked || !scramble) {
           c.fillStyle = INK;
-          c.font = `600 ${fontPx}px 'Archivo Narrow', ui-sans-serif, sans-serif`;
+          c.font = `600 ${fontPx}px 'Host Grotesk', ui-sans-serif, sans-serif`;
           c.fillText(ch, cx, cy);
         } else {
           c.fillStyle = INK;
@@ -230,7 +230,7 @@ export default function SandboxHome() {
     };
     raf = requestAnimationFrame(frame);
     // Re-measure once fonts are ready (the loop redraws every frame, so this just
-    // ensures correct metrics land as soon as Archivo Narrow / Space Mono swap in).
+    // ensures correct metrics land as soon as Host Grotesk / Space Mono swap in).
     document.fonts?.ready?.then(() => { lastBw = -1; });
 
     return () => {

@@ -30,13 +30,16 @@
      │  FONTS                                                  │
      │  --font-primary  → body copy, headings, display text   │
      │  --font-label    → uppercase caps labels, nav, tags     │
-     │  Both currently use Archivo Narrow (loaded in          │
+     │  Both use Host Grotesk (loaded in          │
      │  layout.tsx via next/font/google).                     │
      │  To swap: change the fallback or load a new font in    │
      │  layout.tsx and update the var() reference here.       │
      └─────────────────────────────────────────────────────────┘ */
   --font-primary: var(--font-host), "Host Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-label:   var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
+  /* Labels consolidated onto Host Grotesk (Archivo Narrow removed 18 Jul 2026
+     — one face fewer to load, and the labels sit in the display face's own
+     voice). */
+  --font-label:   var(--font-host), "Host Grotesk", ui-sans-serif, system-ui, sans-serif;
   /* Display serif fallback stack (Bookmania/Typekit was removed as unused). */
   --font-display: Georgia, "Times New Roman", serif;
 
@@ -359,7 +362,7 @@
   padding: 10px 16px;
   background: var(--ink);
   color: var(--bg);
-  font-family: var(--font-archivo-narrow), sans-serif;
+  font-family: var(--font-label);
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.04em;
@@ -477,7 +480,7 @@
 /* ─── Components ─────────────────────────────────────────────── */
 @layer components {
 
-  /* Caps label (Archivo Narrow), uppercase tracking, used for nav, eyebrows, meta */
+  /* Caps label (Host Grotesk), uppercase tracking, used for nav, eyebrows, meta */
   .mono-label {
     font-family: var(--font-label);
     font-weight: 700;
@@ -697,7 +700,7 @@
     font-size: clamp(2.4rem, 7.5vw, 5.6rem);
     font-kerning: normal;
   }
-  /* H2 — sans (Archivo Narrow), so it reads as a clearly different tier to the
+  /* H2 — sans (Host Grotesk), so it reads as a clearly different tier to the
      serif H1. Heavier tracking + a touch smaller line. */
   .home-display-sm {
     font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;

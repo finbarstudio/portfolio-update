@@ -1,0 +1,184 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   /free-redesign — route-scoped styles for the Meta-campaign landing page.
+   Lives beside its route (the direction all satellite/one-off surfaces are
+   moving): the page consumes the site's real tokens (palette, .tag,
+   .book-call-pill, .quote-box, .mono-label, .home-display, the pulse) and
+   keeps ONLY its own layout here. Mobile-first: ~95% of traffic is phones in
+   Instagram's in-app browser.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.fr {
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Logo-only header: no nav, no exit doors. */
+.fr-head {
+  display: flex;
+  justify-content: center;
+  padding: 22px 20px 0;
+}
+.fr-logo {
+  font-size: 18px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* ── Hero ── */
+.fr-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(48px, 10vh, 96px) 20px clamp(40px, 8vh, 72px);
+}
+.fr-hero-mark {
+  width: clamp(56px, 9vw, 84px);
+  height: clamp(56px, 9vw, 84px);
+  margin-bottom: clamp(20px, 4vh, 36px);
+}
+.fr-hero-title {
+  max-width: 17ch;
+  text-wrap: balance;
+}
+.fr-lede {
+  max-width: 44ch;
+  margin-top: 1.4rem;
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  line-height: 1.55;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.fr-cta {
+  margin-top: 2rem;
+  font-size: 1rem;
+  padding: 1em 2.2em;
+}
+
+/* ── Section rhythm ── */
+.fr-section {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: clamp(36px, 7vh, 72px) 20px;
+}
+.fr-kicker {
+  display: block;
+  text-align: center;
+  margin-bottom: clamp(20px, 4vh, 36px);
+}
+
+/* ── Steps ── */
+.fr-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+  max-width: 560px;
+  margin-inline: auto;
+}
+.fr-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: baseline;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 16px 18px;
+}
+.fr-step-n { color: var(--pink); }
+.fr-step p { margin: 0; line-height: 1.5; }
+
+/* ── Proof strip ── */
+.fr-proof {
+  display: grid;
+  gap: 22px;
+}
+@media (min-width: 720px) {
+  .fr-proof { grid-template-columns: repeat(3, 1fr); }
+}
+.fr-proof-item { margin: 0; }
+.fr-proof-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+.fr-proof-item figcaption {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+/* Case-study links are deliberately quiet — never competing with the CTA. */
+.fr-proof-link {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Includes ── */
+.fr-includes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* ── Testimonials ── */
+.fr-quotes {
+  display: grid;
+  gap: 22px;
+  max-width: 640px;
+  margin-inline: auto;
+}
+.fr-quote blockquote {
+  margin: 0;
+  line-height: 1.55;
+}
+.fr-quote figcaption { margin-top: 12px; text-align: center; }
+
+/* ── Booking (the conversion point) ── */
+.fr-book { max-width: 1100px; }
+.fr-cal {
+  position: relative;      /* the brand Loader fills this while Cal boots */
+  min-height: 560px;       /* reserves the slot so the embed doesn't shift the page */
+  border-radius: 6px;
+}
+.fr-micro {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* ── Footer: wordmark, one quiet mailto, © ── */
+.fr-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(40px, 8vh, 72px) 20px 32px;
+  border-top: 1px solid var(--line);
+  margin-top: clamp(24px, 5vh, 48px);
+}
+.fr-foot-logo {
+  font-size: 16px;
+  color: var(--ink);
+  text-decoration: none;
+}
+/* Plain text on purpose: the escape hatch must not read as an alternative CTA. */
+.fr-foot-mail {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

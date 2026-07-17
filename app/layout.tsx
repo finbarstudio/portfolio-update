@@ -1,17 +1,9 @@
 import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata, Viewport } from "next";
-import { Archivo_Narrow, Archivo, Host_Grotesk, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
+import { Archivo, Host_Grotesk, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
 import TempusKernel from "@/components/TempusKernel";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
-
-// Body + mono/label text.
-const archivoNarrow = Archivo_Narrow({
-  variable: "--font-archivo-narrow",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
 
 // Archivo (variable weight) — the numeral/body face for the demo sites; weight reacts to
 // the cursor via font-variation-settings.
@@ -286,7 +278,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={`${archivoNarrow.variable} ${archivo.variable} ${spaceMono.variable} ${hostGrotesk.variable} ${notoSymbols.variable}`}
+      className={`${archivo.variable} ${spaceMono.variable} ${hostGrotesk.variable} ${notoSymbols.variable}`}
     >
       {/* suppressHydrationWarning: browser extensions (e.g. ColorZilla adds
           cz-shortcut-listen) mutate <body> before hydration; suppress the
@@ -295,6 +287,10 @@ export default function RootLayout({
         {/* One shared rAF loop (tempus): absorbs every native requestAnimationFrame
             — Lenis, canvas effects, R3F, GSAP — into a single ordered loop. */}
         <TempusKernel />
+        {/* Meta base pixel, site-wide (no-op until NEXT_PUBLIC_META_PIXEL_ID
+            is set) — builds the ad retargeting audience; /free-redesign fires
+            the Schedule conversion on top of it. */}
+        <MetaPixel />
         {/* Bookmania (Typekit) was removed: --font-display is referenced nowhere
             and HeroHeadline is unmounted, so the render-blocking third-party
             stylesheet was pure LCP cost on every page. */}
