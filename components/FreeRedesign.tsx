@@ -75,7 +75,7 @@ const TESTIMONIALS: { quote: string; author: string }[] = [
   {
     quote:
       "Finbar is reliable, fast and really easy to work with. He was able to translate the brief of a sound-based website into something aesthetically beautiful and totally original. I'm so impressed and would genuinely recommend him to anyone.",
-    author: "Lola Stoodley, composer & sound designer",
+    author: "Lola Stoodley, Lola Audio",
   },
 ];
 

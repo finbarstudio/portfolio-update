@@ -63,7 +63,7 @@ const WEBSITES: Website[] = [
     caseStudy: "/case-studies/lola-audio",
     quote: {
       text: "Finbar is reliable, fast and really easy to work with… something aesthetically beautiful and totally original.",
-      author: "Lola Stoodley, composer & sound designer",
+      author: "Lola Stoodley, Lola Audio",
     },
   },
   {
