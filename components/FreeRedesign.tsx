@@ -48,9 +48,12 @@ const PROOF = [
 
 const INCLUDES = [
   "Coded, not templated",
+  "Mobile optimised",
   "Custom animation",
   "A CMS you edit yourself",
   "Integrations like booking and custom calculators",
+  "SEO",
+  "Optimised for AI search",
   "Hosting handled",
   "Full handover",
   "Live in about two weeks",
