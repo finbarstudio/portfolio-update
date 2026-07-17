@@ -558,7 +558,11 @@ export default async function CaseStudyPage({
         <>
           <div className="mb-8">
             {project.heroModel ? (
-              <ModelDisplay {...project.heroModel} aspectRatio="16/9" bare hoverable={false} />
+              /* 16/10, not 16/9: the scroll-engagement camera zooms in as you
+                 scroll and the mac's base was riding the frame's bottom edge.
+                 The taller frame keeps the model clear through the whole move
+                 and adds breathing room before the first section. */
+              <ModelDisplay {...project.heroModel} aspectRatio="16/10" bare hoverable={false} />
             ) : project.heroSlideshow ? (
               <HeroSlideshow images={project.heroSlideshow} cardAspect={project.slideshowAspect} aspectRatio="5/2" />
             ) : project.heroSpline ? (

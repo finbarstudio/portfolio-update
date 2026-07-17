@@ -90,13 +90,15 @@
 .fr-step-n { color: var(--pink); }
 .fr-step p { margin: 0; line-height: 1.5; }
 
-/* ── Proof strip (4 sites, 2x2 from tablet up) ── */
+/* ── Proof strip: Lows leads full-width (it's the site in the ad, and the ad
+      points people at its case study), the other three share row two. ── */
 .fr-proof {
   display: grid;
   gap: 28px;
 }
 @media (min-width: 640px) {
-  .fr-proof { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  .fr-proof { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .fr-proof-item:first-child { grid-column: 1 / -1; }
 }
 .fr-proof-item {
   margin: 0;
