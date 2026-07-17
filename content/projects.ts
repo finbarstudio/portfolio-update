@@ -853,7 +853,21 @@ export const projects: Project[] = [
     depth: [
       {
         heading: "The mark",
+        split: true,
         body: "It started with the client's own sketches. I refined them into a clean geometric mark, a little house drawn in one continuous line, then set a typeface and a colour that hold up small on a phone and large on a wall. One mark, one weight of line, working the same everywhere: on Bromley FC matchday branding, on the hoarding around a live site, and later as the foundation the website was built on.",
+        images: [
+          {
+            src: "/images/lows-design-build/logomark.svg",
+            aspectRatio: "300/80",
+            caption: "The geometric mark, refined from the client's concepts.",
+            alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
+          },
+        ],
+      },
+      {
+        heading: "Custom, not a template",
+        split: true,
+        body: "The old site was a stock template. The new one is Next.js and a hand-written front end. No page builder, no theme sitting underneath it. The whole thing loads fast, reads well on any screen, and behaves exactly how it was drawn, because nothing on the page is there by accident.",
         images: [
           {
             src: "/images/web/lows-1.webp",
@@ -862,19 +876,7 @@ export const projects: Project[] = [
             caption: "For comparison: the old template site, top to bottom.",
             alt: "Scrolling capture of the previous Lows Design and Build website, a standard template design",
           },
-          {
-            src: "/images/lows-design-build/logomark.svg",
-            aspectRatio: "300/80",
-            half: true,
-            caption: "The geometric mark, refined from the client's concepts.",
-            alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
-          },
         ],
-      },
-      {
-        heading: "Custom, not a template",
-        body: "The old site was a stock template. The new one is Next.js and a hand-written front end. No page builder, no theme sitting underneath it. The whole thing loads fast, reads well on any screen, and behaves exactly how it was drawn, because nothing on the page is there by accident.",
-        images: [],
       },
       {
         heading: "A CMS they run themselves",
