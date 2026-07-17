@@ -4,6 +4,7 @@ import Link from "next/link";
 import Script from "next/script";
 import type { Metadata } from "next";
 import SplineScene from "@/components/SplineScene";
+import ScrollShot from "@/components/ScrollShot";
 import ModelDisplay from "@/components/ModelDisplay";
 import AlbumShowcase from "@/components/AlbumShowcase";
 import KinayaShowcase from "@/components/KinayaShowcase";
@@ -149,6 +150,9 @@ function CaseMedia({ img, full = false }: { img: ProjectImage; full?: boolean })
   const sizes = full
     ? "(max-width: 768px) 100vw, calc(100vw - 224px)"
     : "(max-width: 768px) 100vw, calc((100vw - 224px) / 2)";
+  if (img.scrollShot) {
+    return <ScrollShot src={img.src} alt={img.alt} aspectRatio={img.aspectRatio ?? "16/9"} />;
+  }
   if (img.video) {
     return (
       <div
@@ -208,9 +212,11 @@ function Gallery({ images, cols }: { images: ProjectImage[]; cols?: number }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
       {images.map((img, i) => {
-        const full = ratioOf(img.aspectRatio) >= 1.6;
+        // half: an explicit opt-out of the wide-ratio full-span (e.g. the flat
+        // logomark paired beside the old-site video). Centre it in its row.
+        const full = img.half ? false : ratioOf(img.aspectRatio) >= 1.6;
         return (
-          <Reveal as="figure" key={i} y={24} delay={(i % 2) * 0.06} className={full ? "md:col-span-2" : "min-w-0"}>
+          <Reveal as="figure" key={i} y={24} delay={(i % 2) * 0.06} className={full ? "md:col-span-2" : "min-w-0 self-center"}>
             <CaseMedia img={img} full={full} />
             {img.caption && <Caption text={img.caption} />}
           </Reveal>
@@ -265,21 +271,13 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 items-center">
                 {/* self-start: beside tall media (the old-site scroll) the text
                     column must hug its heading, not float to the row's middle. */}
-                <div className="md:self-start">
-                  <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-                    {section.body}
-                  </p>
-                  {section.more?.map((block) => (
-                    <div key={block.heading} className="mt-8">
-                      <h4 className="mono-heading text-pink mb-3">{block.heading}</h4>
-                      <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-                        {block.body}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                <p className="md:self-start text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
+                  {section.body}
+                </p>
                 {section.images.length > 0 && (
-                  <div className={`w-full ${section.images.some((im) => im.video) ? "" : "max-w-[340px]"} md:justify-self-end`}>
+                  /* Flat logo strips sit in a 340px slot; real media (video,
+                     screenshots) takes the whole half column. */
+                  <div className={`w-full ${section.images.some((im) => im.video || ratioOf(im.aspectRatio) < 2) ? "" : "max-w-[340px]"} md:justify-self-end`}>
                     <Gallery images={section.images} cols={section.cols} />
                   </div>
                 )}

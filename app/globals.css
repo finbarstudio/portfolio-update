@@ -4578,3 +4578,39 @@ html:has(.contact-skin) { background: var(--pink-deep); }
   .contact-skin.is-ready .contact-reveal { animation: none; clip-path: inset(0 0 0 0); }
   .contact-preloader { transition: none; }
 }
+
+/* ── Scroll-shot: a full-page screenshot panning inside a fixed frame, like
+      someone scrolling the site (see components/ScrollShot). Unlayered on
+      purpose — Tailwind v4 tree-shakes @layer components classes it can't
+      see in content. Pan pauses off-screen and stops entirely under reduced
+      motion (the top of the page still shows). ── */
+.scroll-shot {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  container-type: size;
+  background: rgba(33, 30, 26, 0.08);
+  margin-top: var(--image-pad);
+  margin-bottom: var(--image-pad);
+}
+.scroll-shot-ground {
+  position: absolute;
+  inset: 0;
+  background: rgba(33, 30, 26, 0.08);
+}
+.scroll-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.3s ease;
+  animation: scroll-shot-pan 16s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.scroll-shot.is-live img { animation-play-state: running; }
+@keyframes scroll-shot-pan {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(-100% + 100cqh)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-shot img { animation: none; }
+}

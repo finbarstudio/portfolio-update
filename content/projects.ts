@@ -23,6 +23,8 @@ export interface ProjectImage {
   alt: string;
   video?: string;     // WebM path. If set, renders as a looping video.
   aspectRatio?: string; // Override the default 16/9 frame (e.g. "1/1" for square covers).
+  scrollShot?: boolean; // src is a full-page screenshot; render it panning inside the frame.
+  half?: boolean;     // Force a half column even when the ratio is wide enough to full-span.
 }
 
 export interface DepthSection {
@@ -34,9 +36,6 @@ export interface DepthSection {
   cols?: number;
   /** two-column section: body text left, gallery right */
   split?: boolean;
-  /** extra text blocks stacked under the body in the split's left column,
-   *  each with its own small heading (e.g. the CMS blurb beside a tall video) */
-  more?: { heading: string; body: string }[];
 }
 
 // One horizontal row of media (images or videos) sharing a single caption.
@@ -854,27 +853,7 @@ export const projects: Project[] = [
     depth: [
       {
         heading: "The mark",
-        split: true,
         body: "It started with the client's own sketches. I refined them into a clean geometric mark, a little house drawn in one continuous line, then set a typeface and a colour that hold up small on a phone and large on a wall. One mark, one weight of line, working the same everywhere: on Bromley FC matchday branding, on the hoarding around a live site, and later as the foundation the website was built on.",
-        images: [
-          {
-            src: "/images/lows-design-build/logomark.svg",
-            aspectRatio: "300/80",
-            caption: "The geometric mark, refined from the client's concepts.",
-            alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
-          },
-        ],
-      },
-      {
-        heading: "Custom, not a template",
-        split: true,
-        body: "The old site was a stock template. The new one is Next.js and a hand-written front end. No page builder, no theme sitting underneath it. The whole thing loads fast, reads well on any screen, and behaves exactly how it was drawn, because nothing on the page is there by accident.",
-        more: [
-          {
-            heading: "A CMS they run themselves",
-            body: "The site is wired into Sanity. Projects, team, copy, pricing, the photos in every gallery: the family edits all of it from one dashboard and the site updates itself. Add a project and it appears in the grid, gets its own page, and slots into the sitemap. No developer, no waiting, no invoice for a text change. The fields are set up so they cannot break the layout: long title, short title, one photo or ten, the components hold their shape either way.",
-          },
-        ],
         images: [
           {
             src: "/images/web/lows-1.webp",
@@ -882,6 +861,31 @@ export const projects: Project[] = [
             aspectRatio: "4/3",
             caption: "For comparison: the old template site, top to bottom.",
             alt: "Scrolling capture of the previous Lows Design and Build website, a standard template design",
+          },
+          {
+            src: "/images/lows-design-build/logomark.svg",
+            aspectRatio: "300/80",
+            half: true,
+            caption: "The geometric mark, refined from the client's concepts.",
+            alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
+          },
+        ],
+      },
+      {
+        heading: "Custom, not a template",
+        body: "The old site was a stock template. The new one is Next.js and a hand-written front end. No page builder, no theme sitting underneath it. The whole thing loads fast, reads well on any screen, and behaves exactly how it was drawn, because nothing on the page is there by accident.",
+        images: [],
+      },
+      {
+        heading: "A CMS they run themselves",
+        split: true,
+        body: "The site is wired into Sanity. Projects, team, copy, pricing, the photos in every gallery: the family edits all of it from one dashboard and the site updates itself. Add a project and it appears in the grid, gets its own page, and slots into the sitemap. No developer, no waiting, no invoice for a text change. The fields are set up so they cannot break the layout: long title, short title, one photo or ten, the components hold their shape either way.",
+        images: [
+          {
+            src: "/images/lows-design-build/cms-panel.webp",
+            aspectRatio: "1440/934",
+            caption: "The Sanity dashboard the family edits from.",
+            alt: "Sanity CMS dashboard for the Lows Design and Build website",
           },
         ],
       },
@@ -917,10 +921,11 @@ export const projects: Project[] = [
         body: "An instant estimate calculator lets a visitor price their own extension or loft in about a minute; to see the figure they leave a name and an email, so every estimate lands in the client's inbox as a warm lead. Booking a call runs through Calendly, skinned to the brand in its own quiet overlay. Enquiries go straight to their inbox through Web3Forms, and a live Instagram feed keeps the site current without anyone touching it.",
         images: [
           {
-            src: "/images/lows-design-build/estimate.webp",
+            src: "/images/lows-design-build/estimate-page-scroll.webp",
+            scrollShot: true,
             aspectRatio: "16/9",
             caption: "The estimate tool: a visitor prices their own project and becomes a named lead.",
-            alt: "Lows Design and Build estimate calculator page, instant project pricing tool",
+            alt: "Full scroll of the Lows Design and Build estimate calculator page",
           },
         ],
       },
