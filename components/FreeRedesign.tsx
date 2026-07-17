@@ -54,15 +54,29 @@ const INCLUDES = [
   "Live in about two weeks",
 ];
 
-// Quotes drop in as they're collected — empty entries never render.
+// One quote per proof site, verbatim from the case studies (content/projects.ts)
+// — shortened only with ellipses, never reworded. Empty entries never render.
 const TESTIMONIALS: { quote: string; author: string }[] = [
   {
     quote:
       "It has been nothing but a pleasure working with Finbar on our new website. He has completely transformed our online presence and taken it to the next level.",
     author: "Samuel Low, Lows Design + Build",
   },
-  { quote: "", author: "" },
-  { quote: "", author: "" },
+  {
+    quote:
+      "Finbar just got it, honestly. I'd send him a voice note about something I wanted changed and it would be live by the evening. He kept me in the loop the whole way through without ever drowning me in tech talk, and the site went from an idea to launched faster than I thought was possible. It feels completely like me.",
+    author: "Issy Park, Plated with Issy",
+  },
+  {
+    quote:
+      "Finbar was great to work with from start to finish. He took the time to understand what KinAya needed, communicated clearly throughout, and delivered something that felt cohesive. The branding and website genuinely felt like one vision. … Highly recommend.",
+    author: "Aryan Sareen, KinAya",
+  },
+  {
+    quote:
+      "Finbar is reliable, fast and really easy to work with. He was able to translate the brief of a sound-based website into something aesthetically beautiful and totally original. I'm so impressed and would genuinely recommend him to anyone.",
+    author: "Lola Stoodley, composer & sound designer",
+  },
 ];
 
 export default function FreeRedesign() {
@@ -162,7 +176,8 @@ export default function FreeRedesign() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.src} alt={p.alt} loading="lazy" decoding="async" />
                 <figcaption>{p.caption}</figcaption>
-                <a href={p.href} className="sticker-pill fr-proof-cta">Case study</a>
+                {/* New tab: the landing page (and its booking calendar) stays open. */}
+                <a href={p.href} target="_blank" rel="noopener noreferrer" className="sticker-pill fr-proof-cta">Case study</a>
               </figure>
             ))}
           </div>

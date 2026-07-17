@@ -147,12 +147,20 @@
   color: var(--ink);
 }
 
-/* ── Testimonials ── */
+/* ── Testimonials (4, one per proof site — 2-up from tablet) ── */
 .fr-quotes {
   display: grid;
-  gap: 22px;
+  gap: 26px;
   max-width: 640px;
   margin-inline: auto;
+}
+@media (min-width: 720px) {
+  .fr-quotes {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    max-width: 1000px;
+    align-items: start;
+  }
 }
 .fr-quote blockquote {
   margin: 0;
