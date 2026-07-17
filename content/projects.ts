@@ -824,7 +824,7 @@ export const projects: Project[] = [
     testimonial: {
       quote:
         "It has been nothing but a pleasure working with Finbar on our new website. He has completely transformed our online presence and taken it to the next level.\n\nFrom the initial design through to the finished site, his communication was excellent throughout. He really listened to our ideas, brought them to life, and made creative suggestions for each page that improved both the content and the overall layout and navigation of the website. He also guided us through the SEO side of things, making sure everything was set up properly to give us the best chance of improving our visibility on Google. On top of that, he designed a selection of Instagram posts for us, giving us high-quality content ready to promote the business across our social media.\n\nWe\u2019re genuinely delighted with the end result and wouldn\u2019t hesitate to recommend Finbar to anyone looking for a professional, high-quality website.",
-      author: "The Lows family, Lows Design + Build",
+      author: "Samuel Low, Lows Design + Build",
     },
     logo: "/images/lows-design-build/logomark.svg",
     cardLogo: "/images/lows-design-build/logomark.svg",

@@ -37,7 +37,7 @@ const WEBSITES: Website[] = [
     caseStudy: "/case-studies/lows-design-build",
     quote: {
       text: "He has completely transformed our online presence and taken it to the next level.",
-      author: "The Lows family, Lows Design + Build",
+      author: "Samuel Low, Lows Design + Build",
     },
   },
   {

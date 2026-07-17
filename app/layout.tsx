@@ -272,6 +272,9 @@ const serviceJsonLd = {
   },
 };
 
+// Meta pixel (supplied by Finbar 17 Jul 2026). Public-by-nature client-side ID.
+const META_PIXEL_ID = "1291157749527923";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -280,16 +283,46 @@ export default function RootLayout({
       lang="en-AU"
       className={`${archivo.variable} ${spaceMono.variable} ${hostGrotesk.variable} ${notoSymbols.variable}`}
     >
+      <head>
+        {/* Meta base pixel, verbatim per Meta's install instructions, in <head>
+            so the ad platform's checker sees it where it expects it. Fires the
+            first PageView; MetaPixel (below) adds one per App Router navigation.
+            The ID is public by nature (visible in any browser), so it lives in
+            code, not env. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${META_PIXEL_ID}');
+fbq('track', 'PageView');`,
+          }}
+        />
+      </head>
       {/* suppressHydrationWarning: browser extensions (e.g. ColorZilla adds
           cz-shortcut-listen) mutate <body> before hydration; suppress the
           attribute-mismatch warning for this node only, not its children. */}
       <body className="bg-bg text-ink font-sans antialiased min-h-screen" suppressHydrationWarning>
+        <noscript>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            alt=""
+            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+          />
+        </noscript>
         {/* One shared rAF loop (tempus): absorbs every native requestAnimationFrame
             — Lenis, canvas effects, R3F, GSAP — into a single ordered loop. */}
         <TempusKernel />
-        {/* Meta base pixel, site-wide (no-op until NEXT_PUBLIC_META_PIXEL_ID
-            is set) — builds the ad retargeting audience; /free-redesign fires
-            the Schedule conversion on top of it. */}
+        {/* PageView per client-side navigation (the head snippet only fires the
+            first one; App Router route changes don't reload the page). */}
         <MetaPixel />
         {/* Bookmania (Typekit) was removed: --font-display is referenced nowhere
             and HeroHeadline is unmounted, so the render-blocking third-party

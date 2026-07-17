@@ -190,7 +190,7 @@ export default function QldPoolsPage() {
                   recommend Finbar to anyone looking for a professional, high-quality website.
                 </blockquote>
               </div>
-              <figcaption className="mono-label text-ink-soft mt-3 text-center">&mdash; The Lows family, Lows Design + Build</figcaption>
+              <figcaption className="mono-label text-ink-soft mt-3 text-center">&mdash; Samuel Low, Lows Design + Build</figcaption>
             </figure>
           </div>
         </div>

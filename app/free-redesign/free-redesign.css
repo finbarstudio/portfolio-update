@@ -90,15 +90,20 @@
 .fr-step-n { color: var(--pink); }
 .fr-step p { margin: 0; line-height: 1.5; }
 
-/* ── Proof strip ── */
+/* ── Proof strip (4 sites, 2x2 from tablet up) ── */
 .fr-proof {
   display: grid;
-  gap: 22px;
+  gap: 28px;
 }
-@media (min-width: 720px) {
-  .fr-proof { grid-template-columns: repeat(3, 1fr); }
+@media (min-width: 640px) {
+  .fr-proof { grid-template-columns: repeat(2, 1fr); gap: 32px; }
 }
-.fr-proof-item { margin: 0; }
+.fr-proof-item {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 .fr-proof-item img {
   width: 100%;
   height: auto;
@@ -112,14 +117,13 @@
   color: var(--ink-soft);
   line-height: 1.45;
 }
-/* Case-study links are deliberately quiet — never competing with the CTA. */
-.fr-proof-link {
-  color: var(--ink-soft);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+/* Case-study button: the site's sticker-pill token, on its own line. */
+.fr-proof-cta {
+  margin-top: 12px;
+  text-decoration: none;
 }
 
-/* ── Includes ── */
+/* ── Includes: pills sized to be read, not squinted at ── */
 .fr-includes {
   list-style: none;
   margin: 0;
@@ -127,9 +131,20 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  max-width: 640px;
+  gap: 12px;
+  max-width: 720px;
   margin-inline: auto;
+}
+.fr-include {
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.8em 1.4em;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  color: var(--ink);
 }
 
 /* ── Testimonials ── */
@@ -152,13 +167,6 @@
   min-height: 560px;       /* reserves the slot so the embed doesn't shift the page */
   border-radius: 6px;
 }
-.fr-micro {
-  margin-top: 18px;
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
-}
-
 /* ── Footer: wordmark, one quiet mailto, © ── */
 .fr-foot {
   display: flex;

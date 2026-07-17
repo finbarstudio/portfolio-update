@@ -42,6 +42,7 @@ const PROOF = [
   { src: "/images/web/lows-1.webp", alt: "Lows Design and Build homepage", caption: "Lows Design + Build, family builders in London", href: "/case-studies/lows-design-build" },
   { src: "/images/web/plated-1.webp", alt: "Plated with Issy homepage", caption: "Plated with Issy, a candlelit supper club", href: "/case-studies/plated-with-issy" },
   { src: "/images/web/kinaya-1.webp", alt: "KinAya homepage", caption: "KinAya, wellness brand and store", href: "/case-studies/kinaya" },
+  { src: "/images/web/lola-1.webp", alt: "Lola Audio homepage", caption: "Lola Audio, a portfolio you can mix", href: "/case-studies/lola-audio" },
 ];
 
 const INCLUDES = [
@@ -58,7 +59,7 @@ const TESTIMONIALS: { quote: string; author: string }[] = [
   {
     quote:
       "It has been nothing but a pleasure working with Finbar on our new website. He has completely transformed our online presence and taken it to the next level.",
-    author: "The Lows family, Lows Design + Build",
+    author: "Samuel Low, Lows Design + Build",
   },
   { quote: "", author: "" },
   { quote: "", author: "" },
@@ -160,10 +161,8 @@ export default function FreeRedesign() {
               <figure key={p.src} className="fr-proof-item">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.src} alt={p.alt} loading="lazy" decoding="async" />
-                <figcaption>
-                  {p.caption}{" "}
-                  <a href={p.href} className="fr-proof-link">case study →</a>
-                </figcaption>
+                <figcaption>{p.caption}</figcaption>
+                <a href={p.href} className="sticker-pill fr-proof-cta">Case study</a>
               </figure>
             ))}
           </div>
@@ -174,7 +173,7 @@ export default function FreeRedesign() {
           <p className="mono-label text-ink-soft fr-kicker">If you go ahead, the full build includes</p>
           <ul className="fr-includes">
             {INCLUDES.map((item) => (
-              <li key={item} className="tag tag-default">{item}</li>
+              <li key={item} className="fr-include">{item}</li>
             ))}
           </ul>
         </section>
@@ -202,10 +201,6 @@ export default function FreeRedesign() {
             {calInView && !calReady && <Loader />}
             {calInView && <CalEmbed onReady={() => setCalReady(true)} />}
           </div>
-          <p className="fr-micro">
-            Taking a couple of Brisbane businesses this month. If the
-            calendar&rsquo;s open, the spot&rsquo;s real.
-          </p>
         </section>
       </main>
 
