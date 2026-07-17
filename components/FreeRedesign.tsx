@@ -36,7 +36,7 @@ const CAL_NS = "book-call"; // must match CalEmbed's namespace for the event hoo
 const STEPS = [
   { n: "01", text: "A 15-minute call about your business." },
   { n: "02", text: "Your homepage redesigned as a real concept, within a week." },
-  { n: "03", text: "Love it? If one page is all you need, it's yours: free, hosted, live. A full site with the bells and whistles is a paid build, live in about two weeks. Don't? Keep the concept, no hard feelings." },
+  { n: "03", text: "Love it? If one page is all you need, it's yours: free, hosted, live.\n\nA full site with the bells and whistles is a paid build, live in about two weeks.\n\nDon't? Keep the concept, no hard feelings." },
 ];
 
 const PROOF = [

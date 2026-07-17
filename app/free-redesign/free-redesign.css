@@ -95,6 +95,7 @@
   font-size: clamp(1.05rem, 1.5vw, 1.25rem);
   font-weight: 600;
   line-height: 1.45;
+  white-space: pre-line; /* step 03 breaks into spaced paragraphs via \n\n */
 }
 
 /* ── Proof strip: Lows leads full-width (it's the site in the ad, and the ad
