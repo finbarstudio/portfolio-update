@@ -263,7 +263,9 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
                  Logos sit in a 340px slot; a video (e.g. the old-site scroll)
                  gets the whole half column. */
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 items-center">
-                <div>
+                {/* self-start: beside tall media (the old-site scroll) the text
+                    column must hug its heading, not float to the row's middle. */}
+                <div className="md:self-start">
                   <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
                     {section.body}
                   </p>
