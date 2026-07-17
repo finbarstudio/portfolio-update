@@ -868,6 +868,13 @@ export const projects: Project[] = [
         images: [
           {
             src: "/images/web/lows-1.webp",
+            video: "/images/lows-design-build/old-site-scroll.mp4",
+            aspectRatio: "4/3",
+            caption: "For comparison: the old template site, top to bottom.",
+            alt: "Scrolling capture of the previous Lows Design and Build website, a standard template design",
+          },
+          {
+            src: "/images/web/lows-1.webp",
             aspectRatio: "16/9",
             caption: "The home page: hand-written front end, nothing by default.",
             alt: "Lows Design and Build website home page, custom Next.js build",
