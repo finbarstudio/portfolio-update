@@ -27,8 +27,23 @@ const GRAPH = `https://graph.facebook.com/v23.0/${META_PIXEL_ID}/events`;
 // Only event names our own client code sends — this is a relay, not an open proxy.
 const ALLOWED_EVENTS = new Set(["PageView", "Schedule", "Lead", "Contact"]);
 
+// Shape guards for client-supplied matching params (they improve Event Match
+// Quality; the client generates them first-party — see lib/meta.ts).
+const FB_CLICK_RE = /^fb\.\d\.\d+\..+$/; // documented _fbp/_fbc format (fb.<subdomainIndex>.<ts>.<v>)
+const SHA256_RE = /^[a-f0-9]{64}$/; // em/ph arrive pre-hashed, hex
+const EID_RE = /^[\w-]{8,64}$/;
+
 export async function POST(req: NextRequest) {
-  let body: { event_name?: string; event_id?: string; event_source_url?: string };
+  let body: {
+    event_name?: string;
+    event_id?: string;
+    event_source_url?: string;
+    fbp?: string;
+    fbc?: string;
+    external_id?: string;
+    em?: string;
+    ph?: string;
+  };
   try {
     body = await req.json();
   } catch {
@@ -42,8 +57,13 @@ export async function POST(req: NextRequest) {
 
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || undefined;
   const ua = req.headers.get("user-agent") ?? undefined;
-  const fbp = req.cookies.get("_fbp")?.value;
-  const fbc = req.cookies.get("_fbc")?.value;
+  // Cookies win (the pixel's own values); body carries the first-party
+  // fallbacks minted when the pixel was blocked.
+  const fbp = req.cookies.get("_fbp")?.value ?? (FB_CLICK_RE.test(body.fbp ?? "") ? body.fbp : undefined);
+  const fbc = req.cookies.get("_fbc")?.value ?? (FB_CLICK_RE.test(body.fbc ?? "") ? body.fbc : undefined);
+  const external_id = EID_RE.test(body.external_id ?? "") ? body.external_id : undefined;
+  const em = SHA256_RE.test(body.em ?? "") ? body.em : undefined;
+  const ph = SHA256_RE.test(body.ph ?? "") ? body.ph : undefined;
 
   const payload: Record<string, unknown> = {
     data: [
@@ -58,6 +78,9 @@ export async function POST(req: NextRequest) {
           ...(ua && { client_user_agent: ua }),
           ...(fbp && { fbp }),
           ...(fbc && { fbc }),
+          ...(external_id && { external_id }),
+          ...(em && { em: [em] }),
+          ...(ph && { ph: [ph] }),
         },
       },
     ],

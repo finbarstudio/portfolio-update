@@ -117,10 +117,29 @@ export default function FreeRedesign() {
       const api = await getCalApi({ namespace: CAL_NS });
       api("on", {
         action: "bookingSuccessful",
-        callback: () => {
+        callback: (e) => {
           if (sessionStorage.getItem("fr-scheduled")) return;
           sessionStorage.setItem("fr-scheduled", "1");
-          trackMeta("Schedule");
+          // Cal's event detail carries the booking; the shape shifts between
+          // embed versions, so probe the known paths defensively. Email/phone
+          // (when found) lift the Meta match quality a long way — they're
+          // SHA-256 hashed inside trackMeta before anything leaves the page.
+          const d = (e as { detail?: { data?: Record<string, unknown> } })?.detail?.data ?? {};
+          const dig = (obj: unknown, path: string[]): unknown =>
+            path.reduce<unknown>((o, k) => (o && typeof o === "object" ? (o as Record<string, unknown>)[k] : undefined), obj);
+          const email = [
+            dig(d, ["booking", "attendees", "0", "email"]),
+            dig(d, ["attendees", "0", "email"]),
+            dig(d, ["booking", "responses", "email", "value"]),
+            dig(d, ["responses", "email", "value"]),
+            dig(d, ["email"]),
+          ].find((v) => typeof v === "string" && v.includes("@")) as string | undefined;
+          const phone = [
+            dig(d, ["booking", "responses", "phone", "value"]),
+            dig(d, ["responses", "phone", "value"]),
+            dig(d, ["booking", "attendees", "0", "phoneNumber"]),
+          ].find((v) => typeof v === "string" && v.length > 5) as string | undefined;
+          trackMeta("Schedule", { email, phone });
         },
       });
     })();
