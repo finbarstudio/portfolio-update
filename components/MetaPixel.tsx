@@ -1,34 +1,28 @@
 "use client";
 
 /**
- * MetaPixel — PageView per App Router navigation.
+ * MetaPixel — fires PageView on load and on every App Router navigation,
+ * through BOTH channels (browser fbq + the /api/meta server relay) with a
+ * shared event_id so Meta counts each once. See lib/meta.ts.
  *
- * The base pixel snippet lives verbatim in the root layout's <head> (Meta's
- * install location) and fires the FIRST PageView itself. Client-side route
- * changes never reload the page, so without this the pixel would undercount
- * by almost every navigation. Skips the mount run, tracks every one after.
+ * The base snippet in the root layout's <head> does init ONLY — the tracks
+ * all come from here, so every PageView carries an event_id and dedups
+ * cleanly against its Conversions API twin.
  *
  * /free-redesign layers a Schedule conversion on top (see FreeRedesign) —
- * that's what Meta optimises ad delivery against; the base pixel builds the
+ * that's what Meta optimises ad delivery against; PageViews build the
  * retargeting audience.
  */
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
-
-declare global {
-  interface Window {
-    fbq?: (...args: unknown[]) => void;
-  }
-}
+import { useEffect } from "react";
+import { trackMeta } from "@/lib/meta";
 
 export default function MetaPixel() {
   const pathname = usePathname();
-  const first = useRef(true);
 
   useEffect(() => {
-    if (first.current) { first.current = false; return; }
-    window.fbq?.("track", "PageView");
+    trackMeta("PageView");
   }, [pathname]);
 
   return null;

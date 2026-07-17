@@ -24,6 +24,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { getCalApi } from "@calcom/embed-react";
+import { trackMeta } from "@/lib/meta";
 import BrandWordmark from "./BrandWordmark";
 import BrandMark from "./BrandMark";
 import Loader from "./Loader";
@@ -107,7 +108,9 @@ export default function FreeRedesign() {
 
   // The conversion signal: Cal's embed emits bookingSuccessful in the browser
   // when a booking completes inside the inline embed. Once per session
-  // (sessionStorage guard against re-renders and double events).
+  // (sessionStorage guard against re-renders and double events). trackMeta
+  // sends it via BOTH the browser pixel and the /api/meta server relay with a
+  // shared event_id — the conversion survives ad blockers and in-app WebViews.
   useEffect(() => {
     if (!calInView) return;
     (async () => {
@@ -117,7 +120,7 @@ export default function FreeRedesign() {
         callback: () => {
           if (sessionStorage.getItem("fr-scheduled")) return;
           sessionStorage.setItem("fr-scheduled", "1");
-          window.fbq?.("track", "Schedule");
+          trackMeta("Schedule");
         },
       });
     })();

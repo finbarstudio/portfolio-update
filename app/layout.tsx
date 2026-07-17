@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo, Host_Grotesk, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
 import TempusKernel from "@/components/TempusKernel";
 import MetaPixel from "@/components/MetaPixel";
+import { META_PIXEL_ID } from "@/lib/meta-const";
 import "./globals.css";
 
 // Archivo (variable weight) — the numeral/body face for the demo sites; weight reacts to
@@ -272,9 +273,6 @@ const serviceJsonLd = {
   },
 };
 
-// Meta pixel (supplied by Finbar 17 Jul 2026). Public-by-nature client-side ID.
-const META_PIXEL_ID = "1291157749527923";
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -284,11 +282,11 @@ export default function RootLayout({
       className={`${archivo.variable} ${spaceMono.variable} ${hostGrotesk.variable} ${notoSymbols.variable}`}
     >
       <head>
-        {/* Meta base pixel, verbatim per Meta's install instructions, in <head>
-            so the ad platform's checker sees it where it expects it. Fires the
-            first PageView; MetaPixel (below) adds one per App Router navigation.
-            The ID is public by nature (visible in any browser), so it lives in
-            code, not env. */}
+        {/* Meta base pixel in <head>, init ONLY: every track (PageView per
+            route, Schedule on booking) fires from client code with an
+            event_id, dual-channel with the /api/meta Conversions API relay,
+            so Meta dedups the pairs. A tracked PageView here would have no
+            event_id and double-count against its server twin. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `!function(f,b,e,v,n,t,s)
@@ -299,8 +297,7 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${META_PIXEL_ID}');
-fbq('track', 'PageView');`,
+fbq('init', '${META_PIXEL_ID}');`,
           }}
         />
       </head>
