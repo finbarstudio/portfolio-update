@@ -263,9 +263,19 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
                  Logos sit in a 340px slot; a video (e.g. the old-site scroll)
                  gets the whole half column. */
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 items-center">
-                <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-                  {section.body}
-                </p>
+                <div>
+                  <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
+                    {section.body}
+                  </p>
+                  {section.more?.map((block) => (
+                    <div key={block.heading} className="mt-8">
+                      <h4 className="mono-heading text-pink mb-3">{block.heading}</h4>
+                      <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
+                        {block.body}
+                      </p>
+                    </div>
+                  ))}
+                </div>
                 {section.images.length > 0 && (
                   <div className={`w-full ${section.images.some((im) => im.video) ? "" : "max-w-[340px]"} md:justify-self-end`}>
                     <Gallery images={section.images} cols={section.cols} />

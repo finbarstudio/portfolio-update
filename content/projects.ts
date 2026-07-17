@@ -34,6 +34,9 @@ export interface DepthSection {
   cols?: number;
   /** two-column section: body text left, gallery right */
   split?: boolean;
+  /** extra text blocks stacked under the body in the split's left column,
+   *  each with its own small heading (e.g. the CMS blurb beside a tall video) */
+  more?: { heading: string; body: string }[];
 }
 
 // One horizontal row of media (images or videos) sharing a single caption.
@@ -866,6 +869,12 @@ export const projects: Project[] = [
         heading: "Custom, not a template",
         split: true,
         body: "The old site was a stock template. The new one is Next.js and a hand-written front end. No page builder, no theme sitting underneath it. The whole thing loads fast, reads well on any screen, and behaves exactly how it was drawn, because nothing on the page is there by accident.",
+        more: [
+          {
+            heading: "A CMS they run themselves",
+            body: "The site is wired into Sanity. Projects, team, copy, pricing, the photos in every gallery: the family edits all of it from one dashboard and the site updates itself. Add a project and it appears in the grid, gets its own page, and slots into the sitemap. No developer, no waiting, no invoice for a text change. The fields are set up so they cannot break the layout: long title, short title, one photo or ten, the components hold their shape either way.",
+          },
+        ],
         images: [
           {
             src: "/images/web/lows-1.webp",
@@ -875,11 +884,6 @@ export const projects: Project[] = [
             alt: "Scrolling capture of the previous Lows Design and Build website, a standard template design",
           },
         ],
-      },
-      {
-        heading: "A CMS they run themselves",
-        body: "The site is wired into Sanity. Projects, team, copy, pricing, the photos in every gallery: the family edits all of it from one dashboard and the site updates itself. Add a project and it appears in the grid, gets its own page, and slots into the sitemap. No developer, no waiting, no invoice for a text change. The fields are set up so they cannot break the layout: long title, short title, one photo or ten, the components hold their shape either way.",
-        images: [],
       },
       {
         heading: "The animation",
