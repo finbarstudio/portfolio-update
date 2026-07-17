@@ -88,7 +88,14 @@
   padding: 16px 18px;
 }
 .fr-step-n { color: var(--pink); }
-.fr-step p { margin: 0; line-height: 1.5; }
+/* The steps ARE the offer — sized and weighted to be read, not skimmed.
+   Styled up rather than retagged: h2 would be wrong semantics for list items. */
+.fr-step p {
+  margin: 0;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.45;
+}
 
 /* ── Proof strip: Lows leads full-width (it's the site in the ad, and the ad
       points people at its case study), the other three share row two. ── */
@@ -148,14 +155,16 @@
   line-height: 1.3;
   color: var(--ink);
 }
-/* The free-tier clarifier under the paid-build pills. */
+/* The free-tier clarifier under the paid-build pills — as loud as the steps,
+   it's the other half of the pricing shape. */
 .fr-note {
-  max-width: 46ch;
-  margin: 26px auto 0;
+  max-width: 52ch;
+  margin: 30px auto 0;
   text-align: center;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  color: var(--ink-soft);
+  font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
   text-wrap: pretty;
 }
 
