@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { loadOgFonts } from "@/lib/og-fonts";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 
 /**
@@ -37,31 +38,9 @@ function Mark({ size: s }: { size: number }) {
   );
 }
 
-// Faces aren't bundled with next/og, so fetch them at generation time.
-// Falls back to the default face if offline.
-async function loadGoogleFont(family: string, weight: number): Promise<ArrayBuffer | null> {
-  try {
-    const css = await fetch(`https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weight}`).then((r) => r.text());
-    const url = css.match(/src:\s*url\((https:\/\/[^)]+)\)\s*format\(['"]?(?:woff2?|truetype|opentype)['"]?\)/)?.[1];
-    if (!url) return null;
-    return await fetch(url).then((r) => r.arrayBuffer());
-  } catch {
-    return null;
-  }
-}
-
 export default async function SandboxOpengraphImage() {
   // Host Grotesk = the canonical wordmark; Space Mono stays for the SANDBOX title.
-  const [host700, mono700, mono400] = await Promise.all([
-    loadGoogleFont("Host Grotesk", 700),
-    loadGoogleFont("Space Mono", 700),
-    loadGoogleFont("Space Mono", 400),
-  ]);
-  const fonts = [
-    host700 && { name: "Host Grotesk", data: host700, weight: 700 as const, style: "normal" as const },
-    mono700 && { name: "Space Mono", data: mono700, weight: 700 as const, style: "normal" as const },
-    mono400 && { name: "Space Mono", data: mono400, weight: 400 as const, style: "normal" as const },
-  ].filter(Boolean) as { name: string; data: ArrayBuffer; weight: 400 | 700; style: "normal" }[];
+  const fonts = await loadOgFonts();
 
   return new ImageResponse(
     (
