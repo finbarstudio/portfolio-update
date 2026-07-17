@@ -4878,12 +4878,13 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
     border-color: var(--bg);
     color: var(--pink-deep);
   }
-  /* The stacked sheet hugs its content instead of holding a page of empty
-     maroon under the button (top-anchored; bottom releases). */
-  .contact-sheet {
-    bottom: auto;
-    max-height: calc(100% - 2 * var(--contact-inset));
-  }
+  /* The sheet stays FULLSCREEN (matching the traced frame — a content-hugging
+     sheet left the outline drawing a frame the fill never covered). The short
+     stacked content centres inside it via auto-margins on the first/last
+     blocks: unlike justify-content:center, auto margins collapse to 0 when
+     content overflows, so small landscape phones still scroll from the top. */
+  .contact-rail { margin-top: auto; }
+  .contact-cal-col { margin-bottom: auto; align-items: center; text-align: center; }
   /* Phone/tablet: direct contact + booking only — the note form earns its
      place on desktop, in the stack it's just scroll. (Double selector: the
      base .contact-bottom rule sits later in the file and ties on specificity,
