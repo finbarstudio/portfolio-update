@@ -979,84 +979,6 @@
     .cap-card:active { transform: none; }
   }
 
-  /* ── Store ──────────────────────────────────────────────────── */
-  .store-media {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    background: var(--thumb-bg);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--elev-1);
-  }
-  .store-media-placeholder {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    color: color-mix(in srgb, var(--pink) 30%, transparent);
-  }
-  .store-media-placeholder svg { width: 64px; height: 64px; }
-  .store-buy {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--hit);
-    padding: 0 1.4rem;
-    background: var(--ink);
-    color: var(--bg);
-    border: 1px solid var(--ink);
-    border-radius: 8px;
-    font-family: var(--font-label);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: var(--text-label);
-    cursor: pointer;
-    transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
-  }
-  .store-buy:hover { background: var(--pink); border-color: var(--pink); color: var(--bg); }
-  .store-buy-ghost { background: transparent; color: var(--ink); }
-  .store-buy-ghost:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-  .store-buy:disabled { opacity: 0.55; cursor: default; }
-
-  /* Waitlist email-capture form */
-  .waitlist-form { max-width: 30rem; }
-  .waitlist-row { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-  .waitlist-input {
-    flex: 1 1 14rem;
-    min-height: var(--hit);
-    padding: 0 0.9rem;
-    background: var(--surface-raised);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    font-family: var(--font-primary);
-    font-size: var(--text-small);
-    color: var(--ink);
-    transition: border-color var(--dur-fast) var(--ease);
-  }
-  .waitlist-input::placeholder { color: var(--ink-soft); }
-  .waitlist-input:focus { outline: none; border-color: var(--pink); }
-  .waitlist-consent {
-    display: flex;
-    gap: 0.55rem;
-    margin-top: 0.9rem;
-    color: var(--ink-soft);
-    font-size: var(--text-caption);
-    line-height: 1.5;
-    cursor: pointer;
-  }
-  .waitlist-consent input { margin-top: 0.18em; accent-color: var(--pink); flex: 0 0 auto; }
-  .waitlist-link { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
-  .waitlist-link:hover { color: var(--pink); }
-  .waitlist-error { margin-top: 0.7rem; color: var(--pink); font-size: var(--text-caption); }
-  .waitlist-done {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    color: var(--ink);
-    font-size: var(--text-small);
-  }
   .cap-desc { color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); }
   @media (hover: hover) {
     .cap-item:hover { background: var(--surface-sunken); }
@@ -3621,17 +3543,51 @@ body:has(.contact-panel.is-open) .sf-cta-pin {
 /* Mobile 2×2 grid. Left column: AUS/BNE (top) over ENG/LON (bottom), left-aligned.
    Right column: hiring+contact (top) over copyright+build (bottom), right-aligned.
    Order flows the items AUS, contact, ENG, copyright into the row-major grid. */
-.sf-col-aus { order: 1; }
-.sf-contact { order: 2; align-items: flex-end; text-align: right; }
-.sf-col-eng { order: 3; }
+/* Mobile 2×2: locations (top-left) + newsletter (top-right), contact +
+   copyright below. Desktop resets to natural order: locations, newsletter,
+   contact, copyright. */
+.sf-col-locations { order: 1; }
+.sf-newsletter { order: 2; align-items: flex-end; text-align: right; }
+.sf-contact { order: 3; }
 .sf-col-end { order: 4; }
 @media (min-width: 768px) {
-  .sf-col-aus,
+  .sf-col-locations,
+  .sf-newsletter,
   .sf-contact,
-  .sf-col-eng,
   .sf-col-end { order: 0; }
-  .sf-contact { align-items: flex-start; text-align: left; }
+  .sf-newsletter { align-items: flex-start; text-align: left; }
 }
+/* Brisbane over London, stacked, with a little air between the two clocks. */
+.sf-col-locations { gap: 0.9rem; }
+/* London block: label line over time line, matching the Brisbane clock's
+   two-line layout (without it the inline loc + time sit on one line). */
+.sf-loc-eng { display: flex; flex-direction: column; }
+/* The mailing-list field — a boxed input with the arrow button inside it. */
+.sf-nl-form { display: flex; align-items: stretch; gap: 0; margin-top: 0.4rem; max-width: 15rem; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.sf-nl-form:focus-within { border-color: var(--pink); }
+.sf-nl-input {
+  min-width: 0; flex: 1 1 auto;
+  background: transparent;
+  border: none;
+  padding: 0.5rem 0.7rem;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.sf-nl-input::placeholder { color: var(--ink-soft); text-transform: none; letter-spacing: 0; }
+.sf-nl-input:focus { outline: none; }
+.sf-nl-btn {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: none; border-left: 1px solid var(--line); cursor: pointer;
+  color: var(--pink); padding: 0 0.6rem;
+  transition: background var(--dur-fast, 0.2s) var(--ease, ease);
+}
+.sf-nl-btn:hover { background: var(--pink); color: var(--bg); }
+.sf-nl-btn:disabled { opacity: 0.5; cursor: default; }
+.sf-nl-done { color: var(--pink); margin-top: 0.4rem; }
+.sf-nl-err { color: var(--pink); font-size: 0.82em; margin-left: 0.5rem; align-self: center; }
+/* Legal links under the copyright — pink, stacked tight. */
+.sf-legal { display: flex; flex-direction: column; align-items: flex-end; gap: 0; }
+.sf-privacy { color: var(--pink); }
 .sf-label { color: var(--ink); }          /* hiring / build-by — ink */
 /* Cheeky aside next to ENG/LON. */
 .sf-note { color: var(--ink-soft); font-size: 0.82em; }
@@ -4612,4 +4568,50 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-shot img { animation: none; }
+}
+
+/* ── Cookie/tracking notice (informational, dismissible) ──────────────────
+   Bottom-left so it clears the bottom-right "Get a quote" pin. Unlayered so
+   Tailwind v4 doesn't tree-shake it. */
+.cookie-notice {
+  position: fixed;
+  left: clamp(12px, 2vw, 24px);
+  bottom: clamp(12px, 2vw, 24px);
+  z-index: 25;
+  max-width: 340px;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(33, 30, 26, 0.1);
+}
+.cookie-notice-text {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-caption);
+  line-height: 1.45;
+}
+.cookie-notice-link { color: var(--pink); white-space: nowrap; }
+.cookie-notice-newtab { display: inline-block; vertical-align: -1px; }
+.cookie-notice-btn {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.45em 1em;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background var(--dur-fast, 0.2s) var(--ease, ease), color var(--dur-fast, 0.2s) var(--ease, ease);
+}
+.cookie-notice-btn:hover { background: var(--pink); border-color: var(--pink); }
+@media (max-width: 520px) {
+  .cookie-notice { left: 12px; right: 12px; max-width: none; }
 }

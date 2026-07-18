@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo, Host_Grotesk, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
 import TempusKernel from "@/components/TempusKernel";
 import MetaPixel from "@/components/MetaPixel";
+import CookieNotice from "@/components/CookieNotice";
 import { META_PIXEL_ID } from "@/lib/meta-const";
 import "./globals.css";
 
@@ -327,6 +328,8 @@ fbq('init', '${META_PIXEL_ID}');`,
         {/* Routes bring their own chrome: portfolio routes via app/(site)/layout
             (the sidebar shell); the Sandbox + embeds via their own bare layouts. */}
         {children}
+        {/* Informational cookie/tracking notice (dismissible, remembered). */}
+        <CookieNotice />
         {/* JSON-LD as plain inline <script> tags (the pattern the Next docs
             recommend) — next/script beforeInteractive re-renders these on the
             client and React warns the script "will never execute", which is

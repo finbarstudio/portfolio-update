@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description: "How Finbar Studio handles your data, what's collected, why, and your rights.",
+  description: "How Finbar Studio handles your data, what's collected, why, who it's shared with, and how to have it deleted.",
   alternates: { canonical: "/privacy" },
   robots: { index: true, follow: true },
 };
 
-const UPDATED = "14 June 2026";
+const UPDATED = "18 July 2026";
 
 export default function PrivacyPage() {
   return (
@@ -27,57 +27,74 @@ export default function PrivacyPage() {
         <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>Last updated {UPDATED}.</p>
 
         <p>
-          This site is run by Finbar Skitini, trading as Finbar Studio, a graphic designer based in
-          Brisbane, Australia. This page explains what data I collect, why, and what you can do
-          about it. I keep the collection deliberately small.
+          This site is run by Finbar Skitini, trading as Finbar Studio, a designer based in
+          Brisbane, Australia, working with clients in Australia and the UK. This page explains what
+          data the site collects, why, who it&rsquo;s shared with, and how to have it removed.
         </p>
 
         <section className="space-y-3">
           <h2 className="mono-heading text-ink">What I collect</h2>
           <ul className="space-y-2 text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
-            <li className="text-ink"><strong className="text-ink">Launch waitlist email.</strong> If you sign up to be notified when a product launches, I store the email address you enter, along with the time you gave consent.</li>
-            <li className="text-ink"><strong className="text-ink">Things you send me.</strong> If you email or call, I keep that correspondence so I can reply.</li>
-            <li className="text-ink"><strong className="text-ink">Basic technical data.</strong> Like any website, the host records standard server logs (e.g. IP address, browser) to run and secure the site. There are no advertising or tracking cookies. A single browser preference (sidebar open/closed) is stored locally on your device, not sent to me.</li>
+            <li className="text-ink"><strong className="text-ink">Things you send me.</strong> If you email, call, send an enquiry through a form, or book a call, I keep that information and correspondence so I can reply and work with you.</li>
+            <li className="text-ink"><strong className="text-ink">Mailing list.</strong> If you sign up to my mailing list, I keep the email address you enter so I can email you occasional updates. You can unsubscribe or ask to be removed at any time.</li>
+            <li className="text-ink"><strong className="text-ink">Advertising and analytics.</strong> This site runs the Meta (Facebook) pixel, which measures how ads perform and helps show relevant ads. It sets cookies (including <code>_fbp</code> and <code>_fbc</code>) and sends Meta events about your visit, both from your browser and from my server (the Conversions API). When you complete a booking, a hashed (not readable) version of the email and phone you enter may be sent to Meta to match the conversion. See &ldquo;Cookies and tracking&rdquo; below.</li>
+            <li className="text-ink"><strong className="text-ink">Basic technical data.</strong> Like any website, the host records standard server logs (for example IP address and browser) to run and secure the site. A couple of small browser preferences (like whether you&rsquo;ve dismissed a notice) are stored locally on your device, not sent to me.</li>
           </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="mono-heading text-ink">Cookies and tracking</h2>
+          <p style={{ fontSize: "var(--text-small)" }}>
+            The Meta pixel is the only advertising tracker on the site. It sets cookies to recognise
+            return visits and measure ad results. You can opt out at any time: block or clear cookies
+            in your browser, use your{" "}
+            <a href="https://www.facebook.com/adpreferences/ad_settings" target="_blank" rel="noopener noreferrer" className="u-underline">Meta ad preferences</a>, or the industry opt-outs at{" "}
+            <a href="https://www.youronlinechoices.com" target="_blank" rel="noopener noreferrer" className="u-underline">Your Online Choices</a>. The site uses no other advertising or analytics cookies.
+          </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="mono-heading text-ink">Why, and the lawful basis</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
-            The waitlist email is collected only with your <strong>consent</strong> (the tick box at
-            sign-up), and used for one purpose: to email you when the product launches. Correspondence
-            you send is handled on the basis of your request. Server logs are kept for the legitimate
-            interest of running a secure website.
+            Enquiries and bookings are handled on the basis of your request and my legitimate
+            interest in responding. Mailing-list emails are collected only with your{" "}
+            <strong>consent</strong>, to send you occasional updates. Advertising measurement runs on
+            the basis of legitimate interest, and you can opt out as above. Server logs are kept for
+            the legitimate interest of running a secure site.
           </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="mono-heading text-ink">Who processes it</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
-            Waitlist emails are handled by <strong>MailerLite</strong> (the email service), and any
-            future purchases go through <strong>Lemon Squeezy</strong> (the checkout / merchant of
-            record). The site is hosted on <strong>Vercel</strong>. These providers may process data
-            on servers outside your country under their own safeguards. I don&rsquo;t sell your data
-            or share it with anyone else.
+            The site relies on a small set of providers, each handling only what it needs:{" "}
+            <strong>Meta Platforms</strong> (the advertising pixel and Conversions API),{" "}
+            <strong>Cal.com</strong> (call bookings), and <strong>Web3Forms</strong> (which delivers
+            enquiry forms and mailing-list signups to my inbox). The site is hosted on{" "}
+            <strong>Vercel</strong>. These providers may process data on servers outside your country
+            under their own safeguards. I don&rsquo;t sell your data.
           </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="mono-heading text-ink">How long I keep it</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
-            Waitlist emails are kept until the launch you signed up for, or until you ask to be
-            removed or withdraw consent, whichever comes first.
+            Correspondence and enquiries are kept as long as needed to work together and for a
+            reasonable period after. Mailing-list emails are kept until you unsubscribe or ask to be
+            removed. Advertising cookies expire on their own (Meta&rsquo;s are typically up to 90
+            days) or when you clear them.
           </p>
         </section>
 
         <section className="space-y-3">
-          <h2 className="mono-heading text-ink">Your rights</h2>
+          <h2 className="mono-heading text-ink">Your rights, and deleting your data</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
             You can ask to access, correct or delete your data, withdraw consent, or object to its
             use, at any time. If you&rsquo;re in the UK or EU you also have the right to complain to
-            your data protection authority. To do any of this, email{" "}
-            <a href="mailto:finbar@finbar.studio" className="waitlist-link">finbar@finbar.studio</a>{" "}
-            and I&rsquo;ll action it.
+            your data protection authority. To have your data deleted or to make any of these
+            requests, email{" "}
+            <a href="mailto:finbar@finbar.studio?subject=Data%20request" className="u-underline">finbar@finbar.studio</a>{" "}
+            and I&rsquo;ll action it and confirm when it&rsquo;s done.
           </p>
         </section>
 
@@ -85,7 +102,7 @@ export default function PrivacyPage() {
           <h2 className="mono-heading text-ink">Contact</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
             Questions about this policy:{" "}
-            <a href="mailto:finbar@finbar.studio" className="waitlist-link">finbar@finbar.studio</a>.
+            <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>.
           </p>
         </section>
       </div>

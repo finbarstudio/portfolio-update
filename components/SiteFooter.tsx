@@ -11,6 +11,8 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import NewsletterForm from "./NewsletterForm";
 import BrandWordmark from "./BrandWordmark";
 import FooterCopyright from "./FooterCopyright";
 import BookCall from "./BookCall";
@@ -122,16 +124,21 @@ export default function SiteFooter() {
       <div className="site-footer-rule" aria-hidden="true" />
 
       <div className="site-footer-info">
-        <div className="sf-col sf-col-aus">
+        {/* Locations stacked: Brisbane over London, freeing a column for the
+            mailing-list field. */}
+        <div className="sf-col sf-col-locations">
           <FooterClock />
+          {/* London, stacked as two lines to match the Brisbane clock above:
+              ENG/LON + flag on line 1, the time on line 2. */}
+          <div className="sf-loc-eng">
+            <span className="sf-loc"><span className="sf-label">ENG/LON</span><EngFlag /></span>
+            <LiveTime tz="Europe/London" className="sf-value tabular-nums" />
+          </div>
         </div>
-        <div className="sf-col sf-col-eng sf-reveal">
+        <div className="sf-col sf-newsletter sf-reveal">
           <div className="sf-reveal-inner">
-            <span className="sf-loc">
-              <span className="sf-label">ENG/LON</span>
-              <EngFlag />
-            </span>
-            <LiveTime tz="Europe/London" />
+            <span className="sf-label">Join my mailing list</span>
+            <NewsletterForm />
           </div>
         </div>
         <div className="sf-col sf-contact sf-reveal">
@@ -144,7 +151,10 @@ export default function SiteFooter() {
         <div className="sf-col sf-col-end">
           <BookCall />
           <FooterCopyright year={year} />
-          <span className="sf-value">Design &amp; build finbarstudio</span>
+          <span className="sf-legal">
+            <Link href="/privacy" className="sf-privacy u-underline">Privacy policy</Link>
+            <Link href="/terms" className="sf-privacy u-underline">Terms</Link>
+          </span>
         </div>
       </div>
 
