@@ -130,7 +130,7 @@ export default function AboutPage() {
             {SERVICE_GROUPS.map((g) => (
               <div key={g.label}>
                 <p className="font-mono uppercase text-ink-soft mb-0.5" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>{g.label}</p>
-                <ul className="text-pink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.35rem)" }}>
+                <ul className="text-ink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.35rem)" }}>
                   {g.items.map((s) => (
                     <li key={s}>{s}</li>
                   ))}
@@ -142,12 +142,12 @@ export default function AboutPage() {
 
         <Reveal as="div">
           <p className="font-mono uppercase text-ink-soft mb-0.5" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>Clients</p>
-          <ul className="text-pink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>
+          <ul className="text-ink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>
             {CLIENTS.map((c) => (
               <li key={c}>{c}</li>
             ))}
             <li>
-              <Link href="/work" className="text-pink u-underline">View all &rarr;</Link>
+              <Link href="/work" className="text-ink u-underline">View all &rarr;</Link>
             </li>
           </ul>
         </Reveal>

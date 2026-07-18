@@ -154,7 +154,7 @@ export default function ServiceLanding({
       {/* 2 — what I do */}
       <section className="px-5 md:px-10 pb-12 md:pb-16" aria-labelledby={`${slug}-caps`}>
         <h2 id={`${slug}-caps`} className="mono-heading text-ink-soft mb-5">{capsTitle}</h2>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 max-w-4xl text-pink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.7vw, 1.65rem)" }}>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 max-w-4xl text-ink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.7vw, 1.65rem)" }}>
           {capabilities.map((c) => (
             <li key={c}>{c}</li>
           ))}
@@ -220,7 +220,7 @@ export default function ServiceLanding({
           <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8 max-w-6xl">
             {process.map((p, i) => (
               <li key={p.title}>
-                <p className="mono-label text-pink mb-2">{String(i + 1).padStart(2, "0")}</p>
+                <p className="mono-label text-ink-soft mb-2">{String(i + 1).padStart(2, "0")}</p>
                 <h3 className="text-ink font-sans font-semibold mb-1.5" style={{ fontSize: "clamp(1rem, 1.3vw, 1.2rem)" }}>{p.title}</h3>
                 <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{p.body}</p>
               </li>
@@ -237,7 +237,7 @@ export default function ServiceLanding({
               {meet.heading}
             </h2>
             <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-body)" }}>{meet.body}</p>
-            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-pink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.3rem)" }}>
+            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-ink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.3rem)" }}>
               {meet.points.map((pt) => (
                 <li key={pt}>{pt}</li>
               ))}
@@ -263,7 +263,7 @@ export default function ServiceLanding({
       {guarantee && (
         <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="Our guarantee">
           <div className="max-w-3xl rounded-md border border-pink px-6 py-6" style={{ background: "rgba(233, 109, 137, 0.08)" }}>
-            <p className="mono-label text-pink mb-2">{guarantee.label}</p>
+            <p className="mono-label text-ink-soft mb-2">{guarantee.label}</p>
             <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)" }}>{guarantee.body}</p>
           </div>
         </section>
