@@ -91,6 +91,13 @@ const nextConfig: NextConfig = {
     return [
       { source: "/gemfest", destination: "/gemfest/index.html" },
       { source: "/pullup", destination: "/pullup/index.html" },
+      // Serve the generated brand icon at the conventional /favicon.ico path.
+      // Next only emits /icon (from app/icon.tsx), so /favicon.ico 404s — and
+      // that's the path browsers, crawlers and Google's favicon fetcher hit
+      // first, which can keep an old cached favicon around. This makes it
+      // resolve to the current mark (a PNG served with image/png, which they
+      // accept at the .ico path).
+      { source: "/favicon.ico", destination: "/icon" },
     ];
   },
 };

@@ -9,14 +9,14 @@ import { MdArrowForward } from "@/components/MaterialIcon";
 
 const SITE_URL = "https://www.finbar.studio";
 
-// Combined About + Contact page. ProfilePage with a contactPoint, pointing at
-// the one Person node defined in the root layout.
+// About page. ProfilePage with a contactPoint, pointing at the one Person node
+// defined in the root layout. (Contact has its own page at /contact now.)
 const aboutJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfilePage",
   "@id": `${SITE_URL}/about#webpage`,
   url: `${SITE_URL}/about`,
-  name: "About & Contact | Finbar Skitini, Brisbane Graphic Designer",
+  name: "About | Finbar Skitini, Brisbane Graphic Designer",
   isPartOf: { "@id": `${SITE_URL}/#website` },
   inLanguage: "en-AU",
   mainEntity: {
@@ -95,12 +95,12 @@ const CAP_PILLS: { name: string; href: string }[] = [
 ];
 
 export const metadata: Metadata = {
-  title: { absolute: "About & Contact | Finbar Skitini, Brisbane Graphic Designer" },
+  title: { absolute: "About | Finbar Skitini, Brisbane Graphic Designer" },
   description:
     "Finbar Skitini is a Brisbane graphic designer working in brand identity, editorial, web and motion. About the studio, plus how to get in touch.",
   alternates: { canonical: "/about" },
   openGraph: {
-    title: "About & Contact | Finbar Studio",
+    title: "About | Finbar Studio",
     description:
       "Brisbane graphic designer working in brand identity, editorial, web and motion. About the studio and how to get in touch.",
     url: "/about",
