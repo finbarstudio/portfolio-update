@@ -162,6 +162,14 @@
   font-size: clamp(0.95rem, 1.3vw, 1.05rem);
   line-height: 1.3;
   color: var(--ink);
+  /* Most pills stay one line; the few long ones that wrap on a phone break
+     into balanced, centred lines instead of one long + one orphan word. */
+  text-align: center;
+  text-wrap: balance;
+}
+/* Phones: trim the type + padding a touch so more pills hold a single line. */
+@media (max-width: 520px) {
+  .fr-include { font-size: 0.9rem; padding: 0.7em 1.15em; }
 }
 /* The free-tier clarifier under the paid-build pills — as loud as the steps,
    it's the other half of the pricing shape. */

@@ -5,11 +5,14 @@
  * reading like someone scrolling the site. Used to show off whole pages
  * (e.g. the Lows estimate calculator) without a video capture.
  *
- * The pan runs only while in view (IntersectionObserver), sits still under
+ * The pan distance (image height minus frame height) is measured in JS and
+ * set as --pan, so the CSS animation is a plain translateY(var(--pan)). An
+ * earlier version used container-query units (100cqh), which iOS Safari
+ * resolves unreliably inside animations — the pan sat still on mobile.
+ *
+ * Pans only while in view (IntersectionObserver), sits still under
  * prefers-reduced-motion, and follows the loading rule: grey box + brand
  * loader until the image is really there, never the pulse over visible media.
- * Distance is pure CSS — the frame is a size container, so the keyframes can
- * say "image height minus frame height" as calc(-100% + 100cqh).
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -37,13 +40,22 @@ export default function ScrollShot({
     return () => io.disconnect();
   }, []);
 
+  // Measure how far the image overflows the frame and expose it as --pan.
+  // Recompute on load and whenever the frame resizes (rotate / responsive).
   useEffect(() => {
-    const el = imgRef.current;
-    if (!el) return;
-    const mark = () => setLoaded(true);
-    if (el.complete && el.naturalWidth > 0) { mark(); return; }
-    el.addEventListener("load", mark);
-    return () => el.removeEventListener("load", mark);
+    const frame = frameRef.current;
+    const img = imgRef.current;
+    if (!frame || !img) return;
+    const measure = () => {
+      const dist = frame.clientHeight - img.offsetHeight; // negative = pan up
+      img.style.setProperty("--pan", `${Math.min(0, dist)}px`);
+    };
+    const mark = () => { setLoaded(true); measure(); };
+    if (img.complete && img.naturalWidth > 0) mark();
+    else img.addEventListener("load", mark);
+    const ro = new ResizeObserver(measure);
+    ro.observe(frame);
+    return () => { img.removeEventListener("load", mark); ro.disconnect(); };
   }, []);
 
   return (

@@ -30,15 +30,21 @@ export default function VideoPlayer({
     const video = ref.current;
     if (!video) return;
 
+    // Play only once the clip is well into view (not peeking from the bottom
+    // edge), and restart from frame 0 on entry so short demo clips — the
+    // preloader especially — are always caught from the start instead of
+    // arriving mid-play or sitting on a held end frame. rootMargin shrinks the
+    // trigger band to the centre ~60% of the viewport.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          video.currentTime = 0;
           video.play().catch(() => {});
         } else {
           video.pause();
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0, rootMargin: "-20% 0px -20% 0px" }
     );
 
     observer.observe(video);

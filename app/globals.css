@@ -4588,7 +4588,6 @@ html:has(.contact-skin) { background: var(--pink-deep); }
   position: relative;
   width: 100%;
   overflow: hidden;
-  container-type: size;
   background: rgba(33, 30, 26, 0.08);
   margin-top: var(--image-pad);
   margin-bottom: var(--image-pad);
@@ -4609,7 +4608,7 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 .scroll-shot.is-live img { animation-play-state: running; }
 @keyframes scroll-shot-pan {
   from { transform: translateY(0); }
-  to { transform: translateY(calc(-100% + 100cqh)); }
+  to { transform: translateY(var(--pan, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-shot img { animation: none; }
