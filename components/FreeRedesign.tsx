@@ -49,16 +49,20 @@ const PROOF = [
   { images: ["/images/web/lola-1.webp", "/images/web/lola-2.webp", "/images/web/lola-3.webp"], alt: "Lola Audio website", caption: "Lola Audio, a portfolio you can mix", href: "/case-studies/lola-audio" },
 ];
 
+// Order tuned for balanced wrap, not narrative: greedy flex-wrap + the one long
+// "Integrations…" pill (it sits solo on its own line, reading intentional) left
+// short pills orphaned. This sequence packs 2-3 per line with no lone short pill
+// at every desktop/tablet width, and closes on "Live in about two weeks".
 const INCLUDES = [
-  "Coded, not templated",
+  "Full handover",
+  "Optimised for AI search",
+  "Integrations like booking and custom calculators",
   "Mobile optimised",
   "Custom animation",
-  "A CMS you edit yourself",
-  "Integrations like booking and custom calculators",
   "SEO",
-  "Optimised for AI search",
+  "A CMS you edit yourself",
+  "Coded, not templated",
   "Hosting handled",
-  "Full handover",
   "Live in about two weeks",
 ];
 
