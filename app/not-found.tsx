@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import BrandMark from "@/components/BrandMark";
+import { MdArrowForward } from "@/components/MaterialIcon";
 
 export const metadata: Metadata = {
   // Bare name — the root layout's title template appends "| Finbar Studio"
@@ -56,8 +57,8 @@ export default function NotFound() {
 
         {/* Boxed, on the same token as the nav pills. */}
         <div className="flex flex-wrap justify-center gap-3 mt-9">
-          <Link href="/" className="tag tag-default">Back home →</Link>
-          <Link href="/work" className="tag tag-default">View work →</Link>
+          <Link href="/" className="tag tag-default">Back home <MdArrowForward size={14} /></Link>
+          <Link href="/work" className="tag tag-default">View work <MdArrowForward size={14} /></Link>
         </div>
       </div>
     </section>

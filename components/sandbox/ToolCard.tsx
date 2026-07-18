@@ -4,6 +4,7 @@
  */
 
 import Link from "next/link";
+import { MdArrowForward } from "@/components/MaterialIcon";
 
 export type Tool = {
   title: string;
@@ -25,7 +26,11 @@ export default function ToolCard({ tool }: { tool: Tool }) {
       <p className="sb-card-blurb">{tool.blurb}</p>
       <div className="sb-card-foot">
         {tool.tag && <span className="mono-label sb-card-tag">{tool.tag}</span>}
-        {tool.status === "live" && <span className="sb-card-cta mono-label">Open →</span>}
+        {tool.status === "live" && (
+          <span className="sb-card-cta mono-label inline-flex items-center gap-1">
+            Open <MdArrowForward size={12} />
+          </span>
+        )}
       </div>
     </>
   );

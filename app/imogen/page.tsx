@@ -20,6 +20,7 @@ import Highlights from "@/components/imogen/Highlights";
 import CollapsibleSection from "@/components/imogen/CollapsibleSection";
 import MapFab from "@/components/imogen/MapFab";
 import Reveal from "@/components/imogen/Reveal";
+import { MdArrowOutward, MdOpenInNew } from "@/components/MaterialIcon";
 
 // Photos Finbar drops in public/imogen are auto-detected and take priority over
 // searched images. Each subfolder is named after a place or activity; its web
@@ -174,7 +175,7 @@ export default function ImogenPage() {
                   >
                     <div className="im-app-top">
                       <span className="im-app-name">{a.name}</span>
-                      <span className="im-app-go">Open ↗</span>
+                      <span className="im-app-go">Open <MdOpenInNew size={12} /></span>
                     </div>
                     <div className="im-app-tag">{a.tagline}</div>
                     {a.note && <p className="im-app-note">{a.note}</p>}
@@ -229,7 +230,7 @@ export default function ImogenPage() {
                 <div className="im-safety-links">
                   {safety.sources.map((s) => (
                     <a key={s.url} className="im-linkbtn is-quiet" href={s.url} target="_blank" rel="noopener noreferrer">
-                      {s.text} ↗
+                      {s.text} <MdOpenInNew size={12} />
                     </a>
                   ))}
                 </div>
@@ -243,7 +244,7 @@ export default function ImogenPage() {
           <p className="im-section-label">The trip, in order</p>
           <div className="im-stops">
             {stops.map((s) => {
-              const badge = s.side ? "↗" : s.kind === "place" ? String(++placeN) : "≈";
+              const badge = s.side ? <MdArrowOutward size={11} /> : s.kind === "place" ? String(++placeN) : "≈";
               return (
                 <Reveal key={s.id}>
                   <StopCard

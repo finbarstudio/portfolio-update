@@ -8,6 +8,7 @@ import { urlForImage } from "@/sanity/image";
 import { POST_QUERY, POST_SLUGS_QUERY } from "@/sanity/queries";
 import type { Post } from "@/sanity/types";
 import PortableBody from "@/components/journal/PortableBody";
+import { MdArrowBack } from "@/components/MaterialIcon";
 import "../journal.css";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -85,7 +86,9 @@ export default async function JournalPostPage({ params }: { params: Promise<{ sl
       <script id="ld-post-crumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumb) }} />
       <div className="jr-wrap">
         <article className="jr-article">
-          <Link href="/journal" className="mono-label text-ink-soft u-underline jr-back">&larr; Journal</Link>
+          <Link href="/journal" className="mono-label text-ink-soft u-underline jr-back inline-flex items-center gap-1">
+            <MdArrowBack size={14} /> Journal
+          </Link>
           <p className="jr-meta">{formatDate(post.publishedAt)}</p>
           <h1 className="jr-title" style={{ marginTop: "0.5rem" }}>{post.title}</h1>
           {post.excerpt && <p className="jr-lede">{post.excerpt}</p>}

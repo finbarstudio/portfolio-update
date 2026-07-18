@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ClientImage from "@/components/ClientImage";
+import { MdArrowBack, MdArrowForward } from "@/components/MaterialIcon";
 
 // PDF-to-image slideshow: renders each page as a WebP image with minimal
 // prev/next navigation. Pages are pre-converted by the build pipeline.
@@ -69,10 +70,10 @@ export default function PDFSlideshow({
           <button
             onClick={() => goTo(Math.max(0, current - 1))}
             disabled={current === 0}
-            className="mono-label text-ink-soft hover:text-pink transition-colors disabled:opacity-30"
+            className="mono-label text-ink-soft hover:text-pink transition-colors disabled:opacity-30 inline-flex items-center gap-1"
             aria-label="Previous page"
           >
-            ← PREV
+            <MdArrowBack size={14} /> PREV
           </button>
 
           <div className="flex gap-1 flex-1 justify-center flex-wrap">
@@ -99,10 +100,10 @@ export default function PDFSlideshow({
           <button
             onClick={() => goTo(Math.min(total - 1, current + 1))}
             disabled={current === total - 1}
-            className="mono-label text-ink-soft hover:text-pink transition-colors disabled:opacity-30"
+            className="mono-label text-ink-soft hover:text-pink transition-colors disabled:opacity-30 inline-flex items-center gap-1"
             aria-label="Next page"
           >
-            NEXT →
+            NEXT <MdArrowForward size={14} />
           </button>
         </div>
       )}

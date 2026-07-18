@@ -10,6 +10,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import Loader from "./Loader";
 import PdfSlideshowThumb from "./PdfSlideshowThumb";
+import { MdOpenInNew } from "@/components/MaterialIcon";
 
 /* A looping reel that plays while in view, with a play/pause button and a
    stylised pink scrubber. */
@@ -191,7 +192,7 @@ export default function PackerShowcase() {
             rel="noopener noreferrer"
             className="packer-link"
           >
-            Visit the live site ↗
+            Visit the live site <MdOpenInNew size={13} />
           </a>
         )}
         <div className="packer-website-visual">

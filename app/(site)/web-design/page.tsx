@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ServiceLanding from "@/components/ServiceLanding";
+import { MdArrowForward } from "@/components/MaterialIcon";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -104,7 +105,7 @@ export default function WebDesignPage() {
         <>
           Not sure yet? I&rsquo;ll redesign your homepage for free, no
           obligation, so you can see the difference before spending anything.{" "}
-          <Link href="/free-redesign" className="u-underline">About the free redesign →</Link>
+          <Link href="/free-redesign" className="u-underline inline-flex items-center gap-1">About the free redesign <MdArrowForward size={14} /></Link>
         </>
       }
       faqs={[

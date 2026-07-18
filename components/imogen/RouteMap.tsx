@@ -1,5 +1,6 @@
 import { route, stops, type Country, type RoutePoint } from "@/content/imogen";
 import { COUNTRIES, LABELS, VB_W, VB_H, project } from "./geo";
+import { MdArrowOutward } from "@/components/MaterialIcon";
 
 // Stops rated 9 or 10 get a star on their pin + in the legend.
 const TOP_IDS = new Set(stops.filter((s) => s.rating != null && s.rating >= 9).map((s) => s.id));
@@ -40,7 +41,7 @@ const markerClass = (p: RoutePoint) => {
   const planned = !p.detailed && !p.side && !p.waypoint;
   return `${COUNTRY_CLASS[p.country]} ${planned ? "is-planned" : ""} ${p.side ? "is-side" : ""} ${p.waypoint ? "is-waypoint" : ""}`;
 };
-const markerText = (p: RoutePoint) => (p.side ? "↗" : p.waypoint ? "" : p.n);
+const markerText = (p: RoutePoint) => (p.side ? <MdArrowOutward size={9} /> : p.waypoint ? "" : p.n);
 
 export default function RouteMap() {
   const linePts = route.filter((p) => !p.side).map((p) => project(p.lon, p.lat));

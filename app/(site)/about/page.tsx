@@ -5,6 +5,7 @@ import Script from "next/script";
 import Reveal from "@/components/Reveal";
 import AboutHero from "@/components/about/AboutHero";
 import { projects } from "@/content/projects";
+import { MdArrowForward } from "@/components/MaterialIcon";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -147,7 +148,7 @@ export default function AboutPage() {
               <li key={c}>{c}</li>
             ))}
             <li>
-              <Link href="/work" className="text-ink u-underline">View all &rarr;</Link>
+              <Link href="/work" className="text-ink u-underline inline-flex items-center gap-1">View all <MdArrowForward size={14} /></Link>
             </li>
           </ul>
         </Reveal>

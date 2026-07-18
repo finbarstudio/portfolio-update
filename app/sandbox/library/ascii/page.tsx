@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AsciiLab from "@/components/sandbox/library/AsciiLab";
+import { MdOpenInNew } from "@/components/MaterialIcon";
 
 export const metadata: Metadata = {
   title: "ASCII Imagery",
@@ -25,7 +26,7 @@ export default function AsciiPage() {
           </p>
         </div>
         <Link className="sb-fx-ref" href={REFERENCE} target="_blank" rel="noopener noreferrer">
-          Reference tool ↗
+          Reference tool <MdOpenInNew size={13} />
         </Link>
       </header>
 

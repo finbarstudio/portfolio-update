@@ -13,6 +13,7 @@ import MagazineCarousel from "@/components/MagazineCarousel";
 import HeroSlideshow from "@/components/HeroSlideshow";
 import AlbumThumb from "@/components/AlbumThumb";
 import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
+import { MdArrowOutward } from "@/components/MaterialIcon";
 
 /* ─── Tag pill ────────────────────────────────────────────── */
 function Tag({
@@ -235,8 +236,8 @@ export function GalleryCard({ project, index }: { project: Project; index: numbe
               <TagRow project={project} />
               {project.liveUrl && (
                 <HrItem block className="hr-line">
-                  <span className="mono-label text-teal block" style={{ fontSize: "0.625rem" }}>
-                    LIVE ↗
+                  <span className="mono-label text-teal inline-flex items-center gap-1" style={{ fontSize: "0.625rem" }}>
+                    LIVE <MdArrowOutward size={11} />
                   </span>
                 </HrItem>
               )}

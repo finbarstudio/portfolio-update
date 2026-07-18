@@ -8,6 +8,7 @@
 
 import dynamic from "next/dynamic";
 import Loader from "./Loader";
+import { MdOpenInNew } from "@/components/MaterialIcon";
 
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ssr: false,
@@ -39,7 +40,7 @@ export default function MomentumShowcase() {
           rel="noopener noreferrer"
           className="packer-link"
         >
-          momentummentoring.co ↗
+          momentummentoring.co <MdOpenInNew size={13} />
         </a>
         <div className="packer-website-visual">
           <ModelDisplay

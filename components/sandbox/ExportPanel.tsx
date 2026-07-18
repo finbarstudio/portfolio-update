@@ -10,6 +10,7 @@
 
 import { useState } from "react";
 import type { MockupExport, QualityKey } from "@/lib/sandbox/useMockupExport";
+import { MdArrowForward } from "@/components/MaterialIcon";
 
 const QUALITIES: { key: QualityKey; label: string }[] = [
   { key: "sd", label: "SD" },
@@ -173,7 +174,13 @@ export default function ExportPanel({
 
       <p className="mono-label sb-watermark-note">
         Export up to UHD (2160p). Every export carries a finbar.studio watermark.
-        {transparentBg ? " Video & GIF are opaque (transparent → matte); PNG keeps alpha." : ""}
+        {transparentBg ? (
+          <>
+            {" "}Video &amp; GIF are opaque (transparent <MdArrowForward size={11} /> matte); PNG keeps alpha.
+          </>
+        ) : (
+          ""
+        )}
       </p>
     </div>
   );

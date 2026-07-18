@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { mapsUrl, ratingColor, COUNTRY_FLAG, imgSlug, type Stop, type StopDates, type Country, type DoItem } from "@/content/imogen";
 import LoopTable from "./LoopTable";
+import { MdArrowDownward, MdArrowUpward, MdOpenInNew } from "@/components/MaterialIcon";
 
 /**
  * StopCard — a stop in the trip, as a two-level accordion. The stop itself is
@@ -73,7 +74,7 @@ export default function StopCard({
 }: {
   stop: Stop;
   dates?: StopDates;
-  badge: string;
+  badge: ReactNode;
   stopPhotos?: string[];
   itemPhotos?: Record<string, string[]>;
 }) {
@@ -189,7 +190,9 @@ export default function StopCard({
 
           {items.length > 0 && (
             <div className="im-block">
-              <p className="im-tap-hint">Tap any item below for the notes, photos &amp; map ↓</p>
+              <p className="im-tap-hint">
+                Tap any item below for the notes, photos &amp; map <MdArrowDownward size={12} />
+              </p>
               {cats.length > 1 && (
                 <div className="im-filters">
                   <span className="im-filter-label">Show</span>
@@ -233,7 +236,7 @@ export default function StopCard({
                             </button>
                             {it.maps && (
                               <a className="im-item-map" href={mapsUrl(it.maps)} target="_blank" rel="noopener noreferrer">
-                                Map ↗
+                                Map <MdOpenInNew size={11} />
                               </a>
                             )}
                             <button
@@ -251,7 +254,7 @@ export default function StopCard({
                               {it.note && <p className="im-item-note">{it.note}</p>}
                               {it.tip && (
                                 <a className="im-item-tiplink" href={it.tip.href}>
-                                  ↑ {it.tip.label}
+                                  <MdArrowUpward size={11} /> {it.tip.label}
                                 </a>
                               )}
                               {it.imgs && it.imgs.length > 0 && (
@@ -265,17 +268,17 @@ export default function StopCard({
                                 <div className="im-item-links">
                                   {it.book && (
                                     <a className="im-linkbtn is-primary" href={it.book} target="_blank" rel="noopener noreferrer">
-                                      {it.book.includes("booking.com") ? "Book on Booking.com" : "Book on Hostelworld"} ↗
+                                      {it.book.includes("booking.com") ? "Book on Booking.com" : "Book on Hostelworld"} <MdOpenInNew size={11} />
                                     </a>
                                   )}
                                   {it.url && (
                                     <a className="im-linkbtn is-quiet" href={it.url} target="_blank" rel="noopener noreferrer">
-                                      Open ↗
+                                      Open <MdOpenInNew size={11} />
                                     </a>
                                   )}
                                   {it.links?.map((l) => (
                                     <a key={l.url} className="im-linkbtn is-quiet" href={l.url} target="_blank" rel="noopener noreferrer">
-                                      {l.label} ↗
+                                      {l.label} <MdOpenInNew size={11} />
                                     </a>
                                   ))}
                                 </div>

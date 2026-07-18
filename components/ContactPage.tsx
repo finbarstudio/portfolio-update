@@ -20,6 +20,7 @@ import Loader from "./Loader";
 import ContactDirect from "./ContactDirect";
 import ContactNoteForm from "./ContactNoteForm";
 import BrandWordmark from "./BrandWordmark";
+import { MdOpenInNew } from "@/components/MaterialIcon";
 
 const CalEmbed = dynamic(() => import("./CalEmbed"), { ssr: false, loading: () => null });
 
@@ -90,7 +91,7 @@ export default function ContactPage() {
               rel="noopener noreferrer"
               className="sticker-pill book-call-pill contact-cal-link"
             >
-              Pick a time ↗
+              Pick a time <MdOpenInNew size={13} />
             </a>
           ) : (
             <div className="contact-cal">

@@ -19,6 +19,7 @@ import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import Reveal from "@/components/Reveal";
 import HeroSlideshow from "@/components/HeroSlideshow";
+import { MdArrowBack, MdArrowForward, MdArrowOutward, MdOpenInNew } from "@/components/MaterialIcon";
 
 /* TikTok glyph (inline, currentColor). */
 function TikTokGlyph() {
@@ -358,7 +359,7 @@ function FooterMeta({ project }: { project: Project }) {
                   className="u-underline font-mono break-words"
                   style={{ fontSize: "var(--text-small)" }}
                 >
-                  {project.liveUrl.replace(/^https?:\/\//, "")} ↗
+                  {project.liveUrl.replace(/^https?:\/\//, "")} <MdOpenInNew size={13} />
                 </a>
               )}
               {project.companyUrl && project.companyUrl !== project.liveUrl && (
@@ -369,7 +370,7 @@ function FooterMeta({ project }: { project: Project }) {
                   className="u-underline font-mono break-words"
                   style={{ fontSize: "var(--text-small)" }}
                 >
-                  {project.companyUrl.replace(/^https?:\/\//, "")} ↗
+                  {project.companyUrl.replace(/^https?:\/\//, "")} <MdOpenInNew size={13} />
                 </a>
               )}
             </div>
@@ -384,7 +385,7 @@ function FooterMeta({ project }: { project: Project }) {
             className="u-underline font-mono break-words"
             style={{ fontSize: "var(--text-small)" }}
           >
-            finbar@finbar.studio ↗
+            finbar@finbar.studio <MdArrowOutward size={14} />
           </a>
         </div>
       </div>
@@ -394,10 +395,10 @@ function FooterMeta({ project }: { project: Project }) {
       <div className="pt-6 pb-8 text-center md:text-left">
         <Link
           href="/work"
-          className="u-underline min-h-[44px] py-2 font-mono uppercase inline-flex items-center"
+          className="u-underline min-h-[44px] py-2 font-mono uppercase inline-flex items-center gap-1"
           style={{ fontSize: "var(--text-small)", letterSpacing: "0.12em" }}
         >
-          ← Back to Work
+          <MdArrowBack size={14} /> Back to Work
         </Link>
       </div>
     </>
@@ -486,7 +487,7 @@ export default async function CaseStudyPage({
               rel="noopener noreferrer"
               className="sticker-pill is-pink mt-4 inline-flex"
             >
-              Visit live site ↗
+              Visit live site <MdOpenInNew size={13} />
             </a>
           )}
         </div>
@@ -519,7 +520,7 @@ export default async function CaseStudyPage({
             <p className="tt-callout-sub">
               A fictional 1970s Palm Springs motel, posted one slideshow at a time.
             </p>
-            <span className="tt-callout-cta">Watch the series on TikTok →</span>
+            <span className="tt-callout-cta">Watch the series on TikTok <MdArrowForward size={14} /></span>
           </a>
           {project.outcomes && (
             <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-8">

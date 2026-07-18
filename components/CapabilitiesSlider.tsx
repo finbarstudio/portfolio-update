@@ -16,6 +16,7 @@ import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import Link, { useLinkStatus } from "next/link";
 import { gsap } from "gsap";
 import CapabilityViz, { type VizVariant } from "./CapabilityViz";
+import { MdArrowForward } from "@/components/MaterialIcon";
 
 /* The hover call-to-action: a bold "SEE WORK" that rises in as the vignette plays
  * (hidden at rest on desktop, always shown on touch). Turns into a spinner the
@@ -28,7 +29,7 @@ function CapCta() {
       {pending ? (
         <><span className="cap-spinner" />Loading</>
       ) : (
-        <>See work <span className="cap-cta-arrow">&rarr;</span></>
+        <>See work <span className="cap-cta-arrow"><MdArrowForward size={14} /></span></>
       )}
     </span>
   );

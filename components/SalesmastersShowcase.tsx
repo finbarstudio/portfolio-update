@@ -9,6 +9,7 @@
 
 import type { ReactNode } from "react";
 import BookViewer from "./BookViewer";
+import { MdOpenInNew } from "@/components/MaterialIcon";
 
 const SITE_URL = "https://salesmasters.com.au";
 
@@ -98,7 +99,7 @@ export default function SalesmastersShowcase() {
         </div>
 
         <a href={SITE_URL} target="_blank" rel="noopener noreferrer" className="packer-link">
-          salesmasters.com.au ↗
+          salesmasters.com.au <MdOpenInNew size={13} />
         </a>
 
         {/* Client logos, scrolling — grey, colour on hover */}

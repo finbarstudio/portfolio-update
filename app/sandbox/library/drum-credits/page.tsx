@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import DrumCreditsClient from "@/components/sandbox/library/DrumCreditsClient";
+import { MdOpenInNew } from "@/components/MaterialIcon";
 
 export const metadata: Metadata = {
   title: "Drum Credits",
@@ -26,7 +27,7 @@ export default function DrumCreditsPage() {
           </p>
         </div>
         <Link className="sb-fx-ref" href={REFERENCE} target="_blank" rel="noopener noreferrer">
-          Reference film ↗
+          Reference film <MdOpenInNew size={13} />
         </Link>
       </header>
 

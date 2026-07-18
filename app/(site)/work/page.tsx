@@ -5,6 +5,7 @@ import Link from "next/link";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import { WORK_FILTERS, projectMatchesFilter, filterLabel } from "@/content/filters";
+import { MdArrowForward } from "@/components/MaterialIcon";
 
 // Newest year mentioned in a project's date ("2023 to 2026" -> 2026), for
 // sorting the grid newest-first.
@@ -128,7 +129,8 @@ function WorkGrid({ filter }: { filter?: string }) {
         </div>
       ) : (
         <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
-          Nothing under that filter yet. <Link href="/work" className="u-underline">Show all →</Link>
+          Nothing under that filter yet.{" "}
+          <Link href="/work" className="u-underline inline-flex items-center gap-1">Show all <MdArrowForward size={14} /></Link>
         </p>
       )}
     </section>

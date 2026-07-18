@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LensLab from "@/components/sandbox/library/LensLab";
+import { MdOpenInNew } from "@/components/MaterialIcon";
 
 export const metadata: Metadata = {
   title: "Lens Test",
@@ -25,7 +26,7 @@ export default function LensTestPage() {
           </p>
         </div>
         <Link className="sb-fx-ref" href={REFERENCE} target="_blank" rel="noopener noreferrer">
-          Reference page ↗
+          Reference page <MdOpenInNew size={13} />
         </Link>
       </header>
 

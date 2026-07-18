@@ -9,6 +9,7 @@
 
 import dynamic from "next/dynamic";
 import Loader from "./Loader";
+import { MdOpenInNew } from "@/components/MaterialIcon";
 
 // ModelDisplay is r3f / WebGL → dynamic, SSR-disabled, identical to the home card.
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
@@ -134,7 +135,7 @@ export default function KinayaShowcase() {
           rel="noopener noreferrer"
           className="packer-link"
         >
-          kinaya.com.au ↗
+          kinaya.com.au <MdOpenInNew size={13} />
         </a>
         <div className="packer-website-visual">
           <ModelDisplay
