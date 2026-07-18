@@ -1,5 +1,4 @@
 import { jsonLdHtml } from "@/lib/json-ld";
-import Script from "next/script";
 import Link from "next/link";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
@@ -37,8 +36,17 @@ export type ServiceLandingProps = {
   excludeSlugs?: string[]; // projects to keep off this page (e.g. web off graphic)
   capsTitle: string;      // "What I do" heading
   capabilities: string[]; // capability bullets
+  /** Long-form H2 sections after the capabilities — the substance search
+   *  actually rewards (keyword variants, locations, specifics). */
+  sections?: { heading: string; body: string }[];
+  /** "How a project runs" numbered steps. */
+  process?: { title: string; body: string }[];
+  /** E-E-A-T block: who is behind the work, with true credential points. */
+  meet?: { heading: string; body: string; points: string[] };
   faqs: Faq[];            // FAQ + FAQPage schema
   ctaHeading: string;     // CTA headline, page-specific
+  /** Optional line under the CTA (e.g. the free homepage redesign offer). */
+  ctaNote?: React.ReactNode;
 };
 
 // Whole-word term match (so "ui" doesn't match "guidelines").
@@ -55,7 +63,7 @@ const newestYear = (date: string) => {
 
 export default function ServiceLanding({
   slug, label, heading, intro, serviceName, description, terms, excludeSlugs = [],
-  capsTitle, capabilities, faqs, ctaHeading,
+  capsTitle, capabilities, sections = [], process = [], meet, faqs, ctaHeading, ctaNote,
 }: ServiceLandingProps) {
   const exclude = new Set(excludeSlugs);
   const matched = [...projects]
@@ -114,13 +122,16 @@ export default function ServiceLanding({
 
   return (
     <>
-      <Script
+      {/* Plain inline scripts (the root layout's pattern): next/script injects
+          after hydration, which keeps the schema OUT of the server HTML — fine
+          for Googlebot's renderer, invisible to everything that doesn't run JS. */}
+      <script
         id={`ld-${slug}`}
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(pageJsonLd) }}
       />
-      <Script
+      <script
         id={`ld-${slug}-faq`}
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -147,6 +158,23 @@ export default function ServiceLanding({
           ))}
         </ul>
       </section>
+
+      {/* 2b — long-form sections: the crawlable substance (variants, locations,
+          the how-and-why). Plain H2 + paragraph, nothing clever. */}
+      {sections.length > 0 && (
+        <section className="px-5 md:px-10 pb-12 md:pb-16" aria-label={`About ${serviceName.toLowerCase()}`}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-10 max-w-6xl">
+            {sections.map((s) => (
+              <div key={s.heading}>
+                <h2 className="font-bold display-brand leading-snug mb-3" style={{ fontSize: "clamp(1.15rem, 1.6vw, 1.5rem)", letterSpacing: "-0.01em" }}>
+                  {s.heading}
+                </h2>
+                <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 3 — portfolio slice */}
       <section
@@ -183,6 +211,39 @@ export default function ServiceLanding({
         </section>
       )}
 
+      {/* 4b — how a project runs */}
+      {process.length > 0 && (
+        <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-process-h`}>
+          <h2 id={`${slug}-process-h`} className="mono-heading text-ink-soft mb-6">How a project runs</h2>
+          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8 max-w-6xl">
+            {process.map((p, i) => (
+              <li key={p.title}>
+                <p className="mono-label text-pink mb-2">{String(i + 1).padStart(2, "0")}</p>
+                <h3 className="text-ink font-sans font-semibold mb-1.5" style={{ fontSize: "clamp(1rem, 1.3vw, 1.2rem)" }}>{p.title}</h3>
+                <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{p.body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {/* 4c — who is behind the work (the credentials search and clients both check) */}
+      {meet && (
+        <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-meet-h`}>
+          <div className="border-t border-line pt-10 max-w-4xl">
+            <h2 id={`${slug}-meet-h`} className="font-bold display-brand leading-[1.05] mb-4" style={{ fontSize: "clamp(1.4rem, 2.4vw, 2.2rem)", letterSpacing: "-0.01em" }}>
+              {meet.heading}
+            </h2>
+            <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-body)" }}>{meet.body}</p>
+            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-pink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.3rem)" }}>
+              {meet.points.map((pt) => (
+                <li key={pt}>{pt}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
       {/* 5 — FAQ */}
       <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-faq-h`}>
         <h2 id={`${slug}-faq-h`} className="mono-heading text-ink-soft mb-6">Common questions</h2>
@@ -207,6 +268,9 @@ export default function ServiceLanding({
             <ContactCta className="tag tag-pink">Start a project ↗</ContactCta>
             <Link href="/work" className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>See more work</Link>
           </div>
+          {ctaNote && (
+            <p className="text-ink-soft mt-4 leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>{ctaNote}</p>
+          )}
           <address className="not-italic text-ink-soft mt-8 leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
             Finbar Studio, Brisbane, QLD, Australia. Working with clients across Australia and the UK.{" "}
             <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>{" "}
