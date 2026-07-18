@@ -28,6 +28,7 @@ import { trackMeta } from "@/lib/meta";
 import BrandWordmark from "./BrandWordmark";
 import BrandMark from "./BrandMark";
 import Loader from "./Loader";
+import PreviewCycle from "./PreviewCycle";
 
 const CalEmbed = dynamic(() => import("./CalEmbed"), { ssr: false, loading: () => null });
 
@@ -36,14 +37,16 @@ const CAL_NS = "book-call"; // must match CalEmbed's namespace for the event hoo
 const STEPS = [
   { n: "01", text: "A 15-minute call about your business." },
   { n: "02", text: "Your homepage redesigned as a real concept, within a week." },
-  { n: "03", text: "Love it? If one page is all you need, it's yours: free, hosted, live.\n\nA full site with the bells and whistles is a paid build, live in about two weeks.\n\nDon't? Keep the concept, no hard feelings." },
+  { n: "03", text: "Love it? If one page is all you need, it's yours: free, hosted, live.\n\nA full site with the bells and whistles is a paid build, live in about two weeks." },
 ];
 
+// Each proof card hover-cycles through the site's section shots (same as the
+// studio home site list), so hovering scrolls through the build, not one still.
 const PROOF = [
-  { src: "/images/web/lows-1.webp", alt: "Lows Design and Build homepage", caption: "Lows Design + Build, family builders in London", href: "/case-studies/lows-design-build" },
-  { src: "/images/web/plated-1.webp", alt: "Plated with Issy homepage", caption: "Plated with Issy, a candlelit supper club", href: "/case-studies/plated-with-issy" },
-  { src: "/images/web/kinaya-1.webp", alt: "KinAya homepage", caption: "KinAya, Adelaide-based NDIS support specialists", href: "/case-studies/kinaya" },
-  { src: "/images/web/lola-1.webp", alt: "Lola Audio homepage", caption: "Lola Audio, a portfolio you can mix", href: "/case-studies/lola-audio" },
+  { images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp", "/images/web/lows-4.webp"], alt: "Lows Design and Build website", caption: "Lows Design + Build, family builders in London", href: "/case-studies/lows-design-build" },
+  { images: ["/images/web/plated-1.webp", "/images/web/plated-2.webp", "/images/web/plated-3.webp", "/images/web/plated-4.webp"], alt: "Plated with Issy website", caption: "Plated with Issy, a candlelit supper club", href: "/case-studies/plated-with-issy" },
+  { images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp", "/images/web/kinaya-4.webp"], alt: "KinAya website", caption: "KinAya, Adelaide-based NDIS support specialists", href: "/case-studies/kinaya" },
+  { images: ["/images/web/lola-1.webp", "/images/web/lola-2.webp", "/images/web/lola-3.webp"], alt: "Lola Audio website", caption: "Lola Audio, a portfolio you can mix", href: "/case-studies/lola-audio" },
 ];
 
 const INCLUDES = [
@@ -198,9 +201,12 @@ export default function FreeRedesign() {
           <p className="mono-label text-ink-soft fr-kicker">Shipped this year</p>
           <div className="fr-proof">
             {PROOF.map((p) => (
-              <figure key={p.src} className="fr-proof-item">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.src} alt={p.alt} loading="lazy" decoding="async" />
+              <figure key={p.href} className="fr-proof-item">
+                {/* Hover cycles through the site's section shots (PreviewCycle,
+                    the studio home treatment). Rests on the first shot. */}
+                <div className="fr-proof-frame">
+                  <PreviewCycle images={p.images} alt={p.alt} />
+                </div>
                 <figcaption>{p.caption}</figcaption>
                 {/* New tab: the landing page (and its booking calendar) stays open. */}
                 <a href={p.href} target="_blank" rel="noopener noreferrer" className="sticker-pill fr-proof-cta">Case study</a>

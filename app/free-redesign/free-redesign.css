@@ -114,10 +114,14 @@
   flex-direction: column;
   align-items: flex-start;
 }
-.fr-proof-item img {
+/* 16:9 frame holding the hover-cycling PreviewCycle (which is absolute
+   inset-0 + object-cover); rests on the first shot, scrolls the sections on
+   hover. Full width for the Lows lead card, one-third for the row-two three. */
+.fr-proof-frame {
+  position: relative;
   width: 100%;
-  height: auto;
-  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
   border-radius: 14px;
   border: 1px solid var(--line);
 }
