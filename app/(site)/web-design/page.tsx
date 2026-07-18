@@ -14,12 +14,15 @@ const SITE_URL = "https://www.finbar.studio";
  */
 
 export const metadata: Metadata = {
-  title: { absolute: "Web Design Brisbane | Custom-Coded Websites | Finbar Studio" },
+  // "Web Designer Brisbane" covers both query families in one: the designer
+  // noun (what the top-ranking competitors put in their titles) AND the exact
+  // "web design" phrase as its substring.
+  title: { absolute: "Web Designer Brisbane | Custom-Coded Websites | Finbar Studio" },
   description:
     "Brisbane web designer building custom-coded websites: brand-led design, a CMS you run yourself, SEO and AI-search ready. For businesses in Brisbane, across Australia and the UK.",
   alternates: { canonical: "/web-design" },
   openGraph: {
-    title: "Web Design Brisbane | Custom-Coded Websites | Finbar Studio",
+    title: "Web Designer Brisbane | Custom-Coded Websites | Finbar Studio",
     description:
       "Custom-coded, brand-led websites with a CMS you run yourself, from a Brisbane web designer. Selected web projects.",
     url: `${SITE_URL}/web-design`,

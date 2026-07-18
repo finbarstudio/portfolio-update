@@ -21,7 +21,7 @@ import { usePathname } from "next/navigation";
 const PIN_BOTTOM = 42; // matches .sf-cta-pin { bottom: 42px } — sits above the ©
 
 function Pill({ interactive, tab, onOpen }: { interactive: boolean; tab: number; onOpen?: (e: React.MouseEvent) => void }) {
-  const inner = <>Book a call</>;
+  const inner = <>Get a quote</>;
   if (!interactive) {
     // Placeholder: reserves the line + width, never interactive.
     return <span className="sticker-pill book-call-pill">{inner}</span>;
