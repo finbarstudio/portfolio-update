@@ -208,11 +208,12 @@ export default function FreeRedesign() {
 
   return (
     <div className="fr">
-      {/* Header: logo only — paid traffic gets no exit doors. */}
+      {/* Header: the mark only, and deliberately NOT a link — paid traffic gets
+          no exit doors, not even the logo home. */}
       <header className="fr-head">
-        <a href="/" aria-label="finbarstudio, home" className="fr-logo">
+        <span className="fr-logo" aria-label="finbarstudio">
           <BrandWordmark />
-        </a>
+        </span>
       </header>
 
       <main>
