@@ -145,13 +145,14 @@
   max-width: 780px;
   margin-inline: auto;
 }
-/* Same voice as the steps and the note: bigger, bolder, meant to be read. */
+/* Sized up like the steps and the note, but regular weight — bold mono caps
+   read too heavy in a chip. */
 .fr-include {
   border: 1px solid var(--ink);
   border-radius: 999px;
   padding: 0.8em 1.4em;
   font-family: var(--font-mono);
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-size: clamp(0.95rem, 1.3vw, 1.05rem);
