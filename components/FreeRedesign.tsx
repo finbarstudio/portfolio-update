@@ -96,7 +96,7 @@ export default function FreeRedesign() {
   const [calReady, setCalReady] = useState(false);
   const [showStickyBook, setShowStickyBook] = useState(false);
   const bookRef = useRef<HTMLDivElement>(null);
-  const howRef = useRef<HTMLElement>(null);
+  const proofRef = useRef<HTMLElement>(null);
 
   // A standard event on the landing view itself, so the dataset sees a real
   // conversion-funnel event from every ad click (not just PageView) — this is
@@ -125,27 +125,36 @@ export default function FreeRedesign() {
     return () => { io.disconnect(); clearTimeout(fallback); };
   }, []);
 
-  // Mobile only: once "How it works" has scrolled past, the book CTA rides the
-  // bottom of the viewport so it's always a tap away — until the calendar
-  // itself is on screen, when it steps aside so it never covers the booker.
+  // Mobile only: the book CTA rides the bottom of the viewport so it's always a
+  // tap away. It comes up JUST BEFORE the case studies reach the fold, stays up
+  // through the rest of the page, and steps aside once the calendar itself is on
+  // screen so it never covers the booker.
   useEffect(() => {
-    const how = howRef.current;
+    const proof = proofRef.current;
     const book = bookRef.current;
-    if (!how || !book) return;
-    let pastHow = false;
-    let bookVisible = false;
-    const apply = () => setShowStickyBook(pastHow && !bookVisible);
-    const howIO = new IntersectionObserver(
-      ([e]) => { pastHow = !e.isIntersecting && e.boundingClientRect.top < 0; apply(); },
-      { threshold: 0 }
+    if (!proof || !book) return;
+    let reached = false;      // reached the case-studies region
+    let bookVisible = false;  // the calendar is on screen
+    const apply = () => setShowStickyBook(reached && !bookVisible);
+    // The 140px bottom margin fires the observer while the case studies are
+    // still just below the fold — "just before" they appear. Once they've
+    // scrolled up and out the top we keep it up; only scrolling back above them
+    // (proof still below the fold) puts it away again.
+    const proofIO = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) reached = true;
+        else if (e.boundingClientRect.top > 0) reached = false;
+        apply();
+      },
+      { rootMargin: "0px 0px 140px 0px" }
     );
     const bookIO = new IntersectionObserver(
       ([e]) => { bookVisible = e.isIntersecting; apply(); },
       { threshold: 0 }
     );
-    howIO.observe(how);
+    proofIO.observe(proof);
     bookIO.observe(book);
-    return () => { howIO.disconnect(); bookIO.disconnect(); };
+    return () => { proofIO.disconnect(); bookIO.disconnect(); };
   }, []);
 
   // The Meta-pixel cookie notice is also pinned to the bottom. While the sticky
@@ -227,7 +236,7 @@ export default function FreeRedesign() {
         </section>
 
         {/* ── How it works ─────────────────────────────────────── */}
-        <section className="fr-section" aria-label="How it works" ref={howRef}>
+        <section className="fr-section" aria-label="How it works">
           <p className="mono-label text-ink-soft fr-kicker">How it works</p>
           <ol className="fr-steps">
             {STEPS.map((s) => (
@@ -256,7 +265,7 @@ export default function FreeRedesign() {
         </div>
 
         {/* ── Proof ────────────────────────────────────────────── */}
-        <section className="fr-section" aria-label="Recent builds">
+        <section className="fr-section" aria-label="Recent builds" ref={proofRef}>
           <p className="mono-label text-ink-soft fr-kicker">Shipped this year</p>
           <div className="fr-proof">
             {PROOF.map((p) => (
