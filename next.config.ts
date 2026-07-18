@@ -16,11 +16,13 @@ const baseSecurityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
-  // Process isolation without breaking anything: same-origin windows only
-  // (no cross-window handles), and resources loadable from our own site
-  // (www + sandbox subdomains are the same site). COEP is deliberately
-  // omitted — it would require CORP on every third-party resource.
-  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  // COOP is left at the default (unsafe-none): Meta's Event Setup Tool opens
+  // the site in a new tab and drives it through the window.opener channel
+  // (injecting its overlay, confirming the pixel). COOP: same-origin severs
+  // that link for a cross-origin opener like facebook.com, so the tool showed
+  // "a pixel wasn't detected" and never rendered its overlay. We don't opt
+  // into crossOriginIsolated (COEP is omitted), so COOP bought little here.
+  { key: "Cross-Origin-Opener-Policy", value: "unsafe-none" },
   { key: "Cross-Origin-Resource-Policy", value: "same-site" },
 ];
 
