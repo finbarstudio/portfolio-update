@@ -43,6 +43,8 @@ export type ServiceLandingProps = {
   process?: { title: string; body: string }[];
   /** E-E-A-T block: who is behind the work, with true credential points. */
   meet?: { heading: string; body: string; points: string[] };
+  /** Risk-reversal band near the CTA (e.g. the design-stage guarantee). */
+  guarantee?: { label: string; body: string };
   faqs: Faq[];            // FAQ + FAQPage schema
   ctaHeading: string;     // CTA headline, page-specific
   /** Optional line under the CTA (e.g. the free homepage redesign offer). */
@@ -63,7 +65,7 @@ const newestYear = (date: string) => {
 
 export default function ServiceLanding({
   slug, label, heading, intro, serviceName, description, terms, excludeSlugs = [],
-  capsTitle, capabilities, sections = [], process = [], meet, faqs, ctaHeading, ctaNote,
+  capsTitle, capabilities, sections = [], process = [], meet, guarantee, faqs, ctaHeading, ctaNote,
 }: ServiceLandingProps) {
   const exclude = new Set(excludeSlugs);
   const matched = [...projects]
@@ -163,7 +165,7 @@ export default function ServiceLanding({
           the how-and-why). Plain H2 + paragraph, nothing clever. */}
       {sections.length > 0 && (
         <section className="px-5 md:px-10 pb-12 md:pb-16" aria-label={`About ${serviceName.toLowerCase()}`}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-10 max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10 max-w-5xl">
             {sections.map((s) => (
               <div key={s.heading}>
                 <h2 className="font-bold display-brand leading-snug mb-3" style={{ fontSize: "clamp(1.15rem, 1.6vw, 1.5rem)", letterSpacing: "-0.01em" }}>
@@ -256,6 +258,16 @@ export default function ServiceLanding({
           ))}
         </dl>
       </section>
+
+      {/* 5b — risk-reversal band: the guarantee, right before the ask. */}
+      {guarantee && (
+        <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="Our guarantee">
+          <div className="max-w-3xl rounded-md border border-pink px-6 py-6" style={{ background: "rgba(233, 109, 137, 0.08)" }}>
+            <p className="mono-label text-pink mb-2">{guarantee.label}</p>
+            <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)" }}>{guarantee.body}</p>
+          </div>
+        </section>
+      )}
 
       {/* 6 — CTA + crawlable NAP */}
       <section className="px-5 md:px-10 pb-24 md:pb-32" aria-label="Start a project">

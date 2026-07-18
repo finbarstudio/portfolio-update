@@ -62,6 +62,10 @@ export default function WebDesignPage() {
           heading: "From Brisbane to London",
           body: "Recent website design work: Lows Design + Build, family builders in South London. KinAya, an NDIS support provider in Adelaide. Salesmasters, a sales consultancy here in Brisbane. Plated with Issy, a candlelit supper club. Lola Audio, a composer's portfolio you can actually mix. I'm based in Brisbane and most of the work happens over calls and shared files, so where you are has never been a barrier.",
         },
+        {
+          heading: "Looked after beyond launch",
+          body: "Launch isn't the end of it. I can host the site so you've one less bill and login to chase, keep it updated and secure, and stay on hand for changes as the business grows. You still own everything and edit the day-to-day yourself through the CMS, but the technical care is handled, so the site keeps working long after it goes live.",
+        },
       ]}
       process={[
         {
@@ -91,6 +95,10 @@ export default function WebDesignPage() {
           "Custom builds on Next.js, with Sanity, Payload and Framer CMS",
         ],
       }}
+      guarantee={{
+        label: "The guarantee",
+        body: "If you don't love the first design, you don't pay. I redesign your homepage before you commit to anything, so you see exactly what you're getting. Only happy with it? Then we build. There's no risk in starting.",
+      }}
       ctaHeading="Thinking about a new website?"
       ctaNote={
         <>
@@ -115,6 +123,14 @@ export default function WebDesignPage() {
         {
           q: "Will I be able to update the site myself?",
           a: "Yes. Sites come wired into a CMS, and I walk you through it at handover, so you can change words, images and pages without touching code or coming back to me.",
+        },
+        {
+          q: "What happens after the site launches?",
+          a: "Launch isn't goodbye. I can host the site, keep it updated and secure, and stay on hand for changes as your business grows. You still own everything and handle day-to-day edits yourself through the CMS; the technical care is looked after so the site keeps working long-term.",
+        },
+        {
+          q: "What if I don't like the design?",
+          a: "Then you don't pay. I redesign your homepage as a real concept before you commit to a full build, so you see exactly what you're getting first. If it isn't right, there's no cost and no hard feelings. The build only starts once you're happy, so there's no risk in getting in touch.",
         },
         {
           q: "Will my website show up on Google?",
