@@ -21,6 +21,18 @@ import LiveTime from "./LiveTime";
 import { EngFlag } from "./Flags";
 import BrandMark from "./BrandMark";
 
+// The primary nav, mirrored in the footer so visitors can keep exploring from
+// the bottom of any page (plus Home + the Sandbox link). Keep in sync with
+// TopNav's items if the nav changes.
+const FOOTER_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "Work", href: "/work" },
+  { label: "Journal", href: "/journal" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+  { label: "Sandbox", href: "https://sandbox.finbar.studio", external: true },
+];
+
 export default function SiteFooter() {
   // Deterministic initial year (matches SSR), then corrected on the client.
   const [year, setYear] = useState(2026);
@@ -124,6 +136,28 @@ export default function SiteFooter() {
       <div className="site-footer-rule" aria-hidden="true" />
 
       <div className="site-footer-info">
+        {/* The nav, mirrored: a full-width row of pills so visitors can keep
+            exploring from the foot of any page. */}
+        <nav className="sf-nav" aria-label="Explore the site">
+          {FOOTER_LINKS.map((l) =>
+            l.external ? (
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tag tag-default"
+              >
+                {l.label}
+              </a>
+            ) : (
+              <Link key={l.href} href={l.href} className="tag tag-default">
+                {l.label}
+              </Link>
+            )
+          )}
+        </nav>
+
         {/* Locations stacked: Brisbane over London, freeing a column for the
             mailing-list field. */}
         <div className="sf-col sf-col-locations">
