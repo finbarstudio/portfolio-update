@@ -36,13 +36,18 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors *" },
         ],
       },
-      // Everything else: deny framing outright (clickjacking) + lock base/object.
+      // Everything else: framing allowed ONLY for us + Meta's tools. Meta's
+      // Event Setup Tool / Events Manager iframes the page to detect the pixel;
+      // with frame-ancestors 'none' + X-Frame-Options: DENY that load was
+      // blocked ("a pixel wasn't detected on this website"). frame-ancestors is
+      // an allowlist so every other origin still can't frame us; X-Frame-Options
+      // is dropped because it's all-or-nothing (can't express the allowlist) and
+      // CSP frame-ancestors supersedes it in modern browsers.
       {
         source: "/((?!embed/).*)",
         headers: [
           ...baseSecurityHeaders,
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors 'none'" },
+          { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors 'self' https://*.facebook.com https://facebook.com" },
         ],
       },
       // Long-lived caching for /public assets (the "Add Expires headers"

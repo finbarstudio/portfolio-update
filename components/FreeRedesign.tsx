@@ -96,6 +96,12 @@ export default function FreeRedesign() {
   const [calReady, setCalReady] = useState(false);
   const bookRef = useRef<HTMLDivElement>(null);
 
+  // A standard event on the landing view itself, so the dataset sees a real
+  // conversion-funnel event from every ad click (not just PageView) — this is
+  // what completes Meta's "set up events" step. Schedule (below) is the hard
+  // conversion once someone books; ViewContent is the top of the funnel.
+  useEffect(() => { trackMeta("ViewContent"); }, []);
+
   // Load the embed on approach, not on page load — hero LCP stays clean.
   // Belt and braces for the conversion point: if the observer never fires
   // (throttled tabs, odd in-app WebViews), a 5s idle fallback mounts it anyway

@@ -19,6 +19,7 @@ import dynamic from "next/dynamic";
 import ContactDirect from "./ContactDirect";
 import ContactNoteForm from "./ContactNoteForm";
 import Loader from "./Loader";
+import { trackMeta } from "@/lib/meta";
 
 // The Cal.com iframe embed. The native @calcom/atoms BookerEmbed was tried and
 // proven credential-less, but its 2.11.0 build infinite-loops setState on
@@ -41,7 +42,7 @@ export default function ContactPanel() {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onOpen = () => { setOpen(true); setEverOpened(true); };
+    const onOpen = () => { setOpen(true); setEverOpened(true); trackMeta("Contact"); };
     window.addEventListener("contact:open", onOpen as EventListener);
     return () => window.removeEventListener("contact:open", onOpen as EventListener);
   }, []);

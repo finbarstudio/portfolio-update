@@ -25,7 +25,7 @@ const TEST_CODE = process.env.META_TEST_EVENT_CODE;
 const GRAPH = `https://graph.facebook.com/v23.0/${META_PIXEL_ID}/events`;
 
 // Only event names our own client code sends — this is a relay, not an open proxy.
-const ALLOWED_EVENTS = new Set(["PageView", "Schedule", "Lead", "Contact"]);
+const ALLOWED_EVENTS = new Set(["PageView", "ViewContent", "Schedule", "Lead", "Contact"]);
 
 // Shape guards for client-supplied matching params (they improve Event Match
 // Quality; the client generates them first-party — see lib/meta.ts).
