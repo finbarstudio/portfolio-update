@@ -43,7 +43,7 @@ export default function ContactPage() {
   // Same breakpoint the popup uses: stacked layouts link out to Cal's own
   // mobile page instead of embedding.
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 860px)");
+    const mq = window.matchMedia("(max-width: 1439px)");
     const update = () => setStacked(mq.matches);
     update();
     mq.addEventListener("change", update);
