@@ -94,7 +94,9 @@ const TESTIMONIALS: { quote: string; author: string }[] = [
 export default function FreeRedesign() {
   const [calInView, setCalInView] = useState(false);
   const [calReady, setCalReady] = useState(false);
+  const [showStickyBook, setShowStickyBook] = useState(false);
   const bookRef = useRef<HTMLDivElement>(null);
+  const howRef = useRef<HTMLElement>(null);
 
   // A standard event on the landing view itself, so the dataset sees a real
   // conversion-funnel event from every ad click (not just PageView) — this is
@@ -122,6 +124,37 @@ export default function FreeRedesign() {
     const fallback = setTimeout(() => { setCalInView(true); io.disconnect(); }, 5000);
     return () => { io.disconnect(); clearTimeout(fallback); };
   }, []);
+
+  // Mobile only: once "How it works" has scrolled past, the book CTA rides the
+  // bottom of the viewport so it's always a tap away — until the calendar
+  // itself is on screen, when it steps aside so it never covers the booker.
+  useEffect(() => {
+    const how = howRef.current;
+    const book = bookRef.current;
+    if (!how || !book) return;
+    let pastHow = false;
+    let bookVisible = false;
+    const apply = () => setShowStickyBook(pastHow && !bookVisible);
+    const howIO = new IntersectionObserver(
+      ([e]) => { pastHow = !e.isIntersecting && e.boundingClientRect.top < 0; apply(); },
+      { threshold: 0 }
+    );
+    const bookIO = new IntersectionObserver(
+      ([e]) => { bookVisible = e.isIntersecting; apply(); },
+      { threshold: 0 }
+    );
+    howIO.observe(how);
+    bookIO.observe(book);
+    return () => { howIO.disconnect(); bookIO.disconnect(); };
+  }, []);
+
+  // The Meta-pixel cookie notice is also pinned to the bottom. While the sticky
+  // CTA is up, lift the notice above it so the two never overlap (mobile only —
+  // the CSS rule is scoped to this class and the phone breakpoint).
+  useEffect(() => {
+    document.body.classList.toggle("fr-sticky-on", showStickyBook);
+    return () => document.body.classList.remove("fr-sticky-on");
+  }, [showStickyBook]);
 
   // The conversion signal: Cal's embed emits bookingSuccessful in the browser
   // when a booking completes inside the inline embed. Once per session
@@ -194,7 +227,7 @@ export default function FreeRedesign() {
         </section>
 
         {/* ── How it works ─────────────────────────────────────── */}
-        <section className="fr-section" aria-label="How it works">
+        <section className="fr-section" aria-label="How it works" ref={howRef}>
           <p className="mono-label text-ink-soft fr-kicker">How it works</p>
           <ol className="fr-steps">
             {STEPS.map((s) => (
@@ -205,6 +238,22 @@ export default function FreeRedesign() {
             ))}
           </ol>
         </section>
+
+        {/* Mobile: from here the book CTA rides the bottom of the screen,
+            stepping aside once the calendar is reached. Hidden on desktop —
+            desktop keeps the hero CTA. */}
+        <div
+          className={`fr-book-sticky ${showStickyBook ? "is-visible" : ""}`}
+          aria-hidden={!showStickyBook}
+        >
+          <a
+            href="#book"
+            className="sticker-pill book-call-pill fr-sticky-cta"
+            tabIndex={showStickyBook ? 0 : -1}
+          >
+            Book a 15-min chat
+          </a>
+        </div>
 
         {/* ── Proof ────────────────────────────────────────────── */}
         <section className="fr-section" aria-label="Recent builds">

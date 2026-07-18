@@ -56,6 +56,52 @@
   padding: 1em 2.2em;
 }
 
+/* ── Mobile sticky book CTA ──
+   Phones only: the hero CTA is moved to a bar that rides the bottom of the
+   viewport, appearing once "How it works" is scrolled past and stepping aside
+   when the calendar itself is on screen (JS toggles .is-visible). Desktop and
+   tablet keep the hero CTA and the inline flow, so this stays hidden there. */
+.fr-book-sticky { display: none; }
+@media (max-width: 767px) {
+  .fr-cta { display: none; } /* moved to the sticky bar on mobile */
+  .fr-book-sticky {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -6px 22px -14px rgba(0, 0, 0, 0.3);
+    transform: translateY(120%);
+    opacity: 0;
+    transition: transform 0.28s ease, opacity 0.28s ease;
+    pointer-events: none;
+  }
+  .fr-book-sticky.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .fr-sticky-cta {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    font-size: 1rem;
+    padding: 1em 2.2em;
+    text-decoration: none;
+  }
+  /* Lift the Meta-pixel notice clear of the sticky CTA while it's up. */
+  body.fr-sticky-on .cookie-notice {
+    bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fr-book-sticky { transition: none; }
+}
+
 /* ── Section rhythm ── */
 .fr-section {
   max-width: 1060px;
