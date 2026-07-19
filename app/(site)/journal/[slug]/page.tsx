@@ -8,6 +8,7 @@ import { urlForImage } from "@/sanity/image";
 import { POST_QUERY, POSTS_QUERY } from "@/sanity/queries";
 import type { Post, PostListItem } from "@/sanity/types";
 import PortableBody from "@/components/journal/PortableBody";
+import Caption from "@/components/journal/Caption";
 import JournalFeed from "@/components/journal/JournalFeed";
 import "../journal.css";
 
@@ -195,16 +196,23 @@ export default async function JournalSlugPage({ params }: { params: Promise<{ sl
           <h1 className="jr-title">{post.title}</h1>
           {post.excerpt && <p className="jr-lede">{post.excerpt}</p>}
           {cover && (
-            <div className="jr-hero">
-              <Image
-                src={cover.width(1600).height(900).quality(82).url()}
-                alt={post.coverImage?.alt ?? ""}
-                width={1600}
-                height={900}
-                sizes="(max-width: 820px) 100vw, 820px"
-                priority
-              />
-            </div>
+            <figure className="jr-hero-figure">
+              <div className="jr-hero">
+                <Image
+                  src={cover.width(1600).height(900).quality(82).url()}
+                  alt={post.coverImage?.alt ?? ""}
+                  width={1600}
+                  height={900}
+                  sizes="(max-width: 820px) 100vw, 820px"
+                  priority
+                />
+              </div>
+              {post.coverImage?.caption && (
+                <figcaption className="jr-caption">
+                  <Caption text={post.coverImage.caption} />
+                </figcaption>
+              )}
+            </figure>
           )}
           {post.body && post.body.length > 0 && <PortableBody value={post.body} />}
         </article>

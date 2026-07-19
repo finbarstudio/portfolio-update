@@ -150,7 +150,10 @@
 }
 .jr-title { font-family: "bookmania", Georgia, "Times New Roman", serif; font-weight: 500; letter-spacing: -0.01em; line-height: 1.05; font-size: clamp(2rem, 5vw, 3.4rem); color: var(--ink); text-wrap: balance; }
 .jr-lede { margin-top: 1rem; max-width: 60ch; color: var(--ink-soft); font-size: clamp(1.05rem, 1.6vw, 1.3rem); line-height: 1.5; }
-.jr-hero { position: relative; aspect-ratio: 16 / 9; margin: clamp(28px, 5vh, 48px) 0; border-radius: 8px; overflow: hidden; background: rgba(33, 30, 26, 0.06); }
+/* Figure owns the vertical rhythm so the caption sits just under the frame
+   (the frame itself is overflow:hidden and would clip a caption inside it). */
+.jr-hero-figure { margin: clamp(28px, 5vh, 48px) 0; }
+.jr-hero { position: relative; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: rgba(33, 30, 26, 0.06); }
 .jr-hero img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ── Prose (Portable Text) ── */
@@ -167,4 +170,6 @@
 .jr-quote blockquote, .jr-quote p { font-size: clamp(1.15rem, 1.9vw, 1.45rem); line-height: 1.45; }
 .jr-figure { margin: 1.8em 0; }
 .jr-figure-img { width: 100%; height: auto; border-radius: 8px; display: block; }
-.jr-caption { margin-top: 0.6rem; color: var(--ink-soft); font-size: var(--text-caption); line-height: 1.4; }
+.jr-caption { margin-top: 0.6rem; color: var(--ink-soft); font-size: var(--text-caption); line-height: 1.4; overflow-wrap: anywhere; }
+.jr-caption-link { color: var(--pink); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.jr-caption-link:hover { color: var(--pink-deep); }

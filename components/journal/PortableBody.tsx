@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { urlForImage } from "@/sanity/image";
 import type { CoverImage } from "@/sanity/types";
+import Caption from "./Caption";
 
 /**
  * Renders a post's Portable Text body into the studio's four-colour system.
@@ -29,7 +30,11 @@ function BodyImage({ value }: { value: CoverImage }) {
         sizes="(max-width: 760px) 100vw, 720px"
         className="jr-figure-img"
       />
-      {value.caption && <figcaption className="jr-caption">{value.caption}</figcaption>}
+      {value.caption && (
+        <figcaption className="jr-caption">
+          <Caption text={value.caption} />
+        </figcaption>
+      )}
     </figure>
   );
 }
