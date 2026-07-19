@@ -187,6 +187,36 @@
   padding: 4px 11px;
 }
 
+/* ── Who: a sentence and a face — the "is he legit" line above the proof ── */
+.fr-proof-section { padding-top: clamp(16px, 3.5vh, 36px); }
+.fr-who {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: clamp(26px, 5vh, 44px);
+  text-align: center;
+}
+.fr-who-face {
+  display: block;
+  width: clamp(56px, 8vw, 72px);
+  height: clamp(56px, 8vw, 72px);
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--pink) 16%, var(--bg));
+}
+.fr-who-face img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.fr-who-line {
+  margin: 0;
+  max-width: 36ch;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
 /* ── Proof strip: Lows leads full-width (it's the site in the ad, and the ad
       points people at its case study), the other three share row two. ── */
 .fr-proof {

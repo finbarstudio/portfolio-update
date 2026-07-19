@@ -219,12 +219,18 @@ export default function FreeRedesign() {
 
   return (
     <div className="fr">
-      {/* Header: the mark only, and deliberately NOT a link — paid traffic gets
-          no exit doors, not even the logo home. */}
+      {/* Header: the mark links home — in a NEW TAB, so the landing (and its
+          booking calendar) stays open behind anyone who goes exploring. */}
       <header className="fr-head">
-        <span className="fr-logo" aria-label="finbarstudio">
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fr-logo"
+          aria-label="finbarstudio, home (opens in a new tab)"
+        >
           <BrandWordmark />
-        </span>
+        </a>
       </header>
 
       <main>
@@ -259,6 +265,34 @@ export default function FreeRedesign() {
           </a>
         </section>
 
+        {/* ── Proof — straight after the hero. Real builds with real names are
+            the "is he legit" answer, so they come before any more selling,
+            led by a sentence and a face. ── */}
+        <section className="fr-section fr-proof-section" aria-label="Recent builds" ref={proofRef}>
+          <div className="fr-who">
+            <span className="fr-who-face">
+              <Image src="/images/about/finbar.webp" alt="Finbar Skitini" width={128} height={128} />
+            </span>
+            <p className="fr-who-line">
+              I&rsquo;m Finbar, a web designer in Brisbane. I built all of these.
+            </p>
+          </div>
+          <div className="fr-proof">
+            {PROOF.map((p) => (
+              <figure key={p.href} className="fr-proof-item">
+                {/* Hover cycles through the site's section shots (PreviewCycle,
+                    the studio home treatment). Rests on the first shot. */}
+                <div className="fr-proof-frame">
+                  <PreviewCycle images={p.images} alt={p.alt} />
+                </div>
+                <figcaption>{p.caption}</figcaption>
+                {/* New tab: the landing page (and its booking calendar) stays open. */}
+                <a href={p.href} target="_blank" rel="noopener noreferrer" className="sticker-pill fr-proof-cta">Case study</a>
+              </figure>
+            ))}
+          </div>
+        </section>
+
         {/* ── How it works ─────────────────────────────────────── */}
         <section className="fr-section" aria-label="How it works">
           <p className="mono-label text-ink-soft fr-kicker">How it works</p>
@@ -288,25 +322,6 @@ export default function FreeRedesign() {
             Book a 15-min chat
           </a>
         </div>
-
-        {/* ── Proof ────────────────────────────────────────────── */}
-        <section className="fr-section" aria-label="Recent builds" ref={proofRef}>
-          <p className="mono-label text-ink-soft fr-kicker">Shipped this year</p>
-          <div className="fr-proof">
-            {PROOF.map((p) => (
-              <figure key={p.href} className="fr-proof-item">
-                {/* Hover cycles through the site's section shots (PreviewCycle,
-                    the studio home treatment). Rests on the first shot. */}
-                <div className="fr-proof-frame">
-                  <PreviewCycle images={p.images} alt={p.alt} />
-                </div>
-                <figcaption>{p.caption}</figcaption>
-                {/* New tab: the landing page (and its booking calendar) stays open. */}
-                <a href={p.href} target="_blank" rel="noopener noreferrer" className="sticker-pill fr-proof-cta">Case study</a>
-              </figure>
-            ))}
-          </div>
-        </section>
 
         {/* ── What a full build includes ───────────────────────── */}
         {/* Honest pricing shape: the one-page redesign is free, hosting
