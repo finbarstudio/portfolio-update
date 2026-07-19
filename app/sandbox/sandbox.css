@@ -15,21 +15,25 @@
    ════════════════════════════════════════════════════════════════════ */
 
 .sb-root {
-  /* Inverted palette: the sandbox runs dark — ink becomes the ground, the cream
-     becomes the text, pink stays. Every .sb-* class reads these vars directly
-     (no Tailwind colour utilities here), so overriding them flips the whole UI.
-     Surfaces/lines below are derived from the vars, so they invert with them. */
-  --bg: #211E1A;          /* ground (was the cream) */
-  --ink: #F6EFE1;         /* text (was the ink) */
-  --ink-soft: color-mix(in srgb, var(--ink) 58%, var(--bg));
-  --line: color-mix(in srgb, var(--ink) 16%, transparent);
+  /* Monochrome technical: solid black ground, solid white ink, white 1px lines.
+     No brand pink here — the accent IS white, and interactive states invert
+     (white fill, black text). Every .sb-* class reads these vars, so this block
+     drives the whole look; the pink→white inversions + sharp corners live in the
+     MONOCHROME TECHNICAL block at the foot of this file. */
+  --bg: #000000;          /* solid black ground */
+  --ink: #FFFFFF;         /* solid white text + marks */
+  --ink-soft: rgba(255, 255, 255, 0.55);  /* dimmed white for secondary text */
+  --line: rgba(255, 255, 255, 0.82);      /* the 1px white outline, everywhere */
 
-  --sb-surface: color-mix(in srgb, var(--ink) 4%, var(--bg));
-  --sb-surface-2: color-mix(in srgb, var(--ink) 8%, var(--bg));
+  --sb-surface: #000000;
+  --sb-surface-2: #0c0c0c;
   --sb-line: var(--line);
-  /* Small device corner radius + the neutral very-dark-grey bezel it paints into. */
-  --sb-screen-radius: 16px;
-  --sb-screen-frame: #1C1C1C;
+  /* Neutralise the brand accent to white — interactive fills invert to black text. */
+  --pink: #FFFFFF;
+  --pink-soft: rgba(255, 255, 255, 0.7);
+  /* No rounded device frame: full-bleed black screen, technical. */
+  --sb-screen-radius: 0px;
+  --sb-screen-frame: #000000;
   color: var(--ink);
   font-family: var(--font-primary);
 }
@@ -45,7 +49,7 @@ html:has(.sb-root),
 body:has(.sb-root) {
   height: 100%;
   overflow: hidden;
-  background-color: #1C1C1C;   /* bezel — visible in the rounded corner notches */
+  background-color: #000000;   /* full black — no device bezel in the technical look */
   overscroll-behavior: none;
 }
 
@@ -694,3 +698,103 @@ body:has(.sb-root) {
 .sb-range { border-radius: 999px; }
 .sb-range::-webkit-slider-thumb { border-radius: 50%; }
 .sb-range::-moz-range-thumb { border-radius: 50%; }
+
+/* ════════════════════════════════════════════════════════════════════
+   MONOCHROME TECHNICAL  — solid black / solid white, 1px white outlines,
+   sharp corners, invert-on-interaction. This block wins on source order
+   over the rounded "bubble" treatment above. Genuinely-round things (the
+   lens magnifier, status dots, the timeline diamond, the loader mark) are
+   left alone.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Sharp corners on every clickable + container token (the "box" look). */
+.sb-root .sb-tabs,
+.sb-root .sb-corner-tr,
+.sb-root .sb-corner-pill,
+.sb-root .sb-tabs-glow,
+.sb-root .sb-tab,
+.sb-root .sb-card,
+.sb-root .sb-card-status,
+.sb-root .sb-mock-btn,
+.sb-root .sb-fx-ref,
+.sb-root .sb-studio,
+.sb-root .sb-studio-btn,
+.sb-root .sb-studio-num,
+.sb-root .sb-studio-select,
+.sb-root .sb-studio-text,
+.sb-root .sb-studio-color,
+.sb-root .sb-studio-modal-box,
+.sb-root .sb-studio-modal-box textarea,
+.sb-root .sb-panel,
+.sb-root .sb-segmented,
+.sb-root .sb-seg,
+.sb-root .sb-dropzone,
+.sb-root .sb-btn,
+.sb-root .sb-select,
+.sb-root .sb-swatch,
+.sb-root .sb-thumb-media,
+.sb-root .sb-thumb-badge,
+.sb-root .sb-thumb-btn,
+.sb-root .sb-msg,
+.sb-root .sb-url-input,
+.sb-root .sb-progress-track,
+.sb-root .sb-progress-bar,
+.sb-root .sb-range,
+.sb-root .sb-suggest-chip,
+.sb-root .sb-suggest-panel,
+.sb-root .sb-suggest-text,
+.sb-root .sb-suggest-send,
+.sb-root .sb-lens-picker button,
+.sb-root .sb-ascii-group button {
+  border-radius: 0;
+}
+.sb-root .sb-range::-webkit-slider-thumb { border-radius: 0; }
+.sb-root .sb-range::-moz-range-thumb { border-radius: 0; }
+
+/* Interactive fills used to be pink + white text. The fill is now white, so the
+   text on it must go black (invert). Covers active tabs, hovered cards, primary
+   buttons, active segments and the corner link. */
+.sb-root .sb-corner-pill,
+.sb-root .sb-tab.is-active,
+.sb-root .sb-mock-btn:hover,
+.sb-root .sb-fx-ref:hover,
+.sb-root .sb-seg.is-active,
+.sb-root .sb-btn.is-primary,
+.sb-root .sb-studio-btn.primary,
+.sb-root .sb-card.is-live:hover,
+.sb-root .sb-card.is-live:hover .sb-card-blurb,
+.sb-root .sb-card.is-live:hover .sb-card-code,
+.sb-root .sb-card.is-live:hover .sb-card-tag,
+.sb-root .sb-card.is-live:hover .sb-card-cta,
+.sb-root .sb-card.is-live:hover .sb-card-title {
+  color: #000;
+}
+/* Hovered card: its status chip flips to black-on-white too. */
+.sb-root .sb-card.is-live:hover .sb-card-status {
+  color: #000;
+  border-color: rgba(0, 0, 0, 0.5);
+}
+/* Keep the invert crisp: the primary/hover greys mixed pink with black — with
+   pink now white those became mid-grey; force pure white fills so it reads as a
+   clean invert. */
+.sb-root .sb-btn.is-primary:hover:not(:disabled),
+.sb-root .sb-corner-tr:hover .sb-corner-pill,
+.sb-root .sb-card.is-live:hover {
+  background: #ffffff;
+}
+/* Error message: monochrome (was a maroon-on-pink tint). */
+.sb-root .sb-msg.is-error {
+  color: var(--ink);
+  background: transparent;
+  border-color: var(--ink);
+}
+/* The shared brand loader is a pink gradient asterisk; desaturate + brighten it
+   to a white pulse so loading stays monochrome. */
+.sb-root .sb-loader-mark {
+  filter: grayscale(1) brightness(2.6) drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+}
+/* Generated-thumbnail placeholder was a pink radial; make it a neutral dark tile. */
+.sb-root .sb-thumb-gen {
+  background: #101010;
+  color: var(--ink);
+}
