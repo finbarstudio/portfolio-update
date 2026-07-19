@@ -2,8 +2,9 @@ import { ImageResponse } from "next/og";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 
 /**
- * Sandbox Apple touch icon (180×180) — the brand asterisk on the dark sandbox
- * ground, with rounded-square padding for the iOS home-screen tile.
+ * Sandbox Apple touch icon (180×180) — the brand asterisk in WHITE on the dark
+ * sandbox ground (matching the sandbox preloader's white mark), with
+ * rounded-square padding for the iOS home-screen tile.
  */
 
 export const size = { width: 180, height: 180 };
@@ -25,11 +26,11 @@ export default function AppleIcon() {
         <svg width={108} height={108} viewBox={MARK_VIEWBOX}>
           {MARK_SHAPES.map((sh, i) =>
             sh.tag === "polygon" ? (
-              <polygon key={i} points={sh.points} fill={sh.fill} />
+              <polygon key={i} points={sh.points} fill="#fff" />
             ) : sh.tag === "circle" ? (
-              <circle key={i} cx={sh.cx} cy={sh.cy} r={sh.r} fill={sh.fill} />
+              <circle key={i} cx={sh.cx} cy={sh.cy} r={sh.r} fill="#fff" />
             ) : (
-              <path key={i} d={sh.d} fill={sh.fill} />
+              <path key={i} d={sh.d} fill="#fff" />
             ),
           )}
         </svg>
