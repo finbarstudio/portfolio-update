@@ -3710,8 +3710,15 @@ body:has(.contact-panel.is-open) .sf-cta-pin {
 .top-nav button { pointer-events: auto; }
 /* Hidden state: slid up out of view (see TopNav scroll handler). */
 .top-nav.is-hidden { transform: translateY(-100%); }
+/* The centred logo rides with the bar: it fades out when the nav auto-hides on
+   scroll (data-nav="up"), but NOT during the home intro (data-nav="intro"),
+   where the big lockup is the whole show. Opacity only — the lockup's docking
+   transform stays JS-driven and instant. */
+.nav-logo, .home-intro-mark { transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
+html[data-nav="up"] .nav-logo,
+html[data-nav="up"] .home-intro-mark { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
-  .top-nav { transition: none; }
+  .top-nav, .nav-logo, .home-intro-mark { transition: none; }
 }
 .top-nav-inner {
   display: flex;

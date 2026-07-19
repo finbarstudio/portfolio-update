@@ -54,24 +54,44 @@ function FlaskIcon() {
 export default function TopNav() {
   const pathname = usePathname();
 
-  // Auto-hide the bar on scroll-down, slide it back on scroll-up; always show
-  // near the top (over the hero). Works with Lenis (which drives native scroll)
-  // plus a plain window listener as the reliable fallback.
+  // Auto-hide the bar on scroll-down, slide it back on scroll-up. The logo rides
+  // with it (CSS keys off data-nav). Home is special: the intro plays a full
+  // logo screen ABOVE the hero, so at the top there's no nav — it comes in once
+  // the hero docks under the bar, stays through the hero, then auto-hides below.
+  // Works with Lenis (native scroll) plus a plain window listener as fallback.
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
-    const TOP = 80; // px from the top where the bar is always shown
+    const isHome = pathname === "/";
+    const TOP = 80;  // non-home: px from the top where the bar is always shown
     const DELTA = 6; // ignore sub-pixel jitter
-    // Read from Lenis when present (it can route scroll through its own value),
-    // falling back to the native window position.
+    const NAVH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--menubar-h")) || 56;
     const getY = () => Math.max(0, (window.__lenis?.animatedScroll ?? window.scrollY) || 0);
+    const root = document.documentElement;
+    // state: "shown" (visible) | "up" (hidden by scroll — logo fades too)
+    //        | "intro" (home logo screen above the hero — nav hidden, logo stays)
+    const apply = (state: "shown" | "up" | "intro") => {
+      setHidden(state !== "shown");
+      root.dataset.nav = state;
+    };
     let lastY = getY();
     let ticking = false;
     const update = () => {
       ticking = false;
       const y = getY();
-      if (y < TOP) { setHidden(false); lastY = y; return; }
+      if (isHome) {
+        const r = document.getElementById("hero")?.getBoundingClientRect();
+        if (r) {
+          if (r.top > NAVH + 4) { apply("intro"); lastY = y; return; }  // still above the hero
+          if (r.bottom > NAVH) { apply("shown"); lastY = y; return; }   // hero in view → stay
+        } else {
+          apply("intro"); lastY = y; return;                            // hero not laid out yet
+        }
+        // fall through: past the hero → direction-based
+      } else if (y < TOP) {
+        apply("shown"); lastY = y; return;
+      }
       if (Math.abs(y - lastY) < DELTA) return;
-      setHidden(y > lastY);
+      apply(y > lastY ? "up" : "shown");
       lastY = y;
     };
     const onScroll = () => {
@@ -91,12 +111,14 @@ export default function TopNav() {
       else attach();
     }, 120);
     window.setTimeout(() => window.clearInterval(iv), 3000);
+    update(); // set the initial state for this route
     return () => {
       window.removeEventListener("scroll", onScroll);
       lenis?.off("scroll", onScroll);
       window.clearInterval(iv);
+      delete root.dataset.nav;
     };
-  }, []);
+  }, [pathname]);
   const isActive = (href: string) =>
     href === "/"
       ? pathname === "/"
