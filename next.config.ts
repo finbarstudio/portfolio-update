@@ -84,13 +84,8 @@ const nextConfig: NextConfig = {
   // NOTE: /contact used to 308 to /about (contact once lived there). It's a
   // real page again — if a browser cached the old permanent redirect it will
   // keep bouncing until its cache expires; a hard refresh clears it.
-  // GemFest + PullUp: self-contained static sites living in /public/<name> (all
-  // their internal refs are absolute /<name>/… paths). Next doesn't serve a
-  // directory index from /public, so map each clean URL onto its index.html.
   async rewrites() {
     return [
-      { source: "/gemfest", destination: "/gemfest/index.html" },
-      { source: "/pullup", destination: "/pullup/index.html" },
       // Serve the generated brand icon at the conventional /favicon.ico path.
       // Next only emits /icon (from app/icon.tsx), so /favicon.ico 404s — and
       // that's the path browsers, crawlers and Google's favicon fetcher hit
