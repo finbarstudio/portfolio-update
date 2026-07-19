@@ -8,25 +8,89 @@
 
 .jr-wrap { max-width: 820px; margin: 0 auto; padding: 0 20px; }
 
-/* ── Index ── */
-.jr-index-head { padding: clamp(48px, 9vh, 88px) 0 clamp(28px, 5vh, 48px); }
-.jr-index-lede { max-width: 52ch; margin-top: 0.9rem; color: var(--ink-soft); font-size: var(--text-body); line-height: 1.6; text-wrap: pretty; }
-
-.jr-list { display: grid; gap: clamp(28px, 5vh, 52px); padding-bottom: clamp(64px, 12vh, 140px); }
-.jr-card { display: grid; gap: 16px; }
-@media (min-width: 720px) {
-  .jr-card { grid-template-columns: 300px 1fr; gap: 28px; align-items: start; }
+/* ── Index — serif (Bookmania), one featured post, everything else stripped ── */
+.jr-index {
+  --jr-serif: "bookmania", Georgia, "Times New Roman", serif;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px) clamp(64px, 12vh, 140px);
 }
-.jr-card-cover { position: relative; aspect-ratio: 3 / 2; border-radius: 6px; overflow: hidden; background: rgba(33, 30, 26, 0.06); }
-.jr-card-cover img { width: 100%; height: 100%; object-fit: cover; }
-.jr-card-body { min-width: 0; }
-.jr-card-title { font-family: var(--font-sans); font-weight: 600; letter-spacing: -0.01em; line-height: 1.12; font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--ink); }
-.jr-card:hover .jr-card-title { color: var(--pink-deep); }
-.jr-card-title, .jr-card-cover { transition: color var(--dur-fast, 0.2s) var(--ease, ease); }
-.jr-card-excerpt { margin-top: 0.6rem; color: var(--ink-soft); font-size: var(--text-body); line-height: 1.55; max-width: 60ch; }
+.jr-index-head { padding: clamp(40px, 8vh, 84px) 0 clamp(28px, 5vh, 52px); text-align: center; }
+.jr-index-title {
+  font-family: var(--jr-serif);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* Featured (most recent): a central 50/50 card — cover left, text right. */
+.jr-featured {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: clamp(380px, 54vh, 580px);
+  max-width: 1080px;
+  margin: 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color var(--dur-fast, 0.2s) var(--ease, ease);
+}
+.jr-featured:hover { border-color: var(--pink); }
+.jr-featured-img { position: relative; overflow: hidden; background: rgba(33, 30, 26, 0.06); }
+.jr-featured-img img { object-fit: cover; }
+/* Right panel: title + description centred in the space; date + byline at the foot. */
+.jr-featured-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(28px, 4vw, 56px) clamp(24px, 4vw, 52px);
+  font-family: var(--jr-serif);
+}
+.jr-featured-head { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; }
+.jr-featured-title {
+  font-family: var(--jr-serif);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 2.6vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.jr-featured:hover .jr-featured-title { color: var(--pink-deep); }
+.jr-featured-desc { color: var(--ink-soft); font-size: clamp(1rem, 1.3vw, 1.15rem); line-height: 1.5; max-width: 42ch; text-wrap: pretty; }
+.jr-featured-meta { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+.jr-featured-date { font-family: var(--jr-serif); font-style: italic; font-size: clamp(0.95rem, 1.2vw, 1.1rem); color: var(--ink); }
+.jr-featured-author { font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+@media (max-width: 720px) {
+  .jr-featured { grid-template-columns: 1fr; min-height: 0; }
+  .jr-featured-img { aspect-ratio: 3 / 2; }
+  .jr-featured-text { padding: 32px 24px 40px; gap: 28px; }
+}
+
+/* Older posts — a quiet centred index beneath the feature. */
+.jr-more { list-style: none; margin: clamp(40px, 7vh, 72px) auto 0; padding: 0; max-width: 640px; }
+.jr-more li { border-top: 1px solid var(--line); }
+.jr-more li:last-child { border-bottom: 1px solid var(--line); }
+.jr-more-link {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
+  padding: 16px 4px; text-decoration: none; color: var(--ink);
+  font-family: var(--jr-serif);
+  transition: color var(--dur-fast, 0.2s) var(--ease, ease);
+}
+.jr-more-link:hover { color: var(--pink-deep); }
+.jr-more-title { font-size: clamp(1.05rem, 1.5vw, 1.25rem); }
+.jr-more-date { flex: none; font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+
+/* Shared with the post page. */
 .jr-meta { font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
 
-.jr-empty { padding: clamp(64px, 16vh, 200px) 0; text-align: center; color: var(--ink-soft); font-size: var(--text-body); }
+.jr-empty { padding: clamp(56px, 14vh, 180px) 0; text-align: center; color: var(--ink-soft); font-family: var(--jr-serif); font-size: 1.15rem; }
 
 /* ── Post ── */
 .jr-article { padding: clamp(40px, 8vh, 80px) 0 clamp(72px, 14vh, 160px); }

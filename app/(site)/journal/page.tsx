@@ -9,6 +9,7 @@ import type { PostListItem } from "@/sanity/types";
 import "./journal.css";
 
 const SITE_URL = "https://www.finbar.studio";
+const AUTHOR = "Finbar Skitini";
 
 export const metadata: Metadata = {
   title: "Journal",
@@ -34,6 +35,8 @@ function formatDate(iso?: string) {
 
 export default async function JournalPage() {
   const posts = (await sanityFetch<PostListItem[]>(POSTS_QUERY)) ?? [];
+  const [featured, ...rest] = posts;
+  const cover = featured ? urlForImage(featured.coverImage) : null;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -56,45 +59,55 @@ export default async function JournalPage() {
       {/* Plain inline script (not next/script) so the schema is in the server
           HTML for crawlers — next/script injects post-hydration. */}
       <script id="ld-journal" type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
-      <div className="jr-wrap">
+      <div className="jr-index">
         <header className="jr-index-head">
-          <p className="mono-label text-ink-soft">Journal</p>
-          <h1 className="home-display-sm" style={{ marginTop: "0.5rem" }}>Thoughts, notes and work in progress</h1>
-          <p className="jr-index-lede">
-            Occasional writing on web design, branding and building for the web.
-          </p>
+          <h1 className="jr-index-title">Journal</h1>
         </header>
 
-        {posts.length === 0 ? (
-          <p className="jr-empty">No posts yet. Check back soon.</p>
+        {!featured ? (
+          <p className="jr-empty">First entry coming soon.</p>
         ) : (
-          <div className="jr-list">
-            {posts.map((post) => {
-              const cover = urlForImage(post.coverImage);
-              return (
-                <article key={post._id} className="jr-card">
-                  <Link href={`/journal/${post.slug}`} className="jr-card-cover" aria-label={post.title}>
-                    {cover && (
-                      <Image
-                        src={cover.width(600).height(400).quality(75).url()}
-                        alt={post.coverImage?.alt ?? ""}
-                        width={600}
-                        height={400}
-                        sizes="(max-width: 720px) 100vw, 300px"
-                      />
-                    )}
-                  </Link>
-                  <div className="jr-card-body">
-                    <p className="jr-meta">{formatDate(post.publishedAt)}</p>
-                    <Link href={`/journal/${post.slug}`}>
-                      <h2 className="jr-card-title" style={{ marginTop: "0.4rem" }}>{post.title}</h2>
+          <>
+            {/* Most recent post: a central 50/50 card — cover on the left, the
+                title/description centred in the space on the right, the date and
+                byline settled at the bottom. */}
+            <Link href={`/journal/${featured.slug}`} className="jr-featured" aria-label={featured.title}>
+              <div className="jr-featured-img">
+                {cover && (
+                  <Image
+                    src={cover.width(900).height(1100).quality(78).url()}
+                    alt={featured.coverImage?.alt ?? ""}
+                    fill
+                    sizes="(max-width: 720px) 100vw, 540px"
+                    priority
+                  />
+                )}
+              </div>
+              <div className="jr-featured-text">
+                <div className="jr-featured-head">
+                  <h2 className="jr-featured-title">{featured.title}</h2>
+                  {featured.excerpt && <p className="jr-featured-desc">{featured.excerpt}</p>}
+                </div>
+                <div className="jr-featured-meta">
+                  <p className="jr-featured-date">{formatDate(featured.publishedAt)}</p>
+                  <p className="jr-featured-author">by {AUTHOR}</p>
+                </div>
+              </div>
+            </Link>
+
+            {rest.length > 0 && (
+              <ul className="jr-more">
+                {rest.map((p) => (
+                  <li key={p._id}>
+                    <Link href={`/journal/${p.slug}`} className="jr-more-link">
+                      <span className="jr-more-title">{p.title}</span>
+                      <span className="jr-more-date">{formatDate(p.publishedAt)}</span>
                     </Link>
-                    {post.excerpt && <p className="jr-card-excerpt">{post.excerpt}</p>}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         )}
       </div>
     </>
