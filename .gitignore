@@ -56,3 +56,10 @@ Football Crests/
 # getting scanned by Tailwind's content detection and breaking the CSS build
 /venv/
 .env*.local
+
+# Local-only research + outreach dossiers (never shipped, not part of the site)
+/research/
+
+# Archived demo sites (off the live deploy). Kept on disk locally; not shipped
+# to GitHub/Vercel. To restore one to live: git add the folder back.
+/archive/

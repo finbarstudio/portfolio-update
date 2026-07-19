@@ -4,6 +4,28 @@
 This version has breaking changes, APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+# Repository & folder layout
+
+**This `Website/` folder IS the git repo and the whole deploy.** The git root is
+here, not the parent. Anything that should go to GitHub or ship on the site
+lives inside `Website/`. Nothing above this folder is in git.
+
+The parent `finbar.studio/` is Finbar's design workspace, deliberately OUTSIDE
+the repo. It holds source/working assets, not site code:
+
+- `Brand/`, `Headshots/`, `Journal/` — design source files (logos, photo edits,
+  writing drafts). The site consumes finished exports copied into
+  `Website/public/`, never these originals.
+- `journal-studio/` — the hosted Sanity Studio source (separate deploy).
+- `Social Media/` — **DO NOT TOUCH.** Another agent owns this folder. It's
+  outside the repo so git never sees it; leave it entirely alone.
+
+Rules of thumb:
+- New asset for the site → optimise it and put the export in `Website/public/`.
+- Working file, research, or non-site design → keep it in the parent, out of git.
+- `archive/` and `research/` are on disk but **gitignored** (not live). To put an
+  archived demo back on the site, `git add` its folder again.
+
 # The palette is four colours
 
 `--bg` (the ground), `--pink-deep` (the dark pink), `--pink` (the main pink),

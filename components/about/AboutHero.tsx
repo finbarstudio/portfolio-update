@@ -43,7 +43,7 @@ const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
 // the type, no disc/backing. (finbar.webp carries a real alpha channel; the old
 // finbar-long-hair.webp was an opaque photo whose light ground read as white.)
 const PHOTO_SRC = "/images/about/finbar.webp";
-const PHOTO_ASPECT = "900 / 863";
+const PHOTO_ASPECT = "1 / 1";
 
 export default function AboutHero() {
   const sectionRef = useRef<HTMLElement>(null);
