@@ -3018,12 +3018,25 @@
 /* The lockup: FINBAR ✶ STUDIO. font-size is set by JS so it spans the row at
    its natural spacing (see HomeIntro). nowrap keeps it on one measurable line. */
 .home-intro-mark {
-  /* Fixed so it can shrink + rise from the bottom of the first screen into the
-     centre of the nav as you scroll (transform driven by JS in HomeIntro). */
+  /* Wipe carrier: a full-width band at the top that slides up with the nav
+     (CSS transform, data-nav driven). It never carries the dock transform, so
+     the wipe can't fight the scroll-dock (which lives on .home-intro-lockup). */
   position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--menubar-h);
+  z-index: 60;
+  pointer-events: none;
+  transform: translateY(0);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.home-intro-lockup {
+  /* The lockup itself — absolute inside the carrier. Fit + scroll-dock (shrink
+     up into the nav centre) are JS-driven via transform in HomeIntro. */
+  position: absolute;
   left: 50%;
   top: 0;
-  z-index: 60;
   transform: translate(-50%, -50%);
   transform-origin: center center;
   display: flex;
@@ -3035,6 +3048,8 @@
   /* Wordmark letters read in ink (the mark's gradient asterisk carries the
      brand colour on its own). Same call in .nav-logo and .site-footer-mark-inner. */
   color: var(--ink);
+  text-decoration: none;
+  pointer-events: auto;     /* only the lockup is clickable, not the whole band */
   will-change: transform;
 }
 /* The wordmark's text reveals via clip-path (GSAP); the slot ✳ holds the spot. */
@@ -3710,13 +3725,20 @@ body:has(.contact-panel.is-open) .sf-cta-pin {
 .top-nav button { pointer-events: auto; }
 /* Hidden state: slid up out of view (see TopNav scroll handler). */
 .top-nav.is-hidden { transform: translateY(-100%); }
-/* The centred logo rides with the bar: it fades out when the nav auto-hides on
-   scroll (data-nav="up"), but NOT during the home intro (data-nav="intro"),
-   where the big lockup is the whole show. Opacity only — the lockup's docking
-   transform stays JS-driven and instant. */
-.nav-logo, .home-intro-mark { transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
-html[data-nav="up"] .nav-logo,
-html[data-nav="up"] .home-intro-mark { opacity: 0; pointer-events: none; }
+/* The logo rides with the bar and wipes UP the same way + pace as .top-nav
+   (translateY), not a fade — but only when the nav auto-hides on scroll
+   (data-nav="up"), never during the home intro (data-nav="intro"). */
+.nav-logo { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+html[data-nav="up"] .nav-logo { transform: translate(-50%, -110%); pointer-events: none; }
+@media (max-width: 767px) {
+  /* Mobile logo sits top-right (no centering translate) — wipe straight up. */
+  html[data-nav="up"] .nav-logo { transform: translateY(-110%); }
+}
+/* The desktop-home intro lockup now wipes UP too — its carrier (.home-intro-mark)
+   translateY's exactly like the nav, while the scroll-dock stays on the inner
+   .home-intro-lockup, so the two transforms don't collide. (Transition + base
+   transform live on the .home-intro-mark rule above.) */
+html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
 @media (prefers-reduced-motion: reduce) {
   .top-nav, .nav-logo, .home-intro-mark { transition: none; }
 }

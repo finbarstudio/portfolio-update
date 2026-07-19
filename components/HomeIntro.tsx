@@ -77,7 +77,9 @@ export default function HomeIntro() {
     let bigFont = 0;
     let natH = 0;
     const fit = () => {
-      const parent = el.parentElement;
+      // Width reference is the section, not the immediate parent (now the wipe
+      // carrier) — keeps the fit identical to before the wrapper was added.
+      const parent = el.closest(".home-intro") as HTMLElement | null;
       if (!parent) return;
       const cs = getComputedStyle(parent);
       const avail = parent.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
@@ -297,26 +299,31 @@ export default function HomeIntro() {
         </div>
       )}
 
-      <a
-        href="/"
-        className="home-intro-mark brand-wordmark"
-        ref={lockupRef}
-        aria-label="Back to top of the hero"
-        onClick={(e) => {
-          // The logo lives only on home — smooth-scroll up to the hero, not navigate.
-          e.preventDefault();
-          scrollToHero();
-        }}
-      >
-        <span className={`home-intro-text ${done ? "is-revealed" : ""}`} ref={textRef} aria-hidden="true">FINBARSTUDIO</span>
-        <span
-          className={`brand-wordmark-mark home-intro-slot ${done ? "is-shown" : ""}`}
-          ref={slotRef}
-          aria-hidden="true"
+      {/* Outer = the wipe carrier (CSS translateY, data-nav driven). Inner = the
+          lockup, whose fit + scroll-dock transform is JS-driven — separating them
+          means the wipe never fights the dock. */}
+      <div className="home-intro-mark">
+        <a
+          href="/"
+          className="home-intro-lockup brand-wordmark"
+          ref={lockupRef}
+          aria-label="Back to top of the hero"
+          onClick={(e) => {
+            // The logo lives only on home — smooth-scroll up to the hero, not navigate.
+            e.preventDefault();
+            scrollToHero();
+          }}
         >
-          <BrandMark className="home-intro-slot-star brand-wordmark-asterisk" />
-        </span>
-      </a>
+          <span className={`home-intro-text ${done ? "is-revealed" : ""}`} ref={textRef} aria-hidden="true">FINBARSTUDIO</span>
+          <span
+            className={`brand-wordmark-mark home-intro-slot ${done ? "is-shown" : ""}`}
+            ref={slotRef}
+            aria-hidden="true"
+          >
+            <BrandMark className="home-intro-slot-star brand-wordmark-asterisk" />
+          </span>
+        </a>
+      </div>
     </section>
   );
 }

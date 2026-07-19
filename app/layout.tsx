@@ -61,24 +61,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Finbar Skitini", url: SITE_URL }],
   creator: "Finbar Skitini",
   publisher: "Finbar Skitini",
-  keywords: [
-    "Brisbane web design",
-    "Brisbane web development",
-    "web developer Brisbane",
-    "web design Brisbane",
-    "Brisbane web designer",
-    "website design Brisbane",
-    "Brisbane graphic design",
-    "Brisbane graphic designer",
-    "graphic designer Brisbane",
-    "brand identity designer Brisbane",
-    "logo designer Brisbane",
-    "freelance graphic designer Brisbane",
-    "creative studio Brisbane",
-    "editorial design",
-    "motion graphics",
-    "Finbar Skitini",
-  ],
+  // No site-wide `keywords`: Google ignores the tag, and a global list bleeds
+  // Brisbane-web-design terms onto unrelated pages (e.g. the journal), which
+  // reads as a non-per-post template. Pages that want keywords set their own.
   alternates: { canonical: "/" },
   openGraph: {
     title: "Brisbane Web Design & Development Studio | Finbar Studio",

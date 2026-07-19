@@ -23,6 +23,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { getCalApi } from "@calcom/embed-react";
 import { trackMeta } from "@/lib/meta";
 import BrandWordmark from "./BrandWordmark";
@@ -47,7 +48,7 @@ const FR_NAV = [
 const STEPS = [
   { n: "01", text: "A 15-minute call about your business. Not a sales call, just a chat about what you do." },
   { n: "02", text: "Within a week, I redesign your homepage as a real, coded concept. Free. No strings, no catch." },
-  { n: "03", text: "It's yours to keep. Want it live? I'll put it up for you.\n\nI'm genuinely happy to build the free page and walk away, that's the whole offer. If you ever want the full site it's a separate paid job, but there is zero pressure to go there." },
+  { n: "03", text: "It's yours to keep. Want it live? I'll put it up for you.\n\nI'm genuinely happy to build the free page and walk away, that's the whole offer. If you ever want the full site it's a separate paid job, but there is zero pressure to go there.", note: "No obligation" },
 ];
 
 // Each proof card hover-cycles through the site's section shots (same as the
@@ -237,10 +238,22 @@ export default function FreeRedesign() {
           <h1 className="home-display fr-hero-title">
             A free redesign of your homepage. Seriously.
           </h1>
-          <p className="fr-lede">
-            You&rsquo;ve seen the before-and-after. Yours is next: no cost, no
-            pitch, no obligation.
-          </p>
+          {/* The proof, up front: the old Lows site next to the redesign. Stays
+              two-up on every width (never stacks) — it reads as a before/after. */}
+          <div className="fr-beforeafter">
+            <figure className="fr-ba-item">
+              <div className="fr-ba-frame">
+                <Image src="/images/web/lows-old.jpg" alt="Lows Design and Build, old website" fill sizes="(max-width: 640px) 46vw, 320px" />
+              </div>
+              <figcaption>Old Lows site</figcaption>
+            </figure>
+            <figure className="fr-ba-item">
+              <div className="fr-ba-frame">
+                <Image src="/images/web/lows-1.webp" alt="Lows Design and Build, redesigned by Finbar Studio" fill sizes="(max-width: 640px) 46vw, 320px" />
+              </div>
+              <figcaption>New Lows site</figcaption>
+            </figure>
+          </div>
           <a href="#book" className="sticker-pill book-call-pill fr-cta">
             Book a 15-min chat
           </a>
@@ -254,6 +267,7 @@ export default function FreeRedesign() {
               <li key={s.n} className="fr-step">
                 <span className="mono-label fr-step-n">{s.n}</span>
                 <p>{s.text}</p>
+                {s.note && <span className="fr-step-note">{s.note}</span>}
               </li>
             ))}
           </ol>

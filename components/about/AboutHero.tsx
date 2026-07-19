@@ -39,11 +39,11 @@ const TOKENS: Token[] = [
 
 const PUSH_MARGIN = 28;   // px of clearance beyond the photo's edge
 const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
-// The plain b/w portrait, circle-cropped by the container. NOT a cutout:
-// machine isolation (macOS Vision) chopped the hair flat against the disc and
-// left a colour bar — Finbar's call is the honest photo disc instead.
-const PHOTO_SRC = "/images/about/finbar-long-hair.webp";
-const PHOTO_ASPECT = "1 / 1";
+// Isolated b/w cutout on a transparent ground — head + shoulders sitting over
+// the type, no disc/backing. (finbar.webp carries a real alpha channel; the old
+// finbar-long-hair.webp was an opaque photo whose light ground read as white.)
+const PHOTO_SRC = "/images/about/finbar.webp";
+const PHOTO_ASPECT = "900 / 863";
 
 export default function AboutHero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -211,21 +211,19 @@ export default function AboutHero() {
       <div
         ref={photoRef}
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 z-20 pointer-events-none overflow-hidden"
+        className="absolute left-1/2 top-1/2 z-20 pointer-events-none"
         style={{
           width: "clamp(300px, 34vw, 460px)",
           aspectRatio: PHOTO_ASPECT,
-          borderRadius: "50%",
         }}
       >
-        {/* The photo fills the disc edge to edge — its own light ground reads
-            as the circle's colour, so no backing fill is needed. */}
+        {/* Transparent cutout — sits directly over the type, no disc/backing. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={PHOTO_SRC}
           alt="Finbar"
           className="w-full h-full"
-          style={{ objectFit: "cover" }}
+          style={{ objectFit: "contain" }}
         />
       </div>
 

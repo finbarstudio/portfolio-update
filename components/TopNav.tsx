@@ -63,6 +63,7 @@ export default function TopNav() {
   useEffect(() => {
     const isHome = pathname === "/";
     const TOP = 80;  // non-home: px from the top where the bar is always shown
+    const HERO_GRACE = 100; // home: px past the hero-dock the bar stays before it can hide
     const DELTA = 6; // ignore sub-pixel jitter
     const NAVH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--menubar-h")) || 56;
     const getY = () => Math.max(0, (window.__lenis?.animatedScroll ?? window.scrollY) || 0);
@@ -82,11 +83,13 @@ export default function TopNav() {
         const r = document.getElementById("hero")?.getBoundingClientRect();
         if (r) {
           if (r.top > NAVH + 4) { apply("intro"); lastY = y; return; }  // still above the hero
-          if (r.bottom > NAVH) { apply("shown"); lastY = y; return; }   // hero in view → stay
+          // Brief grace once the hero docks — the bar shows as you land, then
+          // hands to direction-based hiding a little way in (so it goes early).
+          if (r.top > -HERO_GRACE) { apply("shown"); lastY = y; return; }
         } else {
           apply("intro"); lastY = y; return;                            // hero not laid out yet
         }
-        // fall through: past the hero → direction-based
+        // fall through: past the grace → direction-based
       } else if (y < TOP) {
         apply("shown"); lastY = y; return;
       }

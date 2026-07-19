@@ -6,6 +6,8 @@ export default function JournalLayout({ children }: { children: React.ReactNode 
   return (
     <>
       <link rel="stylesheet" href="https://use.typekit.net/rlo3ixj.css" precedence="default" />
+      {/* RSS discovery — React hoists this to <head> across /journal/*. */}
+      <link rel="alternate" type="application/rss+xml" title="Finbar Studio Journal" href="/journal/rss.xml" />
       {children}
     </>
   );
