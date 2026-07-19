@@ -3530,20 +3530,6 @@ body:has(.contact-panel.is-open) .sf-cta-pin {
     gap: 2rem;
   }
 }
-/* Footer nav: the primary nav mirrored as pills, a full-width row above the
-   info columns so visitors can keep exploring from the foot of any page. */
-.sf-nav {
-  grid-column: 1 / -1;
-  order: 0;                 /* above the ordered info columns on mobile */
-  align-self: start;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: 0.6rem;
-}
-@media (min-width: 768px) {
-  .sf-nav { margin-bottom: 1.6rem; }
-}
 /* Each column: ink label (optional) stacked above its pink value. */
 .sf-col {
   display: flex;

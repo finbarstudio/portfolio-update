@@ -55,3 +55,4 @@ Football Crests/
 # Local Python virtualenv (skill tooling) — never commit; its binaries were
 # getting scanned by Tailwind's content detection and breaking the CSS build
 /venv/
+.env*.local

@@ -34,6 +34,16 @@ const CalEmbed = dynamic(() => import("./CalEmbed"), { ssr: false, loading: () =
 
 const CAL_NS = "book-call"; // must match CalEmbed's namespace for the event hook
 
+// Footer nav — the one place this stripped landing offers a way into the rest
+// of the site, for anyone who reaches the bottom without booking. New tab, so
+// the landing (and its booking calendar) stays open behind them.
+const FR_NAV = [
+  { label: "Home", href: "/" },
+  { label: "Work", href: "/work" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
 const STEPS = [
   { n: "01", text: "A 15-minute call about your business. Not a sales call, just a chat about what you do." },
   { n: "02", text: "Within a week, I redesign your homepage as a real, coded concept. Free. No strings, no catch." },
@@ -332,6 +342,21 @@ export default function FreeRedesign() {
         <a href="/" aria-label="finbarstudio, home" className="fr-foot-logo">
           <BrandWordmark />
         </a>
+        {/* The nav lives ONLY here — the landing has no top nav, so the footer
+            is where anyone who wants to explore the rest of the site does it. */}
+        <nav className="fr-foot-nav" aria-label="Explore the site">
+          {FR_NAV.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tag tag-default"
+            >
+              {l.label}
+            </a>
+          ))}
+        </nav>
         <a href="mailto:finbar@finbar.studio" className="fr-foot-mail">
           finbar@finbar.studio
         </a>

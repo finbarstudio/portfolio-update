@@ -273,6 +273,13 @@
   color: var(--ink);
   text-decoration: none;
 }
+/* Footer nav pills — the landing's only route into the rest of the site. */
+.fr-foot-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
 /* Plain text on purpose: the escape hatch must not read as an alternative CTA. */
 .fr-foot-mail {
   font-family: var(--font-mono);
