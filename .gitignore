@@ -46,12 +46,6 @@ public/images/tmyr/1080x1920 IG Reels/_av1_originals/
 # Local-only design system reference (copied into new projects, not shipped)
 /styling.md
 
-# soccerdata / FBref scraper cache
-downloaded_files/
-
-# Local crest working files (OG/edit sources + PSD); generated output lives in public/crests
-Football Crests/
-
 # Local Python virtualenv (skill tooling) — never commit; its binaries were
 # getting scanned by Tailwind's content detection and breaking the CSS build
 /venv/
