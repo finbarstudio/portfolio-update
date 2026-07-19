@@ -3,7 +3,7 @@ import Link from "next/link";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import ContactCta from "@/components/ContactCta";
-import { MdArrowForward, MdArrowOutward } from "@/components/MaterialIcon";
+import { MdArrowForward } from "@/components/MaterialIcon";
 
 /**
  * ServiceLanding — a focused service landing page (e.g. /web-design,
@@ -279,7 +279,7 @@ export default function ServiceLanding({
         </h2>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-6">
           {/* Opens the global contact/book-a-call panel, not a mailto. */}
-          <ContactCta className="tag tag-pink">Start a project <MdArrowOutward size={14} /></ContactCta>
+          <ContactCta className="tag tag-pink">Start a project</ContactCta>
           <Link href="/work" className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>See more work</Link>
         </div>
         {ctaNote && (
