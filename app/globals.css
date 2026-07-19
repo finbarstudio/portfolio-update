@@ -3692,6 +3692,9 @@ body:has(.contact-panel.is-open) .sf-cta-pin {
   height: var(--menubar-h);
   display: flex;
   align-items: center;
+  /* Auto-hide on scroll-down, slide back on scroll-up (JS toggles .is-hidden;
+     always shown near the top). */
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   /* Match the page gutter (px-5 / md:px-10) so the pills line up with content
      and the filter chips below. */
   padding: 0 20px;
@@ -3705,6 +3708,11 @@ body:has(.contact-panel.is-open) .sf-cta-pin {
 }
 .top-nav a,
 .top-nav button { pointer-events: auto; }
+/* Hidden state: slid up out of view (see TopNav scroll handler). */
+.top-nav.is-hidden { transform: translateY(-100%); }
+@media (prefers-reduced-motion: reduce) {
+  .top-nav { transition: none; }
+}
 .top-nav-inner {
   display: flex;
   align-items: center;
@@ -4053,8 +4061,10 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* Shrink-wrap and centre the two links (an anchor was stretching to the
    column and pinning its text left of centre). */
 .contact-direct .contact-primary { align-items: center; }
-.contact-sheet .contact-link { color: var(--bg); }
-.contact-sheet .contact-socials .tag-default {
+.contact-sheet .contact-link,
+.contact-skin .contact-link { color: var(--bg); }
+.contact-sheet .contact-socials .tag-default,
+.contact-skin .contact-socials .tag-default {
   border-color: color-mix(in srgb, var(--bg) 65%, transparent);
   color: var(--bg);
 }

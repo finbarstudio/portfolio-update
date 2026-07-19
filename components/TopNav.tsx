@@ -3,6 +3,7 @@
 // Top nav bar. Nav items (left) are plain pill tags (the .tag token, same as
 // the intro "menu" button); social icons sit at the top right.
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
@@ -52,13 +53,57 @@ function FlaskIcon() {
 
 export default function TopNav() {
   const pathname = usePathname();
+
+  // Auto-hide the bar on scroll-down, slide it back on scroll-up; always show
+  // near the top (over the hero). Works with Lenis (which drives native scroll)
+  // plus a plain window listener as the reliable fallback.
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    const TOP = 80; // px from the top where the bar is always shown
+    const DELTA = 6; // ignore sub-pixel jitter
+    // Read from Lenis when present (it can route scroll through its own value),
+    // falling back to the native window position.
+    const getY = () => Math.max(0, (window.__lenis?.animatedScroll ?? window.scrollY) || 0);
+    let lastY = getY();
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const y = getY();
+      if (y < TOP) { setHidden(false); lastY = y; return; }
+      if (Math.abs(y - lastY) < DELTA) return;
+      setHidden(y > lastY);
+      lastY = y;
+    };
+    const onScroll = () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // Lenis may initialise after this mounts — attach once it appears.
+    let lenis = window.__lenis ?? null;
+    let attached = false;
+    const attach = () => {
+      const l = window.__lenis;
+      if (l) { lenis = l; l.on("scroll", onScroll); attached = true; }
+    };
+    if (lenis) attach();
+    const iv = window.setInterval(() => {
+      if (attached) window.clearInterval(iv);
+      else attach();
+    }, 120);
+    window.setTimeout(() => window.clearInterval(iv), 3000);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      lenis?.off("scroll", onScroll);
+      window.clearInterval(iv);
+    };
+  }, []);
   const isActive = (href: string) =>
     href === "/"
       ? pathname === "/"
       : pathname.startsWith(href) || (href === "/work" && pathname.startsWith("/case-studies/"));
 
   return (
-    <header className="top-nav">
+    <header className={`top-nav ${hidden ? "is-hidden" : ""}`}>
       <nav className="top-nav-inner" aria-label="Primary">
         {items.map((it) => (
           <Link

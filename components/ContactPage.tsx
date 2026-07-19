@@ -41,10 +41,10 @@ export default function ContactPage() {
     return () => { cancelled = true; clearTimeout(failsafe); };
   }, []);
 
-  // Same breakpoint the popup uses: stacked layouts link out to Cal's own
-  // mobile page instead of embedding.
+  // Same breakpoint the popup uses: only genuinely narrow screens link out to
+  // Cal's own page; from ~1024px up the 920px booker embeds fine.
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1439px)");
+    const mq = window.matchMedia("(max-width: 1024px)");
     const update = () => setStacked(mq.matches);
     update();
     mq.addEventListener("change", update);

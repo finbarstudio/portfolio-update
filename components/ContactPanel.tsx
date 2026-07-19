@@ -49,12 +49,11 @@ export default function ContactPanel() {
   }, []);
 
   useEffect(() => {
-    // Embed only where Cal's compact 2-col month actually fits: the booker
-    // column needs ~950px, which the sheet only gives it at ~1440px+ viewport.
-    // Below that Cal collapses to a tall 1-col list and the nested scroll fights
-    // the fixed sheet on touch (the tablet bug) — so tablets and smaller laptops
-    // get the "Pick a time" link instead.
-    const mq = window.matchMedia("(max-width: 1439px)");
+    // Below this the sheet stacks to a single full-width column, where Cal's
+    // 920px card still fits its 2-col month down to ~1024px viewport (no tall
+    // 1-col list, so no nested-scroll fight). Only genuinely narrow screens
+    // (phones/small tablets) fall back to the "Pick a time" link.
+    const mq = window.matchMedia("(max-width: 1024px)");
     const update = () => setStacked(mq.matches);
     update();
     mq.addEventListener("change", update);
