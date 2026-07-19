@@ -35,6 +35,7 @@ export default function WebDesignPage() {
   return (
     <ServiceLanding
       slug="web-design"
+      galleryFirst
       label="Service · Brisbane"
       heading="Brisbane web design & development"
       serviceName="Web Design & Development"

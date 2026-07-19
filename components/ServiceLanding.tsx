@@ -8,14 +8,17 @@ import { MdArrowForward, MdArrowOutward } from "@/components/MaterialIcon";
 /**
  * ServiceLanding — a focused service landing page (e.g. /web-design,
  * /graphic-design) built for local search intent and for turning a visitor
- * into an enquiry. Sections, top to bottom:
+ * into an enquiry. Default order, top to bottom:
  *   1. Keyword-led intro (H1 + one paragraph).
  *   2. "What I do" — the capability list, so the page reads as substantial.
- *   3. The relevant slice of the portfolio (matched on category terms).
- *   4. A testimonial strip pulled from those same projects (social proof).
- *   5. FAQ — answers the questions people actually search, and feeds a
- *      FAQPage rich result.
+ *   3. Long-form H2 sections (the crawlable substance).
+ *   4. The relevant slice of the portfolio (matched on category terms).
+ *   5. Testimonials, process, meet-the-designer, FAQ, guarantee.
  *   6. CTA with a crawlable NAP (name, area, email, phone).
+ *
+ * With `galleryFirst`, the portfolio slice jumps to right under the H1 and all
+ * the descriptive copy moves below it (used on /web-design — show the work
+ * first, explain second).
  *
  * Schema: a Service (provider = the #studio ProfessionalService node, so the
  * local-business signal carries through) inside a CollectionPage, plus a
@@ -50,6 +53,8 @@ export type ServiceLandingProps = {
   ctaHeading: string;     // CTA headline, page-specific
   /** Optional line under the CTA (e.g. the free homepage redesign offer). */
   ctaNote?: React.ReactNode;
+  /** Show the project gallery straight after the H1, with all copy below it. */
+  galleryFirst?: boolean;
 };
 
 // Whole-word term match (so "ui" doesn't match "guidelines").
@@ -67,6 +72,7 @@ const newestYear = (date: string) => {
 export default function ServiceLanding({
   slug, label, heading, intro, serviceName, description, terms, excludeSlugs = [],
   capsTitle, capabilities, sections = [], process = [], meet, guarantee, faqs, ctaHeading, ctaNote,
+  galleryFirst = false,
 }: ServiceLandingProps) {
   const exclude = new Set(excludeSlugs);
   const matched = [...projects]
@@ -123,6 +129,185 @@ export default function ServiceLanding({
     })),
   };
 
+  // ── Blocks (declared once, arranged by `galleryFirst` below) ──────────────
+
+  // Header: eyebrow + H1. In the default layout the intro paragraph sits with
+  // it; in galleryFirst it drops down into the copy flow under the gallery.
+  const header = (
+    <section className={galleryFirst ? "px-5 md:px-10 pt-10 md:pt-16 pb-6 md:pb-8" : "px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14"}>
+      <p className="mono-label text-ink-soft mb-4">{label}</p>
+      <h1 className="font-bold text-ink leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
+        {heading}
+      </h1>
+      {!galleryFirst && (
+        <p className="text-ink-soft mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
+          {intro}
+        </p>
+      )}
+    </section>
+  );
+
+  // The intro paragraph as a standalone block (galleryFirst only) — the first
+  // line of copy once the work has been shown.
+  const introBlock = galleryFirst ? (
+    <section className="px-5 md:px-10 pt-12 md:pt-16 pb-4">
+      <p className="text-ink-soft max-w-2xl" style={{ fontSize: "var(--text-body)" }}>{intro}</p>
+    </section>
+  ) : null;
+
+  const capsBlock = (
+    <section className="px-5 md:px-10 pb-12 md:pb-16" aria-labelledby={`${slug}-caps`}>
+      <h2 id={`${slug}-caps`} className="mono-heading text-ink-soft mb-5">{capsTitle}</h2>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 max-w-4xl text-ink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.7vw, 1.65rem)" }}>
+        {capabilities.map((c) => (
+          <li key={c}>{c}</li>
+        ))}
+      </ul>
+    </section>
+  );
+
+  const sectionsBlock = sections.length > 0 ? (
+    <section className="px-5 md:px-10 pb-12 md:pb-16" aria-label={`About ${serviceName.toLowerCase()}`}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10 max-w-5xl">
+        {sections.map((s) => (
+          <div key={s.heading}>
+            <h2 className="font-bold display-brand leading-snug mb-3" style={{ fontSize: "clamp(1.15rem, 1.6vw, 1.5rem)", letterSpacing: "-0.01em" }}>
+              {s.heading}
+            </h2>
+            <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{s.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  ) : null;
+
+  const galleryBlock = (
+    <section
+      className="bg-bg px-5 md:px-10 pt-2"
+      style={{ paddingBottom: "var(--space-section)" }}
+      aria-label={`${heading} projects`}
+    >
+      {matched.length > 0 ? (
+        <div className="reveal-open grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
+          {matched.map((project, i) => (
+            <ProjectCard key={project.slug} project={project} index={i} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
+          More coming soon.{" "}
+          <Link href="/work" className="u-underline inline-flex items-center gap-1">See all work <MdArrowForward size={14} /></Link>
+        </p>
+      )}
+    </section>
+  );
+
+  const testimonialsBlock = testimonials.length > 0 ? (
+    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="What clients say">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl">
+        {testimonials.map((t) => (
+          <figure key={t.slug} className="flex flex-col">
+            <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)" }}>
+              &ldquo;{t.quote.length > 220 ? `${t.quote.slice(0, 217).trimEnd()}…` : t.quote}&rdquo;
+            </blockquote>
+            <figcaption className="mono-label text-ink-soft mt-4">{t.author}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  ) : null;
+
+  const processBlock = process.length > 0 ? (
+    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-process-h`}>
+      <h2 id={`${slug}-process-h`} className="mono-heading text-ink-soft mb-6">How a project runs</h2>
+      <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8 max-w-6xl">
+        {process.map((p, i) => (
+          <li key={p.title}>
+            <p className="mono-label text-ink-soft mb-2">{String(i + 1).padStart(2, "0")}</p>
+            <h3 className="text-ink font-sans font-semibold mb-1.5" style={{ fontSize: "clamp(1rem, 1.3vw, 1.2rem)" }}>{p.title}</h3>
+            <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{p.body}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  ) : null;
+
+  const meetBlock = meet ? (
+    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-meet-h`}>
+      <div className="border-t border-line pt-10 max-w-4xl">
+        <h2 id={`${slug}-meet-h`} className="font-bold display-brand leading-[1.05] mb-4" style={{ fontSize: "clamp(1.4rem, 2.4vw, 2.2rem)", letterSpacing: "-0.01em" }}>
+          {meet.heading}
+        </h2>
+        <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-body)" }}>{meet.body}</p>
+        <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-ink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.3rem)" }}>
+          {meet.points.map((pt) => (
+            <li key={pt}>{pt}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ) : null;
+
+  const faqBlock = (
+    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-faq-h`}>
+      <h2 id={`${slug}-faq-h`} className="mono-heading text-ink-soft mb-6">Common questions</h2>
+      <dl className="max-w-3xl divide-y divide-line border-t border-line">
+        {faqs.map((f) => (
+          <div key={f.q} className="py-5">
+            <dt className="text-ink font-sans font-semibold mb-1.5" style={{ fontSize: "clamp(1rem, 1.3vw, 1.25rem)" }}>{f.q}</dt>
+            <dd className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{f.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+
+  const guaranteeBlock = guarantee ? (
+    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="Our guarantee">
+      <div className="max-w-3xl rounded-md border border-pink px-6 py-6" style={{ background: "rgba(233, 109, 137, 0.08)" }}>
+        <p className="mono-label text-ink-soft mb-2">{guarantee.label}</p>
+        <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)" }}>{guarantee.body}</p>
+      </div>
+    </section>
+  ) : null;
+
+  const ctaBlock = (
+    <section className="px-5 md:px-10 pb-24 md:pb-32" aria-label="Start a project">
+      <div className="border-t border-line pt-10 max-w-3xl">
+        <h2 className="font-bold display-brand leading-[1.05]" style={{ fontSize: "var(--text-h2, clamp(1.6rem, 3vw, 2.6rem))", letterSpacing: "-0.01em" }}>
+          {ctaHeading}
+        </h2>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-6">
+          {/* Opens the global contact/book-a-call panel, not a mailto. */}
+          <ContactCta className="tag tag-pink">Start a project <MdArrowOutward size={14} /></ContactCta>
+          <Link href="/work" className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>See more work</Link>
+        </div>
+        {ctaNote && (
+          <p className="text-ink-soft mt-4 leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>{ctaNote}</p>
+        )}
+        <address className="not-italic text-ink-soft mt-8 leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
+          Finbar Studio, Brisbane, QLD, Australia. Working with clients across Australia and the UK.{" "}
+          <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>{" "}
+          <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>
+        </address>
+      </div>
+    </section>
+  );
+
+  // Copy blocks shared by both layouts, in reading order.
+  const copyBlocks = (
+    <>
+      {capsBlock}
+      {sectionsBlock}
+      {testimonialsBlock}
+      {processBlock}
+      {meetBlock}
+      {faqBlock}
+      {guaranteeBlock}
+      {ctaBlock}
+    </>
+  );
+
   return (
     <>
       {/* Plain inline scripts (the root layout's pattern): next/script injects
@@ -141,157 +326,29 @@ export default function ServiceLanding({
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(faqJsonLd) }}
       />
 
-      {/* 1 — intro */}
-      <section className="px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14">
-        <p className="mono-label text-ink-soft mb-4">{label}</p>
-        <h1 className="font-bold text-ink leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
-          {heading}
-        </h1>
-        <p className="text-ink-soft mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
-          {intro}
-        </p>
-      </section>
-
-      {/* 2 — what I do */}
-      <section className="px-5 md:px-10 pb-12 md:pb-16" aria-labelledby={`${slug}-caps`}>
-        <h2 id={`${slug}-caps`} className="mono-heading text-ink-soft mb-5">{capsTitle}</h2>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 max-w-4xl text-ink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.7vw, 1.65rem)" }}>
-          {capabilities.map((c) => (
-            <li key={c}>{c}</li>
-          ))}
-        </ul>
-      </section>
-
-      {/* 2b — long-form sections: the crawlable substance (variants, locations,
-          the how-and-why). Plain H2 + paragraph, nothing clever. */}
-      {sections.length > 0 && (
-        <section className="px-5 md:px-10 pb-12 md:pb-16" aria-label={`About ${serviceName.toLowerCase()}`}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10 max-w-5xl">
-            {sections.map((s) => (
-              <div key={s.heading}>
-                <h2 className="font-bold display-brand leading-snug mb-3" style={{ fontSize: "clamp(1.15rem, 1.6vw, 1.5rem)", letterSpacing: "-0.01em" }}>
-                  {s.heading}
-                </h2>
-                <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{s.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      {galleryFirst ? (
+        // H1 → gallery → all copy.
+        <>
+          {header}
+          {galleryBlock}
+          {introBlock}
+          {copyBlocks}
+        </>
+      ) : (
+        // Intro → capabilities → sections → gallery → the rest.
+        <>
+          {header}
+          {capsBlock}
+          {sectionsBlock}
+          {galleryBlock}
+          {testimonialsBlock}
+          {processBlock}
+          {meetBlock}
+          {faqBlock}
+          {guaranteeBlock}
+          {ctaBlock}
+        </>
       )}
-
-      {/* 3 — portfolio slice */}
-      <section
-        className="bg-bg px-5 md:px-10 pt-2"
-        style={{ paddingBottom: "var(--space-section)" }}
-        aria-label={`${heading} projects`}
-      >
-        {matched.length > 0 ? (
-          <div className="reveal-open grid grid-cols-12 gap-x-8 gap-y-16 md:gap-y-20">
-            {matched.map((project, i) => (
-              <ProjectCard key={project.slug} project={project} index={i} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
-            More coming soon.{" "}
-            <Link href="/work" className="u-underline inline-flex items-center gap-1">See all work <MdArrowForward size={14} /></Link>
-          </p>
-        )}
-      </section>
-
-      {/* 4 — testimonials */}
-      {testimonials.length > 0 && (
-        <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="What clients say">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl">
-            {testimonials.map((t) => (
-              <figure key={t.slug} className="flex flex-col">
-                <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)" }}>
-                  &ldquo;{t.quote.length > 220 ? `${t.quote.slice(0, 217).trimEnd()}…` : t.quote}&rdquo;
-                </blockquote>
-                <figcaption className="mono-label text-ink-soft mt-4">{t.author}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 4b — how a project runs */}
-      {process.length > 0 && (
-        <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-process-h`}>
-          <h2 id={`${slug}-process-h`} className="mono-heading text-ink-soft mb-6">How a project runs</h2>
-          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8 max-w-6xl">
-            {process.map((p, i) => (
-              <li key={p.title}>
-                <p className="mono-label text-ink-soft mb-2">{String(i + 1).padStart(2, "0")}</p>
-                <h3 className="text-ink font-sans font-semibold mb-1.5" style={{ fontSize: "clamp(1rem, 1.3vw, 1.2rem)" }}>{p.title}</h3>
-                <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{p.body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
-      {/* 4c — who is behind the work (the credentials search and clients both check) */}
-      {meet && (
-        <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-meet-h`}>
-          <div className="border-t border-line pt-10 max-w-4xl">
-            <h2 id={`${slug}-meet-h`} className="font-bold display-brand leading-[1.05] mb-4" style={{ fontSize: "clamp(1.4rem, 2.4vw, 2.2rem)", letterSpacing: "-0.01em" }}>
-              {meet.heading}
-            </h2>
-            <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-body)" }}>{meet.body}</p>
-            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-ink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.3rem)" }}>
-              {meet.points.map((pt) => (
-                <li key={pt}>{pt}</li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
-
-      {/* 5 — FAQ */}
-      <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-faq-h`}>
-        <h2 id={`${slug}-faq-h`} className="mono-heading text-ink-soft mb-6">Common questions</h2>
-        <dl className="max-w-3xl divide-y divide-line border-t border-line">
-          {faqs.map((f) => (
-            <div key={f.q} className="py-5">
-              <dt className="text-ink font-sans font-semibold mb-1.5" style={{ fontSize: "clamp(1rem, 1.3vw, 1.25rem)" }}>{f.q}</dt>
-              <dd className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{f.a}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      {/* 5b — risk-reversal band: the guarantee, right before the ask. */}
-      {guarantee && (
-        <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="Our guarantee">
-          <div className="max-w-3xl rounded-md border border-pink px-6 py-6" style={{ background: "rgba(233, 109, 137, 0.08)" }}>
-            <p className="mono-label text-ink-soft mb-2">{guarantee.label}</p>
-            <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)" }}>{guarantee.body}</p>
-          </div>
-        </section>
-      )}
-
-      {/* 6 — CTA + crawlable NAP */}
-      <section className="px-5 md:px-10 pb-24 md:pb-32" aria-label="Start a project">
-        <div className="border-t border-line pt-10 max-w-3xl">
-          <h2 className="font-bold display-brand leading-[1.05]" style={{ fontSize: "var(--text-h2, clamp(1.6rem, 3vw, 2.6rem))", letterSpacing: "-0.01em" }}>
-            {ctaHeading}
-          </h2>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-6">
-            {/* Opens the global contact/book-a-call panel, not a mailto. */}
-            <ContactCta className="tag tag-pink">Start a project <MdArrowOutward size={14} /></ContactCta>
-            <Link href="/work" className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>See more work</Link>
-          </div>
-          {ctaNote && (
-            <p className="text-ink-soft mt-4 leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>{ctaNote}</p>
-          )}
-          <address className="not-italic text-ink-soft mt-8 leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
-            Finbar Studio, Brisbane, QLD, Australia. Working with clients across Australia and the UK.{" "}
-            <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>{" "}
-            <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>
-          </address>
-        </div>
-      </section>
     </>
   );
 }
