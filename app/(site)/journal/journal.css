@@ -104,19 +104,19 @@
 /* The article (title / image / body) is PAGE-CENTRED with equal L+R margins;
    the sticky rail floats in the left margin beside it. */
 .jr-post {
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: clamp(28px, 5vh, 56px) clamp(20px, 4vw, 44px) clamp(72px, 14vh, 160px);
+  /* Full-bleed: the rail sits at the same 40px page gutter the nav + footer use,
+     and the article stays viewport-centred via the symmetric side columns — so
+     the gap between the rail and the content opens right up on wider screens. */
+  padding: clamp(28px, 5vh, 56px) 40px clamp(72px, 14vh, 160px);
   display: grid;
-  grid-template-columns: 1fr minmax(0, 700px) 1fr;
+  grid-template-columns: minmax(180px, 1fr) minmax(0, 700px) minmax(180px, 1fr);
   align-items: start;
 }
 .jr-article { grid-column: 2; min-width: 0; }
 .jr-rail {
   grid-column: 1;
-  justify-self: end;
+  justify-self: start;
   width: 180px;
-  margin-right: clamp(28px, 3vw, 60px);
   position: sticky;
   top: calc(var(--menubar-h) + 22px);
   align-self: start;
@@ -142,13 +142,13 @@
 @media (max-width: 1080px) {
   /* Not enough side room for the margin rail: single column — the rail becomes a
      compact meta row above the article (not sticky); Title row drops (h1 has it). */
-  .jr-post { grid-template-columns: 1fr; gap: 18px; }
+  .jr-post { grid-template-columns: 1fr; gap: 18px; padding-inline: 20px; }
   .jr-article, .jr-rail { grid-column: 1; }
   .jr-rail { position: static; width: auto; margin-right: 0; justify-self: stretch; }
   .jr-rail-title { display: none; }
   .jr-rail-info { flex-direction: row; flex-wrap: wrap; gap: 6px 20px; border-top: none; padding-top: 0; }
 }
-.jr-title { font-family: var(--font-sans); font-weight: 700; letter-spacing: -0.02em; line-height: 1.04; font-size: clamp(2rem, 5vw, 3.4rem); color: var(--ink); text-wrap: balance; }
+.jr-title { font-family: "bookmania", Georgia, "Times New Roman", serif; font-weight: 500; letter-spacing: -0.01em; line-height: 1.05; font-size: clamp(2rem, 5vw, 3.4rem); color: var(--ink); text-wrap: balance; }
 .jr-lede { margin-top: 1rem; max-width: 60ch; color: var(--ink-soft); font-size: clamp(1.05rem, 1.6vw, 1.3rem); line-height: 1.5; }
 .jr-hero { position: relative; aspect-ratio: 16 / 9; margin: clamp(28px, 5vh, 48px) 0; border-radius: 8px; overflow: hidden; background: rgba(33, 30, 26, 0.06); }
 .jr-hero img { width: 100%; height: 100%; object-fit: cover; }
