@@ -81,8 +81,9 @@ body:has(.sb-root) {
   background: color-mix(in srgb, var(--ink) 6%, var(--bg));
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   padding: 5px;
-  font-family: var(--font-mono); font-size: 11px;
-  text-transform: uppercase; letter-spacing: 0.14em;
+  /* Match the main site's nav-button token (.tag): 10px mono, 0.06em tracking. */
+  font-family: var(--font-mono); font-size: var(--text-tag);
+  text-transform: uppercase; letter-spacing: 0.06em;
 }
 
 /* Top-right: same outer bubble as the tab, with an inner pink pill (mirrors the
@@ -90,7 +91,7 @@ body:has(.sb-root) {
 .sb-corner-tr { right: 16px; display: inline-block; text-decoration: none; }
 .sb-corner-pill {
   display: inline-block; white-space: nowrap;
-  padding: 8px 16px; border-radius: 9px;
+  padding: 5px 10px; border-radius: 9px;
   background: var(--pink); color: #fff;
   transition: background 0.2s var(--ease);
 }
@@ -114,7 +115,7 @@ body:has(.sb-root) {
 .sb-tab {
   position: relative; z-index: 1;
   display: inline-flex; align-items: center; justify-content: center;
-  padding: 8px 18px; white-space: nowrap; overflow: hidden; max-width: 160px;
+  padding: 5px 10px; white-space: nowrap; overflow: hidden; max-width: 160px;
   color: var(--ink-soft); text-decoration: none;
   transition: color 0.25s var(--ease), max-width 0.34s var(--ease),
               padding 0.34s var(--ease), opacity 0.25s var(--ease);
@@ -133,8 +134,8 @@ body:has(.sb-root) {
   .sb-tabs, .sb-corner-tr { top: 12px; font-size: 9.5px; letter-spacing: 0.05em; }
   .sb-tabs { left: 12px; padding: 4px; }
   .sb-corner-tr { right: 12px; }
-  .sb-tab { padding: 7px 10px; }
-  .sb-corner-pill { padding: 8px 10px; }
+  .sb-tab { padding: 5px 8px; }
+  .sb-corner-pill { padding: 5px 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sb-tabs-glow, .sb-tab { transition: opacity 0.2s var(--ease); }
