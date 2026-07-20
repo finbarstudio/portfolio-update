@@ -4730,6 +4730,9 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 .cl-marquee {
   overflow: hidden;
   width: 100%;
+  /* Top room so the hover name pill (above each logo) sits INSIDE the clipped
+     box rather than being cut off by overflow:hidden. */
+  padding-top: 52px;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
 }
@@ -4739,7 +4742,7 @@ html:has(.contact-skin) { background: var(--pink-deep); }
   gap: clamp(42px, 6vw, 92px);
   width: max-content;
   margin: 0;
-  padding: 16px 0;
+  padding: 0 0 12px;
   list-style: none;
   animation: cl-scroll 44s linear infinite;
 }
@@ -4768,3 +4771,27 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 }
 .cl-item:hover .cl-name { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { .cl-track { animation: none; } }
+
+/* ── About: scroll "ink-in" bio ──────────────────────────────────────────
+   The mission line sits centred in a padded full-height block; its words start
+   faded and brighten line by line on scroll (ScrollRevealText + GSAP scrub). */
+.about-bio-sect {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(72px, 13vh, 160px) 20px;
+}
+.about-bio {
+  max-width: 46rem;
+  margin: 0 auto;
+  text-align: center;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: clamp(1.6rem, 2.8vw, 2.6rem);
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.srt-word { transition: none; will-change: opacity; }
+@media (prefers-reduced-motion: reduce) { .srt-word { opacity: 1 !important; } }

@@ -225,7 +225,6 @@ export default function AboutHero() {
           width: "clamp(300px, 34vw, 460px)",
           aspectRatio: PHOTO_ASPECT,
           borderRadius: "50%",
-          border: "1.5px solid var(--line)",
           background: "transparent",
         }}
       >

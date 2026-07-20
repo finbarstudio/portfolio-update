@@ -7,6 +7,7 @@ import AboutHero from "@/components/about/AboutHero";
 import AboutRevealGate from "@/components/about/AboutRevealGate";
 import { MdArrowForward } from "@/components/MaterialIcon";
 import ClientLogoMarquee from "@/components/about/ClientLogoMarquee";
+import ScrollRevealText from "@/components/about/ScrollRevealText";
 import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -122,7 +123,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── Clients: a scrolling wall of logos (hover → name pill) ──── */}
-      <section className="pb-16 md:pb-24" aria-labelledby="clients-title">
+      <section className="pb-8" aria-labelledby="clients-title">
         <p id="clients-title" className="font-mono uppercase text-ink-soft text-center mb-8" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>
           Clients I&rsquo;ve worked with
         </p>
@@ -132,22 +133,18 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* ── Bio: centred, revealed on scroll ──── */}
-      <section className="pb-20 md:pb-28" aria-label="About the studio">
-        <Reveal
-          as="p"
-          y={44}
-          className="mx-auto max-w-3xl text-center text-ink font-sans text-balance"
-          style={{ fontSize: "clamp(1.5rem, 2.6vw, 2.5rem)", lineHeight: 1.3 }}
-        >
-          BA (Hons), Brighton &amp; Ravensbourne University (admittedly I don&rsquo;t think they mean
-          much). I explore design with my clients. My mission is to bring high-end studio outcomes
-          to a much wider audience, because we all want to look good right?!
-        </Reveal>
+      {/* ── Bio: faded text that inks in word by word on scroll, centred in a
+          padded full-height block (even space to the logos above and the
+          disciplines below). ──── */}
+      <section className="about-bio-sect" aria-label="About the studio">
+        <ScrollRevealText
+          className="about-bio"
+          text={"BA (Hons), Brighton & Ravensbourne University (admittedly I don’t think they mean much). I explore design with my clients. My mission is to bring high-end studio outcomes to a much wider audience, because we all want to look good right?!"}
+        />
       </section>
 
       {/* ── How I help businesses (moved here from the home page) ── */}
-      <section className="home-disciplines is-inset px-0 pt-24 md:pt-32" aria-labelledby="services-title">
+      <section className="home-disciplines is-inset px-0 pt-8 pb-8" aria-labelledby="services-title">
         <div className="home-cap">
           <h2 id="services-title" className="home-cap-title">How I help businesses</h2>
           <div className="home-disc home-cap-wrap">
