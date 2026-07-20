@@ -6,6 +6,7 @@ import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import { WORK_FILTERS, projectMatchesFilter, filterLabel } from "@/content/filters";
 import { MdArrowForward } from "@/components/MaterialIcon";
+import { OG_IMAGE } from "@/lib/og";
 
 // Newest year mentioned in a project's date ("2023 to 2026" -> 2026), for
 // sorting the grid newest-first.
@@ -29,6 +30,7 @@ export const metadata: Metadata = {
       "Branding, web design, publication and motion projects from Finbar Studio, a Brisbane creative practice.",
     url: "/work",
     type: "website",
+    images: [OG_IMAGE],
   },
 };
 

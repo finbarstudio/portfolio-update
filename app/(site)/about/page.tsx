@@ -7,6 +7,7 @@ import AboutHero from "@/components/about/AboutHero";
 import AboutRevealGate from "@/components/about/AboutRevealGate";
 import { projects } from "@/content/projects";
 import { MdArrowForward } from "@/components/MaterialIcon";
+import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -106,6 +107,7 @@ export const metadata: Metadata = {
       "Brisbane graphic designer working in brand identity, editorial, web and motion. About the studio and how to get in touch.",
     url: "/about",
     type: "profile",
+    images: [OG_IMAGE],
   },
 };
 

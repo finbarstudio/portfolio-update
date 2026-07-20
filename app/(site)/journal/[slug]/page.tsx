@@ -11,6 +11,7 @@ import PortableBody from "@/components/journal/PortableBody";
 import Caption from "@/components/journal/Caption";
 import JournalFeed from "@/components/journal/JournalFeed";
 import "../journal.css";
+import { OG_IMAGE } from "@/lib/og";
 
 /**
  * One dynamic route serving BOTH a post and a tag, because /journal/<post-slug>
@@ -69,7 +70,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         url: `${SITE_URL}/journal/${post.slug}`,
         type: "article",
         publishedTime: post.publishedAt,
-        ...(ogImage ? { images: [{ url: ogImage, width: 1200, height: 630 }] } : {}),
+        images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : [OG_IMAGE],
       },
       twitter: { card: "summary_large_image", title, description },
     };
@@ -87,6 +88,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         description: `Journal posts tagged ${tagName}.`,
         url: `${SITE_URL}/journal/${slug}`,
         type: "website",
+        images: [OG_IMAGE],
       },
     };
   }

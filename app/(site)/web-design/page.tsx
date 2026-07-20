@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ServiceLanding from "@/components/ServiceLanding";
 import { MdArrowForward } from "@/components/MaterialIcon";
+import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
       "Custom-coded, brand-led websites with a CMS you run yourself, from a Brisbane web designer. Selected web projects.",
     url: `${SITE_URL}/web-design`,
     type: "website",
+    images: [OG_IMAGE],
   },
 };
 

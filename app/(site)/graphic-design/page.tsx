@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ServiceLanding from "@/components/ServiceLanding";
+import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
       "Brand identity, logos, editorial, print and art direction from a Brisbane studio. Selected graphic design projects.",
     url: `${SITE_URL}/graphic-design`,
     type: "website",
+    images: [OG_IMAGE],
   },
 };
 

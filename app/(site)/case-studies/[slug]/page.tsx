@@ -30,6 +30,7 @@ function TikTokGlyph() {
   );
 }
 import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
+import { OG_IMAGE } from "@/lib/og";
 import {
   projects,
   type Project,
@@ -77,6 +78,9 @@ export async function generateMetadata({
       description: seoDescription,
       url,
       type: "article",
+      // The studio card, explicitly: without it Next drops og:image on this
+      // route (it sets its own openGraph) and Instagram scrapes a project shot.
+      images: [OG_IMAGE],
     },
     twitter: {
       card: "summary_large_image",

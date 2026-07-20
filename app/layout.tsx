@@ -73,6 +73,12 @@ export const metadata: Metadata = {
     siteName: "Finbar Studio",
     locale: "en_AU",
     type: "website",
+    // Explicit og:image (the generated studio card). Pages that set their own
+    // openGraph replace this object wholesale, so the opengraph-image file
+    // convention does NOT get merged into them — without this, og:image goes
+    // missing and Facebook/Instagram scrape the biggest image on the page
+    // (a client screenshot). Declaring it here is the site-wide default.
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Finbar Studio. Brisbane web and graphic design." }],
   },
   twitter: {
     card: "summary_large_image",

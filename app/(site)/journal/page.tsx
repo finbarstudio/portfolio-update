@@ -5,6 +5,7 @@ import { POSTS_QUERY } from "@/sanity/queries";
 import type { PostListItem } from "@/sanity/types";
 import JournalFeed from "@/components/journal/JournalFeed";
 import "./journal.css";
+import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
     description: "Notes on web design, branding and building for the web.",
     url: `${SITE_URL}/journal`,
     type: "website",
+    images: [OG_IMAGE],
   },
 };
 

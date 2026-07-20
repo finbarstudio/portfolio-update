@@ -8,6 +8,7 @@ import HeroTitle from "@/components/home/HeroTitle";
 import ContactCta from "@/components/ContactCta";
 import SiteWindow from "@/components/home/SiteWindow";
 import WebsiteList, { type Website } from "@/components/home/WebsiteList";
+import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
 
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
       "A boutique web development studio in Brisbane. Custom-designed, custom-coded websites, backed by years of brand and graphic design.",
     url: SITE_URL,
     type: "website",
+    images: [OG_IMAGE],
   },
 };
 
