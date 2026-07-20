@@ -32,7 +32,7 @@ export type Faq = { q: string; a: string };
 
 export type ServiceLandingProps = {
   slug: string;
-  label: string;          // small mono eyebrow
+  label?: string;         // deprecated: the mono eyebrow was removed (no redundant subtitles)
   heading: string;        // H1
   intro: string;          // ~1 paragraph, keyword-led, plainly written
   serviceName: string;    // schema Service name
@@ -71,7 +71,7 @@ const newestYear = (date: string) => {
 };
 
 export default function ServiceLanding({
-  slug, label, heading, intro, serviceName, description, terms, excludeSlugs = [],
+  slug, heading, intro, serviceName, description, terms, excludeSlugs = [],
   capsTitle, capabilities, sections = [], process = [], meet, guarantee, faqs, ctaHeading, ctaNote,
   galleryFirst = false,
 }: ServiceLandingProps) {
@@ -136,7 +136,6 @@ export default function ServiceLanding({
   // it; in galleryFirst it drops down into the copy flow under the gallery.
   const header = (
     <section className={galleryFirst ? "px-5 md:px-10 pt-10 md:pt-16 pb-6 md:pb-8" : "px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14"}>
-      <p className="mono-label text-ink-soft mb-4">{label}</p>
       <h1 className="font-bold text-ink leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
         {heading}
       </h1>
@@ -156,12 +155,19 @@ export default function ServiceLanding({
     </section>
   ) : null;
 
+  // Capabilities as a wrap of pill-cards — reads across the width, and carries
+  // no eyebrow (self-evident). aria-label keeps it named for assistive tech.
   const capsBlock = (
-    <section className="px-5 md:px-10 pb-12 md:pb-16" aria-labelledby={`${slug}-caps`}>
-      <h2 id={`${slug}-caps`} className="mono-heading text-ink-soft mb-5">{capsTitle}</h2>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 max-w-4xl text-ink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.7vw, 1.65rem)" }}>
+    <section className="px-5 md:px-10 pb-14 md:pb-20" aria-label={capsTitle}>
+      <ul className="flex flex-wrap gap-2.5 md:gap-3 max-w-5xl">
         {capabilities.map((c) => (
-          <li key={c}>{c}</li>
+          <li
+            key={c}
+            className="rounded-full border border-line px-4 py-2.5 md:px-5 text-ink font-sans leading-none"
+            style={{ fontSize: "clamp(0.95rem, 1.25vw, 1.2rem)" }}
+          >
+            {c}
+          </li>
         ))}
       </ul>
     </section>
@@ -267,30 +273,38 @@ export default function ServiceLanding({
     </section>
   );
 
+  // The guarantee is a focal moment: a centred, oversized risk-reversal card —
+  // deliberately louder than the info blocks above it (no eyebrow label).
   const guaranteeBlock = guarantee ? (
-    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="Our guarantee">
-      <div className="max-w-3xl rounded-md border border-pink px-6 py-6" style={{ background: "rgba(233, 109, 137, 0.08)" }}>
-        <p className="mono-label text-ink-soft mb-2">{guarantee.label}</p>
-        <p className="text-ink leading-relaxed" style={{ fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)" }}>{guarantee.body}</p>
+    <section className="px-5 md:px-10 pb-20 md:pb-28" aria-label="Our guarantee">
+      <div
+        className="mx-auto max-w-3xl text-center rounded-2xl border border-pink px-6 md:px-12 py-12 md:py-16"
+        style={{ background: "rgba(233, 109, 137, 0.08)" }}
+      >
+        <p className="text-ink font-bold leading-[1.15] text-balance" style={{ fontSize: "clamp(1.6rem, 3.4vw, 2.7rem)", letterSpacing: "-0.015em" }}>
+          {guarantee.body}
+        </p>
       </div>
     </section>
   ) : null;
 
+  // The CTA is the climax: centred, the biggest heading on the page, the action
+  // front and centre (louder hierarchy than everything above).
   const ctaBlock = (
     <section className="px-5 md:px-10 pb-24 md:pb-32" aria-label="Start a project">
-      <div className="border-t border-line pt-10 max-w-3xl">
-        <h2 className="font-bold display-brand leading-[1.05]" style={{ fontSize: "var(--text-h2, clamp(1.6rem, 3vw, 2.6rem))", letterSpacing: "-0.01em" }}>
+      <div className="mx-auto max-w-3xl text-center">
+        <h2 className="font-bold display-brand leading-[1.03] text-balance" style={{ fontSize: "clamp(2.1rem, 5.2vw, 3.6rem)", letterSpacing: "-0.02em" }}>
           {ctaHeading}
         </h2>
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-6">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mt-8">
           {/* Opens the global contact/book-a-call panel, not a mailto. */}
           <ContactCta className="tag tag-pink">Start a project</ContactCta>
           <Link href="/work" className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>See more work</Link>
         </div>
         {ctaNote && (
-          <p className="text-ink-soft mt-4 leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-small)" }}>{ctaNote}</p>
+          <p className="text-ink-soft mt-5 leading-relaxed mx-auto max-w-xl" style={{ fontSize: "var(--text-small)" }}>{ctaNote}</p>
         )}
-        <address className="not-italic text-ink-soft mt-8 leading-relaxed" style={{ fontSize: "var(--text-small)" }}>
+        <address className="not-italic text-ink-soft mt-10 leading-relaxed mx-auto max-w-xl" style={{ fontSize: "var(--text-small)" }}>
           Finbar Studio, Brisbane, QLD, Australia. Working with clients across Australia and the UK.{" "}
           <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>{" "}
           <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>

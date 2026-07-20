@@ -3938,7 +3938,9 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   position: absolute;
   inset: var(--contact-inset);
   display: grid;
-  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+  /* Narrow rail keeps the booker column wide, so the left-right split survives
+     to ~1320px before it stacks (below, Cal's month view gets too cramped). */
+  grid-template-columns: minmax(200px, 250px) minmax(0, 1fr);
   align-items: stretch;
   gap: clamp(14px, 2vw, 32px);
   padding: clamp(16px, 2.2vw, 36px);
@@ -4165,7 +4167,11 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   position: relative;   /* the brand Loader fills this while Cal boots */
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  /* No outer scroll: the Cal iframe carries its OWN scroll, so overflow:auto
+     here made two nested scrollers fight. The iframe fills the column height
+     (which is capped by the 100vh sheet) and scrolls internally on its own. */
+  overflow: hidden;
+  overscroll-behavior: contain;
   border-radius: 6px;
   /* No card, no padding: the booker fills the column edge to edge (the
      iframe carries its own ground), clipped to the token radius. */
@@ -4188,7 +4194,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   align-self: center;
 }
 /* Mobile: one column, the whole sheet scrolls; give the booker real height. */
-@media (max-width: 1439px) {
+@media (max-width: 1320px) {
   /* Stacked: a plain flex column, not a grid — the grid's auto rows were
      equalising against the sheet's fixed height and letting the rail's
      content overflow its row into the booker. Flex heights are natural and
