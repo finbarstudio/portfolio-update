@@ -5,8 +5,8 @@ import Script from "next/script";
 import Reveal from "@/components/Reveal";
 import AboutHero from "@/components/about/AboutHero";
 import AboutRevealGate from "@/components/about/AboutRevealGate";
-import { projects } from "@/content/projects";
 import { MdArrowForward } from "@/components/MaterialIcon";
+import ClientLogoMarquee from "@/components/about/ClientLogoMarquee";
 import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -63,28 +63,6 @@ const SERVICE_GROUPS = [
   },
 ];
 
-// Personal / concept work — not commissioned clients.
-const NON_CLIENT_SLUGS = new Set(["palmsmotel", "london-home-show"]);
-// Some projects carry their real client's name rather than the project title.
-const CLIENT_NAME: Record<string, string> = { tmyr: "Share to Buy" };
-
-// Web builds lead the client list (web-first positioning); everything else
-// follows in rank order.
-const WEB_SLUGS = ["lows-design-build", "plated-with-issy", "lola-audio", "kinaya"];
-const CLIENTS = [...projects]
-  .filter((p) => !p.hidden && !NON_CLIENT_SLUGS.has(p.slug))
-  .sort((a, b) => {
-    const aw = WEB_SLUGS.indexOf(a.slug);
-    const bw = WEB_SLUGS.indexOf(b.slug);
-    if (aw !== -1 || bw !== -1) {
-      if (aw === -1) return 1;
-      if (bw === -1) return -1;
-      return aw - bw; // both web: keep the WEB_SLUGS order
-    }
-    return a.rank - b.rank;
-  })
-  .map((p) => CLIENT_NAME[p.slug] ?? p.name);
-
 // Web leads; the design capabilities stay (graphic design roles are still on
 // the table), they just follow. Moved here from the home page.
 const CAP_PILLS: { name: string; href: string }[] = [
@@ -127,45 +105,44 @@ export default function AboutPage() {
           revealing (AboutRevealGate listens for "about:intro-done"). */}
       <AboutRevealGate>
 
-      {/* ── Four columns: services / clients / bio / mission ──── */}
-      <section
-        id="contact"
-        className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-12 pb-4"
-        aria-label="Services, clients and about"
-      >
-        <Reveal as="div">
-          <div className="flex flex-col gap-3">
-            {SERVICE_GROUPS.map((g) => (
-              <div key={g.label}>
-                <p className="font-mono uppercase text-ink-soft mb-0.5" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>{g.label}</p>
-                <ul className="text-ink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.35rem)" }}>
-                  {g.items.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+      {/* ── Services: one row, each category its own column ──── */}
+      <section id="contact" className="pt-2 pb-16 md:pb-24" aria-label="Services">
+        <Reveal as="div" className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10">
+          {SERVICE_GROUPS.map((g) => (
+            <div key={g.label}>
+              <p className="font-mono uppercase text-ink-soft mb-2" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>{g.label}</p>
+              <ul className="text-ink font-sans leading-snug" style={{ fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)" }}>
+                {g.items.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </Reveal>
+      </section>
 
-        <Reveal as="div">
-          <p className="font-mono uppercase text-ink-soft mb-0.5" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>Clients</p>
-          <ul className="text-ink font-sans leading-snug" style={{ fontSize: "clamp(1.1rem, 1.5vw, 1.5rem)" }}>
-            {CLIENTS.map((c) => (
-              <li key={c}>{c}</li>
-            ))}
-            <li>
-              <Link href="/work" className="text-ink u-underline inline-flex items-center gap-1">View all <MdArrowForward size={14} /></Link>
-            </li>
-          </ul>
-        </Reveal>
+      {/* ── Clients: a scrolling wall of logos (hover → name pill) ──── */}
+      <section className="pb-16 md:pb-24" aria-labelledby="clients-title">
+        <p id="clients-title" className="font-mono uppercase text-ink-soft text-center mb-8" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>
+          Clients I&rsquo;ve worked with
+        </p>
+        <ClientLogoMarquee />
+        <p className="text-center mt-8">
+          <Link href="/work" className="text-ink u-underline inline-flex items-center gap-1">View all work <MdArrowForward size={14} /></Link>
+        </p>
+      </section>
 
-        <Reveal as="div" className="md:col-span-2">
-          <p className="text-ink font-sans leading-snug" style={{ fontSize: "clamp(1.5rem, 2.4vw, 2.4rem)" }}>
-            BA (Hons), Brighton &amp; Ravensbourne University (admittedly I don&rsquo;t think they mean
-            much). I explore design with my clients. My mission is to bring high-end studio outcomes
-            to a much wider audience, because we all want to look good right?!
-          </p>
+      {/* ── Bio: centred, revealed on scroll ──── */}
+      <section className="pb-20 md:pb-28" aria-label="About the studio">
+        <Reveal
+          as="p"
+          y={44}
+          className="mx-auto max-w-3xl text-center text-ink font-sans text-balance"
+          style={{ fontSize: "clamp(1.5rem, 2.6vw, 2.5rem)", lineHeight: 1.3 }}
+        >
+          BA (Hons), Brighton &amp; Ravensbourne University (admittedly I don&rsquo;t think they mean
+          much). I explore design with my clients. My mission is to bring high-end studio outcomes
+          to a much wider audience, because we all want to look good right?!
         </Reveal>
       </section>
 

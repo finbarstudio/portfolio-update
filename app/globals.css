@@ -4722,3 +4722,49 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 @media (prefers-reduced-motion: reduce) {
   .about-gate { opacity: 1; transition: none; }
 }
+
+/* ── About: client logo marquee ──────────────────────────────────────────
+   A seamless scrolling wall (two copies, -50% loop). Logos sit desaturated so
+   mixed brand colours read as one wall; hover lifts a logo to full colour and
+   pops the client name in a .tag pill. Pauses on hover. Unlayered. */
+.cl-marquee {
+  overflow: hidden;
+  width: 100%;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.cl-track {
+  display: flex;
+  align-items: center;
+  gap: clamp(42px, 6vw, 92px);
+  width: max-content;
+  margin: 0;
+  padding: 16px 0;
+  list-style: none;
+  animation: cl-scroll 44s linear infinite;
+}
+.cl-marquee:hover .cl-track { animation-play-state: paused; }
+@keyframes cl-scroll { to { transform: translateX(-50%); } }
+.cl-item { position: relative; flex: none; display: flex; align-items: center; justify-content: center; }
+.cl-logo {
+  height: clamp(26px, 3.2vw, 40px);
+  width: auto;
+  max-width: 170px;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.5;
+  transition: opacity var(--dur) var(--ease), filter var(--dur) var(--ease);
+}
+.cl-item:hover .cl-logo { filter: none; opacity: 1; }
+.cl-name {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translate(-50%, 4px);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.cl-item:hover .cl-name { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .cl-track { animation: none; } }
