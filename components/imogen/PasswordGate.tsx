@@ -3,9 +3,9 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 
 /**
- * PasswordGate — a soft lock on the /imogen page. Holds the content back behind a
+ * PasswordGate — a soft lock on the /asia page. Holds the content back behind a
  * password ("love"); once entered it's remembered on the device (localStorage),
- * so Imogen types it once. This is a casual gate to keep the page private, not
+ * so Jamie types it once. This is a casual gate to keep the page private, not
  * hard security: the content still ships in the page payload. For real protection
  * we'd gate it server-side.
  */

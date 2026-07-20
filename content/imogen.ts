@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-// Imogen's Asia — all the content for the /imogen travel guide in ONE place.
+// Jamie's Asia — all the content for the /asia travel guide in ONE place.
 // Finbar edits this file; the page renders from it. Add a stop = add an object
 // to `stops`. Dates are computed from `trip.start` + each stop's nights/days,
 // so changing the nights re-flows every date after it. Side trips (side: true)
@@ -114,7 +114,7 @@ export type RoutePoint = {
 };
 
 export const trip = {
-  who: "Imogen",
+  who: "Jamie",
   title: "Southeast Asia",
   subtitle: "my rough route",
   start: "2026-07-21", // rough start, tune as needed
