@@ -4,6 +4,7 @@ import Link from "next/link";
 import Script from "next/script";
 import Reveal from "@/components/Reveal";
 import AboutHero from "@/components/about/AboutHero";
+import AboutRevealGate from "@/components/about/AboutRevealGate";
 import { projects } from "@/content/projects";
 import { MdArrowForward } from "@/components/MaterialIcon";
 
@@ -120,6 +121,10 @@ export default function AboutPage() {
 
       <AboutHero />
 
+      {/* Everything below stays hidden until the hero statement has finished
+          revealing (AboutRevealGate listens for "about:intro-done"). */}
+      <AboutRevealGate>
+
       {/* ── Four columns: services / clients / bio / mission ──── */}
       <section
         id="contact"
@@ -175,6 +180,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      </AboutRevealGate>
     </div>
   );
 }

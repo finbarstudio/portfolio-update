@@ -4655,3 +4655,70 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 @media (max-width: 520px) {
   .cookie-notice { left: 12px; right: 12px; max-width: none; }
 }
+
+/* ── FAQ accordion (service landing /web-design, /graphic-design) ──────────
+   Interactive collapse via the grid-rows 0fr->1fr trick (pure CSS height
+   animation). Unlayered so Tailwind v4 keeps these names. */
+.faq-acc { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 2px;
+  text-align: left;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  line-height: 1.32;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease);
+}
+@media (hover: hover) { .faq-q:hover { color: var(--pink); } }
+.faq-item[data-open="true"] .faq-q { color: var(--pink-deep); }
+/* + / - indicator, built from two bars so the toggle is a clean scaleY (no
+   glyph swap). */
+.faq-icon { position: relative; flex: none; width: 15px; height: 15px; }
+.faq-icon::before,
+.faq-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  transition: transform var(--dur) var(--ease);
+}
+.faq-icon::before { width: 15px; height: 1.5px; }
+.faq-icon::after { width: 1.5px; height: 15px; }
+.faq-item[data-open="true"] .faq-icon::after { transform: translate(-50%, -50%) scaleY(0); }
+.faq-a-wrap {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.34s var(--ease);
+}
+.faq-a { overflow: hidden; }
+.faq-a p {
+  margin: 0;
+  padding: 0 2px 22px;
+  max-width: 64ch;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  font-size: var(--text-small);
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-a-wrap, .faq-icon::before, .faq-icon::after { transition: none; }
+}
+
+/* ── About page reveal gate ──────────────────────────────────────────────
+   Holds the content below the hero hidden until the statement's word-by-word
+   reveal finishes (AboutRevealGate flips data-open). Opacity only, so it never
+   fights the inner Reveal blocks' own transforms. */
+.about-gate { opacity: 0; transition: opacity 0.7s var(--ease); }
+.about-gate[data-open="true"] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .about-gate { opacity: 1; transition: none; }
+}

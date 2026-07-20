@@ -1,23 +1,23 @@
 "use client";
 
 /**
- * AboutHero — the "Nice to meet you" statement with an isolated photo of Finbar
- * centred over the type.
+ * AboutHero — the "Nice to meet you" statement with Finbar's photo.
  *
- *   1. The statement mask-reveals WORD by word from the bottom (Finbar's call:
- *      not the old per-character rise, a per-word mask), then rests as plain
- *      text.
- *   2. HOVERING the centre zone activates the takeover: the photo (a b/w
- *      cutout on a transparent ground) scales in and a wave scatters the
- *      characters out of its footprint (translate only). Leaving reverses
- *      back to plain text.
+ *   1. On load NOTHING is visible. The statement then reveals WORD by word, one
+ *      at a time, each rising up through a clean bottom mask. Translation only:
+ *      the mask is a clip-path, never opacity or scale. When it finishes it
+ *      dispatches "about:intro-done" so the page content below can load in
+ *      (AboutRevealGate).
+ *   2. HOVERING the centre zone activates the takeover: the photo — a b/w cutout
+ *      in a circular frame (a ring, no fill) — scales in and a wave scatters the
+ *      characters out of its footprint (translate only). Leaving reverses it.
  *   The hover target is a fixed-size zone, so the photo scaling can't make the
  *   pointer flicker on and off it.
  *
- * Reduced motion: readable statement, photo hidden, no animation.
+ * Reduced motion / background tab: readable statement, photo hidden, gate released.
  */
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import InlineIcon from "@/components/InlineIcon";
 
@@ -39,9 +39,8 @@ const TOKENS: Token[] = [
 
 const PUSH_MARGIN = 28;   // px of clearance beyond the photo's edge
 const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
-// Isolated b/w cutout on a transparent ground — head + shoulders sitting over
-// the type, no disc/backing. (finbar.webp carries a real alpha channel; the old
-// finbar-long-hair.webp was an opaque photo whose light ground read as white.)
+// Isolated b/w cutout on a transparent ground, shown in a circular frame (the
+// ring has no fill, so the type reads through where the cutout is transparent).
 const PHOTO_SRC = "/images/about/finbar.webp";
 const PHOTO_ASPECT = "1 / 1";
 
@@ -50,34 +49,44 @@ export default function AboutHero() {
   const photoRef = useRef<HTMLDivElement>(null);   // scatter target (scales in)
   const hitRef = useRef<HTMLDivElement>(null);      // fixed-size hover zone
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const section = sectionRef.current;
     const photo = photoRef.current;
     const hit = hitRef.current;
     if (!section || !photo || !hit) return;
 
+    // Fired once when the statement lands (or is skipped): the content below
+    // stays gated behind this (AboutRevealGate).
+    let signalled = false;
+    const signalDone = () => {
+      if (signalled) return;
+      signalled = true;
+      window.dispatchEvent(new Event("about:intro-done"));
+    };
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Background tab: GSAP's ticker is throttled, so the intro would set the
+    // hidden state and never play. Skip the reveal and release the gate.
+    const inactive = document.visibilityState === "hidden";
+
     let hovering = false;
-    const onEnter = () => {};
-    const handlers: { enter: () => void; leave: () => void; toggle?: () => void } = { enter: onEnter, leave: onEnter };
+    const noop = () => {};
+    const handlers: { enter: () => void; leave: () => void; toggle?: () => void } = { enter: noop, leave: noop };
 
     // Scoped to the section: ctx.revert() on cleanup restores the natural inline
     // styles (readable text, no transforms), so a Strict-Mode double-invoke or
     // an HMR teardown can never leave the statement stuck invisible.
     const ctx = gsap.context(() => {
       const chars = gsap.utils.toArray<HTMLElement>(".ah-char");
+      const words = gsap.utils.toArray<HTMLElement>(".ah-word");
 
-      // Per-character scatter offsets, from the resting layout, so the photo's
-      // footprint clears and the wave reads through the whole line.
+      // Per-character scatter offsets, measured from the RESTING layout (before
+      // the intro hides the chars), so the photo's footprint clears and the wave
+      // reads through the whole line.
       const buildScatter = () => {
         const c = photo.getBoundingClientRect();
         const cx = c.left + c.width / 2;
         const cy = c.top + c.height / 2;
-        // NOTE this measures the rect while the photo sits at scale(0), so R is
-        // effectively just PUSH_MARGIN and characters get only the gentle
-        // exponential shove — that IS the wave Finbar likes. A "fixed" version
-        // using offsetWidth pushed the text a full disc-radius away and he
-        // called it off: characters brushing the photo's edge is the design.
         const R = c.width / 2 + PUSH_MARGIN;
         return chars.map((el) => {
           const b = el.getBoundingClientRect();
@@ -94,58 +103,58 @@ export default function AboutHero() {
         });
       };
 
-      if (reduce) {
-        gsap.set(photo, { xPercent: -50, yPercent: -50, opacity: 0 });
+      // Photo starts hidden (scale 0), centred.
+      gsap.set(photo, { xPercent: -50, yPercent: -50, scale: 0, opacity: reduce ? 0 : 1, transformOrigin: "center center" });
+
+      if (reduce || inactive) {
+        gsap.set(photo, { opacity: 0 });
+        signalDone();
         return;
       }
 
-      gsap.set(photo, { xPercent: -50, yPercent: -50, scale: 0, opacity: 1, transformOrigin: "center center" });
+      // Measure the scatter from the resting positions FIRST...
+      const scatterData = buildScatter();
 
-      // 1 — entrance: each WORD mask-reveals from the bottom, staggered along
-      //     the statement. The mask is a clip-path on the word wrapper (never
-      //     overflow: hidden — that changes an inline-block's baseline and
-      //     shifts the whole line), and it's cleared when the intro lands so
-      //     the hover scatter can fly characters out of the word boxes.
-      //     .from() + immediateRender:false keeps the natural visible layout
-      //     as the default: if the ticker never runs (unfocused/headless tab)
-      //     the statement stays readable rather than stranded mid-mask.
-      const words = gsap.utils.toArray<HTMLElement>(".ah-word");
-      gsap.set(words, { clipPath: "inset(0% -0.1em -0.06em -0.1em)" });
+      // ...then hide the statement: clip each word to its box with a hard BOTTOM
+      // edge (a hair of top/side room for descenders + side bearing), and drop
+      // every char below that edge so nothing shows on load.
+      gsap.set(words, { clipPath: "inset(-0.06em -0.2em 0em -0.2em)" });
+      gsap.set(chars, { yPercent: 118 });
+
+      // 1 — entrance: each WORD rises in, one at a time, translate only.
       const intro = gsap.timeline({
-        onComplete: () => gsap.set(words, { clearProps: "clipPath" }),
+        onComplete: () => { gsap.set(words, { clearProps: "clipPath" }); signalDone(); },
       });
       words.forEach((w, i) => {
-        intro.from(w.querySelectorAll(".ah-char"), {
-          yPercent: 115, duration: 0.65, ease: "power3.out", immediateRender: false,
-        }, i * 0.04);
+        intro.to(w.querySelectorAll(".ah-char"), {
+          yPercent: 0, duration: 0.52, ease: "power3.out",
+        }, i * 0.085);
       });
 
-      // 2 — photo scales in + scatter, paused so hover can reverse it
+      // 2 — photo scales in + scatter, paused so hover can reverse it.
       const scatter = gsap.timeline({ paused: true });
       scatter.to(photo, { scale: 1, duration: 0.5, ease: "power2.out" }, 0);
-      buildScatter().forEach((s) => {
+      scatterData.forEach((s) => {
         scatter.to(s.el, { x: s.x, y: s.y, duration: 1.05, ease: "elastic.out(1, 0.5)" }, s.delay);
       });
 
       // 3 — plain readable text is the default; hovering the centre zone
       //     ACTIVATES the takeover (photo in, characters scatter), and leaving
-      //     reverses back to text. Fixed-size zone + guard so the photo scaling
-      //     never causes enter/leave flicker.
+      //     reverses back to text.
       handlers.enter = () => {
         if (hovering) return;
         hovering = true;
-        // Hovering mid-entrance: land the intro instantly (which also clears
-        // the word masks via its onComplete) so the scatter is never clipped.
+        // Hovering mid-entrance: land the intro instantly (its onComplete clears
+        // the masks + releases the gate) so the scatter is never clipped.
         if (intro.progress() < 1) intro.progress(1);
         scatter.timeScale(1).play();
       };
       handlers.leave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1.6).reverse(); };
 
-      // Touch devices have no hover, so the photo would never appear: play the
-      // takeover automatically once the word reveal has landed. Tapping the
-      // centre zone then toggles photo <-> readable text.
+      // Touch devices have no hover: play the takeover once the word reveal has
+      // landed, then let a tap on the centre zone toggle photo <-> text.
       if (window.matchMedia("(hover: none)").matches) {
-        gsap.delayedCall(1.8, () => handlers.enter());
+        gsap.delayedCall(intro.duration() + 0.4, () => handlers.enter());
         handlers.toggle = () => { if (hovering) handlers.leave(); else handlers.enter(); };
       }
     }, section);
@@ -181,9 +190,8 @@ export default function AboutHero() {
         {TOKENS.map((t, i) => (
           <span key={i}>
             {/* .ah-word doubles as the entrance mask: the intro clips each word
-                to its own box while its characters rise in from below (see the
-                timeline), then the clip is cleared so the hover scatter can fly
-                characters out of it freely. */}
+                to its own box while its characters rise in from below, then the
+                clip is cleared so the hover scatter can fly characters out. */}
             {t.icon ? (
               <span className="ah-word inline-block">
                 <span className="ah-char inline-block will-change-transform">
@@ -207,23 +215,26 @@ export default function AboutHero() {
         ))}
       </h1>
 
-      {/* Isolated head-and-shoulders photo, centred over the type. */}
+      {/* Photo in a circular frame (ring only, transparent fill), centred over
+          the type. Scales in on hover; the type shows through the clear parts. */}
       <div
         ref={photoRef}
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 z-20 pointer-events-none"
+        className="absolute left-1/2 top-1/2 z-20 pointer-events-none overflow-hidden"
         style={{
           width: "clamp(300px, 34vw, 460px)",
           aspectRatio: PHOTO_ASPECT,
+          borderRadius: "50%",
+          border: "1.5px solid var(--line)",
+          background: "transparent",
         }}
       >
-        {/* Transparent cutout — sits directly over the type, no disc/backing. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={PHOTO_SRC}
           alt="Finbar"
           className="w-full h-full"
-          style={{ objectFit: "contain" }}
+          style={{ objectFit: "cover", objectPosition: "center 18%" }}
         />
       </div>
 

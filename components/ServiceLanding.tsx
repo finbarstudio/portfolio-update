@@ -3,6 +3,7 @@ import Link from "next/link";
 import { projects } from "@/content/projects";
 import ProjectCard from "@/components/ProjectCard";
 import ContactCta from "@/components/ContactCta";
+import FaqAccordion from "@/components/FaqAccordion";
 import { MdArrowForward } from "@/components/MaterialIcon";
 
 /**
@@ -234,31 +235,35 @@ export default function ServiceLanding({
 
   const meetBlock = meet ? (
     <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-meet-h`}>
-      <div className="border-t border-line pt-10 max-w-4xl">
-        <h2 id={`${slug}-meet-h`} className="font-bold display-brand leading-[1.05] mb-4" style={{ fontSize: "clamp(1.4rem, 2.4vw, 2.2rem)", letterSpacing: "-0.01em" }}>
+      <div className="border-t border-line pt-10 grid grid-cols-1 md:grid-cols-[minmax(0,7fr)_minmax(0,13fr)] gap-x-12 lg:gap-x-20 gap-y-6 max-w-6xl">
+        <h2 id={`${slug}-meet-h`} className="font-bold display-brand leading-[1.05] md:sticky md:top-24 md:self-start" style={{ fontSize: "clamp(1.5rem, 2.6vw, 2.4rem)", letterSpacing: "-0.01em" }}>
           {meet.heading}
         </h2>
-        <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-body)" }}>{meet.body}</p>
-        <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-ink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.3rem)" }}>
-          {meet.points.map((pt) => (
-            <li key={pt}>{pt}</li>
-          ))}
-        </ul>
+        <div>
+          <p className="text-ink-soft leading-relaxed max-w-2xl" style={{ fontSize: "var(--text-body)" }}>{meet.body}</p>
+          <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-ink font-sans leading-snug" style={{ fontSize: "clamp(1rem, 1.35vw, 1.3rem)" }}>
+            {meet.points.map((pt) => (
+              <li key={pt}>{pt}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   ) : null;
 
   const faqBlock = (
     <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-faq-h`}>
-      <h2 id={`${slug}-faq-h`} className="mono-heading text-ink-soft mb-6">Common questions</h2>
-      <dl className="max-w-3xl divide-y divide-line border-t border-line">
-        {faqs.map((f) => (
-          <div key={f.q} className="py-5">
-            <dt className="text-ink font-sans font-semibold mb-1.5" style={{ fontSize: "clamp(1rem, 1.3vw, 1.25rem)" }}>{f.q}</dt>
-            <dd className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{f.a}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,7fr)_minmax(0,13fr)] gap-x-12 lg:gap-x-20 gap-y-6 max-w-6xl">
+        <div className="md:sticky md:top-24 md:self-start">
+          <h2 id={`${slug}-faq-h`} className="font-bold display-brand leading-[1.05]" style={{ fontSize: "clamp(1.5rem, 2.6vw, 2.4rem)", letterSpacing: "-0.01em" }}>
+            Common questions
+          </h2>
+          <p className="text-ink-soft mt-3 max-w-[26ch]" style={{ fontSize: "var(--text-small)" }}>
+            The things people usually want to know before getting in touch.
+          </p>
+        </div>
+        <FaqAccordion faqs={faqs} idBase={slug} />
+      </div>
     </section>
   );
 
