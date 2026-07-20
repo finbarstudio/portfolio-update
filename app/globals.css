@@ -3181,6 +3181,10 @@
    than sitting tiny inside its em box. */
 .home-disc-icon {
   font-family: var(--font-dingbat), var(--font-mono);
+  /* Force TEXT (monochrome) presentation so glyphs with an emoji form (❉ ✎ ♡ …)
+     render as the one-colour symbol-font icon and take the pink below, never
+     the OS colour emoji. */
+  font-variant-emoji: text;
   font-size: 1.7ex;
   line-height: 1;
   margin: 0 0.32em;
@@ -4162,6 +4166,8 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   /* Same top inset as the rail, so the BOOK A CALL label sits level with the
      title's cap height rhythm. */
   padding-top: clamp(6px, 1.6vh, 18px);
+  /* Breathing room under the booker so it never sits flush to the sheet edge. */
+  padding-bottom: clamp(14px, 2.6vh, 34px);
 }
 .contact-cal {
   position: relative;   /* the brand Loader fills this while Cal boots */
@@ -4754,7 +4760,9 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 }
 .cl-marquee:hover .cl-track { animation-play-state: paused; }
 @keyframes cl-scroll { to { transform: translateX(-50%); } }
-.cl-item { position: relative; flex: none; display: flex; align-items: center; justify-content: center; }
+.cl-item { flex: none; display: flex; align-items: center; justify-content: center; }
+/* The link is the hover target + the positioning context for the name pill. */
+.cl-link { position: relative; display: flex; align-items: center; justify-content: center; text-decoration: none; }
 .cl-logo {
   height: clamp(26px, 3.2vw, 40px);
   width: auto;
@@ -4764,7 +4772,7 @@ html:has(.contact-skin) { background: var(--pink-deep); }
   opacity: 0.5;
   transition: opacity var(--dur) var(--ease), filter var(--dur) var(--ease);
 }
-.cl-item:hover .cl-logo { filter: none; opacity: 1; }
+.cl-link:hover .cl-logo { filter: none; opacity: 1; }
 .cl-name {
   position: absolute;
   bottom: calc(100% + 10px);
@@ -4775,18 +4783,18 @@ html:has(.contact-skin) { background: var(--pink-deep); }
   pointer-events: none;
   transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
-.cl-item:hover .cl-name { opacity: 1; transform: translate(-50%, 0); }
+.cl-link:hover .cl-name { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { .cl-track { animation: none; } }
 
 /* ── About: scroll "ink-in" bio ──────────────────────────────────────────
    The mission line sits centred in a padded full-height block; its words start
    faded and brighten line by line on scroll (ScrollRevealText + GSAP scrub). */
 .about-bio-sect {
-  min-height: 100svh;
+  min-height: 78svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(72px, 13vh, 160px) 20px;
+  padding: clamp(48px, 8vh, 96px) 20px;
 }
 .about-bio {
   max-width: 46rem;

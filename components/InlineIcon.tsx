@@ -11,10 +11,12 @@ import { useRef } from "react";
 
 // The brand icon batch (Noto Sans Symbols 2 glyphs). 🮲🮳 is a single icon made
 // of two glyphs that must stay together (no space).
+// Monochrome symbol-font glyphs only — with .home-disc-icon's
+// font-variant-emoji: text these all render as one-colour pink icons (no OS
+// colour emoji). 🮲🮳 is a single icon made of two glyphs (no space).
 export const ICON_BATCH = [
-  "⦿", "✱", "❉", "♡", "👪", "🖄", "⮔", "🚭", "📦", "🞋",
-  "🖧", "🗑", "🗺", "⛖", "🮲🮳", "🅮", "✎", "✈", "☣", "✌", "🏄", "🂱",
-  "⛐", "🪰", "🕱", "🛺",
+  "⦿", "✱", "❉", "♡", "⮔", "🞋", "🅮", "🮲🮳", "✎", "✈", "☣", "✌",
+  "🂱", "🕱", "⛐", "❂", "✻", "❦", "✧", "⌘", "☾", "✦",
 ];
 
 export default function InlineIcon({ char, className }: { char?: string; className?: string }) {

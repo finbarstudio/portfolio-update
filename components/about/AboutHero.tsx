@@ -24,7 +24,7 @@ import InlineIcon from "@/components/InlineIcon";
 type Token = { word?: string; icon?: string; pink?: boolean };
 const TOKENS: Token[] = [
   { word: "Nice" }, { word: "to" }, { word: "meet" }, { word: "you" },
-  { icon: "👪" },
+  { icon: "✱" },
   { word: "I’m" }, { word: "Finbar", pink: true },
   { icon: "⦿" },
   { word: "one" }, { word: "day" }, { word: "I" }, { word: "woke" }, { word: "up" },

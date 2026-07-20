@@ -122,9 +122,10 @@ export default function AboutPage() {
         </Reveal>
       </section>
 
-      {/* ── Clients: a scrolling wall of logos (hover → name pill) ──── */}
-      <section className="pb-8" aria-labelledby="clients-title">
-        <p id="clients-title" className="font-mono uppercase text-ink-soft text-center mb-8" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>
+      {/* ── Clients: a scrolling wall of logos (hover → name pill; click → case
+          study in a new tab) ──── */}
+      <section className="pt-8 md:pt-16 pb-8" aria-labelledby="clients-title">
+        <p id="clients-title" className="font-mono uppercase text-ink-soft text-center mb-10 md:mb-12" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>
           Clients I&rsquo;ve worked with
         </p>
         <ClientLogoMarquee />

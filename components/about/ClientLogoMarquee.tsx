@@ -11,15 +11,15 @@
  * PNG/webp) that just need to scale to a common height.
  */
 
-const CLIENTS: { name: string; logo: string }[] = [
-  { name: "Lows Design + Build", logo: "/images/lows-design-build/logomark.svg" },
-  { name: "Plated with Issy", logo: "/images/plated-with-issy/wordmark.png" },
-  { name: "KinAya", logo: "/images/kinaya/logo.svg" },
-  { name: "Salesmasters", logo: "/images/salesmasters/logo.webp" },
-  { name: "Share to Buy", logo: "/images/tmyr/STB%20Logo.svg" },
-  { name: "Momentum Mentoring", logo: "/images/momentum-mentoring/Logo2.svg" },
-  { name: "TasWater", logo: "/images/taswater/logo.png" },
-  { name: "The London Home Show", logo: "/images/london-home-show/LHS%20Logo.svg" },
+const CLIENTS: { name: string; logo: string; slug: string }[] = [
+  { name: "Lows Design + Build", logo: "/images/lows-design-build/logomark.svg", slug: "lows-design-build" },
+  { name: "Plated with Issy", logo: "/images/plated-with-issy/wordmark.png", slug: "plated-with-issy" },
+  { name: "KinAya", logo: "/images/kinaya/logo.svg", slug: "kinaya" },
+  { name: "Salesmasters", logo: "/images/salesmasters/logo.webp", slug: "salesmasters" },
+  { name: "Share to Buy", logo: "/images/tmyr/STB%20Logo.svg", slug: "tmyr" },
+  { name: "Momentum Mentoring", logo: "/images/momentum-mentoring/Logo2.svg", slug: "momentum-mentoring" },
+  { name: "TasWater", logo: "/images/taswater/logo.png", slug: "taswater" },
+  { name: "The London Home Show", logo: "/images/london-home-show/LHS%20Logo.svg", slug: "london-home-show" },
 ];
 
 export default function ClientLogoMarquee() {
@@ -30,9 +30,18 @@ export default function ClientLogoMarquee() {
       <ul className="cl-track">
         {loop.map((c, i) => (
           <li key={`${c.name}-${i}`} className="cl-item">
-            <span className="cl-name tag tag-default" aria-hidden="true">{c.name}</span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={c.logo} alt={c.name} className="cl-logo" loading="lazy" draggable={false} />
+            {/* New tab: the about page stays put behind the case study. */}
+            <a
+              href={`/case-studies/${c.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cl-link"
+              aria-label={`${c.name} case study (opens in a new tab)`}
+            >
+              <span className="cl-name tag tag-default" aria-hidden="true">{c.name}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={c.logo} alt={c.name} className="cl-logo" loading="lazy" draggable={false} />
+            </a>
           </li>
         ))}
       </ul>

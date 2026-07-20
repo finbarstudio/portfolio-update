@@ -135,25 +135,15 @@ export default function ServiceLanding({
   // Header: eyebrow + H1. In the default layout the intro paragraph sits with
   // it; in galleryFirst it drops down into the copy flow under the gallery.
   const header = (
-    <section className={galleryFirst ? "px-5 md:px-10 pt-10 md:pt-16 pb-6 md:pb-8" : "px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14"}>
+    <section className="px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14">
       <h1 className="font-bold text-ink leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
         {heading}
       </h1>
-      {!galleryFirst && (
-        <p className="text-ink-soft mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
-          {intro}
-        </p>
-      )}
+      <p className="text-ink-soft mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
+        {intro}
+      </p>
     </section>
   );
-
-  // The intro paragraph as a standalone block (galleryFirst only) — the first
-  // line of copy once the work has been shown.
-  const introBlock = galleryFirst ? (
-    <section className="px-5 md:px-10 pt-12 md:pt-16 pb-4">
-      <p className="text-ink-soft max-w-2xl" style={{ fontSize: "var(--text-body)" }}>{intro}</p>
-    </section>
-  ) : null;
 
   // Capabilities as a wrap of pill-cards — reads across the width, and carries
   // no eyebrow (self-evident). aria-label keeps it named for assistive tech.
@@ -211,13 +201,14 @@ export default function ServiceLanding({
 
   const testimonialsBlock = testimonials.length > 0 ? (
     <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="What clients say">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl items-start">
         {testimonials.map((t) => (
           <figure key={t.slug} className="flex flex-col">
-            <blockquote className="text-ink leading-relaxed" style={{ fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)" }}>
-              &ldquo;{t.quote.length > 220 ? `${t.quote.slice(0, 217).trimEnd()}…` : t.quote}&rdquo;
+            <blockquote className="quote-box">
+              <span aria-hidden="true" className="quote-box-mark">&ldquo;</span>
+              {t.quote.length > 220 ? `${t.quote.slice(0, 217).trimEnd()}…` : t.quote}
             </blockquote>
-            <figcaption className="mono-label text-ink-soft mt-4">{t.author}</figcaption>
+            <figcaption className="mono-label text-ink-soft mt-3 text-center">{t.author}</figcaption>
           </figure>
         ))}
       </div>
@@ -278,10 +269,10 @@ export default function ServiceLanding({
   const guaranteeBlock = guarantee ? (
     <section className="px-5 md:px-10 pb-20 md:pb-28" aria-label="Our guarantee">
       <div
-        className="mx-auto max-w-3xl text-center rounded-2xl border border-pink px-6 md:px-12 py-12 md:py-16"
+        className="mx-auto max-w-2xl text-center rounded-xl border border-pink px-6 md:px-10 py-8 md:py-10"
         style={{ background: "rgba(233, 109, 137, 0.08)" }}
       >
-        <p className="text-ink font-bold leading-[1.15] text-balance" style={{ fontSize: "clamp(1.6rem, 3.4vw, 2.7rem)", letterSpacing: "-0.015em" }}>
+        <p className="text-ink leading-snug text-balance" style={{ fontSize: "clamp(1.15rem, 1.8vw, 1.45rem)" }}>
           {guarantee.body}
         </p>
       </div>
@@ -297,8 +288,9 @@ export default function ServiceLanding({
           {ctaHeading}
         </h2>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mt-8">
-          {/* Opens the global contact/book-a-call panel, not a mailto. */}
-          <ContactCta className="tag tag-pink">Start a project</ContactCta>
+          {/* Opens the global contact/book-a-call panel, not a mailto. The
+              headline action-button token (book-call-pill), not the small tag. */}
+          <ContactCta className="sticker-pill book-call-pill">Start a project</ContactCta>
           <Link href="/work" className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>See more work</Link>
         </div>
         {ctaNote && (
@@ -311,20 +303,6 @@ export default function ServiceLanding({
         </address>
       </div>
     </section>
-  );
-
-  // Copy blocks shared by both layouts, in reading order.
-  const copyBlocks = (
-    <>
-      {capsBlock}
-      {sectionsBlock}
-      {testimonialsBlock}
-      {processBlock}
-      {meetBlock}
-      {faqBlock}
-      {guaranteeBlock}
-      {ctaBlock}
-    </>
   );
 
   return (
@@ -346,12 +324,18 @@ export default function ServiceLanding({
       />
 
       {galleryFirst ? (
-        // H1 → gallery → all copy.
+        // H1 + intro + capabilities → gallery → the rest.
         <>
           {header}
+          {capsBlock}
           {galleryBlock}
-          {introBlock}
-          {copyBlocks}
+          {sectionsBlock}
+          {testimonialsBlock}
+          {processBlock}
+          {meetBlock}
+          {faqBlock}
+          {guaranteeBlock}
+          {ctaBlock}
         </>
       ) : (
         // Intro → capabilities → sections → gallery → the rest.
