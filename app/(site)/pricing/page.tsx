@@ -56,11 +56,12 @@ const SITE_TIERS = [
 ];
 
 const EXTRAS = [
-  { name: "Instant estimate calculator", price: "$680 to $1,275", info: "Follows the logic inside it: a few inputs sits low, multi-step with an email handoff sits high." },
-  { name: "Live social or content feeds", price: "from $425", info: "Depends on the platform and how the feed is designed into the page." },
-  { name: "Blog or journal CMS", price: "from $510", info: "Covers the CMS set-up, templates and feeds. More post types cost more." },
-  { name: "Copywriting pass", price: "from $340", info: "Priced by page count." },
-  { name: "Booking and payments", price: "from $425", info: "Depends on the provider and whether payments are taken on-site." },
+  { name: "Custom-coded components and tools", price: "from $650", info: "Estimate calculators, quote builders, configurators, anything interactive your business needs. Scoped per tool, so there is no fixed ceiling." },
+  { name: "Live social or content feeds", price: "from $400", info: "Depends on the platform and how the feed is designed into the page." },
+  { name: "Blog or journal CMS", price: "from $500", info: "Covers the CMS set-up, templates and feeds. More post types cost more." },
+  { name: "Copywriting pass", price: "from $300", info: "Priced by page count." },
+  { name: "Booking and payments", price: "from $400", info: "Depends on the provider and whether payments are taken on-site." },
+  { name: "Custom email + signatures", price: "from $150", info: "Mailboxes on your own domain set up properly, plus a designed email signature for the team." },
 ];
 
 const BRAND_ROWS = [
@@ -85,6 +86,11 @@ const CARE_ROWS = [
     price: "$250/mo",
     detail: "Everything in Care, plus a full design or dev day every month for whatever is next on the list.",
   },
+  {
+    name: "Always yours",
+    price: "included",
+    detail: "Full code handover whenever you want it. Host it yourself, run the CMS yourself, switch developer any time, cancel hosting any time. Nothing is locked in.",
+  },
 ];
 
 /* ── Page ─────────────────────────────────────────────────────────────────── */
@@ -101,6 +107,10 @@ export default function PricingPage() {
         </h1>
         <p className="pr-sub">
           Custom-coded websites and brand design, quoted fixed before anything starts. AUD, ex GST.
+        </p>
+        <p className="pr-sub" style={{ marginTop: "10px" }}>
+          I can develop, or design and develop. Come with Figma files, an existing
+          website, an existing brand, or just the concept of one.
         </p>
       </section>
 
@@ -172,7 +182,8 @@ export default function PricingPage() {
             weeks. Where a range is shown, the final number comes down to scope:
             page count, custom features and how far the animation goes. Every job
             is quoted fixed before we start, so the number you sign is the number
-            you pay.
+            you pay. Custom emails, signatures and any other design or graphic
+            work are covered too, just ask.
           </p>
         </div>
       </section>
