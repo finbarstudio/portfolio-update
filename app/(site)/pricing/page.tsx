@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import PricingGate from "./PricingGate";
 import InfoTip from "./InfoTip";
-import PrintButton from "./PrintButton";
 import "./pricing.css";
 
 /**
@@ -43,7 +42,7 @@ const SITE_TIERS = [
   {
     name: "Custom build",
     price: "$5,000 to $9,000",
-    blurb: "Bespoke design system, built as drawn.",
+    blurb: "Fully custom design, built exactly as drawn.",
     info: "Driven by the size of the design system, the animation and any integrations or custom tools.",
     points: ["Custom animation throughout", "Integrations and custom tools", "AI-search-ready front end", "Fast, and it stays fast"],
   },
@@ -52,7 +51,7 @@ const SITE_TIERS = [
     price: "from $6,500",
     blurb: "Identity and website as one piece.",
     info: "Depends how much identity work already exists and the size of the site it feeds into.",
-    points: ["Logo and full identity", "Guidelines the site actually uses", "Everything in Custom build", "One voice, sketch to code"],
+    points: ["Logo and full identity", "Guidelines the site actually uses", "Everything in Custom build", "One person, sketch to code"],
   },
 ];
 
@@ -94,7 +93,6 @@ export default function PricingPage() {
   return (
     <div className="pr px-5 md:px-10 pb-24 md:pb-28">
       <PricingGate>
-      <PrintButton />
 
       {/* ── Title: central, caps ── */}
       <section className="pt-10 md:pt-16 pb-10 md:pb-12 text-center">
@@ -111,7 +109,7 @@ export default function PricingPage() {
         <div className="pr-tiers">
           {SITE_TIERS.map((t) => (
             <article key={t.name} className={`pr-tier ${t.lead ? "is-lead" : ""}`}>
-              <h2 className="mono-heading text-ink-soft">{t.name}</h2>
+              <h2 className="pr-tier-name">{t.name}</h2>
               <p className="pr-tier-price">{t.price} <InfoTip text={t.info} /></p>
               <p className="pr-tier-blurb">{t.blurb}</p>
               <ul className="pr-tier-points">

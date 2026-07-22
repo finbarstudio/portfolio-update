@@ -19,7 +19,15 @@ export default function PricingGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      if (localStorage.getItem(KEY) === "1") setUnlocked(true);
+      // ?key=workwithme unlocks directly — lets the deck travel as ONE link
+      // with the password baked in, and lets a headless browser print the PDF.
+      const key = new URLSearchParams(window.location.search).get("key");
+      if (key && key.trim().toLowerCase() === PASSWORD) {
+        localStorage.setItem(KEY, "1");
+        setUnlocked(true);
+      } else if (localStorage.getItem(KEY) === "1") {
+        setUnlocked(true);
+      }
     } catch {
       /* ignore */
     }
@@ -46,7 +54,7 @@ export default function PricingGate({ children }: { children: ReactNode }) {
   return (
     <div className="prg">
       <form className="prg-card" onSubmit={submit}>
-        <p className="mono-label text-ink-soft">Rates are shared by link</p>
+        <p className="prg-label">Rates are shared by link</p>
         <div className="prg-row">
           <input
             className={`prg-input ${err ? "is-err" : ""}`}
