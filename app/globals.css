@@ -4807,3 +4807,17 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 }
 .srt-word { transition: none; will-change: opacity; }
 @media (prefers-reduced-motion: reduce) { .srt-word { opacity: 1 !important; } }
+
+/* ── iOS focus-zoom guard ────────────────────────────────────────────────
+   iOS Safari zooms the page when a focused input's font-size is under 16px,
+   and leaves it zoomed after. On touch devices, force every text field to
+   16px (the exact no-zoom threshold) — desktop keeps each field's designed
+   size. !important on purpose: it must beat the small mono input styles
+   (footer newsletter, contact form, gates). */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
