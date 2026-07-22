@@ -28,6 +28,17 @@ export function MdArrowForward(props: { size?: number } & SVGProps<SVGSVGElement
   return <Base path="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" {...props} />;
 }
 
+// Material Symbols "info" (outlined) — the little explainer affordance
+// (used on /pricing rows for the why-this-price tooltips).
+export function MdInfoOutline(props: { size?: number } & SVGProps<SVGSVGElement>) {
+  return (
+    <Base
+      path="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+      {...props}
+    />
+  );
+}
+
 // Material Symbols "ads_click" — a cursor with radiating click marks. THE click
 // affordance glyph (used on the "Free website" CTA pill).
 export function MdAdsClick(props: { size?: number } & SVGProps<SVGSVGElement>) {

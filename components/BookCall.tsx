@@ -21,10 +21,10 @@ import { MdAdsClick } from "@/components/MaterialIcon";
 
 const PIN_BOTTOM = 42; // matches .sf-cta-pin { bottom: 42px } — sits above the ©
 
-function Pill({ interactive, tab, onOpen }: { interactive: boolean; tab: number; onOpen?: (e: React.MouseEvent) => void }) {
+function Pill({ interactive, tab, onOpen, label }: { interactive: boolean; tab: number; onOpen?: (e: React.MouseEvent) => void; label: string }) {
   // The click glyph reads as an affordance: this pill IS the thing to click.
   // .sticker-pill is inline-flex with a gap, so it sits inline and never wraps.
-  const inner = <>Get a quote <MdAdsClick size={15} /></>;
+  const inner = <>{label} <MdAdsClick size={15} /></>;
   if (!interactive) {
     // Placeholder: reserves the line + width, never interactive.
     return <span className="sticker-pill book-call-pill">{inner}</span>;
@@ -41,6 +41,9 @@ export default function BookCall() {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [shown, setShown] = useState(false);
   const [docked, setDocked] = useState(false);
+  // /pricing reads "Start a project" (the page has no other CTA); everywhere
+  // else keeps the standard label.
+  const label = pathname === "/pricing" ? "Start a project" : "Get a quote";
 
   // Reveal gate: home shows it only after the intro logo scrolls up into the nav;
   // every other page shows it from the start.
@@ -81,13 +84,14 @@ export default function BookCall() {
     <span className="sf-cta" ref={anchorRef}>
       {/* Reserves the line + width in the footer credit (above the copyright). */}
       <span className="sf-cta-ph" aria-hidden="true">
-        <Pill interactive={false} tab={-1} />
+        <Pill interactive={false} tab={-1} label={label} />
       </span>
       <span className={`sf-cta-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
         <span className="sf-cta-inner">
           <Pill
             interactive
             tab={shown ? 0 : -1}
+            label={label}
             onOpen={(e) => window.dispatchEvent(new CustomEvent("contact:open", { detail: { x: e.clientX, y: e.clientY } }))}
           />
         </span>
