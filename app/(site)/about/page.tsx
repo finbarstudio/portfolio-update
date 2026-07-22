@@ -111,7 +111,7 @@ export default function AboutPage() {
         <Reveal as="div" className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10">
           {SERVICE_GROUPS.map((g) => (
             <div key={g.label}>
-              <p className="font-mono uppercase text-ink-soft mb-2" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>{g.label}</p>
+              <p className="font-sans font-semibold text-ink-soft mb-2" style={{ fontSize: "0.82rem" }}>{g.label}</p>
               <ul className="text-ink font-sans leading-snug" style={{ fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)" }}>
                 {g.items.map((s) => (
                   <li key={s}>{s}</li>
@@ -125,7 +125,7 @@ export default function AboutPage() {
       {/* ── Clients: a scrolling wall of logos (hover → name pill; click → case
           study in a new tab) ──── */}
       <section className="pt-8 md:pt-16 pb-8" aria-labelledby="clients-title">
-        <p id="clients-title" className="font-mono uppercase text-ink-soft text-center mb-10 md:mb-12" style={{ fontSize: "11px", letterSpacing: "0.06em" }}>
+        <p id="clients-title" className="font-sans font-semibold text-ink-soft text-center mb-10 md:mb-12" style={{ fontSize: "0.82rem" }}>
           Clients I&rsquo;ve worked with
         </p>
         <ClientLogoMarquee />

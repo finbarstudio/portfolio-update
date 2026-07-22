@@ -714,10 +714,11 @@
   /* H3 tier — true monospace, caps, high tracking. A clear step down from an H2
      above it. Used for the contact email (everywhere it appears) + product name. */
   .mono-h3 {
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    font-weight: 500;
+    /* Host, sentence case (was Space Mono caps — Finbar's July call: mono only
+       for footer + button-like elements). Class name kept for stability. */
+    font-family: var(--font-primary);
+    letter-spacing: 0;
+    font-weight: 600;
     line-height: 1.2;
     font-size: clamp(0.95rem, 2.2vw, 1.45rem);
     word-break: break-word;
@@ -1315,9 +1316,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5em;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-family: var(--font-primary);
+    font-weight: 600;
     font-size: var(--text-small);
     color: var(--ink);
   }
@@ -4117,11 +4117,9 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 /* Group labels: DIRECT / OR SEND A NOTE / OR BOOK A CALL. */
 .contact-col-label {
   margin: 0 0 0.55rem;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--pink-soft);
 }
 /* Left rail: the old drawer's contents, stacked — everything centred. */

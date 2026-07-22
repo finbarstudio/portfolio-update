@@ -77,10 +77,9 @@
 }
 .fr-ba-frame img { object-fit: cover; object-position: top; }
 .fr-ba-item figcaption {
-  font-family: var(--font-mono);
-  font-size: clamp(0.62rem, 1.6vw, 0.72rem);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--font-primary);
+  font-weight: 500;
+  font-size: clamp(0.7rem, 1.7vw, 0.8rem);
   color: var(--ink-soft);
   text-align: center;
 }

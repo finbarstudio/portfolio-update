@@ -137,7 +137,7 @@
 .jr-rail-back:hover { color: var(--pink); }
 .jr-rail-info { margin: 0; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 13px; }
 .jr-rail-row { display: flex; flex-direction: column; gap: 3px; }
-.jr-rail-row dt { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+.jr-rail-row dt { font-family: var(--font-primary); font-weight: 600; font-size: 0.78rem; color: var(--ink-soft); }
 .jr-rail-row dd { margin: 0; font-size: var(--text-small); line-height: 1.4; color: var(--ink); }
 @media (max-width: 1080px) {
   /* Not enough side room for the margin rail: single column — the rail becomes a
