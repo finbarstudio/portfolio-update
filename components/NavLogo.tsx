@@ -19,11 +19,11 @@ import { scrollToHero } from "@/lib/scroll";
 
 export const GOTO_HERO_KEY = "finbar-goto-hero";
 
-export default function NavLogo({ onHome = false }: { onHome?: boolean }) {
+export default function NavLogo({ onHome = false, sticky = false }: { onHome?: boolean; sticky?: boolean }) {
   return (
     <Link
       href="/"
-      className={`nav-logo ${onHome ? "is-home" : ""}`}
+      className={`nav-logo ${onHome ? "is-home" : ""} ${sticky ? "is-sticky" : ""}`}
       aria-label="finbarstudio, home"
       onClick={(e) => {
         if (onHome) {

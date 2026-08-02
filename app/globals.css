@@ -4821,3 +4821,8 @@ html:has(.contact-skin) { background: var(--pink-deep); }
     font-size: 16px !important;
   }
 }
+
+/* Landing page: the nav bar still hides on scroll-down / returns on scroll-up,
+   but the logo stays put always (the work-first home has no intro lockup).
+   Only the wipe (translateY) is cancelled; the centring translateX stays. */
+.nav-logo.is-sticky { transform: translateX(-50%) !important; }

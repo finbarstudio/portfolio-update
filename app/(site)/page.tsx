@@ -104,14 +104,14 @@ function HomeJsonLd() {
   );
 }
 
-/* ─── Work-first: one line of intro, then straight into the sites ────────── */
+/* ─── Work-first: 60vh of air with minimal centred type, then the grid ───── */
 function WorkIntro() {
   return (
-    <section className="px-5 md:px-10 pt-8 md:pt-12 pb-10 md:pb-14" aria-label="Introduction">
-      <h1 className="text-ink font-bold leading-[1.05] max-w-3xl" style={{ fontSize: "clamp(1.5rem, 2.6vw, 2.4rem)", letterSpacing: "-0.01em" }}>
+    <section className="min-h-[60vh] flex flex-col items-center justify-center text-center px-5" aria-label="Introduction">
+      <h1 className="text-ink font-medium leading-snug max-w-xl text-balance" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)" }}>
         Custom-coded websites from a Brisbane studio with a designer&rsquo;s eye.
       </h1>
-      <div className="flex flex-wrap gap-2.5 mt-5">
+      <div className="flex flex-wrap justify-center gap-2.5 mt-6">
         <Link href="/web-design" className="hero-pill">Web design</Link>
         <Link href="/graphic-design" className="hero-pill">Graphic design</Link>
         <Link href="/work" className="hero-pill">All work</Link>
@@ -121,37 +121,22 @@ function WorkIntro() {
   );
 }
 
-/* ─── The work, in your face: big static shots linking straight out ──────── */
+/* ─── The sites: minimal 3-col cards, hero shot only, clicking out ───────── */
 function WorkList() {
   return (
-    <div aria-label="Websites">
+    <div className="px-5 md:px-10 pb-20 md:pb-28 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-5 md:gap-y-10" aria-label="Websites">
       {WEBSITES.map((w, i) => (
-        <section key={w.slug} className="px-5 md:px-10 pb-16 md:pb-24" aria-label={w.name}>
-          <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 mb-4">
-            <h2 className="font-bold display-brand" style={{ fontSize: "clamp(1.3rem, 2.2vw, 2rem)", letterSpacing: "-0.01em" }}>
-              {w.name}
-            </h2>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>{w.year}</span>
-              <a href={w.url} target="_blank" rel="noopener noreferrer" className="sticker-pill is-pink">Visit site</a>
-              {w.caseStudy && <Link href={w.caseStudy} className="sticker-pill">Case study</Link>}
-            </div>
-          </header>
-          {/* Lead shot full width, the rest in a row under it. Static images,
-              every click goes straight to the live site. */}
+        <article key={w.slug}>
           <a href={w.url} target="_blank" rel="noopener noreferrer" className="block">
-            <Image src={w.images[0]} alt={`${w.name} website`} width={2400} height={1350} sizes="100vw" className="w-full h-auto rounded-md border border-line" priority={i === 0} />
+            <Image src={w.images[0]} alt={`${w.name} website`} width={1200} height={675} sizes="(max-width: 640px) 100vw, 33vw" className="w-full h-auto rounded-md border border-line" priority={i < 3} />
           </a>
-          {w.images.length > 1 && (
-            <div className="grid grid-cols-3 gap-3 md:gap-4 mt-3 md:mt-4">
-              {w.images.slice(1).map((src) => (
-                <a key={src} href={w.url} target="_blank" rel="noopener noreferrer" className="block">
-                  <Image src={src} alt={`${w.name} section`} width={800} height={450} sizes="33vw" className="w-full h-auto rounded-md border border-line" />
-                </a>
-              ))}
-            </div>
-          )}
-        </section>
+          <div className="flex items-baseline justify-between gap-4 mt-2.5">
+            <a href={w.url} target="_blank" rel="noopener noreferrer" className="text-ink font-medium" style={{ fontSize: "0.95rem" }}>{w.name}</a>
+            {w.caseStudy && (
+              <Link href={w.caseStudy} className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>Case study</Link>
+            )}
+          </div>
+        </article>
       ))}
     </div>
   );
