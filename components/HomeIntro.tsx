@@ -176,11 +176,20 @@ export default function HomeIntro() {
     // region leaves the document entirely (nothing above the hero to scroll
     // back to) and the static nav logo takes over from the lockup.
     const collapse = () => {
-      const el = document.querySelector<HTMLElement>(".home-intro");
-      const h = el?.offsetHeight ?? 0;
-      document.documentElement.classList.add("intro-collapsed");
-      const y = Math.max(0, (window.__lenis?.animatedScroll ?? window.scrollY) - h);
-      if (window.__lenis) window.__lenis.scrollTo(y, { immediate: true });
+      const doc = document.documentElement;
+      if (doc.classList.contains("intro-collapsed")) return;
+      const hero = document.getElementById("hero");
+      const lenis = window.__lenis;
+      // Kill any in-flight glide FIRST — otherwise Lenis keeps animating toward
+      // pre-collapse coordinates and the landing visibly jumps.
+      lenis?.stop();
+      // Pixel-exact handoff: note where the hero sits on screen, remove the
+      // intro region, then restore that exact on-screen position.
+      const before = hero?.getBoundingClientRect().top ?? 0;
+      doc.classList.add("intro-collapsed");
+      const after = hero?.getBoundingClientRect().top ?? 0;
+      const y = Math.max(0, (lenis?.animatedScroll ?? window.scrollY) + (after - before));
+      if (lenis) { lenis.scrollTo(y, { immediate: true, force: true }); lenis.start(); }
       else window.scrollTo(0, y);
     };
 
@@ -224,7 +233,7 @@ export default function HomeIntro() {
       window.addEventListener("wheel", onCancel, { passive: true });
       window.addEventListener("touchstart", onCancel, { passive: true });
       window.addEventListener("keydown", onCancel);
-      phase2Timer = window.setTimeout(() => { stop(); scrollToHero(); window.setTimeout(collapse, 1100); }, PHASE2_HOLD_MS);
+      phase2Timer = window.setTimeout(() => { stop(); scrollToHero(); window.setTimeout(collapse, 1450); }, PHASE2_HOLD_MS);
     };
 
     const finish = () => {
