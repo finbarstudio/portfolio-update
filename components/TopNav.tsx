@@ -9,7 +9,8 @@ import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
 
-const PROJECT_COUNT = projects.length;
+// Count what the /work grid actually shows — hidden projects don't count.
+const PROJECT_COUNT = projects.filter((p) => !p.hidden).length;
 
 const items = [
   { label: "Work", href: "/work" },
