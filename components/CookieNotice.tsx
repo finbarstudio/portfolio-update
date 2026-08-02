@@ -1,5 +1,7 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
 /**
  * CookieNotice — a small, informational cookie/tracking notice. The Meta pixel
  * fires regardless (Finbar chose an informational notice, not consent-gating);
@@ -15,6 +17,10 @@ import { MdOpenInNew } from "./MaterialIcon";
 const KEY = "cookie-notice-dismissed";
 
 export default function CookieNotice() {
+  // The homepage stays clean — the notice shows everywhere else.
+  const pathname = usePathname();
+  const onHome = pathname === "/";
+
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -32,6 +38,7 @@ export default function CookieNotice() {
     setShow(false);
   };
 
+  if (onHome) return null;
   return (
     <div className="cookie-notice" role="region" aria-label="Cookie notice">
       <p className="cookie-notice-text">

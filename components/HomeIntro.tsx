@@ -172,9 +172,23 @@ export default function HomeIntro() {
       return cancel;
     };
 
+    // The intro is a PRELOADER, not a page state: once it has played, its
+    // region leaves the document entirely (nothing above the hero to scroll
+    // back to) and the static nav logo takes over from the lockup.
+    const collapse = () => {
+      const el = document.querySelector<HTMLElement>(".home-intro");
+      const h = el?.offsetHeight ?? 0;
+      document.documentElement.classList.add("intro-collapsed");
+      const y = Math.max(0, (window.__lenis?.animatedScroll ?? window.scrollY) - h);
+      if (window.__lenis) window.__lenis.scrollTo(y, { immediate: true });
+      else window.scrollTo(0, y);
+    };
+
     let played = false;
     try { played = !!sessionStorage.getItem(PLAYED_KEY); } catch { /* ignore */ }
-    if (played) { setDone(true); return scheduleRevisitScroll(); }
+    // ?intro in the URL forces a replay (handy for reviewing the preloader).
+    if (window.location.search.includes("intro")) played = false;
+    if (played) { setDone(true); collapse(); return; }
 
     const fly = flyRef.current, slot = slotRef.current,
       text = textRef.current, screen = screenRef.current, mark = markRef.current;
@@ -198,16 +212,19 @@ export default function HomeIntro() {
     const startPhase2 = () => {
       const stop = () => {
         if (phase2Timer !== undefined) { clearTimeout(phase2Timer); phase2Timer = undefined; }
-        window.removeEventListener("wheel", stop);
-        window.removeEventListener("touchstart", stop);
-        window.removeEventListener("keydown", stop);
+        window.removeEventListener("wheel", onCancel);
+        window.removeEventListener("touchstart", onCancel);
+        window.removeEventListener("keydown", onCancel);
         cancelHold = undefined;
       };
+      // A manual scroll during the hold takes over from the glide — the intro
+      // still collapses (with the scroll position compensated) a beat later.
+      const onCancel = () => { stop(); window.setTimeout(collapse, 80); };
       cancelHold = stop;
-      window.addEventListener("wheel", stop, { passive: true });
-      window.addEventListener("touchstart", stop, { passive: true });
-      window.addEventListener("keydown", stop);
-      phase2Timer = window.setTimeout(() => { stop(); scrollToHero(); }, PHASE2_HOLD_MS);
+      window.addEventListener("wheel", onCancel, { passive: true });
+      window.addEventListener("touchstart", onCancel, { passive: true });
+      window.addEventListener("keydown", onCancel);
+      phase2Timer = window.setTimeout(() => { stop(); scrollToHero(); window.setTimeout(collapse, 1100); }, PHASE2_HOLD_MS);
     };
 
     const finish = () => {
@@ -220,6 +237,7 @@ export default function HomeIntro() {
       delete document.documentElement.dataset.introLock;
       window.__lenis?.start();
       if (!reduce) startPhase2();   // phase 2: auto-glide to the design-text hero
+      else collapse();
     };
     const failsafe = setTimeout(finish, 7000);
 

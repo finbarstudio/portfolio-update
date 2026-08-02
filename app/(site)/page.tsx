@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
-import HomePreloader from "@/components/HomePreloader";
+import HomeIntro from "@/components/HomeIntro";
 import { type Website } from "@/components/home/WebsiteList";
 import { OG_IMAGE } from "@/lib/og";
 
@@ -118,7 +118,7 @@ function WorkIntro() {
   return (
     <section id="hero" className="min-h-[60vh] flex flex-col items-center justify-center text-center px-5" aria-label="Introduction">
       <h1 className="text-ink font-medium leading-snug max-w-xl text-balance" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)" }}>
-        Finbar Skitini is an independent web developer based in Brisbane, Australia, building custom-coded websites with a designer&rsquo;s eye.
+        Web development with a designer&rsquo;s eye.
       </h1>
     </section>
   );
@@ -178,7 +178,7 @@ export default function HomePage() {
   return (
     <>
       <HomeJsonLd />
-      <HomePreloader />
+      <HomeIntro />
       {/* Sentinel at the very top: the nav is visible from the first frame. */}
       <div id="nav-reveal-sentinel" aria-hidden="true" />
       <WorkIntro />

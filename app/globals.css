@@ -4198,7 +4198,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   align-self: center;
 }
 /* Mobile: one column, the whole sheet scrolls; give the booker real height. */
-@media (max-width: 1320px) {
+@media (max-width: 1279px) {
   /* Stacked: a plain flex column, not a grid — the grid's auto rows were
      equalising against the sheet's fixed height and letting the rail's
      content overflow its row into the booker. Flex heights are natural and
@@ -4826,7 +4826,10 @@ html:has(.contact-skin) { background: var(--pink-deep); }
    and exempt from the nav's hide wipe. The exemption restores each
    breakpoint's own base transform (desktop centres with translateX(-50%),
    mobile is right-anchored with none) instead of forcing one globally. */
-.nav-logo.is-sticky { display: inline-flex; }
+/* Once the intro has played (or is skipped), its region is gone from the
+   document and the static nav logo replaces the lockup. */
+html.intro-collapsed .home-intro { display: none; }
+html.intro-collapsed .nav-logo.is-home { display: inline-flex; }
 html[data-nav="up"] .nav-logo.is-sticky,
 html[data-nav="intro"] .nav-logo.is-sticky { transform: translateX(-50%); }
 @media (max-width: 767px) {
@@ -4837,8 +4840,3 @@ html[data-nav="intro"] .nav-logo.is-sticky { transform: translateX(-50%); }
 
 
 
-/* First landing frame: the fixed footer reveal (clocks, ©) and the cookie
-   notice stay out of sight until the first scroll (data-nav leaves "intro"). */
-html[data-nav="intro"] .site-footer,
-html[data-nav="intro"] .cookie-notice { opacity: 0; pointer-events: none; }
-.site-footer, .cookie-notice { transition: opacity 0.3s var(--ease); }
