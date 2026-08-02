@@ -270,41 +270,29 @@ export default function ServiceLanding({
 
   // The guarantee is a focal moment: a centred, oversized risk-reversal card —
   // deliberately louder than the info blocks above it (no eyebrow label).
-  const guaranteeBlock = guarantee ? (
-    <section className="px-5 md:px-10 pb-20 md:pb-28" aria-label="Our guarantee">
-      <div
-        className="mx-auto max-w-2xl text-center rounded-xl border border-pink px-6 md:px-10 py-8 md:py-10"
-        style={{ background: "rgba(233, 109, 137, 0.08)" }}
-      >
-        <p className="text-ink leading-snug text-balance" style={{ fontSize: "clamp(1.15rem, 1.8vw, 1.45rem)" }}>
-          {guarantee.body}
-        </p>
-      </div>
-    </section>
-  ) : null;
+  const guaranteeBlock = null;
 
   // The CTA is the climax: centred, the biggest heading on the page, the action
   // front and centre (louder hierarchy than everything above).
   const ctaBlock = (
-    <section className="px-5 md:px-10 pb-24 md:pb-32" aria-label="Start a project">
-      <div className="mx-auto max-w-3xl text-center">
-        <h2 className="font-bold display-brand leading-[1.03] text-balance" style={{ fontSize: "clamp(2.1rem, 5.2vw, 3.6rem)", letterSpacing: "-0.02em" }}>
+    <section className="px-5 md:px-10 pb-28 md:pb-40" aria-label="Start a project">
+      <div className="mx-auto max-w-2xl text-center border-t border-line pt-14 md:pt-20">
+        <h2 className="font-bold display-brand leading-[1.05] text-balance" style={{ fontSize: "clamp(1.8rem, 3.6vw, 3rem)", letterSpacing: "-0.01em" }}>
           {ctaHeading}
         </h2>
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mt-8">
-          {/* Opens the global contact/book-a-call panel, not a mailto. The
-              headline action-button token (book-call-pill), not the small tag. */}
-          <ContactCta className="sticker-pill book-call-pill">Start a project</ContactCta>
-          <Link href="/work" className="text-ink-soft u-underline" style={{ fontSize: "var(--text-small)" }}>See more work</Link>
-        </div>
-        {ctaNote && (
-          <p className="text-ink-soft mt-5 leading-relaxed mx-auto max-w-xl" style={{ fontSize: "var(--text-small)" }}>{ctaNote}</p>
+        {guarantee && (
+          <p className="text-ink mt-5 leading-snug text-balance" style={{ fontSize: "clamp(1.1rem, 1.7vw, 1.4rem)" }}>
+            {guarantee.body}
+          </p>
         )}
-        <address className="not-italic text-ink-soft mt-10 leading-relaxed mx-auto max-w-xl" style={{ fontSize: "var(--text-small)" }}>
-          Finbar Studio, Brisbane, QLD, Australia. Working with clients across Australia and the UK.{" "}
-          <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a>{" "}
+        <div className="mt-8">
+          <ContactCta className="sticker-pill book-call-pill">Start a project</ContactCta>
+        </div>
+        <p className="text-ink-soft mt-10" style={{ fontSize: "var(--text-small)" }}>
+          Finbar Studio, Brisbane ·{" "}
+          <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a> ·{" "}
           <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>
-        </address>
+        </p>
       </div>
     </section>
   );
