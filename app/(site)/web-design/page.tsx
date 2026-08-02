@@ -96,7 +96,7 @@ export default function WebDesignPage() {
           "BA (Hons), Brighton and Ravensbourne University",
           "Brand, editorial and motion design behind every build",
           "Based in Brisbane, clients across Australia and the UK",
-          "Custom builds on Next.js, with Sanity, Payload and Framer CMS",
+          "Custom builds on Next.js, with Sanity and Payload CMS",
         ],
       }}
       guarantee={{

@@ -287,7 +287,7 @@ export default function HomeIntro() {
   }, []);
 
   return (
-    <section className="home-intro" aria-label="finbarstudio">
+    <section className={`home-intro ${done ? "is-done" : ""}`} aria-label="finbarstudio">
       {!done && <div ref={screenRef} className="intro-screen" aria-hidden="true" />}
       {!done && (
         <div ref={flyRef} className="intro-fly" aria-hidden="true">
