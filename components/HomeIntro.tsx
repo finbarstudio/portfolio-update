@@ -180,16 +180,16 @@ export default function HomeIntro() {
       if (doc.classList.contains("intro-collapsed")) return;
       const hero = document.getElementById("hero");
       const lenis = window.__lenis;
-      // Kill any in-flight glide FIRST — otherwise Lenis keeps animating toward
-      // pre-collapse coordinates and the landing visibly jumps.
-      lenis?.stop();
       // Pixel-exact handoff: note where the hero sits on screen, remove the
-      // intro region, then restore that exact on-screen position.
+      // intro region, then restore that exact on-screen position. The
+      // immediate+force scrollTo REPLACES any in-flight glide target — do not
+      // stop()/start() around it: resuming re-runs the stale pre-collapse
+      // target in the new coordinates and overshoots deep into the page.
       const before = hero?.getBoundingClientRect().top ?? 0;
       doc.classList.add("intro-collapsed");
       const after = hero?.getBoundingClientRect().top ?? 0;
       const y = Math.max(0, (lenis?.animatedScroll ?? window.scrollY) + (after - before));
-      if (lenis) { lenis.scrollTo(y, { immediate: true, force: true }); lenis.start(); }
+      if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
       else window.scrollTo(0, y);
     };
 
