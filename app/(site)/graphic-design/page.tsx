@@ -23,13 +23,6 @@ export default function GraphicDesignPage() {
   return (
     <ServiceLanding
       slug="graphic-design"
-      headerAction={
-        /* The page doubles as the graphic-design job application landing:
-           the CV is the first action. Drop the file at public/cv/. */
-        <a href="/cv/Finbar-Skitini-CV.pdf" download className="sticker-pill book-call-pill">
-          Download CV
-        </a>
-      }
       label="Service · Brisbane"
       heading="Brisbane graphic design"
       serviceName="Graphic Design"

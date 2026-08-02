@@ -138,7 +138,7 @@ export default function ServiceLanding({
   // Header: eyebrow + H1. In the default layout the intro paragraph sits with
   // it; in galleryFirst it drops down into the copy flow under the gallery.
   const header = (
-    <section className="px-5 md:px-10 pt-10 md:pt-16 pb-10 md:pb-14">
+    <section className="px-5 md:px-10 pt-12 md:pt-20 pb-14 md:pb-24">
       <h1 className="font-bold text-ink leading-[1.02] max-w-4xl" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
         {heading}
       </h1>
@@ -152,7 +152,7 @@ export default function ServiceLanding({
   // Capabilities as a wrap of pill-cards — reads across the width, and carries
   // no eyebrow (self-evident). aria-label keeps it named for assistive tech.
   const capsBlock = (
-    <section className="px-5 md:px-10 pb-14 md:pb-20" aria-label={capsTitle}>
+    <section className="px-5 md:px-10 pb-20 md:pb-32" aria-label={capsTitle}>
       <ul className="flex flex-wrap gap-2.5 md:gap-3 max-w-5xl">
         {capabilities.map((c) => (
           <li
@@ -168,10 +168,10 @@ export default function ServiceLanding({
   );
 
   const sectionsBlock = sections.length > 0 ? (
-    <section className="px-5 md:px-10 pb-12 md:pb-16" aria-label={`About ${serviceName.toLowerCase()}`}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10 max-w-5xl">
+    <section className="px-5 md:px-10 pb-24 md:pb-36" aria-label={`About ${serviceName.toLowerCase()}`}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 max-w-6xl">
         {sections.map((s) => (
-          <div key={s.heading}>
+          <div key={s.heading} className="rounded-md border border-line p-6 md:p-8">
             <h2 className="font-bold display-brand leading-snug mb-3" style={{ fontSize: "clamp(1.15rem, 1.6vw, 1.5rem)", letterSpacing: "-0.01em" }}>
               {s.heading}
             </h2>
@@ -204,8 +204,8 @@ export default function ServiceLanding({
   );
 
   const testimonialsBlock = testimonials.length > 0 ? (
-    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-label="What clients say">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl items-start">
+    <section className="px-5 md:px-10 pb-24 md:pb-36" aria-label="What clients say">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl mx-auto items-start">
         {testimonials.map((t) => (
           <figure key={t.slug} className="flex flex-col">
             <blockquote className="quote-box">
@@ -220,11 +220,11 @@ export default function ServiceLanding({
   ) : null;
 
   const processBlock = process.length > 0 ? (
-    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-process-h`}>
+    <section className="px-5 md:px-10 pb-24 md:pb-36" aria-labelledby={`${slug}-process-h`}>
       <h2 id={`${slug}-process-h`} className="mono-heading text-ink-soft mb-6">How a project runs</h2>
       <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8 max-w-6xl">
         {process.map((p, i) => (
-          <li key={p.title}>
+          <li key={p.title} className="rounded-md border border-line p-6">
             <p className="mono-label text-ink-soft mb-2">{String(i + 1).padStart(2, "0")}</p>
             <h3 className="text-ink font-sans font-semibold mb-1.5" style={{ fontSize: "clamp(1rem, 1.3vw, 1.2rem)" }}>{p.title}</h3>
             <p className="text-ink-soft leading-relaxed" style={{ fontSize: "var(--text-small)" }}>{p.body}</p>
@@ -235,7 +235,7 @@ export default function ServiceLanding({
   ) : null;
 
   const meetBlock = meet ? (
-    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-meet-h`}>
+    <section className="px-5 md:px-10 pb-24 md:pb-36" aria-labelledby={`${slug}-meet-h`}>
       <div className="border-t border-line pt-10 grid grid-cols-1 md:grid-cols-[minmax(0,7fr)_minmax(0,13fr)] gap-x-12 lg:gap-x-20 gap-y-6 max-w-6xl">
         <h2 id={`${slug}-meet-h`} className="font-bold display-brand leading-[1.05] md:sticky md:top-24 md:self-start" style={{ fontSize: "clamp(1.5rem, 2.6vw, 2.4rem)", letterSpacing: "-0.01em" }}>
           {meet.heading}
@@ -253,7 +253,7 @@ export default function ServiceLanding({
   ) : null;
 
   const faqBlock = (
-    <section className="px-5 md:px-10 pb-16 md:pb-24" aria-labelledby={`${slug}-faq-h`}>
+    <section className="px-5 md:px-10 pb-24 md:pb-36" aria-labelledby={`${slug}-faq-h`}>
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,7fr)_minmax(0,13fr)] gap-x-12 lg:gap-x-20 gap-y-6 max-w-6xl">
         <div className="md:sticky md:top-24 md:self-start">
           <h2 id={`${slug}-faq-h`} className="font-bold display-brand leading-[1.05]" style={{ fontSize: "clamp(1.5rem, 2.6vw, 2.4rem)", letterSpacing: "-0.01em" }}>
