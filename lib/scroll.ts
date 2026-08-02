@@ -8,22 +8,23 @@
 
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-export function scrollToHero() {
+export function scrollToHero(onComplete?: () => void) {
   const target = document.getElementById("hero");
   const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--menubar-h")) || 56;
   const lenis = typeof window !== "undefined" ? window.__lenis : undefined;
 
   if (target && lenis) {
     // Slow, eased Lenis scroll; offset clears the fixed nav.
-    lenis.scrollTo(target, { offset: -navH, duration: 1.7, easing: easeInOutCubic });
+    lenis.scrollTo(target, { offset: -navH, duration: 1.7, easing: easeInOutCubic, onComplete });
     return;
   }
   if (target) {
     const y = target.getBoundingClientRect().top + window.scrollY - navH;
     window.scrollTo({ top: y, behavior: "smooth" });
+    if (onComplete) setTimeout(onComplete, 900);
     return;
   }
   // Fallback: top of the page.
-  if (lenis) lenis.scrollTo(0, { duration: 1.7, easing: easeInOutCubic });
-  else window.scrollTo({ top: 0, behavior: "smooth" });
+  if (lenis) lenis.scrollTo(0, { duration: 1.7, easing: easeInOutCubic, onComplete });
+  else { window.scrollTo({ top: 0, behavior: "smooth" }); if (onComplete) setTimeout(onComplete, 900); }
 }

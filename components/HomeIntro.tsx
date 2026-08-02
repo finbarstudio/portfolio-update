@@ -233,7 +233,7 @@ export default function HomeIntro() {
       window.addEventListener("wheel", onCancel, { passive: true });
       window.addEventListener("touchstart", onCancel, { passive: true });
       window.addEventListener("keydown", onCancel);
-      phase2Timer = window.setTimeout(() => { stop(); scrollToHero(); window.setTimeout(collapse, 1450); }, PHASE2_HOLD_MS);
+      phase2Timer = window.setTimeout(() => { stop(); scrollToHero(collapse); }, PHASE2_HOLD_MS);
     };
 
     const finish = () => {
