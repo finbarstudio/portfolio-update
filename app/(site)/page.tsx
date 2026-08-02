@@ -118,7 +118,7 @@ function WorkIntro() {
   return (
     <section id="hero" className="min-h-[60vh] flex flex-col items-center justify-center text-center px-5" aria-label="Introduction">
       <h1 className="text-ink font-medium leading-snug max-w-xl text-balance" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)" }}>
-        A boutique web development studio with a designer&rsquo;s eye.
+        Finbar Skitini is an independent web developer based in Brisbane, Australia, building custom-coded websites with a designer&rsquo;s eye.
       </h1>
     </section>
   );
