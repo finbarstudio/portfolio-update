@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
-import HomeIntro from "@/components/HomeIntro";
+import HomePreloader from "@/components/HomePreloader";
 import { type Website } from "@/components/home/WebsiteList";
 import { OG_IMAGE } from "@/lib/og";
 
@@ -178,7 +178,7 @@ export default function HomePage() {
   return (
     <>
       <HomeJsonLd />
-      <HomeIntro />
+      <HomePreloader />
       {/* Sentinel at the very top: the nav is visible from the first frame. */}
       <div id="nav-reveal-sentinel" aria-hidden="true" />
       <WorkIntro />

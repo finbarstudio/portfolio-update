@@ -4822,22 +4822,20 @@ html:has(.contact-skin) { background: var(--pink-deep); }
   }
 }
 
-/* Landing page: the nav bar still hides on scroll-down / returns on scroll-up,
-   but the logo stays put always (the work-first home has no intro lockup).
-   Only the wipe (translateY) is cancelled; the centring translateX stays. */
-.nav-logo.is-sticky { transform: translateX(-50%) !important; }
+/* The logo lives in the nav, always: visible on every page and breakpoint,
+   and exempt from the nav's hide wipe. The exemption restores each
+   breakpoint's own base transform (desktop centres with translateX(-50%),
+   mobile is right-anchored with none) instead of forcing one globally. */
+.nav-logo.is-sticky { display: inline-flex; }
+html[data-nav="up"] .nav-logo.is-sticky,
+html[data-nav="intro"] .nav-logo.is-sticky { transform: translateX(-50%); }
+@media (max-width: 767px) {
+  html[data-nav="up"] .nav-logo.is-sticky,
+  html[data-nav="intro"] .nav-logo.is-sticky { transform: none; }
+}
 
 
-/* Experiment: the home intro is ONLY a preloader overlay. Fixed out of the
-   document flow (content starts at scroll 0, no logo screen to scroll back
-   to); only the lockup stays interactive via its own fixed carrier. */
-.home-intro { position: fixed; inset: 0; min-height: 100svh; z-index: 55; pointer-events: none; }
 
-/* Experiment: after the preloader lands, the intro overlay (including the big
-   bottom wordmark and its dock behaviour) is gone for good — no scrolling back
-   to it. The static nav logo takes over on desktop home. */
-.home-intro.is-done { display: none; }
-.nav-logo.is-home.is-sticky { display: inline-flex; }
 
 /* First landing frame: the fixed footer reveal (clocks, ©) and the cookie
    notice stay out of sight until the first scroll (data-nav leaves "intro"). */

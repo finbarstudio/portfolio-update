@@ -63,7 +63,6 @@ export default function TopNav() {
   useEffect(() => {
     const isHome = pathname === "/";
     const TOP = 80;  // non-home: px from the top where the bar is always shown
-    const HERO_GRACE = 100; // home: px past the hero-dock the bar stays before it can hide
     const DELTA = 6; // ignore sub-pixel jitter
     const NAVH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--menubar-h")) || 56;
     const getY = () => Math.max(0, (window.__lenis?.animatedScroll ?? window.scrollY) || 0);
@@ -80,17 +79,12 @@ export default function TopNav() {
       ticking = false;
       const y = getY();
       if (isHome) {
-        const r = document.getElementById("hero")?.getBoundingClientRect();
-        if (r) {
-          if (y < 8) { apply("intro"); lastY = y; return; }             // landing: nav hidden until any scroll
-          if (r.top > NAVH + 4) { apply("intro"); lastY = y; return; }  // still above the hero
-          // Brief grace once the hero docks — the bar shows as you land, then
-          // hands to direction-based hiding a little way in (so it goes early).
-          if (r.top > -HERO_GRACE) { apply("shown"); lastY = y; return; }
-        } else {
-          apply("intro"); lastY = y; return;                            // hero not laid out yet
-        }
-        // fall through: past the grace → direction-based
+        // Home: hidden on the landing frame, in on the first scroll, and it
+        // STAYS — no direction-based hiding here (that behaviour is for the
+        // other pages). Matches the pill and the footer reveal exactly.
+        apply(y < 8 ? "intro" : "shown");
+        lastY = y;
+        return;
       } else if (y < TOP) {
         apply("shown"); lastY = y; return;
       }
