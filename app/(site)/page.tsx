@@ -120,12 +120,6 @@ function WorkIntro() {
       <h1 className="text-ink font-medium leading-snug max-w-xl text-balance" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)" }}>
         A boutique web development studio with a designer&rsquo;s eye.
       </h1>
-      <div className="flex flex-wrap justify-center gap-2.5 mt-6">
-        <Link href="/web-design" className="hero-pill">Web design</Link>
-        <Link href="/graphic-design" className="hero-pill">Graphic design</Link>
-        <Link href="/work" className="hero-pill">All work</Link>
-        <Link href="/about" className="hero-pill">About</Link>
-      </div>
     </section>
   );
 }

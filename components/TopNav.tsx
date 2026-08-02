@@ -82,6 +82,7 @@ export default function TopNav() {
       if (isHome) {
         const r = document.getElementById("hero")?.getBoundingClientRect();
         if (r) {
+          if (y < 8) { apply("intro"); lastY = y; return; }             // landing: nav hidden until any scroll
           if (r.top > NAVH + 4) { apply("intro"); lastY = y; return; }  // still above the hero
           // Brief grace once the hero docks — the bar shows as you land, then
           // hands to direction-based hiding a little way in (so it goes early).
