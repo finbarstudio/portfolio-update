@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
+import HomeIntro from "@/components/HomeIntro";
 import { type Website } from "@/components/home/WebsiteList";
 import { OG_IMAGE } from "@/lib/og";
 
@@ -25,6 +26,14 @@ export const metadata: Metadata = {
 /* The shipped sites, newest first. Screens live in /images/web (settled homepage stills
    from the live-site scroll recordings). */
 const WEBSITES: Website[] = [
+  {
+    slug: "fabspeed-au",
+    name: "Fabspeed Australia",
+    url: "https://fabspeed-au.vercel.app",
+    year: "2026",
+    bio: "Performance exhaust, for Australia.",
+    images: ["/images/web/fabspeed-1.jpg"],
+  },
   {
     slug: "lows-design-build",
     name: "Lows Design + Build",
@@ -109,7 +118,7 @@ function WorkIntro() {
   return (
     <section className="min-h-[60vh] flex flex-col items-center justify-center text-center px-5" aria-label="Introduction">
       <h1 className="text-ink font-medium leading-snug max-w-xl text-balance" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)" }}>
-        Custom-coded websites from a Brisbane studio with a designer&rsquo;s eye.
+        A boutique web development studio with a designer&rsquo;s eye.
       </h1>
       <div className="flex flex-wrap justify-center gap-2.5 mt-6">
         <Link href="/web-design" className="hero-pill">Web design</Link>
@@ -175,6 +184,7 @@ export default function HomePage() {
   return (
     <>
       <HomeJsonLd />
+      <HomeIntro />
       {/* Sentinel at the very top: the nav is visible from the first frame. */}
       <div id="nav-reveal-sentinel" aria-hidden="true" />
       <WorkIntro />

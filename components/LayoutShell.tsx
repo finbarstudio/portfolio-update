@@ -41,7 +41,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
           the static nav logo. Visibility handled in CSS via .is-home. */}
       {/* Experiment branch: the work-first home has no HomeIntro lockup, so the
           nav logo shows everywhere (onHome only swaps click for scroll-to-top). */}
-      <NavLogo onHome={false} sticky={pathname === "/"} />
+      <NavLogo onHome={pathname === "/"} sticky={pathname === "/"} />
       <main
         className="min-w-0"
         style={{
