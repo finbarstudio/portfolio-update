@@ -2,12 +2,8 @@ import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import Reveal from "@/components/Reveal";
-import HomeIntro from "@/components/HomeIntro";
-import HeroTitle from "@/components/home/HeroTitle";
-import ContactCta from "@/components/ContactCta";
-import SiteWindow from "@/components/home/SiteWindow";
-import WebsiteList, { type Website } from "@/components/home/WebsiteList";
+import Image from "next/image";
+import { type Website } from "@/components/home/WebsiteList";
 import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
@@ -35,7 +31,7 @@ const WEBSITES: Website[] = [
     url: "https://www.lowsdesignandbuild.com",
     year: "2026",
     bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
-    images: ["/images/web/lows-1.webp?v=2", "/images/web/lows-2.webp?v=2", "/images/web/lows-3.webp?v=2", "/images/web/lows-4.webp?v=2"],
+    images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp", "/images/web/lows-4.webp"],
     caseStudy: "/case-studies/lows-design-build",
     quote: {
       text: "He has completely transformed our online presence and taken it to the next level.",
@@ -83,10 +79,6 @@ const WEBSITES: Website[] = [
   },
 ];
 
-// Only the strongest three cycle in the hero window; KinAya stays in the list
-// (always at the bottom of the stack) but out of the featured shots.
-const WINDOW_SLUGS = new Set(["lows-design-build", "plated-with-issy", "lola-audio"]);
-const WINDOW_SHOTS = WEBSITES.filter((w) => WINDOW_SLUGS.has(w.slug)).map((w) => ({ src: w.images[0], label: w.name }));
 
 function HomeJsonLd() {
   const jsonLd = {
@@ -112,61 +104,59 @@ function HomeJsonLd() {
   );
 }
 
-/* ─── Hero: editorial, type-led, with a small window of recent builds ─────── */
-function Hero() {
+/* ─── Work-first: one line of intro, then straight into the sites ────────── */
+function WorkIntro() {
   return (
-    <section
-      id="hero"
-      className="px-5 md:px-10 flex flex-col justify-center gap-8 md:gap-10"
-      style={{ height: "calc(100svh - var(--menubar-h, 56px))" }}
-      aria-label="Introduction"
-    >
-      {/* Full-width editorial block, sized to sit inside one viewport: the
-          indented title runs straight into the body copy, and the cycling
-          window is slotted inline (floated right) so the text wraps it. */}
-      {/* Every line fitted to the full measure (footer-wordmark trick):
-          edge-to-edge type with normal word spaces, no justify gaps. */}
-      <HeroTitle />
-      {/* 50/50 under the title: body copy + the cycling window on the left;
-          a two-column nav (pages + socials) on the right, vertically centred
-          in its half and right-aligned. */}
-      <Reveal as="div" delay={0.3} className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
-        <div className="flex items-center">
-          <div className="w-full">
-            <SiteWindow shots={WINDOW_SHOTS} />
-          </div>
-        </div>
-
-        <div className="flex items-center justify-center">
-          {/* A centred cluster of pill links: pages in ink, socials in pink. */}
-          <nav
-            className="hero-links flex flex-wrap items-center justify-center content-center gap-2.5 max-w-[34ch]"
-            aria-label="Site and social links"
-          >
-            <Link href="/work" className="hero-pill">Work</Link>
-            <Link href="/about" className="hero-pill">About</Link>
-            <Link href="/web-design" className="hero-pill">Web design</Link>
-            <Link href="/graphic-design" className="hero-pill">Graphic design</Link>
-            <ContactCta className="hero-pill">Contact</ContactCta>
-            <a href="https://instagram.com/finbar.studio" target="_blank" rel="noopener noreferrer" className="hero-pill hero-pill-social">Instagram</a>
-            <a href="https://linkedin.com/in/finbarskitini" target="_blank" rel="noopener noreferrer" className="hero-pill hero-pill-social">LinkedIn</a>
-            <a href="https://x.com/finbarstudio" target="_blank" rel="noopener noreferrer" className="hero-pill hero-pill-social">X</a>
-            <a href="https://are.na/finbar-studio" target="_blank" rel="noopener noreferrer" className="hero-pill hero-pill-social">Are.na</a>
-          </nav>
-        </div>
-      </Reveal>
+    <section className="px-5 md:px-10 pt-8 md:pt-12 pb-10 md:pb-14" aria-label="Introduction">
+      <h1 className="text-ink font-bold leading-[1.05] max-w-3xl" style={{ fontSize: "clamp(1.5rem, 2.6vw, 2.4rem)", letterSpacing: "-0.01em" }}>
+        Custom-coded websites from a Brisbane studio with a designer&rsquo;s eye.
+      </h1>
+      <div className="flex flex-wrap gap-2.5 mt-5">
+        <Link href="/web-design" className="hero-pill">Web design</Link>
+        <Link href="/graphic-design" className="hero-pill">Graphic design</Link>
+        <Link href="/work" className="hero-pill">All work</Link>
+        <Link href="/about" className="hero-pill">About</Link>
+      </div>
     </section>
   );
 }
 
-/* ─── The sites ────────────────────────────────────────────── */
-function Websites() {
+/* ─── The work, in your face: big static shots linking straight out ──────── */
+function WorkList() {
   return (
-    <Reveal section as="section" className="home-section no-rule px-5 md:px-10 pt-20 md:pt-28 pb-24" aria-label="Websites">
-      <WebsiteList sites={WEBSITES} />
-    </Reveal>
+    <div aria-label="Websites">
+      {WEBSITES.map((w, i) => (
+        <section key={w.slug} className="px-5 md:px-10 pb-16 md:pb-24" aria-label={w.name}>
+          <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 mb-4">
+            <h2 className="font-bold display-brand" style={{ fontSize: "clamp(1.3rem, 2.2vw, 2rem)", letterSpacing: "-0.01em" }}>
+              {w.name}
+            </h2>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>{w.year}</span>
+              <a href={w.url} target="_blank" rel="noopener noreferrer" className="sticker-pill is-pink">Visit site</a>
+              {w.caseStudy && <Link href={w.caseStudy} className="sticker-pill">Case study</Link>}
+            </div>
+          </header>
+          {/* Lead shot full width, the rest in a row under it. Static images,
+              every click goes straight to the live site. */}
+          <a href={w.url} target="_blank" rel="noopener noreferrer" className="block">
+            <Image src={w.images[0]} alt={`${w.name} website`} width={2400} height={1350} sizes="100vw" className="w-full h-auto rounded-md border border-line" priority={i === 0} />
+          </a>
+          {w.images.length > 1 && (
+            <div className="grid grid-cols-3 gap-3 md:gap-4 mt-3 md:mt-4">
+              {w.images.slice(1).map((src) => (
+                <a key={src} href={w.url} target="_blank" rel="noopener noreferrer" className="block">
+                  <Image src={src} alt={`${w.name} section`} width={800} height={450} sizes="33vw" className="w-full h-auto rounded-md border border-line" />
+                </a>
+              ))}
+            </div>
+          )}
+        </section>
+      ))}
+    </div>
   );
 }
+
 
 
 /* ─── How I help businesses: category pills (also lives on /about) ── */
@@ -200,11 +190,10 @@ export default function HomePage() {
   return (
     <>
       <HomeJsonLd />
-      <HomeIntro />
-      <Hero />
-      {/* Past this point the auto-hidden nav slides in (see LayoutShell). */}
+      {/* Sentinel at the very top: the nav is visible from the first frame. */}
       <div id="nav-reveal-sentinel" aria-hidden="true" />
-      <Websites />
+      <WorkIntro />
+      <WorkList />
       <Capabilities />
     </>
   );

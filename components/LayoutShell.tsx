@@ -39,7 +39,9 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       {/* Persistent resting logo. On desktop home it's hidden (HomeIntro's
           animated lockup shows instead); on mobile home + every other page it's
           the static nav logo. Visibility handled in CSS via .is-home. */}
-      <NavLogo onHome={pathname === "/"} />
+      {/* Experiment branch: the work-first home has no HomeIntro lockup, so the
+          nav logo shows everywhere (onHome only swaps click for scroll-to-top). */}
+      <NavLogo onHome={false} />
       <main
         className="min-w-0"
         style={{

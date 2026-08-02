@@ -54,6 +54,8 @@ export type ServiceLandingProps = {
   ctaHeading: string;     // CTA headline, page-specific
   /** Optional line under the CTA (e.g. the free homepage redesign offer). */
   ctaNote?: React.ReactNode;
+  /** Optional action rendered under the header intro (e.g. a Download CV pill). */
+  headerAction?: React.ReactNode;
   /** Show the project gallery straight after the H1, with all copy below it. */
   galleryFirst?: boolean;
 };
@@ -73,6 +75,7 @@ const newestYear = (date: string) => {
 export default function ServiceLanding({
   slug, heading, intro, serviceName, description, terms, excludeSlugs = [],
   capsTitle, capabilities, sections = [], process = [], meet, guarantee, faqs, ctaHeading, ctaNote,
+  headerAction,
   galleryFirst = false,
 }: ServiceLandingProps) {
   const exclude = new Set(excludeSlugs);
@@ -142,6 +145,7 @@ export default function ServiceLanding({
       <p className="text-ink-soft mt-6 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
         {intro}
       </p>
+      {headerAction && <div className="mt-6">{headerAction}</div>}
     </section>
   );
 
