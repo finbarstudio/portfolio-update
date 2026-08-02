@@ -116,7 +116,7 @@ function HomeJsonLd() {
 /* ─── Work-first: 60vh of air with minimal centred type, then the grid ───── */
 function WorkIntro() {
   return (
-    <section className="min-h-[60vh] flex flex-col items-center justify-center text-center px-5" aria-label="Introduction">
+    <section id="hero" className="min-h-[60vh] flex flex-col items-center justify-center text-center px-5" aria-label="Introduction">
       <h1 className="text-ink font-medium leading-snug max-w-xl text-balance" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)" }}>
         A boutique web development studio with a designer&rsquo;s eye.
       </h1>

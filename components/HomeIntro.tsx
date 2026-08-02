@@ -30,7 +30,7 @@ const MOBILE_QUERY = "(max-width: 767px)";
 const PLAYED_KEY = "finbar-intro-played";
 // Phase 2 of the intro: how long the finished FINBARSTUDIO* lockup holds at the
 // bottom of the first screen before the page auto-glides to the design-text hero.
-const PHASE2_HOLD_MS = 500;
+const PHASE2_HOLD_MS = 200;
 
 export default function HomeIntro() {
   const lockupRef = useRef<HTMLAnchorElement>(null);
@@ -270,10 +270,10 @@ export default function HomeIntro() {
     // 1 the mark pulses itself into being, one layer at a time, centre → tips.
     //   back.out overshoots slightly so each ring lands with a beat rather than
     //   easing flat, which is what makes it read as a pulse.
-    tl.to(layers, { scale: 1, opacity: 1, duration: 0.38, ease: "back.out(1.7)", stagger: 0.06 })
-      .to(screen, { opacity: 0, duration: 0.45, ease: "power2.inOut" }, "+=0.08")     // 2 screen opens
-      .to(fly, { y: dy, duration: 0.42, ease: "power3.inOut" }, "-=0.12")            // 4 down to middle-bottom
-      .to(fly, { x: dx, duration: 0.45, ease: "power3.inOut" }, "+=0.03")             // 5 right to the slot
+    tl.to(layers, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)", stagger: 0.04 })
+      .to(screen, { opacity: 0, duration: 0.3, ease: "power2.inOut" }, "+=0.03")     // 2 screen opens
+      .to(fly, { y: dy, duration: 0.3, ease: "power3.inOut" }, "-=0.1")            // 4 down to middle-bottom
+      .to(fly, { x: dx, duration: 0.32, ease: "power3.inOut" }, "+=0.02")             // 5 right to the slot
       .call(() => { text.classList.add("is-revealed"); }, undefined, "-=0.1");       // 6 text slides in
 
     return () => {

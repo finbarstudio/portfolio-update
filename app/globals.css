@@ -4826,3 +4826,9 @@ html:has(.contact-skin) { background: var(--pink-deep); }
    but the logo stays put always (the work-first home has no intro lockup).
    Only the wipe (translateY) is cancelled; the centring translateX stays. */
 .nav-logo.is-sticky { transform: translateX(-50%) !important; }
+
+
+/* Experiment: the home intro is ONLY a preloader overlay. Fixed out of the
+   document flow (content starts at scroll 0, no logo screen to scroll back
+   to); only the lockup stays interactive via its own fixed carrier. */
+.home-intro { position: fixed; inset: 0; min-height: 100svh; z-index: 55; pointer-events: none; }
