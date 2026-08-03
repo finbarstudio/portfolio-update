@@ -191,6 +191,8 @@ export default function HomeIntro() {
       const y = Math.max(0, (lenis?.animatedScroll ?? window.scrollY) + (after - before));
       if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
       else window.scrollTo(0, y);
+      // The intro sequence (pulse + glide) is over only now — release the nav.
+      delete document.documentElement.dataset.introLock;
     };
 
     let played = false;
@@ -243,7 +245,6 @@ export default function HomeIntro() {
       text.classList.add("is-revealed");
       setDone(true);
       document.body.style.overflow = prevOverflow;
-      delete document.documentElement.dataset.introLock;
       window.__lenis?.start();
       if (!reduce) startPhase2();   // phase 2: auto-glide to the design-text hero
       else collapse();

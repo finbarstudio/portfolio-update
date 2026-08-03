@@ -80,6 +80,9 @@ export default function TopNav() {
       ticking = false;
       const y = getY();
       if (isHome) {
+        // While the intro (pulse + glide) is running, its own scrolling must
+        // not count as the visitor's first scroll — stay hidden until it ends.
+        if (document.documentElement.dataset.introLock) { apply("intro"); lastY = y; return; }
         // Home: hidden on the landing frame, in on the first scroll, and it
         // STAYS — no direction-based hiding here (that behaviour is for the
         // other pages). Matches the pill and the footer reveal exactly.
