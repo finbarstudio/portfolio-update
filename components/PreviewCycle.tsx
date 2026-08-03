@@ -21,17 +21,21 @@ export default function PreviewCycle({
   interval?: number;
 }) {
   const [i, setI] = useState(0);
+  // The shot we're fading AWAY FROM stays fully opaque underneath the incoming
+  // one: only the top layer fades, so the ground never shows through mid-fade
+  // (a symmetric cross-fade dips to ~75% coverage and blinks white).
+  const prev = useRef(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stop = () => {
     if (timer.current) { clearInterval(timer.current); timer.current = null; }
-    setI(0);
+    setI((v) => { prev.current = v; return 0; });
   };
   const start = () => {
     if (images.length < 2) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     if (timer.current) return;
-    timer.current = setInterval(() => setI((v) => (v + 1) % images.length), interval);
+    timer.current = setInterval(() => setI((v) => { prev.current = v; return (v + 1) % images.length; }), interval);
   };
 
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
@@ -49,8 +53,15 @@ export default function PreviewCycle({
           src={src}
           alt={idx === 0 ? alt : ""}
           loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-          style={{ opacity: idx === i ? 1 : 0 }}
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={
+            idx === i
+              ? { opacity: 1, zIndex: 2, transition: "opacity 0.3s ease" }
+              : idx === prev.current
+                ? { opacity: 1, zIndex: 1, transition: "none" }
+                : { opacity: 0, zIndex: 0, transition: "none" }
+          }
         />
       ))}
     </div>
