@@ -50,7 +50,7 @@ export default function BookCall() {
   useEffect(() => {
     if (pathname !== "/") { setShown(true); return; }
     setShown(false);
-    const update = () => setShown(window.scrollY > 8);
+    const update = () => setShown(!document.documentElement.dataset.introLock && window.scrollY > 8);
     update();
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update, { passive: true });
