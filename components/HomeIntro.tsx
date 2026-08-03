@@ -124,7 +124,30 @@ export default function HomeIntro() {
   // revisit we skip the intro but still glide down to the hero (see
   // scheduleRevisitScroll) so the visitor is never left parked on the logo screen.
   useLayoutEffect(() => {
-    if (window.matchMedia(MOBILE_QUERY).matches) { setDone(true); return; }
+    // The intro is a PRELOADER, not a page state: once it has played, its
+    // region leaves the document entirely (nothing above the hero to scroll
+    // back to) and the static nav logo takes over from the lockup.
+    const collapse = () => {
+      const doc = document.documentElement;
+      if (doc.classList.contains("intro-collapsed")) return;
+      const hero = document.getElementById("hero");
+      const lenis = window.__lenis;
+      // Pixel-exact handoff: note where the hero sits on screen, remove the
+      // intro region, then restore that exact on-screen position. The
+      // immediate+force scrollTo REPLACES any in-flight glide target — do not
+      // stop()/start() around it: resuming re-runs the stale pre-collapse
+      // target in the new coordinates and overshoots deep into the page.
+      const before = hero?.getBoundingClientRect().top ?? 0;
+      doc.classList.add("intro-collapsed");
+      const after = hero?.getBoundingClientRect().top ?? 0;
+      const y = Math.max(0, (lenis?.animatedScroll ?? window.scrollY) + (after - before));
+      if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+      else window.scrollTo(0, y);
+      // The intro sequence (pulse + glide) is over only now — release the nav.
+      delete document.documentElement.dataset.introLock;
+    };
+
+    if (window.matchMedia(MOBILE_QUERY).matches) { setDone(true); collapse(); return; }
 
     // Refresh / revisit: never leave the visitor parked on the logo. Returns a
     // cleanup fn. Once Lenis + the browser's scroll restoration have settled, if
@@ -170,29 +193,6 @@ export default function HomeIntro() {
       };
       timer = window.setTimeout(settle, 120);
       return cancel;
-    };
-
-    // The intro is a PRELOADER, not a page state: once it has played, its
-    // region leaves the document entirely (nothing above the hero to scroll
-    // back to) and the static nav logo takes over from the lockup.
-    const collapse = () => {
-      const doc = document.documentElement;
-      if (doc.classList.contains("intro-collapsed")) return;
-      const hero = document.getElementById("hero");
-      const lenis = window.__lenis;
-      // Pixel-exact handoff: note where the hero sits on screen, remove the
-      // intro region, then restore that exact on-screen position. The
-      // immediate+force scrollTo REPLACES any in-flight glide target — do not
-      // stop()/start() around it: resuming re-runs the stale pre-collapse
-      // target in the new coordinates and overshoots deep into the page.
-      const before = hero?.getBoundingClientRect().top ?? 0;
-      doc.classList.add("intro-collapsed");
-      const after = hero?.getBoundingClientRect().top ?? 0;
-      const y = Math.max(0, (lenis?.animatedScroll ?? window.scrollY) + (after - before));
-      if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
-      else window.scrollTo(0, y);
-      // The intro sequence (pulse + glide) is over only now — release the nav.
-      delete document.documentElement.dataset.introLock;
     };
 
     let played = false;
