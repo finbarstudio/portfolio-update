@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import SandboxNav from "@/components/sandbox/SandboxNav";
 import SandboxTransition from "@/components/sandbox/SandboxTransition";
 import SuggestionWidget from "@/components/sandbox/SuggestionWidget";
+import { jsonLdHtml } from "@/lib/json-ld";
 
 const SANDBOX_URL = "https://sandbox.finbar.studio";
 
@@ -100,7 +101,7 @@ const JSON_LD = {
 export default function SandboxLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="sb-root">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(JSON_LD) }} />
       <SandboxNav />
       {/* The device "screen": a fixed, rounded, clipped scroller. Content scrolls
           inside it; the document itself never does — so iOS Safari's top/bottom

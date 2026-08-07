@@ -57,7 +57,13 @@ const components: PortableTextComponents = {
   },
   marks: {
     link: ({ children, value }) => {
-      const href = value?.href ?? "#";
+      // Scheme allowlist: CMS-authored hrefs only ever render as http(s),
+      // relative, hash or mailto links — anything else (javascript:, data:)
+      // falls back to plain text.
+      const raw = value?.href ?? "#";
+      const safe = /^(https?:\/\/|\/|#|mailto:)/i.test(raw);
+      if (!safe) return <>{children}</>;
+      const href = raw;
       const external = /^https?:\/\//.test(href);
       return external ? (
         <a href={href} target="_blank" rel="noopener noreferrer" className="jr-link">{children}</a>
