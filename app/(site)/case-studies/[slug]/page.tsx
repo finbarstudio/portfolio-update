@@ -363,7 +363,7 @@ function FooterMeta({ project }: { project: Project }) {
                   className="u-underline font-mono break-words"
                   style={{ fontSize: "var(--text-small)" }}
                 >
-                  {project.liveUrl.replace(/^https?:\/\//, "")} <MdOpenInNew size={13} />
+                  {project.liveLabel ?? project.liveUrl.replace(/^https?:\/\//, "")} <MdOpenInNew size={13} />
                 </a>
               )}
               {project.companyUrl && project.companyUrl !== project.liveUrl && (

@@ -87,6 +87,8 @@ export interface Project {
   cardStack?: string[];   // When set, the card thumbnail stacks these images
                           // (contained, not full-bleed) — e.g. two infographics.
   liveUrl?: string;
+  liveLabel?: string;     // Display text when liveUrl isn't a plain domain
+                          // (e.g. a /go/* availability-checking redirect).
   heroSpline?: string;
   heroModel?: {           // Interactive 3D model with looping video on its screen
     model: string;        // Path to .gltf (under /public)
@@ -969,7 +971,10 @@ export const projects: Project[] = [
         "Finbar just got it, honestly. I'd send him a voice note about something I wanted changed and it would be live by the evening. He kept me in the loop the whole way through without ever drowning me in tech talk, and the site went from an idea to launched faster than I thought was possible. It feels completely like me.",
       author: "Issy Park, Plated with Issy",
     },
-    liveUrl: "https://plated-with-issy.vercel.app",
+    // Routes through /go/plated: her domain expired, so the link auto-picks
+    // platedwithissy.com when it's back, the Vercel fallback meanwhile.
+    liveUrl: "/go/plated",
+    liveLabel: "platedwithissy.com",
     heroModel: {
       model: "/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
