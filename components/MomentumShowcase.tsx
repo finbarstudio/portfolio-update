@@ -35,7 +35,7 @@ export default function MomentumShowcase() {
           themselves.
         </p>
         <a
-          href="https://momentummentoring.co"
+          href="/go/momentum"
           target="_blank"
           rel="noopener noreferrer"
           className="packer-link"

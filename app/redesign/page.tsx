@@ -13,7 +13,7 @@ const WEBSITES: Website[] = [
   {
     slug: "lows-design-build",
     name: "Lows Design + Build",
-    url: "https://www.lowsdesignandbuild.com",
+    url: "/go/lows",
     year: "2026",
     bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
     images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
@@ -21,7 +21,7 @@ const WEBSITES: Website[] = [
   {
     slug: "kinaya",
     name: "KinAya",
-    url: "https://kinaya.com.au",
+    url: "/go/kinaya",
     year: "2024",
     bio: "Full rebrand and a six-page site for an Adelaide NDIS provider, with the CMS handed over to their team and a site-wide accessibility text resizer, because their audience genuinely needs one.",
     images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp"],

@@ -130,7 +130,7 @@ export default function KinayaShowcase() {
           in place from launch: per-page metadata, Open Graph, clean URLs.
         </p>
         <a
-          href="https://www.kinaya.com.au/"
+          href="/go/kinaya"
           target="_blank"
           rel="noopener noreferrer"
           className="packer-link"

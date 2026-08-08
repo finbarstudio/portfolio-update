@@ -224,8 +224,9 @@ export const projects: Project[] = [
         ],
       },
     ],
-    liveUrl: "https://kinaya.com.au",
-    companyUrl: "https://kinaya.com.au",
+    liveUrl: "/go/kinaya",
+    liveLabel: "kinaya.com.au",
+    companyUrl: "/go/kinaya",
     testimonial: {
       quote:
         "Finbar was great to work with from start to finish. He took the time to understand what KinAya needed, communicated clearly throughout, and delivered something that felt cohesive. The branding and website genuinely felt like one vision. The accessibility features he suggested, like the text resizer, showed he was thinking beyond just aesthetics. Handover was smooth and we felt confident managing the site ourselves after his walkthrough. Highly recommend.",
@@ -832,7 +833,8 @@ export const projects: Project[] = [
     },
     logo: "/images/lows-design-build/logomark.svg",
     cardLogo: "/images/lows-design-build/logomark.svg",
-    liveUrl: "https://www.lowsdesignandbuild.com",
+    liveUrl: "/go/lows",
+    liveLabel: "lowsdesignandbuild.com",
     heroModel: {
       model: "/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
@@ -1093,7 +1095,8 @@ export const projects: Project[] = [
         "Finbar is reliable, fast and really easy to work with. He was able to translate the brief of a sound-based website into something aesthetically beautiful and totally original. I'm so impressed and would genuinely recommend him to anyone.",
       author: "Lola Stoodley, Lola Audio",
     },
-    liveUrl: "https://www.lola-audio.com",
+    liveUrl: "/go/lola",
+    liveLabel: "lola-audio.com",
     heroModel: {
       model: "/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
@@ -1204,7 +1207,8 @@ export const projects: Project[] = [
       "Domain connection",
       "CMS handover session",
     ],
-    liveUrl: "https://momentummentoring.co",
+    liveUrl: "/go/momentum",
+    liveLabel: "momentummentoring.co",
   },
 
   /* 11. TasWater. Gallery */
