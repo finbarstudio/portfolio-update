@@ -50,7 +50,7 @@ const WEBSITES: Website[] = [
   {
     slug: "plated-with-issy",
     name: "Plated with Issy",
-    url: "https://www.platedwithissy.com",
+    url: "https://plated-with-issy.vercel.app",
     year: "2026",
     bio: "Brand and site for a candlelit supper club, built together: one continuous scroll through an evening, a polaroid gallery of past dinners, and a Payload CMS Issy runs from her phone.",
     images: ["/images/web/plated-1.webp", "/images/web/plated-2.webp", "/images/web/plated-3.webp", "/images/web/plated-4.webp"],

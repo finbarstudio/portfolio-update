@@ -969,7 +969,7 @@ export const projects: Project[] = [
         "Finbar just got it, honestly. I'd send him a voice note about something I wanted changed and it would be live by the evening. He kept me in the loop the whole way through without ever drowning me in tech talk, and the site went from an idea to launched faster than I thought was possible. It feels completely like me.",
       author: "Issy Park, Plated with Issy",
     },
-    liveUrl: "https://www.platedwithissy.com",
+    liveUrl: "https://plated-with-issy.vercel.app",
     heroModel: {
       model: "/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
