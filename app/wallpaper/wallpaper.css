@@ -1,0 +1,44 @@
+/* Live Earth wallpaper — chromeless full-viewport black, disk pinned centre.
+   The page is meant to be looked THROUGH (Plash / a pinned browser tab), so
+   there is no UI at all: space, and the planet. */
+
+html:has(.wp-space),
+body:has(.wp-space) {
+  background: #000;
+  overflow: hidden;
+  height: 100%;
+}
+
+.wp-space {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  cursor: none;
+}
+
+.wp-disk {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  aspect-ratio: 1;
+  display: grid; /* columns set inline — tile count follows the ?res level */
+}
+
+/* The outgoing frame stays fully opaque underneath; only the incoming layer
+   fades, so the swap can never dip to black (same lesson as PreviewCycle). */
+.wp-disk.is-front {
+  animation: wp-fade-in 1.2s ease;
+}
+
+@keyframes wp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.wp-disk img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+}
