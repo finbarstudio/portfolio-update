@@ -14,7 +14,6 @@ const PROJECT_COUNT = projects.filter((p) => !p.hidden).length;
 
 const items = [
   { label: "Work", href: "/work" },
-  { label: "Journal", href: "/journal" },
   { label: "About", href: "/about" },
 ];
 

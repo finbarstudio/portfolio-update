@@ -16,7 +16,9 @@ the repo. It holds source/working assets, not site code:
 - `Brand/`, `Headshots/`, `Journal/` — design source files (logos, photo edits,
   writing drafts). The site consumes finished exports copied into
   `Website/public/`, never these originals.
-- `journal-studio/` — the hosted Sanity Studio source (separate deploy).
+- `journal-studio/` — Sanity Studio source for the retired /journal blog.
+  The journal was removed from the site (Aug 2026); this and the Sanity project
+  still hold the written posts, but nothing here consumes them.
 - `Social Media/` — **DO NOT TOUCH.** Another agent owns this folder. It's
   outside the repo so git never sees it; leave it entirely alone.
 

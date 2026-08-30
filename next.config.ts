@@ -67,11 +67,7 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    // Local /public/images/* paths, plus the Journal's Sanity image CDN. Routing
-    // Sanity images through next/image means Vercel optimises + edge-caches each
-    // variant, so cdn.sanity.io is hit ~once per image/size (the free-tier
-    // bandwidth safeguard), not per visitor.
-    remotePatterns: [{ protocol: "https", hostname: "cdn.sanity.io" }],
+    // Every image is local to /public/images/* — no remote hosts allowed.
     // Allowed next/image quality values. 75 = portfolio default; the rest are
     // used by the Lindon demo (app/lindon/site). Next 16 rejects any quality
     // not in this list once the array is set.

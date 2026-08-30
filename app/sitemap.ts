@@ -1,12 +1,6 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { projects } from "@/content/projects";
-import { sanityFetch } from "@/sanity/client";
-import { POST_SLUGS_QUERY, POSTS_QUERY } from "@/sanity/queries";
-import type { PostListItem } from "@/sanity/types";
-
-const slugifyTag = (t: string) =>
-  t.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 const WWW = "https://www.finbar.studio";
 const SANDBOX = "https://sandbox.finbar.studio";
@@ -37,29 +31,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${WWW}/graphic-design`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${WWW}/about`,          lastModified: now, changeFrequency: "yearly",  priority: 0.8 },
     { url: `${WWW}/contact`,        lastModified: now, changeFrequency: "yearly",  priority: 0.8 },
-    { url: `${WWW}/journal`,        lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${WWW}/privacy`,        lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
     { url: `${WWW}/terms`,          lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
   ];
-
-  // Journal posts from Sanity (empty when unconfigured). Real per-post dates.
-  const postSlugs = (await sanityFetch<{ slug: string; _updatedAt: string }[]>(POST_SLUGS_QUERY)) ?? [];
-  const journalRoutes: MetadataRoute.Sitemap = postSlugs.map((p) => ({
-    url: `${WWW}/journal/${p.slug}`,
-    lastModified: p._updatedAt ? new Date(p._updatedAt) : now,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
-
-  // One /journal/<tag> page per distinct tag (built from the same posts).
-  const tagPosts = (await sanityFetch<PostListItem[]>(POSTS_QUERY)) ?? [];
-  const tagSlugs = [...new Set(tagPosts.flatMap((p) => (p.tags ?? []).map(slugifyTag)).filter(Boolean))];
-  const tagRoutes: MetadataRoute.Sitemap = tagSlugs.map((slug) => ({
-    url: `${WWW}/journal/${slug}`,
-    lastModified: now,
-    changeFrequency: "weekly",
-    priority: 0.6,
-  }));
 
   // Every non-hidden project has a real /case-studies/<slug> page.
   const projectRoutes: MetadataRoute.Sitemap = projects
@@ -71,5 +45,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-  return [...staticRoutes, ...projectRoutes, ...journalRoutes, ...tagRoutes];
+  return [...staticRoutes, ...projectRoutes];
 }
