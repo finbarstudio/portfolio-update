@@ -53,11 +53,6 @@ const LINKS: Record<string, GoLink> = {
     signature: "Plated with Issy",
     home: "/case-studies/plated-with-issy",
   },
-  fabspeed: {
-    candidates: ["https://www.fabspeed.com.au", "https://fabspeed-au.vercel.app"],
-    signature: "Fabspeed Australia",
-    home: "/",
-  },
   // Not hosted by us — no Vercel fallback exists, so it's domain or case study.
   kinaya: {
     candidates: ["https://kinaya.com.au"],

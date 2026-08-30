@@ -27,14 +27,6 @@ export const metadata: Metadata = {
    from the live-site scroll recordings). */
 const WEBSITES: Website[] = [
   {
-    slug: "fabspeed-au",
-    name: "Fabspeed Australia",
-    url: "/go/fabspeed",
-    year: "2026",
-    bio: "Performance exhaust, for Australia.",
-    images: ["/images/web/fabspeed-1.jpg"],
-  },
-  {
     slug: "lows-design-build",
     name: "Lows Design + Build",
     url: "/go/lows",
