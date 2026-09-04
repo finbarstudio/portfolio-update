@@ -27,6 +27,14 @@ export const metadata: Metadata = {
    from the live-site scroll recordings). */
 const WEBSITES: Website[] = [
   {
+    slug: "rennen-plus",
+    name: "Rennen Plus",
+    url: "/go/rennen",
+    year: "2026",
+    bio: "Porsche and exotic performance packages, built around the cars themselves.",
+    images: ["/images/web/rennen-1.webp"],
+  },
+  {
     slug: "lows-design-build",
     name: "Lows Design + Build",
     url: "/go/lows",
