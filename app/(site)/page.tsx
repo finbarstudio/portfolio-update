@@ -4,6 +4,7 @@ import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
 import HomeIntro from "@/components/HomeIntro";
+import SiteThumbVideo from "@/components/home/SiteThumbVideo";
 import { type Website } from "@/components/home/WebsiteList";
 import { OG_IMAGE } from "@/lib/og";
 
@@ -33,6 +34,7 @@ const WEBSITES: Website[] = [
     year: "2026",
     bio: "Porsche and exotic performance packages, built around the cars themselves.",
     images: ["/images/web/rennen-1.webp"],
+    video: "/images/web/rennen.webm",
   },
   {
     slug: "lows-design-build",
@@ -131,7 +133,11 @@ function WorkList() {
       {WEBSITES.map((w, i) => (
         <article key={w.slug}>
           <a href={w.url} target="_blank" rel="noopener noreferrer" className="block">
-            <Image src={w.images[0]} alt={`${w.name} website`} width={1200} height={675} sizes="(max-width: 640px) 100vw, 33vw" className="w-full h-auto rounded-md border border-line" priority={i < 3} />
+            {w.video ? (
+              <SiteThumbVideo src={w.video} poster={w.images[0]} alt={`${w.name} website`} />
+            ) : (
+              <Image src={w.images[0]} alt={`${w.name} website`} width={1200} height={675} sizes="(max-width: 640px) 100vw, 33vw" className="w-full h-auto rounded-md border border-line" priority={i < 3} />
+            )}
           </a>
           <div className="flex items-baseline justify-between gap-4 mt-2.5">
             <a href={w.url} target="_blank" rel="noopener noreferrer" className="text-ink font-medium" style={{ fontSize: "0.95rem" }}>{w.name}</a>

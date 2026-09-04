@@ -14,6 +14,8 @@ export type Website = {
   year: string;
   bio: string;
   images: string[];
+  /** Looping silent clip shown instead of the still on the home grid. */
+  video?: string;
   /** /case-studies route, when one exists */
   caseStudy?: string;
   /** Short verbatim pull-quote (ellipsis for cuts, [] for inferred words). */
