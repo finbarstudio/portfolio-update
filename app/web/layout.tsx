@@ -1,7 +1,6 @@
 import "./web.css";
 import type { Metadata, Viewport } from "next";
 import WebHeader from "@/components/web/WebHeader";
-import WebFooter from "@/components/web/WebFooter";
 
 const WEB_URL = "https://web.finbar.studio";
 
@@ -16,13 +15,13 @@ export const metadata: Metadata = {
   // `absolute` so the root layout's "| Finbar Studio" template does not get
   // appended: this section reads as its own site.
   title: {
-    absolute: "web.finbar · websites worth clicking",
+    absolute: "web.finbar",
     template: "%s · web.finbar",
   },
   description: WEB_DESC,
   alternates: { canonical: WEB_URL },
   openGraph: {
-    title: "web.finbar · websites worth clicking",
+    title: "web.finbar",
     description: WEB_DESC,
     url: WEB_URL,
     siteName: "web.finbar",
@@ -31,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "web.finbar · websites worth clicking",
+    title: "web.finbar",
     description: WEB_DESC,
     creator: "@finbarstudio",
   },
@@ -48,7 +47,6 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
     <div className="wf-root">
       <WebHeader />
       <main>{children}</main>
-      <WebFooter />
     </div>
   );
 }

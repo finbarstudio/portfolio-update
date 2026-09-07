@@ -60,7 +60,19 @@ export default function Catalogue({ page }: { page: number }) {
                 </a>
                 <span className="wf-num">{String(site.id).padStart(4, "0")}</span>
               </div>
-              {site.credit && <p className="wf-credit">{site.credit}</p>}
+              {site.credits && (
+                <dl className="wf-credits">
+                  {site.credits.design && (
+                    <div><dt>Design</dt><dd>{site.credits.design}</dd></div>
+                  )}
+                  {site.credits.development && (
+                    <div><dt>Development</dt><dd>{site.credits.development}</dd></div>
+                  )}
+                  {site.credits.built && (
+                    <div><dt>Built with</dt><dd>{site.credits.built}</dd></div>
+                  )}
+                </dl>
+              )}
             </article>
           );
         })}

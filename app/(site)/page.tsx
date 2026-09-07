@@ -134,7 +134,7 @@ function WorkList() {
         <article key={w.slug}>
           <a href={w.url} target="_blank" rel="noopener noreferrer" className="block">
             {w.video ? (
-              <SiteThumbVideo src={w.video} poster={w.images[0]} alt={`${w.name} website`} />
+              <SiteThumbVideo src={w.video} mp4={w.video.replace(/\.webm$/, ".mp4")} poster={w.images[0]} alt={`${w.name} website`} />
             ) : (
               <Image src={w.images[0]} alt={`${w.name} website`} width={1200} height={675} sizes="(max-width: 640px) 100vw, 33vw" className="w-full h-auto rounded-md border border-line" priority={i < 3} />
             )}
