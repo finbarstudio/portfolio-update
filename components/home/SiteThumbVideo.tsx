@@ -1,8 +1,9 @@
 "use client";
 
 /**
- * SiteThumbVideo — a looping, silent clip in place of a static home-grid
- * thumbnail, for sites that ship with a showcase film.
+ * SiteThumbVideo — a looping, silent clip in place of a static thumbnail, for
+ * sites that ship with a showcase film. Used by the home grid and by the
+ * web.finbar catalogue tiles.
  *
  * Two courtesies, both required by the project's motion rules: it never
  * autoplays under `prefers-reduced-motion` (the poster frame stands in), and
@@ -14,12 +15,20 @@ import { useEffect, useRef } from "react";
 
 export default function SiteThumbVideo({
   src,
+  mp4,
   poster,
   alt,
+  className = "w-full h-auto rounded-md border border-line block",
+  width,
+  height,
 }: {
-  src: string;
+  src: string; // webm
+  mp4?: string; // H.264 fallback for browsers without VP9/WebM
   poster: string;
   alt: string;
+  className?: string;
+  width?: number;
+  height?: number;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -50,9 +59,12 @@ export default function SiteThumbVideo({
       preload="metadata"
       poster={poster}
       aria-label={alt}
-      className="w-full h-auto rounded-md border border-line block"
+      className={className}
+      width={width}
+      height={height}
     >
       <source src={src} type="video/webm" />
+      {mp4 && <source src={mp4} type="video/mp4" />}
     </video>
   );
 }

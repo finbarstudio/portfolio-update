@@ -6,7 +6,7 @@ import WebFooter from "@/components/web/WebFooter";
 const WEB_URL = "https://web.finbar.studio";
 
 const WEB_DESC =
-  "A catalogue of good websites, one at a time. From Finbar Studio, Brisbane. Also on Instagram as @web.finbar.";
+  "A catalogue of good websites, one at a time. From Finbar Studio, London. Also on Instagram as @web.finbar.";
 
 // metadataBase points at the subdomain so OG/Twitter image + canonical URLs all
 // resolve to web.finbar.studio (the host this section is actually served on),
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     description: WEB_DESC,
     url: WEB_URL,
     siteName: "web.finbar",
-    locale: "en_AU",
+    locale: "en_GB",
     type: "website",
   },
   twitter: {

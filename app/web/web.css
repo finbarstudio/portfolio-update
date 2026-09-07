@@ -80,24 +80,34 @@ body:has(.wf-root) {
 }
 
 /* ── Tiles ─────────────────────────────────────────────────────────── */
+/* A tile is the site's Instagram frame: a 1080×1440 (3:4) still or clip that
+   already carries its own dark surround, so it fills the tile edge to edge.
+   Greyscale until hovered; touch screens have no hover, so they get colour. */
 .wf-tile {
   display: block;
+  position: relative;
   background: #d4d4d4;
   border-radius: 2px;
-  aspect-ratio: 472 / 594;
-  display: grid;
-  place-items: center;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
 }
-.wf-tile img {
-  width: 70%;
-  height: auto;
+.wf-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
   filter: grayscale(1);
   transition: filter 0.35s ease;
 }
-.wf-tile:hover img {
+.wf-tile:hover .wf-media {
   filter: none;
+}
+@media (hover: none) {
+  .wf-media {
+    filter: none;
+  }
 }
 
 .wf-cell {
@@ -114,6 +124,11 @@ body:has(.wf-root) {
 .wf-label .wf-num {
   color: #666;
   font-variant-numeric: tabular-nums;
+}
+.wf-credit {
+  margin: 0;
+  color: #666;
+  line-height: 1.3;
 }
 
 /* ── Submit form ───────────────────────────────────────────────────── */

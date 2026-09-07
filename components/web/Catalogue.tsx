@@ -1,8 +1,11 @@
 import { WEB_SITES, PER_PAGE } from "@/content/web-sites";
+import SiteThumbVideo from "@/components/home/SiteThumbVideo";
 
 /**
  * The catalogue grid, shared by the page-1 route and the /page/[n] routes.
  * Newest first (sorted by id, descending), paginated PER_PAGE at a time.
+ * Each tile is the site's 3:4 Instagram frame (still or looping clip), shown
+ * greyscale until hovered.
  */
 export default function Catalogue({ page }: { page: number }) {
   const sorted = [...WEB_SITES].sort((a, b) => b.id - a.id);
@@ -23,27 +26,44 @@ export default function Catalogue({ page }: { page: number }) {
       </div>
 
       <div className="wf-grid">
-        {items.map((site, i) => (
-          <article key={site.id} className="wf-cell">
-            <a className="wf-tile" href={site.url} target="_blank" rel="noopener noreferrer">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={site.image}
-                alt={`${site.name} website`}
-                width={1440}
-                height={810}
-                loading={i < 3 ? "eager" : "lazy"}
-                decoding="async"
-              />
-            </a>
-            <div className="wf-label">
-              <a href={site.url} target="_blank" rel="noopener noreferrer">
-                {site.name}
+        {items.map((site, i) => {
+          const alt = `${site.name} website`;
+          return (
+            <article key={site.id} className="wf-cell">
+              <a className="wf-tile" href={site.url} target="_blank" rel="noopener noreferrer">
+                {site.video ? (
+                  <SiteThumbVideo
+                    src={site.video.webm}
+                    mp4={site.video.mp4}
+                    poster={site.image}
+                    alt={alt}
+                    className="wf-media"
+                    width={1080}
+                    height={1440}
+                  />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    className="wf-media"
+                    src={site.image}
+                    alt={alt}
+                    width={1080}
+                    height={1440}
+                    loading={i < 3 ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                )}
               </a>
-              <span className="wf-num">{String(site.id).padStart(4, "0")}</span>
-            </div>
-          </article>
-        ))}
+              <div className="wf-label">
+                <a href={site.url} target="_blank" rel="noopener noreferrer">
+                  {site.name}
+                </a>
+                <span className="wf-num">{String(site.id).padStart(4, "0")}</span>
+              </div>
+              {site.credit && <p className="wf-credit">{site.credit}</p>}
+            </article>
+          );
+        })}
       </div>
 
       <nav className="wf-grid wf-row" aria-label="Pages">
