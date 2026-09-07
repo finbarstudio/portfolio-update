@@ -1,4 +1,4 @@
-import { WEB_SITES, PER_PAGE } from "@/content/web-sites";
+import { WEB_SITES, PER_PAGE, type Credit } from "@/content/web-sites";
 import SiteThumbVideo from "@/components/home/SiteThumbVideo";
 
 /**
@@ -7,6 +7,25 @@ import SiteThumbVideo from "@/components/home/SiteThumbVideo";
  * Each tile is the site's 3:4 Instagram frame (still or looping clip), shown
  * greyscale until hovered.
  */
+function Names({ list }: { list: Credit[] }) {
+  return (
+    <dd>
+      {list.map((c, i) => (
+        <span key={c.name}>
+          {i > 0 && ", "}
+          {c.url ? (
+            <a href={c.url} target="_blank" rel="noopener noreferrer">
+              {c.name}
+            </a>
+          ) : (
+            c.name
+          )}
+        </span>
+      ))}
+    </dd>
+  );
+}
+
 export default function Catalogue({ page }: { page: number }) {
   const sorted = [...WEB_SITES].sort((a, b) => b.id - a.id);
   const total = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
@@ -63,13 +82,13 @@ export default function Catalogue({ page }: { page: number }) {
               {site.credits && (
                 <dl className="wf-credits">
                   {site.credits.design && (
-                    <div><dt>Design</dt><dd>{site.credits.design}</dd></div>
+                    <div><dt>Design</dt><Names list={site.credits.design} /></div>
                   )}
                   {site.credits.development && (
-                    <div><dt>Development</dt><dd>{site.credits.development}</dd></div>
+                    <div><dt>Development</dt><Names list={site.credits.development} /></div>
                   )}
                   {site.credits.built && (
-                    <div><dt>Built with</dt><dd>{site.credits.built}</dd></div>
+                    <div><dt>Built with</dt><Names list={site.credits.built} /></div>
                   )}
                 </dl>
               )}

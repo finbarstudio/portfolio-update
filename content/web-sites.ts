@@ -11,13 +11,15 @@
  *    ffmpeg -i 1.mp4 -filter_complex "$PP" -map "[v]" -an -c:v libx264 -crf 25 -movflags +faststart dirt.mp4
  *    ffmpeg -ss 0.1 -i 1.mp4 -frames:v 1 -vf scale=810:1080 poster.png && cwebp -q 82 poster.png -o dirt.webp
  */
+export type Credit = { name: string; url?: string }; // url = Instagram or site, optional
+
 export type WebSite = {
   id: number; // catalogue number, shown under the tile
   name: string;
   url: string; // where the tile links (opens in a new tab)
   image: string; // /web/<file>.webp, 1080×1440 (3:4); doubles as the poster for clips
   video?: { webm: string; mp4?: string }; // optional looping clip, same 3:4 frame
-  credits?: { design?: string; development?: string; built?: string }; // three grey lines under the name
+  credits?: { design?: Credit[]; development?: Credit[]; built?: Credit[] }; // three lines under the name, names linked
   added: string; // YYYY-MM-DD
 };
 
@@ -30,7 +32,14 @@ export const WEB_SITES: WebSite[] = [
     url: "https://dirtverse.co",
     image: "/web/dirt.webp",
     video: { webm: "/web/dirt.webm", mp4: "/web/dirt.mp4" },
-    credits: { design: "Dirt", development: "Bart Ocieczek, Michał Kielar", built: "Framer" },
+    credits: {
+      design: [{ name: "Dirt", url: "https://instagram.com/dirtverse" }],
+      development: [
+        { name: "Bart Ocieczek", url: "https://instagram.com/bartocieczek" },
+        { name: "Michał Kielar", url: "https://instagram.com/michall.kielar" },
+      ],
+      built: [{ name: "Framer", url: "https://www.framer.com" }],
+    },
     added: "2026-09-07",
   },
 ];

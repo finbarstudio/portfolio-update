@@ -45,12 +45,16 @@ body:has(.wf-root) {
 
 .wf-header {
   padding-top: 6px;
+  align-items: start;
 }
+/* Same 14px line box as the wordmarks so the links sit on the exact same
+   top edge (a bare inline <a> gets the font's taller 18px box otherwise). */
 .wf-nav {
   justify-self: end;
-}
-.wf-nav a + a {
-  margin-left: 1.5em;
+  display: flex;
+  gap: 1.5em;
+  height: 14px;
+  line-height: 14px;
 }
 .wf-right {
   text-align: right;
