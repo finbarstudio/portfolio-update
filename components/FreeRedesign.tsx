@@ -274,7 +274,7 @@ export default function FreeRedesign() {
               <Image src="/images/about/finbar.webp" alt="Finbar Skitini" width={128} height={128} />
             </span>
             <p className="fr-who-line">
-              I&rsquo;m Finbar, a web designer in Brisbane. I built all of these.
+              I&rsquo;m Finbar, a web designer in London. I built all of these.
             </p>
           </div>
           <div className="fr-proof">

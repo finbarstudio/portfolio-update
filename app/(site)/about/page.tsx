@@ -19,9 +19,9 @@ const aboutJsonLd = {
   "@type": "ProfilePage",
   "@id": `${SITE_URL}/about#webpage`,
   url: `${SITE_URL}/about`,
-  name: "About | Finbar Skitini, Brisbane Graphic Designer",
+  name: "About | Finbar Skitini, London Graphic Designer",
   isPartOf: { "@id": `${SITE_URL}/#website` },
-  inLanguage: "en-AU",
+  inLanguage: "en-GB",
   mainEntity: {
     "@id": `${SITE_URL}/#person`,
     contactPoint: {
@@ -29,7 +29,7 @@ const aboutJsonLd = {
       email: "finbar@finbar.studio",
       telephone: "+61412796630",
       contactType: "Enquiries",
-      areaServed: ["AU", "GB"],
+      areaServed: ["GB", "AU"],
       availableLanguage: "English",
     },
   },
@@ -76,14 +76,14 @@ const CAP_PILLS: { name: string; href: string }[] = [
 ];
 
 export const metadata: Metadata = {
-  title: { absolute: "About | Finbar Skitini, Brisbane Graphic Designer" },
+  title: { absolute: "About | Finbar Skitini, London Graphic Designer" },
   description:
-    "Finbar Skitini is a Brisbane graphic designer working in brand identity, editorial, web and motion. About the studio, plus how to get in touch.",
+    "Finbar Skitini is a London graphic designer working in brand identity, editorial, web and motion. About the studio, plus how to get in touch.",
   alternates: { canonical: "/about" },
   openGraph: {
     title: "About | Finbar Studio",
     description:
-      "Brisbane graphic designer working in brand identity, editorial, web and motion. About the studio and how to get in touch.",
+      "London graphic designer working in brand identity, editorial, web and motion. About the studio and how to get in touch.",
     url: "/about",
     type: "profile",
     images: [OG_IMAGE],

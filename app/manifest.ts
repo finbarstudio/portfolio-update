@@ -11,12 +11,12 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Finbar Studio · Finbar Skitini",
     short_name: "Finbar Studio",
     description:
-      "Brisbane graphic design and web design studio. Brand identity, websites, publication and motion design.",
+      "London graphic design and web design studio. Brand identity, websites, publication and motion design.",
     start_url: "/",
     display: "standalone",
     background_color: "#F6EFE1",
     theme_color: "#F6EFE1",
-    lang: "en-AU",
+    lang: "en-GB",
     categories: ["design", "portfolio", "business"],
     icons: [
       { src: "/icon", sizes: "32x32", type: "image/png" },

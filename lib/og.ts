@@ -10,5 +10,5 @@ export const OG_IMAGE = {
   url: "/opengraph-image",
   width: 1200,
   height: 630,
-  alt: "Finbar Studio. Brisbane web and graphic design.",
+  alt: "Finbar Studio. London web and graphic design.",
 } as const;

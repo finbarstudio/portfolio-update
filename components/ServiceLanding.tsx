@@ -98,7 +98,7 @@ export default function ServiceLanding({
     description,
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#studio` },
-    inLanguage: "en-AU",
+    inLanguage: "en-GB",
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [
@@ -113,10 +113,9 @@ export default function ServiceLanding({
       description,
       provider: { "@id": `${SITE_URL}/#studio` },
       areaServed: [
-        { "@type": "City", name: "Brisbane" },
-        { "@type": "State", name: "Queensland" },
-        { "@type": "Country", name: "Australia" },
+        { "@type": "City", name: "London" },
         { "@type": "Country", name: "United Kingdom" },
+        { "@type": "Country", name: "Australia" },
       ],
     },
   };
@@ -289,7 +288,7 @@ export default function ServiceLanding({
           <ContactCta className="sticker-pill book-call-pill">Start a project</ContactCta>
         </div>
         <p className="text-ink-soft mt-10" style={{ fontSize: "var(--text-small)" }}>
-          Finbar Studio, Brisbane ·{" "}
+          Finbar Studio, London ·{" "}
           <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a> ·{" "}
           <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>
         </p>

@@ -27,7 +27,7 @@ export default function PrivacyPage() {
 
         <p>
           This site is run by Finbar Skitini, trading as Finbar Studio, a designer based in
-          Brisbane, Australia, working with clients in Australia and the UK. This page explains what
+          London, working with clients in the UK and Australia. This page explains what
           data the site collects, why, who it&rsquo;s shared with, and how to have it removed.
         </p>
 

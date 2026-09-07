@@ -52,39 +52,39 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Brisbane Web Design & Development Studio | Finbar Studio",
+    default: "London Web Design & Development Studio | Finbar Studio",
     template: "%s | Finbar Studio",
   },
   description:
-    "Brisbane web design and development studio building custom websites, with brand identity, editorial and motion design behind them. Selected projects for businesses across Australia and the UK.",
+    "London web design and development studio. Custom-designed, custom-coded websites backed by years of brand and graphic design, for businesses across the UK and Australia.",
   applicationName: "Finbar Studio",
   authors: [{ name: "Finbar Skitini", url: SITE_URL }],
   creator: "Finbar Skitini",
   publisher: "Finbar Skitini",
   // No site-wide `keywords`: Google ignores the tag, and a global list bleeds
-  // Brisbane-web-design terms onto unrelated pages (e.g. the journal), which
+  // London-web-design terms onto unrelated pages (e.g. the journal), which
   // reads as a non-per-post template. Pages that want keywords set their own.
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Brisbane Web Design & Development Studio | Finbar Studio",
+    title: "London Web Design & Development Studio | Finbar Studio",
     description:
-      "Brisbane web design and development studio building custom websites, with brand identity, editorial and motion design behind them, for businesses across Australia and the UK.",
+      "London web design and development studio. Custom-designed, custom-coded websites backed by years of brand and graphic design, for businesses across the UK and Australia.",
     url: SITE_URL,
     siteName: "Finbar Studio",
-    locale: "en_AU",
+    locale: "en_GB",
     type: "website",
     // Explicit og:image (the generated studio card). Pages that set their own
     // openGraph replace this object wholesale, so the opengraph-image file
     // convention does NOT get merged into them — without this, og:image goes
     // missing and Facebook/Instagram scrape the biggest image on the page
     // (a client screenshot). Declaring it here is the site-wide default.
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Finbar Studio. Brisbane web and graphic design." }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Finbar Studio. London web and graphic design." }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Brisbane Web Design & Development Studio | Finbar Studio",
+    title: "London Web Design & Development Studio | Finbar Studio",
     description:
-      "Brisbane web design and development. Custom websites, brand identity, editorial and motion.",
+      "London web design and development. Custom-coded websites with a designer's eye, for businesses across the UK and Australia.",
     creator: "@finbarstudio",
   },
   robots: {
@@ -131,29 +131,28 @@ const personJsonLd = {
   image: `${SITE_URL}/images/headshot.webp`,
   jobTitle: "Graphic Designer",
   description:
-    "Brisbane graphic designer working in brand identity, editorial, web and motion design.",
+    "London graphic designer working in brand identity, editorial, web and motion design.",
   email: "finbar@finbar.studio",
   telephone: "+61412796630",
-  knowsLanguage: ["en-AU", "en-GB"],
+  knowsLanguage: ["en-GB", "en-AU"],
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Brisbane",
-    addressRegion: "QLD",
-    addressCountry: "AU",
+    addressLocality: "London",
+    addressCountry: "GB",
   },
   // Occupations, for richer entity understanding.
   hasOccupation: [
     {
       "@type": "Occupation",
       name: "Graphic Designer",
-      occupationLocation: { "@type": "City", name: "Brisbane" },
+      occupationLocation: { "@type": "City", name: "London" },
       skills:
         "Brand identity, logo design, editorial and publication design, infographic design, motion graphics",
     },
     {
       "@type": "Occupation",
       name: "Web & UI Designer",
-      occupationLocation: { "@type": "City", name: "Brisbane" },
+      occupationLocation: { "@type": "City", name: "London" },
       skills:
         "Website design, UI design, brand-led web design, creative direction",
     },
@@ -200,12 +199,12 @@ const websiteJsonLd = {
   name: "Finbar Studio",
   alternateName: "Finbar Skitini Portfolio",
   url: SITE_URL,
-  inLanguage: "en-AU",
+  inLanguage: "en-GB",
   publisher: { "@id": PERSON_ID },
   about: { "@id": PERSON_ID },
 };
 
-// The studio as a hireable service — anchors "Brisbane web design" / "Brisbane
+// The studio as a hireable service — anchors "London web design" / "London
 // graphic design" local intent. ProfessionalService (a LocalBusiness subtype)
 // with the area served + a catalogue of services, provided by the one Person.
 const serviceJsonLd = {
@@ -215,7 +214,7 @@ const serviceJsonLd = {
   name: "Finbar Studio",
   alternateName: "finbar.studio",
   description:
-    "Brisbane graphic design and web design studio. Brand identity, websites, editorial and motion for businesses across Australia and the UK.",
+    "London graphic design and web design studio. Custom-coded websites, brand identity and editorial design for businesses across the UK and Australia.",
   url: SITE_URL,
   image: `${SITE_URL}/opengraph-image`,
   email: "finbar@finbar.studio",
@@ -225,17 +224,15 @@ const serviceJsonLd = {
   provider: { "@id": PERSON_ID },
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Brisbane",
-    addressRegion: "QLD",
-    addressCountry: "AU",
+    addressLocality: "London",
+    addressCountry: "GB",
   },
   areaServed: [
-    { "@type": "City", name: "Brisbane" },
-    { "@type": "State", name: "Queensland" },
-    { "@type": "Country", name: "Australia" },
+    { "@type": "City", name: "London" },
     { "@type": "Country", name: "United Kingdom" },
+    { "@type": "Country", name: "Australia" },
   ],
-  knowsLanguage: ["en-AU", "en-GB"],
+  knowsLanguage: ["en-GB", "en-AU"],
   sameAs: [
     "https://linkedin.com/in/finbarskitini",
     "https://x.com/finbarstudio",
@@ -258,7 +255,7 @@ const serviceJsonLd = {
       itemOffered: {
         "@type": "Service",
         name,
-        areaServed: { "@type": "City", name: "Brisbane" },
+        areaServed: { "@type": "City", name: "London" },
         provider: { "@id": PERSON_ID },
       },
     })),
@@ -270,7 +267,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="en-AU"
+      lang="en-GB"
       className={`${archivo.variable} ${spaceMono.variable} ${hostGrotesk.variable} ${notoSymbols.variable}`}
     >
       <head>

@@ -12,12 +12,12 @@ const SITE_URL = "https://www.finbar.studio";
 
 export const metadata: Metadata = {
   description:
-    "Finbar Studio is a boutique web development studio in Brisbane. Custom-designed and custom-coded websites, backed by years of brand and graphic design, for businesses across Australia and the UK.",
+    "Finbar Studio is a boutique web development studio in London. Custom-designed and custom-coded websites, backed by years of brand and graphic design, for businesses across the UK and Australia.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Brisbane Web Design & Development Studio | Finbar Studio",
+    title: "London Web Design & Development Studio | Finbar Studio",
     description:
-      "A boutique web development studio in Brisbane. Custom-designed, custom-coded websites, backed by years of brand and graphic design.",
+      "A boutique web development studio in London. Custom-designed, custom-coded websites, backed by years of brand and graphic design.",
     url: SITE_URL,
     type: "website",
     images: [OG_IMAGE],
@@ -97,13 +97,13 @@ function HomeJsonLd() {
     "@type": "WebPage",
     "@id": `${SITE_URL}/#webpage`,
     url: SITE_URL,
-    name: "Finbar Studio, Brisbane Web Design & Development",
+    name: "Finbar Studio, London Web Design & Development",
     description:
-      "A boutique web development studio in Brisbane, backed by years of brand and graphic design.",
+      "A boutique web development studio in London, backed by years of brand and graphic design.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#person` },
     primaryImageOfPage: `${SITE_URL}/opengraph-image`,
-    inLanguage: "en-AU",
+    inLanguage: "en-GB",
   };
   return (
     <Script

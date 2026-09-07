@@ -26,8 +26,8 @@ export default function TermsPage() {
         <p className="text-ink-soft" style={{ fontSize: "var(--text-small)" }}>Last updated {UPDATED}.</p>
 
         <p>
-          This website is run by Finbar Skitini, trading as Finbar Studio, based in Brisbane,
-          Australia. By using the site you agree to these terms. They&rsquo;re written plainly, not
+          This website is run by Finbar Skitini, trading as Finbar Studio, based in London,
+          United Kingdom. By using the site you agree to these terms. They&rsquo;re written plainly, not
           as legal boilerplate.
         </p>
 
@@ -73,8 +73,8 @@ export default function TermsPage() {
           <h2 className="mono-heading text-ink">Liability</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
             To the extent the law allows, I&rsquo;m not liable for any loss arising from your use of
-            this website. Nothing in these terms limits rights you have under the Australian Consumer
-            Law or other rights that can&rsquo;t be excluded.
+            this website. Nothing in these terms limits rights you have under the consumer protection
+            laws that apply where you live or other rights that can&rsquo;t be excluded.
           </p>
         </section>
 
@@ -82,7 +82,7 @@ export default function TermsPage() {
           <h2 className="mono-heading text-ink">Changes and governing law</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
             I may update these terms from time to time; the date above shows when. These terms are
-            governed by the laws of Queensland, Australia.
+            governed by the laws of England and Wales.
           </p>
         </section>
 

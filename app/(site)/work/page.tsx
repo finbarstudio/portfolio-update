@@ -22,12 +22,12 @@ const SITE_URL = "https://www.finbar.studio";
 export const metadata: Metadata = {
   title: "Selected Work",
   description:
-    "Selected branding, web design, publication and motion projects by Finbar Skitini, a Brisbane graphic designer working with clients across Australia and the UK.",
+    "Selected branding, web design, publication and motion projects by Finbar Skitini, a London graphic designer working with clients across the UK and Australia.",
   alternates: { canonical: "/work" },
   openGraph: {
     title: "Selected Work | Finbar Studio",
     description:
-      "Branding, web design, publication and motion projects from Finbar Studio, a Brisbane creative practice.",
+      "Branding, web design, publication and motion projects from Finbar Studio, a London creative practice.",
     url: "/work",
     type: "website",
     images: [OG_IMAGE],
@@ -50,10 +50,10 @@ function WorkJsonLd() {
     url: `${SITE_URL}/work`,
     name: "Work: Selected Projects | Finbar Studio",
     description:
-      "Selected web design, brand identity, publication and motion projects by Finbar Skitini, a Brisbane graphic designer.",
+      "Selected web design, brand identity, publication and motion projects by Finbar Skitini, a London graphic designer.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#person` },
-    inLanguage: "en-AU",
+    inLanguage: "en-GB",
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [

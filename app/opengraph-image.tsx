@@ -13,7 +13,7 @@ import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
  */
 
 export const alt =
-  "Finbar Studio. Brisbane graphic and web design. Brand identity, editorial, web and motion.";
+  "Finbar Studio. London graphic and web design. Brand identity, editorial, web and motion.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -91,7 +91,7 @@ export default async function OpengraphImage() {
             textTransform: "uppercase",
           }}
         >
-          Brisbane graphic &amp; web design
+          London graphic &amp; web design
         </div>
 
         {/* URL, pinned to the bottom edge */}

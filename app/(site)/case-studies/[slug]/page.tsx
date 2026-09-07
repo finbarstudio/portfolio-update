@@ -445,7 +445,7 @@ export default async function CaseStudyPage({
     image: project.heroImage?.src
       ? `${SITE_URL}${project.heroImage.src}`
       : undefined,
-    inLanguage: "en-AU",
+    inLanguage: "en-GB",
   };
 
   // Breadcrumb trail so Google can render Home › Work › <Project> in results.

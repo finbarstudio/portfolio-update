@@ -7,26 +7,26 @@ import { OG_IMAGE } from "@/lib/og";
 const SITE_URL = "https://www.finbar.studio";
 
 /**
- * /web-design — the local-search landing page for "web design brisbane" and
- * its variants. Structure follows what the current top-ranking Brisbane pages
+ * /web-design — the local-search landing page for "web design london" and
+ * its variants. Structure follows what the current top-ranking London pages
  * do well (long-form keyword coverage, location-rich client mentions, a
  * meet-the-designer credentials block, process, search-phrased FAQs), told
  * with this studio's actual facts. Keyword variants are used deliberately:
- * web design / website design / web designer / website designer + Brisbane.
+ * web design / website design / web designer / website designer + London.
  */
 
 export const metadata: Metadata = {
-  // "Web Designer Brisbane" covers both query families in one: the designer
+  // "Web Designer London" covers both query families in one: the designer
   // noun (what the top-ranking competitors put in their titles) AND the exact
   // "web design" phrase as its substring.
-  title: { absolute: "Web Designer Brisbane | Custom-Coded Websites | Finbar Studio" },
+  title: { absolute: "Web Designer London | Custom-Coded Websites | Finbar Studio" },
   description:
-    "Brisbane web designer building custom-coded websites: brand-led design, a CMS you run yourself, SEO and AI-search ready. For businesses in Brisbane, across Australia and the UK.",
+    "London web designer building custom-coded websites: brand-led design, a CMS you run yourself, SEO and AI-search ready. For businesses in London, across the UK and Australia.",
   alternates: { canonical: "/web-design" },
   openGraph: {
-    title: "Web Designer Brisbane | Custom-Coded Websites | Finbar Studio",
+    title: "Web Designer London | Custom-Coded Websites | Finbar Studio",
     description:
-      "Custom-coded, brand-led websites with a CMS you run yourself, from a Brisbane web designer. Selected web projects.",
+      "Custom-coded, brand-led websites with a CMS you run yourself, from a London web designer. Selected web projects.",
     url: `${SITE_URL}/web-design`,
     type: "website",
     images: [OG_IMAGE],
@@ -38,11 +38,11 @@ export default function WebDesignPage() {
     <ServiceLanding
       slug="web-design"
       galleryFirst
-      label="Service · Brisbane"
-      heading="Brisbane web design & development"
+      label="Service · London"
+      heading="London web design & development"
       serviceName="Web Design & Development"
-      description="Brisbane web design and development. Custom-coded, brand-led websites with a CMS clients run themselves, for businesses across Australia and the UK."
-      intro="I'm a web designer and developer in Brisbane building websites for businesses here and across Australia and the UK. Mostly custom-coded: hand-built front ends that load fast and behave exactly how they were drawn, wired into a CMS the client runs themselves after launch. Where they earn their place, I build the extras in too, like instant estimate tools and live social feeds. It starts with the brand, from the first sketch, and the same care for type and detail carries through to the code."
+      description="London web design and development. Custom-coded, brand-led websites with a CMS clients run themselves, for businesses across the UK and Australia."
+      intro="I'm a web designer and developer in London building websites for businesses here and across the UK and Australia. Mostly custom-coded: hand-built front ends that load fast and behave exactly how they were drawn, wired into a CMS the client runs themselves after launch. Where they earn their place, I build the extras in too, like instant estimate tools and live social feeds. It starts with the brand, from the first sketch, and the same care for type and detail carries through to the code."
       terms={["web", "ui", "framer"]}
       capsTitle="What I build"
       capabilities={[
@@ -55,16 +55,16 @@ export default function WebDesignPage() {
       ]}
       sections={[
         {
-          heading: "Website design for Brisbane businesses",
-          body: "Most Brisbane website design is a template with your logo on it. Mine isn't. Every site I design starts from your brand and your customers, then gets built by hand, so the layout, the type and the motion are decisions rather than defaults. That's the difference visitors feel in the first few seconds, and it's why my clients' sites win work instead of just sitting there. Whether you're a trade, a consultancy or a shop, the job is the same: a website that looks like nobody else's and quietly brings in enquiries.",
+          heading: "Website design for London businesses",
+          body: "Most London website design is a template with your logo on it. Mine isn't. Every site I design starts from your brand and your customers, then gets built by hand, so the layout, the type and the motion are decisions rather than defaults. That's the difference visitors feel in the first few seconds, and it's why my clients' sites win work instead of just sitting there. Whether you're a trade, a consultancy or a shop, the job is the same: a website that looks like nobody else's and quietly brings in enquiries.",
         },
         {
           heading: "Custom code, not page builders",
           body: "I write the front end myself instead of assembling it in WordPress, Squarespace or Wix. Hand-written code loads faster, scores better on Google's speed checks, and never fights a theme. You still get an easy editing experience: every build is wired into a CMS, so you change words, photos, projects and prices yourself without touching code. Custom also means custom features. For Lows Design + Build I built an instant estimate calculator that turns visitors into named leads while they sleep.",
         },
         {
-          heading: "From Brisbane to London",
-          body: "Recent website design work: Lows Design + Build, family builders in South London. KinAya, an NDIS support provider in Adelaide. Salesmasters, a sales consultancy here in Brisbane. Plated with Issy, a candlelit supper club. Lola Audio, a composer's portfolio you can actually mix. I'm based in Brisbane and most of the work happens over calls and shared files, so where you are has never been a barrier.",
+          heading: "Across the UK and Australia",
+          body: "Recent website design work: Lows Design + Build, family builders in South London. KinAya, an NDIS support provider in Adelaide. Salesmasters, a sales consultancy in Brisbane. Plated with Issy, a candlelit supper club. Lola Audio, a composer's portfolio you can actually mix. I'm based in London and most of the work happens over calls and shared files, so where you are has never been a barrier.",
         },
         {
           heading: "Looked after beyond launch",
@@ -90,12 +90,12 @@ export default function WebDesignPage() {
         },
       ]}
       meet={{
-        heading: "Meet your Brisbane web designer",
-        body: "I'm Finbar Skitini, a designer first and a developer because the design deserves better than a template. I trained in the UK, design brands, publications and motion as well as websites, and moved the studio to Brisbane. That mix is the point: when the same person draws the brand and writes the code, the site reads as one piece of work.",
+        heading: "Meet your London web designer",
+        body: "I'm Finbar Skitini, a designer first and a developer because the design deserves better than a template. I trained in the UK, design brands, publications and motion as well as websites, ran the studio from Brisbane for a few years and am now back in London. That mix is the point: when the same person draws the brand and writes the code, the site reads as one piece of work.",
         points: [
           "BA (Hons), Brighton and Ravensbourne University",
           "Brand, editorial and motion design behind every build",
-          "Based in Brisbane, clients across Australia and the UK",
+          "Based in London, clients across the UK and Australia",
           "Custom builds on Next.js, with Sanity and Payload CMS",
         ],
       }}
@@ -113,7 +113,7 @@ export default function WebDesignPage() {
       }
       faqs={[
         {
-          q: "How much does a website cost in Brisbane?",
+          q: "How much does a website cost in London?",
           a: "It depends on the size of the site and what it needs to do. A small brochure site sits at the lower end; sites with custom tools, animation or a full brand behind them cost more. I quote a fixed price per project after a 15 minute call, so there are no surprises. And if you want to see the standard first, I'll redesign your homepage for free.",
         },
         {
@@ -141,8 +141,8 @@ export default function WebDesignPage() {
           a: "Search is part of the build, not an add-on. Every site ships with clean structure, fast load times, structured data and the on-page basics done properly, and it's set up to be read by AI search tools as well as Google. Rankings take time and depend on competition, but the site will never be the thing holding you back.",
         },
         {
-          q: "Do you work with businesses outside Brisbane?",
-          a: "Yes. I'm a website designer based in Brisbane, and I work with clients across Australia and the UK. Most of the work happens over calls and shared files, so location isn't a barrier.",
+          q: "Do you work with businesses outside London?",
+          a: "Yes. I'm a website designer based in London, and I work with clients across the UK and Australia. Most of the work happens over calls and shared files, so location isn't a barrier.",
         },
         {
           q: "Can you design the brand as well as the site?",

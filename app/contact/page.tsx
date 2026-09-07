@@ -10,7 +10,7 @@ import ContactPage from "@/components/ContactPage";
 export const metadata: Metadata = {
   title: "Contact",   // the root template appends "| Finbar Studio"
   description:
-    "Hiring or have a project? Reach Finbar Studio direct, send a note, or book a call. Brisbane-based web design and development studio.",
+    "Hiring or have a project? Reach Finbar Studio direct, send a note, or book a call. London-based web design and development studio.",
   alternates: { canonical: "https://www.finbar.studio/contact" },
 };
 
