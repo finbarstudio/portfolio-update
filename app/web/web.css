@@ -41,8 +41,17 @@ body:has(.wf-root) {
 .wf-header {
   padding-top: 6px;
 }
+.wf-nav {
+  justify-self: end;
+}
 .wf-nav a + a {
   margin-left: 1.5em;
+}
+.wf-tagline {
+  color: #666;
+}
+.wf-right {
+  text-align: right;
 }
 /* Column-left like everything else on the grid (the reference never centres). */
 .wf-logo {
@@ -73,7 +82,7 @@ body:has(.wf-root) {
 /* ── Tiles ─────────────────────────────────────────────────────────── */
 .wf-tile {
   display: block;
-  background: #ddd;
+  background: #d4d4d4;
   border-radius: 2px;
   aspect-ratio: 472 / 594;
   display: grid;
@@ -102,8 +111,9 @@ body:has(.wf-root) {
   gap: 12px;
   min-height: 14px;
 }
-.wf-label .wf-name {
+.wf-label .wf-num {
   color: #666;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Submit form ───────────────────────────────────────────────────── */
@@ -227,8 +237,8 @@ body:has(.wf-root) {
     row-gap: 10px;
   }
   .wf-header .wf-logo { grid-column: 1; grid-row: 1; }
-  .wf-header > span { grid-column: 2; grid-row: 1; }
-  .wf-header .wf-nav { grid-column: 1 / -1; grid-row: 2; }
+  .wf-header .wf-tagline { display: none; }
+  .wf-header .wf-nav { grid-column: 2; grid-row: 1; }
   /* Keep the three-up label rows on one line rather than stacking. */
   .wf-row,
   .wf-footer {

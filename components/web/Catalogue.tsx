@@ -15,9 +15,11 @@ export default function Catalogue({ page }: { page: number }) {
       <div className="wf-void" />
 
       <div className="wf-grid wf-row">
-        <span>Catalogue</span>
-        <span>{page}</span>
-        <span>{total}</span>
+        <span>
+          {sorted.length} {sorted.length === 1 ? "website" : "websites"}
+        </span>
+        <span />
+        <span className="wf-right">{total > 1 ? `Page ${page} of ${total}` : ""}</span>
       </div>
 
       <div className="wf-grid">
@@ -35,10 +37,10 @@ export default function Catalogue({ page }: { page: number }) {
               />
             </a>
             <div className="wf-label">
-              <span>{String(site.id).padStart(4, "0")}</span>
-              <a className="wf-name" href={site.url} target="_blank" rel="noopener noreferrer">
+              <a href={site.url} target="_blank" rel="noopener noreferrer">
                 {site.name}
               </a>
+              <span className="wf-num">{String(site.id).padStart(4, "0")}</span>
             </div>
           </article>
         ))}
@@ -46,10 +48,10 @@ export default function Catalogue({ page }: { page: number }) {
 
       <nav className="wf-grid wf-row" aria-label="Pages">
         <span>
-          {page > 1 && <a href={page - 1 === 1 ? "/" : `/page/${page - 1}`}>← Previous</a>}
+          {page > 1 && <a href={page - 1 === 1 ? "/" : `/page/${page - 1}`}>← Newer</a>}
         </span>
         <span />
-        <span>{page < total && <a href={`/page/${page + 1}`}>Next →</a>}</span>
+        <span className="wf-right">{page < total && <a href={`/page/${page + 1}`}>Older →</a>}</span>
       </nav>
     </>
   );

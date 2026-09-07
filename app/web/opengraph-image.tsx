@@ -59,40 +59,28 @@ export default async function WebOpengraphImage() {
           padding: 64,
         }}
       >
-        {/* Brand wordmark, greyscale */}
+        {/* The WEBFINBAR lockup is the hero: same construction as the site's
+            wordmark (bold caps, tight tracking, the greyscale mark after). */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            fontFamily: "Host Grotesk, sans-serif",
-            fontSize: 34,
+            marginTop: 56,
+            fontSize: 132,
             fontWeight: 700,
             letterSpacing: "-0.02em",
             textTransform: "uppercase",
             lineHeight: 1,
           }}
         >
-          FINBARSTUDIO
-          <div style={{ display: "flex", marginLeft: 6 }}>
-            <GreyMark size={26} />
+          WEBFINBAR
+          <div style={{ display: "flex", marginLeft: 18 }}>
+            <GreyMark size={100} />
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            marginTop: 40,
-            fontSize: 124,
-            fontWeight: 700,
-            letterSpacing: "-0.02em",
-            lineHeight: 0.95,
-          }}
-        >
-          web.finbar
-        </div>
-
-        <div style={{ display: "flex", marginTop: 28, fontSize: 26, fontWeight: 400, color: INK_SOFT }}>
-          A catalogue of websites worth clicking.
+        <div style={{ display: "flex", marginTop: 32, fontSize: 30, fontWeight: 400, color: INK_SOFT }}>
+          Good websites, one at a time.
         </div>
 
         <div style={{ display: "flex", marginTop: "auto", fontSize: 22, fontWeight: 400, color: INK }}>
