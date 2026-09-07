@@ -3800,6 +3800,15 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
 .top-nav-sandbox:hover,
 .top-nav-sandbox:focus-visible { color: var(--pink-deep); }
 .top-nav-sandbox svg { height: 15px; }
+/* web.finbar — greyscale is the point (it's a greyscale-logo destination),
+   so it does NOT take the pink accent the rest of the nav uses. */
+.top-nav-web {
+  margin-left: clamp(10px, 1.6vw, 22px);
+  color: #6b6560;
+}
+.top-nav-web:hover,
+.top-nav-web:focus-visible { color: var(--ink); }
+.top-nav-web svg { height: 15px; }
 /* The little dropdown label under each icon. Pure CSS: hidden by default,
    drops in on hover/focus. Styled on the SAME token as the nav pills (.tag:
    mono 400, 10px, 0.06em tracking, 3px radius, hairline ink border) so the

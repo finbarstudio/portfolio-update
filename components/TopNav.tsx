@@ -51,6 +51,20 @@ function FlaskIcon() {
   );
 }
 
+/* web.finbar — the @web.finbar Instagram catalogue's site counterpart. A
+   simple 2x2 grid glyph (a "gallery"), kept flat/greyscale-coded to read as a
+   distinct, quieter destination from the socials. */
+function WebGridIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="100%" height="100%">
+      <rect x="3" y="3" width="8" height="8" rx="1.5" />
+      <rect x="13" y="3" width="8" height="8" rx="1.5" />
+      <rect x="3" y="13" width="8" height="8" rx="1.5" />
+      <rect x="13" y="13" width="8" height="8" rx="1.5" />
+    </svg>
+  );
+}
+
 export default function TopNav() {
   const pathname = usePathname();
 
@@ -170,6 +184,19 @@ export default function TopNav() {
             <span className="nav-tip" aria-hidden="true">{s.label}</span>
           </a>
         ))}
+        {/* web.finbar — the @web.finbar Instagram's site catalogue, a quiet
+            greyscale destination distinct from the socials/sandbox. Sits
+            immediately before the sandbox flask. */}
+        <a
+          href="https://web.finbar.studio"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="web.finbar, a catalogue of good websites (opens in a new tab)"
+          className="top-nav-social-item top-nav-web"
+        >
+          <WebGridIcon />
+          <span className="nav-tip" aria-hidden="true">web.finbar</span>
+        </a>
         {/* Sandbox — furthest right, set apart from the socials with its own gap
             and the accent colour (it's ours, they're elsewhere). The old 🫂
             contact glyph lived here; contact still has the nav pill, and the

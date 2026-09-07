@@ -1,0 +1,247 @@
+/**
+ * web.finbar — styling for the /web section (the @web.finbar Instagram's site
+ * counterpart: a catalogue of good websites, one at a time). Every class here
+ * is prefixed `.wf-`; the JSX under app/web/ uses semantic tags + these
+ * classes only, no Tailwind utilities. Modelled on klikkentheke.com: one
+ * greyscale typeface, one size, a strict 3-column grid, a deliberate empty
+ * void before content, and screenshots that go colour on hover.
+ */
+
+body:has(.wf-root) {
+  background: #eeeeee;
+  color: #111;
+}
+
+.wf-root {
+  min-height: 100svh;
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wf-root a {
+  color: inherit;
+  text-decoration: none;
+}
+.wf-root a:hover {
+  color: #666;
+}
+
+/* ── Grid ──────────────────────────────────────────────────────────── */
+.wf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0 6px;
+}
+
+.wf-header {
+  padding-top: 6px;
+}
+.wf-nav a + a {
+  margin-left: 1.5em;
+}
+/* Column-left like everything else on the grid (the reference never centres). */
+.wf-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  justify-self: start;
+}
+.wf-logo .brand-wordmark {
+  filter: grayscale(1);
+  font-size: 14px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+/* The deliberate empty space before content starts. */
+.wf-void {
+  height: clamp(220px, 48vh, 440px);
+}
+.wf-void.is-short {
+  height: clamp(140px, 24vh, 220px);
+}
+
+.wf-row {
+  margin-bottom: 6px;
+}
+
+/* ── Tiles ─────────────────────────────────────────────────────────── */
+.wf-tile {
+  display: block;
+  background: #ddd;
+  border-radius: 2px;
+  aspect-ratio: 472 / 594;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.wf-tile img {
+  width: 70%;
+  height: auto;
+  display: block;
+  filter: grayscale(1);
+  transition: filter 0.35s ease;
+}
+.wf-tile:hover img {
+  filter: none;
+}
+
+.wf-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wf-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 14px;
+}
+.wf-label .wf-name {
+  color: #666;
+}
+
+/* ── Submit form ───────────────────────────────────────────────────── */
+.wf-form {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+}
+/* 14px text + 3px + 1px rule = the reference's 18px row pitch. */
+.wf-input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #222;
+  border-radius: 0;
+  padding: 0 0 3px;
+  font: inherit;
+  color: #111;
+  outline: none;
+  resize: none;
+}
+.wf-input::placeholder {
+  color: #8a8a8a;
+  opacity: 1;
+}
+.wf-input:focus {
+  border-bottom-color: #111;
+}
+.wf-input:focus::placeholder {
+  color: #666;
+}
+.wf-input + .wf-input {
+  margin-top: 0;
+}
+.wf-hp {
+  display: none;
+}
+
+.wf-submit {
+  margin-top: 18px;
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: #111;
+  cursor: pointer;
+}
+.wf-submit:hover {
+  color: #666;
+}
+.wf-submit:disabled {
+  color: #8a8a8a;
+  cursor: default;
+}
+
+.wf-msg {
+  margin-top: 18px;
+  max-width: 38ch;
+  line-height: 1.3;
+}
+
+/* ── Guidelines ────────────────────────────────────────────────────── */
+.wf-guide {
+  grid-column: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.wf-guide h2 {
+  grid-column: 1 / -1;
+  font: inherit;
+  margin: 0 0 18px;
+}
+.wf-guide ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.wf-guide li {
+  margin-bottom: 18px;
+  line-height: 1.3;
+}
+.wf-guide li span {
+  display: block;
+  margin-bottom: 2px;
+  color: #666;
+}
+.wf-guide li b {
+  font-weight: 400;
+  display: block;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+.wf-footer {
+  padding: 48px 6px 12px;
+  color: #666;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .wf-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wf-guide {
+    grid-column: 1 / -1;
+  }
+  .wf-form {
+    grid-column: 1 / -1;
+    max-width: 432px;
+  }
+}
+@media (max-width: 639px) {
+  .wf-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Header becomes two rows: logo + year, then the nav underneath, so the
+     wordmark never wraps and the links get a full line. */
+  .wf-header {
+    grid-template-columns: 1fr auto;
+    row-gap: 10px;
+  }
+  .wf-header .wf-logo { grid-column: 1; grid-row: 1; }
+  .wf-header > span { grid-column: 2; grid-row: 1; }
+  .wf-header .wf-nav { grid-column: 1 / -1; grid-row: 2; }
+  /* Keep the three-up label rows on one line rather than stacking. */
+  .wf-row,
+  .wf-footer {
+    grid-template-columns: 1fr auto auto;
+  }
+  .wf-guide {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The root layout's Meta-pixel notice still shows here (it should, the pixel
+   runs on this host too), but it arrives in the portfolio's cream and pink.
+   Desaturate it so it belongs to this greyscale site. */
+body:has(.wf-root) .cookie-notice {
+  filter: grayscale(1);
+}
