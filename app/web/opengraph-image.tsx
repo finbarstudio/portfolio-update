@@ -15,7 +15,6 @@ export const contentType = "image/png";
 
 const BG = "#eeeeee";
 const INK = "#111111";
-const INK_SOFT = "#666666";
 
 function toGrey(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -77,10 +76,6 @@ export default async function WebOpengraphImage() {
           <div style={{ display: "flex", marginLeft: 18 }}>
             <GreyMark size={100} />
           </div>
-        </div>
-
-        <div style={{ display: "flex", marginTop: 32, fontSize: 30, fontWeight: 400, color: INK_SOFT }}>
-          Good websites, one at a time.
         </div>
 
         <div style={{ display: "flex", marginTop: "auto", fontSize: 22, fontWeight: 400, color: INK }}>

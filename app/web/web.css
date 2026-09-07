@@ -7,6 +7,11 @@
  * void before content, and screenshots that go colour on hover.
  */
 
+/* Both html and body: globals.css paints html in the portfolio's cream, and
+   html is what shows in the rubber-band gap when you overscroll past the top. */
+html:has(.wf-root) {
+  background-color: #eeeeee;
+}
 body:has(.wf-root) {
   background: #eeeeee;
   color: #111;
@@ -46,9 +51,6 @@ body:has(.wf-root) {
 }
 .wf-nav a + a {
   margin-left: 1.5em;
-}
-.wf-tagline {
-  color: #666;
 }
 .wf-right {
   text-align: right;
@@ -245,15 +247,14 @@ body:has(.wf-root) {
   .wf-grid {
     grid-template-columns: 1fr;
   }
-  /* Header becomes two rows: logo + year, then the nav underneath, so the
-     wordmark never wraps and the links get a full line. */
+  /* Header: logo left, links right, on one line. */
   .wf-header {
     grid-template-columns: 1fr auto;
     row-gap: 10px;
   }
   .wf-header .wf-logo { grid-column: 1; grid-row: 1; }
-  .wf-header .wf-tagline { display: none; }
   .wf-header .wf-nav { grid-column: 2; grid-row: 1; }
+  .wf-header > span:empty { display: none; }
   /* Keep the three-up label rows on one line rather than stacking. */
   .wf-row,
   .wf-footer {
