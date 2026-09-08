@@ -64,6 +64,18 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=86400" },
         ],
       },
+      // Direct downloads. Plain static files under public/downloads: no route
+      // code, no parameters, nothing user-controlled, so nothing to exploit.
+      // Force a save dialog rather than inline rendering, keep them out of
+      // search, cache for a day.
+      {
+        source: "/downloads/:path*",
+        headers: [
+          { key: "Content-Disposition", value: "attachment" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Cache-Control", value: "public, max-age=86400" },
+        ],
+      },
     ];
   },
   images: {

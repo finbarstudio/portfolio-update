@@ -17,7 +17,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const host = (await headers()).get("host")?.split(":")[0].toLowerCase() || "";
   const base = host.startsWith("sandbox.") ? SANDBOX : host.startsWith("web.") ? WEB : WWW;
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/downloads/"] }],
     sitemap: `${base}/sitemap.xml`,
     host: base,
   };
