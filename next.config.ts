@@ -92,6 +92,13 @@ const nextConfig: NextConfig = {
   // NOTE: /contact used to 308 to /about (contact once lived there). It's a
   // real page again — if a browser cached the old permanent redirect it will
   // keep bouncing until its cache expires; a hard refresh clears it.
+  async redirects() {
+    return [
+      // finbar.studio/cursor = the CursorMania extension download. A redirect
+      // (not a rewrite) so the browser saves it under the zip's real filename.
+      { source: "/cursor", destination: "/downloads/cursormania-extension.zip", permanent: false },
+    ];
+  },
   async rewrites() {
     return [
       // Serve the generated brand icon at the conventional /favicon.ico path.
