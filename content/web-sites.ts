@@ -27,6 +27,19 @@ export const PER_PAGE = 12;
 
 export const WEB_SITES: WebSite[] = [
   {
+    id: 2,
+    name: "Podium",
+    url: "https://podium.global",
+    image: "/web/podium.webp",
+    video: { webm: "/web/podium.webm", mp4: "/web/podium.mp4" },
+    credits: {
+      design: [{ name: "San Rita", url: "https://instagram.com/sanrita.atelier" }],
+      development: [{ name: "San Rita", url: "https://instagram.com/sanrita.atelier" }],
+      built: [{ name: "Next.js", url: "https://nextjs.org" }],
+    },
+    added: "2026-09-08",
+  },
+  {
     id: 1,
     name: "Dirt",
     url: "https://dirtverse.co",

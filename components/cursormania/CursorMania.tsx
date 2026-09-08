@@ -148,19 +148,20 @@ function hotspotFor(mode: Mode, first: ImageData): [number, number] {
   return best ?? [0, 0];
 }
 
-/* ── The nav button ──────────────────────────────────────────────── */
+/* ── The nav item: a pointer-arrow glyph in the social row ───────── */
 export function CursorManiaButton() {
   return (
     <button
       type="button"
-      className="cm-navbtn xpbtn"
+      className="top-nav-social-item top-nav-cursor"
       onClick={() => window.dispatchEvent(new CustomEvent(TOGGLE))}
       aria-haspopup="dialog"
-      title="CursorMania: free cursors for your PC!"
+      aria-label="CursorMania, pick a cursor"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/cursormania/icon-16.png" alt="" width={16} height={16} />
-      CursorMania
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="100%" height="100%">
+        <path d="M5 3l14.5 10.2-6.4 1.1 3.6 6.3-2.6 1.4-3.6-6.3L5.6 20.4z" />
+      </svg>
+      <span className="nav-tip" aria-hidden="true">CursorMania</span>
     </button>
   );
 }

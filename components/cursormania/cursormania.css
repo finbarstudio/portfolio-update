@@ -26,17 +26,6 @@
 .xpbtn:disabled { color: #a0a0a0; cursor: default; }
 .xpbtn img { image-rendering: pixelated; display: block; }
 
-/* In the top nav: sits after the sandbox flask, top right. Desktop only:
-   there is no cursor to dress on a phone. */
-.cm-navbtn {
-  margin-left: clamp(10px, 1.6vw, 22px);
-  padding: 1px 8px 2px 6px;
-  flex: 0 0 auto;
-}
-@media (max-width: 767px), (hover: none) {
-  .cm-navbtn { display: none; }
-}
-
 /* ── The window ─────────────────────────────────────────────────── */
 .cm-win {
   position: fixed;

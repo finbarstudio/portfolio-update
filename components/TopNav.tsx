@@ -41,27 +41,13 @@ const socials = [
   { label: "Are.na", cls: "is-arena", href: "https://are.na/finbar-studio", icon: <ArenaIcon /> },
 ];
 
-/* The sandbox flask — experiments live there. Stroke-based so it sits with the
-   other line marks at nav size. */
-function FlaskIcon() {
+/* web.finbar — the @web.finbar Instagram catalogue's site counterpart: a
+   globe, kept greyscale-coded to read as a quieter destination than the socials. */
+function GlobeIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" width="100%" height="100%">
-      <path d="M9.4 3h5.2M10.3 3v5.4L5.5 17.5A2.35 2.35 0 0 0 7.7 20.7h8.6a2.35 2.35 0 0 0 2.2-3.2L13.7 8.4V3" />
-      <path d="M7.6 14.5h8.8" />
-    </svg>
-  );
-}
-
-/* web.finbar — the @web.finbar Instagram catalogue's site counterpart. A
-   simple 2x2 grid glyph (a "gallery"), kept flat/greyscale-coded to read as a
-   distinct, quieter destination from the socials. */
-function WebGridIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="100%" height="100%">
-      <rect x="3" y="3" width="8" height="8" rx="1.5" />
-      <rect x="13" y="3" width="8" height="8" rx="1.5" />
-      <rect x="3" y="13" width="8" height="8" rx="1.5" />
-      <rect x="13" y="13" width="8" height="8" rx="1.5" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" width="100%" height="100%">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" />
     </svg>
   );
 }
@@ -186,8 +172,7 @@ export default function TopNav() {
           </a>
         ))}
         {/* web.finbar — the @web.finbar Instagram's site catalogue, a quiet
-            greyscale destination distinct from the socials/sandbox. Sits
-            immediately before the sandbox flask. */}
+            greyscale destination distinct from the socials. */}
         <a
           href="https://web.finbar.studio"
           target="_blank"
@@ -195,25 +180,11 @@ export default function TopNav() {
           aria-label="web.finbar, a catalogue of good websites (opens in a new tab)"
           className="top-nav-social-item top-nav-web"
         >
-          <WebGridIcon />
+          <GlobeIcon />
           <span className="nav-tip" aria-hidden="true">web.finbar</span>
         </a>
-        {/* Sandbox — furthest right, set apart from the socials with its own gap
-            and the accent colour (it's ours, they're elsewhere). The old 🫂
-            contact glyph lived here; contact still has the nav pill, and the
-            footer's Book-a-call is now the main conversion path. */}
-        <a
-          href="https://sandbox.finbar.studio"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Sandbox (opens in a new tab)"
-          className="top-nav-social-item top-nav-sandbox"
-        >
-          <FlaskIcon />
-          <span className="nav-tip" aria-hidden="true">Sandbox</span>
-        </a>
-        {/* CursorMania: the 2004 cursor toolbar as a Windows XP button, last
-            on the row. Opens the picker window (mounted in LayoutShell). */}
+        {/* CursorMania: the 2004 cursor picker, last on the row. Opens the
+            XP window (mounted in LayoutShell). */}
         <CursorManiaButton />
       </div>
     </header>

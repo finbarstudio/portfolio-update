@@ -3789,26 +3789,26 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
   transform: translate(-50%, 0);
 }
 .top-nav-social-item svg { height: 14px; width: auto; display: block; }
-/* Sandbox flask — the row's last item, set apart from the socials by a bigger
-   gap and the accent colour (the socials are ink → pink on hover; this is pink
-   → deep). position: relative anchors the .nav-tip dropdown. */
-.top-nav-sandbox {
-  position: relative;
-  margin-left: clamp(10px, 1.6vw, 22px);
-  color: var(--pink);
-}
-.top-nav-sandbox:hover,
-.top-nav-sandbox:focus-visible { color: var(--pink-deep); }
-.top-nav-sandbox svg { height: 15px; }
 /* web.finbar — greyscale is the point (it's a greyscale-logo destination),
-   so it does NOT take the pink accent the rest of the nav uses. */
-.top-nav-web {
-  margin-left: clamp(10px, 1.6vw, 22px);
-  color: #6b6560;
-}
+   so it does NOT take the pink accent the rest of the nav uses. Same gap as
+   the socials: the row is one evenly spaced run. */
+.top-nav-web { color: #6b6560; }
 .top-nav-web:hover,
 .top-nav-web:focus-visible { color: var(--ink); }
 .top-nav-web svg { height: 15px; }
+/* CursorMania — a pointer-arrow glyph, last on the row. Desktop only: a phone
+   has no cursor to dress. A <button>, so reset the UA chrome. */
+.top-nav-cursor {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+.top-nav-cursor svg { height: 15px; }
+@media (max-width: 767px), (hover: none) {
+  .top-nav-cursor { display: none; }
+}
 /* The little dropdown label under each icon. Pure CSS: hidden by default,
    drops in on hover/focus. Styled on the SAME token as the nav pills (.tag:
    mono 400, 10px, 0.06em tracking, 3px radius, hairline ink border) so the
@@ -3834,15 +3834,15 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
   transform: translateY(-4px);
   transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
 }
-/* The flask is the row's last item, hard against the viewport edge — its tip
-   right-aligns (double class beats the centred socials rule below). */
-.top-nav-social-item.top-nav-sandbox .nav-tip {
+/* The row's last item is hard against the viewport edge — its tip
+   right-aligns (the extra class beats the centred socials rule). */
+.top-nav-social-item:last-child .nav-tip {
   left: auto;
   right: -4px;
   transform: translateY(-4px);
 }
-.top-nav-social-item.top-nav-sandbox:hover .nav-tip,
-.top-nav-social-item.top-nav-sandbox:focus-visible .nav-tip {
+.top-nav-social-item:last-child:hover .nav-tip,
+.top-nav-social-item:last-child:focus-visible .nav-tip {
   opacity: 1;
   transform: translateY(0);
 }
