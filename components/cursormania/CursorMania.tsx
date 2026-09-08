@@ -429,6 +429,9 @@ export default function CursorMania() {
           </span>
         </div>
         <div className="cm-msg">{msg}</div>
+        <a className="cm-credit" href="https://rgbmew.neocities.org/cursormania" target="_blank" rel="noopener noreferrer">
+          Cursors archived by @rgbmew
+        </a>
       </div>
     </div>
   );

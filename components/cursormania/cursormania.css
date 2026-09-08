@@ -257,6 +257,8 @@
 .cm-cur .lbl { color: #333; }
 .cm-cur-img { width: 24px; height: 24px; image-rendering: pixelated; }
 .cm-msg { color: #0046d5; white-space: nowrap; }
+.cm-credit { margin-left: auto; color: #555; white-space: nowrap; }
+.cm-credit:hover { text-decoration: underline; color: #0000aa; }
 
 /* The window is the one place the picked cursor must NOT apply: you need
    the arrow to pick. The applier's rule is `cursor: inherit !important` on
