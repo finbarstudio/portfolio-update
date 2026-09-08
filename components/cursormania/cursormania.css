@@ -1,0 +1,279 @@
+/* CursorMania on the site: the extension's popup.css, scoped under .cm-win,
+   plus the XP button that opens it from the top nav. Windows XP Luna dress,
+   Tahoma 11px, no smoothing. Nothing in here touches the portfolio's tokens. */
+
+/* ── The XP button (shared by the nav button + the window's toolbar) ── */
+.xpbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px 3px;
+  font: 11px Tahoma, "Segoe UI", Verdana, sans-serif;
+  color: #000;
+  background: linear-gradient(#ffffff, #ecebe5 45%, #dcdad1);
+  border: 1px solid #003c74;
+  border-radius: 3px;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c9c5b5;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-font-smoothing: none;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.xpbtn:hover { box-shadow: inset 0 0 0 1px #ffc73c, inset 0 0 0 2px #ffe7a2; color: #000; }
+.xpbtn:active { background: #dcdad1; box-shadow: inset 1px 1px 2px #8e8b7b; }
+.xpbtn:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+.xpbtn:disabled { color: #a0a0a0; cursor: default; }
+.xpbtn img { image-rendering: pixelated; display: block; }
+
+/* In the top nav: sits after the sandbox flask, top right. Desktop only:
+   there is no cursor to dress on a phone. */
+.cm-navbtn {
+  margin-left: clamp(10px, 1.6vw, 22px);
+  padding: 1px 8px 2px 6px;
+  flex: 0 0 auto;
+}
+@media (max-width: 767px), (hover: none) {
+  .cm-navbtn { display: none; }
+}
+
+/* ── The window ─────────────────────────────────────────────────── */
+.cm-win {
+  position: fixed;
+  top: calc(var(--menubar-h, 56px) + 4px);
+  right: 40px;
+  z-index: 60;
+  width: min(640px, 100vw - 16px);
+  height: min(560px, 100vh - var(--menubar-h, 56px) - 24px);
+  display: flex;
+  flex-direction: column;
+  font: 11px Tahoma, "Segoe UI", Verdana, sans-serif;
+  color: #000;
+  background: #ece9d8;
+  border: 1px solid #0a5fe8;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  -webkit-font-smoothing: none;
+  overflow: hidden;
+  text-align: left;
+}
+@media (max-width: 767px) {
+  .cm-win { right: 8px; }
+}
+.cm-win button,
+.cm-win select,
+.cm-win input { font: inherit; }
+.cm-win a { color: inherit; text-decoration: none; }
+
+/* Title bar, Luna blue */
+.cm-titlebar {
+  height: 34px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 0 6px 0 8px;
+  background: linear-gradient(#0a5fe8, #3c8dff 40%, #2e7bf0 60%, #0b57d0);
+  color: #fff;
+  border-bottom: 1px solid #073d9a;
+  text-shadow: 1px 1px 0 #002066;
+  user-select: none;
+  cursor: move;
+  touch-action: none;
+}
+.cm-logo {
+  font: bold 20px "Comic Sans MS", "Comic Neue", cursive;
+  letter-spacing: -0.5px;
+  position: relative;
+  padding-right: 14px;
+}
+.cm-logo span { display: inline-block; }
+.cm-logo .c, .cm-logo .m { color: #fff200; }
+.cm-logo .u, .cm-logo .a { color: #ff7df7; }
+.cm-logo .r, .cm-logo .n { color: #7dffb3; }
+.cm-logo .s, .cm-logo .i { color: #ffb84d; }
+.cm-logo .o, .cm-logo .a2 { color: #8fd9ff; }
+.cm-logo .r2 { color: #ff7df7; }
+.cm-logo .m { transform: translateY(-1px); }
+.cm-spark {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  color: #fff;
+  font-size: 12px;
+  animation: cm-twinkle 1.1s steps(2, end) infinite;
+}
+@keyframes cm-twinkle {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.2; transform: scale(0.6) rotate(45deg); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.cm-tagline { margin-left: 10px; font-size: 11px; color: #e6f0ff; }
+.cm-winbtns { margin-left: auto; display: flex; gap: 2px; }
+.cm-winbtns a,
+.cm-winbtns button {
+  width: 21px;
+  height: 21px;
+  line-height: 20px;
+  text-align: center;
+  padding: 0;
+  background: linear-gradient(#5a9cff, #2a6fe0);
+  border: 1px solid #fff;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px #1a4fb8;
+  font: bold 13px Tahoma, sans-serif;
+  color: #fff;
+  text-shadow: none;
+  cursor: pointer;
+}
+.cm-winbtns .x { background: linear-gradient(#ee8a72, #d14a2b); box-shadow: inset 0 0 0 1px #9a2e15; }
+
+/* Toolbar */
+.cm-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: linear-gradient(#fdfdfb, #ece9d8);
+  border-bottom: 1px solid #aca899;
+  flex-wrap: wrap;
+}
+.cm-toolbar label { display: flex; align-items: center; gap: 4px; }
+.cm-sep { width: 1px; height: 18px; background: #aca899; box-shadow: 1px 0 0 #fff; margin: 0 2px; }
+.cm-grow { flex: 1; }
+.cm-count { color: #555; }
+.cm-dl { padding-left: 6px; }
+.xpsel { border: 1px solid #7f9db9; background: #fff; padding: 1px 2px; border-radius: 0; color: #000; }
+
+/* Main split */
+.cm-main { flex: 1; display: flex; min-height: 0; padding: 6px; gap: 6px; }
+.cm-tree {
+  width: 176px;
+  flex: none;
+  background: #fff;
+  border: 1px solid #7f9db9;
+  box-shadow: inset 1px 1px 0 #d6d3ce;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+.cm-cat { user-select: none; }
+.cm-cat > .cm-row {
+  padding: 1px 4px 1px 6px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.cm-cat > .cm-row:hover { text-decoration: underline; color: #0000aa; }
+.cm-box {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border: 1px solid #919b9c;
+  background: linear-gradient(#fff, #e7e9ea);
+  position: relative;
+}
+.cm-box::before, .cm-box::after { content: ""; position: absolute; background: #000; }
+.cm-box::before { left: 2px; right: 2px; top: 4px; height: 1px; }
+.cm-box::after { top: 2px; bottom: 2px; left: 4px; width: 1px; }
+.cm-cat.open > .cm-row .cm-box::after { display: none; }
+.cm-cat .cm-subs { display: none; margin-left: 12px; border-left: 1px dotted #999; }
+.cm-cat.open .cm-subs { display: block; }
+.cm-sub {
+  padding: 1px 4px 1px 10px;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cm-sub::before { content: ""; position: absolute; left: 0; top: 8px; width: 7px; border-top: 1px dotted #999; }
+.cm-sub:hover { text-decoration: underline; color: #0000aa; }
+.cm-sub.sel { background: #316ac5; color: #fff; }
+.cm-sub.sel:hover { color: #fff; }
+.cm-cnt { color: #888; font-size: 10px; }
+.cm-sub.sel .cm-cnt { color: #d8e4fa; }
+
+.cm-right { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.cm-crumb { padding: 2px 6px 4px; font-weight: bold; color: #0046d5; }
+.cm-crumb b { color: #000; font-weight: normal; }
+.cm-grid {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #7f9db9;
+  box-shadow: inset 1px 1px 0 #d6d3ce;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 40px);
+  grid-auto-rows: 40px;
+  gap: 4px;
+  align-content: start;
+}
+.cm-cell {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fff;
+  image-rendering: pixelated;
+  cursor: pointer;
+  background:
+    linear-gradient(45deg, #f4f4f4 25%, transparent 25%, transparent 75%, #f4f4f4 75%),
+    linear-gradient(45deg, #f4f4f4 25%, #fff 25%, #fff 75%, #f4f4f4 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+.cm-cell:hover { border-color: #98b5e2; background: #e3edfb; }
+.cm-cell.sel { border-color: #316ac5; background: #c1d2ee; }
+.cm-cell img { width: 32px; height: 32px; image-rendering: pixelated; pointer-events: none; }
+
+/* XP scrollbars, inside the window only */
+.cm-win ::-webkit-scrollbar { width: 17px; }
+.cm-win ::-webkit-scrollbar-track { background: #f4f3ee; border-left: 1px solid #e6e4d9; }
+.cm-win ::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #c6dbf6, #e0ecfb 45%, #c0d6f2);
+  border: 1px solid #2c63b6;
+  border-radius: 2px;
+}
+.cm-win ::-webkit-scrollbar-button { display: none; }
+
+/* Status bar */
+.cm-statusbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px;
+  background: #ece9d8;
+  border-top: 1px solid #fff;
+  box-shadow: 0 -1px 0 #aca899;
+  min-width: 0;
+}
+.cm-cur {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #aca899;
+  box-shadow: inset 1px 1px 0 #fff;
+  padding: 1px 6px;
+  background: #ece9d8;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cm-cur .lbl { color: #333; }
+.cm-cur-img { width: 24px; height: 24px; image-rendering: pixelated; }
+.cm-msg { color: #0046d5; white-space: nowrap; }
+
+/* The window is the one place the picked cursor must NOT apply: you need
+   the arrow to pick. The applier's rule is `cursor: inherit !important` on
+   everything; this wins on specificity for the window subtree. */
+.cm-win, .cm-win * { cursor: default !important; }
+.cm-win .cm-titlebar { cursor: move !important; }
+.cm-win .xpbtn, .cm-win .cm-row, .cm-win .cm-sub, .cm-win .cm-winbtns a,
+.cm-win .cm-winbtns button, .cm-win .xpsel { cursor: pointer !important; }
+.cm-win .cm-cell { cursor: pointer !important; }

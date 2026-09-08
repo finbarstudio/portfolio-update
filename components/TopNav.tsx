@@ -8,6 +8,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
+import { CursorManiaButton } from "@/components/cursormania/CursorMania";
 
 // Count what the /work grid actually shows — hidden projects don't count.
 const PROJECT_COUNT = projects.filter((p) => !p.hidden).length;
@@ -211,6 +212,9 @@ export default function TopNav() {
           <FlaskIcon />
           <span className="nav-tip" aria-hidden="true">Sandbox</span>
         </a>
+        {/* CursorMania: the 2004 cursor toolbar as a Windows XP button, last
+            on the row. Opens the picker window (mounted in LayoutShell). */}
+        <CursorManiaButton />
       </div>
     </header>
   );

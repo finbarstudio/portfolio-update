@@ -12,6 +12,7 @@ import NavLogo from "./NavLogo";
 import SmoothScroll from "./SmoothScroll";
 import SiteFooter from "./SiteFooter";
 import ContactPanel from "./ContactPanel";
+import CursorMania from "./cursormania/CursorMania";
 import "lenis/dist/lenis.css";
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
@@ -56,6 +57,8 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         <SiteFooter />
       </main>
       <ContactPanel />
+      {/* CursorMania: the 2004 cursor picker (opened from the nav button). */}
+      <CursorMania />
     </>
   );
 }
