@@ -96,8 +96,12 @@ async function hashEmail(email: string): Promise<string | undefined> {
 
 async function hashPhone(phone: string): Promise<string | undefined> {
   const digits = phone.replace(/\D/g, "");
-  // Bare AU-length local numbers get the country code Meta expects.
-  const norm = digits.length === 10 && digits.startsWith("0") ? `61${digits.slice(1)}` : digits;
+  // Bare local numbers get the country code Meta expects: UK mobiles are 11
+  // digits starting 07, Australian ones 10 digits starting 0.
+  const norm =
+    digits.length === 11 && digits.startsWith("07") ? `44${digits.slice(1)}`
+    : digits.length === 10 && digits.startsWith("0") ? `61${digits.slice(1)}`
+    : digits;
   return norm.length >= 8 ? sha256(norm) : undefined;
 }
 

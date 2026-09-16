@@ -290,7 +290,7 @@ export default function ServiceLanding({
         <p className="text-ink-soft mt-10" style={{ fontSize: "var(--text-small)" }}>
           Finbar Studio, London ·{" "}
           <a href="mailto:finbar@finbar.studio" className="u-underline">finbar@finbar.studio</a> ·{" "}
-          <a href="tel:+61412796630" className="u-underline tabular-nums">+61 412 796 630</a>
+          <a href="tel:+447876492551" className="u-underline tabular-nums">+44 7876 492551</a>
         </p>
       </div>
     </section>

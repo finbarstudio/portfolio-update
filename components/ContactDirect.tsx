@@ -7,8 +7,8 @@
  */
 
 const EMAIL = "finbar@finbar.studio";
-const PHONE = "+61412796630";
-const PHONE_DISPLAY = "+61 412 796 630";
+const PHONE = "+447876492551";
+const PHONE_DISPLAY = "+44 7876 492551";
 
 const SOCIALS = [
   { label: "Instagram", href: "https://instagram.com/finbar.studio" },

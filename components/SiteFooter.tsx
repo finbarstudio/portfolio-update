@@ -145,7 +145,7 @@ export default function SiteFooter() {
           <div className="sf-reveal-inner">
             <span className="sf-label">Hiring or have a project?</span>
             <a href="mailto:finbar@finbar.studio" className="sf-value u-underline">finbar@finbar.studio</a>
-            <a href="tel:+61412796630" className="sf-value u-underline tabular-nums">+61 412 796 630</a>
+            <a href="tel:+447876492551" className="sf-value u-underline tabular-nums">+44 7876 492551</a>
           </div>
         </div>
         <div className="sf-col sf-col-end">

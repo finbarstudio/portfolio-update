@@ -27,7 +27,7 @@ const aboutJsonLd = {
     contactPoint: {
       "@type": "ContactPoint",
       email: "finbar@finbar.studio",
-      telephone: "+61412796630",
+      telephone: "+447876492551",
       contactType: "Enquiries",
       areaServed: ["GB", "AU"],
       availableLanguage: "English",

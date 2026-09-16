@@ -133,7 +133,7 @@ const personJsonLd = {
   description:
     "London graphic designer working in brand identity, editorial, web and motion design.",
   email: "finbar@finbar.studio",
-  telephone: "+61412796630",
+  telephone: "+447876492551",
   knowsLanguage: ["en-GB", "en-AU"],
   address: {
     "@type": "PostalAddress",
@@ -218,7 +218,7 @@ const serviceJsonLd = {
   url: SITE_URL,
   image: `${SITE_URL}/opengraph-image`,
   email: "finbar@finbar.studio",
-  telephone: "+61412796630",
+  telephone: "+447876492551",
   priceRange: "$$",
   founder: { "@id": PERSON_ID },
   provider: { "@id": PERSON_ID },
