@@ -2,62 +2,26 @@
 
 /**
  * ContactPanel — THE contact popup, opened by anything that dispatches
- * "contact:open" (the nav's Contact pill, ContactCta, the Book-a-call pin).
- * One fullscreen sheet over a subtle blur of the page, frameless: the left
- * rail holds the title, direct links, socials and the "Say hi" form; the
- * right column is the Cal.com booker. Each item mask-reveals with a stagger.
- *
- * The booker is dynamically imported and only mounted once the popup first
- * opens, then kept mounted so reopening is instant.
- *
- * Form delivery: set NEXT_PUBLIC_WEB3FORMS_KEY to a Web3Forms access key (free —
- * it emails you each submission). Without it the form opens a pre-filled email.
+ * "contact:open" (the nav's Contact pill, ContactCta, the Get-in-touch pin).
+ * One fullscreen sheet over a subtle blur of the page, frameless: the trace
+ * draws the frame, the fill blooms centre-out, then the details mask-reveal
+ * with a short stagger. Just the direct details and the socials (ContactDirect);
+ * the form and the Cal booker came out on 16 Sep 2026 when the site turned
+ * into a portfolio.
  */
 
 import { useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import ContactDirect from "./ContactDirect";
-import ContactNoteForm from "./ContactNoteForm";
-import Loader from "./Loader";
 import { trackMeta } from "@/lib/meta";
-import { MdOpenInNew } from "@/components/MaterialIcon";
-
-// The Cal.com iframe embed. The native @calcom/atoms BookerEmbed was tried and
-// proven credential-less, but its 2.11.0 build infinite-loops setState on
-// mount under React 19 ("Maximum update depth exceeded") — retry atoms once
-// they ship React 19 support.
-const CalEmbed = dynamic(() => import("./CalEmbed"), { ssr: false, loading: () => null });
-
-
-
 
 export default function ContactPanel() {
   const [open, setOpen] = useState(false);
-  const [everOpened, setEverOpened] = useState(false);
-  const [calReady, setCalReady] = useState(false);
-  // Stacked layouts (phone/tablet) don't embed the booker at all — Cal's tall
-  // mobile column inside the fixed sheet made nested scrolling fight itself
-  // and run off screen. They get a link to Cal's own page instead, which
-  // handles small screens properly. Matches the CSS stack breakpoint.
-  const [stacked, setStacked] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onOpen = () => { setOpen(true); setEverOpened(true); trackMeta("Contact"); };
+    const onOpen = () => { setOpen(true); trackMeta("Contact"); };
     window.addEventListener("contact:open", onOpen as EventListener);
     return () => window.removeEventListener("contact:open", onOpen as EventListener);
-  }, []);
-
-  useEffect(() => {
-    // Below this the sheet stacks to a single full-width column, where Cal's
-    // 920px card still fits its 2-col month down to ~1024px viewport (no tall
-    // 1-col list, so no nested-scroll fight). Only genuinely narrow screens
-    // (phones/small tablets) fall back to the "Pick a time" link.
-    const mq = window.matchMedia("(max-width: 1024px)");
-    const update = () => setStacked(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
@@ -85,7 +49,7 @@ export default function ContactPanel() {
         <rect className="contact-trace-rect" pathLength={1} />
       </svg>
       {/* div, not aside: role="dialog" + aria-modal aren't valid on <aside>. */}
-      <div className="contact-sheet" role="dialog" aria-modal="true" aria-label="Get in touch or book a call">
+      <div className="contact-sheet" role="dialog" aria-modal="true" aria-label="Get in touch">
         {/* The colour, arriving as concentric frames centre-out after the
             trace — the icon's bloom, in blinds (see .contact-fill). */}
         <div className="contact-fill" aria-hidden="true">
@@ -98,50 +62,11 @@ export default function ContactPanel() {
         </button>
 
         <div className="contact-rail">
-        <h2 className="contact-title contact-reveal rv-0">Hiring or have a project?</h2>
-        <p className="contact-lede contact-reveal rv-1">
-          <span className="contact-lede-desktop">
-            Three ways in: reach me direct, send a note with the form, or book
-            a call on the right.
-          </span>
-          <span className="contact-lede-mobile">
-            Reach me direct, or book a call below.
-          </span>
-        </p>
-
-        <div className="contact-direct contact-reveal rv-2">
-          <ContactDirect tabbable={open} />
-        </div>
-
-        <div className="contact-bottom contact-reveal rv-3">
-          <p className="contact-col-label">Send a note</p>
-          <ContactNoteForm tabbable={open} />
-        </div>
-        </div>
-
-        {/* The booker. Mounted on first open, kept mounted after, so a second
-            open lands on an already-loaded calendar. Until Cal reports ready
-            it's OUR loading pulse on the card, not Cal's default spinner. */}
-        <div className="contact-cal-col contact-reveal rv-4">
-          <p className="contact-col-label">Book a call</p>
-          {stacked ? (
-            /* Small screens: straight to Cal's own booking page — their
-               mobile layout, not our iframe wrestling it. */
-            <a
-              href="https://cal.com/finbar.studio/intro"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="sticker-pill book-call-pill contact-cal-link"
-              tabIndex={open ? 0 : -1}
-            >
-              Pick a time <MdOpenInNew size={13} />
-            </a>
-          ) : (
-            <div className="contact-cal">
-              {everOpened && !calReady && <Loader />}
-              {everOpened && <CalEmbed onReady={() => setCalReady(true)} />}
-            </div>
-          )}
+          <h2 className="contact-title contact-reveal rv-0">Hiring or have a project?</h2>
+          <p className="contact-lede contact-reveal rv-1">Email is quickest. I read everything.</p>
+          <div className="contact-direct contact-reveal rv-2">
+            <ContactDirect tabbable={open} />
+          </div>
         </div>
       </div>
     </div>

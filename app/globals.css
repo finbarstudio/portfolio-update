@@ -3961,11 +3961,10 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   position: absolute;
   inset: var(--contact-inset);
   display: grid;
-  /* Narrow rail keeps the booker column wide, so the left-right split survives
-     to ~1320px before it stacks (below, Cal's month view gets too cramped). */
-  grid-template-columns: minmax(200px, 250px) minmax(0, 1fr);
-  align-items: stretch;
-  gap: clamp(14px, 2vw, 32px);
+  /* One centred column since the form and the booker came out (16 Sep 2026). */
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  justify-items: center;
   padding: clamp(16px, 2.2vw, 36px);
   /* Transparent: the COLOUR arrives as the .contact-fill rings, not as the
      sheet itself. */
@@ -4024,16 +4023,16 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
     contact-ring-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards,
     contact-ring-fade 0.45s ease-out forwards;
 }
-.contact-panel.is-open .contact-fill-ring:nth-child(1) { animation-delay: 0.6s,  2.25s; }
-.contact-panel.is-open .contact-fill-ring:nth-child(2) { animation-delay: 0.82s, 2.25s; }
-.contact-panel.is-open .contact-fill-ring:nth-child(3) { animation-delay: 1.04s, 2.25s; }
-.contact-panel.is-open .contact-fill-ring:nth-child(4) { animation-delay: 1.26s, 2.25s; }
-.contact-panel.is-open .contact-fill-ring:nth-child(5) { animation-delay: 1.48s, 2.25s; }
+.contact-panel.is-open .contact-fill-ring:nth-child(1) { animation-delay: 0.6s,  2.0s; }
+.contact-panel.is-open .contact-fill-ring:nth-child(2) { animation-delay: 0.78s, 2.0s; }
+.contact-panel.is-open .contact-fill-ring:nth-child(3) { animation-delay: 0.96s, 2.0s; }
+.contact-panel.is-open .contact-fill-ring:nth-child(4) { animation-delay: 1.14s, 2.0s; }
+.contact-panel.is-open .contact-fill-ring:nth-child(5) { animation-delay: 1.32s, 2.0s; }
 /* The outermost ring defines the final silhouette (no overshoot) and is the
    one that STAYS — it is the panel's colour. */
 .contact-panel.is-open .contact-fill-ring:last-child {
   animation: contact-ring-in-outer 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: 1.7s;
+  animation-delay: 1.5s;
 }
 @keyframes contact-ring-fade {
   to { opacity: 0; }
@@ -4112,6 +4111,29 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 .contact-direct .contact-socials {
   justify-content: center;
   max-width: none;
+  gap: 0.45rem;
+}
+.contact-direct .contact-details { gap: 1.6rem; }
+.contact-direct .contact-primary { gap: 0.45rem; }
+/* The email is the one thing to click: set large in the display face,
+   lowercase, in the page white. Phone and place sit small beneath it. */
+.contact-email {
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.45rem, 4.2vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--bg);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease);
+}
+.contact-email:hover { color: var(--pink-soft); }
+.contact-where {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--bg) 62%, transparent);
 }
 /* Shrink-wrap and centre the two links (an anchor was stretching to the
    column and pinning its text left of centre). */
@@ -4147,11 +4169,10 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: clamp(14px, 2.2vh, 24px);
+  gap: clamp(18px, 3vh, 32px);
   min-width: 0;
-  min-height: 0;
-  overflow-y: auto;
-  padding-top: clamp(6px, 1.6vh, 18px);
+  max-width: 44rem;
+  width: 100%;
 }
 /* Centred children that must still span the rail (the form + its fields). */
 .contact-rail .contact-bottom,
@@ -4257,8 +4278,9 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
      stacked content centres inside it via auto-margins on the first/last
      blocks: unlike justify-content:center, auto margins collapse to 0 when
      content overflows, so small landscape phones still scroll from the top. */
-  .contact-rail { margin-top: auto; }
-  .contact-cal-col { margin-bottom: auto; align-items: center; text-align: center; }
+  /* Auto margins both sides: centred when it fits, scrolls from the top when
+     it does not (auto margins collapse to 0 on overflow). */
+  .contact-rail { margin-top: auto; margin-bottom: auto; }
   /* Phone/tablet: direct contact + booking only — the note form earns its
      place on desktop, in the stack it's just scroll. (Double selector: the
      base .contact-bottom rule sits later in the file and ties on specificity,
@@ -4305,7 +4327,7 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
   clip-path: inset(0 0 100% 0);
 }
 .contact-panel.is-open .contact-reveal {
-  animation: contact-reveal-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: contact-reveal-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @keyframes contact-reveal-in {
   from { clip-path: inset(0 0 100% 0); }
@@ -4313,11 +4335,11 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
 }
 /* Literal per-slot delays (iOS Safari drops calc(number x time)). The close
    button is deliberately FIRST — a way out must never wait 3s. */
-.contact-panel.is-open .rv-0 { animation-delay: 2.7s; }
-.contact-panel.is-open .rv-1 { animation-delay: 2.78s; }
-.contact-panel.is-open .rv-2 { animation-delay: 2.86s; }
-.contact-panel.is-open .rv-3 { animation-delay: 2.94s; }
-.contact-panel.is-open .rv-4 { animation-delay: 3.02s; }
+.contact-panel.is-open .rv-0 { animation-delay: 2.3s; }
+.contact-panel.is-open .rv-1 { animation-delay: 2.37s; }
+.contact-panel.is-open .rv-2 { animation-delay: 2.44s; }
+.contact-panel.is-open .rv-3 { animation-delay: 2.51s; }
+.contact-panel.is-open .rv-4 { animation-delay: 2.58s; }
 .contact-panel.is-open .rv-close { animation-delay: 0.7s; }
 @media (prefers-reduced-motion: reduce) {
   .contact-backdrop, .contact-sheet, .contact-reveal { transition: none; }
@@ -4555,9 +4577,9 @@ html:has(.contact-skin) { background: var(--pink-deep); }
   inset: 0;
   padding: calc(var(--menubar-h) + 10px) clamp(16px, 3vw, 44px) clamp(44px, 7vh, 72px);
   display: grid;
-  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
-  align-items: stretch;
-  gap: clamp(14px, 2vw, 32px);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  justify-items: center;
 }
 /* Content reveals AFTER the preloader hands over — same wipe the popup uses,
    page-paced delays. */
