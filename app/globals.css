@@ -4849,3 +4849,46 @@ html[data-nav="intro"] .nav-logo.is-sticky { transform: translateX(-50%); }
 
 
 
+
+/* ── Case studies: white ground, two-column body, car grid ──────────────
+   Every case-study page sits on pure white (Finbar, 16 Sep 2026): the
+   screenshots and clips read cleaner without the cream cast. html too, so
+   the overscroll gap matches. */
+html:has(.case-study),
+body:has(.case-study) { background-color: #fff; }
+
+/* Long chapter bodies run in two text columns on desktop so they take half
+   the scroll. Paragraphs never split across the gutter. */
+.case-body-cols { max-width: 76rem; margin-bottom: 0.5rem; }
+.case-body-cols p { margin: 0 0 1rem; break-inside: avoid; }
+@media (min-width: 900px) {
+  .case-body-cols { columns: 2; column-gap: 3rem; }
+}
+
+/* Rennen Plus: the car-thumbnail grid, built from the live site's own
+   isolated thumbnails. Wide screens get more columns and fewer rows; a phone
+   shows a smaller set. Each cell is one car on the same baseline and shadow
+   treatment as the site. */
+.rp-cars {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 10px;
+  margin: var(--image-pad) 0;
+}
+.rp-car { display: none; min-width: 0; text-align: center; }
+.rp-car:nth-child(-n + 12) { display: block; }
+.rp-car img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 2; object-fit: contain; }
+.rp-car span { display: block; margin-top: 4px; font-size: 10px; line-height: 1.25; color: var(--color-ink-soft); }
+@media (min-width: 640px) {
+  .rp-cars { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .rp-car:nth-child(-n + 24) { display: block; }
+}
+@media (min-width: 1024px) {
+  .rp-cars { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 16px 14px; }
+  .rp-car:nth-child(-n + 32) { display: block; }
+  .rp-car span { font-size: 11px; }
+}
+@media (min-width: 1400px) {
+  .rp-cars { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+  .rp-car:nth-child(-n + 40) { display: block; }
+}

@@ -19,6 +19,7 @@ import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import Reveal from "@/components/Reveal";
 import HeroSlideshow from "@/components/HeroSlideshow";
+import RennenCarGrid from "@/components/RennenCarGrid";
 import { MdArrowBack, MdArrowForward, MdArrowOutward, MdOpenInNew } from "@/components/MaterialIcon";
 
 /* TikTok glyph (inline, currentColor). */
@@ -260,6 +261,18 @@ function VisualBody({ project }: { project: Project }) {
   );
 }
 
+/* Body copy: blank lines in the content string become paragraphs. */
+function Paragraphs({ text, className, style }: { text: string; className?: string; style?: React.CSSProperties }) {
+  const parts = text.split(/\n\s*\n/).map((t) => t.trim()).filter(Boolean);
+  return (
+    <>
+      {parts.map((t, i) => (
+        <p key={i} className={className} style={style}>{t}</p>
+      ))}
+    </>
+  );
+}
+
 /* ─── Depth sections — an editorial run of heading + body + gallery, each
    block revealing on scroll. The heading is a pink mono eyebrow. ─── */
 function DepthSections({ sections }: { sections: DepthSection[] }) {
@@ -287,11 +300,22 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
                   </div>
                 )}
               </div>
+            ) : section.columns === 2 ? (
+              /* Full-width body in two text columns (desktop), so a long
+                 chapter reads in half the scroll. */
+              <>
+                <div className="case-body-cols">
+                  <Paragraphs text={section.body} className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }} />
+                </div>
+                {section.component === "rennen-cars" && <RennenCarGrid />}
+                {section.images.length > 0 && <Gallery images={section.images} cols={section.cols} />}
+              </>
             ) : (
               <>
-                <p className="text-ink leading-relaxed mb-2 max-w-2xl" style={{ fontSize: "var(--text-body)" }}>
-                  {section.body}
-                </p>
+                <div className="max-w-2xl mb-2">
+                  <Paragraphs text={section.body} className="text-ink leading-relaxed mb-4" style={{ fontSize: "var(--text-body)" }} />
+                </div>
+                {section.component === "rennen-cars" && <RennenCarGrid />}
                 {section.images.length > 0 && <Gallery images={section.images} cols={section.cols} />}
               </>
             )}
@@ -460,7 +484,7 @@ export default async function CaseStudyPage({
   };
 
   return (
-    <article className="px-5 md:px-10 pt-8 md:pt-12 pb-8">
+    <article className="case-study px-5 md:px-10 pt-8 md:pt-12 pb-8">
       <Script
         id={`ld-${project.slug}`}
         type="application/ld+json"
