@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
  * this just tells visitors and links the policy, per the "notice" requirement.
  * Dismissed once, remembered on the device (localStorage). Mounted-guarded so
  * it never flashes during SSR/hydration, and sits bottom-left to clear the
- * bottom-right "Get a quote" pin.
+ * bottom-right "Get in touch" pin.
  */
 
 import { useEffect, useState } from "react";

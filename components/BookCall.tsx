@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * BookCall — the conversion path. A pink "Book a call" pill pinned bottom-right
+ * BookCall — the contact path. A pink "Get in touch" pill pinned bottom-right
  * (the slot the sandbox link used to hold; sandbox now lives in the top nav),
  * opening the Cal.com overlay.
  *
@@ -43,7 +43,7 @@ export default function BookCall() {
   const [docked, setDocked] = useState(false);
   // /pricing reads "Start a project" (the page has no other CTA); everywhere
   // else keeps the standard label.
-  const label = pathname === "/pricing" ? "Start a project" : "Get a quote";
+  const label = pathname === "/pricing" ? "Start a project" : "Get in touch";
 
   // Reveal gate: home shows it only after the intro logo scrolls up into the nav;
   // every other page shows it from the start.

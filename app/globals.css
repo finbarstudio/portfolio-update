@@ -48,7 +48,7 @@
      │  Change any value → ripples to every component.        │
      └─────────────────────────────────────────────────────────┘ */
   /* Retro pastel palette — warm cream ground, muted accents (NYC poster feel). */
-  --bg:         #FDF9F9;   /* near-white ground with the faintest pink cast */
+  --bg:         #FFFFFF;   /* pure white ground (was a faint pink cast until 16 Sep 2026) */
   --ink:        #211E1A;   /* warm near-black, primary text               */
   --ink-soft:   #6E675C;   /* warm grey, secondary text (AA on cream)     */
   --line:       #E2D8C5;   /* warm hairline borders                       */
@@ -68,7 +68,7 @@
   /* ── THE PALETTE IS FOUR COLOURS ───────────────────────────────
      Everything on this site is built from exactly four:
 
-       --bg         the ground (near-white, faintest pink cast)
+       --bg         the ground (pure white)
        --pink-deep  the dark pink, from the mark's centre
        --pink       the main pink, from the mark's tips
        --ink        the warm near-black
@@ -107,7 +107,7 @@
   /* ┌─────────────────────────────────────────────────────────┐
      │  SURFACE + ELEVATION TOKENS (warm, to match the cream)  │
      └─────────────────────────────────────────────────────────┘ */
-  --surface:        #FDF9F9;  /* page + chrome ground (matches --bg)      */
+  --surface:        #FFFFFF;  /* page + chrome ground (matches --bg)      */
   --surface-raised: #FBF6EC;  /* cards, media tiles, panels (light cream) */
   --surface-sunken: #F3F1ED;  /* grouped / inset regions                  */
   --thumb-bg:       #EAE0CC;  /* shared background behind all thumbnails  */
@@ -4630,7 +4630,7 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 }
 
 /* ── Cookie/tracking notice (informational, dismissible) ──────────────────
-   Bottom-left so it clears the bottom-right "Get a quote" pin. Unlayered so
+   Bottom-left so it clears the bottom-right "Get in touch" pin. Unlayered so
    Tailwind v4 doesn't tree-shake it. */
 .cookie-notice {
   position: fixed;
@@ -4892,3 +4892,21 @@ body:has(.case-study) { background-color: #fff; }
   .rp-cars { grid-template-columns: repeat(10, minmax(0, 1fr)); }
   .rp-car:nth-child(-n + 40) { display: block; }
 }
+
+/* ── Home: selected work, two rows of three big 4:3 thumbs ─────────────── */
+.home-selected {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem 1.25rem;
+}
+@media (min-width: 640px) { .home-selected { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .home-selected { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3rem 1.5rem; } }
+.home-selected-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid var(--color-line);
+  background: var(--surface-sunken);
+}
+.home-selected-thumb > * { position: absolute; inset: 0; width: 100%; height: 100%; }

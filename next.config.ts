@@ -97,6 +97,8 @@ const nextConfig: NextConfig = {
       // finbar.studio/cursor = the CursorMania extension download. A redirect
       // (not a rewrite) so the browser saves it under the zip's real filename.
       { source: "/cursor", destination: "/downloads/cursormania-extension.zip", permanent: false },
+      // finbar.studio/cv = the current CV, same static-download treatment.
+      { source: "/cv", destination: "/downloads/Finbar-Skitini-CV.pdf", permanent: false },
     ];
   },
   async rewrites() {

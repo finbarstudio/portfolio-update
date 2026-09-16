@@ -14,8 +14,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "London graphic design and web design studio. Brand identity, websites, publication and motion design.",
     start_url: "/",
     display: "standalone",
-    background_color: "#F6EFE1",
-    theme_color: "#F6EFE1",
+    background_color: "#FFFFFF",
+    theme_color: "#FFFFFF",
     lang: "en-GB",
     categories: ["design", "portfolio", "business"],
     icons: [

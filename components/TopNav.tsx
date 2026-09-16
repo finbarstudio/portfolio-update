@@ -142,6 +142,10 @@ export default function TopNav() {
             )}
           </Link>
         ))}
+        {/* The current CV, served from /downloads with a save-as header. */}
+        <a href="/cv" className="tag tag-default" download>
+          Download CV
+        </a>
         {/* Opens the contact popup — except on /contact, where the page IS the
             contact surface and the button would just be noise. */}
         {pathname !== "/contact" && (

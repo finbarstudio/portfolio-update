@@ -285,7 +285,7 @@ export default function ServiceLanding({
           </p>
         )}
         <div className="mt-8">
-          <ContactCta className="sticker-pill book-call-pill">Start a project</ContactCta>
+          <ContactCta className="sticker-pill book-call-pill">Get in touch</ContactCta>
         </div>
         <p className="text-ink-soft mt-10" style={{ fontSize: "var(--text-small)" }}>
           Finbar Studio, London ·{" "}
