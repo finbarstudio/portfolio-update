@@ -142,10 +142,6 @@ export default function TopNav() {
             )}
           </Link>
         ))}
-        {/* The current CV, served from /downloads with a save-as header. */}
-        <a href="/cv" className="tag tag-default" download>
-          Download CV
-        </a>
         {/* Opens the contact popup — except on /contact, where the page IS the
             contact surface and the button would just be noise. */}
         {pathname !== "/contact" && (
@@ -160,6 +156,12 @@ export default function TopNav() {
       </nav>
 
       <div className="top-nav-social">
+        {/* The CV, first on the right: a bold, tight "CV" as the glyph. Served
+            from /downloads with a save-as header. */}
+        <a href="/cv" download aria-label="Download CV (PDF)" className="top-nav-social-item top-nav-cv">
+          <span className="top-nav-cv-mark" aria-hidden="true">CV</span>
+          <span className="nav-tip" aria-hidden="true">Download CV</span>
+        </a>
         {socials.map((s) => (
           <a
             key={s.href}

@@ -3796,6 +3796,16 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
 .top-nav-web:hover,
 .top-nav-web:focus-visible { color: var(--ink); }
 .top-nav-web svg { height: 15px; }
+/* CV — a wordmark-style "CV" as the icon: bold Host Grotesk, tight tracking,
+   same 14px optical height as the glyphs beside it. */
+.top-nav-cv-mark {
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  display: block;
+}
 /* CursorMania — a pointer-arrow glyph, last on the row. Desktop only: a phone
    has no cursor to dress. A <button>, so reset the UA chrome. */
 .top-nav-cursor {
@@ -4893,17 +4903,17 @@ body:has(.case-study) { background-color: #fff; }
   .rp-car:nth-child(-n + 40) { display: block; }
 }
 
-/* ── Home: selected work, two rows of three big 4:3 thumbs ─────────────── */
+/* ── Home: selected work, two columns of big 16:9 thumbs ────────────────── */
 .home-selected {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2.5rem 1.25rem;
 }
 @media (min-width: 640px) { .home-selected { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .home-selected { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3rem 1.5rem; } }
+@media (min-width: 1024px) { .home-selected { gap: 3.5rem 2rem; } }
 .home-selected-thumb {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 6px;
   border: 1px solid var(--color-line);

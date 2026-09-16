@@ -829,7 +829,9 @@ export const projects: Project[] = [
     liveUrl: "/go/rennen",
     liveLabel: "rennenplus.com.au",
     webThumb: "/images/web/rennen-1.webp",
-    webShots: ["/images/web/rennen-1.webp", "/images/rennen-plus/v2/all-cars.webp", "/images/rennen-plus/v2/price-carbon.webp", "/images/rennen-plus/v2/builds.webp"],
+    webShots: ["/images/web/rennen-1.webp", "/images/web/rennen-2.webp", "/images/web/rennen-3.webp", "/images/web/rennen-4.webp"],
+    // The case-study hero is the site's own film (Zach Sullivan), full width.
+    heroVideo: "/images/rennen-plus/v2/hero-film.mp4",
     heroImage: {
       src: "/images/rennen-plus/v2/hero.webp",
       alt: "The Rennen Plus home hero. A film by Zach Sullivan runs behind the search bar.",

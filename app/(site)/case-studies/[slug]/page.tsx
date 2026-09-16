@@ -596,7 +596,10 @@ export default async function CaseStudyPage({
             ) : project.heroSpline ? (
               <SplineScene scene={project.heroSpline} />
             ) : project.heroVideo ? (
-              <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "72vh" }}>
+              /* maxHeight none: the 72vh clamp shrinks the box on a 900px
+                 viewport and the contained video letterboxes to ~85% width.
+                 A hero film is meant to run the full measure. */
+              <div className="img-wrap" style={{ aspectRatio: "16/9", maxHeight: "none" }}>
                 <VideoPlayer src={project.heroVideo} />
               </div>
             ) : (
