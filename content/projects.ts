@@ -797,6 +797,173 @@ export const projects: Project[] = [
     ],
   },
 
+  /* Rennen Plus. Full. 2026 */
+  {
+    slug: "rennen-plus",
+    name: "Rennen Plus",
+    tier: "full",
+    rank: 8,
+    seo: {
+      title: "Rennen Plus: Car-First Parts Catalogue | Finbar Studio",
+      description:
+        "A car-first catalogue of about 2,500 performance parts across 228 cars, priced live in Australian dollars, designed and delivered in five and a half weeks for Rennen Plus.",
+    },
+    date: "2026",
+    categories: ["Web Design & Development", "Brand Identity"],
+    skills: [
+      "Web Design",
+      "Next.js Development",
+      "Design Systems",
+      "Data Pipelines",
+      "Image Production",
+      "Copywriting",
+      "SEO",
+    ],
+    oneLiner:
+      "An Australian performance-parts business with five partner brands, thousands of parts and no way for a customer to find what fits their car, priced in Australian dollars, on a phone. Now a car-first catalogue of about 2,500 parts across 228 cars, priced live, on the stand at the Porsche Club of Queensland Concours.",
+    role: "Design, front end, data pipelines, imagery, deployment.",
+    problem:
+      "An Australian performance-parts business with five partner brands, thousands of parts and no way for a customer to find what fits their car, priced in Australian dollars, on a phone.",
+    outcome:
+      "A car-first catalogue of about 2,500 parts across 228 cars, priced live in AUD, shipped to production in five and a half weeks and on the stand at the Porsche Club of Queensland Concours.",
+    // Testimonial from Mason Sorby exists in draft (Design Work/Rennen Plus/Case
+    // Study/rennen-plus-case-study.md) but he has not approved the wording.
+    // Add the `testimonial` field only once he signs it off.
+    liveUrl: "/go/rennen",
+    liveLabel: "rennenplus.com.au",
+    webThumb: "/images/web/rennen-1.webp",
+    webShots: [
+      "/images/web/rennen-1.webp",
+      "/images/rennen-plus/17-all-cars-grid.webp",
+      "/images/rennen-plus/02-car-page-997-fold.webp",
+      "/images/rennen-plus/10b-product-price-carbon.webp",
+    ],
+    heroImage: {
+      src: "/images/rennen-plus/01-home-brand-grid.webp",
+      alt: "The Rennen Plus home hero. A film by Zach Sullivan runs behind the search bar and the five partner marks.",
+      caption: "The home hero. A film by Zach Sullivan runs behind the search bar and the five partner marks.",
+    },
+    images: [],
+    hasDepth: true,
+    depth: [
+      {
+        heading: "The brief was a car, not a catalogue",
+        body: "Rennen Plus is the parts arm of Rennen Motorsport, a Porsche workshop in Marleston, Adelaide. It is the brand principal for Fabspeed and TracTive in Australia, the official TECHART Australia operator, and it carries PermaTUNE ignition and its own Rennen ITB throttle bodies for the air-cooled cars. Before this build that catalogue lived on an old Shopify store, in supplier PDFs and in Mason's quoting spreadsheet. A customer with a 997 could not tell what fitted their car, what it would cost landed in Australia, or who could fit it. The business is not a shop. Every sale ends in a phone call, because fitment is confirmed by a human before anything ships. So the site had to do the part a shop does badly, which is get a customer from \"I have this car\" to \"these are my options and this is roughly what they cost\" without a form, a login or a sales rep. Then hand them to the team. We agreed on one rule at the start. The car is the front door. Every part on the site is reached by picking the car first, and the site never shows a part on a car it does not fit.",
+        images: [
+          {
+            src: "/images/rennen-plus/17-all-cars-grid.webp",
+            aspectRatio: "2400/1524",
+            caption: "All cars. Every thumbnail is cut out, faced the same way and sits on the same soft shadow.",
+            alt: "All cars. Every thumbnail is cut out, faced the same way and sits on the same soft shadow.",
+          },
+        ],
+      },
+      {
+        heading: "Every car, isolated",
+        body: "The catalogue covers 228 cars across 21 makes, from the 1976 911 SC and 930 Turbo to the current Taycan, plus the Ferrari, McLaren, BMW and Corvette models Fabspeed covers. Each one needed a thumbnail that read as the same object as its neighbours. There was no press kit for that. Sources ranged from manufacturer configurator renders to supplier product photos with the car half out of frame. Every image went through the same pipeline. Anything below HD was upscaled four times with Upscayl before it was touched. Backgrounds were removed with rembg rather than a flood fill, because rembg also drops the shadow baked into the source. Every car was flipped to face right. Where a source had no ground contact a soft ellipse shadow was added underneath, and never anywhere else. The set was then normalised for width so a Cayenne and a Boxster sit on the same baseline at the same scale, and exported as WebP at two widths. The finder is a set of nested folders rather than a flat list. Porsche opens to seven model lines with the model lettering sitting behind each car, each line opens to its generations, and a search bar over the top understands the way owners actually talk. \"992\", \"c8 fab\" and \"997 exhaust\" all resolve, and \"c8\" correctly offers both the Corvette and the Audi RS6 because both use that code. Queries that return nothing are logged so the alias table grows from real customer language.",
+        images: [
+          {
+            src: "/images/rennen-plus/11-car-thumb-contact-sheet.webp",
+            aspectRatio: "2400/1656",
+            caption: "The full set of 223 car thumbnails as one contact sheet.",
+            alt: "The full set of 223 car thumbnails as one contact sheet.",
+          },
+          {
+            src: "/images/rennen-plus/12-thumb-treatment-detail.webp",
+            aspectRatio: "1920/568",
+            caption: "Six thumbnails at working size. Same treatment whether the source was a press image or a supplier grab.",
+            alt: "Six thumbnails at working size. Same treatment whether the source was a press image or a supplier grab.",
+          },
+          {
+            src: "/images/rennen-plus/08-porsche-drill-grid.webp",
+            aspectRatio: "2880/1612",
+            caption: "The Porsche folder. Model lettering behind each car, a count of what fits, and a back link.",
+            alt: "The Porsche folder. Model lettering behind each car, a count of what fits, and a back link.",
+          },
+        ],
+      },
+      {
+        heading: "One composition, priced live",
+        body: "Every car page and every product page is the same composition, gated by data. A car page opens with the car's own thumbnail as the page mark, an intro written for that car, and a rotating fact an informed owner would not already know. Below it the packages and parts stack in a fixed order: the Fabspeed package first, then every other Fabspeed part, then the TECHART exterior programme, then TracTive suspension and, on the air-cooled cars, PermaTUNE and Rennen ITB. A product page is that same card with its option pills lifted above it, so the customer never learns a second layout. The prices are the part of the site the client cared about most. Fabspeed lists in US dollars from Pennsylvania. Mason's old process was a spreadsheet: supplier retail, exchange rate, freight by weight, duty, clearance, GST, margin, repeated by hand for each quote. That chain is now a pricing engine in the build. It reads the supplier's live retail price, applies the live USD to AUD rate, a freight band from the part's shipping weight and the delivery zone, import processing and GST, and rounds up. It was tested line by line against Mason's own calculator until the two agreed to the cent on the same order. That means the price on the page moves when the customer changes an option. The Supercup system for the 997.1 reads $4,082.30 delivered with polished stainless tips and $4,239.20 with carbon fibre, and both figures say inc GST and import. Pick a finish and the gallery leads with a live 3D swatch of it, a procedural Three.js material that weighs nothing, so a customer can see carbon weave or satin black before they ask. Where a supplier's own price is ambiguous, the site shows the dearer figure, so a customer is only ever surprised downward on the call. Underneath that sits about 2,500 parts: 1,895 Fabspeed products with fitment taken verbatim from Fabspeed's own site, 514 TECHART parts with their finish and component options, 50 PermaTUNE and 27 Rennen ITB kits. Every product carries its own fitment line, specs, image gallery and a set of FAQs written for that part. The site builds to just over 6,000 static pages, and around 23,000 images are served from a Cloudflare bucket on the site's own image subdomain rather than from the app.",
+        images: [
+          {
+            src: "/images/rennen-plus/02-car-page-997-fold.webp",
+            aspectRatio: "2400/1524",
+            caption: "A car page, the 997.1 Carrera. Intro, a rotating fact, and the car's own thumbnail as the page mark.",
+            alt: "A car page, the 997.1 Carrera. Intro, a rotating fact, and the car's own thumbnail as the page mark.",
+          },
+          {
+            src: "/images/rennen-plus/03-product-page-fold.webp",
+            aspectRatio: "2400/1524",
+            caption: "A product page. Trim and tip options above the card, the same card that sits on the car page.",
+            alt: "A product page. Trim and tip options above the card, the same card that sits on the car page.",
+          },
+          {
+            src: "/images/rennen-plus/10-product-price-stainless.webp",
+            aspectRatio: "2400/1524",
+            half: true,
+            caption: "Delivered price, polished stainless tips.",
+            alt: "Delivered price, polished stainless tips.",
+          },
+          {
+            src: "/images/rennen-plus/10b-product-price-carbon.webp",
+            aspectRatio: "2400/1524",
+            half: true,
+            caption: "The same part with carbon fibre tips. The price moves with the option and the gallery leads with a live 3D swatch of the finish.",
+            alt: "The same part with carbon fibre tips. The price moves with the option and the gallery leads with a live 3D swatch of the finish.",
+          },
+        ],
+      },
+      {
+        heading: "A phone system and a side menu",
+        body: "Rennen Plus advertises on Meta, so the first screen most customers see is a phone. The mobile site was designed as a standalone app rather than a squeezed desktop, with its own token set under one breakpoint. Two fonts, six text styles stepping by 4px on an 8px line rhythm, four spacing values where each is the sum of the two before it, two radii, and a small ink palette. Every tappable control is at least 44px tall and hover styles only apply to a real pointer, so nothing sticks under a thumb. The type leans on Porsche Next, borrowed from the Porsche Design System v4 as an exploration theme while the client decides on the long-term face of the brand. The token set is built so that one block can be deleted and the whole site falls back to the original Bebas and Barlow pairing without touching a component. Navigation lives in one side menu on every device. It holds six things: Home, the current event, Find your car, Brands, the Rennen ecosystem and Contact, with a dealer map alongside. Brands and Ecosystem open as sub-panels rather than dropdowns, so the phone and desktop menus are the same component. The event slot is data driven. The Porsche Club of Queensland Concours appeared in red with its date the day the event page went live and will drop out on its own afterwards.",
+        cols: 4,
+        images: [
+          { src: "/images/rennen-plus/13-mobile-home-porsche.webp", aspectRatio: "1170/2532", caption: "The finder on a phone.", alt: "The finder on a phone." },
+          { src: "/images/rennen-plus/14-mobile-car-page.webp", aspectRatio: "1170/2532", caption: "A car page on a phone.", alt: "A car page on a phone." },
+          { src: "/images/rennen-plus/15-mobile-product-page.webp", aspectRatio: "1170/2532", caption: "Option pills on a phone. Every control is at least 44px tall.", alt: "Option pills on a phone. Every control is at least 44px tall." },
+          { src: "/images/rennen-plus/16-mobile-menu.webp", aspectRatio: "1170/2532", caption: "The side menu on a phone.", alt: "The side menu on a phone." },
+        ],
+      },
+      {
+        heading: "Everything around the parts",
+        body: "A parts catalogue on its own does not earn a call. The rest of the site exists to make the call feel safe. Each brand has its own directory page with its full range for the cars it covers. A dealer finder maps 45 authorised installers across Australia with postcode search, so a customer in Brisbane can see who fits a Fabspeed system before they ask for a quote. A customer builds page shows nine real cars from Rennen's own customers with the exact parts on each one linked back to the catalogue, and an owner review where there is one. Every consult button on the site, inline text link or card, opens the same contact panel with the car and the part already filled in, and an assistant trained on the catalogue answers fitment questions in the site's own voice. The whole build ran to one date. Rennen Plus had a stand at the Porsche Club of Queensland Annual Concours on 13 September 2026 and needed the site live before it, with an event page, a photoshoot prize draw tied to the Instagram account, and a \"your car on our feed\" invitation for owners on the day. Work started on 6 August. The site went to production on 12 September, after 1,136 commits, with the event page as the first thing in the menu.",
+        images: [
+          {
+            src: "/images/rennen-plus/09-side-menu.webp",
+            aspectRatio: "2400/1524",
+            caption: "The side menu on desktop. Six items, an event slot, and sub-panels for cars, brands and the ecosystem.",
+            alt: "The side menu on desktop. Six items, an event slot, and sub-panels for cars, brands and the ecosystem.",
+          },
+          {
+            src: "/images/rennen-plus/07-fabspeed-directory.webp",
+            aspectRatio: "2400/1524",
+            caption: "The Fabspeed directory, one of five brand pages.",
+            alt: "The Fabspeed directory, one of five brand pages.",
+          },
+          {
+            src: "/images/rennen-plus/04-dealer-finder.webp",
+            aspectRatio: "2400/1524",
+            caption: "Forty-five dealers and installers on a map, searchable by postcode.",
+            alt: "Forty-five dealers and installers on a map, searchable by postcode.",
+          },
+          {
+            src: "/images/rennen-plus/05-customer-builds.webp",
+            aspectRatio: "2400/1524",
+            caption: "Customer builds. Each car links back to the parts on it.",
+            alt: "Customer builds. Each car links back to the parts on it.",
+          },
+          {
+            src: "/images/rennen-plus/06-concours-page.webp",
+            aspectRatio: "2400/1524",
+            caption: "The Porsche Club of Queensland Concours page, the deadline the whole build ran to.",
+            alt: "The Porsche Club of Queensland Concours page, the deadline the whole build ran to.",
+          },
+        ],
+      },
+    ],
+  },
+
   /* 8. Lows Design and Build. Full */
   {
     slug: "lows-design-build",

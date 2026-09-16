@@ -35,6 +35,7 @@ const WEBSITES: Website[] = [
     bio: "Porsche and exotic performance packages, built around the cars themselves.",
     images: ["/images/web/rennen-1.webp"],
     video: "/images/web/rennen.webm",
+    caseStudy: "/case-studies/rennen-plus",
   },
   {
     slug: "lows-design-build",

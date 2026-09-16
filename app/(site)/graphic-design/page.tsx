@@ -29,7 +29,7 @@ export default function GraphicDesignPage() {
       description="London graphic design. Brand identity, logos, editorial, print and art direction for businesses across the UK and Australia."
       intro="Graphic design is the core of the studio. Brand identities, logos, editorial and print, packaging and art direction for clients in London, around the UK and in Australia. Below is a selection of graphic design work spanning identity systems, publications and campaigns."
       terms={["brand", "publication", "print", "editorial", "infographic", "information", "art direction", "cover", "packaging"]}
-      excludeSlugs={["lows-design-build", "plated-with-issy", "lola-audio", "kinaya"]}
+      excludeSlugs={["rennen-plus", "lows-design-build", "plated-with-issy", "lola-audio", "kinaya"]}
       capsTitle="What I do"
       capabilities={[
         "Brand identity and logo design",

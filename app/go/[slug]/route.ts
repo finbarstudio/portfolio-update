@@ -56,7 +56,7 @@ const LINKS: Record<string, GoLink> = {
   rennen: {
     candidates: ["https://www.rennenplus.com.au", "https://rennen-plus.vercel.app"],
     signature: "Rennen Plus",
-    home: "/",
+    home: "/case-studies/rennen-plus",
   },
   // Not hosted by us — no Vercel fallback exists, so it's domain or case study.
   kinaya: {
