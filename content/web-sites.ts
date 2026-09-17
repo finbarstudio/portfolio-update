@@ -27,6 +27,34 @@ export const PER_PAGE = 12;
 
 export const WEB_SITES: WebSite[] = [
   {
+    id: 4,
+    name: "Area",
+    url: "https://www.area.tech",
+    image: "/web/area.webp",
+    video: { webm: "/web/area.webm", mp4: "/web/area.mp4" },
+    credits: {
+      design: [
+        { name: "Area", url: "https://instagram.com/area.tech" },
+        { name: "Timothy Luke", url: "https://instagram.com/tmthy.luke" },
+      ],
+      development: [{ name: "Area", url: "https://instagram.com/area.tech" }],
+      built: [{ name: "Next.js", url: "https://nextjs.org" }],
+    },
+    added: "2026-09-17",
+  },
+  {
+    id: 3,
+    name: "CLOU architects",
+    url: "https://www.clouarchitects.com",
+    image: "/web/clou.webp",
+    video: { webm: "/web/clou.webm", mp4: "/web/clou.mp4" },
+    credits: {
+      design: [{ name: "Unseen Studio", url: "https://instagram.com/uns__nstudio" }],
+      development: [{ name: "Unseen Studio", url: "https://instagram.com/uns__nstudio" }],
+    },
+    added: "2026-09-09",
+  },
+  {
     id: 2,
     name: "Podium",
     url: "https://podium.global",
