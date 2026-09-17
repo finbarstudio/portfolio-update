@@ -35,6 +35,7 @@ export const WEB_SITES: WebSite[] = [
     credits: {
       design: [
         { name: "Area", url: "https://instagram.com/area.tech" },
+        { name: "John Palmer", url: "https://instagram.com/john_c_palmer" },
         { name: "Timothy Luke", url: "https://instagram.com/tmthy.luke" },
       ],
       development: [{ name: "Area", url: "https://instagram.com/area.tech" }],
