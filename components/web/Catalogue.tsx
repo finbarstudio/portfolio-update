@@ -1,4 +1,5 @@
 import { WEB_SITES, PER_PAGE, type Credit } from "@/content/web-sites";
+import { Fragment } from "react";
 import SiteThumbVideo from "@/components/home/SiteThumbVideo";
 
 /**
@@ -6,7 +7,21 @@ import SiteThumbVideo from "@/components/home/SiteThumbVideo";
  * Newest first (sorted by id, descending), paginated PER_PAGE at a time.
  * Each tile is the site's 3:4 Instagram frame (still or looping clip), shown
  * greyscale until hovered.
+ *
+ * Loose tiles sit in the TOP row, so every row below is full. Invisible spacer
+ * cells after the loose tiles pad the first row out; one set for the
+ * three-column layout, one for the two-column layout (see .wf-gap-* in web.css).
  */
+function Spacers({ after, count }: { after: number; count: number }) {
+  const out = [];
+  const r3 = count % 3;
+  const r2 = count % 2;
+  if (r3 > 0 && after === r3 - 1)
+    for (let k = 0; k < 3 - r3; k++) out.push(<div key={`g3-${k}`} className="wf-gap-3" aria-hidden="true" />);
+  if (r2 > 0 && after === r2 - 1) out.push(<div key="g2" className="wf-gap-2" aria-hidden="true" />);
+  return <>{out}</>;
+}
+
 function Names({ list }: { list: Credit[] }) {
   return (
     <dd>
@@ -48,7 +63,8 @@ export default function Catalogue({ page }: { page: number }) {
         {items.map((site, i) => {
           const alt = `${site.name} website`;
           return (
-            <article key={site.id} className="wf-cell">
+            <Fragment key={site.id}>
+            <article className="wf-cell">
               <a className="wf-tile" href={site.url} target="_blank" rel="noopener noreferrer">
                 {site.video ? (
                   <SiteThumbVideo
@@ -93,6 +109,8 @@ export default function Catalogue({ page }: { page: number }) {
                 </dl>
               )}
             </article>
+            <Spacers after={i} count={items.length} />
+            </Fragment>
           );
         })}
       </div>

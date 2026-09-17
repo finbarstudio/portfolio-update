@@ -43,6 +43,10 @@ body:has(.wf-root) {
   padding: 0 6px;
 }
 
+/* Spacer cells that push the loose tiles into the top row (Catalogue.tsx).
+   -3 pads the three-column layout, -2 the two-column one. */
+.wf-gap-2 { display: none; }
+
 .wf-header {
   padding-top: 6px;
   align-items: start;
@@ -261,6 +265,8 @@ body:has(.wf-root) {
   .wf-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .wf-gap-3 { display: none; }
+  .wf-gap-2 { display: block; }
   .wf-guide {
     grid-column: 1 / -1;
   }
@@ -273,6 +279,7 @@ body:has(.wf-root) {
   .wf-grid {
     grid-template-columns: 1fr;
   }
+  .wf-gap-2 { display: none; }
   /* Header stays one line: logos left, links right. */
   .wf-header {
     grid-template-columns: 1fr auto;
