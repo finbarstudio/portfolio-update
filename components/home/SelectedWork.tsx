@@ -3,6 +3,7 @@ import { projects, type Project } from "@/content/projects";
 import PreviewCycle from "@/components/PreviewCycle";
 import PhoneCarousel from "@/components/PhoneCarousel";
 import HeroSlideshow from "@/components/HeroSlideshow";
+import PdfSlideshowThumb from "@/components/PdfSlideshowThumb";
 import ZoomImage from "@/components/ZoomImage";
 import { MdArrowForward } from "@/components/MaterialIcon";
 
@@ -10,15 +11,19 @@ import { MdArrowForward } from "@/components/MaterialIcon";
  * SelectedWork — the home page's six best pieces in a two-column grid, each a
  * big 16:9 thumbnail that clicks through to its case study. Web projects
  * hover-cycle their section shots; the graphic projects use their own moving
- * thumbs (the TMYR phone carousel, the Salesmasters and Palms Motel
- * slideshows). Order is editorial, Rennen Plus first. Edit SELECTED to
+ * thumbs (the TMYR phone carousel, the Salesmasters slideshow, the Packer
+ * capability statement paging through). Order is editorial, Rennen Plus first,
+ * Lola Audio last. Edit SELECTED to
  * change the set.
  */
-const SELECTED = ["rennen-plus", "lows-design-build", "lola-audio", "tmyr", "salesmasters", "palmsmotel"];
+const SELECTED = ["rennen-plus", "lows-design-build", "tmyr", "salesmasters", "packer-associates", "lola-audio"];
 
 function Thumb({ project, priority }: { project: Project; priority: boolean }) {
   if (project.webShots?.length || project.webThumb) {
     return <PreviewCycle images={project.webShots ?? [project.webThumb!]} alt={`${project.name} website`} />;
+  }
+  if (project.heroPdf) {
+    return <PdfSlideshowThumb pages={project.heroPdf} />;
   }
   if (project.heroPhones) {
     return <PhoneCarousel model={project.heroPhones.model} videos={project.heroPhones.videos} poster={project.heroPhones.poster} fill />;
