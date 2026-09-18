@@ -245,12 +245,15 @@ function CaseIntro({ project }: { project: Project }) {
         </h1>
         <div>
           <p className="case-intro-brief">{project.problem}</p>
-          <div className="flex flex-wrap items-center gap-2 mt-5">
-            {project.liveUrl && (
+          {/* the live link keeps a row to itself, tags on the row beneath */}
+          {project.liveUrl && (
+            <div className="mt-5">
               <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="sticker-pill is-pink inline-flex">
                 Visit live site <MdOpenInNew size={13} />
               </a>
-            )}
+            </div>
+          )}
+          <div className={`flex flex-wrap items-center gap-2 ${project.liveUrl ? "mt-2" : "mt-5"}`}>
             {project.categories.map((cat) => <Tag key={cat} label={cat} />)}
             <Tag label={project.date} variant="teal" num />
           </div>

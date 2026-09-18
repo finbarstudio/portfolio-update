@@ -4750,7 +4750,11 @@ body:has(.case-study) { background-color: #fff; }
     gap: clamp(2.5rem, 5vw, 6rem);
     padding-bottom: 0;
   }
-  .case-intro-lead { justify-content: flex-start; gap: 2rem; position: sticky; top: calc(var(--menubar-h) + 1rem); align-self: start; }
+  /* Sticks exactly where it rests. The column sits 3rem under the menubar at
+     the top of the page; with a 1rem offset it slid up 2rem over the first
+     bit of scroll before it caught, which read as the title drifting
+     (Finbar, 18 Sept). Same value, no travel. */
+  .case-intro-lead { justify-content: flex-start; gap: 2rem; position: sticky; top: calc(var(--menubar-h) + 3rem); align-self: start; }
   .case-steps { grid-template-columns: minmax(0, 1fr) auto; column-gap: 2rem; }
   /* 58svh a step, not a full screen: the next problem shows dimmed at the
      foot of the screen and the run takes about half the scrolling it did
