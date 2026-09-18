@@ -17,6 +17,7 @@ import WhatWasDelivered from "@/components/WhatWasDelivered";
 import Outcomes from "@/components/Outcomes";
 import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
+import CaseIntroSteps from "@/components/CaseIntroSteps";
 import Reveal from "@/components/Reveal";
 import HeroSlideshow from "@/components/HeroSlideshow";
 import { MdArrowBack, MdArrowForward, MdArrowOutward, MdOpenInNew } from "@/components/MaterialIcon";
@@ -232,9 +233,9 @@ function Gallery({ images, cols }: { images: ProjectImage[]; cols?: number }) {
 }
 
 /* ─── Demo-led case study (Rennen Plus) ──────────────────────────────────
-   CaseIntro is a full-height opening: title, live link and a one-line brief on
-   the left; every problem solved on the right, a subtitle and a short body
-   each. DemoColumn then runs the clips one per row, centred, about 70vh tall. */
+   CaseIntro: title, live link and a one-line brief pinned on the left while
+   the right scrolls one problem solved per screen (CaseIntroSteps, with its
+   pagination dots). DemoColumn then runs the clips one per row, centred, about 70vh tall. */
 function CaseIntro({ project }: { project: Project }) {
   return (
     <header className="case-intro">
@@ -255,15 +256,7 @@ function CaseIntro({ project }: { project: Project }) {
           </div>
         </div>
       </div>
-      <ol className="case-intro-items" aria-label="Problems solved">
-        {project.demos!.map((d, i) => (
-          <li key={d.name}>
-            <span className="case-intro-num tabular-nums">{String(i + 1).padStart(2, "0")}</span>
-            <h2>{d.title}</h2>
-            <p>{d.body}</p>
-          </li>
-        ))}
-      </ol>
+      <CaseIntroSteps steps={project.demos!.map(({ name, title, body }) => ({ name, title, body }))} />
     </header>
   );
 }

@@ -4954,29 +4954,97 @@ body:has(.case-study) { background-color: #fff; }
 }
 .case-intro-lead { display: flex; flex-direction: column; gap: 1.5rem; }
 .case-intro-brief { max-width: 30rem; font-size: var(--text-body); line-height: 1.5; color: var(--ink); }
-.case-intro-items { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; }
-.case-intro-items li {
-  display: grid;
-  grid-template-columns: 2.4rem 1fr;
-  column-gap: 0.25rem;
-  padding: 0.95rem 0 1.15rem;
-  border-top: 1px solid var(--color-line);
-  /* Rows share a height across the two columns; keep each item's title and
-     body packed at the top instead of stretching apart. */
-  align-content: start;
+/* The scrolling half: one part per screen, centred in its column, dots beside. */
+.case-steps { display: grid; grid-template-columns: minmax(0, 1fr); }
+.case-steps-list { list-style: none; margin: 0; padding: 0; }
+.case-steps-list li { padding: 1.4rem 0; }
+.case-step { max-width: 34rem; }
+.case-step h2 {
+  margin: 0 0 0.45em;
+  font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
 }
-.case-intro-num { grid-row: 1 / span 2; font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-soft); padding-top: 0.22rem; }
-.case-intro-items h2 { margin: 0 0 0.3rem; font-size: 0.98rem; font-weight: 600; line-height: 1.25; color: var(--ink); }
-.case-intro-items p { margin: 0; font-size: var(--text-small); line-height: 1.5; color: var(--ink-soft); text-wrap: pretty; }
+.case-step p { margin: 0; font-size: var(--text-body); line-height: 1.55; color: var(--ink-soft); text-wrap: pretty; }
+.case-dots { display: none; }
 @media (min-width: 1024px) {
   .case-intro {
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     gap: clamp(2.5rem, 5vw, 6rem);
-    min-height: calc(100svh - var(--menubar-h) - 3rem);
-    padding-bottom: 4rem;
+    padding-bottom: 0;
   }
   .case-intro-lead { justify-content: flex-start; gap: 2rem; position: sticky; top: calc(var(--menubar-h) + 1rem); align-self: start; }
-  .case-intro-items { grid-template-columns: 1fr 1fr; column-gap: clamp(2rem, 3vw, 3.5rem); align-content: space-between; }
+  .case-steps { grid-template-columns: minmax(0, 1fr) auto; column-gap: 2rem; }
+  .case-steps-list li {
+    min-height: calc(100svh - var(--menubar-h));
+    padding: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0.16;
+    transition: opacity 0.5s ease;
+  }
+  /* The first part sits under the title, not a screen below it. */
+  .case-steps-list li:first-child { min-height: calc(100svh - var(--menubar-h) - 6rem); }
+  .case-steps-list li.is-active { opacity: 1; }
+
+  /* Pagination dots, pinned mid-screen. --pitch is one dot's slot. */
+  .case-dots {
+    --pitch: 18px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 50svh;
+    transform: translateY(-50%);
+    align-self: start;
+    width: 18px;
+  }
+  .case-dots button {
+    position: relative;
+    width: 18px;
+    height: var(--pitch);
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .case-dots button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-line);
+    transition: background-color 0.2s ease;
+  }
+  .case-dots button:hover::before { background: var(--ink-soft); }
+  .case-dots button:focus-visible { outline: 2px solid var(--pink); outline-offset: 0; border-radius: 9px; }
+  /* The bubble: top and bottom edges travel separately, so it stretches
+     toward the next dot, then the tail catches up and it pops back round. */
+  .case-dots-blob {
+    position: absolute;
+    left: 5px;
+    width: 8px;
+    top: calc(var(--i) * var(--pitch) + 5px);
+    bottom: calc((var(--n) - 1 - var(--i)) * var(--pitch) + 5px);
+    border-radius: 4px;
+    background: var(--pink);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .case-dots[data-dir="down"] .case-dots-blob {
+    transition: bottom 0.26s cubic-bezier(0.3, 0, 0.2, 1), top 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) 0.14s;
+  }
+  .case-dots[data-dir="up"] .case-dots-blob {
+    transition: top 0.26s cubic-bezier(0.3, 0, 0.2, 1), bottom 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) 0.14s;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-steps-list li, .case-dots-blob { transition: none !important; }
 }
 .case-demos {
   display: grid;
