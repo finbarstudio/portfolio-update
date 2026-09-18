@@ -8,25 +8,33 @@
  *
  *   https://media.finbar.studio/images/x.webp?v=<manifest hash>
  *
- * The bucket root IS public/media, so the "/media" prefix drops off. `v` comes
- * from content/media-manifest.json and changes whenever any media file does,
- * which is what lets the bucket serve everything as immutable for a year.
+ * The bucket root IS public/media, so the "/media" prefix drops off. `v` is the
+ * file's own content hash from content/media-versions.json: it changes only
+ * when that file does, which lets the bucket serve everything as immutable for
+ * a year and keeps Vercel from re-optimising images that did not change.
  *
  * Never write the hostname into source. See AGENTS.md, "The media rule".
  */
-import manifest from "@/content/media-manifest.json";
+import versions from "@/content/media-versions.json";
 
 const BASE = (process.env.NEXT_PUBLIC_MEDIA_URL ?? "").replace(/\/+$/, "");
 const PREFIX = "/media/";
 
 export const MEDIA_BASE = BASE;
 
+const VERSIONS = versions as Record<string, string>;
+function version(path: string): string {
+  let key = path.slice(1);
+  try { key = decodeURIComponent(key); } catch { /* keep as written */ }
+  return VERSIONS[key] ?? "1"; // cursors/ are not versioned: they never change
+}
+
 export function media<T extends string | undefined | null>(src: T): T {
   if (!BASE || typeof src !== "string" || !src.startsWith(PREFIX)) return src;
   // The bucket root is public/media, so "/media" drops off. Only spaces need
   // escaping; literals that are already percent-encoded pass through untouched.
   const path = src.slice(PREFIX.length - 1).replace(/ /g, "%20");
-  return `${BASE}${path}?v=${manifest.hash}` as T;
+  return `${BASE}${path}?v=${version(path)}` as T;
 }
 
 /** media() over every string in a content tree (content/projects.ts etc). */

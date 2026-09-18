@@ -85,6 +85,10 @@ const nextConfig: NextConfig = {
   images: {
     // Images are local (public/media off disk) or on the one R2 hostname.
     ...(mediaHost ? { remotePatterns: [{ protocol: "https" as const, hostname: mediaHost }] } : {}),
+    // Every media URL carries its file's content hash (?v=), so an optimised
+    // image can never go stale: cache it for a month and pay for the
+    // transformation once.
+    minimumCacheTTL: 2678400,
     // Allowed next/image quality values. 75 = portfolio default; the rest are
     // used by the Lindon demo (app/lindon/site). Next 16 rejects any quality
     // not in this list once the array is set.

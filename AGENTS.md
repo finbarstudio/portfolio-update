@@ -34,8 +34,8 @@ it in step.
    `NEXT_PUBLIC_MEDIA_URL` environment variable (set in Vercel, unset locally,
    so local dev serves the folder off disk).
 5. **The sync is automatic and mandatory.** `npm install` points git at
-   `.githooks/`. On commit, `pre-commit` rewrites `content/media-manifest.json`
-   (and `content/asia-photos.json`) whenever `public/media` changed; commit
+   `.githooks/`. On commit, `pre-commit` rewrites `content/media-manifest.json`,
+   `content/media-versions.json` and `content/asia-photos.json` whenever `public/media` changed; commit
    them. On push, `pre-push` runs `scripts/media-sync.sh`, which mirrors the
    git-tracked contents of `public/media` to the bucket with `rclone` and
    refuses the push if that fails. Never push with `--no-verify`. Never delete

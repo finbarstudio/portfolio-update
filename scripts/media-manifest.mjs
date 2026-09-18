@@ -1,9 +1,13 @@
 // Writes the two committed indexes of public/media, from git's own index so it
 // is instant and content-accurate (blob hashes, not mtimes):
 //
-//   content/media-manifest.json  { hash, files, bytes }. `hash` versions every
-//                                CDN URL (lib/media.ts) and is what the build
-//                                checks the R2 bucket against (media-check.mjs).
+//   content/media-manifest.json  { hash, files, bytes }. What the build checks
+//                                the R2 bucket against (media-check.mjs).
+//   content/media-versions.json  path -> 8 chars of its git blob hash. The ?v=
+//                                on each CDN URL (lib/media.ts), so replacing
+//                                one file busts one cache entry, not all of
+//                                them. cursors/ is left out: 12,000 gifs that
+//                                never change would only bloat the bundle.
 //   content/asia-photos.json     folder -> web images for the /asia guide, which
 //                                used to scan the disk at render time. The disk
 //                                is not there on Vercel any more.
@@ -43,8 +47,12 @@ for (const r of rows) {
   if (m && WEB_IMG.test(m[2])) (asia[m[1]] ??= []).push(m[2]);
 }
 
+const versions = {};
+for (const r of rows) if (!r.file.startsWith("cursors/")) versions[r.file] = r.blob.slice(0, 8);
+
 const out = [
   ["content/media-manifest.json", JSON.stringify(manifest, null, 2) + "\n"],
+  ["content/media-versions.json", JSON.stringify(versions, null, 1) + "\n"],
   ["content/asia-photos.json", JSON.stringify(asia, null, 2) + "\n"],
 ];
 let stale = false;
@@ -55,7 +63,7 @@ for (const [file, text] of out) {
   if (!check) writeFileSync(file, text);
 }
 if (check && stale) {
-  console.error("✖ content/media-manifest.json is out of date. Run: npm run media:manifest, then commit it.");
+  console.error("✖ the media manifests in content/ are out of date. Run: npm run media:manifest, then commit it.");
   process.exit(1);
 }
 console.log(`media manifest ${manifest.hash} · ${manifest.files} files · ${(bytes / 1e6).toFixed(1)} MB${stale && !check ? " (updated)" : ""}`);
