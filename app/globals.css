@@ -4752,8 +4752,12 @@ body:has(.case-study) { background-color: #fff; }
   }
   .case-intro-lead { justify-content: flex-start; gap: 2rem; position: sticky; top: calc(var(--menubar-h) + 1rem); align-self: start; }
   .case-steps { grid-template-columns: minmax(0, 1fr) auto; column-gap: 2rem; }
+  /* 58svh a step, not a full screen: the next problem shows dimmed at the
+     foot of the screen and the run takes about half the scrolling it did
+     (Finbar, 18 Sept: "less space between each item"). The centre-line
+     observer in CaseIntroSteps still picks one step at a time. */
   .case-steps-list li {
-    min-height: calc(100svh - var(--menubar-h));
+    min-height: 58svh;
     padding: 0;
     display: grid;
     place-items: center;
@@ -4761,7 +4765,7 @@ body:has(.case-study) { background-color: #fff; }
     transition: opacity 0.5s ease;
   }
   /* The first part sits under the title, not a screen below it. */
-  .case-steps-list li:first-child { min-height: calc(100svh - var(--menubar-h) - 6rem); }
+  .case-steps-list li:first-child { min-height: calc(58svh - 4rem); }
   .case-steps-list li.is-active { opacity: 1; }
 
   /* Pagination dots, pinned mid-screen. --pitch is one dot's slot. */
