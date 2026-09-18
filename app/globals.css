@@ -4944,45 +4944,60 @@ body:has(.case-study) { background-color: #fff; }
 .home-selected-thumb > * { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 /* ── Case study: demo-led layout (Rennen Plus) ─────────────────────────────
-   Header right column = key problems solved; body = two columns of clips,
-   each in a 1px hairline frame with a plain caption. */
-.case-solved { width: 100%; max-width: 34rem; text-align: left; }
-.case-solved ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
-.case-solved li {
-  display: grid;
-  grid-template-columns: 2.2em 1fr;
-  font-size: var(--text-small);
-  line-height: 1.45;
-  color: var(--ink);
-}
-.case-solved li span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-soft); padding-top: 0.15em; }
-.case-demos {
+   A full-height intro (title + brief left, every problem solved right), then
+   the clips one per row, centred, about 70vh tall, in a 1px hairline frame. */
+.case-intro {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2.25rem 1.5rem;
-  padding: 1.5rem 0 3rem;
+  gap: 2.5rem;
+  padding-bottom: 3rem;
 }
-@media (min-width: 768px) { .case-demos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.case-intro-lead { display: flex; flex-direction: column; gap: 1.5rem; }
+.case-intro-brief { max-width: 30rem; font-size: var(--text-body); line-height: 1.5; color: var(--ink); }
+.case-intro-items { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; }
+.case-intro-items li {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  column-gap: 0.25rem;
+  padding: 0.95rem 0 1.15rem;
+  border-top: 1px solid var(--color-line);
+  /* Rows share a height across the two columns; keep each item's title and
+     body packed at the top instead of stretching apart. */
+  align-content: start;
+}
+.case-intro-num { grid-row: 1 / span 2; font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-soft); padding-top: 0.22rem; }
+.case-intro-items h2 { margin: 0 0 0.3rem; font-size: 0.98rem; font-weight: 600; line-height: 1.25; color: var(--ink); }
+.case-intro-items p { margin: 0; font-size: var(--text-small); line-height: 1.5; color: var(--ink-soft); text-wrap: pretty; }
+@media (min-width: 1024px) {
+  .case-intro {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(2.5rem, 5vw, 6rem);
+    min-height: calc(100svh - var(--menubar-h) - 3rem);
+    padding-bottom: 4rem;
+  }
+  .case-intro-lead { justify-content: flex-start; gap: 2rem; position: sticky; top: calc(var(--menubar-h) + 1rem); align-self: start; }
+  .case-intro-items { grid-template-columns: 1fr 1fr; column-gap: clamp(2rem, 3vw, 3.5rem); align-content: space-between; }
+}
+.case-demos {
+  display: grid;
+  justify-items: center;
+  gap: clamp(3.5rem, 9vh, 6.5rem);
+  padding: 2rem 0 5rem;
+}
+.case-demos figure { margin: 0; width: min(100%, calc(70svh * 3024 / 1898)); }
 .case-demo-frame {
   position: relative;
-  aspect-ratio: 3024 / 1964;
+  aspect-ratio: 3024 / 1898;   /* the recordings, notch strip cropped */
   overflow: hidden;
   border: 1px solid var(--color-line);
   border-radius: 6px;
   background: var(--bg);
 }
 .case-demo-frame > * { position: absolute; inset: 0; }
-.case-demo-todo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  background: var(--surface-sunken);
-}
 .case-demos figcaption {
-  margin-top: 0.7rem;
+  margin-top: 0.8rem;
   font-size: var(--text-caption);
   line-height: 1.5;
   color: var(--ink-soft);
 }
+.case-demo-title { color: var(--ink); font-weight: 600; margin-right: 0.6em; }

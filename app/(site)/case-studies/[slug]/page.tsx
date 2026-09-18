@@ -231,24 +231,56 @@ function Gallery({ images, cols }: { images: ProjectImage[]; cols?: number }) {
   );
 }
 
-/* ─── Demo grid — one looping clip per solution, two columns, a plain caption
-   under each. A demo with no video yet is a named placeholder tile. ─── */
-function DemoGrid({ demos }: { demos: NonNullable<Project["demos"]> }) {
+/* ─── Demo-led case study (Rennen Plus) ──────────────────────────────────
+   CaseIntro is a full-height opening: title, live link and a one-line brief on
+   the left; every problem solved on the right, a subtitle and a short body
+   each. DemoColumn then runs the clips one per row, centred, about 70vh tall. */
+function CaseIntro({ project }: { project: Project }) {
+  return (
+    <header className="case-intro">
+      <div className="case-intro-lead">
+        <h1 className="font-bold text-ink leading-[1.02]" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
+          {project.name}
+        </h1>
+        <div>
+          <p className="case-intro-brief">{project.problem}</p>
+          <div className="flex flex-wrap items-center gap-2 mt-5">
+            {project.liveUrl && (
+              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="sticker-pill is-pink inline-flex">
+                Visit live site <MdOpenInNew size={13} />
+              </a>
+            )}
+            {project.categories.map((cat) => <Tag key={cat} label={cat} />)}
+            <Tag label={project.date} variant="teal" num />
+          </div>
+        </div>
+      </div>
+      <ol className="case-intro-items" aria-label="Problems solved">
+        {project.demos!.map((d, i) => (
+          <li key={d.name}>
+            <span className="case-intro-num tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+            <h2>{d.title}</h2>
+            <p>{d.body}</p>
+          </li>
+        ))}
+      </ol>
+    </header>
+  );
+}
+
+function DemoColumn({ demos }: { demos: NonNullable<Project["demos"]> }) {
+  const clips = demos.filter((d) => d.video);
   return (
     <div className="case-demos">
-      {demos.map((d, i) => (
-        <Reveal as="figure" key={d.name} y={20} delay={(i % 2) * 0.05} className="min-w-0">
+      {clips.map((d) => (
+        <Reveal as="figure" key={d.name} y={20}>
           <div className="case-demo-frame">
-            {d.video ? (
-              <VideoPlayer src={d.video} />
-            ) : (
-              <div className="case-demo-todo">
-                <span className="mono-label">{d.name}</span>
-                <span className="mono-label text-ink-soft">To record</span>
-              </div>
-            )}
+            <VideoPlayer src={d.video!} />
           </div>
-          <figcaption>{d.caption}</figcaption>
+          <figcaption>
+            <span className="case-demo-title">{d.title}</span>
+            {d.caption}
+          </figcaption>
         </Reveal>
       ))}
     </div>
@@ -518,6 +550,8 @@ export default async function CaseStudyPage({
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbJsonLd) }}
       />
+      {project.demos ? <CaseIntro project={project} /> : (
+      <>
       {/* Header — mobile: stacked + centred. Desktop: title + live link left, tags right, bottom-aligned. */}
       <header className="flex flex-col items-center text-center gap-5 mb-8 md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left md:gap-x-6 md:gap-y-4 md:mb-6">
         <div className="min-w-0 max-w-full">
@@ -543,18 +577,6 @@ export default async function CaseStudyPage({
 
         {/* Tags — mobile: centred wrap. Desktop: right-aligned brick-wrap, ragged left.
             Equal gap both axes; each tag keeps its own intrinsic text padding. */}
-        {project.solved ? (
-          /* Demo-led pages balance the title with the problems solved; the
-             tags drop to a row beneath the header. */
-          <div className="case-solved">
-            <p className="mono-label text-ink-soft mb-3">Key problems solved</p>
-            <ol>
-              {project.solved.map((line, i) => (
-                <li key={i}><span className="tabular-nums">{String(i + 1).padStart(2, "0")}</span>{line}</li>
-              ))}
-            </ol>
-          </div>
-        ) : (
         <div className="flex flex-wrap justify-center md:justify-end items-end gap-2 max-w-full md:max-w-[45%]">
           {project.categories.map((cat) => (
             <Tag key={cat} label={cat} />
@@ -563,8 +585,9 @@ export default async function CaseStudyPage({
           {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
           {project.isHobby && <Tag label="Hobby project" variant="pink" />}
         </div>
-        )}
       </header>
+      </>
+      )}
 
       {/* TikTok-led intro: a brand-styled TikTok call-out beside the headline
           metrics (the raw embed ran too tall and unbalanced the row). */}
@@ -602,7 +625,7 @@ export default async function CaseStudyPage({
           no standard image grid). mediaRows handles its own layout. Otherwise
           the standard hero + visual body + depth chain. */}
       {project.demos ? (
-        <DemoGrid demos={project.demos} />
+        <DemoColumn demos={project.demos} />
       ) : project.slug === "kinaya" ? (
         <KinayaShowcase />
       ) : project.slug === "packer-associates" ? (

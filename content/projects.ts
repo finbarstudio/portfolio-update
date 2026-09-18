@@ -146,13 +146,12 @@ export interface Project {
     stats: { value: string; delta?: string; label: string }[];
     source?: string;
   };
-  /** Key problems solved: a short list shown top right of the case study,
-   *  balancing the title and the live-site link. */
-  solved?: string[];
   /** Demo-led case study: when set, the page drops the hero and the depth
    *  chapters and shows these as a two-column grid of looping clips, one per
-   *  solution. No `video` yet = a named placeholder tile (still to record). */
-  demos?: { name: string; caption: string; video?: string }[];
+   *  solution. Each entry carries its own title and body for the full-height
+   *  "problems solved" intro, so a new clip always brings its write-up with it.
+   *  An entry with no `video` still appears in the intro; it just has no clip. */
+  demos?: { name: string; title: string; body: string; caption?: string; video?: string }[];
   /** Hide from the home grid + sitemap. Detail page still exists if linked. */
   hidden?: boolean;
   /** TikTok creator handle (no @). When set, the case study embeds the profile
@@ -841,29 +840,48 @@ export const projects: Project[] = [
     },
     images: [],
     hasDepth: false,
-    solved: [
-      "Owners could not tell what fits their car. Every part is now reached by picking the car first, across 228 cars.",
-      "Prices were in US dollars on a supplier's site. Each part now shows a landed price in Australian dollars that moves with the options.",
-      "The range lived in five brands' sites and PDFs. It is one catalogue of about 2,500 parts.",
-      "Quotes were worked out by spreadsheet on the phone. The owner now sends callers to the page.",
-      "Most visitors arrive on a phone from Meta ads. The phone site was designed as its own system.",
-      "Every sale ends in a call. One consult panel opens everywhere with the car and the part filled in.",
-    ],
-    // One clip per solution. Recordings are Finbar's own (retina, cursor in
-    // shot); drop the file in public/images/rennen-plus/demos/ and add `video`.
+    // One entry per problem solved. `title` + `body` feed the full-height
+    // intro; `video` + `caption` feed the clip column. Recordings are Finbar's
+    // own: drop "<Name> Demo.mp4" on the Desktop, run
+    // scripts/encode-rennen-demos.sh, add `video` here.
     demos: [
-      { name: "Landing page", caption: "The home page. A film by Zach Sullivan behind the search bar and the five partner marks.", video: "/images/rennen-plus/demos/landing.mp4" },
-      { name: "Car grid", caption: "The finder. Twenty-one makes, then 228 cars on one baseline, every thumbnail cut out and faced the same way.", video: "/images/rennen-plus/demos/grid.mp4" },
-      { name: "Search", caption: "Search that understands how owners talk. \"c8\" and \"997 exhaust\" both resolve." },
-      { name: "Car page", caption: "A car page. The car as the page mark, a fact an owner might not know, then the packages and parts." },
-      { name: "Options and live price", caption: "Pick a trim and a finish and the delivered price moves, with a 3D swatch of the finish." },
-      { name: "Zoom gallery", caption: "The product gallery, full screen." },
-      { name: "Side menu", caption: "One menu on every device, with an event slot that comes and goes from the data." },
-      { name: "Ask Rennen Plus", caption: "The assistant answers a fitment question from the catalogue and offers the consult." },
-      { name: "Consult panel", caption: "Every consult button opens the same panel, with the car and the part already filled in." },
-      { name: "Dealer map", caption: "Forty-five dealers and installers, searchable by postcode." },
-      { name: "Customer builds", caption: "Nine customer cars, each linked back to the parts on it." },
-      { name: "Phone", caption: "The phone site, finder to car to product." },
+      { name: "Landing page", video: "/images/rennen-plus/demos/landing.mp4",
+        title: "One front door",
+        body: "Five partner brands, each with its own site, and no shared way in. The home page is a search bar over a film by Zach Sullivan, with the five marks underneath.",
+        caption: "The home page." },
+      { name: "Car grid", video: "/images/rennen-plus/demos/grid.mp4",
+        title: "The car comes first",
+        body: "Owners could not tell what fits their car. Every part is reached by picking the car, 228 of them across 21 makes, and a part never shows on a car it does not fit.",
+        caption: "The finder. Twenty-one makes, then every car on one baseline, each thumbnail cut out and faced the same way." },
+      { name: "Search to car page", video: "/images/rennen-plus/demos/journey.mp4",
+        title: "One page per car",
+        body: "The range lived in five brands' sites and supplier PDFs. Search a chassis code like 992.2 and one page holds the package, every part and the questions owners ask.",
+        caption: "Searching 992.2, then the car page top to bottom." },
+      { name: "3D material and live price", video: "/images/rennen-plus/demos/material.mp4",
+        title: "A price you can act on",
+        body: "Quotes were a spreadsheet and a phone call, worked up from US retail. Each part now shows a landed Australian price with GST and import, and it moves when an option changes. Pick a finish and the gallery leads with a live 3D material of it.",
+        caption: "Trim, tip finish, price. The finish renders as a live 3D material, full screen on a click." },
+      { name: "Side menu", video: "/images/rennen-plus/demos/menu.mp4",
+        title: "One way around",
+        body: "Five brands, 228 cars, an events calendar and a dealer map needed a single way in. One side menu runs on every device, and its event slot comes and goes from the data.",
+        caption: "The side menu, with Find your car and the ecosystem opening as panels." },
+      { name: "Ask Rennen Plus", video: "/images/rennen-plus/demos/assistant.mp4",
+        title: "Answers before the call",
+        body: "Fitment questions used to wait for a phone call. An assistant grounded in the catalogue finds the car, links the page and the part, and hands over to a consult when it should.",
+        caption: "\"I have a Ferrari\", then \"I have a Roma\". The assistant finds the car and links the part." },
+      { name: "Dealer map", video: "/images/rennen-plus/demos/dealers.mp4",
+        title: "Someone to fit it",
+        body: "Owners had nobody local to fit the parts. Forty-five dealers and installers now sit on a map, searchable by postcode.",
+        caption: "The dealer map. Pick an installer and the map flies to the workshop." },
+      { name: "Consult panel",
+        title: "One way to enquire",
+        body: "Every sale ends in a call, because fitment is checked by a person before anything ships. Every button opens the same panel, with the car and the part already filled in." },
+      { name: "Customer builds",
+        title: "Proof on real cars",
+        body: "There was nothing showing the parts on a customer's car. Nine builds each link back to the parts on them, eight with the owner's own words." },
+      { name: "Phone",
+        title: "Built for a phone",
+        body: "Most visitors arrive on a phone from Meta ads. The phone site is its own system: two fonts, six text sizes and every control at least 44px tall." },
     ],
   },
 
