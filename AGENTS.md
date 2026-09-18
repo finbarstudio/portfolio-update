@@ -15,7 +15,10 @@ it in step.
 1. **One folder.** Media goes under `public/media/` and nowhere else in
    `public/`. Subfolders: `images/<project-slug>/`, `models/`, `web/`
    (web.finbar tiles), `cursors/`, `asia/`. File names are lowercase kebab-case,
-   no spaces. The only other things in `public/` are `downloads/` (files served
+   no spaces. Raster images go in as **WebP, 2560px on the long edge at most**
+   (`cwebp -q 84 -m 6 -sharp_yuv`; phone photos through `magick -auto-orient`
+   first, or they land sideways). No PNG or JPG in `public/media`: keep the
+   original in the parent design workspace, not in the repo. The only other things in `public/` are `downloads/` (files served
    with a save dialog from the origin), `cursormania/` (tiny UI icons) and
    `llms.txt`.
 2. **One helper.** Every reference is written as a `/media/...` path and passes

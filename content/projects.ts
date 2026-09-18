@@ -195,10 +195,10 @@ const RAW_PROJECTS: Project[] = [
       colors: ["#2F4858", "#E94E77", "#FF8AA2"],
       bg: "#FCF4F6",
     },
-    heroImage: { src: "/media/images/kinaya/desktop.png", alt: "KinAya website desktop view with structured, accessible homepage layout" },
+    heroImage: { src: "/media/images/kinaya/desktop.webp", alt: "KinAya website desktop view with structured, accessible homepage layout" },
     images: [
-      { src: "/media/images/kinaya/desktop.png", caption: "Home page: structured, readable, accessible layout across viewports.", alt: "KinAya Framer website homepage on desktop with clean navigation and NDIS branding" },
-      { src: "/media/images/kinaya/mobile.png", caption: "Responsive mobile layout. Full CMS control was handed over to the KinAya team after launch.", alt: "KinAya website mobile view with responsive layout in the navy and rose palette" },
+      { src: "/media/images/kinaya/desktop.webp", caption: "Home page: structured, readable, accessible layout across viewports.", alt: "KinAya Framer website homepage on desktop with clean navigation and NDIS branding" },
+      { src: "/media/images/kinaya/mobile.webp", caption: "Responsive mobile layout. Full CMS control was handed over to the KinAya team after launch.", alt: "KinAya website mobile view with responsive layout in the navy and rose palette" },
       { src: "/media/images/kinaya/logo-dev-1.png", caption: "Early logomark explorations: testing form, weight and warmth.", alt: "KinAya logo development early stage with pencil and vector explorations" },
       { src: "/media/images/kinaya/logo-dev-4.png", caption: "Final refined logomark. The version that balanced warmth with professional trust.", alt: "KinAya final logomark, refined vector mark with logotype in the brand typeface" },
     ],
@@ -219,7 +219,7 @@ const RAW_PROJECTS: Project[] = [
         body: "A custom site-wide text-resizer was built in Framer. It persists across every page and lets users step the base text size up or down. For an NDIS provider whose audience may include people with vision impairments, this wasn't optional. The preference is stored in localStorage so it sticks across visits.",
         images: [
           {
-            src: "/media/images/kinaya/accessibility-poster.jpg",
+            src: "/media/images/kinaya/accessibility-poster.webp",
             video: "/media/images/kinaya/accessibility.webm",
             caption: "The text-resizer in action: persistent across sessions and fully keyboard-accessible.",
             alt: "KinAya accessibility text-resizer demonstration, custom Framer component scaling text site-wide",
@@ -230,8 +230,8 @@ const RAW_PROJECTS: Project[] = [
         heading: "Website & CMS",
         body: "The six-page Framer site was built for handover from day one. CMS collections handle the repeating content (services, team profiles, news posts), so the KinAya team can update without touching code. SEO basics were in place from launch: semantic HTML, per-page meta, Open Graph and clean URLs.",
         images: [
-          { src: "/media/images/kinaya/desktop.png", caption: "Desktop layout with clean hierarchy and a clear CTA structure.", alt: "KinAya desktop homepage full view with hero, services and CTA sections" },
-          { src: "/media/images/kinaya/mobile.png", caption: "Mobile: fully responsive, same content hierarchy on smaller screens.", alt: "KinAya mobile homepage, responsive layout adapting to small viewport" },
+          { src: "/media/images/kinaya/desktop.webp", caption: "Desktop layout with clean hierarchy and a clear CTA structure.", alt: "KinAya desktop homepage full view with hero, services and CTA sections" },
+          { src: "/media/images/kinaya/mobile.webp", caption: "Mobile: fully responsive, same content hierarchy on smaller screens.", alt: "KinAya mobile homepage, responsive layout adapting to small viewport" },
         ],
       },
     ],
@@ -295,7 +295,7 @@ const RAW_PROJECTS: Project[] = [
       "Campaign ran across 2022 and 2023 windows. December 2023 year on year: new registrants +19.7%, page views +1.5%, property enquiries +3.4%.",
     logo: "/media/images/tmyr/stb-logo.svg",
     heroImage: {
-      src: "/media/images/tmyr/hero-poster.jpg",
+      src: "/media/images/tmyr/hero-poster.webp",
       alt: "The Moment You Realise campaign, Share to Buy social video series hero frame",
     },
     heroPhones: {
@@ -309,7 +309,7 @@ const RAW_PROJECTS: Project[] = [
         "/media/images/tmyr/1080x1920-ig-reels/molly.webm",
         "/media/images/tmyr/1080x1920-ig-reels/olu.webm",
       ],
-      poster: "/media/images/tmyr/hero-poster.jpg",
+      poster: "/media/images/tmyr/hero-poster.webp",
     },
     images: [],
     hasDepth: false,
@@ -447,7 +447,7 @@ const RAW_PROJECTS: Project[] = [
     outcome:
       "Client happy with the series. The releases picked up real traction after launch.",
     heroImage: {
-      src: "/media/images/joe-devine/hero.png",
+      src: "/media/images/joe-devine/hero.webp",
       alt: "Joe Devine, all five single cover artworks shown together as a series",
     },
     heroAlbums: {
@@ -537,15 +537,15 @@ const RAW_PROJECTS: Project[] = [
     outcome:
       "Consistent visual language delivered across the brand system.",
     heroImage: {
-      src: "/media/images/compass-capability/hero.png",
+      src: "/media/images/compass-capability/hero.webp",
       alt: "Compass Capability brand identity, logo mockup collage across touchpoints",
     },
     heroSlideshow: [
-      "/media/images/compass-capability/graphic.png",
-      "/media/images/compass-capability/pattern.png",
-      "/media/images/compass-capability/mockup-billboard.png",
-      "/media/images/compass-capability/mockup-business-card.png",
-      "/media/images/compass-capability/mockup-stationary.png",
+      "/media/images/compass-capability/graphic.webp",
+      "/media/images/compass-capability/pattern.webp",
+      "/media/images/compass-capability/mockup-billboard.webp",
+      "/media/images/compass-capability/mockup-business-card.webp",
+      "/media/images/compass-capability/mockup-stationary.webp",
     ],
     slideshowAspect: "1/1",
     images: [],
@@ -556,13 +556,13 @@ const RAW_PROJECTS: Project[] = [
         body: "The logo reads as direction. From the mark came a flexible graphic motif and a repeating pattern, both built on the same geometry so the brand holds together wherever it lands.",
         images: [
           {
-            src: "/media/images/compass-capability/graphic.png",
+            src: "/media/images/compass-capability/graphic.webp",
             aspectRatio: "1/1",
             caption: "The directional motif, pulled from the logomark.",
             alt: "Compass Capability brand graphic, directional compass motif used as a scalable brand asset",
           },
           {
-            src: "/media/images/compass-capability/pattern.png",
+            src: "/media/images/compass-capability/pattern.webp",
             aspectRatio: "1/1",
             caption: "A repeating pattern built from the logo geometry.",
             alt: "Compass Capability repeating pattern, logo-derived geometric pattern for brand applications",
@@ -574,19 +574,19 @@ const RAW_PROJECTS: Project[] = [
         body: "The same system, run across outdoor, print and stationery. It had to stay credible at billboard scale and at the size of a business card.",
         images: [
           {
-            src: "/media/images/compass-capability/mockup-billboard.png",
+            src: "/media/images/compass-capability/mockup-billboard.webp",
             aspectRatio: "1/1",
             caption: "Large-format outdoor.",
             alt: "Compass Capability brand identity on billboard mockup, large format outdoor application",
           },
           {
-            src: "/media/images/compass-capability/mockup-business-card.png",
+            src: "/media/images/compass-capability/mockup-business-card.webp",
             aspectRatio: "1/1",
             caption: "Business card, mark at small print scale.",
             alt: "Compass Capability business card mockup, logo and typography at small print scale",
           },
           {
-            src: "/media/images/compass-capability/mockup-stationary.png",
+            src: "/media/images/compass-capability/mockup-stationary.webp",
             aspectRatio: "1/1",
             caption: "Letterhead and document templates.",
             alt: "Compass Capability stationery mockup, letterhead and document templates with brand identity",
@@ -630,7 +630,7 @@ const RAW_PROJECTS: Project[] = [
     outcome:
       "Speculative work. Not adopted by the club. Built as a self-initiated concept.",
     heroImage: {
-      src: "/media/images/norths-devils/desktop.png",
+      src: "/media/images/norths-devils/desktop.webp",
       alt: "Norths Devils RLFC prototype website desktop view with full-screen hero and navigation",
     },
     images: [],
@@ -641,13 +641,13 @@ const RAW_PROJECTS: Project[] = [
         body: "The brief was to feel current without losing the club. I kept the devil and tightened the vector construction so it holds at small sizes and in digital, where the old mark struggled. Angular type for aggression, rounded corners for a bit of vintage.",
         images: [
           {
-            src: "/media/images/norths-devils/logo-1.png",
+            src: "/media/images/norths-devils/logo-1.webp",
             aspectRatio: "1/1",
             caption: "The refreshed primary mark.",
             alt: "Norths Devils RLFC refreshed logo, modernised devil mark with thickened edges for digital reproduction",
           },
           {
-            src: "/media/images/norths-devils/logo-2.png",
+            src: "/media/images/norths-devils/logo-2.webp",
             aspectRatio: "1/1",
             caption: "Before and after, old mark versus new.",
             alt: "Norths Devils logo before and after comparison, original versus refreshed mark side by side",
@@ -659,7 +659,7 @@ const RAW_PROJECTS: Project[] = [
         body: "Built from scratch and modelled on professional NRL club sites, so the brand could be judged in something close to the real thing rather than a static mockup.",
         images: [
           {
-            src: "/media/images/norths-devils/video-desktop-poster.jpg",
+            src: "/media/images/norths-devils/video-desktop-poster.webp",
             video: "/media/images/norths-devils/video-desktop.webm",
             aspectRatio: "16/9",
             caption: "Scrolling the desktop prototype.",
@@ -672,19 +672,19 @@ const RAW_PROJECTS: Project[] = [
         body: "The same layout, holding its shape down to a phone.",
         images: [
           {
-            src: "/media/images/norths-devils/iphone-1.png",
+            src: "/media/images/norths-devils/iphone-1.webp",
             aspectRatio: "4/3",
             caption: "Mobile layout, club colours intact.",
             alt: "Norths Devils prototype website on iPhone mockup, mobile responsive layout",
           },
           {
-            src: "/media/images/norths-devils/iphone-2.png",
+            src: "/media/images/norths-devils/iphone-2.webp",
             aspectRatio: "4/3",
             caption: "Team profile and news pages.",
             alt: "Norths Devils prototype website iPhone mockup, team profile and news page layout",
           },
           {
-            src: "/media/images/norths-devils/video-mobile-poster.jpg",
+            src: "/media/images/norths-devils/video-mobile-poster.webp",
             video: "/media/images/norths-devils/video-mobile.webm",
             aspectRatio: "4/3",
             caption: "Scrolling the responsive site on mobile.",
@@ -697,13 +697,13 @@ const RAW_PROJECTS: Project[] = [
         body: "And how the refreshed mark would carry into the club's physical spaces.",
         images: [
           {
-            src: "/media/images/norths-devils/mockup-wall.png",
+            src: "/media/images/norths-devils/mockup-wall.webp",
             aspectRatio: "3/2",
             caption: "The mark at environmental scale.",
             alt: "Norths Devils refreshed logo on concrete wall mockup, environmental scale brand application",
           },
           {
-            src: "/media/images/norths-devils/mockup-gallery.png",
+            src: "/media/images/norths-devils/mockup-gallery.webp",
             aspectRatio: "4/3",
             caption: "Brand applications across surfaces.",
             alt: "Norths Devils brand identity gallery wall mockup, logo silhouettes across multiple brand applications",
@@ -743,15 +743,15 @@ const RAW_PROJECTS: Project[] = [
     outcome:
       "Client happy with the final output and the brand reading consistently across every touchpoint.",
     heroImage: {
-      src: "/media/images/copper-company/hero.png",
+      src: "/media/images/copper-company/hero.webp",
       alt: "Copper Company rum bottle, staged product photography showing the final label design and brand identity",
     },
     heroSlideshow: [
-      "/media/images/copper-company/hero.png",
-      "/media/images/copper-company/bottle-1.png",
-      "/media/images/copper-company/bottle-2.png",
-      "/media/images/copper-company/insta-1.png",
-      "/media/images/copper-company/insta-2.png",
+      "/media/images/copper-company/hero.webp",
+      "/media/images/copper-company/bottle-1.webp",
+      "/media/images/copper-company/bottle-2.webp",
+      "/media/images/copper-company/insta-1.webp",
+      "/media/images/copper-company/insta-2.webp",
     ],
     slideshowAspect: "1/1",
     images: [],
@@ -762,13 +762,13 @@ const RAW_PROJECTS: Project[] = [
         body: "The monogram does the heavy lifting on pack. The front label keeps it to the mark and the name; the back carries tasting notes over the repeating pattern, built from the same geometry as the logo.",
         images: [
           {
-            src: "/media/images/copper-company/bottle-1.png",
+            src: "/media/images/copper-company/bottle-1.webp",
             aspectRatio: "1/1",
             caption: "Front label, monogram at full print spec.",
             alt: "Copper Company rum bottle front, monogram label at print specification on amber glass bottle",
           },
           {
-            src: "/media/images/copper-company/bottle-2.png",
+            src: "/media/images/copper-company/bottle-2.webp",
             aspectRatio: "1/1",
             caption: "Back label, tasting notes over the repeat pattern.",
             alt: "Copper Company rum bottle back, secondary label with tasting notes and repeating monogram pattern",
@@ -780,7 +780,7 @@ const RAW_PROJECTS: Project[] = [
         body: "The label as a flat net, set up for production with bleed and crop marks so it could go straight to the printer.",
         images: [
           {
-            src: "/media/images/copper-company/label-flat.png",
+            src: "/media/images/copper-company/label-flat.webp",
             aspectRatio: "1.86/1",
             caption: "Label flat, artwork with full bleed and crop marks.",
             alt: "Copper Company label flat net, print-ready label design showing full bleed and artwork at flat view",
@@ -792,13 +792,13 @@ const RAW_PROJECTS: Project[] = [
         body: "A short run of launch photography, graded to the copper-and-dark palette so the feed reads as one piece with the pack.",
         images: [
           {
-            src: "/media/images/copper-company/insta-1.png",
+            src: "/media/images/copper-company/insta-1.webp",
             aspectRatio: "1/1",
             caption: "Launch product photography.",
             alt: "Copper Company Instagram post 1, brand-consistent social photography for rum product launch",
           },
           {
-            src: "/media/images/copper-company/insta-2.png",
+            src: "/media/images/copper-company/insta-2.webp",
             aspectRatio: "1/1",
             caption: "Lifestyle shot in the brand grade.",
             alt: "Copper Company Instagram post 2, lifestyle photography with brand copper and dark colour treatment",
@@ -942,7 +942,7 @@ const RAW_PROJECTS: Project[] = [
       bg: "#FFFFFF",
     },
     heroImage: {
-      src: "/media/images/lows-design-build/hero.png",
+      src: "/media/images/lows-design-build/hero.webp",
       alt: "Lows Design and Build brand identity, hero composite showing logo and brand applications",
     },
     images: [],
@@ -1079,7 +1079,7 @@ const RAW_PROJECTS: Project[] = [
     webThumb: "/media/images/web/plated-1.webp",
     webShots: ["/media/images/web/plated-1.webp", "/media/images/web/plated-2.webp", "/media/images/web/plated-3.webp", "/media/images/web/plated-4.webp"],
     brandThumb: {
-      logo: "/media/images/plated-with-issy/wordmark.png",
+      logo: "/media/images/plated-with-issy/wordmark.webp",
       colors: ["#3D3E2A", "#C9A24B", "#E4CE93"],
       bg: "#F6EEDC",
     },
@@ -1326,10 +1326,10 @@ const RAW_PROJECTS: Project[] = [
       "TasWater needed complex data shown clearly while staying inside their strict brand guidelines. New visual systems had to feel native to what already existed.",
     outcome:
       "Client confirmed they were happy. Leadership signed off on the brand alignment.",
-    logo: "/media/images/taswater/logo.png",
-    cardStack: ["/media/images/taswater/hero.jpg", "/media/images/taswater/map.jpg"],
+    logo: "/media/images/taswater/logo.webp",
+    cardStack: ["/media/images/taswater/hero.webp", "/media/images/taswater/map.webp"],
     heroImage: {
-      src: "/media/images/taswater/hero.jpg",
+      src: "/media/images/taswater/hero.webp",
       alt: "TasWater 'first 12 months' employee onboarding journey infographic, designed inside the TasWater brand",
     },
     images: [],
@@ -1340,7 +1340,7 @@ const RAW_PROJECTS: Project[] = [
         body: "Two infographic projects in a month, both made to live inside TasWater's existing brand. The job was to show complex infrastructure data clearly without inventing a new visual language, so the new pieces read as native to what was already there. Leadership signed off on the brand alignment.",
         images: [
           {
-            src: "/media/images/taswater/map.jpg",
+            src: "/media/images/taswater/map.webp",
             aspectRatio: "16/9",
             caption: "Service area and infrastructure, mapped on a branded base.",
             alt: "TasWater interactive map infographic, service area and infrastructure locations across Tasmania",
@@ -1372,18 +1372,18 @@ const RAW_PROJECTS: Project[] = [
     outcome: "Campaign rollout delivered on time across every channel.",
     logo: "/media/images/london-home-show/lhs-logo.svg",
     heroImage: {
-      src: "/media/images/london-home-show/hero.jpg",
+      src: "/media/images/london-home-show/hero.webp",
       alt: "The London Home Show event, branding and signage across the exhibition venue",
     },
     heroSlideshow: [
-      "/media/images/london-home-show/hero.jpg",
-      "/media/images/london-home-show/flags.jpg",
-      "/media/images/london-home-show/banner.jpg",
-      "/media/images/london-home-show/stage.jpg",
-      "/media/images/london-home-show/booklets.jpg",
-      "/media/images/london-home-show/brochure.jpg",
-      "/media/images/london-home-show/podium.jpg",
-      "/media/images/london-home-show/brochure-10yr.jpg",
+      "/media/images/london-home-show/hero.webp",
+      "/media/images/london-home-show/flags.webp",
+      "/media/images/london-home-show/banner.webp",
+      "/media/images/london-home-show/stage.webp",
+      "/media/images/london-home-show/booklets.webp",
+      "/media/images/london-home-show/brochure.webp",
+      "/media/images/london-home-show/podium.webp",
+      "/media/images/london-home-show/brochure-10yr.webp",
     ],
     slideshowAspect: "3/2",
     images: [],
@@ -1394,13 +1394,13 @@ const RAW_PROJECTS: Project[] = [
         body: "The first affordable-homes exhibition of its kind needed to feel like an event from the street in. Flags outside, then directional signage and brand presence once you were through the doors.",
         images: [
           {
-            src: "/media/images/london-home-show/flags.jpg",
+            src: "/media/images/london-home-show/flags.webp",
             aspectRatio: "3/2",
             caption: "Exterior flags at street scale.",
             alt: "London Home Show exterior flags, branded event flags outside the exhibition venue",
           },
           {
-            src: "/media/images/london-home-show/banner.jpg",
+            src: "/media/images/london-home-show/banner.webp",
             aspectRatio: "3/2",
             caption: "Interior wayfinding and signage.",
             alt: "London Home Show banner, interior branded signage for event wayfinding",
@@ -1412,13 +1412,13 @@ const RAW_PROJECTS: Project[] = [
         body: "A branded stage for the panel sessions, from the podium to the full backdrop behind the speakers.",
         images: [
           {
-            src: "/media/images/london-home-show/podium.jpg",
+            src: "/media/images/london-home-show/podium.webp",
             aspectRatio: "3/2",
             caption: "Speaker podium.",
             alt: "London Home Show speaker podium, branded stage and podium for exhibition panel sessions",
           },
           {
-            src: "/media/images/london-home-show/stage.jpg",
+            src: "/media/images/london-home-show/stage.webp",
             aspectRatio: "3/2",
             caption: "Full-width stage backdrop.",
             alt: "London Home Show stage backdrop, full-width branded graphic for the main exhibition stage",
@@ -1430,13 +1430,13 @@ const RAW_PROJECTS: Project[] = [
         body: "The take-home pieces: the show brochure and the programme and exhibitor booklets.",
         images: [
           {
-            src: "/media/images/london-home-show/brochure.jpg",
+            src: "/media/images/london-home-show/brochure.webp",
             aspectRatio: "3/2",
             caption: "Show brochure.",
             alt: "London Home Show brochure, primary printed collateral distributed at the exhibition",
           },
           {
-            src: "/media/images/london-home-show/booklets.jpg",
+            src: "/media/images/london-home-show/booklets.webp",
             aspectRatio: "3/2",
             caption: "Programme and exhibitor booklets.",
             alt: "London Home Show event booklets, attendee programme and exhibitor guide printed collateral",
@@ -1448,7 +1448,7 @@ const RAW_PROJECTS: Project[] = [
         body: "And a commemorative brochure marking a decade of the show.",
         images: [
           {
-            src: "/media/images/london-home-show/brochure-10yr.jpg",
+            src: "/media/images/london-home-show/brochure-10yr.webp",
             aspectRatio: "3/2",
             caption: "The 10-year anniversary edition.",
             alt: "London Home Show 10-year anniversary brochure, commemorative edition marking decade of the exhibition",
@@ -1504,7 +1504,7 @@ const RAW_PROJECTS: Project[] = [
       video: "/media/images/packer-associates/3d-model-video.webm",
     },
     heroImage: {
-      src: "/media/images/packer-associates/hero-poster.jpg",
+      src: "/media/images/packer-associates/hero-poster.webp",
       alt: "Packer & Associates website, brand identity and digital presence for the capability solutions company",
     },
     heroVideo: "/media/images/packer-associates/website-video.webm",
@@ -1589,7 +1589,7 @@ const RAW_PROJECTS: Project[] = [
         body: "A motel that never existed, told one post at a time. Each slideshow was six images under the same line, “POV: you just moved to Palm Springs, 1977,” set to a piece of viral audio. The point was the world, not the single image.",
         images: [
           {
-            src: "/media/images/palmsmotel/sign.png",
+            src: "/media/images/palmsmotel/sign.webp",
             aspectRatio: "4/5",
             caption: "The motel sign, the anchor of the world.",
             alt: "Palms Motel illuminated roadside sign at dusk, framed by palm trees",

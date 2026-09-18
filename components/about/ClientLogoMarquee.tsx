@@ -14,12 +14,12 @@ import { media } from "@/lib/media";
 
 const CLIENTS: { name: string; logo: string; slug: string }[] = [
   { name: "Lows Design + Build", logo: media("/media/images/lows-design-build/logomark.svg"), slug: "lows-design-build" },
-  { name: "Plated with Issy", logo: media("/media/images/plated-with-issy/wordmark.png"), slug: "plated-with-issy" },
+  { name: "Plated with Issy", logo: media("/media/images/plated-with-issy/wordmark.webp"), slug: "plated-with-issy" },
   { name: "KinAya", logo: media("/media/images/kinaya/logo.svg"), slug: "kinaya" },
   { name: "Salesmasters", logo: media("/media/images/salesmasters/logo.webp"), slug: "salesmasters" },
   { name: "Share to Buy", logo: media("/media/images/tmyr/stb-logo.svg"), slug: "tmyr" },
   { name: "Momentum Mentoring", logo: media("/media/images/momentum-mentoring/logo2.svg"), slug: "momentum-mentoring" },
-  { name: "TasWater", logo: media("/media/images/taswater/logo.png"), slug: "taswater" },
+  { name: "TasWater", logo: media("/media/images/taswater/logo.webp"), slug: "taswater" },
   { name: "The London Home Show", logo: media("/media/images/london-home-show/lhs-logo.svg"), slug: "london-home-show" },
 ];
 

@@ -34,12 +34,12 @@ function SectionHeader({ index, name }: { index: number; name: string }) {
 
 /* ── Assets ───────────────────────────────────────────────── */
 const LOGO_DEV = [
-  media("/media/images/kinaya/logo-development/asset-30.png"),
-  media("/media/images/kinaya/logo-development/asset-31.png"),
-  media("/media/images/kinaya/logo-development/asset-32.png"),
-  media("/media/images/kinaya/logo-development/asset-35.png"),
-  media("/media/images/kinaya/logo-development/asset-37.png"),
-  media("/media/images/kinaya/logo-development/asset-38.png"),
+  media("/media/images/kinaya/logo-development/asset-30.webp"),
+  media("/media/images/kinaya/logo-development/asset-31.webp"),
+  media("/media/images/kinaya/logo-development/asset-32.webp"),
+  media("/media/images/kinaya/logo-development/asset-35.webp"),
+  media("/media/images/kinaya/logo-development/asset-37.webp"),
+  media("/media/images/kinaya/logo-development/asset-38.webp"),
 ];
 
 const PALETTE = [

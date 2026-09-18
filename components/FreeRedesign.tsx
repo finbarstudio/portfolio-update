@@ -250,7 +250,7 @@ export default function FreeRedesign() {
           <div className="fr-beforeafter">
             <figure className="fr-ba-item">
               <div className="fr-ba-frame">
-                <Image src={media("/media/images/web/lows-old.jpg")} alt="Lows Design and Build, old website" fill sizes="(max-width: 640px) 46vw, 320px" />
+                <Image src={media("/media/images/web/lows-old.webp")} alt="Lows Design and Build, old website" fill sizes="(max-width: 640px) 46vw, 320px" />
               </div>
               <figcaption>Old Lows site</figcaption>
             </figure>
