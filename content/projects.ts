@@ -852,7 +852,7 @@ export const projects: Project[] = [
     // One clip per solution. Recordings are Finbar's own (retina, cursor in
     // shot); drop the file in public/images/rennen-plus/demos/ and add `video`.
     demos: [
-      { name: "Landing page", caption: "The home page. A film by Zach Sullivan behind the search bar and the five partner marks." },
+      { name: "Landing page", caption: "The home page. A film by Zach Sullivan behind the search bar and the five partner marks.", video: "/images/rennen-plus/demos/landing.mp4" },
       { name: "Car grid", caption: "The finder. Twenty-one makes, then 228 cars on one baseline, every thumbnail cut out and faced the same way.", video: "/images/rennen-plus/demos/grid.mp4" },
       { name: "Search", caption: "Search that understands how owners talk. \"c8\" and \"997 exhaust\" both resolve." },
       { name: "Car page", caption: "A car page. The car as the page mark, a fact an owner might not know, then the packages and parts." },
