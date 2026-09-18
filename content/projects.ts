@@ -151,7 +151,7 @@ export interface Project {
    *  solution. Each entry carries its own title and body for the full-height
    *  "problems solved" intro, so a new clip always brings its write-up with it.
    *  An entry with no `video` still appears in the intro; it just has no clip. */
-  demos?: { name: string; title: string; body: string; caption?: string; video?: string }[];
+  demos?: { name: string; title: string; body: string; caption?: string; video?: string; shots?: string[] }[];
   /** Hide from the home grid + sitemap. Detail page still exists if linked. */
   hidden?: boolean;
   /** TikTok creator handle (no @). When set, the case study embeds the profile
@@ -843,7 +843,8 @@ export const projects: Project[] = [
     // One entry per problem solved. `title` + `body` feed the full-height
     // intro; `video` + `caption` feed the clip column. Recordings are Finbar's
     // own: drop "<Name> Demo.mp4" on the Desktop, run
-    // scripts/encode-rennen-demos.sh, add `video` here.
+    // scripts/encode-rennen-demos.sh, add `video` here. `shots` is the still
+    // version: three phone screenshots (660x1434) set in three columns.
     demos: [
       { name: "Landing page", video: "/images/rennen-plus/demos/landing.mp4",
         title: "One front door",
@@ -880,6 +881,8 @@ export const projects: Project[] = [
         title: "Proof on real cars",
         body: "There was nothing showing the parts on a customer's car. Nine builds each link back to the parts on them, eight with the owner's own words." },
       { name: "Phone",
+        shots: ["/images/rennen-plus/demos/phone-1.webp", "/images/rennen-plus/demos/phone-2.webp", "/images/rennen-plus/demos/phone-3.webp"],
+        caption: "The finder, a car page and its package, as they sit on a phone.",
         title: "Built for a phone",
         body: "Most visitors arrive on a phone from Meta ads. The phone site is its own system: two fonts, six text sizes and every control at least 44px tall." },
     ],

@@ -269,14 +269,23 @@ function CaseIntro({ project }: { project: Project }) {
 }
 
 function DemoColumn({ demos }: { demos: NonNullable<Project["demos"]> }) {
-  const clips = demos.filter((d) => d.video);
+  const clips = demos.filter((d) => d.video || d.shots?.length);
   return (
     <div className="case-demos">
       {clips.map((d) => (
-        <Reveal as="figure" key={d.name} y={20}>
-          <div className="case-demo-frame">
-            <VideoPlayer src={d.video!} />
-          </div>
+        <Reveal as="figure" key={d.name} y={20} className={d.video ? undefined : "is-shots"}>
+          {d.video ? (
+            <div className="case-demo-frame">
+              <VideoPlayer src={d.video} />
+            </div>
+          ) : (
+            <div className="case-demo-shots">
+              {d.shots!.map((src, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={src} src={src} alt={`${d.name} screenshot ${i + 1}`} width={660} height={1434} loading="lazy" decoding="async" />
+              ))}
+            </div>
+          )}
           <figcaption>
             <span className="case-demo-title">{d.title}</span>
             {d.caption}

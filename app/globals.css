@@ -4994,6 +4994,17 @@ body:has(.case-study) { background-color: #fff; }
   background: var(--bg);
 }
 .case-demo-frame > * { position: absolute; inset: 0; }
+/* Phone stills: three across, each about 70svh tall at its own 660:1434. */
+.case-demos figure.is-shots { --shot-gap: clamp(0.5rem, 2vw, 1.5rem); width: min(100%, calc(70svh * 660 / 1434 * 3 + var(--shot-gap) * 2)); }
+.case-demo-shots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--shot-gap); }
+.case-demo-shots img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 660 / 1434;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+}
 .case-demos figcaption {
   margin-top: 0.8rem;
   font-size: var(--text-caption);
