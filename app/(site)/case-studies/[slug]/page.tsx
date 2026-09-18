@@ -19,7 +19,6 @@ import ClientImage from "@/components/ClientImage";
 import VideoPlayer from "@/components/VideoPlayer";
 import Reveal from "@/components/Reveal";
 import HeroSlideshow from "@/components/HeroSlideshow";
-import RennenCarGrid from "@/components/RennenCarGrid";
 import { MdArrowBack, MdArrowForward, MdArrowOutward, MdOpenInNew } from "@/components/MaterialIcon";
 
 /* TikTok glyph (inline, currentColor). */
@@ -232,6 +231,30 @@ function Gallery({ images, cols }: { images: ProjectImage[]; cols?: number }) {
   );
 }
 
+/* ─── Demo grid — one looping clip per solution, two columns, a plain caption
+   under each. A demo with no video yet is a named placeholder tile. ─── */
+function DemoGrid({ demos }: { demos: NonNullable<Project["demos"]> }) {
+  return (
+    <div className="case-demos">
+      {demos.map((d, i) => (
+        <Reveal as="figure" key={d.name} y={20} delay={(i % 2) * 0.05} className="min-w-0">
+          <div className="case-demo-frame">
+            {d.video ? (
+              <VideoPlayer src={d.video} />
+            ) : (
+              <div className="case-demo-todo">
+                <span className="mono-label">{d.name}</span>
+                <span className="mono-label text-ink-soft">To record</span>
+              </div>
+            )}
+          </div>
+          <figcaption>{d.caption}</figcaption>
+        </Reveal>
+      ))}
+    </div>
+  );
+}
+
 /* ─── Summary block ────────────────────────────────────────── */
 function SummaryBlock({ project }: { project: Project }) {
   const items = [
@@ -307,7 +330,6 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
                 <div className="case-body-cols">
                   <Paragraphs text={section.body} className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }} />
                 </div>
-                {section.component === "rennen-cars" && <RennenCarGrid />}
                 {section.images.length > 0 && <Gallery images={section.images} cols={section.cols} />}
               </>
             ) : (
@@ -315,7 +337,6 @@ function DepthSections({ sections }: { sections: DepthSection[] }) {
                 <div className="max-w-2xl mb-2">
                   <Paragraphs text={section.body} className="text-ink leading-relaxed mb-4" style={{ fontSize: "var(--text-body)" }} />
                 </div>
-                {section.component === "rennen-cars" && <RennenCarGrid />}
                 {section.images.length > 0 && <Gallery images={section.images} cols={section.cols} />}
               </>
             )}
@@ -522,6 +543,18 @@ export default async function CaseStudyPage({
 
         {/* Tags — mobile: centred wrap. Desktop: right-aligned brick-wrap, ragged left.
             Equal gap both axes; each tag keeps its own intrinsic text padding. */}
+        {project.solved ? (
+          /* Demo-led pages balance the title with the problems solved; the
+             tags drop to a row beneath the header. */
+          <div className="case-solved">
+            <p className="mono-label text-ink-soft mb-3">Key problems solved</p>
+            <ol>
+              {project.solved.map((line, i) => (
+                <li key={i}><span className="tabular-nums">{String(i + 1).padStart(2, "0")}</span>{line}</li>
+              ))}
+            </ol>
+          </div>
+        ) : (
         <div className="flex flex-wrap justify-center md:justify-end items-end gap-2 max-w-full md:max-w-[45%]">
           {project.categories.map((cat) => (
             <Tag key={cat} label={cat} />
@@ -530,6 +563,7 @@ export default async function CaseStudyPage({
           {project.isConcept && <Tag label="CONCEPT" variant="pink" />}
           {project.isHobby && <Tag label="Hobby project" variant="pink" />}
         </div>
+        )}
       </header>
 
       {/* TikTok-led intro: a brand-styled TikTok call-out beside the headline
@@ -567,7 +601,9 @@ export default async function CaseStudyPage({
       {/* Hero + body. heroAlbums uses a bespoke editorial showcase (no mockup,
           no standard image grid). mediaRows handles its own layout. Otherwise
           the standard hero + visual body + depth chain. */}
-      {project.slug === "kinaya" ? (
+      {project.demos ? (
+        <DemoGrid demos={project.demos} />
+      ) : project.slug === "kinaya" ? (
         <KinayaShowcase />
       ) : project.slug === "packer-associates" ? (
         <PackerShowcase />
