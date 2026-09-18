@@ -17,10 +17,14 @@ import { MdOpenInNew } from "./MaterialIcon";
 const KEY = "cookie-notice-dismissed";
 
 export default function CookieNotice() {
-  // The homepage stays clean, and /wallpaper is literally a wallpaper (Plash
-  // renders it with no one to click) — the notice shows everywhere else.
+  // The homepage stays clean, /wallpaper is literally a wallpaper (Plash
+  // renders it with no one to click), and a client demo is that client's site,
+  // not the portfolio — the notice shows everywhere else.
   const pathname = usePathname();
-  const onHome = pathname === "/" || pathname.startsWith("/wallpaper");
+  const onHome =
+    pathname === "/" ||
+    pathname.startsWith("/wallpaper") ||
+    pathname.startsWith("/moto-technique");
 
   const [show, setShow] = useState(false);
 
