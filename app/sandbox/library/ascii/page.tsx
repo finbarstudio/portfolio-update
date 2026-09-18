@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AsciiLab from "@/components/sandbox/library/AsciiLab";
 import { MdOpenInNew } from "@/components/MaterialIcon";
+import { media } from "@/lib/media";
 
 export const metadata: Metadata = {
   title: "ASCII Imagery",
@@ -30,7 +31,7 @@ export default function AsciiPage() {
         </Link>
       </header>
 
-      <AsciiLab src="/images/palmsmotel/scene-2.webp" />
+      <AsciiLab src={media("/media/images/palmsmotel/scene-2.webp")} />
     </section>
   );
 }

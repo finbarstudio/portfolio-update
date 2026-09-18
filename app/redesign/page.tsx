@@ -3,6 +3,7 @@ import Reveal from "@/components/Reveal";
 import MaskReveal from "@/components/MaskReveal";
 import SiteWindow from "@/components/home/SiteWindow";
 import WebsiteList, { type Website } from "@/components/home/WebsiteList";
+import { media } from "@/lib/media";
 
 // 1:1 copy of the home page (app/(site)/page.tsx) for the redesign sandbox.
 // JSON-LD + SEO metadata deliberately stripped: this page is noindex and only
@@ -16,7 +17,7 @@ const WEBSITES: Website[] = [
     url: "/go/lows",
     year: "2026",
     bio: "A family-run design and build company in London. The brand came first, logo through to the vehicle wrap, and now the site matches it: a custom build with instant quoting and the full project story.",
-    images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp"],
+    images: [media("/media/images/web/lows-1.webp"), media("/media/images/web/lows-2.webp"), media("/media/images/web/lows-3.webp")],
   },
   {
     slug: "kinaya",
@@ -24,7 +25,7 @@ const WEBSITES: Website[] = [
     url: "/go/kinaya",
     year: "2024",
     bio: "Full rebrand and a six-page site for an Adelaide NDIS provider, with the CMS handed over to their team and a site-wide accessibility text resizer, because their audience genuinely needs one.",
-    images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp"],
+    images: [media("/media/images/web/kinaya-1.webp"), media("/media/images/web/kinaya-2.webp"), media("/media/images/web/kinaya-3.webp")],
   },
 ];
 

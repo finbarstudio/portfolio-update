@@ -1,4 +1,5 @@
 "use client";
+import { media } from "@/lib/media";
 
 /**
  * ClientLogoMarquee — a continuously scrolling wall of client logos. The row is
@@ -12,14 +13,14 @@
  */
 
 const CLIENTS: { name: string; logo: string; slug: string }[] = [
-  { name: "Lows Design + Build", logo: "/images/lows-design-build/logomark.svg", slug: "lows-design-build" },
-  { name: "Plated with Issy", logo: "/images/plated-with-issy/wordmark.png", slug: "plated-with-issy" },
-  { name: "KinAya", logo: "/images/kinaya/logo.svg", slug: "kinaya" },
-  { name: "Salesmasters", logo: "/images/salesmasters/logo.webp", slug: "salesmasters" },
-  { name: "Share to Buy", logo: "/images/tmyr/STB%20Logo.svg", slug: "tmyr" },
-  { name: "Momentum Mentoring", logo: "/images/momentum-mentoring/Logo2.svg", slug: "momentum-mentoring" },
-  { name: "TasWater", logo: "/images/taswater/logo.png", slug: "taswater" },
-  { name: "The London Home Show", logo: "/images/london-home-show/LHS%20Logo.svg", slug: "london-home-show" },
+  { name: "Lows Design + Build", logo: media("/media/images/lows-design-build/logomark.svg"), slug: "lows-design-build" },
+  { name: "Plated with Issy", logo: media("/media/images/plated-with-issy/wordmark.png"), slug: "plated-with-issy" },
+  { name: "KinAya", logo: media("/media/images/kinaya/logo.svg"), slug: "kinaya" },
+  { name: "Salesmasters", logo: media("/media/images/salesmasters/logo.webp"), slug: "salesmasters" },
+  { name: "Share to Buy", logo: media("/media/images/tmyr/stb-logo.svg"), slug: "tmyr" },
+  { name: "Momentum Mentoring", logo: media("/media/images/momentum-mentoring/logo2.svg"), slug: "momentum-mentoring" },
+  { name: "TasWater", logo: media("/media/images/taswater/logo.png"), slug: "taswater" },
+  { name: "The London Home Show", logo: media("/media/images/london-home-show/lhs-logo.svg"), slug: "london-home-show" },
 ];
 
 export default function ClientLogoMarquee() {

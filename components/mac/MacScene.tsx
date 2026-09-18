@@ -49,6 +49,7 @@ import {
   type MacMediaItem,
 } from "./mac-config";
 import { useMacTextures } from "./useMacTextures";
+import { media } from "@/lib/media";
 
 export type MacSceneProps = {
   /** Path under /public — defaults to the studio-display GLTF. */
@@ -83,7 +84,7 @@ export type MacSceneProps = {
   onReady?: () => void;
 };
 
-const MAC_MODEL = "/models/studio-display/display.gltf";
+const MAC_MODEL = media("/media/models/studio-display/display.gltf");
 
 /* ── The display: model + screen swap + controller + animation ──────── */
 

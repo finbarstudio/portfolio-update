@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Encode Finbar's Rennen Plus screen recordings for the case study.
 #   scripts/encode-rennen-demos.sh            # every "* Demo*.mp4" on the Desktop
-# Output: public/images/rennen-plus/demos/<slug>.mp4, H.264, 1280 wide, no audio,
+# Output: public/media/images/rennen-plus/demos/<slug>.mp4, H.264, 1280 wide, no audio,
 # faststart. H.264 beat VP9 and AV1 on size for these clips (tested 18 Sep 2026)
 # and is Safari's most reliable path, so there is no WebM. A newer recording of
 # the same demo ("Grid Demo Better") wins over an older one ("Grid Demo").
@@ -9,7 +9,7 @@
 # MacBook carry a 66px black notch strip at the top; it is cropped when present.
 set -e
 FF=/opt/homebrew/bin/ffmpeg; FP=/opt/homebrew/bin/ffprobe
-OUT="$(cd "$(dirname "$0")/.." && pwd)/public/images/rennen-plus/demos"; mkdir -p "$OUT"
+OUT="$(cd "$(dirname "$0")/.." && pwd)/public/media/images/rennen-plus/demos"; mkdir -p "$OUT"
 slug() { case "${1:l}" in
   *landing*) echo landing;; *grid*) echo grid;; *journey*) echo journey;; *search*) echo search;; *car\ page*) echo car-page;;
   *material*|*price*|*option*) echo material;; *menu*) echo menu;; *ai*|*assistant*|*ask*) echo assistant;;

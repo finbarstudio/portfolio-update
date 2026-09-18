@@ -1269,7 +1269,7 @@ export function mapsUrl(query: string): string {
 }
 
 /**
- * Photo folders in public/imogen are matched to a stop or item by their name.
+ * Photo folders in public/media/asia are matched to a stop or item by their name.
  * Most match automatically (folder name === a stop or item name). Anything that
  * doesn't is mapped here by hand — folder-name slug → target. `item` omitted
  * means the folder's photos belong to the stop itself.
@@ -1288,7 +1288,7 @@ export const PHOTO_ALIASES: Record<string, { stopId: string; item?: string }> = 
   "latern-boats-hoi-an": { stopId: "hoi-an", item: "Lantern boats on the river" },
 };
 
-/** Slug used to match a name to a local photo file in public/imogen. */
+/** Slug used to match a name to a local photo file in public/media/asia. */
 export function imgSlug(s: string): string {
   return s
     .toLowerCase()

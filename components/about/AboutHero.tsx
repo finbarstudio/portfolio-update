@@ -20,6 +20,7 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import InlineIcon from "@/components/InlineIcon";
+import { media } from "@/lib/media";
 
 type Token = { word?: string; icon?: string; pink?: boolean };
 const TOKENS: Token[] = [
@@ -41,7 +42,7 @@ const PUSH_MARGIN = 28;   // px of clearance beyond the photo's edge
 const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
 // Isolated b/w cutout on a transparent ground, shown in a circular frame (the
 // ring has no fill, so the type reads through where the cutout is transparent).
-const PHOTO_SRC = "/images/about/finbar.webp";
+const PHOTO_SRC = media("/media/images/about/finbar.webp");
 const PHOTO_ASPECT = "1 / 1";
 
 export default function AboutHero() {

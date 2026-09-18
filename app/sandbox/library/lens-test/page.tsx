@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import LensLab from "@/components/sandbox/library/LensLab";
 import { MdOpenInNew } from "@/components/MaterialIcon";
+import { media } from "@/lib/media";
 
 export const metadata: Metadata = {
   title: "Lens Test",
@@ -30,7 +31,7 @@ export default function LensTestPage() {
         </Link>
       </header>
 
-      <LensLab src="/images/palmsmotel/scene-1.webp" />
+      <LensLab src={media("/media/images/palmsmotel/scene-1.webp")} />
     </section>
   );
 }

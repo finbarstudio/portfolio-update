@@ -9,6 +9,7 @@
 import dynamic from "next/dynamic";
 import Loader from "./Loader";
 import { MdOpenInNew } from "@/components/MaterialIcon";
+import { media } from "@/lib/media";
 
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
   ssr: false,
@@ -44,8 +45,8 @@ export default function MomentumShowcase() {
         </a>
         <div className="packer-website-visual">
           <ModelDisplay
-            model="/models/studio-display/display.gltf"
-            video="/images/momentum-mentoring/screen.mp4"
+            model={media("/media/models/studio-display/display.gltf")}
+            video={media("/media/images/momentum-mentoring/screen.mp4")}
             fill
             bare
             hoverable={false}

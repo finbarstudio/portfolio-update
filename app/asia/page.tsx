@@ -1,5 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
+import asiaPhotos from "@/content/asia-photos.json";
+import { media } from "@/lib/media";
 import {
   trip,
   apps,
@@ -22,11 +22,12 @@ import MapFab from "@/components/imogen/MapFab";
 import Reveal from "@/components/imogen/Reveal";
 import { MdArrowOutward, MdOpenInNew } from "@/components/MaterialIcon";
 
-// Photos Finbar drops in public/imogen are auto-detected and take priority over
-// searched images. Each subfolder is named after a place or activity; its web
-// images (jpg/png/webp/avif — HEIC/MOV can't show in a browser) attach there.
+// Photos Finbar drops in public/media/asia take priority over searched images.
+// Each subfolder is named after a place or activity; its web images attach
+// there (HEIC/MOV can't show in a browser). The folder listing comes from
+// content/asia-photos.json, which scripts/media-manifest.mjs rewrites on every
+// commit that touches public/media: the folder itself is not on Vercel.
 // Matching is by name; anything that doesn't match auto-resolves via PHOTO_ALIASES.
-const WEB_IMG = /\.(jpe?g|png|webp|avif|mp4)$/i;
 
 type PhotoIndex = {
   stops: Record<string, string[]>; // stopId -> place photos
@@ -35,14 +36,6 @@ type PhotoIndex = {
 
 function buildPhotoIndex(): PhotoIndex {
   const out: PhotoIndex = { stops: {}, items: {} };
-  const root = path.join(process.cwd(), "public", "imogen");
-  let entries: fs.Dirent[] = [];
-  try {
-    entries = fs.readdirSync(root, { withFileTypes: true });
-  } catch {
-    return out;
-  }
-
   // Lookup of every stop + item by slug.
   const stopSlugs = new Map<string, string>();
   const itemList: { stopId: string; slug: string }[] = [];
@@ -74,18 +67,10 @@ function buildPhotoIndex(): PhotoIndex {
     }
   };
 
-  for (const e of entries) {
-    if (e.isDirectory()) {
-      const target = resolve(imgSlug(e.name));
-      if (!target) continue;
-      let files: string[] = [];
-      try {
-        files = fs.readdirSync(path.join(root, e.name)).filter((f) => WEB_IMG.test(f)).sort();
-      } catch {
-        /* ignore */
-      }
-      add(target, files.map((f) => `/imogen/${encodeURIComponent(e.name)}/${encodeURIComponent(f)}`));
-    }
+  for (const [folder, files] of Object.entries(asiaPhotos as Record<string, string[]>)) {
+    const target = resolve(imgSlug(folder));
+    if (!target) continue;
+    add(target, [...files].sort().map((f) => media(`/media/asia/${encodeURIComponent(folder)}/${encodeURIComponent(f)}`)));
   }
   return out;
 }

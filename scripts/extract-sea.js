@@ -1,7 +1,7 @@
 // Extract per-country path data from the traced SE Asia SVG into a TS module.
-// Run: node scripts/extract-sea.js   (after editing public/SVG/SE Asia SVG.svg)
+// Run: node scripts/extract-sea.js   (after editing scripts/source/se-asia.svg)
 const fs = require("fs");
-const src = fs.readFileSync("public/SVG/SE Asia SVG.svg", "utf8");
+const src = fs.readFileSync("scripts/source/se-asia.svg", "utf8");
 const groupPaths = (id) => {
   const m = src.match(new RegExp('<g id="' + id + '"[^>]*>([\\s\\S]*?)</g>'));
   return m ? [...m[1].matchAll(/\sd="([^"]+)"/g)].map((x) => x[1]) : [];
@@ -11,7 +11,7 @@ const singlePath = (id) => {
   return m ? [m[1]] : [];
 };
 const out = { th: groupPaths("th"), vn: groupPaths("vn"), kh: groupPaths("kh"), la: singlePath("la") };
-const ts = `// AUTO-GENERATED from public/SVG/SE Asia SVG.svg — accurate SE Asia country outlines.
+const ts = `// AUTO-GENERATED from scripts/source/se-asia.svg — accurate SE Asia country outlines.
 // Each country is an array of SVG path "d" strings in the 0 0 92.38 153.26 viewBox.
 // Regenerate after editing the source SVG: node scripts/extract-sea.js
 export const TH_PATHS: string[] = ${JSON.stringify(out.th)};

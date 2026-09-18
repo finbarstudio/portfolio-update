@@ -1,0 +1,10 @@
+# public/media is served from Cloudflare R2 (media.finbar.studio), never from
+# Vercel. Keeping it out of the deploy saves build time and egress. It stays in
+# git: that is the source of truth the bucket is mirrored from.
+# See AGENTS.md, "The media rule".
+public/media
+
+# Local-only folders that are already gitignored; listed for CLI deploys.
+archive
+research
+venv

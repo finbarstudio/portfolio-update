@@ -10,6 +10,7 @@
 import dynamic from "next/dynamic";
 import Loader from "./Loader";
 import { MdOpenInNew } from "@/components/MaterialIcon";
+import { media } from "@/lib/media";
 
 // ModelDisplay is r3f / WebGL → dynamic, SSR-disabled, identical to the home card.
 const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
@@ -33,12 +34,12 @@ function SectionHeader({ index, name }: { index: number; name: string }) {
 
 /* ── Assets ───────────────────────────────────────────────── */
 const LOGO_DEV = [
-  "/images/kinaya/Logo%20Development/Asset%2030.png",
-  "/images/kinaya/Logo%20Development/Asset%2031.png",
-  "/images/kinaya/Logo%20Development/Asset%2032.png",
-  "/images/kinaya/Logo%20Development/Asset%2035.png",
-  "/images/kinaya/Logo%20Development/Asset%2037.png",
-  "/images/kinaya/Logo%20Development/Asset%2038.png",
+  media("/media/images/kinaya/logo-development/asset-30.png"),
+  media("/media/images/kinaya/logo-development/asset-31.png"),
+  media("/media/images/kinaya/logo-development/asset-32.png"),
+  media("/media/images/kinaya/logo-development/asset-35.png"),
+  media("/media/images/kinaya/logo-development/asset-37.png"),
+  media("/media/images/kinaya/logo-development/asset-38.png"),
 ];
 
 const PALETTE = [
@@ -48,12 +49,12 @@ const PALETTE = [
   { hex: "#FFE6EB", text: "#2F4858" },
 ];
 
-const FINAL_GRADIENT = "/images/kinaya/Final%20Logos/Logo%20Gradient.svg";
+const FINAL_GRADIENT = media("/media/images/kinaya/final-logos/logo-gradient.svg");
 const FINAL_ALTERNATES = [
-  { src: "/images/kinaya/Final%20Logos/Logo%20Pink.svg" },
-  { src: "/images/kinaya/Final%20Logos/Logo%20Grey.svg" },
+  { src: media("/media/images/kinaya/final-logos/logo-pink.svg") },
+  { src: media("/media/images/kinaya/final-logos/logo-grey.svg") },
   // Lightest pink is a dark-mode mark — show it on a dark card.
-  { src: "/images/kinaya/Final%20Logos/Logo%20Lightest%20Pink.svg", dark: true },
+  { src: media("/media/images/kinaya/final-logos/logo-lightest-pink.svg"), dark: true },
 ];
 
 function MoonIcon() {
@@ -139,8 +140,8 @@ export default function KinayaShowcase() {
         </a>
         <div className="packer-website-visual">
           <ModelDisplay
-            model="/models/studio-display/display.gltf"
-            video="/images/kinaya/accessibility.webm"
+            model={media("/media/models/studio-display/display.gltf")}
+            video={media("/media/images/kinaya/accessibility.webm")}
             fill
             bare
             hoverable={false}

@@ -6,6 +6,7 @@ import MetaPixel from "@/components/MetaPixel";
 import CookieNotice from "@/components/CookieNotice";
 import { META_PIXEL_ID } from "@/lib/meta-const";
 import "./globals.css";
+import { absoluteMedia } from "@/lib/media";
 
 // Archivo (variable weight) — the numeral/body face for the demo sites; weight reacts to
 // the cursor via font-variation-settings.
@@ -128,7 +129,7 @@ const personJsonLd = {
   name: "Finbar Skitini",
   alternateName: "Finbar Studio",
   url: SITE_URL,
-  image: `${SITE_URL}/images/headshot.webp`,
+  image: absoluteMedia("/media/images/headshot.webp", SITE_URL),
   jobTitle: "Graphic Designer",
   description:
     "London graphic designer working in brand identity, editorial, web and motion design.",

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Every push deploys, so the media goes to Cloudflare R2 first. If the sync
+# fails the push is refused: the site and the bucket never drift apart.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+[ -d public/media ] || exit 0
+bash scripts/media-sync.sh

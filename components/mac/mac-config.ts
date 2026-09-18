@@ -1,3 +1,5 @@
+import { media } from "@/lib/media";
+
 /**
  * mac-config — tunables for the single Studio Display mockup engine (MacScene).
  *
@@ -22,7 +24,7 @@ export type {
   PhoneMediaKind as MacMediaKind,
 } from "@/components/phone/phone-config";
 
-export const MAC_MODEL = "/models/studio-display/display.gltf";
+export const MAC_MODEL = media("/media/models/studio-display/display.gltf");
 
 /** Aspect (w/h) of the Studio Display's screen, used to composite uploaded images
  *  so cover/contain/stretch line up. 27" 5K panel ≈ 5120×2880 = 16:9. */

@@ -18,7 +18,7 @@ import PhoneScene from "./phone/PhoneScene";
 import type { PhoneMediaItem } from "./phone/phone-config";
 
 type Props = {
-  /** Path under /public, e.g. /models/iphone/iphone-15-pro-max.glb */
+  /** Path under /public, e.g. /media/models/iphone/iphone-15-pro-max.glb */
   model: string;
   /** Array of video URLs (webm preferred). */
   videos: string[];

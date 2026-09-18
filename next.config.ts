@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+// Where public/media is served from in production: the Cloudflare R2 hostname.
+// Unset locally, so media() is a no-op and Next serves the folder off disk.
+// See lib/media.ts and AGENTS.md, "The media rule".
+const mediaBase = (process.env.NEXT_PUBLIC_MEDIA_URL ?? "").replace(/\/+$/, "");
+const mediaHost = mediaBase ? new URL(mediaBase).hostname : null;
+
 /**
  * Baseline security headers applied to every response.
  *
@@ -52,14 +58,12 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors 'self' https://*.facebook.com https://facebook.com" },
         ],
       },
-      // Long-lived caching for /public assets (the "Add Expires headers"
-      // audit). NOT immutable: this repo replaces images/videos in place, so a
-      // day of freshness + a day of stale-while-revalidate keeps repeat views
-      // instant while capping worst-case staleness at ~2 days. When a replaced
-      // asset must appear immediately (e.g. a re-recorded case-study video),
-      // bump a ?v= query on its reference to bust already-cached copies.
+      // public/media served off disk (local dev, or any deploy made before the
+      // R2 cutover). In production these paths never reach Vercel: media()
+      // points at the R2 hostname, which sets its own year-long immutable
+      // cache, versioned by ?v=<manifest hash>.
       {
-        source: "/(images|models)/:path*",
+        source: "/media/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=86400" },
         ],
@@ -79,7 +83,8 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    // Every image is local to /public/images/* — no remote hosts allowed.
+    // Images are local (public/media off disk) or on the one R2 hostname.
+    ...(mediaHost ? { remotePatterns: [{ protocol: "https" as const, hostname: mediaHost }] } : {}),
     // Allowed next/image quality values. 75 = portfolio default; the rest are
     // used by the Lindon demo (app/lindon/site). Next 16 rejects any quality
     // not in this list once the array is set.
@@ -99,6 +104,10 @@ const nextConfig: NextConfig = {
       { source: "/cursor", destination: "/downloads/cursormania-extension.zip", permanent: false },
       // finbar.studio/cv = the current CV, same static-download treatment.
       { source: "/cv", destination: "/downloads/Finbar-Skitini-CV.pdf", permanent: false },
+      // Safety net: public/media is not deployed once R2 serves it, so any
+      // "/media/..." path that slipped past media() is bounced to the bucket
+      // rather than 404ing. It costs a round trip; fix the reference instead.
+      ...(mediaBase ? [{ source: "/media/:path*", destination: `${mediaBase}/:path*`, permanent: false }] : []),
     ];
   },
   async rewrites() {

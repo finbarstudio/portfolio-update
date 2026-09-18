@@ -10,11 +10,12 @@
 import type { ReactNode } from "react";
 import BookViewer from "./BookViewer";
 import { MdOpenInNew } from "@/components/MaterialIcon";
+import { media } from "@/lib/media";
 
 const SITE_URL = "https://salesmasters.com.au";
 
 const PLAYBOOK_PAGES = Array.from({ length: 20 }, (_, i) =>
-  `/images/salesmasters/playbook/page-${i + 1}.webp`
+  media(`/media/images/salesmasters/playbook/page-${i + 1}.webp`)
 );
 
 const LOGOS = [
@@ -27,15 +28,15 @@ const LOGOS = [
   "all-storage-systems.webp",
   "prescience.webp",
   "connected-platforms.svg",
-].map((n) => `/images/salesmasters/logos/${n}`);
+].map((n) => media(`/media/images/salesmasters/logos/${n}`));
 
-const G = "/images/salesmasters/graphics";
+const G = "/media/images/salesmasters/graphics";
 
 const CUTEK_ICONS = ["architects", "consumers", "distributors", "government"].map(
-  (n) => `${G}/cutek/${n}.webp`
+  (n) => media(`${G}/cutek/${n}.webp`)
 );
 const AM_ICONS = ["handshake", "target", "graph", "star", "bolt", "simple"].map(
-  (n) => `${G}/active-medical/icons/${n}.webp`
+  (n) => media(`${G}/active-medical/icons/${n}.webp`)
 );
 
 const STATS = [
@@ -68,7 +69,7 @@ function Tile({ src, tall = false, wide = false, icon = false }: { src: string; 
   return (
     <figure className={`sm-tile${tall ? " sm-tile-tall" : ""}${wide ? " sm-tile-wide" : ""}${icon ? " sm-tile-icon" : ""}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="" aria-hidden="true" loading="lazy" />
+      <img src={media(src)} alt="" aria-hidden="true" loading="lazy" />
     </figure>
   );
 }

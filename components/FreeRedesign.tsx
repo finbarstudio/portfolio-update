@@ -30,6 +30,7 @@ import BrandWordmark from "./BrandWordmark";
 import BrandMark from "./BrandMark";
 import Loader from "./Loader";
 import PreviewCycle from "./PreviewCycle";
+import { media } from "@/lib/media";
 
 const CalEmbed = dynamic(() => import("./CalEmbed"), { ssr: false, loading: () => null });
 
@@ -54,10 +55,10 @@ const STEPS = [
 // Each proof card hover-cycles through the site's section shots (same as the
 // studio home site list), so hovering scrolls through the build, not one still.
 const PROOF = [
-  { images: ["/images/web/lows-1.webp", "/images/web/lows-2.webp", "/images/web/lows-3.webp", "/images/web/lows-4.webp"], alt: "Lows Design and Build website", caption: "Lows Design + Build, family builders in London", href: "/case-studies/lows-design-build" },
-  { images: ["/images/web/plated-1.webp", "/images/web/plated-2.webp", "/images/web/plated-3.webp", "/images/web/plated-4.webp"], alt: "Plated with Issy website", caption: "Plated with Issy, a candlelit supper club", href: "/case-studies/plated-with-issy" },
-  { images: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp", "/images/web/kinaya-4.webp"], alt: "KinAya website", caption: "KinAya, Adelaide-based NDIS support specialists", href: "/case-studies/kinaya" },
-  { images: ["/images/web/lola-1.webp", "/images/web/lola-2.webp", "/images/web/lola-3.webp"], alt: "Lola Audio website", caption: "Lola Audio, a portfolio you can mix", href: "/case-studies/lola-audio" },
+  { images: [media("/media/images/web/lows-1.webp"), media("/media/images/web/lows-2.webp"), media("/media/images/web/lows-3.webp"), media("/media/images/web/lows-4.webp")], alt: "Lows Design and Build website", caption: "Lows Design + Build, family builders in London", href: "/case-studies/lows-design-build" },
+  { images: [media("/media/images/web/plated-1.webp"), media("/media/images/web/plated-2.webp"), media("/media/images/web/plated-3.webp"), media("/media/images/web/plated-4.webp")], alt: "Plated with Issy website", caption: "Plated with Issy, a candlelit supper club", href: "/case-studies/plated-with-issy" },
+  { images: [media("/media/images/web/kinaya-1.webp"), media("/media/images/web/kinaya-2.webp"), media("/media/images/web/kinaya-3.webp"), media("/media/images/web/kinaya-4.webp")], alt: "KinAya website", caption: "KinAya, Adelaide-based NDIS support specialists", href: "/case-studies/kinaya" },
+  { images: [media("/media/images/web/lola-1.webp"), media("/media/images/web/lola-2.webp"), media("/media/images/web/lola-3.webp")], alt: "Lola Audio website", caption: "Lola Audio, a portfolio you can mix", href: "/case-studies/lola-audio" },
 ];
 
 // Order tuned for balanced wrap, not narrative: greedy flex-wrap + the one long
@@ -249,13 +250,13 @@ export default function FreeRedesign() {
           <div className="fr-beforeafter">
             <figure className="fr-ba-item">
               <div className="fr-ba-frame">
-                <Image src="/images/web/lows-old.jpg" alt="Lows Design and Build, old website" fill sizes="(max-width: 640px) 46vw, 320px" />
+                <Image src={media("/media/images/web/lows-old.jpg")} alt="Lows Design and Build, old website" fill sizes="(max-width: 640px) 46vw, 320px" />
               </div>
               <figcaption>Old Lows site</figcaption>
             </figure>
             <figure className="fr-ba-item">
               <div className="fr-ba-frame">
-                <Image src="/images/web/lows-1.webp" alt="Lows Design and Build, redesigned by Finbar Studio" fill sizes="(max-width: 640px) 46vw, 320px" />
+                <Image src={media("/media/images/web/lows-1.webp")} alt="Lows Design and Build, redesigned by Finbar Studio" fill sizes="(max-width: 640px) 46vw, 320px" />
               </div>
               <figcaption>New Lows site</figcaption>
             </figure>
@@ -271,7 +272,7 @@ export default function FreeRedesign() {
         <section className="fr-section fr-proof-section" aria-label="Recent builds" ref={proofRef}>
           <div className="fr-who">
             <span className="fr-who-face">
-              <Image src="/images/about/finbar.webp" alt="Finbar Skitini" width={128} height={128} />
+              <Image src={media("/media/images/about/finbar.webp")} alt="Finbar Skitini" width={128} height={128} />
             </span>
             <p className="fr-who-line">
               I&rsquo;m Finbar, a web designer in London. I built all of these.

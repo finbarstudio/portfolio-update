@@ -4,6 +4,83 @@
 This version has breaking changes, APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+# The media rule (HARD RULE, enforced by git hooks and the build)
+
+Every heavy file the site serves (images, video, gifs, 3D models, PDFs shown on
+a page) lives in **`public/media/`** and is served from a **Cloudflare R2
+bucket**, not from Vercel. The bucket is a mirror of that one folder. It must
+never drift from the repo, and no agent may work around the things that keep
+it in step.
+
+1. **One folder.** Media goes under `public/media/` and nowhere else in
+   `public/`. Subfolders: `images/<project-slug>/`, `models/`, `web/`
+   (web.finbar tiles), `cursors/`, `asia/`. File names are lowercase kebab-case,
+   no spaces. The only other things in `public/` are `downloads/` (files served
+   with a save dialog from the origin), `cursormania/` (tiny UI icons) and
+   `llms.txt`.
+2. **One helper.** Every reference is written as a `/media/...` path and passes
+   through `media()` from `lib/media.ts` before it reaches a `src`, `poster`,
+   `href`, `fetch()` or a loader. `content/projects.ts` and
+   `content/web-sites.ts` do this for their whole tree with `mediaDeep()`, so
+   paths inside them need nothing extra. A literal in a component does:
+   `src={media("/media/images/x.webp")}`. Metadata and JSON-LD use
+   `absoluteMedia()`.
+3. **No CSS `url()` into `/media/`.** Set the background inline through
+   `media()` instead.
+4. **Never write the bucket hostname into source.** It lives only in the
+   `NEXT_PUBLIC_MEDIA_URL` environment variable (set in Vercel, unset locally,
+   so local dev serves the folder off disk).
+5. **The sync is automatic and mandatory.** `npm install` points git at
+   `.githooks/`. On commit, `pre-commit` rewrites `content/media-manifest.json`
+   (and `content/asia-photos.json`) whenever `public/media` changed; commit
+   them. On push, `pre-push` runs `scripts/media-sync.sh`, which mirrors the
+   git-tracked contents of `public/media` to the bucket with `rclone` and
+   refuses the push if that fails. Never push with `--no-verify`. Never delete
+   or edit the hooks to get a push out.
+6. **The build checks it.** `npm run build` runs `scripts/media-check.mjs`
+   first: it fails if media sits outside `public/media`, and on Vercel it fails
+   if the bucket's manifest differs from the committed one. If it fails, run
+   `npm run media:sync` and fix the cause. Editing the checker is not a fix.
+7. **`public/media` stays in git** (it is the source of truth and the backup)
+   but is **not deployed to Vercel** (`.vercelignore`). Nothing at build or
+   request time may read it from disk: use the committed manifests.
+8. **Cross-origin.** The bucket allows `GET` from any origin (CORS), because
+   three.js, the Spline runtime and CursorMania fetch their files. A `<video>`
+   or `<img>` that is drawn into a canvas or WebGL texture must set
+   `crossOrigin="anonymous"`.
+
+Commands: `npm run media:manifest` (rewrite the manifests), `npm run media:sync`
+(mirror to R2 now; add `-- --dry-run` to preview), `npm run media:check`.
+Machine setup, once: `brew install rclone`, then an rclone S3 remote called
+`r2` for the Cloudflare account (provider Cloudflare, the account's R2
+endpoint, an R2 API token with object read and write). Bucket:
+`finbar-studio-images`. Public hostname: `media.finbar.studio`.
+
+# Never push without instruction
+
+Every push to `main` triggers a Vercel production build, which burns Vercel
+usage (CPU/build minutes). Finbar is managing that budget. So:
+
+- Do NOT `git push` unless Finbar explicitly says to (e.g. "push", "ship it",
+  "deploy this"). No exceptions.
+- Committing locally is fine without asking. Pushing is the gated step.
+- Batch work: make and verify changes locally (typecheck, `npm run build`),
+  leave them committed-but-unpushed (or uncommitted for review), and tell
+  Finbar it's ready. He decides when to push.
+- When several changes are ready, push them together in one deploy rather
+  than one deploy per change.
+- Prefer local verification (dev server, `npm run build`) over deploying to
+  check something.
+- If a push feels warranted, ask first and wait for a clear yes.
+
+# Git
+
+- Conventional commit messages (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`).
+- No AI attribution or co-author lines in commits. Nothing that mentions
+  Claude, Codex, or any AI tool in a commit message or PR body.
+- Commit locally and leave the work unpushed unless Finbar has said to push
+  (see "Never push without instruction" above).
+
 # Repository & folder layout
 
 **This `Website/` folder IS the git repo and the whole deploy.** The git root is

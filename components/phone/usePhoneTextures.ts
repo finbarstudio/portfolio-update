@@ -60,6 +60,7 @@ function applyMirror(tex: THREE.Texture, crop = { repeat: [1, 1], offset: [0, 0]
 
 function makeVideoDescriptor(src: string): PhoneTextureDescriptor {
   const el = document.createElement("video");
+  el.crossOrigin = "anonymous"; // cross-origin (R2) video as a WebGL texture needs CORS
   el.muted = true;
   el.loop = true;
   el.playsInline = true;

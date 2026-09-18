@@ -1,7 +1,7 @@
 /** web.finbar — the catalogue. Newest first is automatic (sorted by id, descending).
  *
  *  To add a site: export the Instagram post frame at 1080×1440 (3:4), drop it
- *  under public/web/ as a .webp (the still) and, if it's a clip, a .webm plus
+ *  under public/media/web/ as a .webp (the still) and, if it's a clip, a .webm plus
  *  an .mp4 fallback for older Safari. Add an entry with the next id. Nothing
  *  else to touch. Quick recipe from an exports folder:
  *
@@ -11,6 +11,8 @@
  *    ffmpeg -i 1.mp4 -filter_complex "$PP" -map "[v]" -an -c:v libx264 -crf 25 -movflags +faststart dirt.mp4
  *    ffmpeg -ss 0.1 -i 1.mp4 -frames:v 1 -vf scale=810:1080 poster.png && cwebp -q 82 poster.png -o dirt.webp
  */
+import { mediaDeep } from "@/lib/media";
+
 export type Credit = { name: string; url?: string }; // url = Instagram or site, optional
 
 export type WebSite = {
@@ -25,13 +27,13 @@ export type WebSite = {
 
 export const PER_PAGE = 12;
 
-export const WEB_SITES: WebSite[] = [
+const RAW_SITES: WebSite[] = [
   {
     id: 4,
     name: "Area",
     url: "https://www.area.tech",
-    image: "/web/area.webp",
-    video: { webm: "/web/area.webm", mp4: "/web/area.mp4" },
+    image: "/media/web/area.webp",
+    video: { webm: "/media/web/area.webm", mp4: "/media/web/area.mp4" },
     credits: {
       design: [
         { name: "Area", url: "https://instagram.com/area.tech" },
@@ -47,8 +49,8 @@ export const WEB_SITES: WebSite[] = [
     id: 3,
     name: "CLOU architects",
     url: "https://www.clouarchitects.com",
-    image: "/web/clou.webp",
-    video: { webm: "/web/clou.webm", mp4: "/web/clou.mp4" },
+    image: "/media/web/clou.webp",
+    video: { webm: "/media/web/clou.webm", mp4: "/media/web/clou.mp4" },
     credits: {
       design: [{ name: "Unseen Studio", url: "https://instagram.com/uns__nstudio" }],
       development: [{ name: "Unseen Studio", url: "https://instagram.com/uns__nstudio" }],
@@ -59,8 +61,8 @@ export const WEB_SITES: WebSite[] = [
     id: 2,
     name: "Podium",
     url: "https://podium.global",
-    image: "/web/podium.webp",
-    video: { webm: "/web/podium.webm", mp4: "/web/podium.mp4" },
+    image: "/media/web/podium.webp",
+    video: { webm: "/media/web/podium.webm", mp4: "/media/web/podium.mp4" },
     credits: {
       design: [{ name: "San Rita", url: "https://instagram.com/sanrita.atelier" }],
       development: [{ name: "San Rita", url: "https://instagram.com/sanrita.atelier" }],
@@ -72,8 +74,8 @@ export const WEB_SITES: WebSite[] = [
     id: 1,
     name: "Dirt",
     url: "https://dirtverse.co",
-    image: "/web/dirt.webp",
-    video: { webm: "/web/dirt.webm", mp4: "/web/dirt.mp4" },
+    image: "/media/web/dirt.webp",
+    video: { webm: "/media/web/dirt.webm", mp4: "/media/web/dirt.mp4" },
     credits: {
       design: [{ name: "Dirt", url: "https://instagram.com/dirtverse" }],
       development: [
@@ -85,3 +87,5 @@ export const WEB_SITES: WebSite[] = [
     added: "2026-09-07",
   },
 ];
+
+export const WEB_SITES: WebSite[] = mediaDeep(RAW_SITES);

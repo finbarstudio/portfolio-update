@@ -94,6 +94,7 @@ export default function LensLab({ src }: { src: string }) {
 
   useEffect(() => {
     const img = new window.Image();
+    img.crossOrigin = "anonymous"; // read back through a canvas; the file is on the R2 hostname
     img.src = src;
     imgRef.current = img;
   }, [src]);

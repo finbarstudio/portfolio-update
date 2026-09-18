@@ -522,7 +522,7 @@ export default async function CaseStudyPage({
     url: pageUrl,
     mainEntityOfPage: pageUrl,
     image: project.heroImage?.src
-      ? `${SITE_URL}${project.heroImage.src}`
+      ? (/^https?:/.test(project.heroImage.src) ? project.heroImage.src : `${SITE_URL}${project.heroImage.src}`)
       : undefined,
     inLanguage: "en-GB",
   };

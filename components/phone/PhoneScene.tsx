@@ -65,7 +65,7 @@ export type PhoneSceneController = {
 };
 
 export type PhoneSceneProps = {
-  /** Path under /public, e.g. /models/iphone/iphone-15-pro-max.glb */
+  /** Path under /public, e.g. /media/models/iphone/iphone-15-pro-max.glb */
   model: string;
   /** 1..10 media items (videos and/or images). count = media.length. */
   media: PhoneMediaItem[];

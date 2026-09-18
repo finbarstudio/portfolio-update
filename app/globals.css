@@ -172,8 +172,6 @@
      └─────────────────────────────────────────────────────────┘ */
   --menubar-h:    48px;      /* top nav bar height                         */
   --sidebar-w:    0px;       /* legacy: content no longer reflows for a rail */
-  --statusbar-h:  22px;      /* bottom status bar height                  */
-  --titlebar-h:   22px;      /* window chrome title bar height            */
   --win-shadow:    var(--elev-2);
   --win-shadow-sm: var(--elev-1);
 }
@@ -832,155 +830,6 @@
   }
   .cap-name { font-family: var(--font-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; font-size: 1.35rem; line-height: 1.05; color: var(--ink); transition: color var(--dur-fast) var(--ease); }
 
-  /* ── Capabilities: infinite auto-scrolling card slider (GSAP) ──
-     Each card mirrors the project thumbnails: transparent at rest (no box, no
-     outline), and on hover the centre-out pink reveal grows behind a 3D shape
-     that spins behind the text; the outline only draws in once the reveal has
-     filled. Vertical padding gives the cards room so nothing crops. */
-  .cap-slider {
-    overflow: hidden;
-    padding-block: 0.75rem;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-  }
-  /* Touch: no auto-marquee, swipe the row natively. */
-  @media (hover: none) {
-    .cap-slider { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-    .cap-slider::-webkit-scrollbar { display: none; }
-  }
-  .cap-track {
-    display: flex;
-    gap: clamp(0.75rem, 1.4vw, 1.25rem);
-    width: max-content;
-    will-change: transform;
-  }
-  .cap-card {
-    position: relative;
-    isolation: isolate;
-    flex: 0 0 auto;
-    width: clamp(230px, 25vw, 310px);
-    min-height: 230px;
-    display: flex;                            /* body fills height */
-    border-radius: 4px;
-    overflow: hidden;
-    background: transparent;                  /* no white box at rest */
-    border: 1px solid transparent;            /* no outline at rest */
-    transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
-  }
-  /* Vignette layer (SVG + GSAP): above the reveal, behind the text. Fades with hover. */
-  .cap-scene {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s var(--ease);
-  }
-  .cap-viz-wrap {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .cap-viz {
-    width: 82%;
-    height: 78%;
-    overflow: visible;       /* let back.out overshoot / sweeps spill past the box */
-  }
-  .cap-card-body {
-    position: relative;
-    z-index: 2;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: var(--space-5);
-    pointer-events: none;                     /* hover is tracked on the card */
-  }
-  @media (hover: hover) {
-    /* Hover indicator (the pink reveal panels are gone): hairline border tint. */
-    .cap-card:hover,
-    .cap-card:focus-within { border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
-    .cap-card:hover .cap-scene,
-    .cap-card:focus-within .cap-scene { opacity: 1; }
-    /* On hover the vignette is the focus: drop the descriptive text (so it's not
-       obstructed) and rise the bold CTA in to replace it. */
-    .cap-card:hover .cap-desc,
-    .cap-card:focus-within .cap-desc { opacity: 0; transform: translateY(6px); }
-    .cap-card:hover .cap-cta,
-    .cap-card:focus-within .cap-cta { opacity: 1; transform: none; }
-  }
-  /* Touch devices have no hover to reveal the card, so give it a legible resting
-     state — a soft tile with an outline and the discipline name in pink. */
-  @media (hover: none) {
-    /* Outlined sticker chip on touch — no white fill, just a 1px ink outline
-       and the discipline name in pink. No 3D scene ever shows on touch, so drop
-       the tall reserve space and let name/desc/CTA stack compactly. */
-    .cap-card { background: transparent; border-color: var(--ink); min-height: 0; }
-    .cap-card .cap-name { color: var(--pink); }
-  }
-
-  /* Desc + CTA share the bottom of the card. On hover-capable devices they stack
-     in one grid cell and swap (desc out, CTA in); on touch they stack normally
-     and both stay visible. */
-  .cap-foot { margin-top: auto; }
-  @media (hover: hover) {
-    .cap-foot { display: grid; }
-    .cap-foot > * { grid-area: 1 / 1; align-self: end; }
-  }
-  @media (hover: none) {
-    .cap-foot { display: flex; flex-direction: column; gap: var(--space-3); }
-  }
-
-  /* The hover CTA — a bold "SEE WORK" statement that rises in with the vignette.
-     Hidden at rest on desktop (revealed on hover above); always shown on touch as
-     the tappable cue. Turns into a spinner the instant the card is tapped. */
-  .cap-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45em;
-    font-family: var(--font-primary);
-    font-weight: 700;
-    font-size: 1.1rem;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    line-height: 1;
-    color: var(--ink);
-    opacity: 0;                       /* hidden at rest on hover-capable; hover reveals */
-    transform: translateY(14px);
-    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
-  }
-  .cap-cta-arrow {
-    display: inline-block;
-    font-size: 1.2em;
-    color: var(--cap-accent, var(--pink));   /* the discipline's accent — ties the CTA to its vignette */
-    transition: transform var(--dur-fast) var(--ease);
-  }
-  @media (hover: hover) {
-    .cap-card:hover .cap-cta-arrow,
-    .cap-card:focus-within .cap-cta-arrow { transform: translateX(5px); }
-  }
-  @media (hover: none) {
-    /* touch has no hover state — show the CTA as the persistent tappable cue */
-    .cap-cta { opacity: 1; transform: none; font-size: 0.95rem; }
-  }
-  .cap-cta.is-loading { color: var(--ink-soft); }
-  .cap-spinner {
-    width: 11px;
-    height: 11px;
-    border: 1.5px solid var(--line);
-    border-top-color: var(--pink);
-    border-radius: 50%;
-    animation: cap-spin 0.6s linear infinite;
-  }
-  @keyframes cap-spin { to { transform: rotate(360deg); } }
-  .cap-card:active { transform: scale(0.985); }
-  @media (prefers-reduced-motion: reduce) {
-    .cap-spinner { animation: none; }
-    .cap-card:active { transform: none; }
-  }
-
-  .cap-desc { color: var(--ink-soft); font-size: var(--text-small); line-height: 1.5; transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); }
   @media (hover: hover) {
     .cap-item:hover { background: var(--surface-sunken); }
     .cap-item:hover .cap-name { color: var(--pink); }
@@ -1443,52 +1292,6 @@
   /* Pixel drop-shadow (chunky offset, no blur) */
   .pixel-shadow    { box-shadow: var(--win-shadow); }
   .pixel-shadow-sm { box-shadow: var(--win-shadow-sm); }
-
-  /* Window, Snow Leopard-inspired: rounded, soft shadow */
-  .os-window {
-    border: 1px solid var(--line);
-    background: var(--bg);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--win-shadow);
-    animation: window-open 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  }
-
-  /* Title bar, subtle gradient, no pinstripe */
-  .os-titlebar {
-    height: var(--titlebar-h);
-    border-bottom: 1px solid var(--line);
-    background: linear-gradient(to bottom, #f5f5f3 0%, #e6e6e2 100%);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0 8px;
-  }
-  .os-titlebar-title {
-    margin: 0 auto;
-    font-family: var(--font-label);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-soft);
-    line-height: 1;
-  }
-  /* Traffic-light circles */
-  .os-titlebar-btn {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.12);
-    background: var(--line);
-    flex-shrink: 0;
-    cursor: default;
-  }
-  /* Decorative spans: non-interactive */
-  span.os-titlebar-btn {
-    pointer-events: none;
-    user-select: none;
-  }
 
   /* Collapsed-sidebar rail buttons — uniform square targets with a soft
      rounded hover/active pill, so every glyph (home, work, about, contact,
@@ -2868,31 +2671,13 @@
     display: inline-block;
   }
 
-  /* Status-bar live dot */
-  .status-dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    background: var(--teal);
-    flex-shrink: 0;
-    animation: dot-pulse 2s ease-in-out infinite;
-  }
-
   /* ───────────────────────────────────────────────────────────────
      Mobile overrides, collapse heavy OS chrome below `md` (768px).
-     Titlebars are hidden in markup (`hidden md:flex`); here we strip
-     borders + drop-shadows from windows so content reads cleanly.
-     Chrome bars themselves (MenuBar, StatusBar, sidebar Navigator
-     header, Mobile menu Navigation.WDW header) live on different
-     classes and are unaffected.
+     Chrome bars themselves (MenuBar, sidebar Navigator header,
+     Mobile menu Navigation.WDW header) live on different classes
+     and are unaffected.
      ─────────────────────────────────────────────────────────────── */
   @media (max-width: 767px) {
-    .os-window {
-      border: none;
-      box-shadow: none;
-      border-radius: 0;
-      animation: none;
-    }
     /* Slightly tighter rhythm on mobile, still generous */
     :root {
       --space-section: var(--space-7);  /* 48px */
@@ -3366,23 +3151,12 @@ body:has(.contact-panel.is-open) .sf-cta-pin {
    The canonical logo: FINBARSTUDIO in Space Mono caps with the pink brand
    asterisk on the end, no space. BrandWordmark draws that asterisk as the
    rectangular SVG polygon — the nav, main footer, favicon, OG and home intro
-   all use it. The demo footer credits use BrandWordmarkText instead, which sets
-   the asterisk as Space Mono's own * glyph (.brand-wordmark-star) for clean
-   inline spacing at small sizes. */
+   all use it. */
 .brand-wordmark {
   font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: -0.02em;
-}
-/* The pink asterisk after the wordmark. A real Space Mono glyph (not an SVG) so
-   it stays on the baseline and keeps its spacing at any size — the old inline
-   SVG broke both at the ~9-11px footer-credit size. */
-.brand-wordmark-star {
-  /* Keep the small inline * as Space Mono's own glyph (tuned baseline/spacing at
-     ~9-11px), even though the letters are now Host Grotesk. */
-  font-family: var(--font-mono);
-  color: var(--pink, #e96d89);
 }
 
 /* Persistent resting logo on non-home pages — centred in the nav (matching where

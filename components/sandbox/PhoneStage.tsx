@@ -15,13 +15,14 @@ import type { PhoneSceneController } from "@/components/phone/PhoneScene";
 import type { FitMode, PhoneMediaItem } from "@/components/phone/phone-config";
 import type { MediaAsset } from "@/lib/sandbox/media";
 import { aspectToCss } from "@/lib/sandbox/embed-config";
+import { media } from "@/lib/media";
 
 const PhoneScene = dynamic(() => import("@/components/phone/PhoneScene"), {
   ssr: false,
   loading: () => <div style={{ position: "absolute", inset: 0 }} />,
 });
 
-const MODEL = "/models/iphone/iphone-15-pro-max.glb";
+const MODEL = media("/media/models/iphone/iphone-15-pro-max.glb");
 
 export default function PhoneStage({
   media,

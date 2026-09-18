@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import Loader from "./Loader";
 import PdfSlideshowThumb from "./PdfSlideshowThumb";
 import { MdOpenInNew } from "@/components/MaterialIcon";
+import { media } from "@/lib/media";
 
 /* A looping reel that plays while in view, with a play/pause button and a
    stylised pink scrubber. */
@@ -105,7 +106,7 @@ const ModelDisplay = dynamic(() => import("./ModelDisplay"), {
 const SITE_URL = "https://packerandassociates.com.au/";
 
 const PDF_PAGES = Array.from({ length: 12 }, (_, i) =>
-  `/images/packer-associates/pdf-pages/page-${i}.webp`
+  media(`/media/images/packer-associates/pdf-pages/page-${i}.webp`)
 );
 
 const SOCIAL = [
@@ -115,11 +116,11 @@ const SOCIAL = [
   "post-1",
   "post-2",
   "post-3",
-].map((n) => `/images/packer-associates/social/${n}.webp`);
+].map((n) => media(`/media/images/packer-associates/social/${n}.webp`));
 
 const REELS = [
-  { src: "/images/packer-associates/reels/compass-reel.webm", poster: "/images/packer-associates/reels/compass-reel.webp" },
-  { src: "/images/packer-associates/reels/stimula-reel.webm", poster: "/images/packer-associates/reels/stimula-reel.webp" },
+  { src: media("/media/images/packer-associates/reels/compass-reel.webm"), poster: media("/media/images/packer-associates/reels/compass-reel.webp") },
+  { src: media("/media/images/packer-associates/reels/stimula-reel.webm"), poster: media("/media/images/packer-associates/reels/stimula-reel.webp") },
 ];
 
 function SectionHeader({ index, name }: { index: number; name: string }) {
@@ -197,8 +198,8 @@ export default function PackerShowcase() {
         )}
         <div className="packer-website-visual">
           <ModelDisplay
-            model="/models/studio-display/display.gltf"
-            video="/images/packer-associates/3D%20Model%20Video.webm"
+            model={media("/media/models/studio-display/display.gltf")}
+            video={media("/media/images/packer-associates/3d-model-video.webm")}
             fill
             bare
             hoverable={false}

@@ -18,10 +18,11 @@ import { poseFromAngle, DEFAULT_ANGLE, DEFAULT_SPEED } from "@/components/phone/
 import { DEMO_MEDIA } from "@/lib/sandbox/media";
 import { aspectToCss, type EmbedConfig } from "@/lib/sandbox/embed-config";
 import EmbedWatermark from "@/components/sandbox/EmbedWatermark";
+import { media } from "@/lib/media";
 
 const PhoneScene = dynamic(() => import("@/components/phone/PhoneScene"), { ssr: false });
 
-const MODEL = "/models/iphone/iphone-15-pro-max.glb";
+const MODEL = media("/media/models/iphone/iphone-15-pro-max.glb");
 
 export default function EmbedPhone({ config }: { config: EmbedConfig }) {
   const media: PhoneMediaItem[] = useMemo(() => {

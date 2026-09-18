@@ -4,7 +4,7 @@
  * Edit this file to update anything on the site.
  *
  * IMAGE GUIDE
- * All images live in /public/images/<slug>/
+ * All images live in /public/media/images/<slug>/
  * Compressed WebP versions are in the same folder as the originals.
  * Videos are WebM; poster frames are WebP.
  *
@@ -14,6 +14,8 @@
  * Project.heroVideo: looping WebM for the case study hero.
  * Project.pdfSlideshow: array of WebP page images from a PDF.
  */
+
+import { mediaDeep } from "@/lib/media";
 
 export type Tier = "featured" | "full" | "gallery";
 
@@ -161,7 +163,7 @@ export interface Project {
 
 /* PROJECTS, ranked, all tiers */
 
-export const projects: Project[] = [
+const RAW_PROJECTS: Project[] = [
 
   /* 2. KinAya. Featured */
   {
@@ -181,24 +183,24 @@ export const projects: Project[] = [
     role: "Sole designer and developer. Delivered the brand (logomark, logotype, colour, guidelines) and the Framer site itself, including CMS, custom interactive components, and a site-wide accessibility text-resizer.",
     problem: "KinAya was rebranding from the ground up: new name, new identity. The brand had to feel trustworthy and human without slipping into something flashy. The site needed to be easy for the team to run themselves after launch.",
     outcome: "Brand and site delivered as a single piece of work. CMS handover went smoothly. Positive testimonial from Aryan Sareen.",
-    logo: "/images/kinaya/Final%20Logos/Logo%20Pink%20Grey.svg",
+    logo: "/media/images/kinaya/Final%20Logos/Logo%20Pink%20Grey.svg",
     heroModel: {
-      model: "/models/studio-display/display.gltf",
-      video: "/images/kinaya/site-scroll.mp4",
+      model: "/media/models/studio-display/display.gltf",
+      video: "/media/images/kinaya/site-scroll.mp4",
     },
-    webThumb: "/images/web/kinaya-1.webp",
-    webShots: ["/images/web/kinaya-1.webp", "/images/web/kinaya-2.webp", "/images/web/kinaya-3.webp", "/images/web/kinaya-4.webp"],
+    webThumb: "/media/images/web/kinaya-1.webp",
+    webShots: ["/media/images/web/kinaya-1.webp", "/media/images/web/kinaya-2.webp", "/media/images/web/kinaya-3.webp", "/media/images/web/kinaya-4.webp"],
     brandThumb: {
-      logo: "/images/kinaya/logo.svg",
+      logo: "/media/images/kinaya/logo.svg",
       colors: ["#2F4858", "#E94E77", "#FF8AA2"],
       bg: "#FCF4F6",
     },
-    heroImage: { src: "/images/kinaya/desktop.png", alt: "KinAya website desktop view with structured, accessible homepage layout" },
+    heroImage: { src: "/media/images/kinaya/desktop.png", alt: "KinAya website desktop view with structured, accessible homepage layout" },
     images: [
-      { src: "/images/kinaya/desktop.png", caption: "Home page: structured, readable, accessible layout across viewports.", alt: "KinAya Framer website homepage on desktop with clean navigation and NDIS branding" },
-      { src: "/images/kinaya/mobile.png", caption: "Responsive mobile layout. Full CMS control was handed over to the KinAya team after launch.", alt: "KinAya website mobile view with responsive layout in the navy and rose palette" },
-      { src: "/images/kinaya/logo-dev-1.png", caption: "Early logomark explorations: testing form, weight and warmth.", alt: "KinAya logo development early stage with pencil and vector explorations" },
-      { src: "/images/kinaya/logo-dev-4.png", caption: "Final refined logomark. The version that balanced warmth with professional trust.", alt: "KinAya final logomark, refined vector mark with logotype in the brand typeface" },
+      { src: "/media/images/kinaya/desktop.png", caption: "Home page: structured, readable, accessible layout across viewports.", alt: "KinAya Framer website homepage on desktop with clean navigation and NDIS branding" },
+      { src: "/media/images/kinaya/mobile.png", caption: "Responsive mobile layout. Full CMS control was handed over to the KinAya team after launch.", alt: "KinAya website mobile view with responsive layout in the navy and rose palette" },
+      { src: "/media/images/kinaya/logo-dev-1.png", caption: "Early logomark explorations: testing form, weight and warmth.", alt: "KinAya logo development early stage with pencil and vector explorations" },
+      { src: "/media/images/kinaya/logo-dev-4.png", caption: "Final refined logomark. The version that balanced warmth with professional trust.", alt: "KinAya final logomark, refined vector mark with logotype in the brand typeface" },
     ],
     hasDepth: true,
     depth: [
@@ -206,10 +208,10 @@ export const projects: Project[] = [
         heading: "Brand Identity Development",
         body: "The KinAya identity had to land somewhere between warm and trustworthy for an NDIS audience. The logomark went through several rounds of refinement from rough concept to final vector. The logotype was set in a typeface that balances human feel with clarity at small sizes.",
         images: [
-          { src: "/images/kinaya/logo-dev-1.png", caption: "Early explorations: testing form and visual weight.", alt: "KinAya logo development stage 1, initial vector form explorations" },
-          { src: "/images/kinaya/logo-dev-2.png", caption: "Mid-process refinement: narrowing to the core concept.", alt: "KinAya logo development stage 2, refined mark candidates" },
-          { src: "/images/kinaya/logo-dev-3.png", caption: "Near-final stage. Geometry tightened, proportions locked.", alt: "KinAya logo development stage 3, near-final mark with logotype" },
-          { src: "/images/kinaya/logo-dev-4.png", caption: "Final mark, delivered with full brand guidelines.", alt: "KinAya final logomark in brand colours navy and rose on white" },
+          { src: "/media/images/kinaya/logo-dev-1.png", caption: "Early explorations: testing form and visual weight.", alt: "KinAya logo development stage 1, initial vector form explorations" },
+          { src: "/media/images/kinaya/logo-dev-2.png", caption: "Mid-process refinement: narrowing to the core concept.", alt: "KinAya logo development stage 2, refined mark candidates" },
+          { src: "/media/images/kinaya/logo-dev-3.png", caption: "Near-final stage. Geometry tightened, proportions locked.", alt: "KinAya logo development stage 3, near-final mark with logotype" },
+          { src: "/media/images/kinaya/logo-dev-4.png", caption: "Final mark, delivered with full brand guidelines.", alt: "KinAya final logomark in brand colours navy and rose on white" },
         ],
       },
       {
@@ -217,8 +219,8 @@ export const projects: Project[] = [
         body: "A custom site-wide text-resizer was built in Framer. It persists across every page and lets users step the base text size up or down. For an NDIS provider whose audience may include people with vision impairments, this wasn't optional. The preference is stored in localStorage so it sticks across visits.",
         images: [
           {
-            src: "/images/kinaya/accessibility-poster.jpg",
-            video: "/images/kinaya/accessibility.webm",
+            src: "/media/images/kinaya/accessibility-poster.jpg",
+            video: "/media/images/kinaya/accessibility.webm",
             caption: "The text-resizer in action: persistent across sessions and fully keyboard-accessible.",
             alt: "KinAya accessibility text-resizer demonstration, custom Framer component scaling text site-wide",
           },
@@ -228,8 +230,8 @@ export const projects: Project[] = [
         heading: "Website & CMS",
         body: "The six-page Framer site was built for handover from day one. CMS collections handle the repeating content (services, team profiles, news posts), so the KinAya team can update without touching code. SEO basics were in place from launch: semantic HTML, per-page meta, Open Graph and clean URLs.",
         images: [
-          { src: "/images/kinaya/desktop.png", caption: "Desktop layout with clean hierarchy and a clear CTA structure.", alt: "KinAya desktop homepage full view with hero, services and CTA sections" },
-          { src: "/images/kinaya/mobile.png", caption: "Mobile: fully responsive, same content hierarchy on smaller screens.", alt: "KinAya mobile homepage, responsive layout adapting to small viewport" },
+          { src: "/media/images/kinaya/desktop.png", caption: "Desktop layout with clean hierarchy and a clear CTA structure.", alt: "KinAya desktop homepage full view with hero, services and CTA sections" },
+          { src: "/media/images/kinaya/mobile.png", caption: "Mobile: fully responsive, same content hierarchy on smaller screens.", alt: "KinAya mobile homepage, responsive layout adapting to small viewport" },
         ],
       },
     ],
@@ -291,23 +293,23 @@ export const projects: Project[] = [
       "Share to Buy needed an evergreen social campaign that hit a specific emotional beat: the second someone realises shared ownership is within reach. It had to work across every major social format and channel.",
     outcome:
       "Campaign ran across 2022 and 2023 windows. December 2023 year on year: new registrants +19.7%, page views +1.5%, property enquiries +3.4%.",
-    logo: "/images/tmyr/STB%20Logo.svg",
+    logo: "/media/images/tmyr/stb-logo.svg",
     heroImage: {
-      src: "/images/tmyr/hero-poster.jpg",
+      src: "/media/images/tmyr/hero-poster.jpg",
       alt: "The Moment You Realise campaign, Share to Buy social video series hero frame",
     },
     heroPhones: {
-      model: "/models/iphone/iphone-15-pro-max.glb",
+      model: "/media/models/iphone/iphone-15-pro-max.glb",
       videos: [
-        "/images/tmyr/1080x1920%20IG%20Reels/Anthony.webm",
-        "/images/tmyr/1080x1920%20IG%20Reels/Freya.webm",
-        "/images/tmyr/1080x1920%20IG%20Reels/Katie.webm",
-        "/images/tmyr/1080x1920%20IG%20Reels/Kiran.webm",
-        "/images/tmyr/1080x1920%20IG%20Reels/Lauren.webm",
-        "/images/tmyr/1080x1920%20IG%20Reels/Molly.webm",
-        "/images/tmyr/1080x1920%20IG%20Reels/Olu.webm",
+        "/media/images/tmyr/1080x1920-ig-reels/anthony.webm",
+        "/media/images/tmyr/1080x1920-ig-reels/freya.webm",
+        "/media/images/tmyr/1080x1920-ig-reels/katie.webm",
+        "/media/images/tmyr/1080x1920-ig-reels/kiran.webm",
+        "/media/images/tmyr/1080x1920-ig-reels/lauren.webm",
+        "/media/images/tmyr/1080x1920-ig-reels/molly.webm",
+        "/media/images/tmyr/1080x1920-ig-reels/olu.webm",
       ],
-      poster: "/images/tmyr/hero-poster.jpg",
+      poster: "/media/images/tmyr/hero-poster.jpg",
     },
     images: [],
     hasDepth: false,
@@ -315,13 +317,13 @@ export const projects: Project[] = [
       {
         ratio: "1/1",
         videos: [
-          "/images/tmyr/1080x1080%20IG%20Posts/Anthony.webm",
-          "/images/tmyr/1080x1080%20IG%20Posts/Freya.webm",
-          "/images/tmyr/1080x1080%20IG%20Posts/Katie.webm",
-          "/images/tmyr/1080x1080%20IG%20Posts/Kiran.webm",
-          "/images/tmyr/1080x1080%20IG%20Posts/Lauren.webm",
-          "/images/tmyr/1080x1080%20IG%20Posts/Molly.webm",
-          "/images/tmyr/1080x1080%20IG%20Posts/Olu.webm",
+          "/media/images/tmyr/1080x1080-ig-posts/anthony.webm",
+          "/media/images/tmyr/1080x1080-ig-posts/freya.webm",
+          "/media/images/tmyr/1080x1080-ig-posts/katie.webm",
+          "/media/images/tmyr/1080x1080-ig-posts/kiran.webm",
+          "/media/images/tmyr/1080x1080-ig-posts/lauren.webm",
+          "/media/images/tmyr/1080x1080-ig-posts/molly.webm",
+          "/media/images/tmyr/1080x1080-ig-posts/olu.webm",
         ],
         alt: "TMYR campaign, 1080x1080 Instagram post variants for Share to Buy",
       },
@@ -331,13 +333,13 @@ export const projects: Project[] = [
         // (col 1..7) lines up with the same person/story in the posts row above.
         ratio: "540/1162",
         videos: [
-          "/images/tmyr/1080x1920%20IG%20Reels/Anthony.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Lauren.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Freya.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Molly.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Katie.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Olu.webm",
-          "/images/tmyr/1080x1920%20IG%20Reels/Kiran.webm",
+          "/media/images/tmyr/1080x1920-ig-reels/anthony.webm",
+          "/media/images/tmyr/1080x1920-ig-reels/lauren.webm",
+          "/media/images/tmyr/1080x1920-ig-reels/freya.webm",
+          "/media/images/tmyr/1080x1920-ig-reels/molly.webm",
+          "/media/images/tmyr/1080x1920-ig-reels/katie.webm",
+          "/media/images/tmyr/1080x1920-ig-reels/olu.webm",
+          "/media/images/tmyr/1080x1920-ig-reels/kiran.webm",
         ],
         alt: "TMYR campaign, 1080x1920 Instagram reel variants for Share to Buy",
       },
@@ -384,15 +386,15 @@ export const projects: Project[] = [
       "Salesmasters needed unique 40 to 50-page playbooks for each client. Text-heavy but still readable, brand-compliant, and ready to print. There was no template to start from. Every playbook had to feel custom while still reading as part of the same set.",
     outcome:
       "15+ playbooks delivered across healthcare, manufacturing, technology, storage and professional services. The clearest signal is the repeat work over more than a year.",
-    logo: "/images/salesmasters/logo.webp",
+    logo: "/media/images/salesmasters/logo.webp",
     heroSlideshow: [
-      "/images/salesmasters/covers/alpha.webp",
-      "/images/salesmasters/covers/siteware.webp",
-      "/images/salesmasters/covers/playbook.webp",
-      "/images/salesmasters/covers/bus4x4.webp",
+      "/media/images/salesmasters/covers/alpha.webp",
+      "/media/images/salesmasters/covers/siteware.webp",
+      "/media/images/salesmasters/covers/playbook.webp",
+      "/media/images/salesmasters/covers/bus4x4.webp",
     ],
     heroImage: {
-      src: "/images/salesmasters/covers/bus4x4.webp",
+      src: "/media/images/salesmasters/covers/bus4x4.webp",
       alt: "Salesmasters Sales Process Playbook cover, Bus4x4 edition",
     },
     // Detail page uses the bespoke SalesmastersShowcase, so the generic
@@ -445,55 +447,55 @@ export const projects: Project[] = [
     outcome:
       "Client happy with the series. The releases picked up real traction after launch.",
     heroImage: {
-      src: "/images/joe-devine/hero.png",
+      src: "/media/images/joe-devine/hero.png",
       alt: "Joe Devine, all five single cover artworks shown together as a series",
     },
     heroAlbums: {
       images: [
-        "/images/joe-devine/albums/baby-steps.webp",
-        "/images/joe-devine/albums/giant-leap.webp",
-        "/images/joe-devine/albums/a-perfect-contrast.webp",
-        "/images/joe-devine/albums/one-foot-forward.webp",
-        "/images/joe-devine/albums/too-far-gone.webp",
+        "/media/images/joe-devine/albums/baby-steps.webp",
+        "/media/images/joe-devine/albums/giant-leap.webp",
+        "/media/images/joe-devine/albums/a-perfect-contrast.webp",
+        "/media/images/joe-devine/albums/one-foot-forward.webp",
+        "/media/images/joe-devine/albums/too-far-gone.webp",
       ],
     },
     // Card thumbnail uses the flowing cover carousel (square covers, no clipping);
     // the detail page still uses the bespoke AlbumShowcase via heroAlbums.
     heroSlideshow: [
-      "/images/joe-devine/albums/baby-steps.webp",
-      "/images/joe-devine/albums/giant-leap.webp",
-      "/images/joe-devine/albums/a-perfect-contrast.webp",
-      "/images/joe-devine/albums/one-foot-forward.webp",
-      "/images/joe-devine/albums/too-far-gone.webp",
+      "/media/images/joe-devine/albums/baby-steps.webp",
+      "/media/images/joe-devine/albums/giant-leap.webp",
+      "/media/images/joe-devine/albums/a-perfect-contrast.webp",
+      "/media/images/joe-devine/albums/one-foot-forward.webp",
+      "/media/images/joe-devine/albums/too-far-gone.webp",
     ],
     slideshowAspect: "1/1",
     images: [
       {
-        src: "/images/joe-devine/albums/baby-steps-md.webp",
+        src: "/media/images/joe-devine/albums/baby-steps-md.webp",
         caption: "Baby Steps",
         alt: "Joe Devine, Baby Steps single cover artwork",
         aspectRatio: "1/1",
       },
       {
-        src: "/images/joe-devine/albums/giant-leap-md.webp",
+        src: "/media/images/joe-devine/albums/giant-leap-md.webp",
         caption: "Giant Leap",
         alt: "Joe Devine, Giant Leap single cover artwork",
         aspectRatio: "1/1",
       },
       {
-        src: "/images/joe-devine/albums/a-perfect-contrast-md.webp",
+        src: "/media/images/joe-devine/albums/a-perfect-contrast-md.webp",
         caption: "A Perfect Contrast",
         alt: "Joe Devine, A Perfect Contrast single cover artwork",
         aspectRatio: "1/1",
       },
       {
-        src: "/images/joe-devine/albums/one-foot-forward-md.webp",
+        src: "/media/images/joe-devine/albums/one-foot-forward-md.webp",
         caption: "One Foot Forward",
         alt: "Joe Devine, One Foot Forward single cover artwork",
         aspectRatio: "1/1",
       },
       {
-        src: "/images/joe-devine/albums/too-far-gone-md.webp",
+        src: "/media/images/joe-devine/albums/too-far-gone-md.webp",
         caption: "Too Far Gone",
         alt: "Joe Devine, Too Far Gone single cover artwork",
         aspectRatio: "1/1",
@@ -535,15 +537,15 @@ export const projects: Project[] = [
     outcome:
       "Consistent visual language delivered across the brand system.",
     heroImage: {
-      src: "/images/compass-capability/hero.png",
+      src: "/media/images/compass-capability/hero.png",
       alt: "Compass Capability brand identity, logo mockup collage across touchpoints",
     },
     heroSlideshow: [
-      "/images/compass-capability/graphic.png",
-      "/images/compass-capability/pattern.png",
-      "/images/compass-capability/mockup-billboard.png",
-      "/images/compass-capability/mockup-business-card.png",
-      "/images/compass-capability/mockup-stationary.png",
+      "/media/images/compass-capability/graphic.png",
+      "/media/images/compass-capability/pattern.png",
+      "/media/images/compass-capability/mockup-billboard.png",
+      "/media/images/compass-capability/mockup-business-card.png",
+      "/media/images/compass-capability/mockup-stationary.png",
     ],
     slideshowAspect: "1/1",
     images: [],
@@ -554,13 +556,13 @@ export const projects: Project[] = [
         body: "The logo reads as direction. From the mark came a flexible graphic motif and a repeating pattern, both built on the same geometry so the brand holds together wherever it lands.",
         images: [
           {
-            src: "/images/compass-capability/graphic.png",
+            src: "/media/images/compass-capability/graphic.png",
             aspectRatio: "1/1",
             caption: "The directional motif, pulled from the logomark.",
             alt: "Compass Capability brand graphic, directional compass motif used as a scalable brand asset",
           },
           {
-            src: "/images/compass-capability/pattern.png",
+            src: "/media/images/compass-capability/pattern.png",
             aspectRatio: "1/1",
             caption: "A repeating pattern built from the logo geometry.",
             alt: "Compass Capability repeating pattern, logo-derived geometric pattern for brand applications",
@@ -572,19 +574,19 @@ export const projects: Project[] = [
         body: "The same system, run across outdoor, print and stationery. It had to stay credible at billboard scale and at the size of a business card.",
         images: [
           {
-            src: "/images/compass-capability/mockup-billboard.png",
+            src: "/media/images/compass-capability/mockup-billboard.png",
             aspectRatio: "1/1",
             caption: "Large-format outdoor.",
             alt: "Compass Capability brand identity on billboard mockup, large format outdoor application",
           },
           {
-            src: "/images/compass-capability/mockup-business-card.png",
+            src: "/media/images/compass-capability/mockup-business-card.png",
             aspectRatio: "1/1",
             caption: "Business card, mark at small print scale.",
             alt: "Compass Capability business card mockup, logo and typography at small print scale",
           },
           {
-            src: "/images/compass-capability/mockup-stationary.png",
+            src: "/media/images/compass-capability/mockup-stationary.png",
             aspectRatio: "1/1",
             caption: "Letterhead and document templates.",
             alt: "Compass Capability stationery mockup, letterhead and document templates with brand identity",
@@ -595,10 +597,10 @@ export const projects: Project[] = [
     pdfSlideshow: {
       title: "Brand Guidelines",
       pages: [
-        "/images/compass-capability/pdf-pages/page-0.webp",
-        "/images/compass-capability/pdf-pages/page-1.webp",
-        "/images/compass-capability/pdf-pages/page-2.webp",
-        "/images/compass-capability/pdf-pages/page-3.webp",
+        "/media/images/compass-capability/pdf-pages/page-0.webp",
+        "/media/images/compass-capability/pdf-pages/page-1.webp",
+        "/media/images/compass-capability/pdf-pages/page-2.webp",
+        "/media/images/compass-capability/pdf-pages/page-3.webp",
       ],
     },
   },
@@ -628,7 +630,7 @@ export const projects: Project[] = [
     outcome:
       "Speculative work. Not adopted by the club. Built as a self-initiated concept.",
     heroImage: {
-      src: "/images/norths-devils/desktop.png",
+      src: "/media/images/norths-devils/desktop.png",
       alt: "Norths Devils RLFC prototype website desktop view with full-screen hero and navigation",
     },
     images: [],
@@ -639,13 +641,13 @@ export const projects: Project[] = [
         body: "The brief was to feel current without losing the club. I kept the devil and tightened the vector construction so it holds at small sizes and in digital, where the old mark struggled. Angular type for aggression, rounded corners for a bit of vintage.",
         images: [
           {
-            src: "/images/norths-devils/logo-1.png",
+            src: "/media/images/norths-devils/logo-1.png",
             aspectRatio: "1/1",
             caption: "The refreshed primary mark.",
             alt: "Norths Devils RLFC refreshed logo, modernised devil mark with thickened edges for digital reproduction",
           },
           {
-            src: "/images/norths-devils/logo-2.png",
+            src: "/media/images/norths-devils/logo-2.png",
             aspectRatio: "1/1",
             caption: "Before and after, old mark versus new.",
             alt: "Norths Devils logo before and after comparison, original versus refreshed mark side by side",
@@ -657,8 +659,8 @@ export const projects: Project[] = [
         body: "Built from scratch and modelled on professional NRL club sites, so the brand could be judged in something close to the real thing rather than a static mockup.",
         images: [
           {
-            src: "/images/norths-devils/video-desktop-poster.jpg",
-            video: "/images/norths-devils/video-desktop.webm",
+            src: "/media/images/norths-devils/video-desktop-poster.jpg",
+            video: "/media/images/norths-devils/video-desktop.webm",
             aspectRatio: "16/9",
             caption: "Scrolling the desktop prototype.",
             alt: "Norths Devils prototype website desktop interaction, scroll through homepage, team and club sections",
@@ -670,20 +672,20 @@ export const projects: Project[] = [
         body: "The same layout, holding its shape down to a phone.",
         images: [
           {
-            src: "/images/norths-devils/iphone-1.png",
+            src: "/media/images/norths-devils/iphone-1.png",
             aspectRatio: "4/3",
             caption: "Mobile layout, club colours intact.",
             alt: "Norths Devils prototype website on iPhone mockup, mobile responsive layout",
           },
           {
-            src: "/images/norths-devils/iphone-2.png",
+            src: "/media/images/norths-devils/iphone-2.png",
             aspectRatio: "4/3",
             caption: "Team profile and news pages.",
             alt: "Norths Devils prototype website iPhone mockup, team profile and news page layout",
           },
           {
-            src: "/images/norths-devils/video-mobile-poster.jpg",
-            video: "/images/norths-devils/video-mobile.webm",
+            src: "/media/images/norths-devils/video-mobile-poster.jpg",
+            video: "/media/images/norths-devils/video-mobile.webm",
             aspectRatio: "4/3",
             caption: "Scrolling the responsive site on mobile.",
             alt: "Norths Devils prototype website mobile interaction, responsive scroll through the full site on iPhone",
@@ -695,13 +697,13 @@ export const projects: Project[] = [
         body: "And how the refreshed mark would carry into the club's physical spaces.",
         images: [
           {
-            src: "/images/norths-devils/mockup-wall.png",
+            src: "/media/images/norths-devils/mockup-wall.png",
             aspectRatio: "3/2",
             caption: "The mark at environmental scale.",
             alt: "Norths Devils refreshed logo on concrete wall mockup, environmental scale brand application",
           },
           {
-            src: "/images/norths-devils/mockup-gallery.png",
+            src: "/media/images/norths-devils/mockup-gallery.png",
             aspectRatio: "4/3",
             caption: "Brand applications across surfaces.",
             alt: "Norths Devils brand identity gallery wall mockup, logo silhouettes across multiple brand applications",
@@ -741,15 +743,15 @@ export const projects: Project[] = [
     outcome:
       "Client happy with the final output and the brand reading consistently across every touchpoint.",
     heroImage: {
-      src: "/images/copper-company/hero.png",
+      src: "/media/images/copper-company/hero.png",
       alt: "Copper Company rum bottle, staged product photography showing the final label design and brand identity",
     },
     heroSlideshow: [
-      "/images/copper-company/hero.png",
-      "/images/copper-company/bottle-1.png",
-      "/images/copper-company/bottle-2.png",
-      "/images/copper-company/insta-1.png",
-      "/images/copper-company/insta-2.png",
+      "/media/images/copper-company/hero.png",
+      "/media/images/copper-company/bottle-1.png",
+      "/media/images/copper-company/bottle-2.png",
+      "/media/images/copper-company/insta-1.png",
+      "/media/images/copper-company/insta-2.png",
     ],
     slideshowAspect: "1/1",
     images: [],
@@ -760,13 +762,13 @@ export const projects: Project[] = [
         body: "The monogram does the heavy lifting on pack. The front label keeps it to the mark and the name; the back carries tasting notes over the repeating pattern, built from the same geometry as the logo.",
         images: [
           {
-            src: "/images/copper-company/bottle-1.png",
+            src: "/media/images/copper-company/bottle-1.png",
             aspectRatio: "1/1",
             caption: "Front label, monogram at full print spec.",
             alt: "Copper Company rum bottle front, monogram label at print specification on amber glass bottle",
           },
           {
-            src: "/images/copper-company/bottle-2.png",
+            src: "/media/images/copper-company/bottle-2.png",
             aspectRatio: "1/1",
             caption: "Back label, tasting notes over the repeat pattern.",
             alt: "Copper Company rum bottle back, secondary label with tasting notes and repeating monogram pattern",
@@ -778,7 +780,7 @@ export const projects: Project[] = [
         body: "The label as a flat net, set up for production with bleed and crop marks so it could go straight to the printer.",
         images: [
           {
-            src: "/images/copper-company/label-flat.png",
+            src: "/media/images/copper-company/label-flat.png",
             aspectRatio: "1.86/1",
             caption: "Label flat, artwork with full bleed and crop marks.",
             alt: "Copper Company label flat net, print-ready label design showing full bleed and artwork at flat view",
@@ -790,13 +792,13 @@ export const projects: Project[] = [
         body: "A short run of launch photography, graded to the copper-and-dark palette so the feed reads as one piece with the pack.",
         images: [
           {
-            src: "/images/copper-company/insta-1.png",
+            src: "/media/images/copper-company/insta-1.png",
             aspectRatio: "1/1",
             caption: "Launch product photography.",
             alt: "Copper Company Instagram post 1, brand-consistent social photography for rum product launch",
           },
           {
-            src: "/images/copper-company/insta-2.png",
+            src: "/media/images/copper-company/insta-2.png",
             aspectRatio: "1/1",
             caption: "Lifestyle shot in the brand grade.",
             alt: "Copper Company Instagram post 2, lifestyle photography with brand copper and dark colour treatment",
@@ -832,10 +834,10 @@ export const projects: Project[] = [
     // Add the `testimonial` field only once he signs it off.
     liveUrl: "/go/rennen",
     liveLabel: "rennenplus.com.au",
-    webThumb: "/images/web/rennen-1.webp",
-    webShots: ["/images/web/rennen-1.webp", "/images/web/rennen-2.webp", "/images/web/rennen-3.webp", "/images/web/rennen-4.webp"],
+    webThumb: "/media/images/web/rennen-1.webp",
+    webShots: ["/media/images/web/rennen-1.webp", "/media/images/web/rennen-2.webp", "/media/images/web/rennen-3.webp", "/media/images/web/rennen-4.webp"],
     heroImage: {
-      src: "/images/rennen-plus/v2/hero.webp",
+      src: "/media/images/rennen-plus/v2/hero.webp",
       alt: "The Rennen Plus home page. A film by Zach Sullivan runs behind the search bar.",
     },
     images: [],
@@ -846,31 +848,31 @@ export const projects: Project[] = [
     // scripts/encode-rennen-demos.sh, add `video` here. `shots` is the still
     // version: three phone screenshots (660x1434) set in three columns.
     demos: [
-      { name: "Landing page", video: "/images/rennen-plus/demos/landing.mp4",
+      { name: "Landing page", video: "/media/images/rennen-plus/demos/landing.mp4",
         title: "One front door",
         body: "Five partner brands, each with its own site, and no shared way in. The home page is a search bar over a film by Zach Sullivan, with the five marks underneath.",
         caption: "The home page." },
-      { name: "Car grid", video: "/images/rennen-plus/demos/grid.mp4",
+      { name: "Car grid", video: "/media/images/rennen-plus/demos/grid.mp4",
         title: "The car comes first",
         body: "Owners could not tell what fits their car. Every part is reached by picking the car, 228 of them across 21 makes, and a part never shows on a car it does not fit.",
         caption: "The finder. Twenty-one makes, then every car on one baseline, each thumbnail cut out and faced the same way." },
-      { name: "Search to car page", video: "/images/rennen-plus/demos/journey.mp4",
+      { name: "Search to car page", video: "/media/images/rennen-plus/demos/journey.mp4",
         title: "One page per car",
         body: "The range lived in five brands' sites and supplier PDFs. Search a chassis code like 992.2 and one page holds the package, every part and the questions owners ask.",
         caption: "Searching 992.2, then the car page top to bottom." },
-      { name: "3D material and live price", video: "/images/rennen-plus/demos/material.mp4",
+      { name: "3D material and live price", video: "/media/images/rennen-plus/demos/material.mp4",
         title: "A price you can act on",
         body: "Quotes were a spreadsheet and a phone call, worked up from US retail. Each part now shows a landed Australian price with GST and import, and it moves when an option changes. Pick a finish and the gallery leads with a live 3D material of it.",
         caption: "Trim, tip finish, price. The finish renders as a live 3D material, full screen on a click." },
-      { name: "Side menu", video: "/images/rennen-plus/demos/menu.mp4",
+      { name: "Side menu", video: "/media/images/rennen-plus/demos/menu.mp4",
         title: "One way around",
         body: "Five brands, 228 cars, an events calendar and a dealer map needed a single way in. One side menu runs on every device, and its event slot comes and goes from the data.",
         caption: "The side menu, with Find your car and the ecosystem opening as panels." },
-      { name: "Ask Rennen Plus", video: "/images/rennen-plus/demos/assistant.mp4",
+      { name: "Ask Rennen Plus", video: "/media/images/rennen-plus/demos/assistant.mp4",
         title: "Answers before the call",
         body: "Fitment questions used to wait for a phone call. An assistant grounded in the catalogue finds the car, links the page and the part, and hands over to a consult when it should.",
         caption: "\"I have a Ferrari\", then \"I have a Roma\". The assistant finds the car and links the part." },
-      { name: "Dealer map", video: "/images/rennen-plus/demos/dealers.mp4",
+      { name: "Dealer map", video: "/media/images/rennen-plus/demos/dealers.mp4",
         title: "Someone to fit it",
         body: "Owners had nobody local to fit the parts. Forty-five dealers and installers now sit on a map, searchable by postcode.",
         caption: "The dealer map. Pick an installer and the map flies to the workshop." },
@@ -881,7 +883,7 @@ export const projects: Project[] = [
         title: "Proof on real cars",
         body: "There was nothing showing the parts on a customer's car. Nine builds each link back to the parts on them, eight with the owner's own words." },
       { name: "Phone",
-        shots: ["/images/rennen-plus/demos/phone-1.webp", "/images/rennen-plus/demos/phone-2.webp", "/images/rennen-plus/demos/phone-3.webp"],
+        shots: ["/media/images/rennen-plus/demos/phone-1.webp", "/media/images/rennen-plus/demos/phone-2.webp", "/media/images/rennen-plus/demos/phone-3.webp"],
         caption: "The finder, a car page and its package, as they sit on a phone.",
         title: "Built for a phone",
         body: "Most visitors arrive on a phone from Meta ads. The phone site is its own system: two fonts, six text sizes and every control at least 44px tall." },
@@ -922,25 +924,25 @@ export const projects: Project[] = [
         "It has been nothing but a pleasure working with Finbar on our new website. He has completely transformed our online presence and taken it to the next level.\n\nFrom the initial design through to the finished site, his communication was excellent throughout. He really listened to our ideas, brought them to life, and made creative suggestions for each page that improved both the content and the overall layout and navigation of the website. He also guided us through the SEO side of things, making sure everything was set up properly to give us the best chance of improving our visibility on Google. On top of that, he designed a selection of Instagram posts for us, giving us high-quality content ready to promote the business across our social media.\n\nWe\u2019re genuinely delighted with the end result and wouldn\u2019t hesitate to recommend Finbar to anyone looking for a professional, high-quality website.",
       author: "Samuel Low, Lows Design + Build",
     },
-    logo: "/images/lows-design-build/logomark.svg",
-    cardLogo: "/images/lows-design-build/logomark.svg",
+    logo: "/media/images/lows-design-build/logomark.svg",
+    cardLogo: "/media/images/lows-design-build/logomark.svg",
     liveUrl: "/go/lows",
     liveLabel: "lowsdesignandbuild.com",
     heroModel: {
-      model: "/models/studio-display/display.gltf",
+      model: "/media/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
       // full-res site-scroll.mp4.
-      video: "/images/lows-design-build/site-scroll-3d.mp4?v=2",
+      video: "/media/images/lows-design-build/site-scroll-3d.mp4?v=2",
     },
-    webThumb: "/images/web/lows-1.webp",
-    webShots: ["/images/web/lows-1.webp?v=2", "/images/web/lows-2.webp?v=2", "/images/web/lows-3.webp?v=2", "/images/web/lows-4.webp?v=2"],
+    webThumb: "/media/images/web/lows-1.webp",
+    webShots: ["/media/images/web/lows-1.webp?v=2", "/media/images/web/lows-2.webp?v=2", "/media/images/web/lows-3.webp?v=2", "/media/images/web/lows-4.webp?v=2"],
     brandThumb: {
-      logo: "/images/lows-design-build/logomark.svg",
+      logo: "/media/images/lows-design-build/logomark.svg",
       colors: ["#424952", "#A99E92", "#E6E0D6"],
       bg: "#FFFFFF",
     },
     heroImage: {
-      src: "/images/lows-design-build/hero.png",
+      src: "/media/images/lows-design-build/hero.png",
       alt: "Lows Design and Build brand identity, hero composite showing logo and brand applications",
     },
     images: [],
@@ -952,7 +954,7 @@ export const projects: Project[] = [
         body: "It started with the client's own sketches. I refined them into a clean geometric mark, a little house drawn in one continuous line, then set a typeface and a colour that hold up small on a phone and large on a wall. One mark, one weight of line, working the same everywhere: on Bromley FC matchday branding, on the hoarding around a live site, and later as the foundation the website was built on.",
         images: [
           {
-            src: "/images/lows-design-build/logomark.svg",
+            src: "/media/images/lows-design-build/logomark.svg",
             aspectRatio: "300/80",
             caption: "The geometric mark, refined from the client's concepts.",
             alt: "Lows Design and Build logo, geometric scalable mark refined from client concept sketches",
@@ -965,8 +967,8 @@ export const projects: Project[] = [
         body: "The old site was a stock template. The new one is Next.js and a hand-written front end. No page builder, no theme sitting underneath it. The whole thing loads fast, reads well on any screen, and behaves exactly how it was drawn, because nothing on the page is there by accident.",
         images: [
           {
-            src: "/images/web/lows-1.webp",
-            video: "/images/lows-design-build/old-site-scroll.mp4",
+            src: "/media/images/web/lows-1.webp",
+            video: "/media/images/lows-design-build/old-site-scroll.mp4",
             aspectRatio: "4/3",
             caption: "For comparison: the old template site, top to bottom.",
             alt: "Scrolling capture of the previous Lows Design and Build website, a standard template design",
@@ -979,7 +981,7 @@ export const projects: Project[] = [
         body: "The site is wired into Sanity. Projects, team, copy, pricing, the photos in every gallery: the family edits all of it from one dashboard and the site updates itself. Add a project and it appears in the grid, gets its own page, and slots into the sitemap. No developer, no waiting, no invoice for a text change. The fields are set up so they cannot break the layout: long title, short title, one photo or ten, the components hold their shape either way.",
         images: [
           {
-            src: "/images/lows-design-build/cms-panel.webp",
+            src: "/media/images/lows-design-build/cms-panel.webp",
             aspectRatio: "1440/934",
             caption: "The Sanity dashboard the family edits from.",
             alt: "Sanity CMS dashboard for the Lows Design and Build website",
@@ -991,22 +993,22 @@ export const projects: Project[] = [
         body: "Nothing on the site fades in. It rises. Every heading, image and section comes up out of a mask as you reach it, so the page feels built rather than dropped in front of you. The entrance is a custom preloader: the house mark draws itself, then opens like a keyhole onto the home page. On project pages the title starts big over the hero, then shrinks and docks into the top corner as you scroll, turning into the nav without a cut.",
         images: [
           {
-            src: "/images/web/lows-1.webp",
-            video: "/images/lows-design-build/site-scroll.mp4?v=2",
+            src: "/media/images/web/lows-1.webp",
+            video: "/media/images/lows-design-build/site-scroll.mp4?v=2",
             aspectRatio: "16/9",
             caption: "A scroll through the live site: masked rises, docking titles.",
             alt: "Scrolling capture of the Lows Design and Build website showing masked reveal animations",
           },
           {
-            src: "/images/web/lows-1.webp",
-            video: "/images/lows-design-build/preloader.mp4",
+            src: "/media/images/web/lows-1.webp",
+            video: "/media/images/lows-design-build/preloader.mp4",
             aspectRatio: "3/2",
             caption: "The entrance: the house mark draws itself, then opens onto the home page.",
             alt: "Lows Design and Build preloader, the house logomark drawing itself before the page reveals",
           },
           {
-            src: "/images/web/lows-1.webp",
-            video: "/images/lows-design-build/project-page.mp4",
+            src: "/media/images/web/lows-1.webp",
+            video: "/media/images/lows-design-build/project-page.mp4",
             aspectRatio: "3/2",
             caption: "Project cards on hover, then a title that docks itself into the nav as you scroll.",
             alt: "Lows Design and Build project page, card hover states and the docking title animation",
@@ -1018,7 +1020,7 @@ export const projects: Project[] = [
         body: "An instant estimate calculator lets a visitor price their own extension or loft in about a minute; to see the figure they leave a name and an email, so every estimate lands in the client's inbox as a warm lead. Booking a call runs through Calendly, skinned to the brand in its own quiet overlay. Enquiries go straight to their inbox through Web3Forms, and a live Instagram feed keeps the site current without anyone touching it.",
         images: [
           {
-            src: "/images/lows-design-build/estimate-page-scroll.webp",
+            src: "/media/images/lows-design-build/estimate-page-scroll.webp",
             scrollShot: true,
             aspectRatio: "16/9",
             caption: "The estimate tool: a visitor prices their own project and becomes a named lead.",
@@ -1069,20 +1071,20 @@ export const projects: Project[] = [
     liveUrl: "/go/plated",
     liveLabel: "platedwithissy.com",
     heroModel: {
-      model: "/models/studio-display/display.gltf",
+      model: "/media/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
       // full-res site-scroll.mp4.
-      video: "/images/plated-with-issy/site-scroll-3d.mp4?v=2",
+      video: "/media/images/plated-with-issy/site-scroll-3d.mp4?v=2",
     },
-    webThumb: "/images/web/plated-1.webp",
-    webShots: ["/images/web/plated-1.webp", "/images/web/plated-2.webp", "/images/web/plated-3.webp", "/images/web/plated-4.webp"],
+    webThumb: "/media/images/web/plated-1.webp",
+    webShots: ["/media/images/web/plated-1.webp", "/media/images/web/plated-2.webp", "/media/images/web/plated-3.webp", "/media/images/web/plated-4.webp"],
     brandThumb: {
-      logo: "/images/plated-with-issy/wordmark.png",
+      logo: "/media/images/plated-with-issy/wordmark.png",
       colors: ["#3D3E2A", "#C9A24B", "#E4CE93"],
       bg: "#F6EEDC",
     },
     heroImage: {
-      src: "/images/web/plated-1.webp",
+      src: "/media/images/web/plated-1.webp",
       alt: "Plated with Issy website hero, script wordmark over a candlelit dinner table",
     },
     images: [],
@@ -1093,7 +1095,7 @@ export const projects: Project[] = [
         body: "Two typefaces doing one job. Plated with in a fine script, ISSY in small serif capitals beside it, so the lockup reads like a signature on a menu. It sits over photography at any size, from the hero of the site down to the nav, and it never needed a logo drawn around it. The type is the mark. The palette is pulled from the dinners themselves: cream, mustard, a deep olive green. Candlelight colours.",
         images: [
           {
-            src: "/images/web/plated-1.webp",
+            src: "/media/images/web/plated-1.webp",
             aspectRatio: "16/9",
             caption: "The wordmark over the hero: the type is the mark.",
             alt: "Plated with Issy wordmark in script and serif capitals over a candlelit table photograph",
@@ -1105,14 +1107,14 @@ export const projects: Project[] = [
         body: "No template underneath. Next.js and a hand-written front end, so every section is a decision and the whole site is really one continuous scroll through an evening. It opens on a full-bleed candlelit table with the wordmark drawing itself across it. From there the page is a sequence, not a stack: the story section pins while polaroid photos fan out one by one over the copy, then Issy's own polaroid grows to centre stage and the page splits into her bio. Scrolling drives all of it, and nav links glide into sections mid-animation rather than jumping, so you never land on an empty frame.",
         images: [
           {
-            src: "/images/web/plated-1.webp",
-            video: "/images/plated-with-issy/site-scroll.mp4?v=2",
+            src: "/media/images/web/plated-1.webp",
+            video: "/media/images/plated-with-issy/site-scroll.mp4?v=2",
             aspectRatio: "16/9",
             caption: "A scroll through the live site, hero to footer.",
             alt: "Scrolling capture of the Plated with Issy website showing the pinned story and gallery",
           },
           {
-            src: "/images/plated-with-issy/story.webp",
+            src: "/media/images/plated-with-issy/story.webp",
             aspectRatio: "16/9",
             caption: "The story section: polaroids fan out over the copy as it pins.",
             alt: "Plated with Issy story section with polaroid photographs fanned over the text",
@@ -1124,7 +1126,7 @@ export const projects: Project[] = [
         body: "Past dinners run in an infinite carousel of polaroids, each titled in a handwritten pen font. Hover one and the row blurs back while that dinner's photos spread into a grid with its story beside them. It loops seamlessly and never resets; it just keeps drifting, like a table being cleared slowly.",
         images: [
           {
-            src: "/images/plated-with-issy/gallery.webp",
+            src: "/media/images/plated-with-issy/gallery.webp",
             aspectRatio: "16/9",
             caption: "A dinner opened out of the carousel into its grid.",
             alt: "Plated with Issy gallery, polaroid carousel expanded into a photo grid of one dinner",
@@ -1136,7 +1138,7 @@ export const projects: Project[] = [
         body: "A two-stage preloader: the wordmark fades up over a filling line, then the curtain lifts, and it waits for the brand typefaces before showing anything so it never flashes a system font. The logo stays out of the nav on the hero, where the big wordmark owns the screen, then fades into place as you scroll past. Enquiries post straight to Issy's inbox through Web3Forms, no mail client, just book a table and a thank-you in the house type. And a branded 404: dark green, the wordmark, this dish isn't on the menu.",
         images: [
           {
-            src: "/images/plated-with-issy/404.webp",
+            src: "/media/images/plated-with-issy/404.webp",
             aspectRatio: "16/9",
             caption: "The 404. This dish isn't on the menu.",
             alt: "Plated with Issy branded 404 page in dark olive green with the script wordmark",
@@ -1189,15 +1191,15 @@ export const projects: Project[] = [
     liveUrl: "/go/lola",
     liveLabel: "lola-audio.com",
     heroModel: {
-      model: "/models/studio-display/display.gltf",
+      model: "/media/models/studio-display/display.gltf",
       // Lighter re-encode for the small 3D screen; the depth section keeps the
       // full-res site-scroll.mp4.
-      video: "/images/lola-audio/site-scroll-3d.mp4?v=2",
+      video: "/media/images/lola-audio/site-scroll-3d.mp4?v=2",
     },
-    webThumb: "/images/web/lola-1.webp",
-    webShots: ["/images/web/lola-1.webp", "/images/web/lola-2.webp", "/images/web/lola-3.webp"],
+    webThumb: "/media/images/web/lola-1.webp",
+    webShots: ["/media/images/web/lola-1.webp", "/media/images/web/lola-2.webp", "/media/images/web/lola-3.webp"],
     heroImage: {
-      src: "/images/web/lola-1.webp",
+      src: "/media/images/web/lola-1.webp",
       alt: "Lola Audio title card, a white sheet of paper with a signature logo between two working mixing-desk faders",
     },
     images: [],
@@ -1208,8 +1210,8 @@ export const projects: Project[] = [
         body: "The site opens on an off-black void with a single white sheet of paper: an A4 card carrying her name, her role, and a line that says commissions are open. Either side of the card sits a real mixing desk: four vertical faders with ribbed caps, tick scales, and LEDs that boot up in an analogue chase when the page loads, each bulb fractionally different in timing and warmth, the way real hardware is. Push a fader and a stem starts, bass, synths, strings, birds, each one a loop she composed. Every stem runs on one shared clock, so a fader engaged late is exactly in time with the first, and the LEDs breathe with their levels. A line of type on the card turns out to be a live waveform: idle it drifts like a sine, and the moment the music starts it draws the actual mix in fader green. There is a reset switch. It is an illuminated rocker, it thunks, and the faders glide home like a motorised desk.",
         images: [
           {
-            src: "/images/web/lola-1.webp",
-            video: "/images/lola-audio/site-scroll.mp4?v=2",
+            src: "/media/images/web/lola-1.webp",
+            video: "/media/images/lola-audio/site-scroll.mp4?v=2",
             aspectRatio: "16/9",
             caption: "The desk played live, then the scroll: the card grows until the whole screen is paper.",
             alt: "Scrolling capture of the Lola Audio site, faders playing stems then the card growing to full screen",
@@ -1226,14 +1228,14 @@ export const projects: Project[] = [
         body: "Films run in a two-column grid, playing silently as you arrive at them. Each card carries a listen, the film's own sound with a small live visualiser, and while you listen, every other film blurs back so nothing competes. Watch opens the film full screen with a scrubber, volume, and nothing else on the screen but the work. As you scroll on, watched cards shrink into a thin stack of pills pinned under the logo, a rack of everything you have passed, each one still playable, each one reopening with a click without disturbing the rest. At the bottom the films fade away beneath her bio, and the contacts step back to a whisper while you browse, returning when you need them. For long-form work, fashion shows and short films, the site plays a condensed cut and offers the full version on YouTube in one click.",
         images: [
           {
-            src: "/images/lola-audio/portfolio.webp",
+            src: "/media/images/lola-audio/portfolio.webp",
             aspectRatio: "16/9",
             caption: "The film grid: silent autoplay, a listen on every card, watched work stacking into pills.",
             alt: "Lola Audio portfolio grid with film cards and audio visualisers",
           },
           {
-            src: "/images/lola-audio/watch-poster.webp",
-            video: "/images/lola-audio/watch.mp4",
+            src: "/media/images/lola-audio/watch-poster.webp",
+            video: "/media/images/lola-audio/watch.mp4",
             aspectRatio: "16/9",
             caption: "Watch: the film full screen with a custom scrubber, and nothing else on the screen but the work.",
             alt: "Lola Audio full-screen film player, a runway film playing with a custom timeline scrubber",
@@ -1270,19 +1272,19 @@ export const projects: Project[] = [
       "Momentum needed a brand and site that read as empowering and independent without slipping into clinical or institutional territory. It had to feel approachable for participants and their families, and stay simple for a small team to maintain once it was live.",
     outcome:
       "Brand and website delivered as a single piece of work and live at momentummentoring.co.",
-    logo: "/images/momentum-mentoring/Logo2.svg",
+    logo: "/media/images/momentum-mentoring/logo2.svg",
     heroModel: {
-      model: "/models/studio-display/display.gltf",
-      video: "/images/momentum-mentoring/site-scroll.mp4",
+      model: "/media/models/studio-display/display.gltf",
+      video: "/media/images/momentum-mentoring/site-scroll.mp4",
     },
-    webThumb: "/images/web/momentum-1.webp",
+    webThumb: "/media/images/web/momentum-1.webp",
     heroImage: {
-      src: "/images/momentum-mentoring/hero.webp",
+      src: "/media/images/momentum-mentoring/hero.webp",
       alt: "Momentum Mentoring brand identity and website for an NDIS mentoring provider",
     },
     images: [
       {
-        src: "/images/momentum-mentoring/hero.webp",
+        src: "/media/images/momentum-mentoring/hero.webp",
         caption: "Home page: a warm, approachable layout built for an NDIS mentoring audience.",
         alt: "Momentum Mentoring website homepage with empowering, approachable NDIS branding",
       },
@@ -1324,10 +1326,10 @@ export const projects: Project[] = [
       "TasWater needed complex data shown clearly while staying inside their strict brand guidelines. New visual systems had to feel native to what already existed.",
     outcome:
       "Client confirmed they were happy. Leadership signed off on the brand alignment.",
-    logo: "/images/taswater/logo.png",
-    cardStack: ["/images/taswater/hero.jpg", "/images/taswater/map.jpg"],
+    logo: "/media/images/taswater/logo.png",
+    cardStack: ["/media/images/taswater/hero.jpg", "/media/images/taswater/map.jpg"],
     heroImage: {
-      src: "/images/taswater/hero.jpg",
+      src: "/media/images/taswater/hero.jpg",
       alt: "TasWater 'first 12 months' employee onboarding journey infographic, designed inside the TasWater brand",
     },
     images: [],
@@ -1338,7 +1340,7 @@ export const projects: Project[] = [
         body: "Two infographic projects in a month, both made to live inside TasWater's existing brand. The job was to show complex infrastructure data clearly without inventing a new visual language, so the new pieces read as native to what was already there. Leadership signed off on the brand alignment.",
         images: [
           {
-            src: "/images/taswater/map.jpg",
+            src: "/media/images/taswater/map.jpg",
             aspectRatio: "16/9",
             caption: "Service area and infrastructure, mapped on a branded base.",
             alt: "TasWater interactive map infographic, service area and infrastructure locations across Tasmania",
@@ -1368,20 +1370,20 @@ export const projects: Project[] = [
     problem:
       "The London Home Show needed event materials that worked across a wide range of print formats and digital channels: outdoor flags, stage graphics, 10-year anniversary brochures.",
     outcome: "Campaign rollout delivered on time across every channel.",
-    logo: "/images/london-home-show/LHS%20Logo.svg",
+    logo: "/media/images/london-home-show/lhs-logo.svg",
     heroImage: {
-      src: "/images/london-home-show/hero.jpg",
+      src: "/media/images/london-home-show/hero.jpg",
       alt: "The London Home Show event, branding and signage across the exhibition venue",
     },
     heroSlideshow: [
-      "/images/london-home-show/hero.jpg",
-      "/images/london-home-show/flags.jpg",
-      "/images/london-home-show/banner.jpg",
-      "/images/london-home-show/stage.jpg",
-      "/images/london-home-show/booklets.jpg",
-      "/images/london-home-show/brochure.jpg",
-      "/images/london-home-show/podium.jpg",
-      "/images/london-home-show/brochure-10yr.jpg",
+      "/media/images/london-home-show/hero.jpg",
+      "/media/images/london-home-show/flags.jpg",
+      "/media/images/london-home-show/banner.jpg",
+      "/media/images/london-home-show/stage.jpg",
+      "/media/images/london-home-show/booklets.jpg",
+      "/media/images/london-home-show/brochure.jpg",
+      "/media/images/london-home-show/podium.jpg",
+      "/media/images/london-home-show/brochure-10yr.jpg",
     ],
     slideshowAspect: "3/2",
     images: [],
@@ -1392,13 +1394,13 @@ export const projects: Project[] = [
         body: "The first affordable-homes exhibition of its kind needed to feel like an event from the street in. Flags outside, then directional signage and brand presence once you were through the doors.",
         images: [
           {
-            src: "/images/london-home-show/flags.jpg",
+            src: "/media/images/london-home-show/flags.jpg",
             aspectRatio: "3/2",
             caption: "Exterior flags at street scale.",
             alt: "London Home Show exterior flags, branded event flags outside the exhibition venue",
           },
           {
-            src: "/images/london-home-show/banner.jpg",
+            src: "/media/images/london-home-show/banner.jpg",
             aspectRatio: "3/2",
             caption: "Interior wayfinding and signage.",
             alt: "London Home Show banner, interior branded signage for event wayfinding",
@@ -1410,13 +1412,13 @@ export const projects: Project[] = [
         body: "A branded stage for the panel sessions, from the podium to the full backdrop behind the speakers.",
         images: [
           {
-            src: "/images/london-home-show/podium.jpg",
+            src: "/media/images/london-home-show/podium.jpg",
             aspectRatio: "3/2",
             caption: "Speaker podium.",
             alt: "London Home Show speaker podium, branded stage and podium for exhibition panel sessions",
           },
           {
-            src: "/images/london-home-show/stage.jpg",
+            src: "/media/images/london-home-show/stage.jpg",
             aspectRatio: "3/2",
             caption: "Full-width stage backdrop.",
             alt: "London Home Show stage backdrop, full-width branded graphic for the main exhibition stage",
@@ -1428,13 +1430,13 @@ export const projects: Project[] = [
         body: "The take-home pieces: the show brochure and the programme and exhibitor booklets.",
         images: [
           {
-            src: "/images/london-home-show/brochure.jpg",
+            src: "/media/images/london-home-show/brochure.jpg",
             aspectRatio: "3/2",
             caption: "Show brochure.",
             alt: "London Home Show brochure, primary printed collateral distributed at the exhibition",
           },
           {
-            src: "/images/london-home-show/booklets.jpg",
+            src: "/media/images/london-home-show/booklets.jpg",
             aspectRatio: "3/2",
             caption: "Programme and exhibitor booklets.",
             alt: "London Home Show event booklets, attendee programme and exhibitor guide printed collateral",
@@ -1446,7 +1448,7 @@ export const projects: Project[] = [
         body: "And a commemorative brochure marking a decade of the show.",
         images: [
           {
-            src: "/images/london-home-show/brochure-10yr.jpg",
+            src: "/media/images/london-home-show/brochure-10yr.jpg",
             aspectRatio: "3/2",
             caption: "The 10-year anniversary edition.",
             alt: "London Home Show 10-year anniversary brochure, commemorative edition marking decade of the exhibition",
@@ -1482,30 +1484,30 @@ export const projects: Project[] = [
       "Packer & Associates needed a consistent design and communications presence maintained over time across three fronts: their website, their flagship capability statement, and their day-to-day social and editorial output.",
     outcome: "Brand expression held consistent across every touchpoint, sustained over the full engagement.",
     heroPdf: [
-      "/images/packer-associates/pdf-pages/page-0-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-1-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-2-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-3-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-4-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-5-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-6-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-7-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-8-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-9-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-10-thumb.webp",
-      "/images/packer-associates/pdf-pages/page-11-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-0-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-1-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-2-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-3-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-4-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-5-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-6-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-7-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-8-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-9-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-10-thumb.webp",
+      "/media/images/packer-associates/pdf-pages/page-11-thumb.webp",
     ],
     // Detail-page hero: the studio-display mac (same as KinAya) playing the
     // packer video. Home grid still uses heroPdf (checked first in the card).
     heroModel: {
-      model: "/models/studio-display/display.gltf",
-      video: "/images/packer-associates/3D%20Model%20Video.webm",
+      model: "/media/models/studio-display/display.gltf",
+      video: "/media/images/packer-associates/3d-model-video.webm",
     },
     heroImage: {
-      src: "/images/packer-associates/hero-poster.jpg",
+      src: "/media/images/packer-associates/hero-poster.jpg",
       alt: "Packer & Associates website, brand identity and digital presence for the capability solutions company",
     },
-    heroVideo: "/images/packer-associates/website-video.webm",
+    heroVideo: "/media/images/packer-associates/website-video.webm",
     images: [],
     hasDepth: false,
   },
@@ -1529,7 +1531,7 @@ export const projects: Project[] = [
     outcome:
       "Speculative work. Not adopted by the club. Built as a self-initiated concept.",
     heroImage: {
-      src: "/images/toombul-bulls/hero.webp",
+      src: "/media/images/toombul-bulls/hero.webp",
       alt: "Toombul Bulls brand refresh concept, logo and brand applications for Queensland rugby league club",
     },
     images: [],
@@ -1562,13 +1564,13 @@ export const projects: Project[] = [
     outcome:
       "Forty-eight slideshow posts off the back of one prompt system. The series passed 100k likes, and the top post hit 770k views.",
     heroSlideshow: [
-      "/images/palmsmotel/scene-1.webp",
-      "/images/palmsmotel/scene-2.webp",
-      "/images/palmsmotel/scene-3.webp",
+      "/media/images/palmsmotel/scene-1.webp",
+      "/media/images/palmsmotel/scene-2.webp",
+      "/media/images/palmsmotel/scene-3.webp",
     ],
     slideshowAspect: "4/3",
     heroImage: {
-      src: "/images/palmsmotel/scene-1.webp",
+      src: "/media/images/palmsmotel/scene-1.webp",
       alt: "Palms Motel, an AI-generated 1970s Palm Springs motel scene with a kidney pool, palms and a mid-century house",
     },
     images: [],
@@ -1587,7 +1589,7 @@ export const projects: Project[] = [
         body: "A motel that never existed, told one post at a time. Each slideshow was six images under the same line, “POV: you just moved to Palm Springs, 1977,” set to a piece of viral audio. The point was the world, not the single image.",
         images: [
           {
-            src: "/images/palmsmotel/sign.png",
+            src: "/media/images/palmsmotel/sign.png",
             aspectRatio: "4/5",
             caption: "The motel sign, the anchor of the world.",
             alt: "Palms Motel illuminated roadside sign at dusk, framed by palm trees",
@@ -1604,15 +1606,19 @@ export const projects: Project[] = [
         body: "Raw Midjourney outputs went through Photoshop for grading and artifact cleanup, then out as TikTok slideshows. A handful sold as poster prints through a Shopify store before the time it took to run made it not worth keeping open.",
         cols: 4,
         images: [
-          { src: "/images/palmsmotel/poster-1.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
-          { src: "/images/palmsmotel/poster-2.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
-          { src: "/images/palmsmotel/poster-3.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
-          { src: "/images/palmsmotel/poster-4.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
+          { src: "/media/images/palmsmotel/poster-1.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
+          { src: "/media/images/palmsmotel/poster-2.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
+          { src: "/media/images/palmsmotel/poster-3.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
+          { src: "/media/images/palmsmotel/poster-4.webp", aspectRatio: "424/600", caption: "Poster print.", alt: "Palms Motel poster print, retro travel poster style" },
         ],
       },
     ],
   },
 ];
+
+// Every "/media/..." string below resolves through lib/media.ts: off disk
+// locally, off the Cloudflare R2 hostname in production.
+export const projects: Project[] = mediaDeep(RAW_PROJECTS);
 
 /* Helper: get project by slug */
 export function getProjectBySlug(slug: string): Project | undefined {

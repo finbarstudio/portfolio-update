@@ -255,7 +255,7 @@ function Rig({
 /* ── Outer component ───────────────────────────────────────── */
 
 type Props = {
-  /** Path under /public, e.g. /models/studio-display/display.gltf */
+  /** Path under /public, e.g. /media/models/studio-display/display.gltf */
   model: string;
   /** Looping video shown on the screen. WebM or MP4. */
   video?: string;
@@ -363,6 +363,9 @@ function ModelDisplayInner({
   const videoEl = useMemo(() => {
     if (!video || typeof document === "undefined") return null;
     const el = document.createElement("video");
+    // Media is served from the R2 hostname: WebGL refuses a cross-origin video
+    // as a texture unless it was fetched with CORS. Must be set before src.
+    el.crossOrigin = "anonymous";
     el.src = video;
     el.loop = true;
     el.muted = true;

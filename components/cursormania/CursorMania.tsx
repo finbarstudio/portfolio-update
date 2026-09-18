@@ -5,8 +5,8 @@
  * extension that lives at /cursor: same Windows XP window (category tree,
  * cursor grid, status bar), same decode-then-cycle trick for animated GIFs.
  * Picking a cursor applies it to every page of the portfolio and sticks in
- * localStorage until "Normal cursor". Cursors live in /public/cursors,
- * indexed by /cursors/index.json, and are only fetched once the window opens.
+ * localStorage until "Normal cursor". Cursors live in /public/media/cursors,
+ * indexed by /media/cursors/index.json, and are only fetched once the window opens.
  *
  * Two pieces: <CursorManiaButton/> (the XP button in the top nav) and
  * <CursorMania/> (the window + the applier, mounted once in LayoutShell).
@@ -15,6 +15,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./cursormania.css";
+import { media } from "@/lib/media";
 
 type Index = Record<string, Record<string, string[]>>;
 type Frame = { url: string; delay: number };
@@ -34,7 +35,7 @@ const STYLE_ID = "__cursormania_style";
 const TOGGLE = "cursormania:toggle";
 
 const cursorUrl = (cat: string, sub: string, f: string) =>
-  "/cursors/" + [cat, sub === "(all)" ? null : sub, f].filter(Boolean).map((s) => encodeURIComponent(s as string)).join("/");
+  media("/media/cursors/" + [cat, sub === "(all)" ? null : sub, f].filter(Boolean).map((s) => encodeURIComponent(s as string)).join("/"));
 
 function titleCase(s: string) {
   return s
@@ -122,6 +123,7 @@ async function decodeGif(u: string): Promise<{ frames: Frame[]; first: ImageData
   } else {
     // Safari / Firefox: no ImageDecoder, so the first frame stands still.
     const img = new Image();
+    img.crossOrigin = "anonymous"; // drawn to a canvas then read back
     img.src = u;
     await img.decode();
     cv.width = img.naturalWidth;
@@ -209,7 +211,7 @@ export default function CursorMania() {
     let dead = false;
     (async () => {
       try {
-        const idx: Index = await (await fetch("/cursors/index.json")).json();
+        const idx: Index = await (await fetch(media("/media/cursors/index.json"))).json();
         if (dead) return;
         setIndex(idx);
         const saved = readStore();

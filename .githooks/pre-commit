@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Keeps content/media-manifest.json and content/asia-photos.json in step with
+# public/media, so the version on every CDN URL changes when the media does.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+if git diff --cached --name-only | grep -q '^public/media/'; then
+  node scripts/media-manifest.mjs
+  git add content/media-manifest.json content/asia-photos.json
+fi

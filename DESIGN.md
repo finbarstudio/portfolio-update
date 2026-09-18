@@ -2,7 +2,7 @@
 
 This is the authoritative design-system document for the studio portfolio (not the demo/sandbox/pitch satellite sites — see section 11). Every value below is copied verbatim from source, primarily `app/globals.css`. Where a comment disagrees with the code, the code wins; discrepancies are logged at the end.
 
-Sources read: `app/globals.css`, `AGENTS.md`, `app/layout.tsx`, `components/BrandMark.tsx`, `components/brand-mark.ts`, `components/BrandWordmark.tsx`, `components/BrandWordmarkText.tsx`, `components/NavLogo.tsx`, `components/ui/loader.tsx`, `components/SiteFooter.tsx`, `components/FooterCopyright.tsx`, `components/BookCall.tsx`, `components/ContactPanel.tsx`, `components/ContactDirect.tsx`, `components/ContactNoteForm.tsx`, `components/Testimonial.tsx`, `components/TopNav.tsx`.
+Sources read: `app/globals.css`, `AGENTS.md`, `app/layout.tsx`, `components/BrandMark.tsx`, `components/brand-mark.ts`, `components/BrandWordmark.tsx`, `components/NavLogo.tsx`, `components/ui/loader.tsx`, `components/SiteFooter.tsx`, `components/FooterCopyright.tsx`, `components/BookCall.tsx`, `components/ContactPanel.tsx`, `components/ContactDirect.tsx`, `components/ContactNoteForm.tsx`, `components/Testimonial.tsx`, `components/TopNav.tsx`.
 
 ---
 
@@ -97,9 +97,9 @@ The mark does **NOT** take `currentColor`. It carries its own six-step ramp and 
 
 The mark sits in `.brand-wordmark-mark` (`font-size: 0.72em`, `color: var(--pink)`, tuned to the cap/x-height of the text) wrapping `.brand-wordmark-asterisk` (`width: 1em; height: 1em`). This is the canonical logo lockup — used in the nav (`NavLogo.tsx` → `.nav-logo`), the main site footer's giant wordmark, the favicon, and OG images.
 
-### `BrandWordmarkText` — demo credits only
+### `BrandWordmarkText` (removed)
 
-Renders `FINBARSTUDIO` + Space Mono's own literal `*` character (`.brand-wordmark-star`, `font-family: var(--font-mono)`, `color: var(--pink, #e96d89)`) instead of the SVG mark. Used **only** for the small "Concept site by" credits in demo-site footers (A Rolley / Braeden / Lindon / OJ Pippin), where the inline SVG asterisk threw off baseline + letter-spacing at ~9–11px. Component doc-comment: "The main site keeps `BrandWordmark`... don't swap that one."
+A text-only variant, `FINBARSTUDIO` plus Space Mono's literal `*`, existed for the small "Concept site by" credits in the builder demo footers, where the inline SVG asterisk sat badly at 9 to 11px. Those demos are archived and the component went with them on 18 Sep 2026; a copy sits in `archive/builders-outreach/components/` for any demo that is restored. The live site only ever uses `BrandWordmark`.
 
 ### NEVER rules
 
