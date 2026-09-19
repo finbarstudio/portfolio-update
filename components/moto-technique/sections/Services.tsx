@@ -96,7 +96,7 @@ export default function Services({ services }: { services: { title: string; quar
 
   const label = (s: Item, className: string, style?: React.CSSProperties) => (
     <a
-      key={s.id}
+      key={`label-${s.id}`}
       href={s.href}
       target="_blank"
       rel="noopener noreferrer"
@@ -116,7 +116,7 @@ export default function Services({ services }: { services: { title: string; quar
   );
 
   const box = (s: Item, where: string) => (
-    <div key={s.id} id={`mt-svc-${s.id}`} className="mt-wheel-box" data-where={where} data-open={open === s.id ? "1" : "0"}>
+    <div key={`box-${s.id}`} id={`mt-svc-${s.id}`} className="mt-wheel-box" data-where={where} data-open={open === s.id ? "1" : "0"}>
       <span className="mt-wheel-box-name">{s.name}</span>
       <p>{s.blurb}</p>
     </div>

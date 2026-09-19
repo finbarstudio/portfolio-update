@@ -188,7 +188,7 @@ export const why = {
   title: "Why Moto Technique",
   heading: ["One workshop.", "Every discipline."],
   body: "Established in 1980, Moto Technique are at the forefront of classic and sports car restoration and engineering excellence, with an international reputation for quality work and innovation. Every discipline is carried out in-house and under one roof, by artisan panel beaters, paint sprayers, fitters, mechanics and Hi-tech technicians.",
-  cta: { label: "Inside the workshop", href: "#workshop" },
+  cta: { label: "See the projects", href: "#projects" },
   figures: [
     { value: "1000s", label: "Classic and exotic sports cars restored or repaired, over four decades" },
     { value: "120", label: "Years of combined experience in the paintshop, nearly" },
@@ -248,6 +248,81 @@ export const services = {
     blurb:
       "Advancements in car restoration technology has happened in every single stage of the process, from paint and body materials to electronic scanning and alignment and most interestingly in engine management systems and reliability.",
   },
+};
+
+/**
+ * The shelf: eight projects, stood side by side like books.
+ *
+ * Their site has nine project pages. The Dino 3.6 is the hero, so these are the
+ * other eight. `name` is the page's own title and `line` is VERBATIM from that
+ * page (their spelling and capitals kept). The Miura page has no words on it at
+ * all, so it has no line here either: a gap is better than an invented caption.
+ * `href` is their page. Note the Iso Grifo really does live at a URL that says
+ * F40: that is a slip on their site, copied faithfully so the link works.
+ *
+ * The first one stands open when the section arrives. Reorder the list and the
+ * shelf reorders; it lays itself out for however many there are.
+ */
+export const projects = {
+  title: "Projects",
+  items: [
+    {
+      id: "gto",
+      name: "Ferrari 250 GTO",
+      line: "Ferrari 250 GTO Complete “Step by Step” body restoration by MOTO TECHNIQUE",
+      image: img("gto-restored"),
+      href: "https://www.mototechnique.com/ferrari-250-gto",
+    },
+    {
+      id: "f40",
+      name: "Ferrari F40LM / GTE",
+      line: "Ferrari F40LM/GTE Upgraded to 720BHP",
+      image: img("f40lm-anglesey"),
+      href: "https://www.mototechnique.com/ferrari-f40lm-gte-1",
+    },
+    {
+      id: "gullwing",
+      name: "Mercedes 300SL Gullwing",
+      line: "Mercedes 300SL Gullwing Restored to absolute perfection by Moto Technique",
+      image: img("gullwing-restored"),
+      href: "https://www.mototechnique.com/mercedes-300sl-gullwing",
+    },
+    {
+      id: "f308",
+      name: "Ferrari 308 GTB",
+      line: "A unique spec Ferrari 308 Restomond by Moto Technique fitted with a Ferrari V8 (Stage 2) Engine and many other bespoke features.",
+      image: img("f308-hero"),
+      href: "https://www.mototechnique.com/308-gtb-restomod",
+    },
+    {
+      id: "miura",
+      name: "Lamborghini Miura P400",
+      line: "",
+      image: img("miura-roadster"),
+      href: "https://www.mototechnique.com/lamborghini-miurap400",
+    },
+    {
+      id: "iso",
+      name: "Iso Grifo Mk2",
+      line: "Iso Grifo Mk2 - Ground-up restoration to award winning standards by MOTO TECHNIQUE",
+      image: img("iso-hero"),
+      href: "https://www.mototechnique.com/ferrari-f40lm-gte",
+    },
+    {
+      id: "dino32",
+      name: "Dino 246 GTS 3.2 V8",
+      line: "Dino 246 GTS - Upgraded to Ferrari V8 300bhp engine with handling and braking to match.",
+      image: img("dino32-road"),
+      href: "https://www.mototechnique.com/dino-246-gts-upgrade-32-v8",
+    },
+    {
+      id: "isetta",
+      name: "BMW Isetta 300",
+      line: "BMW Isetta 300 or Ferrari 250 GTO, they all receive the same care and attention at Moto Technique.",
+      image: img("isetta-pub"),
+      href: "https://www.mototechnique.com/bmw-isetta-300",
+    },
+  ],
 };
 
 /** Kevin's own words on what a restomod is. Verbatim from /upgrades. */
@@ -391,9 +466,10 @@ export const site = {
   h1: "Classic and Sports Car Restoration Specialists",
   established: "Est. 1980",
   nav: [
-    { label: "Work", href: "#work" },
-    { label: "Restomods", href: "#restomods" },
-    { label: "Workshop", href: "#workshop" },
+    { label: "The Dino", href: "#top" },
+    { label: "Why Moto Technique", href: "#why" },
+    { label: "Services", href: "#services" },
+    { label: "Projects", href: "#projects" },
     { label: "Contact", href: "#contact" },
   ],
 };
@@ -404,6 +480,7 @@ const content = mediaDeep({
   marks,
   why,
   services,
+  projects,
   sale,
   restomod,
   disciplines,

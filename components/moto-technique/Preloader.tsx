@@ -4,19 +4,20 @@ import { useEffect, useRef } from "react";
 import { LOGOMARK_PATHS, LOGOMARK_VIEWBOX } from "./logomarkPath";
 
 /**
- * The preloader: a white screen, the logomark, and out.
+ * The preloader: a white screen, the logomark, and a wipe.
  *
  *   1. the screen is white
- *   2. the mark fades in, small, in the middle
+ *   2. the mark comes in: small, black, against the left edge, halfway down
  *   3. it holds for a beat
- *   4. the whole screen fades away and the page is behind it
+ *   4. the white is wiped off from right to left, so the page appears from the
+ *      right and the mark, on the left, is the last thing to go
  *
- * Nothing is drawn, cut or flown through. Every move is one opacity transition
- * in the stylesheet; this file only flips the states at the right moments and
- * tidies up. `data-stage` on the root is the whole interface between the two:
+ * Every move is one transition in the stylesheet; this file only flips the
+ * states at the right moments and tidies up. `data-stage` on the root is the
+ * whole interface between the two:
  *   (none)  white, mark hidden
- *   "in"    the mark fades in
- *   "out"   the screen fades out
+ *   "in"    the mark comes in
+ *   "out"   the wipe runs
  *
  * ONCE PER SESSION. layout.tsx runs a one-line script before first paint that
  * marks the page `data-intro` only if this session has not seen it (in
@@ -24,11 +25,11 @@ import { LOGOMARK_PATHS, LOGOMARK_VIEWBOX } from "./logomarkPath";
  * mark. So a refresh on the live site never flashes white. `?intro` forces it.
  */
 
-/** The sequence, in milliseconds. Keep FADE_OUT in step with the stylesheet. */
+/** The sequence, in milliseconds. Keep WIPE in step with the stylesheet. */
 const BEFORE = 150;
-const MARK_IN = 900;
-const HOLD = 700;
-const FADE_OUT = 900;
+const MARK_IN = 700;
+const HOLD = 650;
+const WIPE = 1100;
 
 const SEEN_KEY = "mt-intro-seen";
 
@@ -56,8 +57,8 @@ export default function Preloader() {
       }
     };
 
-    // Reduced motion gets the same thing, since it is already only a fade, but
-    // without the wait for the mark: the white lifts straight away.
+    // Reduced motion: no wipe travelling across the screen. The stylesheet
+    // turns it into a plain fade, and it starts straight away.
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const lead = reduce ? 0 : BEFORE + MARK_IN + HOLD;
 
@@ -67,7 +68,7 @@ export default function Preloader() {
       // The page is about to show, so let the hero start its own entrance.
       site.setAttribute("data-intro", "open");
     });
-    after(lead + FADE_OUT, finish);
+    after(lead + WIPE, finish);
 
     return () => timers.forEach((t) => window.clearTimeout(t));
   }, []);

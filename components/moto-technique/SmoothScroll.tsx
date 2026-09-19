@@ -40,6 +40,11 @@ export default function SmoothScroll() {
         const jump = () => {
           if (site?.hasAttribute("data-intro")) return;
           window.clearInterval(qa);
+          // Lenis clamps to the page height it last measured, which at mount is
+          // still zero, so measure first. The native call covers the frame
+          // before Lenis takes over.
+          lenis.resize();
+          window.scrollTo(0, y);
           lenis.scrollTo(y, { immediate: true, force: true });
         };
         qa = window.setInterval(jump, 80);

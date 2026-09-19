@@ -57,10 +57,11 @@ export const metadata: Metadata = {
  *
  * In development it plays on every refresh, because that is how it gets worked
  * on. The once-a-session rule only exists in a production build. ALWAYS is
- * decided here on the server and baked into the script as a literal.
+ * decided here on the server and baked into the script as a literal. In
+ * development only, `?nointro` skips it, for screenshot tools.
  */
 const ALWAYS = process.env.NODE_ENV !== "production";
-const INTRO_GATE = `(function(){var r=document.currentScript.parentElement;try{if(${ALWAYS}||/[?&]intro\\b/.test(location.search)||!sessionStorage.getItem("mt-intro-seen"))r.setAttribute("data-intro","1")}catch(e){r.setAttribute("data-intro","1")}})()`;
+const INTRO_GATE = `(function(){var r=document.currentScript.parentElement;try{if(${ALWAYS}&&/[?&]nointro\\b/.test(location.search))return;if(${ALWAYS}||/[?&]intro\\b/.test(location.search)||!sessionStorage.getItem("mt-intro-seen"))r.setAttribute("data-intro","1")}catch(e){r.setAttribute("data-intro","1")}})()`;
 
 export default function MotoTechniqueLayout({ children }: { children: React.ReactNode }) {
   return (
