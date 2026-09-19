@@ -13,11 +13,11 @@ import Contact from "@/components/moto-technique/sections/Contact";
  * changes: reorder the hero, add a car, swap a discipline.
  */
 export default function MotoTechniqueHome() {
-  const { hero, marks, sale, restomod, disciplines, workshop, testimonials, contact, site } = content;
+  const { hero, heroMark, marks, sale, restomod, disciplines, workshop, testimonials, contact, site } = content;
 
   return (
     <main id="top">
-      <Hero slides={hero} marks={marks} name={site.name} />
+      <Hero slides={hero} title={heroMark} marks={marks} />
       <Sale sale={sale} />
       <Restomods restomod={restomod} />
       <Disciplines disciplines={disciplines} />

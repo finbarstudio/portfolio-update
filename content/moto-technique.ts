@@ -5,7 +5,7 @@ import { mediaDeep } from "@/lib/media";
  *
  * Every string, image and link on the demo comes from this file, so the page is
  * a renderer with nothing hard-coded. Reordering `hero` reorders the hero
- * slides and the thumbnails under them; adding a discipline adds a card. This
+ * photographs; adding a discipline adds a card. This
  * is the shape a CMS would hold, so Kevin can be handed the editor later
  * without the page being rebuilt.
  *
@@ -81,9 +81,24 @@ export const hero: HeroSlide[] = [
   },
 ];
 
+/**
+ * The name of the car, set in the middle of the hero over every frame.
+ *
+ * Finbar's artwork of the Dino script (Design Work/Mototechnique/Dino
+ * Wordmark.png). It is a picture, not type, so the real size is recorded here
+ * and the page can hold its space before it loads. Swap the car in `hero` and
+ * this is the other thing to swap, or set it to null to have no name at all.
+ */
+export const heroMark: { image: string; alt: string; width: number; height: number } | null = {
+  image: img("dino-wordmark"),
+  alt: "Dino",
+  width: 1732,
+  height: 541,
+};
+
 /** Credentials under the hero line. Real, checkable claims only. */
 export const marks = {
-  laurel: { mark: "40", body: "Established", label: "1980" },
+  laurel: { mark: "40", unit: "Years", body: "Established", label: "1980" },
   /** Verbatim from the home page: "...projects from all over the UK, Europe, Asia and North America." */
   regions: [
     { id: "uk", label: "UK" },
@@ -260,6 +275,7 @@ export const site = {
 
 const content = mediaDeep({
   hero,
+  heroMark,
   marks,
   sale,
   restomod,

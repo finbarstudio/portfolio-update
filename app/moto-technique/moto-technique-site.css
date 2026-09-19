@@ -43,9 +43,17 @@
 
   --mt-ease: cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* Futura for titles, Host Grotesk for reading. Futura is a licensed face, so
+     no font file is served: the stack names it first, which gives the real
+     thing on every Mac, iPhone and iPad (it ships with them), and falls to
+     Jost, the open Futura revival loaded in layout.tsx, everywhere else. A
+     licensed web Futura would make the two identical. */
+  --mt-font-title: Futura, "Futura PT", var(--font-mt-brand), "Century Gothic", sans-serif;
+  --mt-font-body: var(--font-mt), system-ui, -apple-system, sans-serif;
+
   background: var(--mt-paper);
   color: var(--mt-ink);
-  font-family: var(--font-mt), system-ui, -apple-system, sans-serif;
+  font-family: var(--mt-font-body);
   font-size: var(--mt-step-body);
   line-height: 1.6;
   font-weight: 300;
@@ -57,19 +65,27 @@
 
 /* The portfolio's @layer base forces every h1 to uppercase. Undo it here or the
    thin display face renders in caps, which it reads badly in. */
-.mt-site :is(h1, h2, h3, h4) {
+/* These resets are wrapped in :where() so they add no specificity of their own.
+   Written as `.mt-site p` they scored higher than any single class, so every
+   `.mt-thing { margin-top }` set on a paragraph further down was silently
+   thrown away. They still beat the portfolio's own element rules, because
+   those live in @layer base and anything unlayered wins over a layer. */
+.mt-site :where(h1, h2, h3, h4) {
+  font-family: var(--mt-font-title);
   text-transform: none;
-  font-weight: 200;
-  letter-spacing: -0.015em;
+  /* 400 asks for Futura Medium on a Mac (it has no lighter cut) and Jost
+     Regular elsewhere, which are the closest pair the two families have */
+  font-weight: 400;
+  letter-spacing: -0.01em;
   line-height: 1.08;
   margin: 0;
 }
 
-.mt-site p {
+.mt-site :where(p) {
   margin: 0;
 }
 
-.mt-site a {
+.mt-site :where(a) {
   color: inherit;
   text-decoration: none;
 }
@@ -154,129 +170,166 @@
   }
 }
 
-/* ---------- nav ------------------------------------------------------------- */
+/* ---------- the preloader -----------------------------------------------------
+   Preloader.tsx does the moving; this only says when it shows and how the line
+   looks. It is hidden unless the wrapper is marked data-intro, which a script
+   in layout.tsx decides before first paint, so a repeat visit never sees it.
 
-.mt-nav {
+   data-intro="1"     the white is solid: the hero holds its entrance
+   data-intro="open"  the window is open: the hero starts, seen through it */
+
+.mt-pre {
+  display: none;
   position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: clamp(16px, 2vw, 26px) var(--mt-gutter);
-  color: var(--mt-light);
-  transition:
-    background 0.5s var(--mt-ease),
-    color 0.5s var(--mt-ease),
-    backdrop-filter 0.5s var(--mt-ease);
+  inset: 0;
+  z-index: 100;
+  pointer-events: auto;
 }
 
-.mt-nav[data-stuck="1"] {
-  background: rgba(16, 16, 16, 0.86);
-  backdrop-filter: blur(14px);
+.mt-site[data-intro] .mt-pre {
+  display: block;
+  /* If the script never arrives the white must not stay for ever. */
+  animation: mt-pre-failsafe 0.6s linear 9s forwards;
 }
 
-.mt-nav-brand {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
+@keyframes mt-pre-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
-.mt-nav-name {
-  font-family: var(--font-mt-brand), var(--font-mt), sans-serif;
-  font-size: clamp(15px, 1.35vw, 19px);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 500;
+.mt-pre-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.mt-nav-est {
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--mt-light-faint);
+.mt-pre-line path {
+  fill: none;
+  stroke: var(--mt-red);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* stays a hairline however far the camera has flown in */
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
 }
 
-.mt-nav-links {
-  display: flex;
-  align-items: center;
-  gap: clamp(18px, 2.4vw, 38px);
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 400;
+/* Nothing in the hero starts its entrance behind a solid white screen. */
+.mt-site[data-intro="1"] :is(
+  .mt-wordmark,
+  .mt-hero-title,
+  .mt-regions,
+  .mt-laurel-art path,
+  .mt-laurel-mark,
+  .mt-laurel-line
+) {
+  animation-play-state: paused;
 }
 
-.mt-nav-links a {
-  position: relative;
-  padding-bottom: 3px;
-  color: var(--mt-light-soft);
-  transition: color 0.3s var(--mt-ease);
-}
+/* ---------- the bar ----------------------------------------------------------
+   The wordmark, fixed, and nothing else. It rides over a dark photograph, then
+   a white section, then a paper one, so it is set in white and blended with
+   `difference`: it comes out white over dark and near-black over light, with no
+   scroll listener deciding which. It has to live outside the hero for that,
+   because the hero isolates its own stacking context. */
 
-.mt-nav-links a::after {
-  content: "";
-  position: absolute;
+.mt-bar {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--mt-red);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s var(--mt-ease);
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding-top: clamp(24px, 3.4vh, 46px);
+  pointer-events: none;
+  mix-blend-mode: difference;
 }
 
-.mt-nav-links a:hover {
-  color: var(--mt-light);
+/* Without something behind it, body text scrolls straight through the wordmark
+   and the two collide. This blurs whatever passes under the bar, fading out
+   downwards so there is no edge. A blur rather than a fill because the bar
+   crosses white, paper and dark sections, and a blur needs no colour to match
+   any of them. Over the hero it changes nothing: the top of the photograph is
+   already near-black. */
+.mt-bar-veil {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 59;
+  height: clamp(86px, 13vh, 132px);
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
 }
 
-.mt-nav-links a:hover::after {
-  transform: scaleX(1);
-}
-
-.mt-nav-tel {
-  color: var(--mt-light) !important;
-}
-
-.mt-nav-toggle {
-  display: none;
-  width: 40px;
-  height: 40px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 6px;
-  background: none;
-  border: 0;
-  cursor: pointer;
-}
-
-.mt-nav-toggle span {
+.mt-wordmark {
   display: block;
-  width: 24px;
-  height: 1px;
-  background: currentColor;
-  transition: transform 0.4s var(--mt-ease);
+  pointer-events: auto;
+  font-family: var(--mt-font-title);
+  font-size: clamp(17px, 1.9vw, 27px);
+  letter-spacing: 0.62em;
+  /* tracking adds a gap after the last letter too; this balances it so the
+     word sits on the true centre line */
+  padding-left: 0.62em;
+  text-transform: uppercase;
+  font-weight: 400;
+  line-height: 1;
+  color: #fff;
+  animation: mt-fade-in-soft 1.2s var(--mt-ease) 0.2s both;
 }
 
 /* ---------- hero ------------------------------------------------------------ */
 
+/* The hero pins to the top and everything after it scrolls up over it, so the
+   white edge of the next section rises like a curtain across the photograph.
+   While that happens the hero's own layers drift up at different speeds (see
+   --mt-p below), which is what gives it depth.
+
+   overflow is `clip`, never `hidden`. A hidden box is still a scroll container:
+   focusing a thumbnail made the browser scroll it "into view", which scrolled
+   the hero's own contents and jolted the photograph. A clipped box cannot be
+   scrolled at all. */
 .mt-hero {
-  position: relative;
-  min-height: 100svh;
-  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100svh;
+  overflow: clip;
   isolation: isolate;
+  /* 0 at the top of the page, 1 once the hero is fully covered. Hero.tsx keeps
+     it current; with reduced motion it stays 0 and nothing drifts. */
+  --mt-p: 0;
 }
 
+/* Every section after the hero sits above it and is opaque, or the pinned
+   photograph would show through. :where() keeps this at zero specificity so a
+   section's own background still wins. */
+:where(.mt-site main) > :where(:not(.mt-hero)) {
+  position: relative;
+  z-index: 1;
+  background: var(--mt-paper);
+}
+
+/* `translate`, not `transform`: the entrance animations on these layers end on
+   `transform: none` and hold it, which would cancel a transform-based drift. */
 .mt-hero-stage {
   position: absolute;
   inset: 0;
   z-index: 0;
   background: var(--mt-ground);
+  translate: 0 calc(var(--mt-p) * -9%);
+  will-change: translate;
 }
 
+/* Frames cross-fade and nothing else. No zoom: the photograph holds still when
+   you change it. */
 .mt-hero-img {
   position: absolute;
   inset: 0;
@@ -284,16 +337,34 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transform: scale(1.05);
-  transition:
-    opacity 1.1s var(--mt-ease),
-    transform 7s var(--mt-ease);
-  will-change: opacity, transform;
+  transition: opacity 1.1s var(--mt-ease);
 }
 
 .mt-hero-img[data-active="1"] {
   opacity: 1;
-  transform: scale(1);
+}
+
+/* The outer fifths of the frame step through the photographs. Invisible; the
+   cursor turns into an arrow over them (see the cursor section). */
+.mt-hero-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 22%;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mt-hero-edge-prev {
+  left: 0;
+}
+
+.mt-hero-edge-next {
+  right: 0;
 }
 
 /* Deep gradients top and bottom. Nothing sits on the car itself. */
@@ -330,87 +401,25 @@
   pointer-events: none;
 }
 
-/* the wordmark, centred at the top */
-.mt-hero-brand {
+/* The car's name, dead centre over every frame. It is a picture (Finbar's
+   artwork of the script), so width and height are on the <img> and the space is
+   held before it loads. Its drift sits between the photograph's and the marks',
+   which makes three depths as the hero is covered.
+
+   `translate` carries both the centring and the drift. It cannot be split
+   across `transform`, because the entrance animation ends on `transform: none`
+   and holds it, which would undo a transform-based centring. */
+.mt-hero-title {
   position: absolute;
-  top: clamp(24px, 3.4vh, 46px);
-  left: 0;
-  right: 0;
+  top: 50%;
+  left: 50%;
   z-index: 3;
-  display: grid;
-  place-items: center;
+  width: clamp(230px, 36vw, 600px);
+  height: auto;
+  translate: -50% calc(-50% + var(--mt-p) * -15vh);
   pointer-events: none;
-}
-
-.mt-hero-wordmark {
-  font-family: var(--font-mt-brand), var(--font-mt), sans-serif;
-  font-size: clamp(17px, 1.9vw, 27px);
-  letter-spacing: 0.34em;
-  text-indent: 0.34em;
-  text-transform: uppercase;
-  font-weight: 400;
-  color: var(--mt-light);
-  animation: mt-fade-in-soft 1.2s var(--mt-ease) 0.2s both;
-}
-
-/* the six frames, small, top right */
-.mt-hero-switcher {
-  position: absolute;
-  top: clamp(20px, 3vh, 40px);
-  right: var(--mt-gutter);
-  z-index: 4;
-  display: flex;
-  gap: 7px;
-  animation: mt-fade-in-soft 1.2s var(--mt-ease) 0.5s both;
-}
-
-.mt-hero-thumb {
-  position: relative;
-  width: clamp(42px, 3.6vw, 58px);
-  aspect-ratio: 3 / 2;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  overflow: hidden;
-  opacity: 0.42;
-  filter: grayscale(1);
-  transition:
-    opacity 0.45s var(--mt-ease),
-    filter 0.45s var(--mt-ease);
-}
-
-.mt-hero-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.mt-hero-thumb::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 2px;
-  background: var(--mt-red);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.5s var(--mt-ease);
-}
-
-.mt-hero-thumb:hover,
-.mt-hero-thumb:focus-visible {
-  opacity: 0.78;
-  filter: grayscale(0.3);
-}
-
-.mt-hero-thumb[data-active="1"] {
-  opacity: 1;
-  filter: grayscale(0);
-}
-
-.mt-hero-thumb[data-active="1"]::after {
-  transform: scaleX(1);
+  user-select: none;
+  animation: mt-fade-in-soft 1.4s var(--mt-ease) 0.45s both;
 }
 
 /* laurel over the flags, centred with a bottom bias */
@@ -426,6 +435,7 @@
   gap: clamp(18px, 2.8vh, 32px);
   color: var(--mt-light);
   pointer-events: none;
+  translate: 0 calc(var(--mt-p) * -24vh);
 }
 
 .mt-laurel {
@@ -481,21 +491,36 @@
   inset: 0;
   display: grid;
   place-items: center;
+  font-family: var(--mt-font-title);
   font-size: clamp(15px, 1.25vw, 18px);
-  font-weight: 300;
+  font-weight: 400;
   padding-top: 2px;
   opacity: 0;
   animation: mt-fade-in 0.4s var(--mt-ease) calc(var(--mt-delay, 0s) + 1.15s) forwards;
 }
 
+/* YEARS, then ESTABLISHED 1980 on its own row beneath */
 .mt-laurel-lines {
   display: flex;
-  align-items: baseline;
-  gap: 7px;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* "40 YEARS" is one phrase, so the unit is as bright as the number and the
+   date under it is the quieter line. Doubled selector: it has to beat
+   .mt-laurel-line, which is declared further down. */
+.mt-laurel-line.mt-laurel-unit {
+  font-size: 11px;
+  letter-spacing: 0.42em;
+  /* trailing tracking would push the word left of the wreath's centre */
+  text-indent: 0.42em;
+  color: var(--mt-light);
 }
 
 .mt-laurel-line {
   display: block;
+  font-family: var(--mt-font-title);
   font-size: 10px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -510,7 +535,7 @@
 }
 
 .mt-laurel-year {
-  color: var(--mt-light);
+  color: var(--mt-light-soft);
 }
 
 @keyframes mt-drop {
@@ -544,6 +569,9 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  /* starts hidden: mt-fade-in only has a `to`, so without this it would be
+     animating from 1 to 1 and the row would simply be there from the start */
+  opacity: 0;
   animation: mt-fade-in 0.8s var(--mt-ease) 2.1s both;
 }
 
@@ -552,10 +580,20 @@
   color: var(--mt-light);
 }
 
+/* One height for all four, and each flag's own width from its viewBox, so the
+   Union Flag and the Stars and Stripes come out wider than Europe, as they are.
+
+   The edge is 0.5px on purpose. On a retina screen 1 CSS pixel is drawn two
+   physical pixels thick, which reads as a heavy frame at this size. Browsers
+   snap a border to whole physical pixels and never below one, so 0.5px is one
+   true pixel on retina and still 1px on a standard display. It is a border, not
+   an outline or an SVG stroke, because only borders are guaranteed that snap. */
 .mt-flag {
-  width: clamp(30px, 2.7vw, 40px);
-  height: auto;
   display: block;
+  box-sizing: content-box;
+  height: clamp(20px, 1.65vw, 25px);
+  width: auto;
+  border: 0.5px solid currentColor;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -575,10 +613,11 @@
     animation: none;
   }
 
-  .mt-hero-wordmark,
-  .mt-hero-switcher,
+  .mt-wordmark,
+  .mt-hero-title,
   .mt-regions {
     animation: none;
+    opacity: 1;
   }
 }
 
@@ -586,59 +625,41 @@
 
 .mt-sale {
   position: relative;
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.mt-sale-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-
-.mt-sale-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    linear-gradient(to right, rgba(8, 8, 8, 0.9) 0%, rgba(8, 8, 8, 0.55) 46%, rgba(8, 8, 8, 0.2) 100%),
-    linear-gradient(to top, rgba(8, 8, 8, 0.8) 0%, rgba(8, 8, 8, 0) 46%);
+  background: #fff;
+  color: var(--mt-ink);
 }
 
 .mt-sale-inner {
-  position: relative;
-  z-index: 2;
   width: 100%;
   max-width: var(--mt-max);
   margin-inline: auto;
-  padding: clamp(80px, 12vh, 150px) var(--mt-gutter);
+  padding: clamp(80px, 13vh, 170px) var(--mt-gutter);
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: clamp(28px, 5vw, 90px);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(32px, 6vw, 110px);
   align-items: center;
-  color: var(--mt-light);
 }
 
 .mt-sale-price {
-  font-size: clamp(44px, 7.6vw, 122px);
-  font-weight: 200;
+  font-family: var(--mt-font-title);
+  font-size: clamp(44px, 6.4vw, 104px);
+  font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.03em;
   margin-top: 14px;
+  font-variant-numeric: tabular-nums;
 }
 
 .mt-sale-lot {
-  margin-top: 12px;
+  margin-top: 14px;
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--mt-light-faint);
+  color: var(--mt-ink-soft);
+}
+
+.mt-sale-words {
+  margin-top: clamp(30px, 4.4vw, 60px);
 }
 
 .mt-sale-quote {
@@ -648,10 +669,11 @@
 }
 
 .mt-sale-quote p {
-  font-size: clamp(19px, 2.1vw, 30px);
+  font-size: clamp(19px, 1.9vw, 28px);
   font-weight: 200;
   line-height: 1.34;
   letter-spacing: -0.01em;
+  text-wrap: pretty;
 }
 
 .mt-sale-quote cite {
@@ -661,13 +683,14 @@
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--mt-light-soft);
+  color: var(--mt-ink-soft);
 }
 
 .mt-sale-body {
   margin-top: clamp(20px, 2.6vw, 34px);
   max-width: 52ch;
-  color: var(--mt-light-soft);
+  color: var(--mt-ink-soft);
+  text-wrap: pretty;
 }
 
 .mt-sale-links {
@@ -683,12 +706,24 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   padding-bottom: 4px;
-  border-bottom: 1px solid var(--mt-line-light);
+  border-bottom: 1px solid var(--mt-line);
   transition: border-color 0.35s var(--mt-ease);
 }
 
 .mt-sale-links a:hover {
   border-color: var(--mt-red);
+}
+
+/* the car as a framed picture, not a backdrop */
+.mt-sale-art {
+  margin: 0;
+}
+
+.mt-sale-art img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
 }
 
 /* ---------- restomods ------------------------------------------------------- */
@@ -1069,7 +1104,17 @@
   white-space: nowrap;
 }
 
-/* ---------- the pill cursor -------------------------------------------------- */
+/* ---------- the cursor --------------------------------------------------------
+   Two states, no pill. Over anything that opens it is the word, set in the
+   title face to match the wordmark. Over the outer fifths of the hero it is a
+   triangle pointing the way the photographs will step.
+
+   Both are white with a 1px black edge, so they read over a dark photograph
+   and over a white section alike. The word gets its edge from eight offset
+   shadows rather than -webkit-text-stroke: a stroke is centred on the outline
+   and eats into the letterforms, where shadows sit wholly outside them. The
+   arrow does the same job with a 2px stroke painted under the fill, which
+   leaves exactly 1px showing. */
 
 .mt-cursor {
   position: fixed;
@@ -1077,24 +1122,67 @@
   left: 0;
   z-index: 90;
   pointer-events: none;
-  background: var(--mt-red);
-  color: #fff;
-  border-radius: 999px;
-  padding: 7px 14px;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
   opacity: 0;
   transition: opacity 0.3s var(--mt-ease);
-  white-space: nowrap;
 }
 
 .mt-cursor[data-on="1"] {
   opacity: 1;
 }
 
+.mt-cursor-word {
+  display: block;
+  font-family: var(--mt-font-title);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.3em;
+  /* balances the trailing tracking so the word centres on the pointer */
+  padding-left: 0.3em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow:
+    -1px -1px 0 #000,
+    0 -1px 0 #000,
+    1px -1px 0 #000,
+    1px 0 0 #000,
+    1px 1px 0 #000,
+    0 1px 0 #000,
+    -1px 1px 0 #000,
+    -1px 0 0 #000;
+}
+
+.mt-cursor-arrow {
+  display: none;
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+}
+
+.mt-cursor-arrow polygon {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 2;
+  stroke-linejoin: miter;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+
+.mt-cursor:is([data-shape="next"], [data-shape="prev"]) .mt-cursor-word {
+  display: none;
+}
+
+.mt-cursor:is([data-shape="next"], [data-shape="prev"]) .mt-cursor-arrow {
+  display: block;
+}
+
+.mt-cursor[data-shape="prev"] .mt-cursor-arrow {
+  transform: scaleX(-1);
+}
+
 @media (pointer: fine) {
-  .mt-site [data-cursor],
+  .mt-site :is([data-cursor], [data-cursor-shape]),
   .mt-site [data-cursor] * {
     cursor: none;
   }
@@ -1105,6 +1193,11 @@
 .mt-site :is(a, button):focus-visible {
   outline: 2px solid var(--mt-red);
   outline-offset: 3px;
+}
+
+/* the flags carry their own hairline; it is not a focus ring */
+.mt-site .mt-hero-edge:focus-visible {
+  outline-offset: -8px;
 }
 
 /* ---------- narrow ----------------------------------------------------------- */
@@ -1129,114 +1222,34 @@
 }
 
 @media (max-width: 760px) {
-  .mt-nav-links {
-    position: fixed;
-    inset: 0 0 auto 0;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 18px;
-    padding: 84px var(--mt-gutter) 30px;
-    background: rgba(12, 12, 12, 0.97);
-    backdrop-filter: blur(16px);
-    transform: translateY(-101%);
-    transition: transform 0.5s var(--mt-ease);
-    font-size: 15px;
-  }
-
-  .mt-nav[data-open="1"] .mt-nav-links {
-    transform: none;
-  }
-
-  .mt-nav-toggle {
-    display: flex;
-    position: relative;
-    z-index: 2;
-    color: var(--mt-light);
-  }
-
-  .mt-nav[data-open="1"] .mt-nav-toggle span:first-child {
-    transform: translateY(3.5px) rotate(45deg);
-  }
-
-  .mt-nav[data-open="1"] .mt-nav-toggle span:last-child {
-    transform: translateY(-3.5px) rotate(-45deg);
-  }
-
-  .mt-hero-foot {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
-
-  .mt-hero-switcher {
-    width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding-bottom: 2px;
-  }
-
-  .mt-hero-switcher::-webkit-scrollbar {
-    display: none;
-  }
-
-  .mt-hero-thumb {
-    width: 84px;
-  }
-
-  .mt-hero-credentials {
-    gap: 16px;
-  }
-
-  .mt-hero-rule {
-    display: none;
-  }
-
-  .mt-regions {
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-
   .mt-restomods-body,
   .mt-cars,
   .mt-disc-grid {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .mt-back {
-    display: none;
-  }
 }
 
 
 /* ---------- hero at phone size ----------------------------------------------
-   The thumbnails sit beside the wordmark on a desktop, which collides at phone
-   width, so they drop to their own centred row underneath it. The photographs
-   are landscape, so the frame holds the car rather than the middle of the file. */
+   The photographs are landscape and a phone is not, so the frame holds the car
+   rather than the middle of the file. */
 @media (max-width: 760px) {
   .mt-hero-img {
     object-position: 58% center;
   }
 
-  .mt-hero-brand {
-    top: clamp(18px, 2.6vh, 28px);
+  .mt-bar {
+    padding-top: clamp(18px, 2.6vh, 28px);
   }
 
-  .mt-hero-switcher {
-    position: absolute;
-    top: auto;
-    bottom: clamp(18px, 3vh, 30px);
-    left: 0;
-    right: 0;
-    justify-content: center;
-    gap: 6px;
-    padding-inline: var(--mt-gutter);
+  /* 0.62em of tracking would run the word off a 320px screen */
+  .mt-wordmark {
+    font-size: 15px;
+    letter-spacing: 0.46em;
+    padding-left: 0.46em;
   }
 
-  .mt-hero-thumb {
-    width: 44px;
-  }
-
-  .mt-hero-marks {
-    bottom: clamp(84px, 16vh, 140px);
+  .mt-hero-title {
+    width: min(74vw, 340px);
   }
 }

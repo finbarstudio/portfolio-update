@@ -17,11 +17,13 @@ import { LAUREL_PATH } from "./laurelPath";
  */
 export default function AwardLaurel({
   mark,
+  unit,
   body,
   label,
   delay = 0,
 }: {
   mark: string;
+  unit: string;
   body: string;
   label: string;
   delay?: number;
@@ -50,12 +52,15 @@ export default function AwardLaurel({
         </svg>
         <span className="mt-laurel-mark">{mark}</span>
       </div>
+      {/* Two rows: the unit the number is counting, then the date it counts from. */}
       <div className="mt-laurel-lines">
         <span className="mt-mask">
-          <span className="mt-laurel-line">{body}</span>
+          <span className="mt-laurel-line mt-laurel-unit">{unit}</span>
         </span>
         <span className="mt-mask">
-          <span className="mt-laurel-line mt-laurel-year">{label}</span>
+          <span className="mt-laurel-line mt-laurel-year">
+            {body} {label}
+          </span>
         </span>
       </div>
     </div>
