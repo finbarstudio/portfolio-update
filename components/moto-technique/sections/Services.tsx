@@ -2,22 +2,30 @@
 
 import { useState } from "react";
 
-type Item = { id: string; name: string; href: string; blurb: string };
+type Item = { id: string; name: string; href: string; blurb: string; image: string };
 
 /**
  * The services wheel: one circle cut into quarters, with Hi-Tech at the hub.
  *
- * Point at a quarter and it fills, a hairline runs out of it at an angle, and a
- * white box opens outside the circle on that quarter's own corner: top right
- * for the top right quarter, and so on round. The line meets the box on its
- * side, near the corner, never at its middle. Hi-Tech's box opens just under
- * the hub, over the wheel, which is why the boxes are solid white. Click and
- * that service's page opens.
+ * Point at a quarter and it fills, a line draws itself out of it at an angle,
+ * and a white card opens outside the circle on that quarter's own side: top
+ * right for the top right quarter, and so on round. The card takes all the
+ * room there is beside the wheel and carries that discipline's photograph. The
+ * line meets the card on its side, near the corner, never at its middle.
+ * Hi-Tech's card opens just under the hub, over the wheel. Nothing but the
+ * wheel shows until you point: no lines, no cards. Click and that service's
+ * page opens.
  *
- * ONE SET OF UNITS. The wheel is a 100 x 100 drawing, and the boxes are placed
- * in percentages of the same square, so 112% across is the same place as x =
- * 112 in the drawing. That is what lets a line drawn in the SVG land exactly
- * on the edge of a box that is HTML, at every size, with no measuring.
+ * ONE SET OF UNITS. The wheel is a 100 x 100 drawing, and the cards and lines
+ * are placed in percentages of the same square, so 112% across is the same
+ * place as x = 112 in the drawing. That is what lets a line land exactly on the
+ * edge of a card at every size, with no measuring.
+ *
+ * THE LINES ARE HTML, NOT SVG. Each is a 1px-tall box, as long as the line,
+ * turned to its angle about its starting end, and drawn in by growing from
+ * that end. The usual SVG way (a dash the length of the line, slid into view)
+ * came out visibly dashed here: a line told to stay 1px at any size also has
+ * its dashes measured in screen pixels, so the "one long dash" broke up.
  *
  * WHO GETS WHAT. The labels are real links, so a keyboard or a screen reader
  * gets five ordinary links and never meets the drawing; focusing one opens its
@@ -35,8 +43,8 @@ const HUB = 15;
 const BOX_NEAR = 112;
 /** How far down (or up) the box's side the line lands: near the corner. */
 const BOX_HIT = 9;
-/** The boxes start this far inside the wheel's top and bottom. */
-const BOX_INSET = 2;
+/** The cards start this far above the wheel's top, and end as far below its bottom. */
+const BOX_INSET = -6;
 
 /** A point on the wheel, from an angle clockwise off 12 o'clock and a radius. */
 const at = (deg: number, r: number) => {
@@ -62,7 +70,13 @@ function place(index: number) {
   const ey = top ? BOX_INSET + BOX_HIT : 100 - BOX_INSET - BOX_HIT;
   return {
     label: { left: `${lx.toFixed(2)}%`, top: `${ly.toFixed(2)}%` },
-    line: { x1: sx, y1: sy, x2: ex, y2: ey },
+    // start point, length and angle: all the stylesheet needs to draw it
+    line: {
+      left: `${sx.toFixed(3)}%`,
+      top: `${sy.toFixed(3)}%`,
+      width: `${Math.hypot(ex - sx, ey - sy).toFixed(3)}%`,
+      rotate: `${((Math.atan2(ey - sy, ex - sx) * 180) / Math.PI).toFixed(3)}deg`,
+    },
     box: `${right ? "right" : "left"}-${top ? "top" : "bottom"}`,
   };
 }
@@ -117,13 +131,17 @@ export default function Services({ services }: { services: { title: string; quar
 
   const box = (s: Item, where: string) => (
     <div key={`box-${s.id}`} id={`mt-svc-${s.id}`} className="mt-wheel-box" data-where={where} data-open={open === s.id ? "1" : "0"}>
-      <span className="mt-wheel-box-name">{s.name}</span>
-      <p>{s.blurb}</p>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={s.image} alt="" className="mt-wheel-box-img" loading="lazy" decoding="async" />
+      <div className="mt-wheel-box-say">
+        <span className="mt-wheel-box-name">{s.name}</span>
+        <p>{s.blurb}</p>
+      </div>
     </div>
   );
 
   return (
-    <section className="mt-services" id="services">
+    <section className="mt-services" id="services" data-tone="light">
       <h2 className="mt-title">{services.title}</h2>
 
       <div className="mt-wheel">
@@ -140,17 +158,6 @@ export default function Services({ services }: { services: { title: string; quar
           ))}
           <circle cx="50" cy="50" r={RIM} className="mt-wheel-ring" />
 
-          {/* The leader lines. Each draws itself out from the quarter to the box. */}
-          {services.quarters.map((s, i) => {
-            const l = place(i).line;
-            return (
-              <g key={s.id} className="mt-wheel-lead" data-open={open === s.id ? "1" : "0"}>
-                <line {...l} pathLength={1} />
-                <circle cx={l.x1} cy={l.y1} r="0.9" />
-              </g>
-            );
-          })}
-
           <circle
             cx="50"
             cy="50"
@@ -161,6 +168,17 @@ export default function Services({ services }: { services: { title: string; quar
             {...point(services.hub)}
           />
         </svg>
+
+        {/* The leader lines: nothing until a quarter is pointed at, then drawn in. */}
+        {services.quarters.map((s, i) => (
+          <span
+            key={`lead-${s.id}`}
+            className="mt-wheel-lead"
+            style={place(i).line}
+            data-open={open === s.id ? "1" : "0"}
+            aria-hidden="true"
+          />
+        ))}
 
         {services.quarters.map((s, i) => label(s, "mt-wheel-label", place(i).label))}
         {label(services.hub, "mt-wheel-hub-label")}

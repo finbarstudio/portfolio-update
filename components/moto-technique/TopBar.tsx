@@ -11,10 +11,17 @@ import { useEffect, useRef, useState } from "react";
  * line or two. One is open at a time; Escape, a click outside, or the same icon
  * again closes it, and focus goes back to the icon that opened it.
  *
- * TWO FIXED LAYERS. The bar is white and blended with `difference`, so it turns
- * near-black by itself wherever it crosses white, including the right half of
- * the split hero, with no scroll listener deciding. The window must NOT be
- * inside that layer or it would be inverted too, so it is a second fixed layer.
+ * WHITE, UNLESS IT IS OVER WHITE. The bar is white. The one thing that turns it
+ * black is sitting over a light section, and nothing else does: not a bright
+ * photograph, not a pale patch of one. (It used to invert against whatever was
+ * under it, pixel by pixel, which also flipped it over bright parts of a
+ * photograph and turned it odd colours over anything that was not black or
+ * white.) Each section says what it is with `data-tone`, and on scroll this
+ * looks at what is under each end of the bar and reads that section's tone.
+ *
+ * The two ends decide separately, because when the hero splits they really are
+ * over different things: the wordmark over the photograph, the icons over the
+ * white panel.
  *
  * Icons are Material Symbols (outlined), inlined so they take `currentColor`.
  * Everything shown comes from content/moto-technique.ts.
@@ -67,6 +74,41 @@ export default function TopBar({
 }) {
   const [panel, setPanel] = useState<Panel | null>(null);
   const win = useRef<HTMLDivElement>(null);
+  const word = useRef<HTMLAnchorElement>(null);
+  const toolbox = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    /** The tone of whatever section is under the middle of `el`. */
+    const toneUnder = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      const stack = document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      // skip the bar itself and anything else that floats above the page
+      const below = stack.find((n) => !n.closest(".mt-bar, .mt-window, .mt-cursor, .mt-pre"));
+      return below?.closest<HTMLElement>("[data-tone]")?.dataset.tone === "light" ? "light" : "dark";
+    };
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      for (const el of [word.current, toolbox.current]) {
+        if (!el) continue;
+        const tone = toneUnder(el);
+        if (el.dataset.over !== tone) el.dataset.over = tone;
+      }
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
   const opener = useRef<HTMLButtonElement | null>(null);
 
   const close = (refocus = true) => {
@@ -110,11 +152,11 @@ export default function TopBar({
   return (
     <>
       <header className="mt-bar">
-        <a href="#top" className="mt-wordmark" aria-label={`${name}, back to the top`} onClick={(e) => go(e, "#top")}>
+        <a ref={word} href="#top" className="mt-wordmark" data-over="dark" aria-label={`${name}, back to the top`} onClick={(e) => go(e, "#top")}>
           {name}
         </a>
 
-        <div className="mt-bar-tools">
+        <div ref={toolbox} className="mt-bar-tools" data-over="dark">
           {tools.map((id) => (
             <button
               key={id}

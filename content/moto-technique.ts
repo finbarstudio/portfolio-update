@@ -110,7 +110,7 @@ export const heroMark: {
 } | null = {
   image: img("dino-wordmark"),
   normal: img("dino-wordmark-normal"),
-  finish: "silver",
+  finish: "brass",
   alt: "Dino",
   width: 1732,
   height: 541,
@@ -205,7 +205,8 @@ export const why = {
  * Hi-Tech sits in the middle because it touches all four.
  *
  * Quarters run clockwise from the top right, which is also where each one's
- * info box comes out. `blurb` is VERBATIM from that service's own page on
+ * info box comes out. `image` is the photograph their own site uses for that
+ * discipline. `blurb` is VERBATIM from that service's own page on
  * mototechnique.com: a whole sentence, or the main clause of one, with their
  * spelling and capitals kept. `href` is that page, so the wheel already goes somewhere.
  */
@@ -216,6 +217,7 @@ export const services = {
       id: "bodywork",
       name: "Bodywork",
       href: "https://www.mototechnique.com/bodywork",
+      image: img("gullwing-ext"),
       blurb:
         "Tubular chassis’s with lightweight aluminium body panels, monocoque chassis’s, Carbon tubs, steel panels, fibreglass, Carbon, Kevlar, welding, riveting, bonding…. the list is endless.",
     },
@@ -223,6 +225,7 @@ export const services = {
       id: "paintwork",
       name: "Paintwork",
       href: "https://www.mototechnique.com/paintwork",
+      image: img("dino-candy-red"),
       blurb:
         "Moto Technique can boast a combined accumulative experience of nearly 120 years of repainting high end classic and exotic supercars.",
     },
@@ -230,6 +233,7 @@ export const services = {
       id: "mechanical",
       name: "Mechanical",
       href: "https://www.mototechnique.com/mechanical",
+      image: img("v8-38-engine"),
       blurb:
         "Rebuilding, servicing and upgrading classic and modern engines, using traditional and modern methods to the highest standards possible is the goal of the Moto Technique engineers.",
     },
@@ -237,6 +241,7 @@ export const services = {
       id: "trim",
       name: "Interior trim",
       href: "https://www.mototechnique.com/trim",
+      image: img("trim-tdf"),
       blurb:
         "All the interior trim work that comes to Moto Technique is carried out by the award winning O’Rourke Coachtrimmers who are respected by many people in the trade as being one of the very best, if not THE best coach trimmers in the World.",
     },
@@ -245,6 +250,7 @@ export const services = {
     id: "hitech",
     name: "Hi-Tech",
     href: "https://www.mototechnique.com/hitech",
+    image: img("f40lm-720"),
     blurb:
       "Advancements in car restoration technology has happened in every single stage of the process, from paint and body materials to electronic scanning and alignment and most interestingly in engine management systems and reliability.",
   },
@@ -261,7 +267,8 @@ export const services = {
  * F40: that is a slip on their site, copied faithfully so the link works.
  *
  * The first one stands open when the section arrives. Reorder the list and the
- * shelf reorders; it lays itself out for however many there are.
+ * shelf reorders; it lays itself out for however many there are. `focus` is
+ * optional: the part of the photograph to keep in view (CSS object-position).
  */
 export const projects = {
   title: "Projects",
@@ -270,7 +277,12 @@ export const projects = {
       id: "gto",
       name: "Ferrari 250 GTO",
       line: "Ferrari 250 GTO Complete “Step by Step” body restoration by MOTO TECHNIQUE",
-      image: img("gto-restored"),
+      // The finished car at Goodwood. It is a portrait and the car is low in the
+      // frame, so `focus` keeps the car in the slice, not the house behind it.
+      // NOTE: 816px wide is all their site has of it, so it softens on a very
+      // large screen. A bigger original from Kevin would fix that.
+      image: img("gto-goodwood"),
+      focus: "50% 80%",
       href: "https://www.mototechnique.com/ferrari-250-gto",
     },
     {

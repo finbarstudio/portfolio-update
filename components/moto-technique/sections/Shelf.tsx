@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Project = { id: string; name: string; line: string; image: string; href: string };
+type Project = { id: string; name: string; line: string; image: string; href: string; focus?: string };
 
 /**
  * The shelf: the projects stood side by side like books, one of them open.
@@ -32,7 +32,7 @@ export default function Shelf({ projects }: { projects: { title: string; items: 
       <h2 className="mt-sr">{projects.title}</h2>
 
       <div className="mt-shelf-row" style={{ ["--mt-count" as string]: projects.items.length }}>
-        {projects.items.map((p, i) => {
+        {projects.items.map((p) => {
           const isOpen = open === p.id;
           return (
             <a
@@ -57,16 +57,21 @@ export default function Shelf({ projects }: { projects: { title: string; items: 
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.image} alt="" className="mt-book-img" loading="lazy" decoding="async" />
+              <img
+                src={p.image}
+                alt=""
+                className="mt-book-img"
+                style={p.focus ? { objectPosition: p.focus } : undefined}
+                loading="lazy"
+                decoding="async"
+              />
               <span className="mt-book-shade" aria-hidden="true" />
 
               <span className="mt-book-spine" aria-hidden="true">
-                <span className="mt-book-no">{String(i + 1).padStart(2, "0")}</span>
                 <span className="mt-book-name">{p.name}</span>
               </span>
 
               <span className="mt-book-face" aria-hidden="true">
-                <span className="mt-book-no">{String(i + 1).padStart(2, "0")}</span>
                 <span className="mt-book-title">{p.name}</span>
                 {p.line ? <span className="mt-book-line">{p.line}</span> : null}
                 <span className="mt-book-go">View the project</span>

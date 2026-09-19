@@ -284,13 +284,10 @@
 }
 
 /* ---------- the bar ----------------------------------------------------------
-   Wordmark top left, icons and the menu top right, fixed. It rides over a dark
-   photograph, a white panel and paper sections, so it is set in white and
-   blended with `difference`: every pixel comes out white over dark and
-   near-black over light, with no scroll listener deciding which. That is per
-   pixel, so when the hero splits the left of the bar stays white over the
-   photograph while the right turns black over the white panel. It has to live
-   outside the hero for that, because the hero isolates its own stacking context. */
+   Wordmark top left, icons and the menu top right, fixed. White, and black only
+   while it is over a light section. TopBar.tsx reads each section's data-tone
+   and sets data-over on the wordmark and on the icons separately, because when
+   the hero splits they are over different things. */
 
 .mt-bar {
   position: fixed;
@@ -305,7 +302,14 @@
   padding: clamp(18px, 2.6vh, 32px) var(--mt-gutter) 0;
   pointer-events: none;
   color: #fff;
-  mix-blend-mode: difference;
+}
+
+.mt-bar [data-over] {
+  transition: color 0.3s var(--mt-ease);
+}
+
+.mt-bar [data-over="light"] {
+  color: var(--mt-ink);
 }
 
 .mt-wordmark {
@@ -357,15 +361,13 @@
   height: 21px;
 }
 
-/* Red would come out cyan through the blend wherever the bar is over white. */
 .mt-site .mt-bar :is(a, button):focus-visible {
-  outline-color: #fff;
+  outline-color: currentColor;
 }
 
 /* ---------- the window -------------------------------------------------------
-   The one small window every icon opens. A second fixed layer, not a child of
-   the bar, or the blend would invert it. Dark, so it reads over the photograph
-   and over the white panel alike. */
+   The one small window every icon opens. Dark, so it reads over the photograph
+   and over the white sections alike. */
 
 .mt-window {
   position: fixed;
@@ -1195,12 +1197,14 @@
 /* Square, and never taller than the room it has: the wheel is the section. */
 .mt-wheel {
   position: relative;
-  /* the boxes hang outside it left and right, so its width also has to leave
-     them room: 112% out plus a box each side */
-  width: min(58svh, 520px, calc((100vw - 2 * var(--mt-gutter) - 2 * var(--mt-box-w)) / 1.24));
+  /* Kept to under a third of the screen's width, so the cards that hang either
+     side of it have real room. A card gets everything between the wheel (plus
+     the 12% its line travels) and the gutter. */
+  --mt-wheel: min(54svh, 480px, 30vw);
+  --mt-box-w: calc((100vw - var(--mt-wheel) * 1.24) / 2 - var(--mt-gutter));
+  width: var(--mt-wheel);
   aspect-ratio: 1;
   color: var(--mt-ink);
-  --mt-box-w: clamp(210px, 21vw, 300px);
 }
 
 .mt-wheel-art {
@@ -1247,63 +1251,72 @@
   fill: #f6efee;
 }
 
-/* The leader line: a hairline that draws itself out of the quarter to the side
-   of its box, with a dot where it starts. Never in the way of the pointer. */
+/* The leader line. Nothing at all until its quarter is pointed at, then a solid
+   1px line that grows out of the quarter to the side of its card. Services.tsx
+   sets where it starts, how long it is and its angle; it turns about its
+   starting end, which is also the end it grows from. */
 .mt-wheel-lead {
+  position: absolute;
+  z-index: 1;
+  height: 1px;
+  margin-top: -0.5px;
+  background: currentColor;
+  transform-origin: 0 50%;
+  scale: 0 1;
   pointer-events: none;
+  transition: scale 0.25s var(--mt-ease);
 }
 
-.mt-wheel-lead line {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset 0.45s var(--mt-ease);
+.mt-wheel-lead[data-open="1"] {
+  scale: 1 1;
+  transition: scale 0.5s var(--mt-ease);
 }
 
-.mt-wheel-lead circle {
-  fill: currentColor;
-  opacity: 0;
-  transition: opacity 0.2s var(--mt-ease);
-}
-
-.mt-wheel-lead[data-open="1"] line {
-  stroke-dashoffset: 0;
-}
-
-.mt-wheel-lead[data-open="1"] circle {
-  opacity: 1;
-}
-
-/* The info boxes. Placed in percentages of the wheel, the same units the SVG
-   draws in, so a box's near edge at 112% is exactly where its line ends.
-   Solid white because Hi-Tech's opens over the wheel itself. They never take
-   the pointer: leaving a quarter for its box would otherwise close the box. */
+/* The cards. Placed in percentages of the wheel, the same units the lines use,
+   so a card's near edge at 112% is exactly where its line ends. White, rounded,
+   lifted off the page by a soft shadow, and no outline. They never take the
+   pointer: leaving a quarter for its card would otherwise close the card. */
 .mt-wheel-box {
   position: absolute;
   z-index: 2;
   width: var(--mt-box-w);
-  padding: 18px 20px 20px;
+  overflow: hidden;
   background: #fff;
-  border: 0.5px solid var(--mt-ink);
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(17, 16, 15, 0.05),
+    0 18px 50px -12px rgba(17, 16, 15, 0.22);
   text-align: left;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
+  translate: 0 8px;
   transition:
-    opacity 0.3s var(--mt-ease) 0s,
-    visibility 0s linear 0.3s;
+    opacity 0.25s var(--mt-ease) 0s,
+    translate 0.25s var(--mt-ease) 0s,
+    visibility 0s linear 0.25s;
 }
 
 /* arrives as the line lands, not before it */
 .mt-wheel-box[data-open="1"] {
   opacity: 1;
   visibility: visible;
+  translate: 0 0;
   transition:
-    opacity 0.35s var(--mt-ease) 0.22s,
+    opacity 0.4s var(--mt-ease) 0.3s,
+    translate 0.5s var(--mt-ease) 0.3s,
     visibility 0s;
+}
+
+.mt-wheel-box-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.mt-wheel-box-say {
+  padding: 20px 22px 24px;
 }
 
 .mt-wheel-box[data-where^="right"] {
@@ -1315,19 +1328,32 @@
 }
 
 .mt-wheel-box[data-where$="top"] {
-  top: 2%;
+  top: -6%;
 }
 
 .mt-wheel-box[data-where$="bottom"] {
-  bottom: 2%;
+  bottom: -6%;
 }
 
-/* just under the hub (which ends at 65%), over the wheel */
+/* Just under the hub (which ends at 65%), over the wheel. Wider than the wheel
+   and laid on its side, photograph left and words right, so it stays shallow. */
 .mt-wheel-box[data-where="hub"] {
   top: 68%;
   left: 50%;
+  width: min(150%, 88vw);
+  display: grid;
+  grid-template-columns: 42% minmax(0, 1fr);
+  translate: -50% 8px;
+}
+
+.mt-wheel-box[data-where="hub"][data-open="1"] {
   translate: -50% 0;
-  transition-delay: 0s;
+  transition-delay: 0s, 0s, 0s;
+}
+
+.mt-wheel-box[data-where="hub"] .mt-wheel-box-img {
+  height: 100%;
+  aspect-ratio: auto;
 }
 
 .mt-wheel-box-name {
@@ -1392,22 +1418,31 @@
    space is held open so the page does not jump as boxes come and go. */
 @media (max-width: 980px) {
   .mt-wheel {
-    width: min(84vw, 46svh);
-    margin-bottom: 190px;
+    --mt-wheel: min(84vw, 44svh);
+    margin-bottom: 250px;
   }
 
   .mt-wheel-lead {
     display: none;
   }
 
+  /* every card, hub included, becomes the same shallow strip under the wheel */
   .mt-wheel-box,
-  .mt-wheel-box[data-where="hub"] {
+  .mt-wheel-box[data-where="hub"],
+  .mt-wheel-box[data-where="hub"][data-open="1"] {
     top: calc(100% + 22px);
     right: auto;
     bottom: auto;
     left: 50%;
+    width: min(90vw, 460px);
+    display: grid;
+    grid-template-columns: 38% minmax(0, 1fr);
     translate: -50% 0;
-    width: min(88vw, 420px);
+  }
+
+  .mt-wheel-box .mt-wheel-box-img {
+    height: 100%;
+    aspect-ratio: auto;
   }
 }
 
@@ -1426,6 +1461,8 @@
 }
 
 .mt-shelf-row {
+  /* how far the type sits up from the bottom edge, spines and face alike */
+  --mt-book-lift: clamp(72px, 11vh, 110px);
   --mt-open-share: 0.6;
   /* open : closed, so that open / (open + count - 1) = the share above */
   --mt-open-grow: calc(var(--mt-open-share) * (var(--mt-count) - 1) / (1 - var(--mt-open-share)));
@@ -1481,15 +1518,9 @@
 .mt-book-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(4, 4, 4, 0.86) 0%, rgba(4, 4, 4, 0.3) 34%, rgba(4, 4, 4, 0) 60%);
+  /* taller than before: the type now sits higher and still needs its ground */
+  background: linear-gradient(to top, rgba(4, 4, 4, 0.88) 0%, rgba(4, 4, 4, 0.5) 30%, rgba(4, 4, 4, 0) 68%);
   pointer-events: none;
-}
-
-.mt-book-no {
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  font-variant-numeric: tabular-nums;
-  opacity: 0.7;
 }
 
 /* The spine: the name running down the closed book, top to bottom, the way an
@@ -1497,7 +1528,8 @@
 .mt-book-spine {
   position: absolute;
   left: 50%;
-  bottom: clamp(28px, 5vh, 56px);
+  /* lifted well clear of the bottom edge; the face below uses the same */
+  bottom: var(--mt-book-lift);
   display: flex;
   align-items: center;
   gap: 18px;
@@ -1522,7 +1554,7 @@
 .mt-book-face {
   position: absolute;
   left: clamp(24px, 3.2vw, 56px);
-  bottom: clamp(28px, 5vh, 56px);
+  bottom: var(--mt-book-lift);
   width: min(30rem, calc(var(--mt-open-share) * 100vw - 2 * clamp(24px, 3.2vw, 56px)));
   display: grid;
   gap: 12px;
@@ -1602,7 +1634,7 @@
 
   .mt-book-face {
     left: var(--mt-gutter);
-    bottom: 18px;
+    bottom: 22px;
     width: calc(100vw - 2 * var(--mt-gutter));
     gap: 8px;
   }

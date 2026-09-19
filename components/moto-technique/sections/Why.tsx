@@ -21,7 +21,7 @@ export default function Why({
   };
 }) {
   return (
-    <section className="mt-why" id="why">
+    <section className="mt-why" id="why" data-tone="light">
       <div className="mt-why-inner">
         <Reveal className="mt-why-say">
           <h2 className="mt-title">{why.title}</h2>

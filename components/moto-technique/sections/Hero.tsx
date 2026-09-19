@@ -243,7 +243,7 @@ export default function Hero({
 
         {/* What the car is. Off screen until the split, and inert until then so
             its links cannot take focus while nobody can see them. */}
-        <aside className="mt-hero-info" id="sale" aria-label="About this car" inert={!open}>
+        <aside className="mt-hero-info" id="sale" aria-label="About this car" data-tone="light" inert={!open}>
           <div ref={panel} className="mt-hero-info-inner">
             <span className="mt-eyebrow">{sale.eyebrow}</span>
             <p className="mt-sale-price">{sale.price}</p>
