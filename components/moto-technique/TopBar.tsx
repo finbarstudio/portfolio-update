@@ -96,14 +96,21 @@ export default function TopBar({
         if (el.dataset.over !== tone) el.dataset.over = tone;
       }
     };
+    // Two frames, not one. The hero moves its white panel in a frame callback of
+    // its own on the same scroll event; reading in the very next frame can land
+    // before that and see where the panel WAS. One frame later it has moved.
     const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
+      if (!frame) frame = requestAnimationFrame(() => (frame = requestAnimationFrame(update)));
     };
 
-    update();
+    onScroll();
+    // The page under the bar also changes with no scroll at all: once when the
+    // preloader lifts, and whenever fonts or images settle.
+    const settle = window.setTimeout(onScroll, 1200);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
+      window.clearTimeout(settle);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(frame);

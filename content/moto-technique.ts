@@ -128,43 +128,65 @@ export const marks = {
   ],
 };
 
-/** The Dino sale. Figures supplied by Kevin O'Rourke, 18 Sep 2026. */
+/**
+ * The Dino's story: the white half of the split hero.
+ *
+ * Laid out as an editorial spread, not a column of paragraphs, so the content
+ * is held in the shapes the layout needs. Nothing is reworded to fit:
+ *   - The sale figures are Kevin's own (18 Sep 2026).
+ *   - Both quotes are VERBATIM. Each is split in two only so the layout can set
+ *     the last words large: read `lead` then `punch` and you have the original
+ *     sentence, in order, nothing dropped. Jay Leno's is from the testimonial
+ *     card on mototechnique.com; Kevin's is from the Dino 3.6 V8 upgrade page.
+ *   - Every figure and detail is from that same upgrade page. If a number
+ *     cannot be pointed at on their site, it does not belong here. "in excess
+ *     of" is their wording for the top speed and stays attached to it.
+ */
 export const sale = {
   eyebrow: "Sold at auction",
   price: "$1,106,000",
-  headline: "The Dino the factory should have built",
-  /** Jay Leno, transcribed from the testimonial card on mototechnique.com. */
-  quote:
-    "This is as nice a restomod as I've ever seen... It's such a Brilliant Car. This is the car the factory should have built",
-  quoteBy: "Jay Leno",
-  body: "The ex-David Lee Dino 246 GTS Evo, upgraded by Moto Technique to a 3.6 litre Ferrari V8, sold on Bring a Trailer on 25 June 2026 for $1,106,000.",
-  lot: "Lot #248,947",
-  image: img("dino36-rear-moving"),
-  credit: "Jayson Fong",
-  /**
-   * The car itself. Every figure is Kevin's own, from the Dino 3.6 V8 upgrade
-   * page on mototechnique.com. Nothing here is estimated: if a number cannot be
-   * pointed at on their site, it does not belong in this list.
-   */
-  spec: [
-    { label: "Engine", value: "Ferrari 2.9 V8, bored and stroked to 3.6 litres" },
-    { label: "Output", value: "400bhp" },
-    { label: "Management", value: "MoTeC ECU, mapped hot or cold" },
-    { label: "Gearbox", value: "Ferrari 328" },
-    { label: "Top speed", value: "In excess of 170mph" },
-    { label: "Wheels", value: "Original Campagnolo, 3D scanned and recast to 17 inch" },
+  facts: [
+    { label: "Sold on", value: "Bring a Trailer" },
+    { label: "Date", value: "25 June 2026" },
+    { label: "Lot", value: "#248,947" },
   ],
-  /** Verbatim from the same page. The details that make it theirs. */
+  car: "The ex-David Lee Dino 246 GTS Evo",
+  quote: {
+    lead: "This is as nice a restomod as I've ever seen... It's such a Brilliant Car.",
+    punch: "This is the car the factory should have built",
+    by: "Jay Leno",
+  },
+  /** Full bleed, edge to edge of the panel. Order is the order on the page. */
+  gallery: [
+    { image: img("dino36-engine"), alt: "The 3.6 litre Ferrari V8 in the Dino's engine bay" },
+    { image: img("dino36-perspex-lid"), alt: "The perspex engine cover" },
+    { image: img("dino36-lens-wheels"), alt: "Perspex headlight cover and 17 inch Campagnolo wheel" },
+    { image: img("dino36-interior"), alt: "Red leather interior, Chairs and Flares specification" },
+  ],
+  figures: [
+    { value: "400", unit: "bhp", note: "Ferrari V8, developed and built in-house" },
+    { value: "3.6", unit: "litres", note: "A Ferrari 2.9 V8, bored and stroked" },
+    { value: "170", unit: "mph", note: "Top speed, in excess of" },
+  ],
+  spec: [
+    { label: "Gearbox", value: "Ferrari 328" },
+    { label: "Management", value: "MoTeC ECU, mapped hot or cold" },
+    { label: "Wheels", value: "Original Campagnolo, 3D scanned and recast to 17 inch" },
+    { label: "Brakes", value: "Bigger brakes and callipers" },
+  ],
+  detailsTitle: "The details",
   details: [
     "Fared-in perspex headlight covers with invisible fixings.",
     "A Snap four exhaust system, a tip of the hat to the legendary Dino.",
-    "Ferrari 360 brakes and callipers, adjustable suspension, electric power steering.",
-    "Air conditioning and iPod connectivity, with the doors retrimmed to Chairs and Flares specification.",
+    "Adjustable suspension, electric power steering, hydraulic clutch.",
+    "Air conditioning and iPod connectivity.",
   ],
-  /** Kevin, on the same page, on what the car is actually for. */
-  closing:
-    "This Dino Evolution Restomod is not just about numbers like bhp, 0-60 and top speed, its about the driving experience, its about the car communicating with the driver and giving feedback through the seat and the steering. It has modern capabilities in terms of power, handling and reliability, but above all, It has a soul.",
-  closingBy: "Kevin O'Rourke",
+  closing: {
+    lead: "This Dino Evolution Restomod is not just about numbers like bhp, 0-60 and top speed, its about the driving experience, its about the car communicating with the driver and giving feedback through the seat and the steering. It has modern capabilities in terms of power, handling and reliability,",
+    punch: "but above all, It has a soul.",
+    by: "Kevin O'Rourke",
+  },
+  closer: { image: img("dino36-rear-leafs"), alt: "The Dino 3.6 from behind, leaves in the air" },
   links: [
     { label: "The auction", href: "https://bringatrailer.com/listing/1972-ferrari-dino-246-gts-15/" },
     { label: "Jay Leno's Garage", href: "https://www.youtube.com/watch?v=qnt0DNqJYvM" },

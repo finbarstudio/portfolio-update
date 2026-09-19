@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { HeroSlide } from "@/content/moto-technique";
 import AwardLaurel from "../AwardLaurel";
 import DinoBadge, { type Finish } from "../DinoBadge";
+import DinoStory, { type Sale } from "../DinoStory";
 import RegionMarks from "../RegionMarks";
 
 /** How long each photograph holds before the next one fades in. */
@@ -12,20 +13,6 @@ const HOLD_MS = 6000;
 /** Eases the scroll so the split starts and lands softly instead of tracking the wheel 1:1. */
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
-
-type Sale = {
-  eyebrow: string;
-  price: string;
-  quote: string;
-  quoteBy: string;
-  body: string;
-  lot: string;
-  spec: { label: string; value: string }[];
-  details: string[];
-  closing: string;
-  closingBy: string;
-  links: { label: string; href: string }[];
-};
 
 /**
  * The hero: one car, its name, and then its story.
@@ -40,9 +27,9 @@ type Sale = {
  * for left and right, so the panel rises from the bottom and the badge stays
  * level in the photograph above it.
  *
- * ONCE OPEN the panel scrolls on its own while the hero stays pinned: the sale
- * figure and Jay Leno's line, then the specification, the details that make it
- * theirs, Kevin's closing word, and the links out to the auction and the film.
+ * ONCE OPEN the panel scrolls on its own while the hero stays pinned, through
+ * the Dino's story (DinoStory.tsx): the sale, Jay Leno, the photographs, the
+ * figures, and Kevin's closing word with the links out to the auction and film.
  * Only when it reaches its end does the rest of the page start to scroll up
  * over the pinned hero like a curtain, with the hero drifting up behind it.
  *
@@ -144,9 +131,21 @@ export default function Hero({
     ro.observe(inner);
     if (inner.parentElement) ro.observe(inner.parentElement);
 
+    // QA only, never in a production build: `?split=1&read=0.5` poses the hero
+    // at that point of its move without scrolling, for screenshot tools that
+    // cannot scroll. `read` is how far through its own contents the panel is.
+    const q = process.env.NODE_ENV !== "production" ? new URLSearchParams(window.location.search) : null;
+    const posed = q?.has("split") ? { split: Number(q.get("split")), read: Number(q.get("read") ?? 0) } : null;
+
     let frame = 0;
     const update = () => {
       frame = 0;
+      if (posed) {
+        el.style.setProperty("--mt-split", String(posed.split));
+        el.style.setProperty("--mt-read", String(posed.read));
+        setOpen(posed.split > 0.6);
+        return;
+      }
       const y = window.scrollY;
       const distance = spacer.offsetHeight || 1;
       // The move finishes at 80% of the spacer; the last fifth is a held beat
@@ -245,43 +244,7 @@ export default function Hero({
             its links cannot take focus while nobody can see them. */}
         <aside className="mt-hero-info" id="sale" aria-label="About this car" data-tone="light" inert={!open}>
           <div ref={panel} className="mt-hero-info-inner">
-            <span className="mt-eyebrow">{sale.eyebrow}</span>
-            <p className="mt-sale-price">{sale.price}</p>
-            <p className="mt-sale-lot">{sale.lot}</p>
-
-            <blockquote className="mt-sale-quote">
-              <p>“{sale.quote}”</p>
-              <cite>{sale.quoteBy}</cite>
-            </blockquote>
-            <p className="mt-sale-body">{sale.body}</p>
-
-            <dl className="mt-spec">
-              {sale.spec.map((row) => (
-                <div key={row.label} className="mt-spec-row">
-                  <dt>{row.label}</dt>
-                  <dd>{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <ul className="mt-details">
-              {sale.details.map((d) => (
-                <li key={d}>{d}</li>
-              ))}
-            </ul>
-
-            <blockquote className="mt-sale-closing">
-              <p>“{sale.closing}”</p>
-              <cite>{sale.closingBy}</cite>
-            </blockquote>
-
-            <p className="mt-sale-links">
-              {sale.links.map((l) => (
-                <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" data-cursor="Open">
-                  {l.label}
-                </a>
-              ))}
-            </p>
+            <DinoStory sale={sale} />
           </div>
         </aside>
       </section>
