@@ -115,6 +115,33 @@
   color: var(--mt-light-faint);
 }
 
+/* Section titles, set like the wordmark: the title face in tracked capitals.
+   padding-left balances the tracking's trailing gap so a centred title sits on
+   the true centre line. */
+.mt-title {
+  font-family: var(--mt-font-title);
+  font-size: clamp(20px, 2.5vw, 38px);
+  font-weight: 400;
+  letter-spacing: 0.42em;
+  padding-left: 0.42em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+/* There for a screen reader and a search engine, not for the eye. */
+.mt-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .mt-h2 {
   font-size: var(--mt-step-h2);
   max-width: 18ch;
@@ -171,25 +198,35 @@
 }
 
 /* ---------- the preloader -----------------------------------------------------
-   Preloader.tsx does the moving; this only says when it shows and how the line
-   looks. It is hidden unless the wrapper is marked data-intro, which a script
-   in layout.tsx decides before first paint, so a repeat visit never sees it.
+   White, the mark fades in small in the middle, holds, and the whole screen
+   fades out. Preloader.tsx only flips data-stage at the right moments; every
+   move is an opacity transition here. Hidden unless the wrapper is marked
+   data-intro, which a script in layout.tsx decides before first paint, so a
+   repeat visit never sees it.
 
    data-intro="1"     the white is solid: the hero holds its entrance
-   data-intro="open"  the window is open: the hero starts, seen through it */
+   data-intro="open"  the white is lifting: the hero starts behind it */
 
 .mt-pre {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 100;
-  pointer-events: auto;
+  place-items: center;
+  background: #fff;
+  /* 0.9s: keep in step with FADE_OUT in Preloader.tsx */
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mt-site[data-intro] .mt-pre {
-  display: block;
+  display: grid;
   /* If the script never arrives the white must not stay for ever. */
-  animation: mt-pre-failsafe 0.6s linear 9s forwards;
+  animation: mt-pre-failsafe 0.6s linear 7s forwards;
+}
+
+.mt-pre[data-stage="out"] {
+  opacity: 0;
+  pointer-events: none;
 }
 
 @keyframes mt-pre-failsafe {
@@ -199,27 +236,26 @@
   }
 }
 
-.mt-pre-svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.mt-pre-mark {
+  width: min(150px, 34vw);
+  height: auto;
+  fill: var(--mt-red);
+  opacity: 0;
+  scale: 0.96;
+  transition:
+    opacity 0.9s var(--mt-ease),
+    scale 1.6s var(--mt-ease);
 }
 
-.mt-pre-line path {
-  fill: none;
-  stroke: var(--mt-red);
-  stroke-width: 1.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  /* stays a hairline however far the camera has flown in */
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+.mt-pre:is([data-stage="in"], [data-stage="out"]) .mt-pre-mark {
+  opacity: 1;
+  scale: 1;
 }
 
 /* Nothing in the hero starts its entrance behind a solid white screen. */
 .mt-site[data-intro="1"] :is(
   .mt-wordmark,
+  .mt-bar-tools,
   .mt-hero-title,
   .mt-regions,
   .mt-laurel-art path,
@@ -230,11 +266,13 @@
 }
 
 /* ---------- the bar ----------------------------------------------------------
-   The wordmark, fixed, and nothing else. It rides over a dark photograph, then
-   a white section, then a paper one, so it is set in white and blended with
-   `difference`: it comes out white over dark and near-black over light, with no
-   scroll listener deciding which. It has to live outside the hero for that,
-   because the hero isolates its own stacking context. */
+   Wordmark top left, icons and the menu top right, fixed. It rides over a dark
+   photograph, a white panel and paper sections, so it is set in white and
+   blended with `difference`: every pixel comes out white over dark and
+   near-black over light, with no scroll listener deciding which. That is per
+   pixel, so when the hero splits the left of the bar stays white over the
+   photograph while the right turns black over the white panel. It has to live
+   outside the hero for that, because the hero isolates its own stacking context. */
 
 .mt-bar {
   position: fixed;
@@ -242,47 +280,177 @@
   left: 0;
   right: 0;
   z-index: 60;
-  display: grid;
-  place-items: center;
-  padding-top: clamp(24px, 3.4vh, 46px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(18px, 2.6vh, 32px) var(--mt-gutter) 0;
   pointer-events: none;
+  color: #fff;
   mix-blend-mode: difference;
-}
-
-/* Without something behind it, body text scrolls straight through the wordmark
-   and the two collide. This blurs whatever passes under the bar, fading out
-   downwards so there is no edge. A blur rather than a fill because the bar
-   crosses white, paper and dark sections, and a blur needs no colour to match
-   any of them. Over the hero it changes nothing: the top of the photograph is
-   already near-black. */
-.mt-bar-veil {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 59;
-  height: clamp(86px, 13vh, 132px);
-  pointer-events: none;
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
 }
 
 .mt-wordmark {
   display: block;
   pointer-events: auto;
   font-family: var(--mt-font-title);
-  font-size: clamp(17px, 1.9vw, 27px);
-  letter-spacing: 0.62em;
-  /* tracking adds a gap after the last letter too; this balances it so the
-     word sits on the true centre line */
-  padding-left: 0.62em;
+  font-size: clamp(13px, 1.15vw, 17px);
+  letter-spacing: 0.5em;
   text-transform: uppercase;
   font-weight: 400;
   line-height: 1;
-  color: #fff;
+  white-space: nowrap;
   animation: mt-fade-in-soft 1.2s var(--mt-ease) 0.2s both;
+}
+
+.mt-bar-tools {
+  display: flex;
+  align-items: center;
+  /* the buttons carry their own padding; pull the row back so the last icon's
+     glyph, not its hit area, lines up with the gutter */
+  margin-right: -10px;
+  pointer-events: auto;
+  animation: mt-fade-in-soft 1.2s var(--mt-ease) 0.3s both;
+}
+
+/* 44px square: the smallest comfortable touch target, whatever the glyph size */
+.mt-tool {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.86;
+  transition: opacity 0.2s var(--mt-ease);
+}
+
+.mt-tool:hover,
+.mt-tool[aria-expanded="true"] {
+  opacity: 1;
+}
+
+.mt-icon {
+  display: block;
+  width: 21px;
+  height: 21px;
+}
+
+/* Red would come out cyan through the blend wherever the bar is over white. */
+.mt-site .mt-bar :is(a, button):focus-visible {
+  outline-color: #fff;
+}
+
+/* ---------- the window -------------------------------------------------------
+   The one small window every icon opens. A second fixed layer, not a child of
+   the bar, or the blend would invert it. Dark, so it reads over the photograph
+   and over the white panel alike. */
+
+.mt-window {
+  position: fixed;
+  top: clamp(70px, 9.5vh, 96px);
+  right: var(--mt-gutter);
+  z-index: 61;
+  width: min(330px, calc(100vw - 2 * var(--mt-gutter)));
+  padding: 24px 26px 26px;
+  background: rgba(14, 14, 14, 0.96);
+  color: var(--mt-light);
+  border: 0.5px solid var(--mt-line-light);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  display: grid;
+  gap: 12px;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 -8px;
+  transition:
+    opacity 0.2s var(--mt-ease),
+    translate 0.2s var(--mt-ease),
+    visibility 0s linear 0.2s;
+}
+
+.mt-window[data-open="1"] {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    opacity 0.2s var(--mt-ease),
+    translate 0.2s var(--mt-ease);
+}
+
+.mt-window:focus {
+  outline: none;
+}
+
+.mt-window-label {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--mt-light-faint);
+}
+
+.mt-window-lead {
+  font-family: var(--mt-font-title);
+  font-size: clamp(19px, 1.5vw, 23px);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.mt-window-address {
+  display: grid;
+  gap: 2px;
+  font-style: normal;
+  color: var(--mt-light-soft);
+}
+
+.mt-window-link,
+.mt-window-foot a {
+  justify-self: start;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--mt-line-light);
+  transition: border-color 0.2s var(--mt-ease);
+}
+
+.mt-window-nav {
+  display: grid;
+  gap: 6px;
+}
+
+.mt-window-nav a {
+  font-family: var(--mt-font-title);
+  font-size: clamp(22px, 1.9vw, 28px);
+  line-height: 1.25;
+  transition: color 0.2s var(--mt-ease);
+}
+
+.mt-window-nav a:hover {
+  color: var(--mt-red);
+}
+
+.mt-window-foot {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 0.5px solid var(--mt-line-light);
+}
+
+.mt-window-foot a {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 13px;
+  color: var(--mt-light-soft);
+}
+
+.mt-window :is(.mt-window-link, .mt-window-foot a):hover {
+  border-color: var(--mt-red);
 }
 
 /* ---------- hero ------------------------------------------------------------ */
@@ -303,15 +471,30 @@
   height: 100svh;
   overflow: clip;
   isolation: isolate;
-  /* 0 at the top of the page, 1 once the hero is fully covered. Hero.tsx keeps
-     it current; with reduced motion it stays 0 and nothing drifts. */
+  /* Hero.tsx keeps both current.
+     --mt-split  0 at rest, 1 once the photograph and the white panel share the
+                 screen. Plays over the spacer below (.mt-hero-run).
+     --mt-p      0 until the next section starts to cover the hero, 1 once it is
+                 fully covered. With reduced motion it stays 0: nothing drifts. */
+  --mt-split: 0;
+  --mt-read: 0;
   --mt-p: 0;
+}
+
+/* Scroll distance for the split to play over. It holds nothing and the pinned
+   hero shows through it; clicks pass through it to the hero as well. */
+.mt-hero-run {
+  position: relative;
+  z-index: 1;
+  /* long enough for the split to play, then for the panel to read itself out */
+  height: 320svh;
+  pointer-events: none;
 }
 
 /* Every section after the hero sits above it and is opaque, or the pinned
    photograph would show through. :where() keeps this at zero specificity so a
    section's own background still wins. */
-:where(.mt-site main) > :where(:not(.mt-hero)) {
+:where(.mt-site main) > :where(:not(.mt-hero, .mt-hero-run)) {
   position: relative;
   z-index: 1;
   background: var(--mt-paper);
@@ -324,8 +507,27 @@
   inset: 0;
   z-index: 0;
   background: var(--mt-ground);
-  translate: 0 calc(var(--mt-p) * -9%);
+  /* x: as the white panel takes the right half, the photograph slides a quarter
+     of the way left, which keeps its middle in the middle of what is still
+     showing. The strip this uncovers on the right is under the panel.
+     y: the slow drift behind the curtain. */
+  translate: calc(var(--mt-split) * -25%) calc(var(--mt-p) * -9%);
   will-change: translate;
+}
+
+/* A breath of film grain over the photographs. Fine noise reads as detail, so a
+   picture looks crisper with it than without, and it hides the banding that
+   compression leaves in the dark gradients. The real sharpening is baked into
+   the files (Tools/make-hero-photos.sh); this is the last few percent. The
+   noise is an inline SVG, so it costs no request. */
+.mt-hero-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.11;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.1 -.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
 }
 
 /* Frames cross-fade and nothing else. No zoom: the photograph holds still when
@@ -401,25 +603,57 @@
   pointer-events: none;
 }
 
-/* The car's name, dead centre over every frame. It is a picture (Finbar's
-   artwork of the script), so width and height are on the <img> and the space is
-   held before it loads. Its drift sits between the photograph's and the marks',
-   which makes three depths as the hero is covered.
+/* The car's name: a metal badge, dead centre over every frame (DinoBadge.tsx).
 
-   `translate` carries both the centring and the drift. It cannot be split
-   across `transform`, because the entrance animation ends on `transform: none`
-   and holds it, which would undo a transform-based centring. */
+   AT REST it is level in the middle. AS THE HERO SPLITS it turns a quarter turn
+   anticlockwise, reading bottom to top, and moves to the middle of the left
+   half. Its width is also capped by the screen's height, because once it is on
+   its side its length has to fit top to bottom.
+
+   `translate` and `rotate` are their own properties on purpose. The entrance
+   animation ends on `transform: none` and holds it, which would undo a centring
+   or a turn written as a transform. */
 .mt-hero-title {
   position: absolute;
   top: 50%;
   left: 50%;
   z-index: 3;
-  width: clamp(230px, 36vw, 600px);
-  height: auto;
-  translate: -50% calc(-50% + var(--mt-p) * -15vh);
+  width: min(clamp(230px, 36vw, 600px), 62svh);
+  translate: calc(-50% + var(--mt-split) * -25vw) calc(-50% + var(--mt-p) * -15vh);
+  rotate: calc(var(--mt-split) * -90deg);
   pointer-events: none;
   user-select: none;
+  /* the shadow a badge throws on the panel it is fixed to, and nothing else:
+     the artwork carries its own light */
+  filter: drop-shadow(0 0.25vw 0.4vw rgba(0, 0, 0, 0.6));
   animation: mt-fade-in-soft 1.4s var(--mt-ease) 0.45s both;
+}
+
+.mt-hero-title-flat {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.9s var(--mt-ease);
+}
+
+/* 14% larger than the artwork, matching PAD in DinoBadge.tsx, so a tilted badge
+   is never cut off at the corners. */
+.mt-hero-title-metal {
+  position: absolute;
+  top: -7%;
+  left: -7%;
+  width: 114%;
+  height: 114%;
+  opacity: 0;
+  transition: opacity 0.9s var(--mt-ease);
+}
+
+.mt-hero-title[data-ready="1"] .mt-hero-title-metal {
+  opacity: 1;
+}
+
+.mt-hero-title[data-ready="1"] .mt-hero-title-flat {
+  opacity: 0;
 }
 
 /* laurel over the flags, centred with a bottom bias */
@@ -435,7 +669,9 @@
   gap: clamp(18px, 2.8vh, 32px);
   color: var(--mt-light);
   pointer-events: none;
-  translate: 0 calc(var(--mt-p) * -24vh);
+  /* gone within the first third of the split, lifting a little as they go */
+  opacity: clamp(0, calc(1 - var(--mt-split) * 3.2), 1);
+  translate: 0 calc(var(--mt-split) * -5vh);
 }
 
 .mt-laurel {
@@ -575,25 +811,42 @@
   animation: mt-fade-in 0.8s var(--mt-ease) 2.1s both;
 }
 
-.mt-region {
-  display: block;
-  color: var(--mt-light);
-}
-
-/* One height for all four, and each flag's own width from its viewBox, so the
-   Union Flag and the Stars and Stripes come out wider than Europe, as they are.
+/* One height for all four, and each flag's own width from its proportions, so
+   the Union Flag and the Stars and Stripes come out wider than Europe, as they
+   are. The height is a whole number of pixels at every size: a fractional
+   height lands each flag's artwork on different sub-pixels and they stop
+   looking the same height even when they measure the same.
 
    The edge is 0.5px on purpose. On a retina screen 1 CSS pixel is drawn two
    physical pixels thick, which reads as a heavy frame at this size. Browsers
    snap a border to whole physical pixels and never below one, so 0.5px is one
-   true pixel on retina and still 1px on a standard display. It is a border, not
-   an outline or an SVG stroke, because only borders are guaranteed that snap. */
+   true pixel on retina and still 1px on a standard display. */
+.mt-region {
+  display: block;
+  box-sizing: border-box;
+  height: 20px;
+  aspect-ratio: var(--mt-ratio, 1.5);
+  border: 0.5px solid currentColor;
+  color: var(--mt-light);
+  overflow: hidden;
+}
+
+@media (min-width: 1280px) {
+  .mt-region {
+    height: 22px;
+  }
+}
+
+@media (min-width: 1680px) {
+  .mt-region {
+    height: 25px;
+  }
+}
+
 .mt-flag {
   display: block;
-  box-sizing: content-box;
-  height: clamp(20px, 1.65vw, 25px);
-  width: auto;
-  border: 0.5px solid currentColor;
+  width: 100%;
+  height: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -614,6 +867,7 @@
   }
 
   .mt-wordmark,
+  .mt-bar-tools,
   .mt-hero-title,
   .mt-regions {
     animation: none;
@@ -621,28 +875,63 @@
   }
 }
 
-/* ---------- the sale -------------------------------------------------------- */
+/* ---------- the car's story --------------------------------------------------
+   The white panel that comes in from the right as the hero splits. It sits
+   inside the pinned hero, above everything else in it. */
 
-.mt-sale {
-  position: relative;
+.mt-hero-info {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 4;
+  padding-inline: var(--mt-gutter) clamp(28px, 5vw, 96px);
   background: #fff;
   color: var(--mt-ink);
+  /* 101%, not 100%: a hairline of white would otherwise show at the right edge
+     of the screen at rest on fractional-width viewports */
+  translate: calc((1 - var(--mt-split)) * 101%) 0;
+  will-change: translate;
+  /* the contents run past the panel; the panel shows a window onto them */
+  overflow: hidden;
 }
 
-.mt-sale-inner {
-  width: 100%;
-  max-width: var(--mt-max);
-  margin-inline: auto;
-  padding: clamp(80px, 13vh, 170px) var(--mt-gutter);
-  display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  gap: clamp(32px, 6vw, 110px);
-  align-items: center;
+/* As the contents travel up they would pass straight under the bar's icons. The
+   panel is white, so a white fade at its top edge takes them out cleanly before
+   they get there. Not a blur: it only exists inside this panel. */
+.mt-hero-info::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: clamp(84px, 12vh, 124px);
+  z-index: 1;
+  background: linear-gradient(to bottom, #fff 0%, #fff 48%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+/* The panel reads itself out while the hero stays pinned. --mt-read runs 0 to 1
+   over the second part of the spacer, and the contents travel by however much
+   they actually overflow (--mt-over, measured in Hero.tsx), so everything is
+   reached at any screen height and nothing is cut off on a tall one. The words
+   also arrive after the panel has landed, rather than riding in with it. */
+.mt-hero-info-inner {
+  position: relative;
+  max-width: 35rem;
+  padding-block: clamp(96px, 14vh, 150px) clamp(48px, 9vh, 110px);
+  opacity: clamp(0, calc((var(--mt-split) - 0.55) * 2.6), 1);
+  translate: 0 calc((1 - var(--mt-split)) * 30px - var(--mt-read) * var(--mt-over));
+}
+
+/* the hero is a dark section, which would make this eyebrow pale */
+.mt-hero-info .mt-eyebrow {
+  color: var(--mt-ink-soft);
 }
 
 .mt-sale-price {
   font-family: var(--mt-font-title);
-  font-size: clamp(44px, 6.4vw, 104px);
+  /* sized to the half-width panel it now lives in, and to short screens */
+  font-size: min(clamp(40px, 5.2vw, 88px), 11svh);
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.03em;
@@ -658,12 +947,8 @@
   color: var(--mt-ink-soft);
 }
 
-.mt-sale-words {
-  margin-top: clamp(30px, 4.4vw, 60px);
-}
-
 .mt-sale-quote {
-  margin: 0;
+  margin: clamp(26px, 4.4vh, 52px) 0 0;
   border-left: 2px solid var(--mt-red);
   padding-left: clamp(16px, 1.8vw, 26px);
 }
@@ -714,16 +999,398 @@
   border-color: var(--mt-red);
 }
 
-/* the car as a framed picture, not a backdrop */
-.mt-sale-art {
-  margin: 0;
+/* the specification: real figures, from their own page */
+.mt-spec {
+  margin: clamp(26px, 4.4vh, 48px) 0 0;
+  border-top: 1px solid var(--mt-line);
 }
 
-.mt-sale-art img {
+.mt-spec-row {
+  display: grid;
+  grid-template-columns: minmax(0, 8rem) minmax(0, 1fr);
+  gap: 18px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--mt-line);
+}
+
+.mt-spec dt {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--mt-ink-soft);
+  padding-top: 3px;
+}
+
+.mt-spec dd {
+  margin: 0;
+  font-size: clamp(14px, 1.05vw, 16px);
+  text-wrap: pretty;
+}
+
+.mt-details {
+  margin: clamp(22px, 3.4vh, 36px) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  color: var(--mt-ink-soft);
+  font-size: clamp(13px, 0.95vw, 15px);
+  text-wrap: pretty;
+}
+
+/* a short rule instead of a bullet */
+.mt-details li {
+  padding-left: 26px;
+  position: relative;
+}
+
+.mt-details li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 14px;
+  height: 1px;
+  background: var(--mt-red);
+}
+
+.mt-sale-closing {
+  margin: clamp(26px, 4.4vh, 46px) 0 0;
+}
+
+.mt-sale-closing p {
+  font-size: clamp(15px, 1.15vw, 18px);
+  font-weight: 300;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.mt-sale-closing cite {
+  display: block;
+  margin-top: 12px;
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mt-ink-soft);
+}
+
+/* ---------- why ---------------------------------------------------------------
+   A full screen of white after the hero's photographs, so the eye stops. */
+
+.mt-why {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  padding: clamp(90px, 14vh, 150px) var(--mt-gutter);
+  text-align: center;
+}
+
+.mt-why-inner {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  justify-items: center;
+  gap: clamp(46px, 8vh, 96px);
+}
+
+.mt-why-heading {
+  margin-top: clamp(22px, 3.6vh, 38px);
+  font-size: var(--mt-step-h2);
+  line-height: 1.1;
+}
+
+/* two beats, one per line, however wide the screen */
+.mt-why-heading span {
+  display: block;
+}
+
+.mt-why-body {
+  margin: clamp(22px, 3.4vh, 34px) auto 0;
+  max-width: 62ch;
+  color: var(--mt-ink-soft);
+  font-size: var(--mt-step-lead);
+  line-height: 1.58;
+  text-wrap: pretty;
+}
+
+.mt-why-cta {
+  display: inline-block;
+  margin-top: clamp(26px, 4vh, 40px);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--mt-line);
+  transition: border-color 0.35s var(--mt-ease);
+}
+
+.mt-why-cta:hover {
+  border-color: var(--mt-red);
+}
+
+.mt-figures {
+  margin: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 48px);
+  border-top: 1px solid var(--mt-line);
+  padding-top: clamp(28px, 4.4vh, 48px);
+}
+
+.mt-figure-value {
+  font-family: var(--mt-font-title);
+  font-size: clamp(30px, 4.6vw, 68px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.mt-figure-label {
+  margin: 12px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mt-ink-soft);
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+/* ---------- the services wheel ------------------------------------------------
+   One circle cut into quarters with the hub in the middle. Services.tsx draws
+   it; this sizes it and says what hovering does. */
+
+.mt-services {
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: clamp(36px, 6vh, 72px);
+  padding: clamp(80px, 12vh, 140px) var(--mt-gutter);
+  background: var(--mt-paper);
+  text-align: center;
+}
+
+/* Square, and never taller than the room it has: the wheel is the section. */
+.mt-wheel {
+  position: relative;
+  /* the boxes hang outside it left and right, so its width also has to leave
+     them room: 112% out plus a box each side */
+  width: min(58svh, 520px, calc((100vw - 2 * var(--mt-gutter) - 2 * var(--mt-box-w)) / 1.24));
+  aspect-ratio: 1;
+  color: var(--mt-ink);
+  --mt-box-w: clamp(210px, 21vw, 300px);
+}
+
+.mt-wheel-art {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+  height: 100%;
+  overflow: visible;
+}
+
+/* vector-effect keeps every line one pixel however large the circle is drawn */
+.mt-wheel-art :is(.mt-wheel-quarter, .mt-wheel-ring, .mt-wheel-hub) {
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The ring is only a line, and must not swallow the pointer on its way to the
+   quarters underneath it. */
+.mt-wheel-ring {
+  fill: none;
+  pointer-events: none;
+}
+
+/* `transparent`, never `none`: a shape with no fill cannot be pointed at except
+   on its hairline, and the whole quarter has to be the target. */
+.mt-wheel-quarter {
+  fill: transparent;
+  cursor: pointer;
+  transition: fill 0.4s var(--mt-ease);
+}
+
+.mt-wheel-quarter[data-open="1"] {
+  fill: rgba(17, 16, 15, 0.06);
+}
+
+/* white and opaque, so the quarter lines stop at the hub instead of crossing it */
+.mt-wheel-hub {
+  fill: #fff;
+  cursor: pointer;
+  transition: fill 0.4s var(--mt-ease);
+}
+
+.mt-wheel-hub[data-open="1"] {
+  fill: #f6efee;
+}
+
+/* The leader line: a hairline that draws itself out of the quarter to the side
+   of its box, with a dot where it starts. Never in the way of the pointer. */
+.mt-wheel-lead {
+  pointer-events: none;
+}
+
+.mt-wheel-lead line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.45s var(--mt-ease);
+}
+
+.mt-wheel-lead circle {
+  fill: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s var(--mt-ease);
+}
+
+.mt-wheel-lead[data-open="1"] line {
+  stroke-dashoffset: 0;
+}
+
+.mt-wheel-lead[data-open="1"] circle {
+  opacity: 1;
+}
+
+/* The info boxes. Placed in percentages of the wheel, the same units the SVG
+   draws in, so a box's near edge at 112% is exactly where its line ends.
+   Solid white because Hi-Tech's opens over the wheel itself. They never take
+   the pointer: leaving a quarter for its box would otherwise close the box. */
+.mt-wheel-box {
+  position: absolute;
+  z-index: 2;
+  width: var(--mt-box-w);
+  padding: 18px 20px 20px;
+  background: #fff;
+  border: 0.5px solid var(--mt-ink);
+  text-align: left;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s var(--mt-ease) 0s,
+    visibility 0s linear 0.3s;
+}
+
+/* arrives as the line lands, not before it */
+.mt-wheel-box[data-open="1"] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.35s var(--mt-ease) 0.22s,
+    visibility 0s;
+}
+
+.mt-wheel-box[data-where^="right"] {
+  left: 112%;
+}
+
+.mt-wheel-box[data-where^="left"] {
+  right: 112%;
+}
+
+.mt-wheel-box[data-where$="top"] {
+  top: 2%;
+}
+
+.mt-wheel-box[data-where$="bottom"] {
+  bottom: 2%;
+}
+
+/* just under the hub (which ends at 65%), over the wheel */
+.mt-wheel-box[data-where="hub"] {
+  top: 68%;
+  left: 50%;
+  translate: -50% 0;
+  transition-delay: 0s;
+}
+
+.mt-wheel-box-name {
+  display: block;
+  font-family: var(--mt-font-title);
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.mt-wheel-box p {
+  font-size: clamp(12.5px, 0.95vw, 14px);
+  line-height: 1.55;
+  color: var(--mt-ink-soft);
+  text-wrap: pretty;
+}
+
+/* Each label is centred on a point halfway out along the middle of its own
+   quarter. Services.tsx works that point out and sets left and top. */
+.mt-wheel-label {
+  position: absolute;
+  translate: -50% -50%;
+  white-space: nowrap;
+  font-size: clamp(11px, 1.15vw, 13px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: color 0.3s var(--mt-ease);
+}
+
+.mt-wheel-hub-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  font-family: var(--mt-font-title);
+  font-size: clamp(12px, 1.35vw, 16px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.3s var(--mt-ease);
+}
+
+.mt-wheel :is(.mt-wheel-label, .mt-wheel-hub-label)[data-open="1"] {
+  color: var(--mt-red);
+}
+
+@media (max-width: 760px) {
+  .mt-figures {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+
+  /* the labels have to clear a smaller circle */
+  .mt-wheel-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+}
+
+/* Below this there is no room to hang a box either side of the wheel, so the
+   open box sits under it instead, full width, and the lines are not drawn. The
+   space is held open so the page does not jump as boxes come and go. */
+@media (max-width: 980px) {
+  .mt-wheel {
+    width: min(84vw, 46svh);
+    margin-bottom: 190px;
+  }
+
+  .mt-wheel-lead {
+    display: none;
+  }
+
+  .mt-wheel-box,
+  .mt-wheel-box[data-where="hub"] {
+    top: calc(100% + 22px);
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    translate: -50% 0;
+    width: min(88vw, 420px);
+  }
 }
 
 /* ---------- restomods ------------------------------------------------------- */
@@ -1203,7 +1870,6 @@
 /* ---------- narrow ----------------------------------------------------------- */
 
 @media (max-width: 1080px) {
-  .mt-sale-inner,
   .mt-workshop-grid,
   .mt-contact-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -1231,25 +1897,62 @@
 
 
 /* ---------- hero at phone size ----------------------------------------------
-   The photographs are landscape and a phone is not, so the frame holds the car
-   rather than the middle of the file. */
+   No room for left and right, so the split goes top and bottom: the white panel
+   rises to cover the lower three fifths, the photograph slides up to stay
+   centred in what is left, and the badge stays level and rises with it rather
+   than turning on its side. The photographs are landscape and a phone is not,
+   so the frame holds the car rather than the middle of the file. */
 @media (max-width: 760px) {
   .mt-hero-img {
     object-position: 58% center;
   }
 
-  .mt-bar {
-    padding-top: clamp(18px, 2.6vh, 28px);
+  .mt-wordmark {
+    font-size: 12px;
+    letter-spacing: 0.34em;
   }
 
-  /* 0.62em of tracking would run the word off a 320px screen */
-  .mt-wordmark {
-    font-size: 15px;
-    letter-spacing: 0.46em;
-    padding-left: 0.46em;
+  /* phone and menu stay; email and the address are inside the menu's window */
+  .mt-tool:is([data-tool="mail"], [data-tool="place"]) {
+    display: none;
+  }
+
+  .mt-hero-stage {
+    translate: 0 calc(var(--mt-split) * -24% + var(--mt-p) * -9%);
   }
 
   .mt-hero-title {
     width: min(74vw, 340px);
+    translate: -50% calc(-50% + var(--mt-split) * -27svh);
+    rotate: none;
+  }
+
+  .mt-hero-info {
+    top: auto;
+    width: 100%;
+    height: 62%;
+    padding-inline: var(--mt-gutter);
+    translate: 0 calc((1 - var(--mt-split)) * 101%);
+  }
+
+  .mt-hero-info-inner {
+    padding-block: clamp(22px, 3.4vh, 36px) clamp(28px, 5vh, 48px);
+  }
+
+  .mt-sale-price {
+    font-size: clamp(38px, 11vw, 52px);
+  }
+
+  .mt-sale-quote {
+    margin-top: 20px;
+  }
+
+  .mt-sale-quote p {
+    font-size: 17px;
+  }
+
+  .mt-sale-body {
+    margin-top: 16px;
+    font-size: 14px;
   }
 }

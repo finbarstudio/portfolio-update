@@ -23,6 +23,8 @@ export type HeroSlide = {
   /** Short line over the photo. Verbatim where possible. */
   line: string;
   image: string;
+  /** The same photograph at 1600px, for phones and ordinary screens. */
+  imageSm: string;
   /** Photographer, shown small. */
   credit?: string;
 };
@@ -42,6 +44,7 @@ export const hero: HeroSlide[] = [
     car: "Dino 246 GTS",
     line: "A Ferrari 3.6 litre V8 in a Dino 246 GTS. 400bhp, built in-house.",
     image: img("dino36-profile"),
+    imageSm: img("dino36-profile-1600"),
     credit: "Jayson Fong",
   },
   {
@@ -49,6 +52,7 @@ export const hero: HeroSlide[] = [
     car: "Dino 246 GTS",
     line: "The Moto Technique Dino 3.6 Litre V8 Restomod.",
     image: img("dino36-rear-moving"),
+    imageSm: img("dino36-rear-moving-1600"),
     credit: "Jayson Fong",
   },
   {
@@ -56,6 +60,7 @@ export const hero: HeroSlide[] = [
     car: "Dino 246 GTS",
     line: "If you're going to drop a 400bhp Ferrari V8 engine into a Dino, its nice to be able to see it.",
     image: img("dino36-perspex"),
+    imageSm: img("dino36-perspex-1600"),
     credit: "Jayson Fong",
   },
   {
@@ -63,6 +68,7 @@ export const hero: HeroSlide[] = [
     car: "Dino 246 GTS",
     line: "Snap exhaust system, a tip of the hat to the legendary Dino.",
     image: img("dino36-rear-leafs"),
+    imageSm: img("dino36-rear-leafs-1600"),
     credit: "Jayson Fong",
   },
   {
@@ -70,6 +76,7 @@ export const hero: HeroSlide[] = [
     car: "Dino 246 GTS",
     line: "Fixing-free headlight covers and 17 inch Campagnolo wheels.",
     image: img("dino36-lens-wheels"),
+    imageSm: img("dino36-lens-wheels-1600"),
     credit: "Jayson Fong",
   },
   {
@@ -77,6 +84,7 @@ export const hero: HeroSlide[] = [
     car: "Dino 246 GTS",
     line: "Stunning red leather interior to Chairs and Flares specification.",
     image: img("dino36-interior"),
+    imageSm: img("dino36-interior-1600"),
     credit: "Jayson Fong",
   },
 ];
@@ -86,11 +94,23 @@ export const hero: HeroSlide[] = [
  *
  * Finbar's artwork of the Dino script (Design Work/Mototechnique/Dino
  * Wordmark.png). It is a picture, not type, so the real size is recorded here
- * and the page can hold its space before it loads. Swap the car in `hero` and
- * this is the other thing to swap, or set it to null to have no name at all.
+ * and the page can hold its space before it loads. `normal` is the relief map
+ * that lets it render as a metal badge; both files come from
+ * Tools/make-dino-badge.py. Swap the car in `hero` and this is the other thing
+ * to swap, or set it to null to have no name at all.
  */
-export const heroMark: { image: string; alt: string; width: number; height: number } | null = {
+export const heroMark: {
+  image: string;
+  normal: string;
+  /** How the metal is finished: "silver" (chrome, rim keeps its colour) or "brass". */
+  finish: "silver" | "brass";
+  alt: string;
+  width: number;
+  height: number;
+} | null = {
   image: img("dino-wordmark"),
+  normal: img("dino-wordmark-normal"),
+  finish: "silver",
   alt: "Dino",
   width: 1732,
   height: 541,
@@ -121,10 +141,113 @@ export const sale = {
   lot: "Lot #248,947",
   image: img("dino36-rear-moving"),
   credit: "Jayson Fong",
+  /**
+   * The car itself. Every figure is Kevin's own, from the Dino 3.6 V8 upgrade
+   * page on mototechnique.com. Nothing here is estimated: if a number cannot be
+   * pointed at on their site, it does not belong in this list.
+   */
+  spec: [
+    { label: "Engine", value: "Ferrari 2.9 V8, bored and stroked to 3.6 litres" },
+    { label: "Output", value: "400bhp" },
+    { label: "Management", value: "MoTeC ECU, mapped hot or cold" },
+    { label: "Gearbox", value: "Ferrari 328" },
+    { label: "Top speed", value: "In excess of 170mph" },
+    { label: "Wheels", value: "Original Campagnolo, 3D scanned and recast to 17 inch" },
+  ],
+  /** Verbatim from the same page. The details that make it theirs. */
+  details: [
+    "Fared-in perspex headlight covers with invisible fixings.",
+    "A Snap four exhaust system, a tip of the hat to the legendary Dino.",
+    "Ferrari 360 brakes and callipers, adjustable suspension, electric power steering.",
+    "Air conditioning and iPod connectivity, with the doors retrimmed to Chairs and Flares specification.",
+  ],
+  /** Kevin, on the same page, on what the car is actually for. */
+  closing:
+    "This Dino Evolution Restomod is not just about numbers like bhp, 0-60 and top speed, its about the driving experience, its about the car communicating with the driver and giving feedback through the seat and the steering. It has modern capabilities in terms of power, handling and reliability, but above all, It has a soul.",
+  closingBy: "Kevin O'Rourke",
   links: [
     { label: "The auction", href: "https://bringatrailer.com/listing/1972-ferrari-dino-246-gts-15/" },
     { label: "Jay Leno's Garage", href: "https://www.youtube.com/watch?v=qnt0DNqJYvM" },
   ],
+};
+
+/**
+ * Why Moto Technique. The title, the claim, then three figures that back it.
+ *
+ * Every figure is theirs and can be pointed at on mototechnique.com:
+ *   1000s  /hitech: "Having restored or repaired literally thousands of classic
+ *          and exotic sports cars over the last four decades"
+ *   120    /paintwork: "a combined accumulative experience of nearly 120 years
+ *          of repainting high end classic and exotic supercars"
+ *   $1.1M  the Dino sale, Kevin's own figures (25 Jun 2026, Bring a Trailer)
+ * Only one of the three is about the Dino, on purpose: the hero already is.
+ * Their words are kept as claims ("thousands", "nearly") and never sharpened
+ * into a count nobody could check.
+ */
+export const why = {
+  title: "Why Moto Technique",
+  heading: ["One workshop.", "Every discipline."],
+  body: "Established in 1980, Moto Technique are at the forefront of classic and sports car restoration and engineering excellence, with an international reputation for quality work and innovation. Every discipline is carried out in-house and under one roof, by artisan panel beaters, paint sprayers, fitters, mechanics and Hi-tech technicians.",
+  cta: { label: "Inside the workshop", href: "#workshop" },
+  figures: [
+    { value: "1000s", label: "Classic and exotic sports cars restored or repaired, over four decades" },
+    { value: "120", label: "Years of combined experience in the paintshop, nearly" },
+    { value: "$1.1M", label: "Dino 246 GTS Evo, built here, sold at auction in 2026" },
+  ],
+};
+
+/**
+ * The services wheel: four disciplines round a circle with Hi-Tech at its hub.
+ *
+ * The shape is the argument. Their site lists these as five separate pages, so
+ * nothing says they are one operation; drawn as quarters of a single circle,
+ * the fact that one workshop does all of it is the first thing you see, and
+ * Hi-Tech sits in the middle because it touches all four.
+ *
+ * Quarters run clockwise from the top right, which is also where each one's
+ * info box comes out. `blurb` is VERBATIM from that service's own page on
+ * mototechnique.com: a whole sentence, or the main clause of one, with their
+ * spelling and capitals kept. `href` is that page, so the wheel already goes somewhere.
+ */
+export const services = {
+  title: "Services",
+  quarters: [
+    {
+      id: "bodywork",
+      name: "Bodywork",
+      href: "https://www.mototechnique.com/bodywork",
+      blurb:
+        "Tubular chassis’s with lightweight aluminium body panels, monocoque chassis’s, Carbon tubs, steel panels, fibreglass, Carbon, Kevlar, welding, riveting, bonding…. the list is endless.",
+    },
+    {
+      id: "paintwork",
+      name: "Paintwork",
+      href: "https://www.mototechnique.com/paintwork",
+      blurb:
+        "Moto Technique can boast a combined accumulative experience of nearly 120 years of repainting high end classic and exotic supercars.",
+    },
+    {
+      id: "mechanical",
+      name: "Mechanical",
+      href: "https://www.mototechnique.com/mechanical",
+      blurb:
+        "Rebuilding, servicing and upgrading classic and modern engines, using traditional and modern methods to the highest standards possible is the goal of the Moto Technique engineers.",
+    },
+    {
+      id: "trim",
+      name: "Interior trim",
+      href: "https://www.mototechnique.com/trim",
+      blurb:
+        "All the interior trim work that comes to Moto Technique is carried out by the award winning O’Rourke Coachtrimmers who are respected by many people in the trade as being one of the very best, if not THE best coach trimmers in the World.",
+    },
+  ],
+  hub: {
+    id: "hitech",
+    name: "Hi-Tech",
+    href: "https://www.mototechnique.com/hitech",
+    blurb:
+      "Advancements in car restoration technology has happened in every single stage of the process, from paint and body materials to electronic scanning and alignment and most interestingly in engine management systems and reliability.",
+  },
 };
 
 /** Kevin's own words on what a restomod is. Verbatim from /upgrades. */
@@ -253,6 +376,8 @@ export const contact = {
   phoneHref: "tel:+442089413510",
   email: "kevin@mototechnique.com",
   instagram: "https://www.instagram.com/mototechnique/",
+  /** The published business address, as a search, so it opens in whichever maps app the visitor uses. */
+  maps: "https://www.google.com/maps/search/?api=1&query=Moto+Technique+141+Molesey+Avenue+West+Molesey+KT8+2RY",
   image: img("contact-dino"),
   credit: "V12 Enterprises",
 };
@@ -277,6 +402,8 @@ const content = mediaDeep({
   hero,
   heroMark,
   marks,
+  why,
+  services,
   sale,
   restomod,
   disciplines,

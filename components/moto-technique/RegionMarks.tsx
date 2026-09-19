@@ -17,13 +17,29 @@ import { FLAG_ART, type FlagArt } from "./flagArt";
  * All four share one height and a hairline outline, and each keeps its own true
  * proportions, the way a row of real flags hangs: the Union Flag at 1:2 and the
  * Stars and Stripes at 10:19 come out wider than Europe at 2:3. Nothing is
- * cropped or squeezed to match. The width follows from the viewBox, so a new
- * flag needs no sizing of its own. Europe's artwork is the ring of stars with
- * no field, so the outline is what makes it a flag.
+ * cropped or squeezed to match.
+ *
+ * The box is the <li>, not the <svg>. Each <li> is told its proportions outright
+ * (--mt-ratio, read from the artwork's viewBox) and the stylesheet gives it a
+ * whole-pixel height and the border; the svg just fills it. Sizing the svg
+ * itself with an automatic width and a border is where browsers disagree about
+ * which box the proportions apply to, and the flags came out different heights.
  */
+const ratio = (viewBox: string) => {
+  const [, , w, h] = viewBox.split(/\s+/).map(Number);
+  return (w / h).toFixed(4);
+};
+
 function Flag({ art, label }: { art: FlagArt; label: string }) {
   return (
-    <svg viewBox={art.viewBox} className="mt-flag" role="img" aria-label={label} fill="currentColor">
+    <svg
+      viewBox={art.viewBox}
+      preserveAspectRatio="xMidYMid slice"
+      className="mt-flag"
+      role="img"
+      aria-label={label}
+      fill="currentColor"
+    >
       {art.shapes.map((s, i) => {
         if (s.t === "polygon") return <polygon key={i} points={s.points} />;
         if (s.t === "path") return <path key={i} d={s.d} />;
@@ -57,7 +73,12 @@ export default function RegionMarks({ regions }: { regions: { id: string; label:
       {regions.map(({ id, label }) => {
         if (!isFlag(id) && id !== "asia") return null;
         return (
-          <li key={id} className="mt-region" title={label}>
+          <li
+            key={id}
+            className="mt-region"
+            title={label}
+            style={{ ["--mt-ratio" as string]: ratio(isFlag(id) ? FLAG_ART[id].viewBox : ASIA_VIEWBOX) }}
+          >
             {isFlag(id) ? <Flag art={FLAG_ART[id]} label={label} /> : <Asia label={label} />}
           </li>
         );

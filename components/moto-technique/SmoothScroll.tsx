@@ -27,12 +27,33 @@ export default function SmoothScroll() {
     history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
 
+    // QA only, never in a production build: `?y=1200` opens the page already
+    // scrolled to that point, so a screenshot tool that cannot scroll can still
+    // capture the hero mid-split. In viewport heights with `?yvh=1.04`.
+    let qa = 0;
+    if (process.env.NODE_ENV !== "production") {
+      const q = new URLSearchParams(location.search);
+      const y = q.has("yvh") ? Number(q.get("yvh")) * window.innerHeight : Number(q.get("y"));
+      if (y > 0) {
+        // The preloader holds the scroll while it plays, so wait for it to let go.
+        const site = document.querySelector(".mt-site");
+        const jump = () => {
+          if (site?.hasAttribute("data-intro")) return;
+          window.clearInterval(qa);
+          lenis.scrollTo(y, { immediate: true, force: true });
+        };
+        qa = window.setInterval(jump, 80);
+        jump();
+      }
+    }
+
     lenis.on("scroll", ScrollTrigger.update);
     const raf = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      window.clearInterval(qa);
       gsap.ticker.remove(raf);
       lenis.destroy();
       delete (window as unknown as { __mtLenis?: Lenis }).__mtLenis;

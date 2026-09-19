@@ -70,7 +70,7 @@ export default function MotoTechniqueLayout({ children }: { children: React.Reac
       <SmoothScroll />
       <Preloader />
       <ViewCursor />
-      <TopBar name={content.site.name} />
+      <TopBar name={content.site.name} nav={content.site.nav} contact={content.contact} />
       {children}
     </div>
   );
