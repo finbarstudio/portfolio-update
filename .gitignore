@@ -57,3 +57,7 @@ next-env.d.ts
 
 # Agent scratch memory written by subagents (local only)
 .claude/agent-memory/
+
+# llm-tldr code index (local tool cache)
+.tldr/
+.tldrignore
