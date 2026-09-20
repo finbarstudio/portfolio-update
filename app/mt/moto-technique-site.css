@@ -199,6 +199,13 @@
   transform: none;
 }
 
+/* DeskImg wraps a photograph in <picture> so a phone never fetches it. The
+   wrapper must not change the layout: with `contents` it has no box, and the
+   <img> inside is laid out as if it were a direct child. */
+.mt-deskimg {
+  display: contents;
+}
+
 .mt-mask {
   display: block;
   overflow: hidden;
@@ -1478,19 +1485,6 @@
   color: var(--mt-red);
 }
 
-@media (max-width: 760px) {
-  .mt-figures {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 26px;
-  }
-
-  /* the labels have to clear a smaller circle */
-  .mt-wheel-label {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-  }
-}
-
 /* Below this there is no room to hang a box either side of the wheel, so the
    open box sits under it instead, full width, and the lines are not drawn. The
    space is held open so the page does not jump as boxes come and go. */
@@ -1707,49 +1701,6 @@
   outline-offset: -6px;
 }
 
-/* On a phone the shelf turns on its side: rows, with the names level. */
-@media (max-width: 760px) {
-  .mt-shelf-row {
-    --mt-open-share: 0.44;
-    flex-direction: column;
-  }
-
-  .mt-book {
-    border-left: 0;
-    border-top: 0.5px solid rgba(255, 255, 255, 0.9);
-  }
-
-  .mt-book:first-child {
-    border-top: 0;
-  }
-
-  .mt-book-img {
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: calc(var(--mt-open-share) * 100svh);
-    translate: 0 -50%;
-  }
-
-  .mt-book-spine {
-    left: var(--mt-gutter);
-    bottom: 50%;
-    writing-mode: horizontal-tb;
-    translate: 0 50%;
-  }
-
-  .mt-book-face {
-    left: var(--mt-gutter);
-    bottom: 22px;
-    width: calc(100vw - 2 * var(--mt-gutter));
-    gap: 8px;
-  }
-
-  .mt-book-title {
-    font-size: 22px;
-  }
-}
-
 /* ---------- the footer --------------------------------------------------------
    White. Three columns of equal depth, then the name across the full width of
    the footer's own margins, its letters rising one by one with the scroll. */
@@ -1924,6 +1875,304 @@
   border-bottom-color: var(--mt-red);
 }
 
+/* ---------- the phone page (MobileHome.tsx) ------------------------------------
+   Under 761px the desktop sections are not shown at all and this plain page is.
+   Above it, the reverse. The footer and the bar are shared.
+
+   THE SCALES. Four type sizes and four spaces, declared here once and used for
+   everything below. Nothing in this block sets a font-size or a gap that is not
+   one of these. That strictness is the design: on a small screen, consistency
+   reads as quality far more than variety does.
+
+     type    label 12 / body 16 / lead 22 / display 40
+     space   8 / 16 / 32 / 64, and the one page margin (the gutter)
+
+   NO EFFECTS. No transforms, filters, blend modes, backdrop blurs, sticky
+   positioning or transitions on anything that scrolls. Each of those makes the
+   phone's GPU keep extra layers alive while a finger is moving the page. */
+
+.mt-mob {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  /* everything in the home page's main except the phone page */
+  .mt-site main#top > :not(.mt-mob) {
+    display: none;
+  }
+
+  .mt-mob {
+    --t-label: 12px;
+    --t-body: 16px;
+    --t-lead: 22px;
+    --t-display: 40px;
+    --s-1: 8px;
+    --s-2: 16px;
+    --s-3: 32px;
+    --s-4: 64px;
+
+    display: block;
+    /* the stacking rule gives main's children a z-index and a background for
+       the pinned desktop hero; neither is wanted here */
+    position: static;
+    background: #fff;
+    color: var(--mt-ink);
+  }
+
+  /* ---- type: the only four treatments ---- */
+  .mt-m-label {
+    display: block;
+    font-family: var(--mt-font-title);
+    font-size: var(--t-label);
+    font-weight: 400;
+    letter-spacing: 0.26em;
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--mt-ink-soft);
+  }
+
+  .mt-m-body {
+    font-size: var(--t-body);
+    line-height: 1.6;
+  }
+
+  .mt-m-lead {
+    font-family: var(--mt-font-title);
+    font-size: var(--t-lead);
+    line-height: 1.28;
+  }
+
+  .mt-m-display {
+    font-family: var(--mt-font-title);
+    font-size: var(--t-display);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mt-m-soft {
+    color: var(--mt-ink-soft);
+  }
+
+  /* ---- hero: one photograph, held still ---- */
+  .mt-m-hero {
+    position: relative;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+  }
+
+  .mt-m-hero > img:first-of-type {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* the photographs are landscape: hold the car, not the middle of the file */
+    object-position: 58% center;
+  }
+
+  .mt-m-hero-shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(2, 2, 2, 0.86) 0%, rgba(2, 2, 2, 0) 34%),
+      linear-gradient(to top, rgba(2, 2, 2, 0.96) 0%, rgba(2, 2, 2, 0.6) 30%, rgba(2, 2, 2, 0) 62%);
+  }
+
+  /* centred with margins, not a transform: nothing here needs its own layer */
+  .mt-m-hero-name {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: min(74vw, 340px);
+    height: auto;
+  }
+
+  .mt-m-hero-marks {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--s-4) + env(safe-area-inset-bottom));
+    display: grid;
+    justify-items: center;
+    gap: var(--s-3);
+    color: var(--mt-light);
+  }
+
+  /* The laurel is shared with the desktop page, where it has sizes of its own.
+     Here it takes the scale like everything else: the number at body size, its
+     two lines at label size. */
+  .mt-mob .mt-laurel-mark {
+    font-size: var(--t-body);
+  }
+
+  .mt-mob .mt-laurel-line,
+  .mt-mob .mt-laurel-line.mt-laurel-unit {
+    font-size: var(--t-label);
+  }
+
+  /* ---- sections ---- */
+  .mt-m-section {
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-4) var(--mt-gutter);
+  }
+
+  /* a hairline between sections that share the white ground */
+  .mt-m-rule {
+    border-top: 1px solid var(--mt-line);
+  }
+
+  /* a label sits closer to what it introduces than sections sit to each other */
+  .mt-m-section > .mt-m-label + * {
+    margin-top: calc(var(--s-2) - var(--s-3));
+  }
+
+  .mt-m-quote {
+    margin: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .mt-m-quote cite {
+    font-style: normal;
+  }
+
+  /* photographs leave the text column and run to the screen's edges */
+  .mt-m-bleed {
+    margin-inline: calc(var(--mt-gutter) * -1);
+    display: grid;
+    gap: 2px;
+  }
+
+  .mt-m-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mt-m-bleed img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+  }
+
+  .mt-m-pair img {
+    aspect-ratio: 4 / 5;
+  }
+
+  .mt-m-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-3);
+    font-size: var(--t-body);
+  }
+
+  /* 44px tall: the smallest comfortable tap target */
+  .mt-m-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-bottom: 1px solid var(--mt-line);
+  }
+
+  .mt-m-figures {
+    margin: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .mt-m-figures dd {
+    margin: var(--s-1) 0 0;
+  }
+
+  /* ---- swipe galleries: the browser's own scroll-snap, no script ----
+     Each item is narrower than the screen, so the edge of the next one shows
+     and it is plain that it swipes. */
+  .mt-m-gallery {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 82%;
+    gap: var(--s-1);
+    margin-inline: calc(var(--mt-gutter) * -1);
+    padding-inline: var(--mt-gutter);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--mt-gutter);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mt-m-gallery::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mt-m-gallery > * {
+    scroll-snap-align: start;
+  }
+
+  .mt-m-gallery img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  /* the gallery straight under the hero sits outside a section, so it has no
+     gutter to cancel and keeps its own space above and below */
+  .mt-m-gallery-flush {
+    margin-inline: 0;
+    padding-block: var(--s-1) 0;
+    background: #fff;
+  }
+
+  .mt-m-gallery-flush img {
+    aspect-ratio: 3 / 2;
+  }
+
+  .mt-m-card {
+    display: grid;
+    gap: var(--s-1);
+    align-content: start;
+  }
+
+  .mt-m-card img {
+    margin-bottom: var(--s-1);
+  }
+
+  /* ---- services: a plain list ---- */
+  .mt-m-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .mt-m-list a {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: var(--s-1) var(--s-2);
+    align-items: start;
+  }
+
+  .mt-m-list img {
+    grid-row: span 2;
+    display: block;
+    width: 88px;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  /* ---- shared furniture, made cheap on a phone ---- */
+  /* a backdrop blur is re-rendered every frame the page moves under it */
+  .mt-window {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #0e0e0e;
+  }
+}
+
 /* ---------- the cursor --------------------------------------------------------
    Two states, no pill. Over anything that opens it is the word, set in the
    title face to match the wordmark. Over the outer fifths of the hero it is a
@@ -2020,53 +2269,32 @@
   outline-offset: -8px;
 }
 
-/* ---------- hero at phone size ----------------------------------------------
-   No room for left and right, so the split goes top and bottom: the white panel
-   rises to cover the lower three fifths, the photograph slides up to stay
-   centred in what is left, and the badge stays level and rises with it rather
-   than turning on its side. The photographs are landscape and a phone is not,
-   so the frame holds the car rather than the middle of the file. */
+/* ---------- the bar at phone size ---------------------------------------------
+   The bar is shared by the desktop page and the phone page. */
 @media (max-width: 760px) {
-  .mt-hero-img {
-    object-position: 58% center;
-  }
-
   .mt-wordmark {
     font-size: 12px;
     letter-spacing: 0.34em;
   }
 
-  /* phone and menu stay; email and the address are inside the menu's window */
+  /* phone and menu stay; email and the address are inside the side menu */
   .mt-tool:is([data-tool="mail"], [data-tool="place"]) {
     display: none;
   }
 
-  .mt-hero-stage {
-    translate: 0 calc(var(--mt-split) * -24% + var(--mt-p) * -9%);
+  /* On a phone, photographs run edge to edge and pass right under the bar. Over
+     a light section the bar is black, so a dark photograph under it would
+     swallow it. So there it stands on a solid white strip: solid, not blurred,
+     because a blur is redrawn every frame the page moves and white costs
+     nothing. Over the hero there is no strip and the bar stays white on the
+     photograph, as on desktop. */
+  .mt-bar {
+    padding-block: 6px;
+    transition: background-color 0.25s var(--mt-ease);
   }
 
-  .mt-hero-title {
-    width: min(74vw, 340px);
-    translate: -50% calc(-50% + var(--mt-split) * -27svh);
-    rotate: none;
+  .mt-bar:has(.mt-wordmark[data-over="light"]) {
+    background: #fff;
+    border-bottom: 1px solid var(--mt-line);
   }
-
-  .mt-hero-info {
-    top: auto;
-    width: 100%;
-    height: 62%;
-    padding-inline: var(--mt-gutter);
-    translate: 0 calc((1 - var(--mt-split)) * 101%);
-  }
-
-  .mt-hero-info-inner {
-    padding-top: clamp(24px, 4vh, 40px);
-  }
-
-  /* The fade clears the bar's icons. Here the panel starts far below the bar,
-     so all it would do is hide the panel's first lines. */
-  .mt-hero-info::before {
-    display: none;
-  }
-
 }

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { isPhone } from "./phone";
 
 /**
  * Lenis for this demo only.
@@ -16,6 +17,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 export default function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // A phone scrolls natively. Its own momentum scrolling is better than any
+    // script's, and a second scroller fighting it is most of what "laggy" is.
+    if (isPhone()) return;
     gsap.registerPlugin(ScrollTrigger);
 
     const lenis = new Lenis({

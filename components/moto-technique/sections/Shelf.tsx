@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import DeskImg from "../DeskImg";
+import { isPhone } from "../phone";
 
 type Project = {
   id: string;
@@ -65,6 +67,7 @@ export default function Shelf({
     const at = mark.current;
     const el = root.current;
     if (!at || !el) return;
+    if (isPhone()) return; // hidden on a phone: no scroll work for it
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     /** Room kept under the bar at the top, where the type stops rising. */
@@ -139,14 +142,11 @@ export default function Shelf({
                   }
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <DeskImg
                   src={p.image}
                   alt=""
                   className="mt-book-img"
                   style={p.focus ? { objectPosition: p.focus } : undefined}
-                  loading="lazy"
-                  decoding="async"
                 />
                 <span className="mt-book-shade" aria-hidden="true" />
 

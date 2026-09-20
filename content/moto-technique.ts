@@ -33,8 +33,10 @@ export type HeroSlide = {
   /** Short line over the photo. Verbatim where possible. */
   line: string;
   image: string;
-  /** The same photograph at 1600px, for phones and ordinary screens. */
+  /** The same photograph at 1600px, for ordinary screens. */
   imageSm: string;
+  /** The cut the phone page uses: 900px in its swipe gallery, 1600px for the one that fills the screen. */
+  imagePhone: string;
   /** Photographer, shown small. */
   credit?: string;
 };
@@ -55,6 +57,7 @@ export const hero: HeroSlide[] = [
     line: "A Ferrari 3.6 litre V8 in a Dino 246 GTS. 400bhp, built in-house.",
     image: img("dino36-profile"),
     imageSm: img("dino36-profile-1600"),
+    imagePhone: img("dino36-profile-1600"),
     credit: "Jayson Fong",
   },
   {
@@ -63,6 +66,7 @@ export const hero: HeroSlide[] = [
     line: "The Moto Technique Dino 3.6 Litre V8 Restomod.",
     image: img("dino36-rear-moving"),
     imageSm: img("dino36-rear-moving-1600"),
+    imagePhone: img("dino36-rear-moving-900"),
     credit: "Jayson Fong",
   },
   {
@@ -71,6 +75,7 @@ export const hero: HeroSlide[] = [
     line: "If you're going to drop a 400bhp Ferrari V8 engine into a Dino, its nice to be able to see it.",
     image: img("dino36-perspex"),
     imageSm: img("dino36-perspex-1600"),
+    imagePhone: img("dino36-perspex-900"),
     credit: "Jayson Fong",
   },
   {
@@ -79,6 +84,7 @@ export const hero: HeroSlide[] = [
     line: "Snap exhaust system, a tip of the hat to the legendary Dino.",
     image: img("dino36-rear-leafs"),
     imageSm: img("dino36-rear-leafs-1600"),
+    imagePhone: img("dino36-rear-leafs-900"),
     credit: "Jayson Fong",
   },
   {
@@ -87,6 +93,7 @@ export const hero: HeroSlide[] = [
     line: "Fixing-free headlight covers and 17 inch Campagnolo wheels.",
     image: img("dino36-lens-wheels"),
     imageSm: img("dino36-lens-wheels-1600"),
+    imagePhone: img("dino36-lens-wheels-900"),
     credit: "Jayson Fong",
   },
   {
@@ -95,6 +102,7 @@ export const hero: HeroSlide[] = [
     line: "Stunning red leather interior to Chairs and Flares specification.",
     image: img("dino36-interior"),
     imageSm: img("dino36-interior-1600"),
+    imagePhone: img("dino36-interior-900"),
     credit: "Jayson Fong",
   },
 ];
@@ -158,8 +166,8 @@ export const marks = {
 type StoryBlock =
   | { kind: "text"; text: string }
   | { kind: "say"; text: string; by: string }
-  | { kind: "image"; image: string; alt: string }
-  | { kind: "pair"; images: { image: string; alt: string }[] };
+  | { kind: "image"; image: string; imagePhone: string; alt: string }
+  | { kind: "pair"; images: { image: string; imagePhone: string; alt: string }[] };
 
 const story: StoryBlock[] = [
   {
@@ -167,7 +175,7 @@ const story: StoryBlock[] = [
     text: "The ex-David Lee Dino 246 GTS Evo, upgraded by Moto Technique to a 3.6 litre Ferrari V8, sold on Bring a Trailer on 25 June 2026 for $1,106,000.",
   },
   // the 1600px cuts: the panel is half the screen, so the full-size files are wasted here
-  { kind: "image", image: img("dino36-rear-moving-1600"), alt: "The Dino 3.6 from behind, at speed" },
+  { kind: "image", image: img("dino36-rear-moving-1600"), imagePhone: img("dino36-rear-moving-900"), alt: "The Dino 3.6 from behind, at speed" },
   {
     kind: "say",
     text: "This is as nice a restomod as I've ever seen... It's such a Brilliant Car. This is the car the factory should have built",
@@ -176,15 +184,15 @@ const story: StoryBlock[] = [
   {
     kind: "pair",
     images: [
-      { image: img("dino36-engine"), alt: "The 3.6 litre Ferrari V8 in the Dino's engine bay" },
-      { image: img("dino36-interior-1600"), alt: "Red leather interior, Chairs and Flares specification" },
+      { image: img("dino36-engine"), imagePhone: img("dino36-engine-900"), alt: "The 3.6 litre Ferrari V8 in the Dino's engine bay" },
+      { image: img("dino36-interior-1600"), imagePhone: img("dino36-interior-900"), alt: "Red leather interior, Chairs and Flares specification" },
     ],
   },
   {
     kind: "text",
     text: "They took a Ferrari 2.9 Litre V8 and bored and stroked it to 3.6 Litres. With the advancements in ECU’s since the original Dino “Prototype” they added a MoTec engine management system to get the very best out of new 400bhp engine. It has been mapped to start, hot or cold wether its up a mountain or down by the seashore and deliver the power smoothly through a Ferrari 328 gearbox. This car will pull effortlessly from 30mph in 5th gear right up to its top speed which is in excess of 170mph.",
   },
-  { kind: "image", image: img("dino36-perspex-lid"), alt: "The perspex engine cover" },
+  { kind: "image", image: img("dino36-perspex-lid"), imagePhone: img("dino36-perspex-lid-900"), alt: "The perspex engine cover" },
   {
     kind: "say",
     text: "This Dino Evolution Restomod is not just about numbers like bhp, 0-60 and top speed, its about the driving experience, its about the car communicating with the driver and giving feedback through the seat and the steering. It has modern capabilities in terms of power, handling and reliability, but above all, It has a soul.",
@@ -248,6 +256,7 @@ export const services = {
       href: SOON,
       source: "https://www.mototechnique.com/bodywork",
       image: img("gullwing-ext"),
+      imagePhone: img("gullwing-ext-900"),
       blurb:
         "Tubular chassis’s with lightweight aluminium body panels, monocoque chassis’s, Carbon tubs, steel panels, fibreglass, Carbon, Kevlar, welding, riveting, bonding…. the list is endless.",
     },
@@ -257,6 +266,7 @@ export const services = {
       href: SOON,
       source: "https://www.mototechnique.com/paintwork",
       image: img("dino-candy-red"),
+      imagePhone: img("dino-candy-red-900"),
       blurb:
         "Moto Technique can boast a combined accumulative experience of nearly 120 years of repainting high end classic and exotic supercars.",
     },
@@ -266,6 +276,7 @@ export const services = {
       href: SOON,
       source: "https://www.mototechnique.com/mechanical",
       image: img("v8-38-engine"),
+      imagePhone: img("v8-38-engine-900"),
       blurb:
         "Rebuilding, servicing and upgrading classic and modern engines, using traditional and modern methods to the highest standards possible is the goal of the Moto Technique engineers.",
     },
@@ -275,6 +286,7 @@ export const services = {
       href: SOON,
       source: "https://www.mototechnique.com/trim",
       image: img("trim-tdf"),
+      imagePhone: img("trim-tdf-900"),
       blurb:
         "All the interior trim work that comes to Moto Technique is carried out by the award winning O’Rourke Coachtrimmers who are respected by many people in the trade as being one of the very best, if not THE best coach trimmers in the World.",
     },
@@ -286,6 +298,7 @@ export const services = {
     source: "https://www.mototechnique.com/hitech",
     // Finbar's pick: the 250 GTO on the digital alignment jig, from their GTO page.
     image: img("gto-jig-richard"),
+    imagePhone: img("gto-jig-richard-900"),
     blurb:
       "Advancements in car restoration technology has happened in every single stage of the process, from paint and body materials to electronic scanning and alignment and most interestingly in engine management systems and reliability.",
   },
@@ -300,6 +313,8 @@ export const services = {
  * all, so it has no line here either: a gap is better than an invented caption.
  * `href` is their page. Note the Iso Grifo really does live at a URL that says
  * F40: that is a slip on their site, copied faithfully so the link works.
+ *
+ * `imagePhone` is a 900px cut for the phone page (Tools/make-phone-cuts.sh).
  *
  * The first one stands open when the section arrives. Reorder the list and the
  * shelf reorders; it lays itself out for however many there are. `focus` is
@@ -317,6 +332,7 @@ export const projects = {
       // NOTE: 816px wide is all their site has of it, so it softens on a very
       // large screen. A bigger original from Kevin would fix that.
       image: img("gto-goodwood"),
+      imagePhone: img("gto-goodwood-900"),
       focus: "50% 80%",
       href: SOON,
       source: "https://www.mototechnique.com/ferrari-250-gto",
@@ -326,6 +342,7 @@ export const projects = {
       name: "Ferrari F40LM / GTE",
       line: "Ferrari F40LM/GTE Upgraded to 720BHP",
       image: img("f40lm-anglesey"),
+      imagePhone: img("f40lm-anglesey-900"),
       href: SOON,
       source: "https://www.mototechnique.com/ferrari-f40lm-gte-1",
     },
@@ -334,6 +351,7 @@ export const projects = {
       name: "Mercedes 300SL Gullwing",
       line: "Mercedes 300SL Gullwing Restored to absolute perfection by Moto Technique",
       image: img("gullwing-restored"),
+      imagePhone: img("gullwing-restored-900"),
       href: SOON,
       source: "https://www.mototechnique.com/mercedes-300sl-gullwing",
     },
@@ -342,6 +360,7 @@ export const projects = {
       name: "Ferrari 308 GTB",
       line: "A unique spec Ferrari 308 Restomond by Moto Technique fitted with a Ferrari V8 (Stage 2) Engine and many other bespoke features.",
       image: img("f308-hero"),
+      imagePhone: img("f308-hero-900"),
       href: SOON,
       source: "https://www.mototechnique.com/308-gtb-restomod",
     },
@@ -350,6 +369,7 @@ export const projects = {
       name: "Lamborghini Miura P400",
       line: "",
       image: img("miura-roadster"),
+      imagePhone: img("miura-roadster-900"),
       href: SOON,
       source: "https://www.mototechnique.com/lamborghini-miurap400",
     },
@@ -358,6 +378,7 @@ export const projects = {
       name: "Iso Grifo Mk2",
       line: "Iso Grifo Mk2 - Ground-up restoration to award winning standards by MOTO TECHNIQUE",
       image: img("iso-hero"),
+      imagePhone: img("iso-hero-900"),
       href: SOON,
       source: "https://www.mototechnique.com/ferrari-f40lm-gte",
     },
@@ -366,6 +387,7 @@ export const projects = {
       name: "Dino 246 GTS 3.2 V8",
       line: "Dino 246 GTS - Upgraded to Ferrari V8 300bhp engine with handling and braking to match.",
       image: img("dino32-road"),
+      imagePhone: img("dino32-road-900"),
       href: SOON,
       source: "https://www.mototechnique.com/dino-246-gts-upgrade-32-v8",
     },
@@ -374,6 +396,7 @@ export const projects = {
       name: "BMW Isetta 300",
       line: "BMW Isetta 300 or Ferrari 250 GTO, they all receive the same care and attention at Moto Technique.",
       image: img("isetta-pub"),
+      imagePhone: img("isetta-pub-900"),
       href: SOON,
       source: "https://www.mototechnique.com/bmw-isetta-300",
     },

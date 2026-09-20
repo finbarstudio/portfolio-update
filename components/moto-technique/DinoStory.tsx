@@ -1,3 +1,5 @@
+import DeskImg from "./DeskImg";
+
 /**
  * The Dino's story: what fills the white half of the split hero.
  *
@@ -17,12 +19,13 @@
  * This component never edits a word. See the content file for sources.
  */
 
-type Shot = { image: string; alt: string };
+/** `imagePhone` is a smaller cut of the same photograph; only the phone page uses it. */
+type Shot = { image: string; imagePhone?: string; alt: string };
 
 export type StoryBlock =
   | { kind: "text"; text: string }
   | { kind: "say"; text: string; by: string }
-  | { kind: "image"; image: string; alt: string }
+  | { kind: "image"; image: string; imagePhone?: string; alt: string }
   | { kind: "pair"; images: Shot[] };
 
 export type Sale = { blocks: StoryBlock[]; links: { label: string; href: string }[] };
@@ -32,11 +35,10 @@ export type Sale = { blocks: StoryBlock[]; links: { label: string; href: string 
  * transform, not by the page scrolling, and the browser's lazy loading judges
  * "nearly on screen" badly for that: photographs arrived blank and filled in
  * late. They load with the page instead, at low priority, so the hero's own
- * photograph still comes first.
+ * photograph still comes first. DeskImg keeps a phone from fetching them at all.
  */
 function Photo({ shot }: { shot: Shot }) {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={shot.image} alt={shot.alt} loading="eager" fetchPriority="low" decoding="async" />;
+  return <DeskImg src={shot.image} alt={shot.alt} eager />;
 }
 
 export default function DinoStory({ sale }: { sale: Sale }) {

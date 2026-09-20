@@ -171,9 +171,10 @@ export default function TopBar({
   const toTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const lenis = (window as unknown as { __mtLenis?: { scrollTo(t: number): void } }).__mtLenis;
     close(false);
-    if (!lenis) return;
     e.preventDefault();
-    lenis.scrollTo(0);
+    // no smooth-scroll library on a phone or with reduced motion: ask the browser
+    if (lenis) lenis.scrollTo(0);
+    else window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const tools: Panel[] = ["call", "mail", "place", "menu"];

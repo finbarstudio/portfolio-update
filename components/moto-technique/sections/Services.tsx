@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import DeskImg from "../DeskImg";
 import Wipe from "../Wipe";
 
 type Item = { id: string; name: string; href: string; blurb: string; image: string };
@@ -136,8 +137,7 @@ export default function Services({ services }: { services: { title: string; quar
 
   const box = (s: Item, where: string) => (
     <div key={`box-${s.id}`} id={`mt-svc-${s.id}`} className="mt-wheel-box" data-where={where} data-open={open === s.id ? "1" : "0"}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={s.image} alt="" className="mt-wheel-box-img" loading="lazy" decoding="async" />
+      <DeskImg src={s.image} alt="" className="mt-wheel-box-img" />
       <div className="mt-wheel-box-say">
         <span className="mt-wheel-box-name">{s.name}</span>
         <p>{s.blurb}</p>

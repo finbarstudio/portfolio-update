@@ -6,6 +6,10 @@ import AwardLaurel from "../AwardLaurel";
 import DinoBadge, { type Finish } from "../DinoBadge";
 import DinoStory, { type Sale } from "../DinoStory";
 import RegionMarks from "../RegionMarks";
+import { isPhone } from "../phone";
+
+/** A 1x1 transparent GIF, handed to phones in place of photographs they never show. */
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 /** How long each photograph holds before the next one fades in. */
 const HOLD_MS = 6000;
@@ -96,6 +100,7 @@ export default function Hero({
   useEffect(() => {
     if (count < 2 || choosing || covered) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (isPhone()) return; // hidden on a phone (see MobileHome)
 
     let timer = 0;
     const arm = () => {
@@ -117,6 +122,7 @@ export default function Hero({
     const spacer = run.current;
     const inner = panel.current;
     if (!el || !spacer || !inner) return;
+    if (isPhone()) return; // hidden on a phone: no scroll work for it
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // How far the panel's contents overflow it, which is how far they travel as
@@ -187,20 +193,23 @@ export default function Hero({
 
         {/* Every frame is mounted and cross-fades, so a switch never blanks. */}
         <div className="mt-hero-stage" aria-hidden="true">
+          {/* Wrapped so a phone, where this hero is hidden, never fetches these
+              (see DeskImg). The phone page asks for its own, smaller, cut. */}
           {slides.map((s, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={s.id}
-              src={s.image}
-              srcSet={`${s.imageSm} 1600w, ${s.image} 2500w`}
-              sizes="100vw"
-              alt=""
-              className="mt-hero-img"
-              data-active={i === active ? "1" : "0"}
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchPriority={i === 0 ? "high" : "low"}
-              decoding="async"
-            />
+            <picture key={s.id} className="mt-deskimg">
+              <source media="(max-width: 760px)" srcSet={BLANK} />
+              <img
+                src={s.image}
+                srcSet={`${s.imageSm} 1600w, ${s.image} 2500w`}
+                sizes="100vw"
+                alt=""
+                className="mt-hero-img"
+                data-active={i === active ? "1" : "0"}
+                loading={i === 0 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : "low"}
+                decoding="async"
+              />
+            </picture>
           ))}
           <div className="mt-hero-grain" />
         </div>

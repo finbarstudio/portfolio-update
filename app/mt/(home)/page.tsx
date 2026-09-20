@@ -4,6 +4,7 @@ import Why from "@/components/moto-technique/sections/Why";
 import Services from "@/components/moto-technique/sections/Services";
 import Shelf from "@/components/moto-technique/sections/Shelf";
 import Footer from "@/components/moto-technique/sections/Footer";
+import MobileHome from "@/components/moto-technique/MobileHome";
 
 /**
  * The home page is a composition, nothing more. Every string and photograph
@@ -25,6 +26,19 @@ export default function MotoTechniqueHome() {
         <Why why={why} />
         <Shelf projects={projects} />
         <Services services={services} />
+
+        {/* Phones get this instead of everything above it. The stylesheet shows
+            one or the other; see MobileHome.tsx for why it is a separate page. */}
+        <MobileHome
+          hero={hero}
+          heroMark={heroMark}
+          marks={marks}
+          sale={sale}
+          why={why}
+          projects={projects}
+          services={services}
+          h1={site.h1}
+        />
       </main>
       <Footer contact={contact} name={site.name} established={site.established} links={sale.links} />
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { isPhone } from "./phone";
 
 /**
  * The car's name as a metal badge.
@@ -67,6 +68,7 @@ export default function DinoBadge({
     const cv = canvas.current;
     if (!host || !cv) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (isPhone()) return; // no WebGL on a phone: the mobile page shows the flat artwork
 
     let dead = false;
     // Everything that needs releasing is pushed here the moment it exists, so
