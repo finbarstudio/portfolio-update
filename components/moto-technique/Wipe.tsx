@@ -17,8 +17,8 @@ import { useEffect, useRef, type ElementType, type ReactNode } from "react";
  *                   group so they follow each other instead of landing as one.
  *   scrub           tied live to the scroll: how far the wipe has run is how
  *                   far the element has travelled up the screen, forwards and
- *                   backwards. It finishes by mid-screen, so nothing is ever
- *                   half-hidden where someone is reading.
+ *                   backwards. It finishes early (by mid-screen, sooner on a
+ *                   phone), so nothing is half-hidden where someone is reading.
  *
  * Both are position-based (IntersectionObserver and getBoundingClientRect), so
  * they work the same for content moved by the page scrolling and for content
@@ -34,10 +34,15 @@ let listening = false;
 
 function measure() {
   const vh = window.innerHeight;
+  // How much of the screen's height a wipe takes to finish, from the moment its
+  // top edge enters at the bottom. Nearly half on a wide screen, so it is done
+  // by mid-screen. Far less on a phone: there the hero's panel only fills the
+  // lower part of the screen, so "mid-screen" is above where its content is
+  // ever shown and a wipe would never finish.
+  const span = window.innerWidth <= 760 ? 0.2 : 0.46;
   for (const el of scrubbed) {
     const top = el.getBoundingClientRect().top;
-    // 0 as its top edge enters at the bottom of the screen, 1 by mid-screen
-    const w = Math.min(1, Math.max(0, (vh * 0.98 - top) / (vh * 0.46)));
+    const w = Math.min(1, Math.max(0, (vh * 0.98 - top) / (vh * span)));
     el.style.setProperty("--mt-w", w.toFixed(4));
   }
 }

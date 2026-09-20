@@ -1995,8 +1995,12 @@
   user-select: none;
 }
 
+/* Never shrink. A clipped flex item may shrink to nothing, and then the word
+   always "fits" at any size, so Footer.tsx's measurement has nothing to read
+   and the name is never scaled to the width. */
 .mt-footer-char {
   display: block;
+  flex: 0 0 auto;
   overflow: hidden;
 }
 
@@ -2215,6 +2219,12 @@
 
   .mt-hero-info-inner {
     padding-top: clamp(24px, 4vh, 40px);
+  }
+
+  /* The fade clears the bar's icons. Here the panel starts far below the bar,
+     so all it would do is hide the panel's first lines. */
+  .mt-hero-info::before {
+    display: none;
   }
 
   .mt-story-gallery {
