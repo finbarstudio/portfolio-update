@@ -36,11 +36,13 @@ type Project = {
  *
  * THE TYPE RIDES THE EDGE. As the next section comes up over the pinned shelf
  * it would cover the names first, since they sit low. Instead each name (spine
- * or open face alike) is lifted just ahead of that rising edge, a margin above
- * it, and rides it up the photograph. It stops when it reaches the top of its
- * own picture, and only then is it covered. Worked out here per element, as
- * --mt-ride in pixels: how far the edge has come, less how far off the bottom
- * the type already sits, capped by the room above it. All the reading of sizes
+ * or open face alike) moves up with that rising edge from its very first pixel,
+ * keeping exactly the gap above it that it had above the bottom of the screen,
+ * so the edge never closes in on the type and there is no moment where one is
+ * moving and the other is not. It stops when it reaches the top of its own
+ * picture, and only then is it covered. Worked out here per element, as
+ * --mt-ride in pixels: simply how far the edge has come, capped by the room
+ * above the type. All the reading of sizes
  * happens before any writing, so it costs one layout per frame. On a phone the
  * shelf is rows, each name is already in the middle of its own row, and this
  * is skipped.
@@ -65,8 +67,7 @@ export default function Shelf({
     if (!at || !el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    /** Gap kept between the rising edge and the type, and under the bar at the top. */
-    const EDGE = 28;
+    /** Room kept under the bar at the top, where the type stops rising. */
     const CEILING = 96;
 
     let frame = 0;
@@ -84,11 +85,7 @@ export default function Shelf({
       const h = el.offsetHeight;
       const covered = Math.max(0, par) * h;
       // read everything, then write everything
-      const rides = [...type].map((t) => {
-        const offBottom = h - (t.offsetTop + t.offsetHeight);
-        const room = Math.max(0, t.offsetTop - CEILING);
-        return Math.min(room, Math.max(0, covered + EDGE - offBottom));
-      });
+      const rides = [...type].map((t) => Math.min(Math.max(0, t.offsetTop - CEILING), covered));
       type.forEach((t, i) => t.style.setProperty("--mt-ride", `${rides[i].toFixed(1)}px`));
     };
     const onScroll = () => {

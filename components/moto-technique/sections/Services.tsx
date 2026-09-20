@@ -70,7 +70,11 @@ function place(index: number) {
   const ex = right ? BOX_NEAR : 100 - BOX_NEAR;
   const ey = top ? BOX_INSET + BOX_HIT : 100 - BOX_INSET - BOX_HIT;
   return {
-    label: { left: `${lx.toFixed(2)}%`, top: `${ly.toFixed(2)}%` },
+    // Each name runs along its own quarter's diagonal. The top right and bottom
+    // left diagonals climb to the right (-45deg); the other two fall to the
+    // right (45deg). Turned that way round, rather than all pointing outwards,
+    // every name still reads left to right and none is upside down.
+    label: { left: `${lx.toFixed(2)}%`, top: `${ly.toFixed(2)}%`, rotate: index % 2 === 0 ? "-45deg" : "45deg" },
     // start point, length and angle: all the stylesheet needs to draw it
     line: {
       left: `${sx.toFixed(3)}%`,

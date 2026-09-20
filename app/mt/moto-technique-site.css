@@ -574,15 +574,19 @@
   transition: translate 0.9s var(--mt-ease) calc(0.18s + var(--mt-i) * 0.07s);
 }
 
-/* U+27F6, the long rightwards arrow, set lighter and smaller than the name */
+/* U+27F6, the long rightwards arrow, sized to sit with the name rather than
+   beside it as a footnote. The glyph comes from whichever font has it, so
+   font-weight cannot be relied on to thicken it; a hairline stroke in the same
+   colour does, in any font. */
 .mt-drawer-nav a::before {
   content: "\27F6";
   position: absolute;
   left: 0;
   top: 50%;
   font-family: var(--mt-font-body);
-  font-size: 0.5em;
-  font-weight: 300;
+  font-size: 0.82em;
+  font-weight: 500;
+  -webkit-text-stroke: 0.035em currentColor;
   line-height: 1;
   opacity: 0;
   translate: -0.8em -50%;
@@ -591,8 +595,9 @@
     translate 0.45s var(--mt-ease);
 }
 
+/* far enough to clear the larger arrow, with a gap */
 .mt-drawer[data-open="1"] .mt-drawer-nav a:is(:hover, :focus-visible) span {
-  translate: 1.25em 0;
+  translate: 1.55em 0;
   transition: translate 0.45s var(--mt-ease);
 }
 
@@ -653,8 +658,10 @@
 
 /* Every section after the hero sits above it and is opaque, or the pinned
    photograph would show through. :where() keeps this at zero specificity so a
-   section's own background still wins. */
-:where(.mt-site main) > :where(:not(.mt-hero, .mt-hero-run)) {
+   section's own background still wins. Only the HOME page's main (#top): any
+   other page under /mt has a main too, and this gave each of its blocks a grey
+   box of its own. */
+:where(.mt-site main#top) > :where(:not(.mt-hero, .mt-hero-run)) {
   position: relative;
   z-index: 1;
   background: var(--mt-paper);
@@ -1442,13 +1449,17 @@
 }
 
 /* Each label is centred on a point halfway out along the middle of its own
-   quarter. Services.tsx works that point out and sets left and top. */
+   quarter, and turned to run along that quarter's diagonal. Services.tsx works
+   out the point and the angle. `translate` centres it and `rotate` then turns
+   it about that same centre, so turning it does not move it off the point. */
 .mt-wheel-label {
   position: absolute;
   translate: -50% -50%;
   white-space: nowrap;
-  font-size: clamp(11px, 1.15vw, 13px);
-  letter-spacing: 0.18em;
+  /* sized to the run it has: on the diagonal a name has only the distance from
+     the hub to the rim, and "Interior trim" all but fills it */
+  font-size: clamp(10px, 0.95vw, 12px);
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   transition: color 0.3s var(--mt-ease);
 }
@@ -1591,7 +1602,9 @@
   height: 114%;
   object-fit: cover;
   translate: -50% calc(var(--mt-par) * -6%);
-  filter: grayscale(1) brightness(0.62);
+  /* closed: black and white and well dimmed, so the white name down the spine
+     has something dark to stand on whatever the photograph */
+  filter: grayscale(1) brightness(0.4);
   transition: filter 0.85s var(--mt-ease);
 }
 
@@ -1604,8 +1617,12 @@
 .mt-book-shade {
   position: absolute;
   inset: 0;
-  /* taller than before: the type now sits higher and still needs its ground */
-  background: linear-gradient(to top, rgba(4, 4, 4, 0.88) 0%, rgba(4, 4, 4, 0.5) 30%, rgba(4, 4, 4, 0) 68%);
+  /* Dark at the foot for the type, and dark at the head for the bar, which sits
+     over whichever photograph is open. Clear through the middle, so the car
+     itself is left alone. */
+  background:
+    linear-gradient(to top, rgba(4, 4, 4, 0.9) 0%, rgba(4, 4, 4, 0.55) 28%, rgba(4, 4, 4, 0) 62%),
+    linear-gradient(to bottom, rgba(4, 4, 4, 0.78) 0%, rgba(4, 4, 4, 0.3) 18%, rgba(4, 4, 4, 0) 38%);
   pointer-events: none;
 }
 
@@ -1869,9 +1886,18 @@
   text-align: center;
 }
 
+/* the one thing this page says, so it is said at size */
+.mt-soon-say .mt-title {
+  font-size: clamp(34px, 6.4vw, 96px);
+  letter-spacing: 0.3em;
+  padding-left: 0.3em;
+}
+
 .mt-soon-say p {
-  margin-top: 22px;
-  max-width: 44ch;
+  margin: clamp(22px, 3.4vh, 40px) auto 0;
+  max-width: 36ch;
+  font-size: clamp(18px, 1.6vw, 24px);
+  line-height: 1.5;
   color: var(--mt-ink-soft);
   text-wrap: balance;
 }
@@ -1880,14 +1906,15 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 8px clamp(18px, 3vw, 44px);
+  gap: 10px clamp(20px, 3vw, 48px);
   font-style: normal;
-  font-size: 14px;
+  font-size: clamp(16px, 1.3vw, 20px);
 }
 
 .mt-soon-studio .mt-eyebrow {
   flex-basis: 100%;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  font-size: 11px;
 }
 
 .mt-soon-studio a {
