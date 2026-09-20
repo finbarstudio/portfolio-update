@@ -1449,17 +1449,15 @@
 }
 
 /* Each label is centred on a point halfway out along the middle of its own
-   quarter, and turned to run along that quarter's diagonal. Services.tsx works
+   quarter, and turned to run across the quarter, following the wheel's curve. Services.tsx works
    out the point and the angle. `translate` centres it and `rotate` then turns
    it about that same centre, so turning it does not move it off the point. */
 .mt-wheel-label {
   position: absolute;
   translate: -50% -50%;
   white-space: nowrap;
-  /* sized to the run it has: on the diagonal a name has only the distance from
-     the hub to the rim, and "Interior trim" all but fills it */
-  font-size: clamp(10px, 0.95vw, 12px);
-  letter-spacing: 0.15em;
+  font-size: clamp(11px, 1.05vw, 13px);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   transition: color 0.3s var(--mt-ease);
 }

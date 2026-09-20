@@ -70,11 +70,13 @@ function place(index: number) {
   const ex = right ? BOX_NEAR : 100 - BOX_NEAR;
   const ey = top ? BOX_INSET + BOX_HIT : 100 - BOX_INSET - BOX_HIT;
   return {
-    // Each name runs along its own quarter's diagonal. The top right and bottom
-    // left diagonals climb to the right (-45deg); the other two fall to the
-    // right (45deg). Turned that way round, rather than all pointing outwards,
-    // every name still reads left to right and none is upside down.
-    label: { left: `${lx.toFixed(2)}%`, top: `${ly.toFixed(2)}%`, rotate: index % 2 === 0 ? "-45deg" : "45deg" },
+    // Each name runs ACROSS its quarter, square to the line out from the hub, so
+    // the four together follow the curve of the wheel. (Along the diagonal, out
+    // from the hub, was tried and was the wrong way.) Top right and bottom left
+    // fall to the right (45deg); the other two climb (-45deg). Every name still
+    // reads left to right and none is upside down. It is also the roomier way
+    // round: across a quarter there is far more length than hub to rim.
+    label: { left: `${lx.toFixed(2)}%`, top: `${ly.toFixed(2)}%`, rotate: index % 2 === 0 ? "45deg" : "-45deg" },
     // start point, length and angle: all the stylesheet needs to draw it
     line: {
       left: `${sx.toFixed(3)}%`,
