@@ -16,6 +16,16 @@ import { mediaDeep } from "@/lib/media";
 
 const img = (name: string) => `/media/images/moto-technique/${name}.webp`;
 
+/**
+ * Where links go for now. Only the home page exists, so every link that would
+ * lead to another page of the site lands on one holding page instead of on
+ * their old site or on a 404. Each item keeps the address of the page it will
+ * become as `source`, so the full build has them. Links that already have a
+ * real destination are left alone: phone, email, maps, Instagram, the auction
+ * and the film.
+ */
+const SOON = "/mt/soon";
+
 export type HeroSlide = {
   id: string;
   /** The car, as Kevin names it. */
@@ -186,7 +196,6 @@ export const sale = {
     punch: "but above all, It has a soul.",
     by: "Kevin O'Rourke",
   },
-  closer: { image: img("dino36-rear-leafs"), alt: "The Dino 3.6 from behind, leaves in the air" },
   links: [
     { label: "The auction", href: "https://bringatrailer.com/listing/1972-ferrari-dino-246-gts-15/" },
     { label: "Jay Leno's Garage", href: "https://www.youtube.com/watch?v=qnt0DNqJYvM" },
@@ -210,7 +219,7 @@ export const why = {
   title: "Why Moto Technique",
   heading: ["One workshop.", "Every discipline."],
   body: "Established in 1980, Moto Technique are at the forefront of classic and sports car restoration and engineering excellence, with an international reputation for quality work and innovation. Every discipline is carried out in-house and under one roof, by artisan panel beaters, paint sprayers, fitters, mechanics and Hi-tech technicians.",
-  cta: { label: "See the projects", href: "#projects" },
+  cta: { label: "See the projects", href: SOON },
   figures: [
     { value: "1000s", label: "Classic and exotic sports cars restored or repaired, over four decades" },
     { value: "120", label: "Years of combined experience in the paintshop, nearly" },
@@ -238,7 +247,8 @@ export const services = {
     {
       id: "bodywork",
       name: "Bodywork",
-      href: "https://www.mototechnique.com/bodywork",
+      href: SOON,
+      source: "https://www.mototechnique.com/bodywork",
       image: img("gullwing-ext"),
       blurb:
         "Tubular chassis’s with lightweight aluminium body panels, monocoque chassis’s, Carbon tubs, steel panels, fibreglass, Carbon, Kevlar, welding, riveting, bonding…. the list is endless.",
@@ -246,7 +256,8 @@ export const services = {
     {
       id: "paintwork",
       name: "Paintwork",
-      href: "https://www.mototechnique.com/paintwork",
+      href: SOON,
+      source: "https://www.mototechnique.com/paintwork",
       image: img("dino-candy-red"),
       blurb:
         "Moto Technique can boast a combined accumulative experience of nearly 120 years of repainting high end classic and exotic supercars.",
@@ -254,7 +265,8 @@ export const services = {
     {
       id: "mechanical",
       name: "Mechanical",
-      href: "https://www.mototechnique.com/mechanical",
+      href: SOON,
+      source: "https://www.mototechnique.com/mechanical",
       image: img("v8-38-engine"),
       blurb:
         "Rebuilding, servicing and upgrading classic and modern engines, using traditional and modern methods to the highest standards possible is the goal of the Moto Technique engineers.",
@@ -262,7 +274,8 @@ export const services = {
     {
       id: "trim",
       name: "Interior trim",
-      href: "https://www.mototechnique.com/trim",
+      href: SOON,
+      source: "https://www.mototechnique.com/trim",
       image: img("trim-tdf"),
       blurb:
         "All the interior trim work that comes to Moto Technique is carried out by the award winning O’Rourke Coachtrimmers who are respected by many people in the trade as being one of the very best, if not THE best coach trimmers in the World.",
@@ -271,8 +284,10 @@ export const services = {
   hub: {
     id: "hitech",
     name: "Hi-Tech",
-    href: "https://www.mototechnique.com/hitech",
-    image: img("f40lm-720"),
+    href: SOON,
+    source: "https://www.mototechnique.com/hitech",
+    // Finbar's pick: the 250 GTO on the digital alignment jig, from their GTO page.
+    image: img("gto-jig-richard"),
     blurb:
       "Advancements in car restoration technology has happened in every single stage of the process, from paint and body materials to electronic scanning and alignment and most interestingly in engine management systems and reliability.",
   },
@@ -305,56 +320,64 @@ export const projects = {
       // large screen. A bigger original from Kevin would fix that.
       image: img("gto-goodwood"),
       focus: "50% 80%",
-      href: "https://www.mototechnique.com/ferrari-250-gto",
+      href: SOON,
+      source: "https://www.mototechnique.com/ferrari-250-gto",
     },
     {
       id: "f40",
       name: "Ferrari F40LM / GTE",
       line: "Ferrari F40LM/GTE Upgraded to 720BHP",
       image: img("f40lm-anglesey"),
-      href: "https://www.mototechnique.com/ferrari-f40lm-gte-1",
+      href: SOON,
+      source: "https://www.mototechnique.com/ferrari-f40lm-gte-1",
     },
     {
       id: "gullwing",
       name: "Mercedes 300SL Gullwing",
       line: "Mercedes 300SL Gullwing Restored to absolute perfection by Moto Technique",
       image: img("gullwing-restored"),
-      href: "https://www.mototechnique.com/mercedes-300sl-gullwing",
+      href: SOON,
+      source: "https://www.mototechnique.com/mercedes-300sl-gullwing",
     },
     {
       id: "f308",
       name: "Ferrari 308 GTB",
       line: "A unique spec Ferrari 308 Restomond by Moto Technique fitted with a Ferrari V8 (Stage 2) Engine and many other bespoke features.",
       image: img("f308-hero"),
-      href: "https://www.mototechnique.com/308-gtb-restomod",
+      href: SOON,
+      source: "https://www.mototechnique.com/308-gtb-restomod",
     },
     {
       id: "miura",
       name: "Lamborghini Miura P400",
       line: "",
       image: img("miura-roadster"),
-      href: "https://www.mototechnique.com/lamborghini-miurap400",
+      href: SOON,
+      source: "https://www.mototechnique.com/lamborghini-miurap400",
     },
     {
       id: "iso",
       name: "Iso Grifo Mk2",
       line: "Iso Grifo Mk2 - Ground-up restoration to award winning standards by MOTO TECHNIQUE",
       image: img("iso-hero"),
-      href: "https://www.mototechnique.com/ferrari-f40lm-gte",
+      href: SOON,
+      source: "https://www.mototechnique.com/ferrari-f40lm-gte",
     },
     {
       id: "dino32",
       name: "Dino 246 GTS 3.2 V8",
       line: "Dino 246 GTS - Upgraded to Ferrari V8 300bhp engine with handling and braking to match.",
       image: img("dino32-road"),
-      href: "https://www.mototechnique.com/dino-246-gts-upgrade-32-v8",
+      href: SOON,
+      source: "https://www.mototechnique.com/dino-246-gts-upgrade-32-v8",
     },
     {
       id: "isetta",
       name: "BMW Isetta 300",
       line: "BMW Isetta 300 or Ferrari 250 GTO, they all receive the same care and attention at Moto Technique.",
       image: img("isetta-pub"),
-      href: "https://www.mototechnique.com/bmw-isetta-300",
+      href: SOON,
+      source: "https://www.mototechnique.com/bmw-isetta-300",
     },
   ],
 };
@@ -480,7 +503,10 @@ export const testimonials = [
 /** Contact details, verbatim from /contact-us. */
 export const contact = {
   name: "Moto Technique Limited",
+  /** Their full address, as their contact page has it. Used by the bar's window. */
   address: ["141 Molsey Avenue", "West Molesey", "KT8 2RY", "Surrey", "United Kingdom"],
+  /** The same address on two lines, for the footer, where five short lines made a ragged column. */
+  addressShort: ["141 Molsey Avenue, West Molesey", "Surrey KT8 2RY"],
   phone: "+44 (0) 208 941 3510",
   phoneHref: "tel:+442089413510",
   email: "kevin@mototechnique.com",
@@ -499,16 +525,30 @@ export const site = {
   /** Verbatim, the home page h1. */
   h1: "Classic and Sports Car Restoration Specialists",
   established: "Est. 1980",
+  home: "/mt",
+  /** The side menu. The pages behind these are not built yet (see SOON). */
   nav: [
-    { label: "The Dino", href: "#top" },
-    { label: "Why Moto Technique", href: "#why" },
-    { label: "Services", href: "#services" },
-    { label: "Projects", href: "#projects" },
-    { label: "Contact", href: "#contact" },
+    { label: "Services", href: SOON },
+    { label: "Projects", href: SOON },
+    { label: "Testimonials", href: SOON },
+    { label: "Workshop", href: SOON },
+    { label: "Contact", href: SOON },
   ],
 };
 
+/** The holding page every unbuilt link lands on. The details are the studio's, not the client's. */
+export const soon = {
+  heading: "To be built",
+  body: "This page is part of the full build. The home page is the demonstration.",
+  by: "Design and build by Finbar Studio",
+  email: "finbar@finbar.studio",
+  phone: "+44 7876 492551",
+  phoneHref: "tel:+447876492551",
+  web: { label: "www.finbar.studio", href: "https://www.finbar.studio" },
+};
+
 const content = mediaDeep({
+  soon,
   hero,
   heroMark,
   marks,

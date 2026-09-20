@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Wipe from "../Wipe";
 
 type Item = { id: string; name: string; href: string; blurb: string; image: string };
 
@@ -105,15 +106,13 @@ export default function Services({ services }: { services: { title: string; quar
   };
 
   const visit = (s: Item) => {
-    if (!tap(s)) window.open(s.href, "_blank", "noopener,noreferrer");
+    if (!tap(s)) window.location.assign(s.href);
   };
 
   const label = (s: Item, className: string, style?: React.CSSProperties) => (
     <a
       key={`label-${s.id}`}
       href={s.href}
-      target="_blank"
-      rel="noopener noreferrer"
       className={className}
       style={style}
       data-open={open === s.id ? "1" : "0"}
@@ -142,7 +141,9 @@ export default function Services({ services }: { services: { title: string; quar
 
   return (
     <section className="mt-services" id="services" data-tone="light">
-      <h2 className="mt-title">{services.title}</h2>
+      <Wipe as="h2" className="mt-title">
+        {services.title}
+      </Wipe>
 
       <div className="mt-wheel">
         <svg viewBox="0 0 100 100" className="mt-wheel-art" aria-hidden="true">

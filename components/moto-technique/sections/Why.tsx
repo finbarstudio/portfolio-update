@@ -1,13 +1,16 @@
-import Reveal from "../Reveal";
+import Wipe from "../Wipe";
 
 /**
  * Why Moto Technique: the title, the claim, then the figures that back it.
  *
  * A full screen of white after the hero's photographs, centred and with
  * nothing else on it, so the eye stops. The title is set like the wordmark, in
- * tracked capitals, and the claim under it is the second-level heading. The
- * figures are set in the title face at display size because they are the
- * argument, not decoration.
+ * tracked capitals. The claim under it is one small line in the same style, in
+ * gold: a strapline, not a second headline. The figures are set in the title
+ * face at display size because they are the argument, not decoration.
+ *
+ * Each piece rises inside its own mask, one after the other; the figures are
+ * tied to the scroll, so they come up as you arrive at them.
  */
 export default function Why({
   why,
@@ -23,27 +26,35 @@ export default function Why({
   return (
     <section className="mt-why" id="why" data-tone="light">
       <div className="mt-why-inner">
-        <Reveal className="mt-why-say">
-          <h2 className="mt-title">{why.title}</h2>
-          <h3 className="mt-why-heading">
-            {why.heading.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-          </h3>
-          <p className="mt-why-body">{why.body}</p>
-          <a className="mt-why-cta" href={why.cta.href} data-cursor="See">
-            {why.cta.label}
-          </a>
-        </Reveal>
+        <div className="mt-why-say">
+          <Wipe as="h2" className="mt-title">
+            {why.title}
+          </Wipe>
+          <Wipe as="h3" delay={0.12} className="mt-strap">
+            {why.heading.join(" ")}
+          </Wipe>
+          <Wipe as="p" delay={0.24} className="mt-why-body">
+            {why.body}
+          </Wipe>
+          <Wipe delay={0.36} className="mt-why-cta-wrap">
+            <a className="mt-why-cta" href={why.cta.href} data-cursor="See">
+              {why.cta.label}
+            </a>
+          </Wipe>
+        </div>
 
-        <Reveal as="dl" className="mt-figures" delay={0.14}>
-          {why.figures.map((f) => (
+        <dl className="mt-figures">
+          {why.figures.map((f, i) => (
             <div key={f.value} className="mt-figure">
-              <dt className="mt-figure-value">{f.value}</dt>
-              <dd className="mt-figure-label">{f.label}</dd>
+              <Wipe as="dt" scrub className="mt-figure-value">
+                {f.value}
+              </Wipe>
+              <Wipe as="dd" delay={0.15 + i * 0.1} className="mt-figure-label">
+                {f.label}
+              </Wipe>
             </div>
           ))}
-        </Reveal>
+        </dl>
       </div>
     </section>
   );

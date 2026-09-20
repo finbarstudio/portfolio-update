@@ -122,7 +122,12 @@ export default function DinoBadge({
 
       const loader = new THREE.TextureLoader();
       loader.setCrossOrigin("anonymous");
-      const [map, normalMap] = await Promise.all([loader.loadAsync(title.image), loader.loadAsync(title.normal)]);
+      let map, normalMap;
+      try {
+        [map, normalMap] = await Promise.all([loader.loadAsync(title.image), loader.loadAsync(title.normal)]);
+      } catch {
+        return release(); // a texture would not load: the flat artwork stays
+      }
       bin.push(() => {
         map.dispose();
         normalMap.dispose();
@@ -231,6 +236,11 @@ export default function DinoBadge({
         height={title.height}
         className="mt-hero-title-flat"
         decoding="async"
+        // Must match the texture request below. On the live site the media is
+        // on another domain: without this, this plain request fills the cache
+        // with a copy that has no CORS headers, three.js then asks for the same
+        // URL WITH CORS, is handed the cached copy, and is refused.
+        crossOrigin="anonymous"
       />
       <canvas ref={canvas} className="mt-hero-title-metal" aria-hidden="true" />
     </div>

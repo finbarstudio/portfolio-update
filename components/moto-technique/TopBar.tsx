@@ -5,11 +5,16 @@ import { useEffect, useRef, useState } from "react";
 /**
  * The bar: the wordmark top left, a few icons and the menu top right.
  *
- * Every icon opens the same small window under the bar with one thing in it:
- * the phone number, the email address, where the workshop is, or the menu. It
- * is a window, not a page and not a full-screen takeover, because each holds a
- * line or two. One is open at a time; Escape, a click outside, or the same icon
- * again closes it, and focus goes back to the icon that opened it.
+ * The three contact icons each open one small window under the bar with one
+ * thing in it: the phone number, the email address, or where the workshop is.
+ * A window, not a page, because each holds a line or two.
+ *
+ * The menu icon opens a side menu instead: a panel the full height of the
+ * screen from the right edge, with the site's pages set large and the contact
+ * details at its foot. The page behind it dims and stops scrolling.
+ *
+ * One thing is open at a time. Escape, a click outside, or the same icon again
+ * closes it, and focus goes back to the icon that opened it.
  *
  * WHITE, UNLESS IT IS OVER WHITE. The bar is white. The one thing that turns it
  * black is sitting over a light section, and nothing else does: not a bright
@@ -67,13 +72,17 @@ export default function TopBar({
   name,
   nav,
   contact,
+  home,
 }: {
   name: string;
   nav: { label: string; href: string }[];
   contact: Contact;
+  /** Where the wordmark goes: the top of this page. */
+  home: string;
 }) {
   const [panel, setPanel] = useState<Panel | null>(null);
   const win = useRef<HTMLDivElement>(null);
+  const drawer = useRef<HTMLDivElement>(null);
   const word = useRef<HTMLAnchorElement>(null);
   const toolbox = useRef<HTMLDivElement>(null);
 
@@ -123,16 +132,28 @@ export default function TopBar({
     if (refocus) opener.current?.focus();
   };
 
+  // The page behind the side menu holds still while it is open.
+  useEffect(() => {
+    if (panel !== "menu") return;
+    const lenis = (window as unknown as { __mtLenis?: { stop(): void; start(): void } }).__mtLenis;
+    lenis?.stop();
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      lenis?.start();
+      document.documentElement.style.overflow = "";
+    };
+  }, [panel]);
+
   useEffect(() => {
     if (!panel) return;
-    win.current?.focus();
+    (panel === "menu" ? drawer : win).current?.focus();
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
     const onDown = (e: PointerEvent) => {
       const t = e.target as Node;
-      if (win.current?.contains(t)) return;
+      if (win.current?.contains(t) || drawer.current?.contains(t)) return;
       // The icons toggle themselves; do not close first and reopen on click.
       if ((t as HTMLElement).closest?.(".mt-bar-tools")) return;
       close(false);
@@ -145,13 +166,13 @@ export default function TopBar({
     };
   }, [panel]);
 
-  /** Menu links ride the smooth scroll if it is running, and jump if it is not. */
-  const go = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    const lenis = (window as unknown as { __mtLenis?: { scrollTo(t: string | number): void } }).__mtLenis;
+  /** The wordmark rides the smooth scroll back to the top if it is running. */
+  const toTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const lenis = (window as unknown as { __mtLenis?: { scrollTo(t: number): void } }).__mtLenis;
     close(false);
     if (!lenis) return;
     e.preventDefault();
-    lenis.scrollTo(href === "#top" ? 0 : href);
+    lenis.scrollTo(0);
   };
 
   const tools: Panel[] = ["call", "mail", "place", "menu"];
@@ -159,7 +180,7 @@ export default function TopBar({
   return (
     <>
       <header className="mt-bar">
-        <a ref={word} href="#top" className="mt-wordmark" data-over="dark" aria-label={`${name}, back to the top`} onClick={(e) => go(e, "#top")}>
+        <a ref={word} href={home} className="mt-wordmark" data-over="dark" aria-label={`${name}, back to the top`} onClick={toTop}>
           {name}
         </a>
 
@@ -172,7 +193,7 @@ export default function TopBar({
               data-tool={id}
               aria-label={LABEL[id]}
               aria-expanded={panel === id}
-              aria-controls="mt-window"
+              aria-controls={id === "menu" ? "mt-drawer" : "mt-window"}
               onClick={(e) => {
                 opener.current = e.currentTarget;
                 setPanel((p) => (p === id ? null : id));
@@ -189,10 +210,10 @@ export default function TopBar({
         id="mt-window"
         className="mt-window"
         role="dialog"
-        aria-label={panel ? LABEL[panel] : undefined}
+        aria-label={panel && panel !== "menu" ? LABEL[panel] : undefined}
         tabIndex={-1}
-        data-open={panel ? "1" : "0"}
-        inert={!panel}
+        data-open={panel && panel !== "menu" ? "1" : "0"}
+        inert={!panel || panel === "menu"}
       >
         {panel === "call" ? (
           <>
@@ -226,24 +247,35 @@ export default function TopBar({
           </>
         ) : null}
 
-        {panel === "menu" ? (
-          <>
-            <nav aria-label="Sections" className="mt-window-nav">
-              {nav.map((n) => (
-                <a key={n.href} href={n.href} onClick={(e) => go(e, n.href)}>
-                  {n.label}
-                </a>
-              ))}
-            </nav>
-            <div className="mt-window-foot">
-              <a href={contact.phoneHref}>{contact.phone}</a>
-              <a href={`mailto:${contact.email}`}>{contact.email}</a>
-              <a href={contact.instagram} target="_blank" rel="noopener noreferrer">
-                Instagram
-              </a>
-            </div>
-          </>
-        ) : null}
+      </div>
+
+      {/* The side menu, and the dimmed page behind it. */}
+      <div className="mt-drawer-shade" data-open={panel === "menu" ? "1" : "0"} aria-hidden="true" />
+      <div
+        ref={drawer}
+        id="mt-drawer"
+        className="mt-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        tabIndex={-1}
+        data-open={panel === "menu" ? "1" : "0"}
+        inert={panel !== "menu"}
+      >
+        <nav aria-label="Pages" className="mt-drawer-nav">
+          {nav.map((n, i) => (
+            <a key={n.label} href={n.href} style={{ ["--mt-i" as string]: i }}>
+              <span>{n.label}</span>
+            </a>
+          ))}
+        </nav>
+        <div className="mt-drawer-foot">
+          <a href={contact.phoneHref}>{contact.phone}</a>
+          <a href={`mailto:${contact.email}`}>{contact.email}</a>
+          <a href={contact.instagram} target="_blank" rel="noopener noreferrer">
+            Instagram
+          </a>
+        </div>
       </div>
     </>
   );

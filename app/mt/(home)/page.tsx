@@ -26,7 +26,7 @@ export default function MotoTechniqueHome() {
         <Shelf projects={projects} />
         <Services services={services} />
       </main>
-      <Footer contact={contact} name={site.name} established={site.established} />
+      <Footer contact={contact} name={site.name} established={site.established} links={sale.links} />
     </>
   );
 }
