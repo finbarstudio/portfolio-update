@@ -9,8 +9,8 @@ import Wipe from "../Wipe";
  * gold: a strapline, not a second headline. The figures are set in the title
  * face at display size because they are the argument, not decoration.
  *
- * Each piece rises inside its own mask, one after the other; the figures are
- * tied to the scroll, so they come up as you arrive at them.
+ * Each piece rises inside its own mask when it arrives on screen, one after the
+ * other: the title, the strapline, the paragraph, then the figures left to right.
  */
 export default function Why({
   why,
@@ -46,10 +46,10 @@ export default function Why({
         <dl className="mt-figures">
           {why.figures.map((f, i) => (
             <div key={f.value} className="mt-figure">
-              <Wipe as="dt" scrub className="mt-figure-value">
+              <Wipe as="dt" delay={i * 0.14} className="mt-figure-value">
                 {f.value}
               </Wipe>
-              <Wipe as="dd" delay={0.15 + i * 0.1} className="mt-figure-label">
+              <Wipe as="dd" delay={0.2 + i * 0.14} className="mt-figure-label">
                 {f.label}
               </Wipe>
             </div>

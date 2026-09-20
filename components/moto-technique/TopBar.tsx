@@ -10,8 +10,9 @@ import { useEffect, useRef, useState } from "react";
  * A window, not a page, because each holds a line or two.
  *
  * The menu icon opens a side menu instead: a panel the full height of the
- * screen from the right edge, with the site's pages set large and the contact
- * details at its foot. The page behind it dims and stops scrolling.
+ * screen from the right edge, with the site's pages set large and the phone and
+ * email at its foot. The whole screen behind it dims and stops scrolling.
+ * Pointing at a page indents it and brings a long arrow in on its left.
  *
  * One thing is open at a time. Escape, a click outside, or the same icon again
  * closes it, and focus goes back to the icon that opened it.
@@ -272,9 +273,6 @@ export default function TopBar({
         <div className="mt-drawer-foot">
           <a href={contact.phoneHref}>{contact.phone}</a>
           <a href={`mailto:${contact.email}`}>{contact.email}</a>
-          <a href={contact.instagram} target="_blank" rel="noopener noreferrer">
-            Instagram
-          </a>
         </div>
       </div>
     </>

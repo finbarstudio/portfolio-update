@@ -34,6 +34,17 @@ type Project = {
  * off a marker placed just before the shelf, because a pinned element reports
  * its pinned position, not where it sits in the page.
  *
+ * THE TYPE RIDES THE EDGE. As the next section comes up over the pinned shelf
+ * it would cover the names first, since they sit low. Instead each name (spine
+ * or open face alike) is lifted just ahead of that rising edge, a margin above
+ * it, and rides it up the photograph. It stops when it reaches the top of its
+ * own picture, and only then is it covered. Worked out here per element, as
+ * --mt-ride in pixels: how far the edge has come, less how far off the bottom
+ * the type already sits, capped by the room above it. All the reading of sizes
+ * happens before any writing, so it costs one layout per frame. On a phone the
+ * shelf is rows, each name is already in the middle of its own row, and this
+ * is skipped.
+ *
  * WHO GETS WHAT. Each slice is one real link. Focusing it opens it, so a
  * keyboard walks the shelf with Tab and follows with Enter. A touch screen has
  * no hover, so the first tap opens a slice and the second follows the link. On
@@ -54,14 +65,31 @@ export default function Shelf({
     if (!at || !el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    /** Gap kept between the rising edge and the type, and under the bar at the top. */
+    const EDGE = 28;
+    const CEILING = 96;
+
     let frame = 0;
     const update = () => {
       frame = 0;
-      const par = Math.min(
-        1,
-        Math.max(-1, -at.getBoundingClientRect().top / window.innerHeight),
-      );
+      const par = Math.min(1, Math.max(-1, -at.getBoundingClientRect().top / window.innerHeight));
       el.style.setProperty("--mt-par", par.toFixed(4));
+
+      const type = el.querySelectorAll<HTMLElement>(".mt-book-spine, .mt-book-face");
+      if (window.innerWidth <= 760) {
+        for (const t of type) t.style.removeProperty("--mt-ride");
+        return;
+      }
+      // how far up the shelf the covering section's top edge has come
+      const h = el.offsetHeight;
+      const covered = Math.max(0, par) * h;
+      // read everything, then write everything
+      const rides = [...type].map((t) => {
+        const offBottom = h - (t.offsetTop + t.offsetHeight);
+        const room = Math.max(0, t.offsetTop - CEILING);
+        return Math.min(room, Math.max(0, covered + EDGE - offBottom));
+      });
+      type.forEach((t, i) => t.style.setProperty("--mt-ride", `${rides[i].toFixed(1)}px`));
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);

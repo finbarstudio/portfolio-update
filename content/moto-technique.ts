@@ -141,61 +141,59 @@ export const marks = {
 /**
  * The Dino's story: the white half of the split hero.
  *
- * Laid out as an editorial spread, not a column of paragraphs, so the content
- * is held in the shapes the layout needs. Nothing is reworded to fit:
- *   - The sale figures are Kevin's own (18 Sep 2026).
- *   - Both quotes are VERBATIM. Each is split in two only so the layout can set
- *     the last words large: read `lead` then `punch` and you have the original
- *     sentence, in order, nothing dropped. Jay Leno's is from the testimonial
- *     card on mototechnique.com; Kevin's is from the Dino 3.6 V8 upgrade page.
- *   - Every figure and detail is from that same upgrade page. If a number
- *     cannot be pointed at on their site, it does not belong here. "in excess
- *     of" is their wording for the top speed and stays attached to it.
+ * Deliberately little: a sentence, a photograph, a quote, photographs, a
+ * paragraph, a photograph, a quote, two links. No headings, labels, captions or
+ * figures. It is read top to bottom, in this order (`blocks`), and the page
+ * sets it in two type treatments only: `say` in the title face, everything
+ * else in the reading face.
+ *
+ * Nothing is reworded:
+ *   - the opening sentence uses Kevin's own figures (18 Sep 2026)
+ *   - Jay Leno is verbatim from the testimonial card on mototechnique.com
+ *   - the paragraph and Kevin's quote are verbatim from the Dino 3.6 V8 upgrade
+ *     page, his spelling and capitals kept ("wether", "MoTec", "It has a soul")
+ * That one paragraph carries every figure the page used to pull out as a spec
+ * table: 2.9 to 3.6 litres, 400bhp, the 328 gearbox, in excess of 170mph.
  */
-export const sale = {
-  eyebrow: "Sold at auction",
-  price: "$1,106,000",
-  facts: [
-    { label: "Sold on", value: "Bring a Trailer" },
-    { label: "Date", value: "25 June 2026" },
-    { label: "Lot", value: "#248,947" },
-  ],
-  car: "The ex-David Lee Dino 246 GTS Evo",
-  quote: {
-    lead: "This is as nice a restomod as I've ever seen... It's such a Brilliant Car.",
-    punch: "This is the car the factory should have built",
+type StoryBlock =
+  | { kind: "text"; text: string }
+  | { kind: "say"; text: string; by: string }
+  | { kind: "image"; image: string; alt: string }
+  | { kind: "pair"; images: { image: string; alt: string }[] };
+
+const story: StoryBlock[] = [
+  {
+    kind: "text",
+    text: "The ex-David Lee Dino 246 GTS Evo, upgraded by Moto Technique to a 3.6 litre Ferrari V8, sold on Bring a Trailer on 25 June 2026 for $1,106,000.",
+  },
+  // the 1600px cuts: the panel is half the screen, so the full-size files are wasted here
+  { kind: "image", image: img("dino36-rear-moving-1600"), alt: "The Dino 3.6 from behind, at speed" },
+  {
+    kind: "say",
+    text: "This is as nice a restomod as I've ever seen... It's such a Brilliant Car. This is the car the factory should have built",
     by: "Jay Leno",
   },
-  /** Full bleed, edge to edge of the panel. Order is the order on the page. */
-  gallery: [
-    { image: img("dino36-engine"), alt: "The 3.6 litre Ferrari V8 in the Dino's engine bay" },
-    { image: img("dino36-perspex-lid"), alt: "The perspex engine cover" },
-    { image: img("dino36-lens-wheels"), alt: "Perspex headlight cover and 17 inch Campagnolo wheel" },
-    { image: img("dino36-interior"), alt: "Red leather interior, Chairs and Flares specification" },
-  ],
-  figures: [
-    { value: "400", unit: "bhp", note: "Ferrari V8, developed and built in-house" },
-    { value: "3.6", unit: "litres", note: "A Ferrari 2.9 V8, bored and stroked" },
-    { value: "170", unit: "mph", note: "Top speed, in excess of" },
-  ],
-  spec: [
-    { label: "Gearbox", value: "Ferrari 328" },
-    { label: "Management", value: "MoTeC ECU, mapped hot or cold" },
-    { label: "Wheels", value: "Original Campagnolo, 3D scanned and recast to 17 inch" },
-    { label: "Brakes", value: "Bigger brakes and callipers" },
-  ],
-  detailsTitle: "The details",
-  details: [
-    "Fared-in perspex headlight covers with invisible fixings.",
-    "A Snap four exhaust system, a tip of the hat to the legendary Dino.",
-    "Adjustable suspension, electric power steering, hydraulic clutch.",
-    "Air conditioning and iPod connectivity.",
-  ],
-  closing: {
-    lead: "This Dino Evolution Restomod is not just about numbers like bhp, 0-60 and top speed, its about the driving experience, its about the car communicating with the driver and giving feedback through the seat and the steering. It has modern capabilities in terms of power, handling and reliability,",
-    punch: "but above all, It has a soul.",
+  {
+    kind: "pair",
+    images: [
+      { image: img("dino36-engine"), alt: "The 3.6 litre Ferrari V8 in the Dino's engine bay" },
+      { image: img("dino36-interior-1600"), alt: "Red leather interior, Chairs and Flares specification" },
+    ],
+  },
+  {
+    kind: "text",
+    text: "They took a Ferrari 2.9 Litre V8 and bored and stroked it to 3.6 Litres. With the advancements in ECU’s since the original Dino “Prototype” they added a MoTec engine management system to get the very best out of new 400bhp engine. It has been mapped to start, hot or cold wether its up a mountain or down by the seashore and deliver the power smoothly through a Ferrari 328 gearbox. This car will pull effortlessly from 30mph in 5th gear right up to its top speed which is in excess of 170mph.",
+  },
+  { kind: "image", image: img("dino36-perspex-lid"), alt: "The perspex engine cover" },
+  {
+    kind: "say",
+    text: "This Dino Evolution Restomod is not just about numbers like bhp, 0-60 and top speed, its about the driving experience, its about the car communicating with the driver and giving feedback through the seat and the steering. It has modern capabilities in terms of power, handling and reliability, but above all, It has a soul.",
     by: "Kevin O'Rourke",
   },
+];
+
+export const sale = {
+  blocks: story,
   links: [
     { label: "The auction", href: "https://bringatrailer.com/listing/1972-ferrari-dino-246-gts-15/" },
     { label: "Jay Leno's Garage", href: "https://www.youtube.com/watch?v=qnt0DNqJYvM" },

@@ -206,9 +206,8 @@
 
 /* ---------- wipe (Wipe.tsx) ---------------------------------------------------
    The wrapper is the mask and never moves; only what is inside it travels.
-   Played once: data-in flips and a transition runs, after --mt-delay.
-   Scrubbed: --mt-w runs 0 to 1 with the scroll, and position follows it
-   directly, with no transition, so it tracks the scroll exactly. */
+   Arriving on screen flips data-in and a transition plays once, after
+   --mt-delay. Nothing here is tied to the scroll position. */
 .mt-wipe {
   display: block;
   overflow: hidden;
@@ -227,11 +226,6 @@
   translate: 0 0;
 }
 
-.mt-wipe[data-scrub="1"] > .mt-wipe-in {
-  translate: 0 calc((1 - var(--mt-w, 0)) * 108%);
-  transition: none;
-}
-
 /* curtain: a clip opens left to right and the content holds still. The clip is
    on the INNER element, never the wrapper: the wrapper is what gets observed to
    trigger the reveal, and an element clipped to nothing counts as not on
@@ -246,10 +240,6 @@
   clip-path: inset(0 0 0 0);
 }
 
-.mt-wipe[data-kind="curtain"][data-scrub="1"] > .mt-wipe-in {
-  clip-path: inset(0 calc((1 - var(--mt-w, 0)) * 100%) 0 0);
-  transition: none;
-}
 
 @media (prefers-reduced-motion: reduce) {
   .mt-reveal {
@@ -511,7 +501,8 @@
   position: fixed;
   inset: 0;
   z-index: 57;
-  background: rgba(6, 6, 6, 0.55);
+  /* the whole screen, dimmed hard enough that the menu is plainly in charge */
+  background: rgba(4, 4, 4, 0.74);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s var(--mt-ease);
@@ -559,15 +550,17 @@
   gap: 4px;
 }
 
-/* each name rises inside its own mask, one after another, as the menu opens */
+/* Each name rises inside its own mask, one after another, as the menu opens.
+   Pointing at one slides it right and brings a long thin arrow in on its left,
+   in the space it has just left. No colour change: the move is the feedback. */
 .mt-drawer-nav a {
+  position: relative;
   display: block;
   overflow: hidden;
   padding-bottom: 0.08em;
   font-family: var(--mt-font-title);
   font-size: clamp(30px, 3.4vw, 46px);
   line-height: 1.16;
-  transition: color 0.3s var(--mt-ease);
 }
 
 .mt-drawer-nav a span {
@@ -581,16 +574,37 @@
   transition: translate 0.9s var(--mt-ease) calc(0.18s + var(--mt-i) * 0.07s);
 }
 
-.mt-drawer-nav a:hover {
-  color: var(--mt-red);
+/* U+27F6, the long rightwards arrow, set lighter and smaller than the name */
+.mt-drawer-nav a::before {
+  content: "\27F6";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  font-family: var(--mt-font-body);
+  font-size: 0.5em;
+  font-weight: 300;
+  line-height: 1;
+  opacity: 0;
+  translate: -0.8em -50%;
+  transition:
+    opacity 0.3s var(--mt-ease),
+    translate 0.45s var(--mt-ease);
+}
+
+.mt-drawer[data-open="1"] .mt-drawer-nav a:is(:hover, :focus-visible) span {
+  translate: 1.25em 0;
+  transition: translate 0.45s var(--mt-ease);
+}
+
+.mt-drawer-nav a:is(:hover, :focus-visible)::before {
+  opacity: 1;
+  translate: 0 -50%;
 }
 
 .mt-drawer-foot {
   display: grid;
   gap: 10px;
   justify-items: start;
-  padding-top: 22px;
-  border-top: 0.5px solid var(--mt-line-light);
   font-size: 14px;
   color: var(--mt-light-soft);
 }
@@ -1073,297 +1087,91 @@
 }
 
 /* ---------- the Dino's story ---------------------------------------------------
-   The spread inside that panel (DinoStory.tsx). Every beat has its own width
-   and its own alignment on purpose: one column of same-width blocks is what
-   made it read as a template. The panel itself has no side padding, so the
-   photographs run to its edges; blocks of type take .mt-story-pad. */
+   The spread inside the white panel (DinoStory.tsx). Text and photographs, one
+   column, two type treatments, nothing else. The restraint is the design:
+
+     one measure    every block of type shares a left edge and a width
+     one rhythm     the same gap between every pair of blocks
+     two voices     .mt-story-say (title face) and .mt-story-text (reading face)
+     one variation  photographs leave the column and run to the panel's edges
+
+   No reveals here: the panel is already moving, and things appearing inside a
+   thing that is moving is one effect too many. */
 
 .mt-hero-info {
   --mt-story-pad: clamp(24px, 4.2vw, 84px);
+  --mt-story-gap: clamp(56px, 10vh, 112px);
 }
 
-.mt-story-pad {
+.mt-story {
+  display: grid;
+  gap: var(--mt-story-gap);
+  padding-bottom: var(--mt-story-gap);
+}
+
+.mt-story-col {
+  margin: 0;
   padding-inline: var(--mt-story-pad);
+  /* a comfortable line, never the full width of a wide panel */
+  max-width: calc(38rem + 2 * var(--mt-story-pad));
 }
 
-/* masthead: the price as wide as the panel will take it. cqw is a hundredth of
-   the panel's own width, so it fills the panel at any screen size. */
-.mt-hero-info-inner {
-  container-type: inline-size;
+.mt-story-text {
+  font-size: clamp(17px, 1.35vw, 21px);
+  line-height: 1.6;
+  text-wrap: pretty;
 }
 
-.mt-story-price {
-  margin-top: 10px;
+.mt-story-say {
   font-family: var(--mt-font-title);
-  font-size: clamp(40px, 14.6cqw, 150px);
-  line-height: 0.9;
-  letter-spacing: -0.035em;
-  font-variant-numeric: tabular-nums;
-  /* optical: the $ has side bearing that makes the line look indented */
-  margin-left: -0.04em;
-  white-space: nowrap;
+  font-size: clamp(24px, 2.35vw, 36px);
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
 }
 
-.mt-story-car {
-  margin-top: clamp(14px, 2vh, 22px);
-  font-size: var(--mt-step-lead);
-  color: var(--mt-ink-soft);
-}
-
-/* three small facts hung from one rule, like a caption line */
-.mt-story-facts {
-  margin: clamp(28px, 4.4vh, 48px) 0 0;
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  justify-content: space-between;
-  gap: 18px;
-}
-
-.mt-story-facts > div {
-  border-top: 1px solid var(--mt-ink);
-  padding-top: 10px;
-  min-width: 0;
-}
-
-.mt-story-facts dt,
-.mt-story-spec dt,
-.mt-story-margin {
-  font-size: 10px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  font-weight: 500;
-  color: var(--mt-ink-soft);
-}
-
-.mt-story-facts dd {
-  margin: 4px 0 0;
-  font-family: var(--mt-font-title);
-  font-size: clamp(14px, 1.25vw, 19px);
-}
-
-/* Jay Leno. The lead sits small and left; his last sentence is set large and
-   pushed to the right, so the two halves of one quote pull against each other. */
-.mt-story-quote {
-  margin: clamp(56px, 10vh, 120px) 0 0;
-}
-
-.mt-story-quote-lead {
-  max-width: 24ch;
-  font-size: clamp(15px, 1.2vw, 18px);
-  line-height: 1.5;
-  color: var(--mt-ink-soft);
-}
-
-/* the full width of the panel, sized so it sets in two lines, not four */
-.mt-story-quote-punch {
-  margin-top: clamp(18px, 3vh, 30px);
-  font-family: var(--mt-font-title);
-  font-size: clamp(26px, 6.6cqw, 62px);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
-.mt-story-quote cite {
+/* who said it: the reading face, quieter, and nothing more than that */
+.mt-story-quiet {
   display: block;
-  margin-top: 18px;
+  margin-top: 1.1em;
   font-style: normal;
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  color: var(--mt-ink-soft);
 }
 
-.mt-story-quote cite {
-  color: var(--mt-red);
-}
-
-/* Four photographs, edge to edge, deliberately uneven: a wide one over a narrow
-   one, then the reverse, with a hairline of white between. */
-.mt-story-gallery {
-  margin-top: clamp(56px, 10vh, 120px);
+/* photographs run edge to edge of the panel */
+.mt-story-shot {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-auto-rows: clamp(150px, 26vh, 280px);
   gap: 3px;
 }
 
-/* each cell is a Wipe: the cell is the mask, the photograph fills it */
-.mt-story-gallery > *,
-.mt-story-gallery .mt-wipe-in {
-  height: 100%;
-  padding: 0;
-  margin: 0;
+.mt-story-shot-pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.mt-story-gallery img {
+.mt-story-shot img {
   display: block;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 3 / 2;
   object-fit: cover;
 }
 
-.mt-story-gallery > :nth-child(4n + 1),
-.mt-story-gallery > :nth-child(4n + 4) {
-  grid-column: span 4;
-}
-
-.mt-story-gallery > :nth-child(4n + 2),
-.mt-story-gallery > :nth-child(4n + 3) {
-  grid-column: span 2;
-}
-
-/* Three oversized numbers stepped down the page, each further in than the last,
-   rather than three equal boxes in a row. */
-.mt-story-figures {
-  margin: clamp(56px, 10vh, 120px) 0 0;
-  display: grid;
-  gap: clamp(18px, 3vh, 34px);
-}
-
-.mt-story-figure:nth-child(2) {
-  margin-left: 18%;
-}
-
-.mt-story-figure:nth-child(3) {
-  margin-left: 36%;
-}
-
-.mt-story-figure dt {
-  font-family: var(--mt-font-title);
-  font-size: clamp(54px, 15cqw, 140px);
-  line-height: 0.86;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-}
-
-.mt-story-figure dt span {
-  margin-left: 0.18em;
-  font-size: 0.2em;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--mt-red);
-}
-
-.mt-story-figure dd {
-  margin: 10px 0 0;
-  max-width: 24ch;
-  font-size: clamp(12.5px, 0.95vw, 14px);
-  color: var(--mt-ink-soft);
-}
-
-/* the quieter facts, two to a line */
-.mt-story-spec {
-  margin: clamp(48px, 8vh, 96px) 0 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 clamp(20px, 3vw, 48px);
-}
-
-.mt-story-spec > div {
-  padding: 14px 0 16px;
-  border-top: 1px solid var(--mt-line);
-}
-
-.mt-story-spec dd {
-  margin: 5px 0 0;
-  font-size: clamp(13.5px, 1.05vw, 16px);
-  text-wrap: pretty;
-}
-
-/* a margin label, then four short lines */
-.mt-story-details {
-  margin-top: clamp(48px, 8vh, 96px);
-  display: grid;
-  grid-template-columns: minmax(0, 7rem) minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
-}
-
-.mt-story-margin {
-  padding-top: 5px;
-}
-
-.mt-story-details ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-family: var(--mt-font-title);
-  font-size: clamp(16px, 1.55vw, 23px);
-  line-height: 1.3;
-}
-
-.mt-story-details li + li {
-  margin-top: 0.7em;
-}
-
-/* Kevin's closing words, in a box of their own: a hairline frame with a red
-   corner rule, the one place on the panel that is enclosed. */
-.mt-story-box {
-  position: relative;
-  margin: clamp(56px, 10vh, 120px) 0 0;
-  padding: clamp(26px, 3.4vw, 52px);
-  border: 1px solid var(--mt-ink);
-}
-
-.mt-story-box::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  width: clamp(36px, 4vw, 64px);
-  height: 3px;
-  background: var(--mt-red);
-}
-
-.mt-story-box-lead {
-  font-size: clamp(14px, 1.1vw, 17px);
-  line-height: 1.6;
-  color: var(--mt-ink-soft);
-  text-wrap: pretty;
-}
-
-.mt-story-box-punch {
-  margin-top: clamp(14px, 2.4vh, 24px);
-  font-family: var(--mt-font-title);
-  font-size: clamp(26px, 6.6cqw, 62px);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
-.mt-story-box cite {
-  display: block;
-  margin-top: 18px;
-  font-style: normal;
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--mt-ink-soft);
+.mt-story-shot-pair img {
+  aspect-ratio: 4 / 5;
 }
 
 .mt-story-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: clamp(24px, 4vh, 40px);
-  padding-bottom: clamp(48px, 9vh, 110px);
+  gap: 0.4em 2em;
 }
 
 .mt-story-links a {
-  padding: 13px 22px;
-  border: 1px solid var(--mt-ink);
-  border-radius: 999px;
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  transition:
-    background-color 0.3s var(--mt-ease),
-    color 0.3s var(--mt-ease);
+  border-bottom: 1px solid var(--mt-line);
+  transition: border-color 0.3s var(--mt-ease);
 }
 
 .mt-story-links a:hover {
-  background: var(--mt-ink);
-  color: #fff;
+  border-bottom-color: var(--mt-ink);
 }
 
 /* ---------- why ---------------------------------------------------------------
@@ -1813,6 +1621,10 @@
   gap: 18px;
   writing-mode: vertical-rl;
   translate: -50% 0;
+  /* Rides the edge of the section rising over the shelf (Shelf.tsx). On
+     `transform`, separately from `translate`, because this must track the
+     scroll exactly and translate carries transitions that would make it lag. */
+  transform: translate3d(0, calc(var(--mt-ride, 0px) * -1), 0);
   white-space: nowrap;
   transition: opacity 0.35s var(--mt-ease);
 }
@@ -1839,6 +1651,7 @@
   justify-items: start;
   opacity: 0;
   translate: 0 14px;
+  transform: translate3d(0, calc(var(--mt-ride, 0px) * -1), 0);
   transition:
     opacity 0.3s var(--mt-ease),
     translate 0.3s var(--mt-ease);
@@ -2004,13 +1817,17 @@
   overflow: hidden;
 }
 
-/* Each letter gets a turn. --mt-foot is how far through the reveal the scroll
-   is; a letter starts when the scroll reaches its index and takes four letters'
-   worth of scroll to land, so several are always moving at once. */
+/* Each letter gets a turn: a pause once the name is in view (0.45s), then one
+   letter every 55ms, each taking long enough that several are moving at once.
+   Played once, at its own pace, never tied to the scroll. */
 .mt-footer-char > span {
   display: block;
-  --mt-t: clamp(0, calc((var(--mt-foot, 0) * (var(--mt-n) + 3) - var(--mt-i)) / 4), 1);
-  translate: 0 calc((1 - var(--mt-t)) * 104%);
+  translate: 0 104%;
+  transition: translate 1.1s var(--mt-ease) calc(0.45s + var(--mt-i) * 0.055s);
+}
+
+.mt-footer-word[data-in="1"] .mt-footer-char > span {
+  translate: 0 0;
 }
 
 @media (max-width: 760px) {
@@ -2227,20 +2044,4 @@
     display: none;
   }
 
-  .mt-story-gallery {
-    grid-auto-rows: 120px;
-  }
-
-  .mt-story-figure:nth-child(2) {
-    margin-left: 10%;
-  }
-
-  .mt-story-figure:nth-child(3) {
-    margin-left: 20%;
-  }
-
-  .mt-story-details {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-  }
 }
