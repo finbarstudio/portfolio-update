@@ -24,7 +24,8 @@ export default function CookieNotice() {
   const onHome =
     pathname === "/" ||
     pathname.startsWith("/wallpaper") ||
-    pathname.startsWith("/moto-technique");
+    pathname === "/mt" ||
+    pathname.startsWith("/mt/");
 
   const [show, setShow] = useState(false);
 
