@@ -99,7 +99,7 @@ const EXTRAS = [
 const BRAND_ROWS = [
   { name: "Logo + core identity", price: "£750 to £1,250", info: "Rounds of exploration and the size of the deliverables list." },
   { name: "Full identity + guidelines", price: "£1,500 to £2,750", info: "Scope of the guidelines and how much collateral launches with it." },
-  { name: "Editorial, print and motion", price: "£300/day", info: "Booked by the day, scoped up front so you know the days before we start." },
+  { name: "Editorial, print and motion", price: "£400/day", info: "Booked by the day, scoped up front so you know the days before we start." },
 ];
 
 const CARE_ROWS = [
