@@ -18,6 +18,8 @@ import "./pricing.css";
  * GUIDE PRICES. Finbar's rule: every figure here is a guide to the product and
  * the scope it expects. Projects never fit the list, so scope and price flex
  * and the page always says: talk first, then a fixed quote. Every ⓘ says so.
+ * FORMAT: never a range and never "from". Always the lowest figure and a plus,
+ * e.g. "£750+".
  *
  * All prices are GBP and say nothing about VAT, on purpose. Build prices do
  * not include hosting. Every price that can vary carries a little ⓘ explaining
@@ -66,9 +68,9 @@ const SITE_TIERS: Tier[] = [
   {
     id: "custom-site",
     name: "Custom site",
-    price: "from £4,000",
+    price: "£4,000+",
     blurb: "A CMS, project or blog posts, anything more involved.",
-    info: "A guide to where this size of job starts. A site like Lows, with a CMS and custom project pages, sits near the from price. Big catalogues and custom tools, like Rennen Plus, sit higher. Every one is scoped with you, then quoted fixed.",
+    info: "A guide to where this size of job starts. A site like Lows, with a CMS and custom project pages, sits near the starting figure. Big catalogues and custom tools, like Rennen Plus, sit higher. Every one is scoped with you, then quoted fixed.",
     points: [
       "A CMS you edit yourself, built on Sanity",
       "Project, portfolio or blog posts",
@@ -93,16 +95,16 @@ const INCLUDED = [
 const EXTRAS = [
   { name: "Extra section", price: "£200", info: "A guide for one more designed section on any page. A simple one costs less, a heavily animated one more." },
   { name: "Extra page", price: "about £1,000", info: "A guide. It depends how much of the page is new design and how much reuses what is already built, so ask." },
-  { name: "Custom-coded components and tools", price: "from £350", info: "A guide to where these start. Estimate calculators, quote builders, configurators, anything interactive your business needs. Each one is scoped with you first." },
-  { name: "Live social or content feeds", price: "from £200", info: "A guide. It depends on the platform and how the feed is designed into the page." },
-  { name: "Copywriting pass", price: "from £150", info: "A guide, priced by page count. Send me what you have and I will tell you what it needs." },
-  { name: "Booking and payments", price: "from £200", info: "A guide. It depends on the provider and whether payments are taken on the site." },
-  { name: "Custom email + signatures", price: "from £75", info: "A guide for mailboxes on your own domain, set up properly, plus a designed email signature. Bigger teams cost a little more." },
+  { name: "Custom-coded components and tools", price: "£350+", info: "A guide to where these start. Estimate calculators, quote builders, configurators, anything interactive your business needs. Each one is scoped with you first." },
+  { name: "Live social or content feeds", price: "£200+", info: "A guide. It depends on the platform and how the feed is designed into the page." },
+  { name: "Copywriting pass", price: "£150+", info: "A guide, priced by page count. Send me what you have and I will tell you what it needs." },
+  { name: "Booking and payments", price: "£200+", info: "A guide. It depends on the provider and whether payments are taken on the site." },
+  { name: "Custom email + signatures", price: "£75+", info: "A guide for mailboxes on your own domain, set up properly, plus a designed email signature. Bigger teams cost a little more." },
 ];
 
 const BRAND_ROWS = [
-  { name: "Logo + core identity", price: "£750 to £1,250", info: "A guide range. Where you land depends on the rounds of exploration and how long the list of deliverables is." },
-  { name: "Full identity + guidelines", price: "£1,500 to £2,750", info: "A guide range. It depends on the scope of the guidelines and how much collateral launches with them." },
+  { name: "Logo + core identity", price: "£750+", info: "A guide to where this starts. It goes up with the rounds of exploration and the length of the list of deliverables." },
+  { name: "Full identity + guidelines", price: "£2,000+", info: "A guide to where this starts. It goes up with the scope of the guidelines and how much collateral launches with them." },
   { name: "Editorial, print and motion", price: "£400/day", info: "Booked by the day. I scope the job with you first, so you know how many days before we start." },
 ];
 
