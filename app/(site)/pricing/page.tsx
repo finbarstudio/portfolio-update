@@ -160,8 +160,26 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ── Extras / brand / care: one wide three-column band ── */}
-      <section className="pb-14 md:pb-20" aria-label="Extras, brand and care">
+      {/* ── Hosting and help: its own full-width row, three across ── */}
+      <section className="pb-14 md:pb-20" aria-label="Hosting and help">
+        <div className="pr-care">
+          <h2 className="pr-h2 font-bold display-brand">Hosting and help</h2>
+          <ul className="pr-care-list">
+            {CARE_ROWS.map((r) => (
+              <li key={r.name}>
+                <span className="pr-care-head">
+                  <span className="pr-list-name">{r.name}</span>
+                  <span className="pr-price">{r.price}</span>
+                </span>
+                <span className="pr-list-detail">{r.detail}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ── Extras and brand: two columns below ── */}
+      <section className="pb-14 md:pb-20" aria-label="Extras and brand">
         <div className="pr-band">
           <div>
             <h2 className="pr-h2 font-bold display-brand">The extras</h2>
@@ -180,20 +198,6 @@ export default function PricingPage() {
               {BRAND_ROWS.map((r) => (
                 <li key={r.name}>
                   <span className="pr-list-name">{r.name} <InfoTip text={r.info} /></span>
-                  <span className="pr-price">{r.price}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h2 className="pr-h2 font-bold display-brand">Hosting and help</h2>
-            <ul className="pr-list">
-              {CARE_ROWS.map((r) => (
-                <li key={r.name} className="pr-list-tall">
-                  <span className="pr-list-name">
-                    {r.name}
-                    <span className="pr-list-detail">{r.detail}</span>
-                  </span>
                   <span className="pr-price">{r.price}</span>
                 </li>
               ))}

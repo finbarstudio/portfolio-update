@@ -120,10 +120,38 @@
 }
 .pr-tier-points li::before { content: "✱"; position: absolute; left: 0; top: 0; color: var(--pink); font-size: 0.65em; line-height: 2.5; }
 
-/* ── The wide three-column band (extras / brand / care) ── */
-.pr-band {
+/* ── Hosting and help: a full-width row of its own, three items across ── */
+.pr-care {
+  border-top: 1px solid var(--line);
+  padding-top: clamp(24px, 4vh, 40px);
+}
+.pr-care-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+}
+@media (max-width: 900px) { .pr-care-list { grid-template-columns: 1fr; gap: 0; } }
+.pr-care-list li {
+  padding: 10px 0 14px;
+  border-top: 1px solid var(--line);
+  font-size: var(--text-small);
+  color: var(--ink);
+}
+.pr-care-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+}
+.pr-care-list .pr-list-detail { margin-top: 8px; max-width: none; }
+
+/* ── Extras and brand: two columns below ── */
+.pr-band {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: clamp(24px, 4vw, 64px);
   border-top: 1px solid var(--line);
   padding-top: clamp(24px, 4vh, 40px);
@@ -241,7 +269,7 @@
   body:has(.pr) a[href="#main-content"] { display: none !important; }
   .pr { padding-bottom: 0 !important; }
   .pr-tiers { grid-template-columns: repeat(3, 1fr); }
-  .pr-tier, .pr-list li, .pr-band > div { break-inside: avoid; page-break-inside: avoid; }
+  .pr-tier, .pr-list li, .pr-care-list li, .pr-band > div { break-inside: avoid; page-break-inside: avoid; }
   /* The ⓘ explainers are hover-only on screen; drop the icons in print. */
   .pr-info { display: none; }
   .pr, .pr * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
