@@ -170,6 +170,17 @@
 }
 .pr-list-name { display: inline-block; }
 /* Care rows carry a visible one-line explainer under the name. */
+/* A quiet sub-heading inside a column: the unpriced list under the extras. */
+.pr-h3 {
+  margin-top: 32px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+.pr-h3 + .pr-list { margin-top: 8px; }
+/* "on consult" sits where a figure would, but must not read as one. */
+.pr-price-ask { font-weight: 500; color: var(--ink-soft); }
 .pr-list-tall { align-items: flex-start; }
 .pr-list-detail {
   display: block;

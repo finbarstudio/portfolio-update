@@ -95,11 +95,21 @@ const INCLUDED = [
 const EXTRAS = [
   { name: "Extra section", price: "£200", info: "A guide for one more designed section on any page. A simple one costs less, a heavily animated one more." },
   { name: "Extra page", price: "about £1,000", info: "A guide. It depends how much of the page is new design and how much reuses what is already built, so ask." },
-  { name: "Custom-coded components and tools", price: "from £350", info: "A guide to where these start. Estimate calculators, quote builders, configurators, anything interactive your business needs. Each one is scoped with you first." },
   { name: "Live social or content feeds", price: "from £200", info: "A guide. It depends on the platform and how the feed is designed into the page." },
   { name: "Copywriting pass", price: "from £150", info: "A guide, priced by page count. Send me what you have and I will tell you what it needs." },
-  { name: "Booking and payments", price: "from £200", info: "A guide. It depends on the provider and whether payments are taken on the site." },
   { name: "Custom email + signatures", price: "from £75", info: "A guide for mailboxes on your own domain, set up properly, plus a designed email signature. Bigger teams cost a little more." },
+];
+
+/**
+ * Available, but too dependent on the job to put a figure on. No guide price on
+ * purpose: each of these is scoped in a conversation and then quoted.
+ */
+const ON_CONSULT = [
+  { name: "Booking and payments", info: "Taking bookings or money on the site. The cost depends on the provider you use and how much of the process lives on your pages." },
+  { name: "Estimate calculators", info: "A visitor answers a few questions and gets a ballpark figure, and you get a better enquiry. Priced on how your pricing actually works." },
+  { name: "Site AI chatbot", info: "An assistant trained on your own products and pages, like the one on Rennen Plus. Priced on how much it needs to know and what it is allowed to do." },
+  { name: "Live, interactive 3D product models", info: "A product the visitor can turn, open or configure on the page. Priced on whether a model already exists and how much it has to do." },
+  { name: "Other custom tools and components", info: "Quote builders, configurators, dashboards, anything interactive your business needs. Tell me what it should do and I will scope it." },
 ];
 
 const BRAND_ROWS = [
@@ -190,6 +200,15 @@ export default function PricingPage() {
                 <li key={r.name}>
                   <span className="pr-list-name">{r.name} <InfoTip text={r.info} /></span>
                   <span className="pr-price">{r.price}</span>
+                </li>
+              ))}
+            </ul>
+            <h3 className="pr-h3">Also available, priced on consult</h3>
+            <ul className="pr-list">
+              {ON_CONSULT.map((r) => (
+                <li key={r.name}>
+                  <span className="pr-list-name">{r.name} <InfoTip text={r.info} /></span>
+                  <span className="pr-price pr-price-ask">on consult</span>
                 </li>
               ))}
             </ul>
