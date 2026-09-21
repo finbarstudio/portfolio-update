@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { corsMedia } from "@/lib/media";
 import { isPhone } from "./phone";
+
+/** A 1x1 transparent GIF, handed to phones in place of the desktop-only wordmark. */
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 /**
  * The car's name as a metal badge.
@@ -126,7 +130,10 @@ export default function DinoBadge({
       loader.setCrossOrigin("anonymous");
       let map, normalMap;
       try {
-        [map, normalMap] = await Promise.all([loader.loadAsync(title.image), loader.loadAsync(title.normal)]);
+        [map, normalMap] = await Promise.all([
+          loader.loadAsync(corsMedia(title.image)),
+          loader.loadAsync(corsMedia(title.normal)),
+        ]);
       } catch {
         return release(); // a texture would not load: the flat artwork stays
       }
@@ -230,20 +237,24 @@ export default function DinoBadge({
 
   return (
     <div ref={wrap} className="mt-hero-title">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={title.image}
-        alt={title.alt}
-        width={title.width}
-        height={title.height}
-        className="mt-hero-title-flat"
-        decoding="async"
-        // Must match the texture request below. On the live site the media is
-        // on another domain: without this, this plain request fills the cache
-        // with a copy that has no CORS headers, three.js then asks for the same
-        // URL WITH CORS, is handed the cached copy, and is refused.
-        crossOrigin="anonymous"
-      />
+      {/* Desktop only: a phone shows its own flat wordmark (MobileHome), so it is
+          handed a blank here and never fetches this one. See DeskImg. */}
+      <picture className="mt-deskimg">
+        <source media="(max-width: 760px)" srcSet={BLANK} />
+        <img
+          // The SAME address and the same CORS mode as the texture request above,
+          // so the two share one download. It is a CORS-only address (corsMedia):
+          // a plain request for the same file elsewhere can then never leave the
+          // browser a copy without CORS headers for three.js to be refused.
+          src={corsMedia(title.image)}
+          crossOrigin="anonymous"
+          alt={title.alt}
+          width={title.width}
+          height={title.height}
+          className="mt-hero-title-flat"
+          decoding="async"
+        />
+      </picture>
       <canvas ref={canvas} className="mt-hero-title-metal" aria-hidden="true" />
     </div>
   );

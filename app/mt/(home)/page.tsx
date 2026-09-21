@@ -17,7 +17,7 @@ import MobileHome from "@/components/moto-technique/MobileHome";
  * parent: the hero lets go when <main> ends.
  */
 export default function MotoTechniqueHome() {
-  const { hero, heroMark, marks, why, services, projects, sale, contact, site } = content;
+  const { hero, heroPhone, heroMark, marks, why, services, projects, sale, contact, site } = content;
 
   return (
     <>
@@ -31,6 +31,7 @@ export default function MotoTechniqueHome() {
             one or the other; see MobileHome.tsx for why it is a separate page. */}
         <MobileHome
           hero={hero}
+          heroPhone={heroPhone}
           heroMark={heroMark}
           marks={marks}
           sale={sale}

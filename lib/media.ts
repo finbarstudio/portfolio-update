@@ -37,6 +37,29 @@ export function media<T extends string | undefined | null>(src: T): T {
   return `${BASE}${path}?v=${version(path)}` as T;
 }
 
+/**
+ * corsMedia() — the address to use when a media file is requested WITH CORS:
+ * a three.js texture, a `crossOrigin="anonymous"` <img> or <video>, a fetch().
+ * Pass it a URL that has already been through media().
+ *
+ * WHY. One address must only ever be asked for one way. The bucket serves every
+ * file as immutable for a year, and it only adds its CORS headers (and
+ * `Vary: Origin`) when the request carries an Origin. So if a plain <img> gets
+ * there first, the browser keeps a copy with no CORS headers and no Vary, and
+ * for the next year hands that copy to any CORS request for the same address,
+ * which is then refused: the texture never loads, the image shows nothing. It
+ * only bites browsers that happened to make the plain request first, so it
+ * looks fine on a fresh machine and broken on the owner's.
+ *
+ * The extra parameter means nothing to the bucket. It just gives the CORS
+ * request an address of its own, so the two copies can never be mixed up.
+ */
+export function corsMedia<T extends string | undefined | null>(url: T): T {
+  if (typeof url !== "string" || url.startsWith("data:") || url.startsWith("blob:")) return url;
+  if (/[?&]cors=1(&|$)/.test(url)) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}cors=1` as T;
+}
+
 /** media() over every string in a content tree (content/projects.ts etc). */
 export function mediaDeep<T>(value: T): T {
   if (typeof value === "string") return media(value) as T;

@@ -12,8 +12,8 @@ import type { StoryBlock } from "./DinoStory";
  * the other (the desktop components also switch their scripts off, see
  * phone.ts).
  *
- * WHAT IT IS. Sections, one after another, scrolled natively. Text, photographs
- * and swipe galleries. No script of its own: the galleries are CSS scroll-snap,
+ * WHAT IT IS. Sections, one after another, scrolled natively. Text, photographs,
+ * a photo grid and a swipe gallery. No script of its own: the galleries are CSS scroll-snap,
  * which is the browser's own momentum scrolling and costs nothing. Nothing is
  * pinned, nothing reacts to the scroll, nothing animates in.
  *
@@ -33,14 +33,32 @@ import type { StoryBlock } from "./DinoStory";
 
 type Shot = { image: string; alt: string };
 
-function Photo({ shot, eager = false }: { shot: Shot; eager?: boolean }) {
+/** A 1x1 transparent GIF, handed to desktops in place of files only a phone shows. */
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+
+/**
+ * The mirror of DeskImg: a picture only the PHONE page shows. The lazy
+ * photographs further down never load on a desktop (a hidden lazy image is not
+ * fetched), but these two are wanted at once on a phone, so they are not lazy,
+ * and a desktop would fetch them for nothing. Keep the width in step with
+ * PHONE in phone.ts.
+ */
+function PhoneOnly({ children }: { children: React.ReactNode }) {
+  return (
+    <picture className="mt-deskimg">
+      <source media="(min-width: 761px)" srcSet={BLANK} />
+      {children}
+    </picture>
+  );
+}
+
+function Photo({ shot }: { shot: Shot }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={shot.image}
       alt={shot.alt}
-      loading={eager ? "eager" : "lazy"}
-      fetchPriority={eager ? "high" : undefined}
+      loading="lazy"
       decoding="async"
     />
   );
@@ -48,6 +66,7 @@ function Photo({ shot, eager = false }: { shot: Shot; eager?: boolean }) {
 
 export default function MobileHome({
   hero,
+  heroPhone,
   heroMark,
   marks,
   sale,
@@ -57,6 +76,8 @@ export default function MobileHome({
   h1,
 }: {
   hero: { id: string; car: string; imagePhone: string }[];
+  /** Which slide the phone holds still, its 1600px file, and where a tall crop should look. */
+  heroPhone: { slide: string; image: string; focus: string };
   heroMark: { image: string; alt: string; width: number; height: number } | null;
   marks: {
     laurel: { mark: string; unit: string; body: string; label: string };
@@ -78,16 +99,18 @@ export default function MobileHome({
   };
   h1: string;
 }) {
-  const [first, ...frames] = hero;
-  // The story below shows some of the same photographs. On one narrow column a
-  // repeat lands a thumb's scroll after the first showing, so the gallery gives
-  // way and keeps only the frames the story does not use.
+  const first = hero.find((s) => s.id === heroPhone.slide) ?? hero[0];
+  const frames = hero.filter((s) => s !== first);
+  // The hero's other frames. Some are also in the story below; those are left
+  // out so nothing is shown twice. What remains joins the story's first
+  // photograph to make one 2 x 2 grid (see `grid`).
   const told = new Set(
     sale.blocks.flatMap((b) =>
       b.kind === "image" ? [b.imagePhone ?? b.image] : b.kind === "pair" ? b.images.map((s) => s.imagePhone ?? s.image) : [],
     ),
   );
-  const rest = frames.filter((s) => !told.has(s.imagePhone));
+  const spare = frames.filter((s) => !told.has(s.imagePhone)).map((s) => ({ image: s.imagePhone, alt: s.car }));
+  const lead = sale.blocks.findIndex((b) => b.kind === "image");
   const disciplines = [...services.quarters, services.hub];
 
   return (
@@ -95,21 +118,35 @@ export default function MobileHome({
       {/* The car, its name, and the two credentials. One photograph, held still. */}
       <section className="mt-m-hero" data-tone="dark">
         <h1 className="mt-sr">{h1}</h1>
-        {first ? <Photo shot={{ image: first.imagePhone, alt: first.car }} eager /> : null}
+        {first ? (
+          <PhoneOnly>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={heroPhone.image}
+              alt={first.car}
+              className="mt-m-hero-photo"
+              style={{ objectPosition: heroPhone.focus }}
+              fetchPriority="high"
+              decoding="async"
+            />
+          </PhoneOnly>
+        ) : null}
         <div className="mt-m-hero-shade" aria-hidden="true" />
         {heroMark ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={heroMark.image}
-            alt={heroMark.alt}
-            width={heroMark.width}
-            height={heroMark.height}
-            className="mt-m-hero-name"
-            decoding="async"
-            // the same request mode as the desktop badge's copy of this file, so the
-            // browser fetches it once and the two never poison each other's cache
-            crossOrigin="anonymous"
-          />
+          <PhoneOnly>
+            {/* A plain request, on the plain address. The desktop badge asks for
+                the same file WITH CORS and so uses an address of its own
+                (corsMedia in lib/media.ts); the two must never share one. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={heroMark.image}
+              alt={heroMark.alt}
+              width={heroMark.width}
+              height={heroMark.height}
+              className="mt-m-hero-name"
+              decoding="async"
+            />
+          </PhoneOnly>
         ) : null}
         <div className="mt-m-hero-marks">
           <AwardLaurel
@@ -123,17 +160,9 @@ export default function MobileHome({
         </div>
       </section>
 
-      {/* The rest of the car: a swipe gallery, straight under the hero. */}
-      {rest.length ? (
-        <div className="mt-m-gallery mt-m-gallery-flush" data-tone="light" role="group" aria-label="More photographs of the car">
-          {rest.map((s) => (
-            <Photo key={s.id} shot={{ image: s.imagePhone, alt: s.car }} />
-          ))}
-        </div>
-      ) : null}
-
-      {/* The Dino's story: text and photographs, in the order the content gives them. */}
-      <section className="mt-m-section" data-tone="light">
+      {/* The Dino's story: text and photographs, in the order the content gives
+          them, on black so it reads as one chapter with the hero above it. */}
+      <section className="mt-m-section mt-m-dark" data-tone="dark">
         {sale.blocks.map((b, i) => {
           if (b.kind === "text")
             return (
@@ -148,6 +177,17 @@ export default function MobileHome({
                 <cite className="mt-m-label">{b.by}</cite>
               </blockquote>
             );
+          if (b.kind === "image" && i === lead && spare.length >= 3) {
+            // four photographs, two by two: the story's own, then the spare frames
+            const grid = [{ image: b.imagePhone ?? b.image, alt: b.alt }, ...spare].slice(0, 4);
+            return (
+              <div key={i} className="mt-m-bleed mt-m-four">
+                {grid.map((shot) => (
+                  <Photo key={shot.image} shot={shot} />
+                ))}
+              </div>
+            );
+          }
           if (b.kind === "image")
             return (
               <div key={i} className="mt-m-bleed">
@@ -200,16 +240,19 @@ export default function MobileHome({
         </div>
       </section>
 
-      {/* Services: a plain list. The wheel needs a pointer to hover; a list does not. */}
+      {/* Services: one block each, the photograph behind and the words at its foot.
+          The wheel needs a pointer to hover; these do not. */}
       <section className="mt-m-section mt-m-rule" id="m-services" data-tone="light">
         <h2 className="mt-m-label">{services.title}</h2>
-        <ul className="mt-m-list">
+        <ul className="mt-m-blocks">
           {disciplines.map((s) => (
             <li key={s.id}>
-              <a href={s.href}>
+              <a href={s.href} className="mt-m-block">
                 <Photo shot={{ image: s.imagePhone, alt: "" }} />
-                <span className="mt-m-lead">{s.name}</span>
-                <span className="mt-m-body mt-m-soft">{s.blurb}</span>
+                <span className="mt-m-block-say">
+                  <span className="mt-m-display">{s.name}</span>
+                  <span className="mt-m-body">{s.blurb}</span>
+                </span>
               </a>
             </li>
           ))}

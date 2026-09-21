@@ -50,6 +50,18 @@ export type HeroSlide = {
  * auction and belong to whoever took them, so they stay off a site we are
  * pitching. Replace this list and the hero is a different car.
  */
+/**
+ * The phone page holds ONE photograph still instead of cycling six, so it gets
+ * to pick which. `slide` is the id of one of the hero slides below; `image` is
+ * that photograph at 1600px (it fills a phone screen, so the 900px cut the
+ * grids use would be soft); `focus` is the point a tall crop should hold.
+ */
+export const heroPhone = {
+  slide: "dino-rear",
+  image: img("dino36-rear-leafs-1600"),
+  focus: "50% 60%",
+};
+
 export const hero: HeroSlide[] = [
   {
     id: "dino-profile",
@@ -57,7 +69,7 @@ export const hero: HeroSlide[] = [
     line: "A Ferrari 3.6 litre V8 in a Dino 246 GTS. 400bhp, built in-house.",
     image: img("dino36-profile"),
     imageSm: img("dino36-profile-1600"),
-    imagePhone: img("dino36-profile-1600"),
+    imagePhone: img("dino36-profile-900"),
     credit: "Jayson Fong",
   },
   {
@@ -571,6 +583,7 @@ export const soon = {
 const content = mediaDeep({
   soon,
   hero,
+  heroPhone,
   heroMark,
   marks,
   why,

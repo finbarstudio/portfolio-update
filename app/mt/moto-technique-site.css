@@ -18,6 +18,9 @@
 .mt-site {
   /* ground and ink */
   --mt-ground: #101010;
+  /* the same off-black as channels, for every dark gradient: one black on the
+     site, never #000, so a shade always fades INTO the ground with no seam */
+  --mt-ground-rgb: 16, 16, 16;
   --mt-ground-2: #171717;
   --mt-paper: #f4f3f1;
   --mt-ink: #11100f;
@@ -204,6 +207,14 @@
    <img> inside is laid out as if it were a direct child. */
 .mt-deskimg {
   display: contents;
+}
+
+/* With the wrapper's box gone its children stand in for it, and that includes
+   the <source>. In a grid the <source> then takes a cell of its own, which
+   pushed a pair of photographs into one column, stacked. It draws nothing, so
+   take it out of layout altogether. */
+.mt-deskimg > source {
+  display: none;
 }
 
 .mt-mask {
@@ -509,7 +520,7 @@
   inset: 0;
   z-index: 57;
   /* the whole screen, dimmed hard enough that the menu is plainly in charge */
-  background: rgba(4, 4, 4, 0.74);
+  background: rgba(var(--mt-ground-rgb), 0.74);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s var(--mt-ease);
@@ -751,11 +762,11 @@
   z-index: 1;
   background: linear-gradient(
     to bottom,
-    rgba(2, 2, 2, 0.98) 0%,
-    rgba(2, 2, 2, 0.9) 22%,
-    rgba(2, 2, 2, 0.64) 48%,
-    rgba(2, 2, 2, 0.28) 74%,
-    rgba(2, 2, 2, 0) 100%
+    rgba(var(--mt-ground-rgb), 0.98) 0%,
+    rgba(var(--mt-ground-rgb), 0.9) 22%,
+    rgba(var(--mt-ground-rgb), 0.64) 48%,
+    rgba(var(--mt-ground-rgb), 0.28) 74%,
+    rgba(var(--mt-ground-rgb), 0) 100%
   );
   pointer-events: none;
 }
@@ -767,12 +778,12 @@
   z-index: 1;
   background: linear-gradient(
     to top,
-    rgba(2, 2, 2, 0.99) 0%,
-    rgba(2, 2, 2, 0.94) 22%,
-    rgba(2, 2, 2, 0.74) 44%,
-    rgba(2, 2, 2, 0.4) 66%,
-    rgba(2, 2, 2, 0.1) 84%,
-    rgba(2, 2, 2, 0) 100%
+    rgba(var(--mt-ground-rgb), 0.99) 0%,
+    rgba(var(--mt-ground-rgb), 0.94) 22%,
+    rgba(var(--mt-ground-rgb), 0.74) 44%,
+    rgba(var(--mt-ground-rgb), 0.4) 66%,
+    rgba(var(--mt-ground-rgb), 0.1) 84%,
+    rgba(var(--mt-ground-rgb), 0) 100%
   );
   pointer-events: none;
 }
@@ -1613,8 +1624,8 @@
      over whichever photograph is open. Clear through the middle, so the car
      itself is left alone. */
   background:
-    linear-gradient(to top, rgba(4, 4, 4, 0.9) 0%, rgba(4, 4, 4, 0.55) 28%, rgba(4, 4, 4, 0) 62%),
-    linear-gradient(to bottom, rgba(4, 4, 4, 0.78) 0%, rgba(4, 4, 4, 0.3) 18%, rgba(4, 4, 4, 0) 38%);
+    linear-gradient(to top, rgba(var(--mt-ground-rgb), 0.9) 0%, rgba(var(--mt-ground-rgb), 0.55) 28%, rgba(var(--mt-ground-rgb), 0) 62%),
+    linear-gradient(to bottom, rgba(var(--mt-ground-rgb), 0.78) 0%, rgba(var(--mt-ground-rgb), 0.3) 18%, rgba(var(--mt-ground-rgb), 0) 38%);
   pointer-events: none;
 }
 
@@ -1961,7 +1972,7 @@
     overflow: hidden;
   }
 
-  .mt-m-hero > img:first-of-type {
+  .mt-m-hero-photo {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1975,8 +1986,8 @@
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(to bottom, rgba(2, 2, 2, 0.86) 0%, rgba(2, 2, 2, 0) 34%),
-      linear-gradient(to top, rgba(2, 2, 2, 0.96) 0%, rgba(2, 2, 2, 0.6) 30%, rgba(2, 2, 2, 0) 62%);
+      linear-gradient(to bottom, rgba(var(--mt-ground-rgb), 0.86) 0%, rgba(var(--mt-ground-rgb), 0) 34%),
+      linear-gradient(to top, rgb(var(--mt-ground-rgb)) 0%, rgba(var(--mt-ground-rgb), 0.66) 30%, rgba(var(--mt-ground-rgb), 0) 64%);
   }
 
   /* centred with margins, not a transform: nothing here needs its own layer */
@@ -2045,7 +2056,8 @@
     gap: 2px;
   }
 
-  .mt-m-pair {
+  .mt-m-pair,
+  .mt-m-four {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -2058,6 +2070,31 @@
 
   .mt-m-pair img {
     aspect-ratio: 4 / 5;
+  }
+
+  /* four to a grid: squarer, so the block of four stays about one screen wide
+     by one photograph tall rather than a long column */
+  .mt-m-four img {
+    aspect-ratio: 1;
+  }
+
+  /* ---- the dark chapter: the Dino's story, on black under the hero ---- */
+  .mt-m-dark {
+    background: var(--mt-ground);
+    color: var(--mt-light);
+  }
+
+  .mt-m-dark :is(.mt-m-label, .mt-m-soft) {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .mt-m-dark .mt-m-links a {
+    border-bottom-color: rgba(255, 255, 255, 0.28);
+  }
+
+  /* the section after it already starts a new ground; no hairline needed */
+  .mt-m-dark + .mt-m-rule {
+    border-top: 0;
   }
 
   .mt-m-links {
@@ -2083,6 +2120,14 @@
 
   .mt-m-figures dd {
     margin: var(--s-1) 0 0;
+  }
+
+  /* short lines that wrap: share the words out evenly instead of leaving one
+     word stranded on the last line */
+  .mt-m-lead,
+  .mt-m-figures dd,
+  .mt-m-block-say .mt-m-body {
+    text-wrap: balance;
   }
 
   /* ---- swipe galleries: the browser's own scroll-snap, no script ----
@@ -2118,18 +2163,6 @@
     object-fit: cover;
   }
 
-  /* the gallery straight under the hero sits outside a section, so it has no
-     gutter to cancel and keeps its own space above and below */
-  .mt-m-gallery-flush {
-    margin-inline: 0;
-    padding-block: var(--s-1) 0;
-    background: #fff;
-  }
-
-  .mt-m-gallery-flush img {
-    aspect-ratio: 3 / 2;
-  }
-
   .mt-m-card {
     display: grid;
     gap: var(--s-1);
@@ -2140,28 +2173,51 @@
     margin-bottom: var(--s-1);
   }
 
-  /* ---- services: a plain list ---- */
-  .mt-m-list {
-    margin: 0;
+  /* ---- services: one block each, photograph behind, words at the foot ----
+     The photograph is an <img> laid under the text, not a CSS background, so it
+     lazy-loads and goes through media() like every other picture. The shade is
+     deliberately heavy: the blurbs run to several lines of white text. */
+  .mt-m-blocks {
+    margin: 0 calc(var(--mt-gutter) * -1);
     padding: 0;
     list-style: none;
     display: grid;
-    gap: var(--s-3);
+    gap: 2px;
   }
 
-  .mt-m-list a {
+  .mt-m-block {
+    position: relative;
     display: grid;
-    grid-template-columns: 88px minmax(0, 1fr);
-    gap: var(--s-1) var(--s-2);
-    align-items: start;
+    align-content: end;
+    min-height: 78svh;
+    padding: var(--s-4) var(--mt-gutter) var(--s-3);
+    overflow: hidden;
+    background: var(--mt-ground);
+    color: var(--mt-light);
   }
 
-  .mt-m-list img {
-    grid-row: span 2;
-    display: block;
-    width: 88px;
-    aspect-ratio: 1;
+  .mt-m-block > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+  }
+
+  .mt-m-block::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(var(--mt-ground-rgb), 0.5) 0%, rgba(var(--mt-ground-rgb), 0) 26%),
+      linear-gradient(to top, rgba(var(--mt-ground-rgb), 0.96) 0%, rgba(var(--mt-ground-rgb), 0.86) 34%, rgba(var(--mt-ground-rgb), 0.45) 62%, rgba(var(--mt-ground-rgb), 0) 88%);
+  }
+
+  .mt-m-block-say {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--s-2);
   }
 
   /* ---- shared furniture, made cheap on a phone ---- */
