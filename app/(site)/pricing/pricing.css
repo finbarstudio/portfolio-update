@@ -217,9 +217,11 @@
   position: absolute;
   bottom: calc(100% + 8px);
   left: 50%;
-  transform: translateX(-50%) translateY(2px);
+  /* --pr-shift: set by InfoTip when it opens, to keep the bubble inside the
+     page margin wherever its icon happens to sit. */
+  transform: translateX(calc(-50% + var(--pr-shift, 0px))) translateY(2px);
   width: max-content;
-  max-width: min(38ch, 74vw);
+  max-width: min(38ch, calc(100vw - 40px));
   text-wrap: pretty;
   background: var(--ink);
   color: var(--bg);
@@ -240,16 +242,8 @@
 .pr-info:hover .pr-info-tip,
 .pr-info:focus-within .pr-info-tip {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(calc(-50% + var(--pr-shift, 0px))) translateY(0);
 }
-/* Tiers near the left/right page edge: keep the tip on-screen. */
-.pr-tier:first-child .pr-info-tip { left: 0; transform: translateX(0) translateY(2px); }
-.pr-tier:first-child .pr-info:hover .pr-info-tip,
-.pr-tier:first-child .pr-info:focus-within .pr-info-tip { transform: translateX(0) translateY(0); }
-.pr-tier:last-child .pr-info-tip { left: auto; right: 0; transform: translateX(0) translateY(2px); }
-.pr-tier:last-child .pr-info:hover .pr-info-tip,
-.pr-tier:last-child .pr-info:focus-within .pr-info-tip { transform: translateX(0) translateY(0); }
-
 /* ── Terms ── */
 .pr-foot {
   border-top: 1px solid var(--line);
