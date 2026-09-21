@@ -1,95 +1,122 @@
 import type { Metadata } from "next";
-import PricingGate from "./PricingGate";
 import InfoTip from "./InfoTip";
+import Tiers, { type Tier } from "./Tiers";
 import "./pricing.css";
 
 /**
- * /pricing — a private rates page for studio partners and serious enquiries.
+ * /pricing — the rates page. Open to anyone with the link: no password.
  *
  * Inside the (site) group: full site chrome. The floating pill reads "Start a
  * project" on this page only (BookCall's pathname override) so there's no
- * duplicate CTA here. Unlisted (noindex, not in the sitemap, linked from
- * nowhere) AND soft-locked behind a password (PricingGate, "workwithme").
+ * duplicate CTA here. Still unlisted: noindex, not in the sitemap, linked from
+ * nowhere. It travels in emails.
  *
- * Every price that can vary carries a little ⓘ explaining what moves it.
- * Numbers are the working draft — tune freely.
+ * ONE PAGE, MANY LINKS. /pricing?landing-page (or ?small-site, ?custom-site)
+ * marks that package as the suggestion for whoever was sent the link; see
+ * Tiers.tsx. The prices are the same for everyone.
+ *
+ * All prices are GBP and say nothing about VAT, on purpose. Build prices do
+ * not include hosting. Every price that can vary carries a little ⓘ explaining
+ * what moves it.
  */
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Rates and packages. Private page for partners.",
+  description: "Fixed prices for custom-coded websites, hosting and ongoing help.",
   robots: { index: false, follow: false },
 };
 
 /* ── Data (edit freely) ───────────────────────────────────────────────────── */
 
-const SITE_TIERS = [
+const SITE_TIERS: Tier[] = [
   {
+    id: "landing-page",
     name: "Landing page",
-    price: "from $1,200",
+    price: "£1,750",
     blurb: "One page that does one job properly.",
-    info: "The from price is a single tight page. More sections, custom illustration or heavier animation move it up.",
-    points: ["Custom-coded, no templates", "Motion and micro-interaction", "SEO and analytics basics", "Live in about two weeks"],
+    info: "Fixed price. It covers a hero, five sections and a footer. Extra sections are £200 each.",
+    points: [
+      "A hero, five sections and a footer",
+      "Contact buttons in the nav",
+      "Custom-coded, no templates",
+      "Live in about two weeks",
+    ],
+    examples: [
+      { label: "Lola Audio", href: "/case-studies/lola-audio" },
+      { label: "Plated with Issy", href: "/case-studies/plated-with-issy" },
+    ],
   },
   {
-    name: "Brochure site",
-    price: "$2,500 to $4,500",
-    blurb: "The full front door, up to six pages.",
-    info: "Where it lands depends on page count, how much the CMS needs to manage, and how custom the design goes.",
-    points: ["A CMS you edit yourself", "Contact and enquiry flows", "Structured data and OG cards", "Full handover and walkthrough"],
-    lead: true,
+    id: "small-site",
+    name: "Small site",
+    price: "£3,500",
+    blurb: "Three pages. Usually home, about and contact.",
+    info: "Fixed price for three pages. Extra pages are about £1,000 each, extra sections £200.",
+    points: [
+      "A tighter home page, with the detail a click deeper",
+      "A contact form if you want one",
+      "Custom-coded, no templates",
+      "Live in about four weeks",
+    ],
   },
   {
-    name: "Custom build",
-    price: "$5,000 to $9,000",
-    blurb: "Fully custom design, built exactly as drawn.",
-    info: "Driven by the size of the design system, the animation and any integrations or custom tools.",
-    points: ["Custom animation throughout", "Integrations and custom tools", "AI-search-ready front end", "Fast, and it stays fast"],
+    id: "custom-site",
+    name: "Custom site",
+    price: "from £4,000",
+    blurb: "A CMS, project or blog posts, anything more involved.",
+    info: "The from price is a site like Lows: a CMS and custom project pages. Big catalogues and custom tools, like Rennen Plus, sit higher. Quoted fixed before we start.",
+    points: [
+      "A CMS you edit yourself, built on Sanity",
+      "Project, portfolio or blog posts",
+      "Custom tools and integrations",
+      "Quoted fixed before we start",
+    ],
+    examples: [
+      { label: "Lows Design + Build", href: "/case-studies/lows-design-build" },
+      { label: "Rennen Plus", href: "/case-studies/rennen-plus" },
+    ],
   },
-  {
-    name: "Brand + site",
-    price: "from $6,500",
-    blurb: "Identity and website as one piece.",
-    info: "Depends how much identity work already exists and the size of the site it feeds into.",
-    points: ["Logo and full identity", "Guidelines the site actually uses", "Everything in Custom build", "One person, sketch to code"],
-  },
+];
+
+/** On every build, whatever the size. */
+const INCLUDED = [
+  "Custom animation and scroll-driven interaction, designed for your site",
+  "A first SEO fix, plus a plain guide to setting up Google Search Console and your Google Business Profile",
+  "The custom code is yours outright",
+  "A fixed price, agreed before anything starts",
 ];
 
 const EXTRAS = [
-  { name: "Custom-coded components and tools", price: "from $650", info: "Estimate calculators, quote builders, configurators, anything interactive your business needs. Scoped per tool, so there is no fixed ceiling." },
-  { name: "Live social or content feeds", price: "from $400", info: "Depends on the platform and how the feed is designed into the page." },
-  { name: "Blog or journal CMS", price: "from $500", info: "Covers the CMS set-up, templates and feeds. More post types cost more." },
-  { name: "Copywriting pass", price: "from $300", info: "Priced by page count." },
-  { name: "Booking and payments", price: "from $400", info: "Depends on the provider and whether payments are taken on-site." },
-  { name: "Custom email + signatures", price: "from $150", info: "Mailboxes on your own domain set up properly, plus a designed email signature for the team." },
+  { name: "Extra section", price: "£200", info: "One more designed section on any page." },
+  { name: "Extra page", price: "about £1,000", info: "Depends how much of the page is new design and how much reuses what is already built." },
+  { name: "Custom-coded components and tools", price: "from £350", info: "Estimate calculators, quote builders, configurators, anything interactive your business needs. Scoped per tool, so there is no fixed ceiling." },
+  { name: "Live social or content feeds", price: "from £200", info: "Depends on the platform and how the feed is designed into the page." },
+  { name: "Copywriting pass", price: "from £150", info: "Priced by page count." },
+  { name: "Booking and payments", price: "from £200", info: "Depends on the provider and whether payments are taken on-site." },
+  { name: "Custom email + signatures", price: "from £75", info: "Mailboxes on your own domain set up properly, plus a designed email signature for the team." },
 ];
 
 const BRAND_ROWS = [
-  { name: "Logo + core identity", price: "$1,500 to $2,500", info: "Rounds of exploration and the size of the deliverables list." },
-  { name: "Full identity + guidelines", price: "$3,000 to $5,500", info: "Scope of the guidelines and how much collateral launches with it." },
-  { name: "Editorial, print and motion", price: "$550/day", info: "Booked by the day, scoped up front so you know the days before we start." },
+  { name: "Logo + core identity", price: "£750 to £1,250", info: "Rounds of exploration and the size of the deliverables list." },
+  { name: "Full identity + guidelines", price: "£1,500 to £2,750", info: "Scope of the guidelines and how much collateral launches with it." },
+  { name: "Editorial, print and motion", price: "£300/day", info: "Booked by the day, scoped up front so you know the days before we start." },
 ];
 
 const CARE_ROWS = [
   {
     name: "Hosting",
-    price: "$35/mo",
-    detail: "Fast, secure hosting with SSL and backups. The domain pointed and looked after, one less login to chase.",
+    price: "£20/mo, or £200 a year",
+    detail: "Charged at what it costs me, with no markup. It covers hosting the code, storing the images and the CMS. Changes to the site are not part of it.",
   },
   {
-    name: "Hosting + care",
-    price: "$75/mo",
-    detail: "Everything in Hosting, plus updates, security patches and small content changes handled within a couple of days.",
-  },
-  {
-    name: "Care + a design day monthly",
-    price: "$250/mo",
-    detail: "Everything in Care, plus a full design or dev day every month for whatever is next on the list.",
+    name: "Monthly retainer",
+    price: "£300/mo",
+    detail: "One page redesigned every month, usually a new hero for a promotion or an event. A direct line to me, and basic content changes across the site live within 48 hours. A CMS lets you do much of this yourself.",
   },
   {
     name: "Always yours",
     price: "included",
-    detail: "Full code handover whenever you want it. Host it yourself, run the CMS yourself, switch developer any time, cancel hosting any time. Nothing is locked in.",
+    detail: "The code is yours. Stop paying for hosting whenever you like and I will help you set up your own, then move everything across, free.",
   },
 ];
 
@@ -98,15 +125,13 @@ const CARE_ROWS = [
 export default function PricingPage() {
   return (
     <div className="pr px-5 md:px-10 pb-24 md:pb-28">
-      <PricingGate>
-
       {/* ── Title: central, caps ── */}
       <section className="pt-10 md:pt-16 pb-10 md:pb-12 text-center">
         <h1 className="font-bold text-ink leading-[1.02] uppercase" style={{ fontSize: "var(--text-display)", letterSpacing: "-0.01em" }}>
           Pricing
         </h1>
         <p className="pr-sub">
-          Custom-coded websites and brand design, quoted fixed before anything starts. AUD, ex GST.
+          Custom-coded websites and brand design, at a fixed price agreed before anything starts. Prices in GBP.
         </p>
         <p className="pr-sub" style={{ marginTop: "10px" }}>
           I can develop, or design and develop. Come with Figma files, an existing
@@ -115,20 +140,19 @@ export default function PricingPage() {
       </section>
 
       {/* ── Websites: the products lead ── */}
-      <section className="pb-14 md:pb-20" aria-label="Website packages">
-        <div className="pr-tiers">
-          {SITE_TIERS.map((t) => (
-            <article key={t.name} className={`pr-tier ${t.lead ? "is-lead" : ""}`}>
-              <h2 className="pr-tier-name">{t.name}</h2>
-              <p className="pr-tier-price">{t.price} <InfoTip text={t.info} /></p>
-              <p className="pr-tier-blurb">{t.blurb}</p>
-              <ul className="pr-tier-points">
-                {t.points.map((p) => (
-                  <li key={p}>{p}</li>
-                ))}
-              </ul>
-            </article>
-          ))}
+      <section className="pb-10 md:pb-12" aria-label="Website packages">
+        <Tiers tiers={SITE_TIERS} />
+      </section>
+
+      {/* ── On every build ── */}
+      <section className="pb-14 md:pb-20" aria-label="Included with every build">
+        <div className="pr-included">
+          <h2 className="pr-included-title">Every build includes</h2>
+          <ul>
+            {INCLUDED.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -158,7 +182,7 @@ export default function PricingPage() {
             </ul>
           </div>
           <div>
-            <h2 className="pr-h2 font-bold display-brand">Hosting and care</h2>
+            <h2 className="pr-h2 font-bold display-brand">Hosting and help</h2>
             <ul className="pr-list">
               {CARE_ROWS.map((r) => (
                 <li key={r.name} className="pr-list-tall">
@@ -178,16 +202,15 @@ export default function PricingPage() {
       <section aria-label="Terms">
         <div className="pr-foot">
           <p className="pr-terms">
-            Half to begin, half at launch, and most sites are live in two to six
-            weeks. Where a range is shown, the final number comes down to scope:
-            page count, custom features and how far the animation goes. Every job
-            is quoted fixed before we start, so the number you sign is the number
-            you pay. Custom emails, signatures and any other design or graphic
-            work are covered too, just ask.
+            Half to begin, half at launch. Build prices do not include hosting,
+            which is separate and optional. Where a price says from, the final
+            number comes down to scope: page count, custom features and how far
+            the animation goes. Every job is quoted fixed before we start, so the
+            number you sign is the number you pay. Custom emails, signatures and
+            any other design or graphic work are covered too, just ask.
           </p>
         </div>
       </section>
-      </PricingGate>
     </div>
   );
 }

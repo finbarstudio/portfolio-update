@@ -18,7 +18,7 @@ import FooterCopyright from "./FooterCopyright";
 import BookCall from "./BookCall";
 import FooterClock from "./FooterClock";
 import LiveTime from "./LiveTime";
-import { EngFlag } from "./Flags";
+import { AusFlag } from "./Flags";
 import BrandMark from "./BrandMark";
 
 export default function SiteFooter() {
@@ -124,15 +124,15 @@ export default function SiteFooter() {
       <div className="site-footer-rule" aria-hidden="true" />
 
       <div className="site-footer-info">
-        {/* Locations stacked: Brisbane over London, freeing a column for the
-            mailing-list field. */}
+        {/* Locations stacked: London (the pinned clock) over Brisbane, freeing a
+            column for the mailing-list field. */}
         <div className="sf-col sf-col-locations">
           <FooterClock />
-          {/* London, stacked as two lines to match the Brisbane clock above:
-              ENG/LON + flag on line 1, the time on line 2. */}
+          {/* Brisbane, stacked as two lines to match the London clock above:
+              AUS/BNE + flag on line 1, the time on line 2. */}
           <div className="sf-loc-eng">
-            <span className="sf-loc"><span className="sf-label">ENG/LON</span><EngFlag /></span>
-            <LiveTime tz="Europe/London" className="sf-value tabular-nums" />
+            <span className="sf-loc"><span className="sf-label">AUS/BNE</span><AusFlag /></span>
+            <LiveTime tz="Australia/Brisbane" className="sf-value tabular-nums" />
           </div>
         </div>
         <div className="sf-col sf-newsletter sf-reveal">

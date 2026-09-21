@@ -1,5 +1,5 @@
 /**
- * Tiny flag marks beside the AUS/BNE and ENG/LON footer location codes.
+ * Tiny flag marks beside the ENG/LDN and AUS/BNE footer location codes.
  * Artwork from /public/{Aus,Eng} Flag.svg, recoloured to the site pink
  * (var(--pink)) on a transparent field. ~1em tall.
  */

@@ -1,25 +1,27 @@
 "use client";
 
 /**
- * FooterClock — the AUS/BNE live clock, mirror of FooterCopyright but bottom-LEFT.
+ * FooterClock — the ENG/LDN live clock, mirror of FooterCopyright but bottom-LEFT.
+ * London since the studio moved back (Sep 2026); Brisbane is the second, static
+ * line under it in SiteFooter.
  *
  * Pinned bottom-left of the viewport while scrolling (on home only after the
  * intro logo has gone up), masked reveal, and DOCKS into its slot in the footer's
- * Brisbane column when that slot rises to the pin's resting line — so it ends up
- * in place rather than jumping. "AUS/BNE" over a 24h day+time line.
+ * locations column when that slot rises to the pin's resting line — so it ends up
+ * in place rather than jumping. "ENG/LDN" over a 24h day+time line.
  */
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useClock } from "./LiveTime";
-import { AusFlag } from "./Flags";
+import { EngFlag } from "./Flags";
 
 export default function FooterClock() {
   const pathname = usePathname();
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [shown, setShown] = useState(false);
   const [docked, setDocked] = useState(false);
-  const time = useClock("Australia/Brisbane");
+  const time = useClock("Europe/London");
 
   // Reveal gate: home shows it only after the intro logo scrolls up; else always.
   useEffect(() => {
@@ -66,14 +68,14 @@ export default function FooterClock() {
 
   return (
     <span className="sf-clock" ref={anchorRef}>
-      {/* Reserves the two lines in the Brisbane column so the layout holds. */}
+      {/* Reserves the two lines in the locations column so the layout holds. */}
       <span className="sf-clock-ph" aria-hidden="true">
-        <span className="sf-loc"><span className="sf-label">AUS/BNE</span><AusFlag /></span>
+        <span className="sf-loc"><span className="sf-label">ENG/LDN</span><EngFlag /></span>
         <span className="sf-value tabular-nums">{time || " "}</span>
       </span>
       <span className={`sf-clock-pin ${shown ? "is-shown" : ""} ${docked ? "is-docked" : ""}`}>
         <span className="sf-clock-inner">
-          <span className="sf-loc"><span className="sf-label">AUS/BNE</span><AusFlag /></span>
+          <span className="sf-loc"><span className="sf-label">ENG/LDN</span><EngFlag /></span>
           <span className="sf-value tabular-nums" suppressHydrationWarning>{time || " "}</span>
         </span>
       </span>
