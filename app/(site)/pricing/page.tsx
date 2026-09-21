@@ -15,6 +15,10 @@ import "./pricing.css";
  * marks that package as the suggestion for whoever was sent the link; see
  * Tiers.tsx. The prices are the same for everyone.
  *
+ * GUIDE PRICES. Finbar's rule: every figure here is a guide to the product and
+ * the scope it expects. Projects never fit the list, so scope and price flex
+ * and the page always says: talk first, then a fixed quote. Every ⓘ says so.
+ *
  * All prices are GBP and say nothing about VAT, on purpose. Build prices do
  * not include hosting. Every price that can vary carries a little ⓘ explaining
  * what moves it.
@@ -34,7 +38,7 @@ const SITE_TIERS: Tier[] = [
     name: "Landing page",
     price: "£1,750",
     blurb: "One page that does one job properly.",
-    info: "Fixed price. It covers a hero, five sections and a footer. Extra sections are £200 each.",
+    info: "A guide price. It assumes a hero, five sections and a footer, but no project fits a list exactly, so the scope can flex and the price moves with it. Talk to me first and I will give you a fixed figure.",
     points: [
       "A hero, five sections and a footer",
       "Contact buttons in the nav",
@@ -51,7 +55,7 @@ const SITE_TIERS: Tier[] = [
     name: "Small site",
     price: "£3,500",
     blurb: "Three pages. Usually home, about and contact.",
-    info: "Fixed price for three pages. Extra pages are about £1,000 each, extra sections £200.",
+    info: "A guide price for three pages. Yours might need two, or four with a gallery, so treat it as the starting point for a conversation. The fixed figure comes after we have talked.",
     points: [
       "A tighter home page, with the detail a click deeper",
       "A contact form if you want one",
@@ -64,7 +68,7 @@ const SITE_TIERS: Tier[] = [
     name: "Custom site",
     price: "from £4,000",
     blurb: "A CMS, project or blog posts, anything more involved.",
-    info: "The from price is a site like Lows: a CMS and custom project pages. Big catalogues and custom tools, like Rennen Plus, sit higher. Quoted fixed before we start.",
+    info: "A guide to where this size of job starts. A site like Lows, with a CMS and custom project pages, sits near the from price. Big catalogues and custom tools, like Rennen Plus, sit higher. Every one is scoped with you, then quoted fixed.",
     points: [
       "A CMS you edit yourself, built on Sanity",
       "Project, portfolio or blog posts",
@@ -83,23 +87,23 @@ const INCLUDED = [
   "Custom animation and scroll-driven interaction, designed for your site",
   "A first SEO fix, plus a plain guide to setting up Google Search Console and your Google Business Profile",
   "The custom code is yours outright",
-  "A fixed price, agreed before anything starts",
+  "A fixed quote once the scope is agreed, before anything starts",
 ];
 
 const EXTRAS = [
-  { name: "Extra section", price: "£200", info: "One more designed section on any page." },
-  { name: "Extra page", price: "about £1,000", info: "Depends how much of the page is new design and how much reuses what is already built." },
-  { name: "Custom-coded components and tools", price: "from £350", info: "Estimate calculators, quote builders, configurators, anything interactive your business needs. Scoped per tool, so there is no fixed ceiling." },
-  { name: "Live social or content feeds", price: "from £200", info: "Depends on the platform and how the feed is designed into the page." },
-  { name: "Copywriting pass", price: "from £150", info: "Priced by page count." },
-  { name: "Booking and payments", price: "from £200", info: "Depends on the provider and whether payments are taken on-site." },
-  { name: "Custom email + signatures", price: "from £75", info: "Mailboxes on your own domain set up properly, plus a designed email signature for the team." },
+  { name: "Extra section", price: "£200", info: "A guide for one more designed section on any page. A simple one costs less, a heavily animated one more." },
+  { name: "Extra page", price: "about £1,000", info: "A guide. It depends how much of the page is new design and how much reuses what is already built, so ask." },
+  { name: "Custom-coded components and tools", price: "from £350", info: "A guide to where these start. Estimate calculators, quote builders, configurators, anything interactive your business needs. Each one is scoped with you first." },
+  { name: "Live social or content feeds", price: "from £200", info: "A guide. It depends on the platform and how the feed is designed into the page." },
+  { name: "Copywriting pass", price: "from £150", info: "A guide, priced by page count. Send me what you have and I will tell you what it needs." },
+  { name: "Booking and payments", price: "from £200", info: "A guide. It depends on the provider and whether payments are taken on the site." },
+  { name: "Custom email + signatures", price: "from £75", info: "A guide for mailboxes on your own domain, set up properly, plus a designed email signature. Bigger teams cost a little more." },
 ];
 
 const BRAND_ROWS = [
-  { name: "Logo + core identity", price: "£750 to £1,250", info: "Rounds of exploration and the size of the deliverables list." },
-  { name: "Full identity + guidelines", price: "£1,500 to £2,750", info: "Scope of the guidelines and how much collateral launches with it." },
-  { name: "Editorial, print and motion", price: "£400/day", info: "Booked by the day, scoped up front so you know the days before we start." },
+  { name: "Logo + core identity", price: "£750 to £1,250", info: "A guide range. Where you land depends on the rounds of exploration and how long the list of deliverables is." },
+  { name: "Full identity + guidelines", price: "£1,500 to £2,750", info: "A guide range. It depends on the scope of the guidelines and how much collateral launches with them." },
+  { name: "Editorial, print and motion", price: "£400/day", info: "Booked by the day. I scope the job with you first, so you know how many days before we start." },
 ];
 
 const CARE_ROWS = [
@@ -131,7 +135,7 @@ export default function PricingPage() {
           Pricing
         </h1>
         <p className="pr-sub">
-          Custom-coded websites and brand design, at a fixed price agreed before anything starts. Prices in GBP.
+          Custom-coded websites and brand design. These are guide prices in GBP: they show what each product is and the scope it expects. Your job gets its own fixed quote once we have talked it through.
         </p>
         <p className="pr-sub" style={{ marginTop: "10px" }}>
           I can develop, or design and develop. Come with Figma files, an existing
@@ -202,11 +206,12 @@ export default function PricingPage() {
       <section aria-label="Terms">
         <div className="pr-foot">
           <p className="pr-terms">
-            Half to begin, half at launch. Build prices do not include hosting,
-            which is separate and optional. Where a price says from, the final
-            number comes down to scope: page count, custom features and how far
-            the animation goes. Every job is quoted fixed before we start, so the
-            number you sign is the number you pay. Custom emails, signatures and
+            Every price here is a guide. No project fits a list exactly, so
+            the scope bends to suit yours and the price moves with it: page
+            count, custom features and how far the animation goes. Talk to me
+            first. Once we agree the scope I quote it fixed, so the number you
+            sign is the number you pay. Half to begin, half at launch. Build
+            prices do not include hosting, which is separate and optional. Custom emails, signatures and
             any other design or graphic work are covered too, just ask.
           </p>
         </div>

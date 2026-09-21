@@ -13,6 +13,10 @@
  *      characters out of its footprint (translate only). Leaving reverses it.
  *   The hover target is a fixed-size zone, so the photo scaling can't make the
  *   pointer flicker on and off it.
+ *   3. LEFT ALONE for a few seconds after the statement lands, the takeover
+ *      plays by itself, so a visitor who never finds the hover still meets the
+ *      photo. Scrolling switches that off: a pending one is cancelled, and one
+ *      already showing reverses back to the text (unless the pointer is on it).
  *
  * Reduced motion / background tab: readable statement, photo hidden, gate released.
  */
@@ -40,6 +44,7 @@ const TOKENS: Token[] = [
 
 const PUSH_MARGIN = 28;   // px of clearance beyond the photo's edge
 const WAVE_SPEED = 1500;  // px/second the scatter wave travels outward
+const IDLE_S = 4;          // seconds of stillness before the takeover plays by itself
 // Isolated b/w cutout on a transparent ground, shown in a circular frame (the
 // ring has no fill, so the type reads through where the cutout is transparent).
 const PHOTO_SRC = media("/media/images/about/finbar.webp");
@@ -71,6 +76,8 @@ export default function AboutHero() {
     const inactive = document.visibilityState === "hidden";
 
     let hovering = false;
+    let pointerOn = false;                       // the pointer is on the hover zone
+    let idle: gsap.core.Tween | null = null;      // the pending play-by-itself call
     const noop = () => {};
     const handlers: { enter: () => void; leave: () => void; toggle?: () => void } = { enter: noop, leave: noop };
 
@@ -152,6 +159,14 @@ export default function AboutHero() {
       };
       handlers.leave = () => { if (!hovering) return; hovering = false; scatter.timeScale(1.6).reverse(); };
 
+      // 4 — nobody has touched anything for a few seconds: play it for them.
+      // Hover devices only; touch already plays it (below). Not once scrolled.
+      if (!window.matchMedia("(hover: none)").matches) {
+        idle = gsap.delayedCall(intro.duration() + IDLE_S, () => {
+          if (window.scrollY <= 8) handlers.enter();
+        });
+      }
+
       // Touch devices have no hover: play the takeover once the word reveal has
       // landed, then let a tap on the centre zone toggle photo <-> text.
       if (window.matchMedia("(hover: none)").matches) {
@@ -160,8 +175,17 @@ export default function AboutHero() {
       }
     }, section);
 
-    const enter = () => handlers.enter();
-    const leave = () => handlers.leave();
+    const enter = () => { pointerOn = true; handlers.enter(); };
+    const leave = () => { pointerOn = false; handlers.leave(); };
+    // Scrolling switches the play-by-itself off, and puts the text back if it
+    // had already played. A photo someone is actually hovering is left alone.
+    const onScroll = () => {
+      if (window.scrollY <= 8) return;
+      idle?.kill();
+      idle = null;
+      if (hovering && !pointerOn && !window.matchMedia("(hover: none)").matches) handlers.leave();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     const tap = () => handlers.toggle?.();
     if (window.matchMedia("(hover: none)").matches) {
       hit.addEventListener("click", tap);
@@ -171,6 +195,7 @@ export default function AboutHero() {
     }
 
     return () => {
+      window.removeEventListener("scroll", onScroll);
       hit.removeEventListener("pointerenter", enter);
       hit.removeEventListener("pointerleave", leave);
       hit.removeEventListener("click", tap);

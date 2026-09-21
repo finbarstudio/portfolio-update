@@ -13,6 +13,7 @@ import { media } from "@/lib/media";
  */
 
 const CLIENTS: { name: string; logo: string; slug: string }[] = [
+  { name: "Rennen Plus", logo: media("/media/images/rennen-plus/logo.svg"), slug: "rennen-plus" },
   { name: "Lows Design + Build", logo: media("/media/images/lows-design-build/logomark.svg"), slug: "lows-design-build" },
   { name: "Plated with Issy", logo: media("/media/images/plated-with-issy/wordmark.webp"), slug: "plated-with-issy" },
   { name: "KinAya", logo: media("/media/images/kinaya/logo.svg"), slug: "kinaya" },

@@ -4602,6 +4602,30 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 /* ── About: scroll "ink-in" bio ──────────────────────────────────────────
    The mission line sits centred in a padded full-height block; its words start
    faded and brighten line by line on scroll (ScrollRevealText + GSAP scrub). */
+/* About: the positioning note under the hero. A large opening line, then one
+   paragraph at reading size. Centred, like the bio further down the page. */
+.about-usp-sect { padding: 0 20px clamp(56px, 9vh, 112px); }
+.about-usp {
+  max-width: 44rem;
+  margin: 0 auto;
+  text-align: center;
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+.about-usp-lead {
+  font-size: clamp(1.6rem, 2.8vw, 2.6rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  margin-bottom: 0.7em;
+}
+.about-usp p:not(.about-usp-lead) {
+  font-size: clamp(1.02rem, 1.25vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
 .about-bio-sect {
   min-height: 78svh;
   display: flex;

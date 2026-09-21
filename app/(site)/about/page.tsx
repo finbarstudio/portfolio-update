@@ -78,12 +78,12 @@ const CAP_PILLS: { name: string; href: string }[] = [
 export const metadata: Metadata = {
   title: { absolute: "About | Finbar Skitini, London Graphic Designer" },
   description:
-    "Finbar Skitini is a London graphic designer working in brand identity, editorial, web and motion. About the studio, plus how to get in touch.",
+    "Finbar Skitini designs and hand-codes websites in London, and does the brand, print and motion work around them. Who I am, what I charge for and how to get in touch.",
   alternates: { canonical: "/about" },
   openGraph: {
     title: "About | Finbar Studio",
     description:
-      "London graphic designer working in brand identity, editorial, web and motion. About the studio and how to get in touch.",
+      "I design and hand-code websites in London, plus the brand, print and motion work around them. Who I am and how to get in touch.",
     url: "/about",
     type: "profile",
     images: [OG_IMAGE],
@@ -105,6 +105,26 @@ export default function AboutPage() {
       {/* Everything below stays hidden until the hero statement has finished
           revealing (AboutRevealGate listens for "about:intro-done"). */}
       <AboutRevealGate>
+
+      {/* ── Where I sit: the price of a freelancer, the standard of a studio.
+          Above the services so the list below reads in that light. ──── */}
+      <section className="about-usp-sect" aria-label="How I work and what it costs">
+        <Reveal as="div" className="about-usp">
+          <p className="about-usp-lead">
+            I love building websites. I&rsquo;d be doing it at the weekend anyway.
+          </p>
+          <p>
+            You can get a site cheaply from a Fiverr gig, a Canva template or an
+            afternoon with an AI builder, and it will look like it. A big studio
+            will do it beautifully, then bill you for the account managers, the
+            meetings and the office. I do the studio version on my own. One
+            person designs it, codes it by hand and launches it, so nothing sits
+            waiting on a handover and the job moves quickly. That speed is why I
+            can charge a good deal less than a studio for the same standard of
+            work.
+          </p>
+        </Reveal>
+      </section>
 
       {/* ── Services: one row, each category its own column ──── */}
       <section id="contact" className="pt-2 pb-16 md:pb-24" aria-label="Services">
@@ -140,7 +160,7 @@ export default function AboutPage() {
       <section className="about-bio-sect" aria-label="About the studio">
         <ScrollRevealText
           className="about-bio"
-          text={"BA (Hons), Brighton & Ravensbourne University (admittedly I don’t think they mean much). I explore design with my clients. My mission is to bring high-end studio outcomes to a much wider audience, because we all want to look good right?!"}
+          text={"BA (Hons), Brighton & Ravensbourne University (admittedly I don’t think the letters mean much). I explore design with my clients. I want studio-quality work to reach a lot more people than it does now, because we all want to look good, right?"}
         />
       </section>
 

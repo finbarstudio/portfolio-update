@@ -14,7 +14,7 @@ export default function InfoTip({ text }: { text: string }) {
       <button
         type="button"
         className="pr-info-btn"
-        aria-label={`Why this price: ${text}`}
+        aria-label={`About this guide price: ${text}`}
         onKeyDown={(e) => { if (e.key === "Escape") (e.target as HTMLElement).blur(); }}
       >
         <MdInfoOutline size={14} />
