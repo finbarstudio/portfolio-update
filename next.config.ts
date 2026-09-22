@@ -115,7 +115,9 @@ const nextConfig: NextConfig = {
       { source: "/cursor", destination: "/downloads/cursormania-extension.zip", permanent: false },
       // finbar.studio/cv = the current CV (the Digital Designer version), shown in
       // the browser rather than downloaded (see the header rule above).
-      { source: "/cv", destination: "/downloads/Finbar-Skitini-CV.pdf", permanent: false },
+      // The ?v= is there for Cloudflare, which caches /downloads for a day by
+      // URL: bump it whenever the PDF is replaced, or /cv serves the old CV.
+      { source: "/cv", destination: "/downloads/Finbar-Skitini-CV.pdf?v=2026-09-22", permanent: false },
       // Safety net: public/media is not deployed once R2 serves it, so any
       // "/media/..." path that slipped past media() is bounced to the bucket
       // rather than 404ing. It costs a round trip; fix the reference instead.
