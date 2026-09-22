@@ -80,6 +80,13 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=86400" },
         ],
       },
+      // Except the CV: it opens in the browser, so a link to finbar.studio/cv
+      // in an application email reads straight away instead of downloading.
+      // Declared after the rule above so this Content-Disposition wins.
+      {
+        source: "/downloads/Finbar-Skitini-CV.pdf",
+        headers: [{ key: "Content-Disposition", value: 'inline; filename="Finbar-Skitini-CV.pdf"' }],
+      },
     ];
   },
   images: {
@@ -106,7 +113,8 @@ const nextConfig: NextConfig = {
       // finbar.studio/cursor = the CursorMania extension download. A redirect
       // (not a rewrite) so the browser saves it under the zip's real filename.
       { source: "/cursor", destination: "/downloads/cursormania-extension.zip", permanent: false },
-      // finbar.studio/cv = the current CV, same static-download treatment.
+      // finbar.studio/cv = the current CV (the Digital Designer version), shown in
+      // the browser rather than downloaded (see the header rule above).
       { source: "/cv", destination: "/downloads/Finbar-Skitini-CV.pdf", permanent: false },
       // Safety net: public/media is not deployed once R2 serves it, so any
       // "/media/..." path that slipped past media() is bounced to the bucket
