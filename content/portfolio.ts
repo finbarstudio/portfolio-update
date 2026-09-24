@@ -29,7 +29,7 @@ export type Slide =
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
   | { kind: "media"; items: Media[]; caption?: string }
-  | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string }
+  | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
   | { kind: "end" };
 
@@ -110,7 +110,7 @@ const RAW: Slide[] = [
       "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
     meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
   },
-  { kind: "logo", src: `/media/images/lows-design-build/logomark.svg`, alt: "Lows Design + Build logo", bg: "#f3efe6", size: "40cqw" },
+  { kind: "logo", src: `/media/images/lows-design-build/logo.svg`, alt: "Lows Design + Build logo", bg: "#f3efe6", size: "44cqw" },
   one("lows-design-build/site-scroll-3d.mp4"),
   one("lows-design-build/project-page.mp4"),
   {
@@ -130,7 +130,7 @@ const RAW: Slide[] = [
       "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
     meta: [ME, { label: "Year", value: "2026" }],
   },
-  { kind: "logo", src: `/media/images/plated-with-issy/wordmark.webp`, alt: "Plated with Issy wordmark", bg: "#efe8d6", size: "46cqw" },
+  { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
   one("plated-with-issy/site-scroll-3d.mp4"),
   row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
 

@@ -171,6 +171,8 @@ body:has(.pf) { background: #f3f1ee; }
 .pf-caption span { text-transform: none; letter-spacing: 0.01em; }
 
 .pf-logo { position: absolute; inset: 0; display: grid; place-items: center; }
+.pf-logoslide.is-dark .pf-run { color: #fae3b1; }
+.pf-logoslide.is-dark .pf-run .pf-soft { color: rgba(250, 227, 177, 0.6); }
 .pf-logo img { width: var(--size, 30cqw); height: auto; max-height: 55%; object-fit: contain; }
 
 /* ── phones ─────────────────────────────────────────────────────── */

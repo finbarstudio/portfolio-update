@@ -219,7 +219,7 @@ function SlideView({ s, i, chap, page }: { s: Slide; i: number; chap?: Chapter; 
     }
     case "logo":
       return (
-        <section className="pf-slide pf-logoslide" style={s.bg ? ({ "--ground": s.bg } as React.CSSProperties) : undefined}>
+        <section className={`pf-slide pf-logoslide${s.dark ? " is-dark" : ""}`} style={s.bg ? ({ "--ground": s.bg } as React.CSSProperties) : undefined}>
           <Run chap={chap} page={page} />
           <div className="pf-logo" style={{ "--size": s.size ?? "30cqw" } as React.CSSProperties}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
