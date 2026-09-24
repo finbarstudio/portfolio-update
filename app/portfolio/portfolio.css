@@ -1,0 +1,181 @@
+/* /portfolio — the PDF portfolio as one scrolling page.
+   Every slide is a 16:9 page and every size inside it is in container units
+   (--u = 1cqw), so on a laptop it reads exactly like the PDF would. Below
+   760px the text pages drop the fixed ratio and grow to fit readable type,
+   and four-up grids fold to 2x2. Nothing else changes on a phone. */
+
+html:has(.pf),
+body:has(.pf) { background: #000; }
+
+.pf {
+  --pf-grey: #5e5e5e;
+  --pf-dim: #2a2a2a;
+  --u: 1cqw;
+  background: #000;
+  color: #fff;
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01";
+}
+.pf a { color: inherit; text-decoration: none; }
+.pf h1, .pf h2 { text-transform: none; font-family: inherit; }
+.pf a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+
+.pf-slide {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  container-type: inline-size;
+  background: var(--pf-bg, #000);
+}
+.pf-pad {
+  position: absolute;
+  inset: 0;
+  padding: calc(var(--u) * 2.4) calc(var(--u) * 2.6);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── type ───────────────────────────────────────────────────────── */
+.pf-display {
+  margin: 0;
+  font-size: calc(var(--u) * 5.2);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+}
+.pf-display .g, .pf-grey { color: var(--pf-grey); }
+.pf-display .g { display: block; }
+.pf-small {
+  font-size: max(calc(var(--u) * 0.78), 11px);
+  line-height: 1.32;
+  letter-spacing: -0.005em;
+}
+.pf-label {
+  font-size: max(calc(var(--u) * 1.15), 12px);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+.pf-label .g { display: block; color: var(--pf-grey); }
+.pf-body {
+  margin: 0;
+  font-size: calc(var(--u) * 2.2);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  color: var(--pf-grey);
+  max-width: 62%;
+  text-wrap: pretty;
+}
+.pf-caption {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: calc(var(--u) * 1.5);
+  text-align: center;
+  font-size: max(calc(var(--u) * 0.66), 10px);
+  letter-spacing: 0;
+  color: var(--pf-caption, #fff);
+  z-index: 2;
+}
+.pf-caption b { font-weight: 700; }
+
+/* ── cover ──────────────────────────────────────────────────────── */
+.pf-cover .pf-pad { justify-content: space-between; }
+.pf-cover-foot { display: flex; justify-content: space-between; align-items: flex-end; }
+.pf-cover-meta { display: flex; gap: calc(var(--u) * 5); padding-bottom: calc(var(--u) * 0.6); }
+.pf-mark { display: inline-block; width: 0.62em; height: 0.62em; margin-left: 0.08em; vertical-align: 0.02em; }
+.pf-mark svg { width: 100%; height: 100%; display: block; }
+
+/* ── CV ─────────────────────────────────────────────────────────── */
+.pf-cv .pf-pad { display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(var(--u) * 5); }
+.pf-cv-left { display: flex; flex-direction: column; }
+.pf-cv-bio {
+  margin: calc(var(--u) * 8.4) 0 0;
+  font-size: calc(var(--u) * 1.3);
+  line-height: 1.24;
+  letter-spacing: -0.015em;
+  max-width: 34em;
+}
+.pf-cv-bio p { margin: 0; }
+.pf-cv-bio p + p { text-indent: 2.6em; }
+.pf-cv-foot { margin-top: auto; display: flex; gap: calc(var(--u) * 3.2); }
+.pf-cv-right { display: grid; grid-template-columns: 1fr 1.35fr; column-gap: calc(var(--u) * 2.4); align-content: start; }
+.pf-cv-block h2 { margin: 0 0 calc(var(--u) * 1.3); font-size: max(calc(var(--u) * 1.15), 12px); font-weight: 500; letter-spacing: -0.015em; }
+.pf-cv-row2 { margin-top: calc(var(--u) * 7.3); }
+.pf-cv-block dl, .pf-cv-block ul { margin: 0; padding: 0; list-style: none; }
+.pf-cv-item { margin-bottom: calc(var(--u) * 1.05); }
+.pf-cv-item .in { display: block; padding-left: 1.9em; }
+.pf-cv-sub { text-decoration: underline; text-underline-offset: 0.15em; margin: 0 0 calc(var(--u) * 0.7); display: block; }
+.pf-cv-contact { display: grid; grid-template-columns: auto 1fr; column-gap: 0.9em; }
+
+/* ── project pages ──────────────────────────────────────────────── */
+.pf-title .pf-pad { justify-content: space-between; }
+.pf-text .pf-pad { justify-content: space-between; }
+.pf-text-body { margin-top: calc(var(--u) * 3.2); flex: 1; }
+.pf-meta { display: flex; gap: calc(var(--u) * 11); }
+.pf-quote .pf-body { color: #fff; max-width: 70%; }
+.pf-quote .pf-by { margin-top: calc(var(--u) * 2.2); }
+
+/* ── media pages ────────────────────────────────────────────────── */
+.pf-media img, .pf-media video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pf-media.is-contain img, .pf-media.is-contain video { object-fit: contain; }
+.pf-inset {
+  position: absolute;
+  inset: calc(var(--u) * 4.2) calc(var(--u) * 6);
+  display: flex; align-items: center; justify-content: center;
+}
+.pf-inset > * { max-width: 100%; max-height: 100%; }
+.pf-inset img { width: 100%; height: 100%; object-fit: contain; }
+.pf-inset .pf-vid { width: 100%; height: 100%; }
+.pf-vid { position: relative; width: 100%; height: 100%; }
+
+.pf-grid {
+  position: absolute;
+  inset: calc(var(--u) * 4.2) calc(var(--u) * 2.6) calc(var(--u) * 4.4);
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: calc(var(--u) * 1.2);
+  align-items: center;
+}
+.pf-grid.is-bleed { inset: 0; gap: 0; }
+.pf-grid > div { position: relative; width: 100%; height: 100%; min-height: 0; }
+.pf-grid img, .pf-grid video { display: block; width: 100%; height: 100%; object-fit: var(--fit, cover); }
+
+.pf-logo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.pf-logo img, .pf-logo svg { width: var(--size, 22cqw); height: auto; max-height: 60%; object-fit: contain; }
+
+/* hairline between pages, like a PDF viewer */
+.pf-slide + .pf-slide { box-shadow: 0 -1px 0 #141414; }
+
+/* ── phones ─────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .pf-slide.is-text { aspect-ratio: auto; }
+  .pf-slide.is-text { --u: 1.9vw; }
+  .pf-slide.is-text .pf-pad { position: static; padding: 28px 18px; min-height: 62svh; }
+  .pf-slide.is-text .pf-display { font-size: calc(var(--u) * 5.6); }
+  .pf-slide.is-text .pf-body { max-width: none; font-size: 20px; line-height: 1.22; }
+  .pf-text-body { margin: 36px 0; }
+  .pf-meta { gap: 48px; }
+  .pf-cover .pf-pad { min-height: 80svh; }
+  .pf-cover-foot { flex-direction: column; align-items: flex-start; gap: 28px; }
+  .pf-cv .pf-pad { display: flex; flex-direction: column; gap: 36px; }
+  .pf-cv-bio { margin-top: 28px; font-size: 16px; }
+  .pf-cv-foot { margin-top: 24px; }
+  .pf-cv-right { grid-template-columns: 1fr 1fr; row-gap: 28px; }
+  .pf-cv-row2 { margin-top: 0; }
+  .pf-small { font-size: 12px; }
+  .pf-label { font-size: 14px; }
+  .pf-grid.is-4 { position: relative; inset: auto; grid-template-columns: 1fr 1fr; padding: 8px; gap: 8px; }
+  .pf-grid.is-4.is-bleed { padding: 0; gap: 0; }
+  .pf-slide:has(.pf-grid.is-4) { aspect-ratio: auto; }
+  .pf-grid.is-4 > div { aspect-ratio: var(--ratio, 1); height: auto; }
+  .pf-slide:has(.pf-grid.is-4) .pf-caption { position: static; padding: 4px 0 18px; }
+  .pf-caption { font-size: 9px; bottom: 6px; }
+}
