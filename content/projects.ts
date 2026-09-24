@@ -1310,7 +1310,6 @@ const RAW_PROJECTS: Project[] = [
     name: "TasWater",
     tier: "gallery",
     rank: 12,
-    hidden: true,
     seo: {
       title: "TasWater: Infographic & Information Design | Finbar Studio",
       description:
