@@ -1,181 +1,204 @@
-/* /portfolio — the PDF portfolio as one scrolling page.
-   Every slide is a 16:9 page and every size inside it is in container units
-   (--u = 1cqw), so on a laptop it reads exactly like the PDF would. Below
-   760px the text pages drop the fixed ratio and grow to fit readable type,
-   and four-up grids fold to 2x2. Nothing else changes on a phone. */
+/* /portfolio — the PDF portfolio as one scrolling page, in the studio's own
+   dress: warm paper, ink, the deep brand pink, Host Grotesk caps for titles and
+   Space Mono for every label (the same pairing as the site).
+
+   Every page is 16:9 and sized in container units (--u = 1cqw), so on a laptop
+   it reads like the PDF would. MEDIA IS ALWAYS INSET, NEVER FULL BLEED, NEVER
+   CROPPED: each image or clip sits in a frame at its true proportions, and a
+   row is sized so the whole row fits the same box (--W x --H) on every page.
+   Below 760px the text pages grow to fit readable type and four-up rows fold
+   to 2x2. Nothing else changes on a phone. */
 
 html:has(.pf),
-body:has(.pf) { background: #000; }
+body:has(.pf) { background: #f3f1ee; }
 
 .pf {
-  --pf-grey: #5e5e5e;
-  --pf-dim: #2a2a2a;
+  --paper: #f3f1ee;
+  --ink: #211e1a;
+  --soft: #8c857e;
+  --brand: #510415;
+  --pink: #e96d89;
+  --line: #d9d3cc;
   --u: 1cqw;
-  background: #000;
-  color: #fff;
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "ss01";
 }
 .pf a { color: inherit; text-decoration: none; }
-.pf h1, .pf h2 { text-transform: none; font-family: inherit; }
-.pf a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+.pf a:hover { text-decoration: underline; text-underline-offset: 0.18em; }
+.pf h1, .pf h2, .pf p { margin: 0; font-family: inherit; }
 
 .pf-slide {
+  /* the media box: every row of media fits inside this, on every page */
+  --T: 5.4cqw; --B: 6.6cqw; --S: 6cqw; --G: 1.4cqw;
+  --W: calc(100cqw - 2 * var(--S));
+  --H: calc(56.25cqw - var(--T) - var(--B));
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
   container-type: inline-size;
-  background: var(--pf-bg, #000);
+  background: var(--ground, var(--paper));
 }
+.pf-slide + .pf-slide { box-shadow: 0 -1px 0 var(--line); }
 .pf-pad {
   position: absolute;
   inset: 0;
-  padding: calc(var(--u) * 2.4) calc(var(--u) * 2.6);
+  padding: calc(var(--u) * 2.2) calc(var(--u) * 2.6);
   display: flex;
   flex-direction: column;
 }
 
 /* ── type ───────────────────────────────────────────────────────── */
+.pf-mono {
+  font-family: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
+  font-weight: 400;
+  font-size: max(calc(var(--u) * 0.74), 10px);
+  line-height: 1.45;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.pf-soft { color: var(--soft); }
+.pf-brand { color: var(--brand); }
 .pf-display {
-  margin: 0;
-  font-size: calc(var(--u) * 5.2);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
-  font-weight: 600;
+  font-size: calc(var(--u) * 7.2);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  text-transform: uppercase;
 }
-.pf-display .g, .pf-grey { color: var(--pf-grey); }
-.pf-display .g { display: block; }
-.pf-small {
-  font-size: max(calc(var(--u) * 0.78), 11px);
-  line-height: 1.32;
-  letter-spacing: -0.005em;
-}
-.pf-label {
-  font-size: max(calc(var(--u) * 1.15), 12px);
-  line-height: 1.2;
-  letter-spacing: -0.015em;
-}
-.pf-label .g { display: block; color: var(--pf-grey); }
+.pf-display .b { display: block; color: var(--brand); }
 .pf-body {
-  margin: 0;
-  font-size: calc(var(--u) * 2.2);
-  line-height: 1.16;
-  letter-spacing: -0.025em;
-  color: var(--pf-grey);
-  max-width: 62%;
+  font-size: calc(var(--u) * 2.05);
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  max-width: 30em;
   text-wrap: pretty;
 }
-.pf-caption {
-  position: absolute;
-  left: 0; right: 0;
-  bottom: calc(var(--u) * 1.5);
-  text-align: center;
-  font-size: max(calc(var(--u) * 0.66), 10px);
-  letter-spacing: 0;
-  color: var(--pf-caption, #fff);
-  z-index: 2;
+.pf-copy {
+  font-size: max(calc(var(--u) * 0.92), 12px);
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: -0.005em;
 }
-.pf-caption b { font-weight: 700; }
 
-/* ── cover ──────────────────────────────────────────────────────── */
-.pf-cover .pf-pad { justify-content: space-between; }
-.pf-cover-foot { display: flex; justify-content: space-between; align-items: flex-end; }
-.pf-cover-meta { display: flex; gap: calc(var(--u) * 5); padding-bottom: calc(var(--u) * 0.6); }
-.pf-mark { display: inline-block; width: 0.62em; height: 0.62em; margin-left: 0.08em; vertical-align: 0.02em; }
+/* the running row across the top of a text page, on the page's four columns */
+.pf-head {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: calc(var(--u) * 2.4);
+  padding-bottom: calc(var(--u) * 0.9);
+  border-bottom: 1px solid var(--ink);
+}
+.pf-head > :last-child { text-align: right; }
+.pf-cols {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: calc(var(--u) * 2.4);
+}
+
+/* ── cover + end ────────────────────────────────────────────────── */
+.pf-cover .pf-pad, .pf-end .pf-pad { justify-content: space-between; }
+.pf-poster {
+  font-size: calc(var(--u) * 13.5);
+  line-height: 0.84;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.pf-mark { display: inline-block; width: 0.5em; height: 0.5em; margin-left: 0.06em; vertical-align: 0.26em; }
 .pf-mark svg { width: 100%; height: 100%; display: block; }
 
-/* ── CV ─────────────────────────────────────────────────────────── */
-.pf-cv .pf-pad { display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(var(--u) * 5); }
-.pf-cv-left { display: flex; flex-direction: column; }
-.pf-cv-bio {
-  margin: calc(var(--u) * 8.4) 0 0;
-  font-size: calc(var(--u) * 1.3);
-  line-height: 1.24;
-  letter-spacing: -0.015em;
-  max-width: 34em;
-}
-.pf-cv-bio p { margin: 0; }
-.pf-cv-bio p + p { text-indent: 2.6em; }
-.pf-cv-foot { margin-top: auto; display: flex; gap: calc(var(--u) * 3.2); }
-.pf-cv-right { display: grid; grid-template-columns: 1fr 1.35fr; column-gap: calc(var(--u) * 2.4); align-content: start; }
-.pf-cv-block h2 { margin: 0 0 calc(var(--u) * 1.3); font-size: max(calc(var(--u) * 1.15), 12px); font-weight: 500; letter-spacing: -0.015em; }
-.pf-cv-row2 { margin-top: calc(var(--u) * 7.3); }
-.pf-cv-block dl, .pf-cv-block ul { margin: 0; padding: 0; list-style: none; }
-.pf-cv-item { margin-bottom: calc(var(--u) * 1.05); }
-.pf-cv-item .in { display: block; padding-left: 1.9em; }
-.pf-cv-sub { text-decoration: underline; text-underline-offset: 0.15em; margin: 0 0 calc(var(--u) * 0.7); display: block; }
-.pf-cv-contact { display: grid; grid-template-columns: auto 1fr; column-gap: 0.9em; }
+/* ── about (CV) ─────────────────────────────────────────────────── */
+.pf-cv .pf-pad { justify-content: space-between; }
+.pf-cv-grid { margin-top: calc(var(--u) * 2.6); flex: 1; row-gap: calc(var(--u) * 3.4); align-content: start; }
+.pf-cv-bio { grid-column: 1 / span 2; grid-row: 1 / span 2; font-size: calc(var(--u) * 1.5); line-height: 1.28; letter-spacing: -0.015em; }
+.pf-cv-bio p + p { margin-top: 0.75em; }
+.pf-cv-block h2 { margin-bottom: calc(var(--u) * 1); }
+.pf-cv-item + .pf-cv-item { margin-top: calc(var(--u) * 0.9); }
+.pf-cv-item .in { display: block; color: var(--soft); }
+.pf-cv-contact { display: grid; grid-template-columns: auto 1fr; column-gap: 0.8em; }
+.pf-cv-foot { display: flex; gap: calc(var(--u) * 3); }
 
-/* ── project pages ──────────────────────────────────────────────── */
-.pf-title .pf-pad { justify-content: space-between; }
-.pf-text .pf-pad { justify-content: space-between; }
-.pf-text-body { margin-top: calc(var(--u) * 3.2); flex: 1; }
-.pf-meta { display: flex; gap: calc(var(--u) * 11); }
-.pf-quote .pf-body { color: #fff; max-width: 70%; }
-.pf-quote .pf-by { margin-top: calc(var(--u) * 2.2); }
+/* ── chapter pages ──────────────────────────────────────────────── */
+.pf-title .pf-pad, .pf-text .pf-pad { justify-content: space-between; }
+.pf-text-body { margin-top: calc(var(--u) * 3.6); flex: 1; }
+.pf-meta { row-gap: calc(var(--u) * 0.4); }
+.pf-meta .v { display: block; color: var(--ink); text-transform: none; letter-spacing: 0; font-family: var(--font-host), "Host Grotesk", sans-serif; font-weight: 500; font-size: max(calc(var(--u) * 0.95), 12px); margin-top: 0.3em; }
+.pf-quote .pf-body { font-size: calc(var(--u) * 3); max-width: 22em; }
+.pf-quote .q { color: var(--pink); }
 
-/* ── media pages ────────────────────────────────────────────────── */
-.pf-media img, .pf-media video { display: block; width: 100%; height: 100%; object-fit: cover; }
-.pf-media.is-contain img, .pf-media.is-contain video { object-fit: contain; }
-.pf-inset {
+/* ── media pages: inset, framed, never cropped ──────────────────── */
+.pf-run {
   position: absolute;
-  inset: calc(var(--u) * 4.2) calc(var(--u) * 6);
-  display: flex; align-items: center; justify-content: center;
+  top: calc(var(--u) * 2.2);
+  left: calc(var(--u) * 2.6);
+  right: calc(var(--u) * 2.6);
+  display: flex;
+  justify-content: space-between;
+  z-index: 2;
 }
-.pf-inset > * { max-width: 100%; max-height: 100%; }
-.pf-inset img { width: 100%; height: 100%; object-fit: contain; }
-.pf-inset .pf-vid { width: 100%; height: 100%; }
-.pf-vid { position: relative; width: 100%; height: 100%; }
-
-.pf-grid {
+.pf-row {
   position: absolute;
-  inset: calc(var(--u) * 4.2) calc(var(--u) * 2.6) calc(var(--u) * 4.4);
-  display: grid;
-  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
-  gap: calc(var(--u) * 1.2);
+  top: var(--T); bottom: var(--B); left: var(--S); right: var(--S);
+  display: flex;
+  justify-content: center;
   align-items: center;
+  gap: var(--G);
 }
-.pf-grid.is-bleed { inset: 0; gap: 0; }
-.pf-grid > div { position: relative; width: 100%; height: 100%; min-height: 0; }
-.pf-grid img, .pf-grid video { display: block; width: 100%; height: 100%; object-fit: var(--fit, cover); }
-
-.pf-logo {
+.pf-item {
+  position: relative;
+  flex: none;
+  height: var(--h);
+  overflow: hidden;
+  background: transparent;
+}
+.pf-item.is-framed { border-radius: calc(var(--u) * 0.4); box-shadow: 0 0 0 1px var(--line); background: #e8e4df; }
+.pf-item img, .pf-item video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.pf-item .pf-vid { width: 100%; height: 100%; }
+.pf-caption {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
+  left: var(--S); right: var(--S);
+  bottom: calc(var(--u) * 2.4);
+  text-align: center;
+  z-index: 2;
 }
-.pf-logo img, .pf-logo svg { width: var(--size, 22cqw); height: auto; max-height: 60%; object-fit: contain; }
+.pf-caption b { font-weight: 700; margin-right: 0.8em; }
+.pf-caption span { text-transform: none; letter-spacing: 0.01em; }
 
-/* hairline between pages, like a PDF viewer */
-.pf-slide + .pf-slide { box-shadow: 0 -1px 0 #141414; }
+.pf-logo { position: absolute; inset: 0; display: grid; place-items: center; }
+.pf-logo img { width: var(--size, 30cqw); height: auto; max-height: 55%; object-fit: contain; }
 
 /* ── phones ─────────────────────────────────────────────────────── */
 @media (max-width: 760px) {
-  .pf-slide.is-text { aspect-ratio: auto; }
-  .pf-slide.is-text { --u: 1.9vw; }
-  .pf-slide.is-text .pf-pad { position: static; padding: 28px 18px; min-height: 62svh; }
-  .pf-slide.is-text .pf-display { font-size: calc(var(--u) * 5.6); }
-  .pf-slide.is-text .pf-body { max-width: none; font-size: 20px; line-height: 1.22; }
-  .pf-text-body { margin: 36px 0; }
-  .pf-meta { gap: 48px; }
-  .pf-cover .pf-pad { min-height: 80svh; }
-  .pf-cover-foot { flex-direction: column; align-items: flex-start; gap: 28px; }
-  .pf-cv .pf-pad { display: flex; flex-direction: column; gap: 36px; }
-  .pf-cv-bio { margin-top: 28px; font-size: 16px; }
-  .pf-cv-foot { margin-top: 24px; }
-  .pf-cv-right { grid-template-columns: 1fr 1fr; row-gap: 28px; }
-  .pf-cv-row2 { margin-top: 0; }
-  .pf-small { font-size: 12px; }
-  .pf-label { font-size: 14px; }
-  .pf-grid.is-4 { position: relative; inset: auto; grid-template-columns: 1fr 1fr; padding: 8px; gap: 8px; }
-  .pf-grid.is-4.is-bleed { padding: 0; gap: 0; }
-  .pf-slide:has(.pf-grid.is-4) { aspect-ratio: auto; }
-  .pf-grid.is-4 > div { aspect-ratio: var(--ratio, 1); height: auto; }
-  .pf-slide:has(.pf-grid.is-4) .pf-caption { position: static; padding: 4px 0 18px; }
-  .pf-caption { font-size: 9px; bottom: 6px; }
+  .pf-slide.is-text { aspect-ratio: auto; --u: 1.9vw; }
+  .pf-slide.is-text .pf-pad { position: static; padding: 22px 18px 26px; min-height: 64svh; }
+  .pf-slide.is-text .pf-display { font-size: 11vw; }
+  .pf-poster { font-size: 17vw; }
+  .pf-body { font-size: 19px; line-height: 1.28; }
+  .pf-quote .pf-body { font-size: 24px; }
+  .pf-text-body { margin: 30px 0 40px; }
+  .pf-head { display: flex; flex-wrap: wrap; justify-content: space-between; row-gap: 6px; }
+  .pf-head > :empty { display: none; }
+  .pf-cover .pf-head > *, .pf-end .pf-head > * { width: 50%; }
+  .pf-text .pf-head > :nth-child(3) { display: none; }
+  .pf-cols { grid-template-columns: 1fr 1fr; row-gap: 22px; }
+  .pf-cv-bio { grid-column: 1 / -1; grid-row: auto; font-size: 16px; }
+  .pf-mono { font-size: 10px; }
+  .pf-copy, .pf-meta .v { font-size: 13px; }
+
+  /* media pages grow to fit: running line, the row at full width (items keep
+     their proportions, so a row still shares one height), caption below.
+     Four-up rows fold to 2x2. Logo pages keep their 16:9 page. */
+  .pf-slide.pf-media { aspect-ratio: auto; }
+  .pf-media .pf-run { position: static; padding: 14px 18px 0; }
+  .pf-media .pf-row { position: static; padding: 12px 18px 14px; gap: 8px; }
+  .pf-media .pf-item { height: auto; flex: var(--r) 1 0; min-width: 0; }
+  .pf-media.is-4 .pf-row { flex-wrap: wrap; }
+  .pf-media.is-4 .pf-item { flex: 0 0 calc((100% - 8px) / 2); }
+  .pf-media .pf-caption { position: static; padding: 0 18px 16px; }
 }

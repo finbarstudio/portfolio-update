@@ -5,10 +5,11 @@ import { PORTFOLIO, CV, UPDATED, type Media, type Slide } from "@/content/portfo
 import "./portfolio.css";
 
 /**
- * /portfolio — the PDF portfolio as one scrolling page. Structure after the
- * classic studio deck: cover, résumé page, then per project a title page, a
- * text page and its image pages, "Other" at the end, a contact page last.
- * All content lives in content/portfolio.ts; this file only draws slides.
+ * /portfolio — the PDF portfolio as one scrolling page: cover, about, then per
+ * project a chapter page, a text page and its media pages, "Other" at the end
+ * and a contact page last. Content lives in content/portfolio.ts; this file
+ * only draws the pages. Media is always inset at its true proportions (see
+ * portfolio.css), never full bleed, never cropped.
  */
 
 export const metadata: Metadata = {
@@ -16,6 +17,9 @@ export const metadata: Metadata = {
   description: "Selected works by Finbar Skitini, graphic and digital designer in London.",
   robots: { index: false, follow: true },
 };
+
+type Chapter = { no: string; name: string };
+const pad2 = (n: number) => String(n).padStart(2, "0");
 
 function Mark() {
   return (
@@ -31,141 +35,145 @@ function Mark() {
   );
 }
 
-function Asset({ m, eager = false }: { m: Media; eager?: boolean }) {
-  if (m.video) {
-    return (
-      <div className="pf-vid">
-        <VideoPlayer src={m.src} eager={eager} style={{ objectFit: m.fit ?? "cover" }} />
-      </div>
-    );
-  }
+function Item({ m, eager }: { m: Media; eager: boolean }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={m.src}
-      alt={m.alt ?? ""}
-      loading={eager ? "eager" : "lazy"}
-      decoding="async"
-      style={m.fit ? { objectFit: m.fit, objectPosition: m.position } : m.position ? { objectPosition: m.position } : undefined}
-    />
+    <div className={`pf-item${m.frame === false ? "" : " is-framed"}`} style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4) } as React.CSSProperties}>
+      {m.video ? (
+        <div className="pf-vid">
+          <VideoPlayer src={m.src} eager={eager} style={{ objectFit: "contain" }} />
+        </div>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={m.src} alt={m.alt ?? ""} width={m.w} height={m.h} loading={eager ? "eager" : "lazy"} decoding="async" />
+      )}
+    </div>
   );
 }
 
-function Caption({ text }: { text?: string }) {
-  if (!text) return null;
+/** The running line on a media page: chapter left, page number right. */
+function Run({ chap, page }: { chap?: Chapter; page: string }) {
   return (
-    <p className="pf-caption">
-      <b>Above:</b> {text}
-    </p>
+    <div className="pf-run pf-mono">
+      <span>{chap ? `${chap.no}  ${chap.name}` : ""}</span>
+      <span className="pf-soft">{page}</span>
+    </div>
   );
 }
 
-function SlideView({ s, i }: { s: Slide; i: number }) {
-  const bg = "bg" in s && s.bg ? ({ "--pf-bg": s.bg } as React.CSSProperties) : undefined;
+function SlideView({ s, i, chap, page }: { s: Slide; i: number; chap?: Chapter; page: string }) {
   switch (s.kind) {
     case "cover":
       return (
         <section className="pf-slide pf-cover is-text">
           <div className="pf-pad">
-            <h1 className="pf-display">
-              Finbar Skitini<Mark />
-              <span className="g">Selected works</span>
-            </h1>
-            <div className="pf-cover-foot">
-              <p className="pf-display pf-grey">2022–2026</p>
-              <div className="pf-cover-meta pf-label">
-                <p style={{ margin: 0 }}>Email<a className="g" href={`mailto:${CV.email}`}>{CV.email}</a></p>
-                <p style={{ margin: 0 }}>Updated<span className="g">{UPDATED.long}</span></p>
-              </div>
+            <div className="pf-head pf-mono">
+              <span>Portfolio</span>
+              <span>Selected works<br /><span className="pf-soft">2022–2026</span></span>
+              <span>Graphic and digital designer<br /><span className="pf-soft">London</span></span>
+              <span><a href={`mailto:${CV.email}`}>{CV.email}</a><br /><span className="pf-soft">Updated {UPDATED.long}</span></span>
             </div>
+            <h1 className="pf-poster">
+              Finbar
+              <br />
+              Skitini<Mark />
+            </h1>
           </div>
         </section>
       );
     case "cv":
       return (
-        <section className="pf-slide pf-cv is-text" aria-label="Résumé">
+        <section className="pf-slide pf-cv is-text" aria-label="About">
           <div className="pf-pad">
-            <div className="pf-cv-left">
-              <p className="pf-display">Finbar Skitini</p>
+            <div className="pf-head pf-mono">
+              <span>About</span>
+              <span />
+              <span>Finbar Skitini</span>
+              <span className="pf-soft">{page}</span>
+            </div>
+            <div className="pf-cols pf-cv-grid">
               <div className="pf-cv-bio">
                 {CV.bio.map((p) => <p key={p}>{p}</p>)}
               </div>
-              <div className="pf-cv-foot pf-small">
-                <a href="/cv">Résumé (PDF)</a>
-                <span>Updated: {UPDATED.short}</span>
-              </div>
-            </div>
-            <div className="pf-cv-right pf-small">
               <div className="pf-cv-block">
-                <h2>Eligibility</h2>
-                <p style={{ margin: 0, maxWidth: "17em" }}>{CV.eligibility}</p>
+                <h2 className="pf-mono pf-brand">Eligibility</h2>
+                <p className="pf-copy">{CV.eligibility}</p>
               </div>
               <div className="pf-cv-block">
-                <h2>Contact</h2>
-                <div className="pf-cv-contact">
+                <h2 className="pf-mono pf-brand">Contact</h2>
+                <div className="pf-cv-contact pf-copy">
                   {CV.contact.map((c) => (
-                    <FragmentRow key={c.label} label={c.label} value={c.value} href={c.href} />
+                    <Row key={c.label} label={c.long} value={c.value} href={c.href} />
                   ))}
                 </div>
               </div>
-              <div className="pf-cv-block pf-cv-row2">
-                <h2>Education</h2>
+              <div className="pf-cv-block">
+                <h2 className="pf-mono pf-brand">Education</h2>
                 {CV.education.map((e) => (
-                  <div className="pf-cv-item" key={e.title}>
+                  <div className="pf-cv-item pf-copy" key={e.title}>
                     {e.title}
-                    {e.lines.map((l) => <span className="in" key={l}>{l}</span>)}
+                    <span className="in">{e.lines.join(", ")}</span>
                   </div>
                 ))}
               </div>
-              <div className="pf-cv-block pf-cv-row2">
-                <h2>Experience (In-house &amp; Freelance)</h2>
-                {CV.experience.map((g) => (
-                  <div key={g.group} style={{ marginBottom: "calc(var(--u) * 1.4)" }}>
-                    <span className="pf-cv-sub">{g.group}</span>
-                    {g.items.map((it) => (
-                      <div className="pf-cv-item" key={it.title + it.lines.join()}>
-                        {it.title}
-                        {it.lines.map((l) => <span className="in" key={l}>{l}</span>)}
-                      </div>
-                    ))}
+              <div className="pf-cv-block">
+                <h2 className="pf-mono pf-brand">Experience</h2>
+                {CV.experience.flatMap((g) => g.items.map((it) => ({ ...it, group: g.group }))).map((it) => (
+                  <div className="pf-cv-item pf-copy" key={it.title + it.lines.join()}>
+                    {it.title}
+                    <span className="in">{[...it.lines, it.group].join(", ")}</span>
                   </div>
                 ))}
               </div>
+            </div>
+            <div className="pf-cv-foot pf-mono">
+              <a href="/cv">Résumé (PDF) ↓</a>
+              <span className="pf-soft">Updated {UPDATED.short}</span>
             </div>
           </div>
         </section>
       );
     case "title":
+    case "section": {
+      const name = s.kind === "title" ? s.name : s.title;
+      const sub = s.kind === "title" ? s.category : s.subtitle;
       return (
-        <section className="pf-slide pf-title is-text" id={s.id}>
+        <section className="pf-slide pf-title is-text" id={s.kind === "title" ? s.id : "other"}>
           <div className="pf-pad">
-            <h2 className="pf-display">
-              {s.name}
-              <span className="g">{s.category}</span>
+            <div className="pf-head pf-mono">
+              <span>{chap?.no}</span>
+              <span />
+              <span />
+              <span>{s.year}</span>
+            </div>
+            <h2 className="pf-display" style={s.kind === "section" ? { maxWidth: "11em" } : undefined}>
+              {name}
+              <span className="b">{sub}</span>
             </h2>
-            <p className="pf-display pf-grey">{s.year}</p>
           </div>
         </section>
       );
+    }
     case "text":
       return (
         <section className="pf-slide pf-text is-text">
           <div className="pf-pad">
-            <p className="pf-label">
-              {s.name}
-              <span className="g">{s.category}</span>
-            </p>
+            <div className="pf-head pf-mono">
+              <span>{chap?.no}</span>
+              <span>{s.name}</span>
+              <span className="pf-soft">{s.category}</span>
+              <span className="pf-soft">{page}</span>
+            </div>
             <div className="pf-text-body">
               <p className="pf-body">{s.body}</p>
             </div>
-            <div className="pf-meta pf-label">
+            <div className="pf-cols pf-meta">
               {s.meta.map((m) => (
-                <p key={m.label} style={{ margin: 0 }}>
+                <p key={m.label} className="pf-mono pf-soft">
                   {m.label}
                   {m.href ? (
-                    <a className="g" href={m.href} target="_blank" rel="noopener noreferrer">{m.value}</a>
+                    <a className="v" href={m.href} target="_blank" rel="noopener noreferrer">{m.value}</a>
                   ) : (
-                    <span className="g">{m.value}</span>
+                    <span className="v">{m.value}</span>
                   )}
                 </p>
               ))}
@@ -177,103 +185,95 @@ function SlideView({ s, i }: { s: Slide; i: number }) {
       return (
         <section className="pf-slide pf-text pf-quote is-text">
           <div className="pf-pad">
-            <p className="pf-label">
-              {s.name}
-              <span className="g">Client</span>
-            </p>
+            <div className="pf-head pf-mono">
+              <span>{chap?.no}</span>
+              <span>{s.name}</span>
+              <span className="pf-soft">Client</span>
+              <span className="pf-soft">{page}</span>
+            </div>
             <div className="pf-text-body">
-              <p className="pf-body">&ldquo;{s.quote}&rdquo;</p>
-              <p className="pf-label pf-by">{s.by}</p>
+              <p className="pf-body"><span className="q">“</span>{s.quote}<span className="q">”</span></p>
             </div>
+            <p className="pf-mono">{s.by}</p>
           </div>
         </section>
       );
-    case "media":
+    case "media": {
+      const ratio = s.items.reduce((a, m) => a + m.w / m.h, 0);
+      const n = s.items.length;
+      const h = `min(var(--H), calc((var(--W) - ${n - 1} * var(--G)) / ${ratio.toFixed(4)}))`;
       return (
-        <section className={`pf-slide pf-media${s.item.fit === "contain" ? " is-contain" : ""}`} style={bg}>
-          {s.inset ? (
-            <div className="pf-inset">
-              <Asset m={s.item} eager={i < 3} />
-            </div>
-          ) : (
-            <Asset m={s.item} eager={i < 3} />
-          )}
-          <Caption text={s.caption} />
-        </section>
-      );
-    case "grid":
-      return (
-        <section className="pf-slide pf-media" style={{ ...bg, ...(s.captionColor ? { "--pf-caption": s.captionColor } : {}) } as React.CSSProperties}>
-          <div
-            className={`pf-grid${s.bleed ? " is-bleed" : ""}${s.cols === 4 ? " is-4" : ""}`}
-            style={{ "--cols": s.cols, "--fit": s.fit ?? "cover", "--ratio": s.ratio ?? "1" } as React.CSSProperties}
-          >
-            {s.items.map((m) => (
-              <div key={m.src}>
-                <Asset m={m} />
-              </div>
-            ))}
+        <section className={`pf-slide pf-media${n === 4 ? " is-4" : ""}`}>
+          <Run chap={chap} page={page} />
+          <div className="pf-row" style={{ "--h": h } as React.CSSProperties}>
+            {s.items.map((m) => <Item key={m.src} m={m} eager={i < 4} />)}
           </div>
-          <Caption text={s.caption} />
+          {s.caption ? (
+            <p className="pf-caption pf-mono">
+              <b>Above</b>
+              <span>{s.caption}</span>
+            </p>
+          ) : null}
         </section>
       );
+    }
     case "logo":
       return (
-        <section className="pf-slide pf-media" style={{ ...bg, ...(s.captionColor ? { "--pf-caption": s.captionColor } : {}) } as React.CSSProperties}>
-          <div className="pf-logo" style={{ "--size": s.size ?? "22cqw" } as React.CSSProperties}>
+        <section className="pf-slide pf-logoslide" style={s.bg ? ({ "--ground": s.bg } as React.CSSProperties) : undefined}>
+          <Run chap={chap} page={page} />
+          <div className="pf-logo" style={{ "--size": s.size ?? "30cqw" } as React.CSSProperties}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={s.src} alt={s.alt ?? ""} loading="lazy" decoding="async" />
-          </div>
-          <Caption text={s.caption} />
-        </section>
-      );
-    case "section":
-      return (
-        <section className="pf-slide pf-title is-text" id="other">
-          <div className="pf-pad">
-            <h2 className="pf-display" style={{ maxWidth: "60%" }}>
-              {s.title}
-              <span className="g">{s.subtitle}</span>
-            </h2>
-            <p className="pf-display pf-grey">{s.year}</p>
           </div>
         </section>
       );
     case "end":
       return (
-        <section className="pf-slide pf-title is-text" id="contact">
+        <section className="pf-slide pf-end is-text" id="contact">
           <div className="pf-pad">
-            <h2 className="pf-display">
-              Thank you
-              <span className="g">Contact ↓</span>
-            </h2>
-            <div className="pf-meta pf-label">
+            <div className="pf-head pf-mono">
               {CV.contact.map((c) => (
-                <p key={c.label} style={{ margin: 0 }}>
+                <span key={c.label}>
                   {c.long}
-                  <a className="g" href={c.href}>{c.value}</a>
-                </p>
+                  <br />
+                  <a className="pf-soft" href={c.href}>{c.value}</a>
+                </span>
               ))}
+              <span className="pf-soft">{page}</span>
             </div>
+            <h2 className="pf-poster">
+              Thank
+              <br />
+              you<Mark />
+            </h2>
           </div>
         </section>
       );
   }
 }
 
-function FragmentRow({ label, value, href }: { label: string; value: string; href: string }) {
+function Row({ label, value, href }: { label: string; value: string; href: string }) {
   return (
     <>
-      <span>{label}:</span>
+      <span className="pf-soft">{label}</span>
       <a href={href}>{value}</a>
     </>
   );
 }
 
 export default function PortfolioPage() {
+  const total = PORTFOLIO.length;
+  let chapter: Chapter | undefined;
+  let count = 0;
   return (
     <main className="pf">
-      {PORTFOLIO.map((s, i) => <SlideView key={i} s={s} i={i} />)}
+      {PORTFOLIO.map((s, i) => {
+        if (s.kind === "title" || s.kind === "section") {
+          count += 1;
+          chapter = { no: pad2(count), name: s.kind === "title" ? s.name : s.title };
+        }
+        return <SlideView key={i} s={s} i={i} chap={chapter} page={`${pad2(i + 1)}/${total}`} />;
+      })}
     </main>
   );
 }
