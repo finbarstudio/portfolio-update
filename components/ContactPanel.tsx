@@ -12,14 +12,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import ContactDirect from "./ContactDirect";
-import { trackMeta } from "@/lib/meta";
 
 export default function ContactPanel() {
   const [open, setOpen] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onOpen = () => { setOpen(true); trackMeta("Contact"); };
+    const onOpen = () => setOpen(true);
     window.addEventListener("contact:open", onOpen as EventListener);
     return () => window.removeEventListener("contact:open", onOpen as EventListener);
   }, []);

@@ -1,20 +1,18 @@
 "use client";
 
 /**
- * FreeRedesign — the /free-redesign ad landing page (Meta campaign).
+ * FreeRedesign — the /free-redesign ad landing page.
  *
- * Conversion architecture, per the campaign brief: ONE action. The inline
- * Cal.com booking is the only CTA; no nav, no phone, no socials, no note form
- * (it's desktop-only and traffic here is ~95% mobile). The single escape hatch
- * is a plain mailto in the footer.
+ * Conversion architecture: ONE action. The inline Cal.com booking is the only
+ * CTA; no nav, no phone, no socials, no note form (it's desktop-only and
+ * traffic here is ~95% mobile). The single escape hatch is a plain mailto in
+ * the footer.
  *
  * The booking embed is TRUE INLINE on every width — unlike /contact, which
  * links out to Cal's hosted page on phones. Here the page scrolls normally, so
- * Cal's own mobile column layout works inside the iframe, the visitor never
- * leaves the page, and the bookingSuccessful browser event can fire — which is
- * what the Meta Schedule conversion (and therefore ad optimisation) hangs off.
- * The embed loads on approach (IntersectionObserver), so it never drags the
- * hero's LCP.
+ * Cal's own mobile column layout works inside the iframe and the visitor never
+ * leaves the page. The embed loads on approach (IntersectionObserver), so it
+ * never drags the hero's LCP.
  *
  * Testimonial slots: quotes are still being collected. Empty slots hide
  * gracefully — the section only renders entries with text, and disappears
@@ -24,8 +22,6 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { getCalApi } from "@calcom/embed-react";
-import { trackMeta } from "@/lib/meta";
 import BrandWordmark from "./BrandWordmark";
 import BrandMark from "./BrandMark";
 import Loader from "./Loader";
@@ -33,8 +29,6 @@ import PreviewCycle from "./PreviewCycle";
 import { media } from "@/lib/media";
 
 const CalEmbed = dynamic(() => import("./CalEmbed"), { ssr: false, loading: () => null });
-
-const CAL_NS = "book-call"; // must match CalEmbed's namespace for the event hook
 
 // Footer nav — the one place this stripped landing offers a way into the rest
 // of the site, for anyone who reaches the bottom without booking. New tab, so
@@ -110,12 +104,6 @@ export default function FreeRedesign() {
   const bookRef = useRef<HTMLDivElement>(null);
   const proofRef = useRef<HTMLElement>(null);
 
-  // A standard event on the landing view itself, so the dataset sees a real
-  // conversion-funnel event from every ad click (not just PageView) — this is
-  // what completes Meta's "set up events" step. Schedule (below) is the hard
-  // conversion once someone books; ViewContent is the top of the funnel.
-  useEffect(() => { trackMeta("ViewContent"); }, []);
-
   // Load the embed on approach, not on page load — hero LCP stays clean.
   // Belt and braces for the conversion point: if the observer never fires
   // (throttled tabs, odd in-app WebViews), a 5s idle fallback mounts it anyway
@@ -168,53 +156,6 @@ export default function FreeRedesign() {
     bookIO.observe(book);
     return () => { proofIO.disconnect(); bookIO.disconnect(); };
   }, []);
-
-  // The Meta-pixel cookie notice is also pinned to the bottom. While the sticky
-  // CTA is up, lift the notice above it so the two never overlap (mobile only —
-  // the CSS rule is scoped to this class and the phone breakpoint).
-  useEffect(() => {
-    document.body.classList.toggle("fr-sticky-on", showStickyBook);
-    return () => document.body.classList.remove("fr-sticky-on");
-  }, [showStickyBook]);
-
-  // The conversion signal: Cal's embed emits bookingSuccessful in the browser
-  // when a booking completes inside the inline embed. Once per session
-  // (sessionStorage guard against re-renders and double events). trackMeta
-  // sends it via BOTH the browser pixel and the /api/meta server relay with a
-  // shared event_id — the conversion survives ad blockers and in-app WebViews.
-  useEffect(() => {
-    if (!calInView) return;
-    (async () => {
-      const api = await getCalApi({ namespace: CAL_NS });
-      api("on", {
-        action: "bookingSuccessful",
-        callback: (e) => {
-          if (sessionStorage.getItem("fr-scheduled")) return;
-          sessionStorage.setItem("fr-scheduled", "1");
-          // Cal's event detail carries the booking; the shape shifts between
-          // embed versions, so probe the known paths defensively. Email/phone
-          // (when found) lift the Meta match quality a long way — they're
-          // SHA-256 hashed inside trackMeta before anything leaves the page.
-          const d = (e as { detail?: { data?: Record<string, unknown> } })?.detail?.data ?? {};
-          const dig = (obj: unknown, path: string[]): unknown =>
-            path.reduce<unknown>((o, k) => (o && typeof o === "object" ? (o as Record<string, unknown>)[k] : undefined), obj);
-          const email = [
-            dig(d, ["booking", "attendees", "0", "email"]),
-            dig(d, ["attendees", "0", "email"]),
-            dig(d, ["booking", "responses", "email", "value"]),
-            dig(d, ["responses", "email", "value"]),
-            dig(d, ["email"]),
-          ].find((v) => typeof v === "string" && v.includes("@")) as string | undefined;
-          const phone = [
-            dig(d, ["booking", "responses", "phone", "value"]),
-            dig(d, ["responses", "phone", "value"]),
-            dig(d, ["booking", "attendees", "0", "phoneNumber"]),
-          ].find((v) => typeof v === "string" && v.length > 5) as string | undefined;
-          trackMeta("Schedule", { email, phone });
-        },
-      });
-    })();
-  }, [calInView]);
 
   const liveTestimonials = TESTIMONIALS.filter((t) => t.quote.trim().length > 0);
 

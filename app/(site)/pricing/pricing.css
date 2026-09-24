@@ -269,7 +269,6 @@
   body:has(.pr) .top-nav,
   body:has(.pr) .nav-logo,
   body:has(.pr) .site-footer,
-  body:has(.pr) .cookie-notice,
   body:has(.pr) .sf-cta,
   body:has(.pr) a[href="#main-content"] { display: none !important; }
   .pr { padding-bottom: 0 !important; }

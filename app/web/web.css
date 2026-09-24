@@ -294,10 +294,3 @@ body:has(.wf-root) {
     grid-template-columns: 1fr;
   }
 }
-
-/* The root layout's Meta-pixel notice still shows here (it should, the pixel
-   runs on this host too), but it arrives in the portfolio's cream and pink.
-   Desaturate it so it belongs to this greyscale site. */
-body:has(.wf-root) .cookie-notice {
-  filter: grayscale(1);
-}

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const UPDATED = "18 July 2026";
+const UPDATED = "24 September 2026";
 
 export default function PrivacyPage() {
   return (
@@ -36,19 +36,16 @@ export default function PrivacyPage() {
           <ul className="space-y-2 text-ink-soft" style={{ fontSize: "var(--text-small)" }}>
             <li className="text-ink"><strong className="text-ink">Things you send me.</strong> If you email, call, send an enquiry through a form, or book a call, I keep that information and correspondence so I can reply and work with you.</li>
             <li className="text-ink"><strong className="text-ink">Mailing list.</strong> If you sign up to my mailing list, I keep the email address you enter so I can email you occasional updates. You can unsubscribe or ask to be removed at any time.</li>
-            <li className="text-ink"><strong className="text-ink">Advertising and analytics.</strong> This site runs the Meta (Facebook) pixel, which measures how ads perform and helps show relevant ads. It sets cookies (including <code>_fbp</code> and <code>_fbc</code>) and sends Meta events about your visit, both from your browser and from my server (the Conversions API). When you complete a booking, a hashed (not readable) version of the email and phone you enter may be sent to Meta to match the conversion. See &ldquo;Cookies and tracking&rdquo; below.</li>
-            <li className="text-ink"><strong className="text-ink">Basic technical data.</strong> Like any website, the host records standard server logs (for example IP address and browser) to run and secure the site. A couple of small browser preferences (like whether you&rsquo;ve dismissed a notice) are stored locally on your device, not sent to me.</li>
+            <li className="text-ink"><strong className="text-ink">Basic technical data.</strong> Like any website, the host records standard server logs (for example IP address and browser) to run and secure the site. A couple of small browser preferences (like whether the intro has played, or a cursor style you&rsquo;ve chosen) are stored locally on your device, not sent to me.</li>
           </ul>
         </section>
 
         <section className="space-y-3">
           <h2 className="mono-heading text-ink">Cookies and tracking</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
-            The Meta pixel is the only advertising tracker on the site. It sets cookies to recognise
-            return visits and measure ad results. You can opt out at any time: block or clear cookies
-            in your browser, use your{" "}
-            <a href="https://www.facebook.com/adpreferences/ad_settings" target="_blank" rel="noopener noreferrer" className="u-underline">Meta ad preferences</a>, or the industry opt-outs at{" "}
-            <a href="https://www.youronlinechoices.com" target="_blank" rel="noopener noreferrer" className="u-underline">Your Online Choices</a>. The site uses no other advertising or analytics cookies.
+            The site sets no advertising or analytics cookies and runs no tracking pixels. It
+            remembers a few small preferences in your browser, like whether the intro has played,
+            and none of it is sent anywhere.
           </p>
         </section>
 
@@ -57,8 +54,7 @@ export default function PrivacyPage() {
           <p style={{ fontSize: "var(--text-small)" }}>
             Enquiries and bookings are handled on the basis of your request and my legitimate
             interest in responding. Mailing-list emails are collected only with your{" "}
-            <strong>consent</strong>, to send you occasional updates. Advertising measurement runs on
-            the basis of legitimate interest, and you can opt out as above. Server logs are kept for
+            <strong>consent</strong>, to send you occasional updates. Server logs are kept for
             the legitimate interest of running a secure site.
           </p>
         </section>
@@ -67,7 +63,6 @@ export default function PrivacyPage() {
           <h2 className="mono-heading text-ink">Who processes it</h2>
           <p style={{ fontSize: "var(--text-small)" }}>
             The site relies on a small set of providers, each handling only what it needs:{" "}
-            <strong>Meta Platforms</strong> (the advertising pixel and Conversions API),{" "}
             <strong>Cal.com</strong> (call bookings), and <strong>Web3Forms</strong> (which delivers
             enquiry forms and mailing-list signups to my inbox). The site is hosted on{" "}
             <strong>Vercel</strong>. These providers may process data on servers outside your country
@@ -80,8 +75,7 @@ export default function PrivacyPage() {
           <p style={{ fontSize: "var(--text-small)" }}>
             Correspondence and enquiries are kept as long as needed to work together and for a
             reasonable period after. Mailing-list emails are kept until you unsubscribe or ask to be
-            removed. Advertising cookies expire on their own (Meta&rsquo;s are typically up to 90
-            days) or when you clear them.
+            removed.
           </p>
         </section>
 

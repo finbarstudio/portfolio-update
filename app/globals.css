@@ -4435,52 +4435,6 @@ html:has(.contact-skin) { background: var(--pink-deep); }
   .scroll-shot img { animation: none; }
 }
 
-/* ── Cookie/tracking notice (informational, dismissible) ──────────────────
-   Bottom-left so it clears the bottom-right "Get in touch" pin. Unlayered so
-   Tailwind v4 doesn't tree-shake it. */
-.cookie-notice {
-  position: fixed;
-  left: clamp(12px, 2vw, 24px);
-  bottom: clamp(12px, 2vw, 24px);
-  z-index: 25;
-  max-width: 340px;
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 0.8rem 1rem;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 6px 24px rgba(33, 30, 26, 0.1);
-}
-.cookie-notice-text {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: var(--text-caption);
-  line-height: 1.45;
-}
-.cookie-notice-link { color: var(--pink); white-space: nowrap; }
-.cookie-notice-newtab { display: inline-block; vertical-align: -1px; }
-.cookie-notice-btn {
-  flex: 0 0 auto;
-  align-self: flex-end;
-  background: var(--ink);
-  color: var(--bg);
-  border: 1px solid var(--ink);
-  border-radius: 999px;
-  padding: 0.45em 1em;
-  font-family: var(--font-mono);
-  font-size: var(--text-label);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  transition: background var(--dur-fast, 0.2s) var(--ease, ease), color var(--dur-fast, 0.2s) var(--ease, ease);
-}
-.cookie-notice-btn:hover { background: var(--pink); border-color: var(--pink); }
-@media (max-width: 520px) {
-  .cookie-notice { left: 12px; right: 12px; max-width: none; }
-}
-
 /* ── FAQ accordion (service landing /web-design, /graphic-design) ──────────
    Interactive collapse via the grid-rows 0fr->1fr trick (pure CSS height
    animation). Unlayered so Tailwind v4 keeps these names. */

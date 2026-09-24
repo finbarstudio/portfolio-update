@@ -22,12 +22,8 @@ const baseSecurityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
-  // COOP is left at the default (unsafe-none): Meta's Event Setup Tool opens
-  // the site in a new tab and drives it through the window.opener channel
-  // (injecting its overlay, confirming the pixel). COOP: same-origin severs
-  // that link for a cross-origin opener like facebook.com, so the tool showed
-  // "a pixel wasn't detected" and never rendered its overlay. We don't opt
-  // into crossOriginIsolated (COEP is omitted), so COOP bought little here.
+  // COOP stays at the default (unsafe-none): COEP is omitted, so we never opt
+  // into crossOriginIsolated and same-origin would buy little here.
   { key: "Cross-Origin-Opener-Policy", value: "unsafe-none" },
   { key: "Cross-Origin-Resource-Policy", value: "same-site" },
 ];
@@ -44,18 +40,13 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors *" },
         ],
       },
-      // Everything else: framing allowed ONLY for us + Meta's tools. Meta's
-      // Event Setup Tool / Events Manager iframes the page to detect the pixel;
-      // with frame-ancestors 'none' + X-Frame-Options: DENY that load was
-      // blocked ("a pixel wasn't detected on this website"). frame-ancestors is
-      // an allowlist so every other origin still can't frame us; X-Frame-Options
-      // is dropped because it's all-or-nothing (can't express the allowlist) and
-      // CSP frame-ancestors supersedes it in modern browsers.
+      // Everything else: framing allowed only for us. X-Frame-Options is
+      // dropped because CSP frame-ancestors supersedes it in modern browsers.
       {
         source: "/((?!embed/).*)",
         headers: [
           ...baseSecurityHeaders,
-          { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors 'self' https://*.facebook.com https://facebook.com" },
+          { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors 'self'" },
         ],
       },
       // public/media served off disk (local dev, or any deploy made before the

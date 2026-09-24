@@ -40,8 +40,8 @@ export const viewport: Viewport = {
   themeColor: "#eeeeee",
 };
 
-// This route lives OUTSIDE app/(site), so it gets only the root layout (fonts,
-// Meta pixel, CookieNotice) — no portfolio nav/footer. Intentional.
+// This route lives OUTSIDE app/(site), so it gets only the root layout
+// (fonts) — no portfolio nav/footer. Intentional.
 export default function WebLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="wf-root">

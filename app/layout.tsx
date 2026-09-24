@@ -2,9 +2,6 @@ import { jsonLdHtml } from "@/lib/json-ld";
 import type { Metadata, Viewport } from "next";
 import { Archivo, Host_Grotesk, Space_Mono, Noto_Sans_Symbols_2 } from "next/font/google";
 import TempusKernel from "@/components/TempusKernel";
-import MetaPixel from "@/components/MetaPixel";
-import CookieNotice from "@/components/CookieNotice";
-import { META_PIXEL_ID } from "@/lib/meta-const";
 import "./globals.css";
 import { absoluteMedia } from "@/lib/media";
 
@@ -271,54 +268,19 @@ export default function RootLayout({
       lang="en-GB"
       className={`${archivo.variable} ${spaceMono.variable} ${hostGrotesk.variable} ${notoSymbols.variable}`}
     >
-      <head>
-        {/* Meta base pixel in <head>, init ONLY: every track (PageView per
-            route, Schedule on booking) fires from client code with an
-            event_id, dual-channel with the /api/meta Conversions API relay,
-            so Meta dedups the pairs. A tracked PageView here would have no
-            event_id and double-count against its server twin. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${META_PIXEL_ID}');`,
-          }}
-        />
-      </head>
       {/* suppressHydrationWarning: browser extensions (e.g. ColorZilla adds
           cz-shortcut-listen) mutate <body> before hydration; suppress the
           attribute-mismatch warning for this node only, not its children. */}
       <body className="bg-bg text-ink font-sans antialiased min-h-screen" suppressHydrationWarning>
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            alt=""
-            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
-          />
-        </noscript>
         {/* One shared rAF loop (tempus): absorbs every native requestAnimationFrame
             — Lenis, canvas effects, R3F, GSAP — into a single ordered loop. */}
         <TempusKernel />
-        {/* PageView per client-side navigation (the head snippet only fires the
-            first one; App Router route changes don't reload the page). */}
-        <MetaPixel />
         {/* Bookmania (Typekit) was removed: --font-display is referenced nowhere
             and HeroHeadline is unmounted, so the render-blocking third-party
             stylesheet was pure LCP cost on every page. */}
         {/* Routes bring their own chrome: portfolio routes via app/(site)/layout
             (the sidebar shell); the Sandbox + embeds via their own bare layouts. */}
         {children}
-        {/* Informational cookie/tracking notice (dismissible, remembered). */}
-        <CookieNotice />
         {/* JSON-LD as plain inline <script> tags (the pattern the Next docs
             recommend) — next/script beforeInteractive re-renders these on the
             client and React warns the script "will never execute", which is

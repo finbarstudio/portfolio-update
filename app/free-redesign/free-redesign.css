@@ -121,10 +121,6 @@
     padding: 1em 2.2em;
     text-decoration: none;
   }
-  /* Lift the Meta-pixel notice clear of the sticky CTA while it's up. */
-  body.fr-sticky-on .cookie-notice {
-    bottom: calc(88px + env(safe-area-inset-bottom));
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .fr-book-sticky { transition: none; }
