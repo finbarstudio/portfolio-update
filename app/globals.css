@@ -4886,3 +4886,17 @@ body:has(.case-study) { background-color: #fff; }
   color: var(--ink-soft);
 }
 .case-demo-title { color: var(--ink); font-weight: 600; margin-right: 0.6em; }
+/* Phones: each step shows its own clip under its text (CaseIntroSteps), so the
+   separate clip column would only repeat them. Desktop is unchanged. */
+.case-step-media { margin: 1.25rem 0 0; --shot-gap: 0.5rem; }
+.case-step-media figcaption { margin-top: 0.7rem; font-size: var(--text-caption); line-height: 1.5; color: var(--ink-soft); }
+@media (max-width: 1023px) {
+  .case-demos { display: none; }
+  /* Centred like the other case-study headers on a phone (see the default
+     header in case-studies/[slug]/page.tsx). */
+  .case-intro { text-align: center; }
+  .case-intro-lead { align-items: center; }
+  .case-intro-brief { margin-inline: auto; }
+  .case-intro-lead .flex-wrap { justify-content: center; }
+  .case-step { margin-inline: auto; }
+}

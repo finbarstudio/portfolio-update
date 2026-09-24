@@ -259,7 +259,7 @@ function CaseIntro({ project }: { project: Project }) {
           </div>
         </div>
       </div>
-      <CaseIntroSteps steps={project.demos!.map(({ name, title, body }) => ({ name, title, body }))} />
+      <CaseIntroSteps steps={project.demos!.map(({ name, title, body, caption, video, shots }) => ({ name, title, body, caption, video, shots }))} />
     </header>
   );
 }
