@@ -3,7 +3,7 @@ import Laurel from "./Laurel";
 /**
  * Full-bleed hero: the new-build photograph fills the screen, with navy
  * gradients at the top (behind the bar) and the bottom only, no overlay across
- * the middle. The gold wordmark in the middle of it is not in here: it is the
+ * the middle. The white wordmark in the middle of it is not in here: it is the
  * travelling mark in Nav.tsx, which sits in the centre of the hero at the top of
  * the page and rides up into the bar as the page scrolls. This section only
  * holds the photograph and the laurel beneath the mark. Nothing here is a link.

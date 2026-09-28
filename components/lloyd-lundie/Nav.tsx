@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
  * back to the icon.
  *
  * The travelling wordmark: at the top of the page "Lloyd Lundie" sits large
- * and gold in the middle of the hero photograph with "Building Contractors"
+ * and white in the middle of the hero photograph with "Building Contractors"
  * under it. As the page scrolls it rises and shrinks until, at DOCK of a screen
  * height, it lands in the centre of the bar at the bar's own size, with the
  * descriptor gone so it is no taller than the icons beside it. It is one fixed

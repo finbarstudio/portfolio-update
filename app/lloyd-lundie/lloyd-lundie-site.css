@@ -20,7 +20,18 @@
 .ll-site {
   --ll-navy: #052f49;
   --ll-navy-rgb: 5, 47, 73;
-  --ll-gold: #eab200;
+  /* shadcn-style radius scale: one base, everything derived from it */
+  --ll-radius: 0.5rem;
+  --ll-radius-sm: calc(var(--ll-radius) - 4px);
+  --ll-radius-md: calc(var(--ll-radius) - 2px);
+  --ll-radius-lg: var(--ll-radius);
+  --ll-radius-xl: calc(var(--ll-radius) + 4px);
+  --ll-input: rgba(var(--ll-navy-rgb), 0.2);
+  --ll-ring: rgba(var(--ll-navy-rgb), 0.28);
+  --ll-accent: rgba(var(--ll-navy-rgb), 0.06);
+  --ll-shadow-xs: 0 1px 2px rgba(var(--ll-navy-rgb), 0.05);
+  --ll-shadow-md: 0 4px 6px -1px rgba(var(--ll-navy-rgb), 0.08), 0 2px 4px -2px rgba(var(--ll-navy-rgb), 0.06);
+  --ll-shadow-lg: 0 10px 15px -3px rgba(var(--ll-navy-rgb), 0.1), 0 4px 6px -4px rgba(var(--ll-navy-rgb), 0.08);
   --ll-white: #ffffff;
   --ll-off-white: #f4f6f9;
   --ll-navy-soft: rgba(var(--ll-navy-rgb), 0.68);
@@ -92,7 +103,7 @@
 .ll-site :focus-visible {
   outline: 2px solid var(--ll-navy);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: var(--ll-radius-sm);
 }
 
 .ll-site [data-tone="inverse"] :focus-visible {
@@ -121,48 +132,41 @@
 }
 
 /* ---------- buttons -----------------------------------------------------------
-   Caps, so there is no descender to sit on and the padding reads even top and
-   bottom. Hover sweeps the opposite colour across from the left. */
+   shadcn's Button: rounded-md, h-10, a colour step on hover, a 3px focus
+   ring. Caps (Finbar's call), so the padding reads even top and bottom. */
 
 .ll-btn {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  padding: 0 1.7em;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--ll-radius-md);
   font-family: var(--ll-font-body);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
-  border: 1px solid var(--ll-navy);
   cursor: pointer;
-  transition: color 0.35s var(--ll-ease), border-color 0.35s var(--ll-ease);
+  box-shadow: var(--ll-shadow-xs);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.ll-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--ll-sweep, var(--ll-white));
-  transform: scaleX(0);
-  transform-origin: right center;
-  transition: transform 0.45s var(--ll-ease);
+.ll-site .ll-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ll-ring);
 }
 
-.ll-btn:hover::before,
-.ll-btn:focus-visible::before {
-  transform: scaleX(1);
-  transform-origin: left center;
-}
-
-.ll-btn:active {
-  transform: translateY(1px);
+.ll-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .ll-btn-primary {
@@ -170,15 +174,18 @@
   color: var(--ll-white);
 }
 
-.ll-btn-primary:hover,
-.ll-btn-primary:focus-visible {
+.ll-btn-primary:hover {
+  background: color-mix(in srgb, var(--ll-navy) 88%, white);
+}
+
+/* White button, for use over the photograph */
+.ll-btn-light {
+  background: var(--ll-white);
   color: var(--ll-navy);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ll-btn::before {
-    transition: none;
-  }
+.ll-btn-light:hover {
+  background: rgba(255, 255, 255, 0.88);
 }
 
 /* Text links inside copy blocks: an underline that draws in from the left. */
@@ -288,44 +295,41 @@
   height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--ll-radius-md);
   background: transparent;
   color: inherit;
   cursor: pointer;
-  transition: background-color 0.25s var(--ll-ease), transform 0.25s var(--ll-ease);
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .ll-icon-btn:hover,
 .ll-icon-btn:focus-visible,
 .ll-icon-btn[aria-expanded="true"] {
-  background: rgba(var(--ll-navy-rgb), 0.08);
+  background: var(--ll-accent);
 }
 
 .ll-nav[data-solid="0"] .ll-icon-btn:hover,
 .ll-nav[data-solid="0"] .ll-icon-btn:focus-visible {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .ll-site .ll-icon-btn:focus-visible {
-  border-radius: 50%;
-  outline-color: currentColor;
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ll-ring);
 }
 
-.ll-icon-btn:active {
-  transform: scale(0.94);
+.ll-nav[data-solid="0"] .ll-icon-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
 }
 
-/* Over the hero the quote button is white on the photo and sweeps to navy. */
+/* Over the hero the quote button is the white variant. */
 .ll-nav[data-solid="0"] .ll-nav-cta {
   background: var(--ll-white);
-  border-color: var(--ll-white);
   color: var(--ll-navy);
-  --ll-sweep: var(--ll-navy);
 }
 
-.ll-nav[data-solid="0"] .ll-nav-cta:hover,
-.ll-nav[data-solid="0"] .ll-nav-cta:focus-visible {
-  color: var(--ll-white);
+.ll-nav[data-solid="0"] .ll-nav-cta:hover {
+  background: rgba(255, 255, 255, 0.88);
 }
 
 /* Too little room on a phone for the name and the button: the mail icon
@@ -355,7 +359,7 @@
   align-items: center;
   transform-origin: 50% 0;
   transform: translate3d(-50%, calc(44svh - 0.5 * var(--ll-mark-size)), 0);
-  color: var(--ll-gold);
+  color: var(--ll-white);
   pointer-events: none;
   /* the middle of the photo has no navy over it, so the name and descriptor
      carry a soft shadow of their own to hold on the pale cladding */
@@ -396,23 +400,25 @@
 
 .ll-window {
   position: fixed;
-  top: 74px;
+  top: 72px;
   right: var(--ll-gutter);
   z-index: 60;
-  width: min(320px, calc(100vw - 2 * var(--ll-gutter)));
-  padding: 22px 24px 24px;
-  background: var(--ll-navy);
-  color: var(--ll-white);
-  box-shadow: 0 18px 50px -18px rgba(var(--ll-navy-rgb), 0.55);
+  width: min(300px, calc(100vw - 2 * var(--ll-gutter)));
+  padding: 16px;
+  background: var(--ll-white);
+  color: var(--ll-navy);
+  border: 1px solid var(--ll-hairline);
+  border-radius: var(--ll-radius-lg);
+  box-shadow: var(--ll-shadow-lg);
   display: grid;
-  gap: 8px;
+  gap: 6px;
   opacity: 0;
   visibility: hidden;
-  translate: 0 -6px;
+  translate: 0 -4px;
   transition:
-    opacity 0.2s var(--ll-ease),
-    translate 0.2s var(--ll-ease),
-    visibility 0s linear 0.2s;
+    opacity 0.15s ease,
+    translate 0.15s ease,
+    visibility 0s linear 0.15s;
 }
 
 .ll-window[data-open="1"] {
@@ -420,8 +426,8 @@
   visibility: visible;
   translate: 0 0;
   transition:
-    opacity 0.2s var(--ll-ease),
-    translate 0.2s var(--ll-ease);
+    opacity 0.15s ease,
+    translate 0.15s ease;
 }
 
 .ll-window:focus {
@@ -429,50 +435,38 @@
 }
 
 .ll-window-label {
-  font-size: 10px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--ll-navy-soft);
 }
 
 .ll-window-label-gap {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
-.ll-window-lead {
-  font-family: var(--ll-font-brand);
-  font-size: 20px;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  overflow-wrap: anywhere;
-  transition: color 0.2s var(--ll-ease);
-}
-
+.ll-window-lead,
 .ll-window-phone {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--ll-hairline-inverse);
-  font-size: 16px;
-  transition: color 0.2s var(--ll-ease), padding-left 0.25s var(--ll-ease);
-}
-
-.ll-window-phone span {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  align-self: center;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: var(--ll-radius-md);
+  font-size: 15px;
+  overflow-wrap: anywhere;
+  transition: background-color 0.15s ease;
 }
 
 .ll-window-lead:hover,
-.ll-window-phone:hover {
-  color: var(--ll-gold);
+.ll-window-phone:hover,
+.ll-window-lead:focus-visible,
+.ll-window-phone:focus-visible {
+  background: var(--ll-accent);
 }
 
-.ll-window-phone:hover {
-  padding-left: 6px;
+.ll-window-phone span {
+  font-size: 12px;
+  color: var(--ll-navy-soft);
 }
 
 /* ---------- hero ------------------------------------------------------------------
@@ -528,7 +522,7 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  color: var(--ll-gold);
+  color: var(--ll-white);
 }
 
 .ll-laurel-art {
@@ -710,6 +704,7 @@
   width: 100%;
   aspect-ratio: 3 / 2;
   object-fit: cover;
+  border-radius: var(--ll-radius-lg);
 }
 
 .ll-work-caption {
@@ -809,33 +804,29 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 28px 28px 24px;
+  gap: 16px;
+  padding: 24px;
   background: var(--ll-white);
   border: 1px solid var(--ll-hairline);
-  border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(var(--ll-navy-rgb), 0.05);
-  transition:
-    transform 0.35s var(--ll-ease),
-    box-shadow 0.35s var(--ll-ease),
-    border-color 0.35s var(--ll-ease);
+  border-radius: var(--ll-radius-xl);
+  box-shadow: var(--ll-shadow-xs);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .ll-review:hover {
-  transform: translateY(-3px);
-  border-color: rgba(var(--ll-navy-rgb), 0.24);
-  box-shadow: 0 18px 40px -22px rgba(var(--ll-navy-rgb), 0.35);
+  border-color: rgba(var(--ll-navy-rgb), 0.22);
+  box-shadow: var(--ll-shadow-md);
 }
 
 .ll-review-stars {
   display: flex;
-  gap: 3px;
-  color: var(--ll-gold);
+  gap: 2px;
+  color: var(--ll-navy);
 }
 
 .ll-review-stars svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
@@ -858,11 +849,11 @@
 .ll-review-avatar {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--ll-navy);
-  color: var(--ll-white);
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--ll-accent);
+  color: var(--ll-navy);
   font-size: 12px;
   letter-spacing: 0.06em;
 }
@@ -947,30 +938,42 @@
 }
 
 .ll-field label {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ll-navy-soft);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--ll-navy);
 }
 
 .ll-field input,
 .ll-field textarea {
   width: 100%;
-  padding: 12px 0;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--ll-hairline);
+  height: 40px;
+  padding: 8px 12px;
+  background: var(--ll-white);
+  border: 1px solid var(--ll-input);
+  border-radius: var(--ll-radius-md);
+  box-shadow: var(--ll-shadow-xs);
   color: var(--ll-navy);
   font-family: var(--ll-font-body);
   font-size: 15px;
-  resize: vertical;
-  transition: border-color 0.2s var(--ll-ease);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.ll-field input:focus,
-.ll-field textarea:focus {
+.ll-field textarea {
+  height: auto;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.ll-field input::placeholder,
+.ll-field textarea::placeholder {
+  color: var(--ll-navy-soft);
+}
+
+.ll-field input:focus-visible,
+.ll-field textarea:focus-visible {
   outline: none;
-  border-bottom-color: var(--ll-navy);
+  border-color: var(--ll-navy);
+  box-shadow: 0 0 0 3px var(--ll-ring);
 }
 
 .ll-contact-form .ll-btn {

@@ -1,7 +1,7 @@
 import Reveal from "./Reveal";
 
 /**
- * Reviews as cards, three across and one row (stacked on a phone): five gold
+ * Reviews as cards, three across and one row (stacked on a phone): five
  * stars, the customer's words verbatim, and their name beside an initials
  * badge. The shape of a classic shadcn reviews section, in this site's navy
  * and white.
