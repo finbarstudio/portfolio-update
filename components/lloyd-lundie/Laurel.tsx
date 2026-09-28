@@ -9,7 +9,18 @@ import { LAUREL_PATH } from "./laurelPath";
  * beneath it rise into place. Same pattern as /mt's AwardLaurel. CSS does the
  * animation; this only flips `data-drawn` once mounted.
  */
-export default function Laurel({ mark, unit, delay = 0 }: { mark: string; unit: string; delay?: number }) {
+export default function Laurel({
+  mark,
+  unit,
+  award,
+  delay = 0,
+}: {
+  mark: string;
+  unit: string;
+  /** An optional second line under the unit: a real award, smaller. */
+  award?: string;
+  delay?: number;
+}) {
   const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,6 +43,11 @@ export default function Laurel({ mark, unit, delay = 0 }: { mark: string; unit: 
       <span className="ll-laurel-mask">
         <span className="ll-laurel-unit">{unit}</span>
       </span>
+      {award ? (
+        <span className="ll-laurel-mask">
+          <span className="ll-laurel-award">{award}</span>
+        </span>
+      ) : null}
     </div>
   );
 }

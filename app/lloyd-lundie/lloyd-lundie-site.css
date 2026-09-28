@@ -594,6 +594,24 @@
   transform: translateY(110%);
 }
 
+.ll-laurel-award {
+  display: block;
+  max-width: 30ch;
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  text-wrap: balance;
+  color: rgba(255, 255, 255, 0.8);
+  transform: translateY(110%);
+}
+
+.ll-laurel[data-drawn="1"] .ll-laurel-award {
+  animation: ll-rise 0.6s var(--ll-ease) calc(var(--ll-delay, 0s) + 1.4s) forwards;
+}
+
 .ll-laurel[data-drawn="1"] .ll-laurel-mark {
   animation: ll-rise 0.6s var(--ll-ease) calc(var(--ll-delay, 0s) + 1s) forwards;
 }
@@ -616,11 +634,13 @@
   }
   .ll-laurel[data-drawn="1"] .ll-laurel-art path,
   .ll-laurel[data-drawn="1"] .ll-laurel-mark,
-  .ll-laurel[data-drawn="1"] .ll-laurel-unit {
+  .ll-laurel[data-drawn="1"] .ll-laurel-unit,
+  .ll-laurel[data-drawn="1"] .ll-laurel-award {
     animation: none;
   }
   .ll-laurel-mark,
-  .ll-laurel-unit {
+  .ll-laurel-unit,
+  .ll-laurel-award {
     opacity: 1;
     transform: none;
   }

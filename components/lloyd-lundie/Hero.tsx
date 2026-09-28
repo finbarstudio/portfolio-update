@@ -18,7 +18,7 @@ export default function Hero({
 }: {
   image: string;
   imageAlt: string;
-  laurel: { mark: string; unit: string };
+  laurel: { mark: string; unit: string; award?: string };
 }) {
   return (
     <section className="ll-hero" id="top">
@@ -36,7 +36,7 @@ export default function Hero({
       <div className="ll-hero-shade ll-hero-shade-bottom" aria-hidden="true" />
       <h1 className="ll-sr-only">Lloyd Lundie Building Contractors, home extensions in Medway and Kent</h1>
       <div className="ll-hero-laurel">
-        <Laurel mark={laurel.mark} unit={laurel.unit} delay={0.35} />
+        <Laurel mark={laurel.mark} unit={laurel.unit} award={laurel.award} delay={0.35} />
       </div>
     </section>
   );

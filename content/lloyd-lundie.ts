@@ -30,8 +30,9 @@ export const hero = {
   image: img("hero-new-build"),
   imageAlt:
     "A finished new-build home in Medway with cedar timber cladding, dark grey aluminium windows and a gravel driveway",
-  /** The laurel under the wordmark: over 30 years (their home page). */
-  laurel: { mark: "30", unit: "Years" },
+  /** The laurel under the wordmark: over 30 years (their home page), and the
+   *  award from Lloyd's own email signature. */
+  laurel: { mark: "30", unit: "Years", award: "Voted best domestic extension company in Kent 2021" },
 };
 
 /** The story beat: who they are, in their own words, verbatim from /home. */
