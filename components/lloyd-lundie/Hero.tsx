@@ -8,8 +8,8 @@ import Laurel from "./Laurel";
  * the page and rides up into the bar as the page scrolls. This section only
  * holds the photograph and the laurel beneath the mark. Nothing here is a link.
  *
- * The source photo is only 960x720, so it softens on very wide screens; swap
- * in a larger original when one exists.
+ * The client's photo was only 960x720; the file served here is a 4x Upscayl
+ * pass (high-fidelity model) scaled back to 2560px, so it holds full bleed.
  */
 export default function Hero({
   image,
@@ -26,8 +26,8 @@ export default function Hero({
         className="ll-hero-img"
         src={image}
         alt={imageAlt}
-        width={960}
-        height={720}
+        width={2560}
+        height={1920}
         loading="eager"
         decoding="sync"
         fetchPriority="high"
