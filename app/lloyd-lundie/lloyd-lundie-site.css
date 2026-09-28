@@ -267,9 +267,8 @@
 }
 
 .ll-nav-inner {
-  max-width: var(--ll-max);
-  margin-inline: auto;
-  padding: 14px var(--ll-gutter);
+  /* the bar runs wider than the page: icons sit near the screen edges */
+  padding: 14px clamp(12px, 2vw, 32px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -401,7 +400,7 @@
 .ll-window {
   position: fixed;
   top: 72px;
-  right: var(--ll-gutter);
+  right: clamp(12px, 2vw, 32px);
   z-index: 60;
   width: min(300px, calc(100vw - 2 * var(--ll-gutter)));
   padding: 16px;
