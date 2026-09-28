@@ -22,7 +22,11 @@ export default function SmoothScroll() {
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      // in-page links (the quote button to #contact) glide too
+      anchors: true,
     });
+    // the bar's home icon scrolls back to the top through this
+    (window as unknown as { __llLenis?: Lenis }).__llLenis = lenis;
 
     let raf = 0;
     const tick = (time: number) => {
@@ -34,6 +38,7 @@ export default function SmoothScroll() {
     return () => {
       cancelAnimationFrame(raf);
       lenis.destroy();
+      delete (window as unknown as { __llLenis?: Lenis }).__llLenis;
     };
   }, []);
 

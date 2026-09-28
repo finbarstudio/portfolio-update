@@ -11,23 +11,33 @@ import ContactSection from "@/components/lloyd-lundie/ContactSection";
 import Footer from "@/components/lloyd-lundie/Footer";
 
 /**
- * Home: nav, hero, story beat, selected work (4 photos), services list,
- * testimonials, areas covered, contact, footer. A composition only — every
- * string and photograph comes from content/lloyd-lundie.ts.
+ * The whole demo is this one page: the bar (with the travelling wordmark),
+ * hero, story beat, selected work (4 photos), services list, three reviews,
+ * areas covered, contact, footer. A composition only: every string and
+ * photograph comes from content/lloyd-lundie.ts.
  */
+
+/** The three reviews shown, from the five on their feedback page. */
+const REVIEWS = ["Tracey Larson", "Debbie Baker", "Simon Damerell"];
 export default function LloydLundieHome() {
-  const { site, nav, hero, story, selectedWork, services, testimonials, areas, contact, footer } = content;
+  const { site, hero, story, selectedWork, services, testimonials, areas, contact, footer } = content;
 
   return (
     <>
       <SmoothScroll />
-      <Nav nav={nav} phone={site.phoneMobile} phoneHref={site.phoneMobileHref} overHero />
+      <Nav
+        email={site.email}
+        phones={[
+          { label: "Mobile", value: site.phoneMobile, href: site.phoneMobileHref },
+          { label: "Office", value: site.phoneOffice, href: site.phoneOfficeHref },
+        ]}
+      />
       <main>
-        <Hero heading={hero.heading} sub={hero.sub} image={hero.image} imageAlt={hero.imageAlt} cta={hero.cta} />
+        <Hero image={hero.image} imageAlt={hero.imageAlt} laurel={hero.laurel} />
         <Story paragraph={story.paragraph} mottos={story.mottos} facts={story.facts} />
         <SelectedWork items={selectedWork} />
         <ServicesList services={services} />
-        <Testimonials testimonials={testimonials} />
+        <Testimonials testimonials={REVIEWS.flatMap((n) => testimonials.filter((t) => t.name === n))} />
         <Areas areas={areas} />
         <ContactSection
           intro={contact.intro}

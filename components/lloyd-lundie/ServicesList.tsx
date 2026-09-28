@@ -1,6 +1,6 @@
 import Reveal from "./Reveal";
 
-/** Seven rows, one sentence each, linking to their anchor on the services page. No grid, no per-row image. */
+/** Seven rows, one sentence each. No grid, no per-row image, no links (the demo is one page). */
 export default function ServicesList({
   services,
 }: {
@@ -16,10 +16,10 @@ export default function ServicesList({
         <ul className="ll-services-list">
           {services.map((service, i) => (
             <Reveal key={service.id} as="li" delay={i * 0.04}>
-              <a href={`/lloyd-lundie/services#${service.id}`} className="ll-services-row">
+              <div className="ll-services-row">
                 <span className="ll-services-name">{service.name}</span>
                 <span className="ll-services-line">{service.oneLiner}</span>
-              </a>
+              </div>
             </Reveal>
           ))}
         </ul>

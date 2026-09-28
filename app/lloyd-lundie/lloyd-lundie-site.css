@@ -18,8 +18,9 @@
    ============================================================================= */
 
 .ll-site {
-  --ll-navy: #042c54;
-  --ll-navy-rgb: 4, 44, 84;
+  --ll-navy: #052f49;
+  --ll-navy-rgb: 5, 47, 73;
+  --ll-gold: #eab200;
   --ll-white: #ffffff;
   --ll-off-white: #f4f6f9;
   --ll-navy-soft: rgba(var(--ll-navy-rgb), 0.68);
@@ -119,21 +120,49 @@
   max-width: 16ch;
 }
 
-/* ---------- buttons ---------------------------------------------------------- */
+/* ---------- buttons -----------------------------------------------------------
+   Caps, so there is no descender to sit on and the padding reads even top and
+   bottom. Hover sweeps the opposite colour across from the left. */
 
 .ll-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  padding: 0.7em 1.5em;
+  padding: 0 1.7em;
   font-family: var(--ll-font-body);
-  font-size: 14px;
-  letter-spacing: 0.02em;
+  font-size: 12.5px;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
   border: 1px solid var(--ll-navy);
-  transition:
-    background-color 0.25s var(--ll-ease),
-    color 0.25s var(--ll-ease);
+  cursor: pointer;
+  transition: color 0.35s var(--ll-ease), border-color 0.35s var(--ll-ease);
+}
+
+.ll-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ll-sweep, var(--ll-white));
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.45s var(--ll-ease);
+}
+
+.ll-btn:hover::before,
+.ll-btn:focus-visible::before {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.ll-btn:active {
+  transform: translateY(1px);
 }
 
 .ll-btn-primary {
@@ -141,14 +170,39 @@
   color: var(--ll-white);
 }
 
-.ll-btn-primary:hover {
-  background: transparent;
+.ll-btn-primary:hover,
+.ll-btn-primary:focus-visible {
   color: var(--ll-navy);
 }
 
-[data-tone="inverse"] .ll-btn-primary,
-.ll-testimonials .ll-btn-primary {
-  border-color: var(--ll-white);
+@media (prefers-reduced-motion: reduce) {
+  .ll-btn::before {
+    transition: none;
+  }
+}
+
+/* Text links inside copy blocks: an underline that draws in from the left. */
+.ll-link {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.35s var(--ll-ease), color 0.2s var(--ll-ease);
+  padding-bottom: 2px;
+}
+
+.ll-link:hover,
+.ll-link:focus-visible {
+  background-size: 100% 1px;
+}
+
+.ll-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---------- reveal ------------------------------------------------------------ */
@@ -175,49 +229,10 @@
   }
 }
 
-/* ---------- wordmark ----------------------------------------------------------- */
-
-.ll-wordmark-link {
-  display: inline-block;
-}
-
-.ll-wordmark {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  color: var(--ll-navy);
-  transition: color 0.3s var(--ll-ease);
-}
-
-.ll-wordmark-name {
-  display: block;
-  font-family: var(--ll-font-brand);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.ll-wordmark-nav .ll-wordmark-name {
-  font-size: clamp(22px, 2.3vw, 28px);
-}
-
-.ll-wordmark-lg .ll-wordmark-name {
-  font-size: clamp(28px, 4vw, 40px);
-}
-
-.ll-wordmark-descriptor {
-  display: block;
-  font-family: var(--ll-font-body);
-  font-size: 9px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ll-navy-soft);
-  white-space: nowrap;
-}
-
-/* ---------- nav ----------------------------------------------------------------- */
+/* ---------- the bar -------------------------------------------------------------
+   Home icon left, mail icon + quote button right, nothing in the middle but
+   room for the travelling name. No background over the hero; white with navy
+   icons once the name has docked. */
 
 .ll-nav {
   position: fixed;
@@ -225,209 +240,250 @@
   left: 0;
   right: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--ll-hairline);
-  transition: background-color 0.35s var(--ll-ease), border-color 0.35s var(--ll-ease);
+  color: var(--ll-navy);
+  transition:
+    background-color 0.35s var(--ll-ease),
+    border-color 0.35s var(--ll-ease),
+    color 0.35s var(--ll-ease);
 }
 
-/* Over the full-bleed hero: no bar, white type, until the hero scrolls past. */
 .ll-nav[data-solid="0"] {
   background: transparent;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   border-bottom-color: transparent;
-}
-.ll-nav[data-solid="0"] .ll-wordmark,
-.ll-nav[data-solid="0"] .ll-wordmark-descriptor,
-.ll-nav[data-solid="0"] .ll-nav-link,
-.ll-nav[data-solid="0"] .ll-nav-phone {
   color: var(--ll-white);
 }
-.ll-nav[data-solid="0"] .ll-nav-cta {
-  background: var(--ll-white);
-  color: var(--ll-navy);
-}
-.ll-nav[data-solid="0"] .ll-nav-burger span {
-  background: var(--ll-white);
-}
 
-/* Three columns so the wordmark sits dead centre whatever the sides hold. */
 .ll-nav-inner {
   max-width: var(--ll-max);
   margin-inline: auto;
-  padding: 16px var(--ll-gutter);
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  padding: 14px var(--ll-gutter);
+  display: flex;
   align-items: center;
-  gap: 24px;
-}
-
-.ll-nav-mark {
-  grid-column: 2;
-  justify-self: center;
-}
-
-.ll-nav-links {
-  display: none;
-  grid-column: 1;
-  align-items: center;
-  gap: 32px;
-}
-
-.ll-nav-link {
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  color: var(--ll-navy-soft);
-  transition: color 0.2s var(--ll-ease);
-}
-
-.ll-nav-link:hover {
-  color: var(--ll-navy);
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .ll-nav-right {
-  grid-column: 3;
-  justify-self: end;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
 }
 
-.ll-nav-phone {
-  display: none;
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+.ll-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
-.ll-nav-cta {
-  display: none;
-  min-height: 40px;
-  padding: 0.55em 1.2em;
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  background: var(--ll-navy);
-  color: var(--ll-white);
-  white-space: nowrap;
-  transition: background-color 0.2s var(--ll-ease);
-}
-
-.ll-nav-cta:hover {
-  background: color-mix(in srgb, var(--ll-navy) 85%, black);
-}
-
-.ll-nav-burger {
-  display: grid;
-  gap: 6px;
+.ll-icon-btn {
+  display: inline-grid;
+  place-items: center;
   width: 44px;
   height: 44px;
-  place-items: center;
+  padding: 0;
   border: 0;
-  background: none;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
   cursor: pointer;
+  transition: background-color 0.25s var(--ll-ease), transform 0.25s var(--ll-ease);
 }
 
-.ll-nav-burger span {
-  display: block;
-  width: 22px;
-  height: 1px;
-  background: var(--ll-navy);
-  transition: transform 0.3s var(--ll-ease), opacity 0.3s var(--ll-ease);
+.ll-icon-btn:hover,
+.ll-icon-btn:focus-visible,
+.ll-icon-btn[aria-expanded="true"] {
+  background: rgba(var(--ll-navy-rgb), 0.08);
 }
 
-.ll-nav-burger span[data-open="1"]:first-child {
-  transform: translateY(3.5px) rotate(45deg);
+.ll-nav[data-solid="0"] .ll-icon-btn:hover,
+.ll-nav[data-solid="0"] .ll-icon-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
 }
 
-.ll-nav-burger span[data-open="1"]:last-child {
-  transform: translateY(-3.5px) rotate(-45deg);
+.ll-site .ll-icon-btn:focus-visible {
+  border-radius: 50%;
+  outline-color: currentColor;
 }
 
-@media (min-width: 860px) {
-  .ll-nav-links {
-    display: flex;
-  }
-  .ll-nav-phone,
-  .ll-nav-cta {
-    display: inline-flex;
-  }
-  .ll-nav-burger {
-    display: none;
-  }
+.ll-icon-btn:active {
+  transform: scale(0.94);
 }
 
-/* ---------- mobile menu ---------------------------------------------------------- */
-
-.ll-menu {
-  position: fixed;
-  inset: 0;
-  z-index: 45;
+/* Over the hero the quote button is white on the photo and sweeps to navy. */
+.ll-nav[data-solid="0"] .ll-nav-cta {
   background: var(--ll-white);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(96px, 16vh, 130px) var(--ll-gutter) clamp(32px, 6vh, 56px);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s var(--ll-ease), visibility 0s linear 0.3s;
+  border-color: var(--ll-white);
+  color: var(--ll-navy);
+  --ll-sweep: var(--ll-navy);
 }
 
-.ll-menu[data-open="1"] {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.3s var(--ll-ease);
-}
-
-.ll-menu-nav {
-  display: grid;
-  gap: 4px;
-}
-
-.ll-menu-nav a {
-  padding: 14px 0;
-  font-size: clamp(28px, 8vw, 40px);
-  font-family: var(--ll-font-brand);
-  border-bottom: 1px solid var(--ll-hairline);
-}
-
-.ll-menu-foot {
-  display: grid;
-  gap: 14px;
-  justify-items: start;
-}
-
-.ll-menu-foot a {
-  font-size: 15px;
-}
-
-.ll-menu-cta {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.7em 1.4em;
-  background: var(--ll-navy);
+.ll-nav[data-solid="0"] .ll-nav-cta:hover,
+.ll-nav[data-solid="0"] .ll-nav-cta:focus-visible {
   color: var(--ll-white);
 }
 
-@media (min-width: 860px) {
-  .ll-menu {
+/* Too little room on a phone for the name and the button: the mail icon
+   carries contact there. */
+@media (max-width: 699px) {
+  .ll-nav-cta {
     display: none;
   }
 }
 
-/* ---------- hero ------------------------------------------------------------------- */
+/* ---------- the travelling name ---------------------------------------------------
+   One fixed element. Nav.tsx sets its transform on scroll; the values below
+   are only its resting place at the top of the page, so the first paint
+   already has it in the middle of the hero. */
+
+.ll-site {
+  --ll-mark-size: clamp(46px, 11vw, 150px);
+}
+
+.ll-fly {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 0;
+  transform: translate3d(-50%, calc(44svh - 0.5 * var(--ll-mark-size)), 0);
+  color: var(--ll-gold);
+  pointer-events: none;
+  /* the middle of the photo has no navy over it, so the name and descriptor
+     carry a soft shadow of their own to hold on the pale cladding */
+  text-shadow: 0 2px 30px rgba(var(--ll-navy-rgb), 0.55), 0 1px 3px rgba(var(--ll-navy-rgb), 0.35);
+  transition: color 0.35s var(--ll-ease);
+  will-change: transform;
+}
+
+.ll-fly[data-solid="1"] {
+  color: var(--ll-navy);
+  text-shadow: none;
+}
+
+.ll-fly-name {
+  display: block;
+  font-family: var(--ll-font-brand);
+  font-weight: 400;
+  font-size: var(--ll-mark-size);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.ll-fly-desc {
+  display: block;
+  margin-top: 0.7em;
+  font-family: var(--ll-font-body);
+  font-size: clamp(11px, 1.05vw, 15px);
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ll-white);
+  opacity: var(--ll-desc, 1);
+}
+
+/* ---------- mail window (the /mt pattern) ------------------------------------------- */
+
+.ll-window {
+  position: fixed;
+  top: 74px;
+  right: var(--ll-gutter);
+  z-index: 60;
+  width: min(320px, calc(100vw - 2 * var(--ll-gutter)));
+  padding: 22px 24px 24px;
+  background: var(--ll-navy);
+  color: var(--ll-white);
+  box-shadow: 0 18px 50px -18px rgba(var(--ll-navy-rgb), 0.55);
+  display: grid;
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 -6px;
+  transition:
+    opacity 0.2s var(--ll-ease),
+    translate 0.2s var(--ll-ease),
+    visibility 0s linear 0.2s;
+}
+
+.ll-window[data-open="1"] {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    opacity 0.2s var(--ll-ease),
+    translate 0.2s var(--ll-ease);
+}
+
+.ll-window:focus {
+  outline: none;
+}
+
+.ll-window-label {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ll-window-label-gap {
+  margin-top: 12px;
+}
+
+.ll-window-lead {
+  font-family: var(--ll-font-brand);
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+  transition: color 0.2s var(--ll-ease);
+}
+
+.ll-window-phone {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ll-hairline-inverse);
+  font-size: 16px;
+  transition: color 0.2s var(--ll-ease), padding-left 0.25s var(--ll-ease);
+}
+
+.ll-window-phone span {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  align-self: center;
+}
+
+.ll-window-lead:hover,
+.ll-window-phone:hover {
+  color: var(--ll-gold);
+}
+
+.ll-window-phone:hover {
+  padding-left: 6px;
+}
+
+/* ---------- hero ------------------------------------------------------------------
+   The photograph full bleed, navy only at the top and the bottom. */
 
 .ll-hero {
   position: relative;
-  min-height: 100svh;
-  padding: clamp(120px, 20vh, 170px) 0 clamp(64px, 10vh, 110px);
-  display: flex;
-  align-items: center;
+  height: 100svh;
+  min-height: 560px;
   overflow: hidden;
   background: var(--ll-navy);
-  color: var(--ll-white);
 }
 
 .ll-hero-img {
@@ -439,48 +495,142 @@
   object-position: 50% 45%;
 }
 
-/* Navy scrim, heaviest at the top (behind the bar) and through the middle
-   where the statement sits, so white type holds AA on the bright sky. */
-.ll-hero-scrim {
+.ll-hero-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.ll-hero-shade-top {
+  top: 0;
+  height: 42%;
+  background: linear-gradient(180deg, rgba(var(--ll-navy-rgb), 0.9) 0%, rgba(var(--ll-navy-rgb), 0.55) 45%, rgba(var(--ll-navy-rgb), 0) 100%);
+}
+
+.ll-hero-shade-bottom {
+  bottom: 0;
+  height: 48%;
+  background: linear-gradient(0deg, rgba(var(--ll-navy-rgb), 0.92) 0%, rgba(var(--ll-navy-rgb), 0.55) 45%, rgba(var(--ll-navy-rgb), 0) 100%);
+}
+
+/* The laurel sits under the name and fades as the name passes it. */
+.ll-hero-laurel {
+  position: absolute;
+  left: 50%;
+  top: calc(44svh + 0.5 * var(--ll-mark-size) + clamp(64px, 11vh, 120px));
+  translate: -50% 0;
+  opacity: calc(1 - var(--ll-p, 0) * 3);
+}
+
+.ll-laurel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--ll-gold);
+}
+
+.ll-laurel-art {
+  position: relative;
+  width: clamp(64px, 5.4vw, 84px);
+  display: grid;
+  place-items: center;
+}
+
+.ll-laurel-art svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.ll-laurel-art path {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0.7;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  fill-opacity: 0;
+}
+
+.ll-laurel[data-drawn="1"] .ll-laurel-art path {
+  animation:
+    ll-laurel-draw 1.2s var(--ll-ease) var(--ll-delay, 0s) forwards,
+    ll-laurel-fill 0.5s var(--ll-ease) calc(var(--ll-delay, 0s) + 0.9s) forwards;
+}
+
+@keyframes ll-laurel-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ll-laurel-fill {
+  to {
+    fill-opacity: 1;
+  }
+}
+
+.ll-laurel-mark {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(var(--ll-navy-rgb), 0.55) 0%, rgba(var(--ll-navy-rgb), 0.2) 22%, rgba(var(--ll-navy-rgb), 0.2) 70%, rgba(var(--ll-navy-rgb), 0.45) 100%),
-    radial-gradient(ellipse 70% 55% at 50% 50%, rgba(var(--ll-navy-rgb), 0.5), rgba(var(--ll-navy-rgb), 0.1) 70%);
-}
-
-.ll-hero-inner {
-  position: relative;
   display: grid;
-  justify-items: center;
-  text-align: center;
-  gap: clamp(20px, 3vh, 32px);
-}
-
-.ll-hero-heading {
-  font-size: var(--ll-step-h1);
-  max-width: 16ch;
+  place-items: center;
+  padding-bottom: 8%;
+  font-family: var(--ll-font-brand);
+  font-size: clamp(20px, 1.8vw, 26px);
+  line-height: 1;
   color: var(--ll-white);
-  text-wrap: balance;
+  opacity: 0;
+  transform: translateY(6px);
 }
 
-.ll-hero-sub {
-  max-width: 46ch;
-  font-size: var(--ll-step-lead);
-  color: rgba(255, 255, 255, 0.88);
-  text-wrap: pretty;
+.ll-laurel-mask {
+  display: block;
+  overflow: hidden;
 }
 
-.ll-hero-cta {
-  margin-top: 4px;
-  background: var(--ll-white);
-  color: var(--ll-navy);
-  border-color: var(--ll-white);
-}
-
-.ll-hero-cta:hover {
-  background: transparent;
+.ll-laurel-unit {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  text-transform: uppercase;
   color: var(--ll-white);
+  transform: translateY(110%);
+}
+
+.ll-laurel[data-drawn="1"] .ll-laurel-mark {
+  animation: ll-rise 0.6s var(--ll-ease) calc(var(--ll-delay, 0s) + 1s) forwards;
+}
+
+.ll-laurel[data-drawn="1"] .ll-laurel-unit {
+  animation: ll-rise 0.6s var(--ll-ease) calc(var(--ll-delay, 0s) + 1.2s) forwards;
+}
+
+@keyframes ll-rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ll-laurel-art path {
+    stroke-dashoffset: 0;
+    fill-opacity: 1;
+  }
+  .ll-laurel[data-drawn="1"] .ll-laurel-art path,
+  .ll-laurel[data-drawn="1"] .ll-laurel-mark,
+  .ll-laurel[data-drawn="1"] .ll-laurel-unit {
+    animation: none;
+  }
+  .ll-laurel-mark,
+  .ll-laurel-unit {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ---------- story ------------------------------------------------------------------ */
@@ -600,12 +750,8 @@
   gap: 4px;
   padding: clamp(18px, 2.6vh, 24px) 4px;
   border-bottom: 1px solid var(--ll-hairline);
-  transition: padding-left 0.25s var(--ll-ease);
 }
 
-.ll-services-row:hover {
-  padding-left: 14px;
-}
 
 .ll-services-name {
   font-family: var(--ll-font-brand);
@@ -634,51 +780,96 @@
   }
 }
 
-/* ---------- testimonials ---------------------------------------------------------------- */
+/* ---------- reviews ------------------------------------------------------------------------
+   Cards, three across: stars, the quote, the name beside an initials badge. */
 
 .ll-testimonials {
   padding: clamp(72px, 12vh, 130px) 0;
-  background: var(--ll-navy);
-  color: var(--ll-white);
+  background: var(--ll-off-white);
 }
 
 .ll-testimonials .ll-section-title {
   text-align: center;
   margin-inline: auto;
-  margin-bottom: clamp(36px, 6vh, 64px);
+  margin-bottom: clamp(36px, 6vh, 56px);
 }
 
-.ll-testimonial-list {
+.ll-review-grid {
   display: grid;
-  gap: clamp(28px, 4vh, 44px);
-  max-width: 820px;
-  margin-inline: auto;
+  gap: 20px;
 }
 
-.ll-testimonial {
+@media (min-width: 860px) {
+  .ll-review-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.ll-review {
   margin: 0;
-  padding-bottom: clamp(28px, 4vh, 44px);
-  border-bottom: 1px solid var(--ll-hairline-inverse);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px 28px 24px;
+  background: var(--ll-white);
+  border: 1px solid var(--ll-hairline);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(var(--ll-navy-rgb), 0.05);
+  transition:
+    transform 0.35s var(--ll-ease),
+    box-shadow 0.35s var(--ll-ease),
+    border-color 0.35s var(--ll-ease);
 }
 
-.ll-testimonial:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
+.ll-review:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--ll-navy-rgb), 0.24);
+  box-shadow: 0 18px 40px -22px rgba(var(--ll-navy-rgb), 0.35);
 }
 
-.ll-testimonial blockquote {
+.ll-review-stars {
+  display: flex;
+  gap: 3px;
+  color: var(--ll-gold);
+}
+
+.ll-review-stars svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.ll-review blockquote {
   margin: 0;
-  font-size: var(--ll-step-lead);
+  flex: 1;
+  font-size: 16px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--ll-navy);
 }
 
-.ll-testimonial figcaption {
-  margin-top: 12px;
+.ll-review figcaption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ll-hairline);
+}
+
+.ll-review-avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--ll-navy);
+  color: var(--ll-white);
   font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.06em;
+}
+
+.ll-review-name {
+  font-size: 14px;
+  color: var(--ll-navy);
 }
 
 /* ---------- areas ------------------------------------------------------------------------ */
@@ -808,7 +999,7 @@
 .ll-footer {
   position: relative;
   background: var(--ll-white);
-  padding-top: clamp(64px, 10vh, 120px);
+  padding: clamp(56px, 9vh, 100px) 0 clamp(48px, 8vh, 88px);
   overflow: clip;
   border-top: 1px solid var(--ll-hairline);
 }
@@ -837,8 +1028,15 @@
   margin-bottom: 4px;
 }
 
-.ll-footer-grid a:hover {
-  color: var(--ll-navy-soft);
+.ll-footer-grid a {
+  width: fit-content;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.35s var(--ll-ease);
+}
+
+.ll-footer-grid a:hover,
+.ll-footer-grid a:focus-visible {
+  background-size: 100% 1px;
 }
 
 .ll-footer-credit {
@@ -853,124 +1051,5 @@
 @media (min-width: 700px) {
   .ll-footer-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-/* The name, rising in letter by letter as the footer scrolls into view.
-   Sized by Footer.tsx's measurement so it spans exactly gutter to gutter. */
-.ll-footer-word {
-  max-width: var(--ll-max);
-  margin: clamp(48px, 8vh, 100px) auto 0;
-  padding: 0 var(--ll-gutter) clamp(28px, 5vh, 48px);
-  display: flex;
-  font-family: var(--ll-font-brand);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 0.9;
-  color: var(--ll-navy);
-  white-space: nowrap;
-}
-
-.ll-footer-char {
-  display: block;
-  /* never let the letters shrink: the footer measures them to size the name */
-  flex: none;
-  overflow: hidden;
-  /* room for the y's descender inside the clipping box */
-  padding-bottom: 0.14em;
-  margin-bottom: -0.14em;
-}
-
-.ll-footer-char span {
-  display: block;
-  transform: translateY(110%);
-  transition: transform 0.8s var(--ll-ease);
-  transition-delay: calc(var(--ll-i) * 0.035s);
-}
-
-.ll-footer-word[data-in="1"] .ll-footer-char span {
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ll-footer-char span {
-    transform: none;
-    transition: none;
-  }
-}
-
-/* ---------- services page: intro + per-service sections -------------------------------------- */
-
-.ll-services-intro {
-  padding: clamp(130px, 22vh, 190px) 0 clamp(48px, 8vh, 88px);
-}
-
-.ll-services-intro-text {
-  margin-top: clamp(16px, 2.4vh, 24px);
-  max-width: 52ch;
-  font-size: var(--ll-step-lead);
-  color: var(--ll-navy-soft);
-}
-
-.ll-service {
-  padding: clamp(48px, 8vh, 96px) 0;
-}
-
-.ll-service:nth-child(odd) {
-  background: var(--ll-off-white);
-}
-
-.ll-service-inner {
-  display: grid;
-  gap: clamp(32px, 5vw, 64px);
-  align-items: center;
-}
-
-.ll-service-image img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-}
-
-.ll-service-copy {
-  display: grid;
-  gap: 14px;
-  align-content: start;
-}
-
-.ll-service-text {
-  font-size: var(--ll-step-body);
-  color: var(--ll-navy);
-}
-
-.ll-service-points {
-  margin-top: 8px;
-  display: grid;
-  gap: 8px;
-}
-
-.ll-service-points li {
-  padding-left: 18px;
-  position: relative;
-  font-size: 14px;
-  color: var(--ll-navy-soft);
-}
-
-.ll-service-points li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.65em;
-  width: 6px;
-  height: 1px;
-  background: var(--ll-navy-soft);
-}
-
-@media (min-width: 860px) {
-  .ll-service-inner {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .ll-service[data-reverse="1"] .ll-service-image {
-    order: 2;
   }
 }
