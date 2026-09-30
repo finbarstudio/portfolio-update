@@ -4844,8 +4844,8 @@ body:has(.case-study) { background-color: #fff; }
   margin-left: 0.04em;
 }
 
-/* The lab switch (components/LabSwitch.tsx): last in the nav (right-most), the height and
-   corner of the .tag pills beside it. A digital toggle: square knob carrying
+/* The lab switch (components/LabSwitch.tsx): last in the nav (right-most), the
+   14px height of the icons beside it. A digital toggle: square knob carrying
    the flask, slides right and lights pink when flipped, then .lab-wipe sweeps
    the screen black left to right and lab.finbar.studio loads under it. */
 .lab-switch {
@@ -4859,26 +4859,26 @@ body:has(.case-study) { background-color: #fff; }
 }
 .lab-switch-track {
   display: block;
-  width: 36px;
-  height: 20px;
+  width: 26px;
+  height: 14px;
   border: 1px solid var(--ink);
-  border-radius: 3px;
-  padding: 2px;
+  border-radius: 2px;
+  padding: 1px;
 }
 .lab-switch-knob {
   display: grid;
   place-items: center;
-  width: 14px;
-  height: 14px;
-  border-radius: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
   background: var(--ink);
   color: var(--bg);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s var(--ease);
 }
-.lab-switch-knob svg { width: 10px; height: 10px; display: block; }
+.lab-switch-knob svg { width: 8px; height: 8px; display: block; }
 .lab-switch:hover .lab-switch-knob,
 .lab-switch:focus-visible .lab-switch-knob { background: var(--pink); }
-.lab-switch[data-on="1"] .lab-switch-knob { transform: translateX(16px); background: var(--pink); }
+.lab-switch[data-on="1"] .lab-switch-knob { transform: translateX(12px); background: var(--pink); }
 /* right-most in the bar: its tip right-aligns so it stays on screen */
 .lab-switch .nav-tip { left: auto; right: 0; }
 .lab-switch:hover .nav-tip,
