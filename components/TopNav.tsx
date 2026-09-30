@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
 import { CursorManiaButton } from "@/components/cursormania/CursorMania";
+import LabSwitch from "@/components/LabSwitch";
 
 // Count what the /work grid actually shows — hidden projects don't count.
 const PROJECT_COUNT = projects.filter((p) => !p.hidden).length;
@@ -52,7 +53,10 @@ function GlobeIcon() {
   );
 }
 
-export default function TopNav() {
+/** `portfolio`: the /portfolio page wears this nav too, inverted on black (see
+ *  app/portfolio/layout.tsx) and carrying the CV download, which the main site
+ *  no longer shows. */
+export default function TopNav({ variant = "site" }: { variant?: "site" | "portfolio" }) {
   const pathname = usePathname();
 
   // Auto-hide the bar on scroll-down, slide it back on scroll-up. The logo rides
@@ -156,12 +160,14 @@ export default function TopNav() {
       </nav>
 
       <div className="top-nav-social">
-        {/* The CV, first on the right: a bold, tight "CV" as the glyph. Served
-            from /downloads with a save-as header. */}
-        <a href="/cv" download aria-label="Download CV (PDF)" className="top-nav-social-item top-nav-cv">
-          <span className="top-nav-cv-mark" aria-hidden="true">CV</span>
-          <span className="nav-tip" aria-hidden="true">Download CV</span>
-        </a>
+        {/* The CV, first on the right, on /portfolio only: a bold, tight "CV" as
+            the glyph. Served from /downloads with a save-as header. */}
+        {variant === "portfolio" && (
+          <a href="/cv" download aria-label="Download CV (PDF)" className="top-nav-social-item top-nav-cv">
+            <span className="top-nav-cv-mark" aria-hidden="true">CV</span>
+            <span className="nav-tip" aria-hidden="true">Download CV</span>
+          </a>
+        )}
         {socials.map((s) => (
           <a
             key={s.href}
@@ -177,6 +183,12 @@ export default function TopNav() {
             <span className="nav-tip" aria-hidden="true">{s.label}</span>
           </a>
         ))}
+        {/* After the socials, three spaced groups (a double gap before each,
+            .top-nav-apart): CursorMania, web.finbar, then the lab switch,
+            right-most. */}
+        {/* CursorMania: the 2004 cursor picker. Opens the XP window (mounted
+            in LayoutShell). */}
+        <CursorManiaButton />
         {/* web.finbar — the @web.finbar Instagram's site catalogue, a quiet
             greyscale destination distinct from the socials. */}
         <a
@@ -184,14 +196,12 @@ export default function TopNav() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="web.finbar, a catalogue of good websites (opens in a new tab)"
-          className="top-nav-social-item top-nav-web"
+          className="top-nav-social-item top-nav-web top-nav-apart"
         >
           <GlobeIcon />
           <span className="nav-tip" aria-hidden="true">web.finbar</span>
         </a>
-        {/* CursorMania: the 2004 cursor picker, last on the row. Opens the
-            XP window (mounted in LayoutShell). */}
-        <CursorManiaButton />
+        <LabSwitch className="top-nav-apart" />
       </div>
     </header>
   );

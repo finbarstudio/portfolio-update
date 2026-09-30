@@ -3533,9 +3533,12 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 11px;
   flex: 0 0 auto;
 }
+/* The groups after the socials (CursorMania, web.finbar, the lab switch) each
+   sit a double gap from what comes before them. */
+.top-nav-apart { margin-left: 11px; }
 .top-nav-social-item {
   /* Normalise by HEIGHT (not a fixed square) so non-square marks — the wide
      Are.na logo especially — read at the same optical size as the rest.
@@ -4556,30 +4559,6 @@ html:has(.contact-skin) { background: var(--pink-deep); }
 /* ── About: scroll "ink-in" bio ──────────────────────────────────────────
    The mission line sits centred in a padded full-height block; its words start
    faded and brighten line by line on scroll (ScrollRevealText + GSAP scrub). */
-/* About: the positioning note under the hero. A large opening line, then one
-   paragraph at reading size. Centred, like the bio further down the page. */
-.about-usp-sect { padding: 0 20px clamp(56px, 9vh, 112px); }
-.about-usp {
-  max-width: 44rem;
-  margin: 0 auto;
-  text-align: center;
-  color: var(--ink);
-  font-family: var(--font-sans);
-}
-.about-usp-lead {
-  font-size: clamp(1.6rem, 2.8vw, 2.6rem);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-  margin-bottom: 0.7em;
-}
-.about-usp p:not(.about-usp-lead) {
-  font-size: clamp(1.02rem, 1.25vw, 1.2rem);
-  line-height: 1.6;
-  color: var(--ink-soft);
-  text-wrap: pretty;
-}
-
 .about-bio-sect {
   min-height: 78svh;
   display: flex;
@@ -4863,4 +4842,64 @@ body:has(.case-study) { background-color: #fff; }
   font-family: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
   color: var(--pink);
   margin-left: 0.04em;
+}
+
+/* The lab switch (components/LabSwitch.tsx): last in the nav (right-most), the height and
+   corner of the .tag pills beside it. A digital toggle: square knob carrying
+   the flask, slides right and lights pink when flipped, then .lab-wipe sweeps
+   the screen black left to right and lab.finbar.studio loads under it. */
+.lab-switch {
+  position: relative;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ink);
+  flex: 0 0 auto;
+}
+.lab-switch-track {
+  display: block;
+  width: 36px;
+  height: 20px;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  padding: 2px;
+}
+.lab-switch-knob {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--bg);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s var(--ease);
+}
+.lab-switch-knob svg { width: 10px; height: 10px; display: block; }
+.lab-switch:hover .lab-switch-knob,
+.lab-switch:focus-visible .lab-switch-knob { background: var(--pink); }
+.lab-switch[data-on="1"] .lab-switch-knob { transform: translateX(16px); background: var(--pink); }
+/* right-most in the bar: its tip right-aligns so it stays on screen */
+.lab-switch .nav-tip { left: auto; right: 0; }
+.lab-switch:hover .nav-tip,
+.lab-switch:focus-visible .nav-tip { opacity: 1; transform: translateY(0); }
+.lab-switch:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; border-radius: 3px; }
+
+.lab-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+/* Back to the studio: its white, sweeping in from the right. */
+.lab-wipe[data-to="studio"] { background: #fff; transform: translateX(100%); }
+.lab-wipe[data-on="1"] {
+  transform: translateX(0);
+  transition: transform 0.75s cubic-bezier(0.76, 0, 0.24, 1) 0.12s;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-switch-knob, .lab-wipe[data-on="1"] { transition: none; }
 }

@@ -51,7 +51,7 @@ function WorkIntro() {
   return (
     <section id="hero" className="min-h-[60vh] flex flex-col items-center justify-center text-center px-5" aria-label="Introduction">
       <h1 className="text-ink font-medium leading-snug max-w-xl text-balance" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)" }}>
-        Graphic and digital designer. Brand, print, motion and websites.
+        Graphic and digital designer. Brand, motion and websites.
       </h1>
     </section>
   );

@@ -106,26 +106,6 @@ export default function AboutPage() {
           revealing (AboutRevealGate listens for "about:intro-done"). */}
       <AboutRevealGate>
 
-      {/* ── Where I sit: the price of a freelancer, the standard of a studio.
-          Above the services so the list below reads in that light. ──── */}
-      <section className="about-usp-sect" aria-label="How I work and what it costs">
-        <Reveal as="div" className="about-usp">
-          <p className="about-usp-lead">
-            I love building websites. I&rsquo;d be doing it at the weekend anyway.
-          </p>
-          <p>
-            You can get a site cheaply from a Fiverr gig, a Canva template or an
-            afternoon with an AI builder, and it will look like it. A big studio
-            will do it beautifully, then bill you for the account managers, the
-            meetings and the office. I do the studio version on my own. One
-            person designs it, codes it by hand and launches it, so nothing sits
-            waiting on a handover and the job moves quickly. That speed is why I
-            can charge a good deal less than a studio for the same standard of
-            work.
-          </p>
-        </Reveal>
-      </section>
-
       {/* ── Services: one row, each category its own column ──── */}
       <section id="contact" className="pt-2 pb-16 md:pb-24" aria-label="Services">
         <Reveal as="div" className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10">

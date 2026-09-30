@@ -155,7 +155,7 @@ export function CursorManiaButton() {
   return (
     <button
       type="button"
-      className="top-nav-social-item top-nav-cursor"
+      className="top-nav-social-item top-nav-cursor top-nav-apart"
       onClick={() => window.dispatchEvent(new CustomEvent(TOGGLE))}
       aria-haspopup="dialog"
       aria-label="CursorMania, pick a cursor"
