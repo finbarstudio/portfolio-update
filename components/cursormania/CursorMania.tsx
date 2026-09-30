@@ -97,6 +97,39 @@ function writeStore(cur: Current | null) {
   }
 }
 
+/* ── Clear a baked-in background ──────────────────────────────────
+   About half the static cursors are GIFs with no transparent colour: a solid
+   (usually white) square around the drawing. If the corner pixel is fully
+   opaque, treat its colour as the background and clear it by flood-filling
+   in from the edges, so the same colour INSIDE the drawing (eyes, highlights)
+   survives. Cursors that already have transparency have a clear corner and
+   are left alone. */
+function clearBackground(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const img = ctx.getImageData(0, 0, w, h);
+  const d = img.data;
+  if (d[3] < 255) return;
+  const [r, g, b] = [d[0], d[1], d[2]];
+  const near = (i: number) =>
+    d[i + 3] === 255 && Math.abs(d[i] - r) <= 8 && Math.abs(d[i + 1] - g) <= 8 && Math.abs(d[i + 2] - b) <= 8;
+  const seen = new Uint8Array(w * h);
+  const stack: number[] = [];
+  for (let x = 0; x < w; x++) stack.push(x, (h - 1) * w + x);
+  for (let y = 0; y < h; y++) stack.push(y * w, y * w + w - 1);
+  while (stack.length) {
+    const p = stack.pop()!;
+    if (seen[p]) continue;
+    seen[p] = 1;
+    if (!near(p * 4)) continue;
+    d[p * 4 + 3] = 0;
+    const x = p % w;
+    if (x > 0) stack.push(p - 1);
+    if (x < w - 1) stack.push(p + 1);
+    if (p >= w) stack.push(p - w);
+    if (p < w * (h - 1)) stack.push(p + w);
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
 /* ── Decode a GIF into frames + hotspot ──────────────────────────── */
 async function decodeGif(u: string): Promise<{ frames: Frame[]; first: ImageData }> {
   const frames: Frame[] = [];
@@ -117,6 +150,7 @@ async function decodeGif(u: string): Promise<{ frames: Frame[]; first: ImageData
       cv.height = image.displayHeight;
       ctx.clearRect(0, 0, cv.width, cv.height);
       ctx.drawImage(image, 0, 0);
+      clearBackground(ctx, cv.width, cv.height);
       if (i === 0) first = ctx.getImageData(0, 0, cv.width, cv.height);
       frames.push({ url: cv.toDataURL("image/png"), delay: Math.round((image.duration || 100000) / 1000) });
       image.close();
@@ -131,6 +165,7 @@ async function decodeGif(u: string): Promise<{ frames: Frame[]; first: ImageData
     cv.width = img.naturalWidth;
     cv.height = img.naturalHeight;
     ctx.drawImage(img, 0, 0);
+    clearBackground(ctx, cv.width, cv.height);
     first = ctx.getImageData(0, 0, cv.width, cv.height);
     frames.push({ url: cv.toDataURL("image/png"), delay: 100 });
   }
