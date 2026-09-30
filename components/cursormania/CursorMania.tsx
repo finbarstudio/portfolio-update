@@ -15,7 +15,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./cursormania.css";
-import { media } from "@/lib/media";
+import { media, corsMedia } from "@/lib/media";
 
 type Index = Record<string, Record<string, string[]>>;
 type Frame = { url: string; delay: number };
@@ -104,7 +104,9 @@ async function decodeGif(u: string): Promise<{ frames: Frame[]; first: ImageData
   const cv = document.createElement("canvas");
   const ctx = cv.getContext("2d")!;
   if ("ImageDecoder" in window) {
-    const buf = await (await fetch(u)).arrayBuffer();
+    // corsMedia: the picker also shows these gifs as plain <img>s, and the
+    // bucket's year-long cache would hand this CORS fetch that header-less copy.
+    const buf = await (await fetch(corsMedia(u))).arrayBuffer();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dec = new (window as any).ImageDecoder({ data: buf, type: "image/gif" });
     await dec.tracks.ready;
@@ -124,7 +126,7 @@ async function decodeGif(u: string): Promise<{ frames: Frame[]; first: ImageData
     // Safari / Firefox: no ImageDecoder, so the first frame stands still.
     const img = new Image();
     img.crossOrigin = "anonymous"; // drawn to a canvas then read back
-    img.src = u;
+    img.src = corsMedia(u);
     await img.decode();
     cv.width = img.naturalWidth;
     cv.height = img.naturalHeight;
