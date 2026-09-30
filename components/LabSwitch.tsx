@@ -59,9 +59,16 @@ export default function LabSwitch({ to = "lab", className = "" }: { to?: "lab" |
   const go = () => {
     if (leaving) return;
     setLeaving(true);
+    const url = targetUrl(to);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      window.location.assign(targetUrl(to));
+      window.location.assign(url);
+      return;
     }
+    // Load the next page the moment the wipe covers the screen: its 0.12s
+    // delay + 0.75s sweep (globals.css .lab-wipe). A timer, not transitionend:
+    // browsers name the clip-path transition differently (Safari reports it
+    // prefixed), so waiting on the event left the screen stuck on black.
+    window.setTimeout(() => window.location.assign(url), 900);
   };
 
   return (
@@ -89,9 +96,6 @@ export default function LabSwitch({ to = "lab", className = "" }: { to?: "lab" |
             data-to={to}
             data-on={leaving ? "1" : "0"}
             aria-hidden="true"
-            onTransitionEnd={(e) => {
-              if (leaving && e.propertyName === "clip-path") window.location.assign(targetUrl(to));
-            }}
           />,
           document.body,
         )}
