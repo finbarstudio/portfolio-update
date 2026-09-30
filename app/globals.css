@@ -3533,12 +3533,12 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 13px;
   flex: 0 0 auto;
 }
 /* The groups after the socials (CursorMania, web.finbar, the lab switch) each
-   sit a double gap from what comes before them. */
-.top-nav-apart { margin-left: 11px; }
+   sit a little further from what comes before them (19px, not a full double). */
+.top-nav-apart { margin-left: 6px; }
 .top-nav-social-item {
   /* Normalise by HEIGHT (not a fixed square) so non-square marks — the wide
      Are.na logo especially — read at the same optical size as the rest.
