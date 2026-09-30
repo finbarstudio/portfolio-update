@@ -24,7 +24,7 @@ const img = (name: string) => `/media/images/moto-technique/${name}.webp`;
  * real destination are left alone: phone, email, maps, Instagram, the auction
  * and the film.
  */
-const SOON = "/mt/soon";
+const SOON = "/demo?site=mt";
 
 export type HeroSlide = {
   id: string;
@@ -569,19 +569,7 @@ export const site = {
   ],
 };
 
-/** The holding page every unbuilt link lands on. The details are the studio's, not the client's. */
-export const soon = {
-  heading: "To be built",
-  body: "This page is part of the full build. The home page is the demonstration.",
-  by: "Design and build by Finbar Studio",
-  email: "finbar@finbar.studio",
-  phone: "+44 7876 492551",
-  phoneHref: "tel:+447876492551",
-  web: { label: "www.finbar.studio", href: "https://www.finbar.studio" },
-};
-
 const content = mediaDeep({
-  soon,
   hero,
   heroPhone,
   heroMark,

@@ -4854,3 +4854,13 @@ body:has(.case-study) { background-color: #fff; }
   .case-intro-lead .flex-wrap { justify-content: center; }
   .case-step { margin-inline: auto; }
 }
+
+/* The studio credit in every demo site's footer (components/DemoCredit.tsx).
+   Colour and size come from the demo footer it sits in. */
+.demo-credit { color: inherit; text-decoration: none; white-space: nowrap; }
+.demo-credit:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.demo-credit-mark .brand-wordmark-star {
+  font-family: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
+  color: var(--pink);
+  margin-left: 0.04em;
+}

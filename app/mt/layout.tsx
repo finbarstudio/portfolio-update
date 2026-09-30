@@ -7,7 +7,7 @@ import "./moto-technique-site.css";
  *
  * This layout is the shell every /mt page shares: the fonts, the stylesheet and
  * the .mt-site wrapper. The home page's own furniture (bar, preloader, smooth
- * scroll, cursor) is in (home)/layout.tsx, so /mt/soon gets none of it.
+ * scroll, cursor) is in (home)/layout.tsx. Unbuilt links go to the studio /demo page.
  *
  * Lives outside app/(site) so LayoutShell never mounts: no portfolio nav,
  * footer, preloader, grain or CursorMania. noindex because this is a pitch,

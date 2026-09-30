@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import DemoCredit from "@/components/DemoCredit";
 
 /**
  * The footer, and the only thing after the services.
@@ -119,6 +120,7 @@ export default function Footer({
               {l.label}
             </a>
           ))}
+          <DemoCredit className="mt-footer-quiet" />
         </div>
       </div>
 
