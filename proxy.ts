@@ -2,15 +2,16 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * proxy — host-based rewrite for the Sandbox and web.finbar subdomains.
+ * proxy — host-based rewrite for the Sandbox, web.finbar and lab subdomains.
  *
  * NOTE (Next 16): the `middleware` file convention was renamed to `proxy`
  * (function `proxy`, file `proxy.ts`). This is the same edge/Node entry point.
  *
  * `sandbox.finbar.studio/<path>` is rewritten to `/sandbox/<path>`, and
  * `web.finbar.studio/<path>` is rewritten to `/web/<path>`, so both live in the
- * same app/deploy as the portfolio. `/embed/*` stays reachable on every host
- * (stable embed URLs) — sandbox only. The sandbox's canonical redirect
+ * same app/deploy as the portfolio. `lab.finbar.studio/<path>` is rewritten to
+ * `/lab/<path>` the same way (unpublished experiments, e.g. /gemfest).
+ * `/embed/*` stays reachable on every host (stable embed URLs) — sandbox only. The sandbox's canonical redirect
  * (www/apex `/sandbox/*` → the subdomain) is unconditional here — same as it
  * always was — this refactor only extracts the shared rewrite logic into
  * `subdomain()`, it does not change sandbox behaviour. The `/web/*` → web.finbar
@@ -20,6 +21,7 @@ import type { NextRequest } from "next/server";
 
 const SANDBOX_HOSTS = new Set(["sandbox.finbar.studio", "sandbox.localhost"]);
 const WEB_HOSTS = new Set(["web.finbar.studio", "web.localhost"]);
+const LAB_HOSTS = new Set(["lab.finbar.studio", "lab.localhost"]);
 const MAIN_HOSTS = new Set(["www.finbar.studio", "finbar.studio"]);
 
 /**
@@ -71,10 +73,13 @@ export function proxy(request: NextRequest): NextResponse {
   // ── web.finbar subdomain: clean URLs (no visible /web prefix) ───────────────
   if (WEB_HOSTS.has(host)) return subdomain(request, "web", false);
 
+  // ── lab subdomain: clean URLs (no visible /lab prefix) ──────────────────────
+  if (LAB_HOSTS.has(host)) return subdomain(request, "lab", false);
+
   // ── Main host: subdomain sections live on their own hosts, so 308 their
   //    prefixed paths there if they're ever hit directly on www/apex. ────────
   // Whole-segment match only: `/web-design` is a main-site page, not `/web`.
-  for (const [prefix, canonical] of [["sandbox", "sandbox.finbar.studio"], ["web", "web.finbar.studio"]] as const) {
+  for (const [prefix, canonical] of [["sandbox", "sandbox.finbar.studio"], ["web", "web.finbar.studio"], ["lab", "lab.finbar.studio"]] as const) {
     if (MAIN_HOSTS.has(host) && (pathname === `/${prefix}` || pathname.startsWith(`/${prefix}/`))) {
       const url = request.nextUrl.clone();
       url.host = canonical;

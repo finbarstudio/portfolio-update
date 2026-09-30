@@ -1,0 +1,197 @@
+/**
+ * lab.finbar — styling for the /lab section (unpublished experiments). The
+ * catalogue is web.finbar's layout on the black /portfolio palette: one
+ * typeface, one size, a strict 3-column grid, a deliberate empty void before
+ * content. Every class here is prefixed `.lb-`.
+ *
+ * OPENING STATE: the first paint of every lab page is fully black with nothing
+ * visible. `.lb-fade` children start at opacity 0 and LabRoot adds `.is-in` on
+ * mount, which fades/rises them in (staggered by --i).
+ */
+
+/* Both html and body: globals.css paints html in the portfolio's cream, and
+   html is what shows in the rubber-band gap and before anything paints. */
+html:has(.lb-root),
+body:has(.lb-root) {
+  background: #000;
+}
+
+.lb-root {
+  --lb-bg: #000000;
+  --lb-ink: #f3f1ee;
+  --lb-soft: #9a938b;
+  --lb-line: #2a2724;
+  min-height: 100svh;
+  background: var(--lb-bg);
+  color: var(--lb-ink);
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.lb-root a {
+  color: inherit;
+  text-decoration: none;
+}
+.lb-root a:hover {
+  color: var(--lb-soft);
+}
+
+/* ── Opening state ─────────────────────────────────────────────────── */
+.lb-fade {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.lb-root.is-in .lb-fade {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 560ms ease calc(var(--i, 0) * 90ms),
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i, 0) * 90ms);
+}
+/* Opacity-only variant for full-bleed pieces (no transform: a transformed
+   ancestor would break the piece's position:fixed / sticky children). */
+.lb-fade-only {
+  opacity: 0;
+}
+.lb-root.is-in .lb-fade-only {
+  opacity: 1;
+  transition: opacity 560ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-fade {
+    transform: none;
+  }
+  .lb-root.is-in .lb-fade {
+    transition: opacity 400ms ease;
+  }
+  .lb-root.is-in .lb-fade-only {
+    transition: opacity 400ms ease;
+  }
+}
+
+/* ── Grid ──────────────────────────────────────────────────────────── */
+.lb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0 6px;
+}
+
+.lb-header {
+  padding-top: 6px;
+  align-items: center;
+  /* the lab switch reads the site's palette variables: invert them here so it
+     sits light-on-black like the rest of the lab */
+  --ink: #f3f1ee;
+  --bg: #000000;
+}
+.lb-nav {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+}
+.lb-right {
+  text-align: right;
+}
+.lb-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  justify-self: start;
+}
+.lb-logo {
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* The deliberate empty space before content starts. */
+.lb-void {
+  height: clamp(220px, 48vh, 440px);
+}
+
+.lb-row {
+  margin-bottom: 6px;
+}
+
+/* ── Tiles ─────────────────────────────────────────────────────────── */
+/* A tile is a 3:4 still or clip that fills the tile edge to edge. Greyscale
+   until hovered; touch screens have no hover, so they get colour. */
+.lb-tile {
+  display: block;
+  position: relative;
+  background: #111;
+  border: 1px solid var(--lb-line);
+  border-radius: 2px;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+.lb-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1);
+  transition: filter 0.35s ease;
+}
+.lb-tile:hover .lb-media {
+  filter: none;
+}
+@media (hover: none) {
+  .lb-media {
+    filter: none;
+  }
+}
+
+.lb-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lb-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 14px;
+}
+.lb-label .lb-num {
+  color: var(--lb-soft);
+  font-variant-numeric: tabular-nums;
+}
+.lb-line {
+  margin: 0;
+  line-height: 18px;
+  color: var(--lb-soft);
+}
+
+/* Bottom breathing room in place of a footer (there isn't one). */
+.lb-root main {
+  padding-bottom: 48px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .lb-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 639px) {
+  .lb-grid {
+    grid-template-columns: 1fr;
+  }
+  .lb-header {
+    grid-template-columns: 1fr auto;
+  }
+  .lb-header > span:empty {
+    display: none;
+  }
+  .lb-row {
+    grid-template-columns: 1fr auto auto;
+  }
+}

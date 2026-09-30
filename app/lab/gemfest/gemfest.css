@@ -1,0 +1,273 @@
+/**
+ * GemFest hero, ported from the standalone site's styles.css (hero parts only:
+ * no nav, sections or footer). Everything is scoped under `.lab-gemfest`, and
+ * it keeps the original white ground. No `url()` into /media here: the logo,
+ * video and grain are all set through media() in GemfestHero.tsx.
+ */
+
+/* Lenis drives the scroll; the site-wide smooth-scroll would fight it. */
+html:has(.lab-gemfest) {
+  scroll-behavior: auto;
+}
+/* GemFest keeps its own white ground (the rest of the lab is black). */
+html:has(.lab-gemfest),
+body:has(.lab-gemfest) {
+  background: #fff;
+}
+
+.lab-gemfest {
+  --gf-bg: #fff;
+  position: relative;
+  background: var(--gf-bg);
+  color: #111;
+}
+
+.lab-gemfest *,
+.lab-gemfest *::before,
+.lab-gemfest *::after {
+  box-sizing: border-box;
+}
+
+/* ===== Preloader ===== */
+.lab-gemfest .gf-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--gf-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lab-gemfest .gf-preloader__logo {
+  width: min(60vw, 640px);
+  height: auto;
+  clip-path: inset(100% 0 0 0); /* mask reveal wipes up via JS */
+}
+
+/* ===== Hero ===== */
+.lab-gemfest .gf-hero {
+  height: 380vh; /* scroll runway: reveal + full-video hold */
+  position: relative;
+}
+
+/* mobile: shorter runway */
+@media (max-width: 760px) {
+  .lab-gemfest .gf-hero {
+    height: 230vh;
+  }
+}
+
+.lab-gemfest .gf-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--gf-bg);
+}
+
+/* the stage the logo window sits in. The logo shape itself comes from the SVG
+   clipPath on .clip-window (no CSS mask: the original disabled it on every
+   device). Own compositing layer so iOS Safari doesn't let a playing <video>
+   escape the clip. */
+.lab-gemfest .gf-video-mask {
+  position: absolute;
+  inset: 0;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+/* a logo-shaped hole (SVG clipPath) around a viewport-fixed inner layer; JS
+   drives its size. Zero until JS sets it, so nothing shows before the intro. */
+.lab-gemfest .clip-window {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+  -webkit-clip-path: url(#gfLogoClip);
+  clip-path: url(#gfLogoClip);
+  will-change: width, height;
+}
+.lab-gemfest .clip-inner {
+  position: absolute;
+}
+
+/* full height fits 100vh, aspect kept; the strip is centred and
+   live-mirrored left + right (box-reflect) to fill the sides */
+.lab-gemfest .gf-strip {
+  /* transform centring (not inset+margin:auto): when the 4/3 strip is
+     WIDER than the viewport, auto margins resolve to 0 and pin it left.
+     This centres correctly at every aspect ratio. */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  aspect-ratio: 4 / 3; /* 1440x1080 footage */
+}
+
+/* strip covers the viewport (portrait phones/tablets): no side gap,
+   so no mirrors and no edge blur (JS toggles this) */
+.lab-gemfest .no-side .strip-mirror,
+.lab-gemfest .no-side .pblur {
+  display: none;
+}
+
+/* enlarged mirror layer sits behind the sharp centre */
+.lab-gemfest .strip-mirror {
+  position: absolute;
+  inset: 0;
+  transform: scale(1.25);
+}
+
+.lab-gemfest .vreflect {
+  width: 100%;
+  height: 100%;
+}
+
+.lab-gemfest .vreflect--right {
+  -webkit-box-reflect: right 0;
+}
+
+.lab-gemfest .vreflect--left {
+  -webkit-box-reflect: left 0;
+}
+
+/* sharp central video, scales up over the mirrors on scroll */
+.lab-gemfest .strip-center {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  will-change: transform;
+}
+
+.lab-gemfest .gf-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* progressive blur: stacked backdrop layers, each masked so blur
+   builds from nothing mid-screen to heavy at the viewport edges */
+.lab-gemfest .pblur {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: calc(50% - 50vw); /* escape the 4/3 strip: span full viewport */
+  width: 100vw;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* narrow strips only over the sides: a fraction of the GPU cost
+   of full-viewport backdrop layers */
+.lab-gemfest .pblur--1 {
+  /* left, inner soft */
+  width: calc(var(--sideW, 12.5vw) * 1.35); /* sized to the real side gap */
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 0%, #000 45%, transparent 100%);
+}
+
+.lab-gemfest .pblur--2 {
+  /* left, outer heavy */
+  width: calc(var(--sideW, 12.5vw) * 0.6);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 0%, #000 55%, transparent 100%);
+}
+
+.lab-gemfest .pblur--3 {
+  /* right, inner soft */
+  left: auto;
+  right: calc(50% - 50vw);
+  width: calc(var(--sideW, 12.5vw) * 1.35);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 0%, #000 45%, transparent 100%);
+}
+
+.lab-gemfest .pblur--4 {
+  /* right, outer heavy */
+  left: auto;
+  right: calc(50% - 50vw);
+  width: calc(var(--sideW, 12.5vw) * 0.6);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 0%, #000 55%, transparent 100%);
+}
+
+/* vignette: inside the window so it only ever tints the video;
+   spans the full viewport, darkens toward the edges */
+.lab-gemfest .vignette {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%, rgba(4, 10, 30, 0.36) 100%);
+}
+
+/* WebGL icon field (canvas is created by hero.ts) */
+.lab-gemfest .gf-gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* subtle bitmap grain over the hero (image set inline through media()) */
+.lab-gemfest .gf-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background-repeat: repeat;
+  background-size: 140px 140px;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+}
+
+@media (max-width: 760px) {
+  /* Mobile: no mirrors or vignette, and no fullscreen backdrop-filter stacks
+     (a jank machine on phones; the sharp centre strip already covers a
+     portrait viewport). */
+  .lab-gemfest .strip-mirror {
+    display: none;
+  }
+  .lab-gemfest .vignette {
+    display: none;
+  }
+  .lab-gemfest .pblur {
+    display: none;
+  }
+
+  /* preloader logo: much smaller on phones (matches the 44vw window handoff) */
+  .lab-gemfest .gf-preloader__logo {
+    width: 42vw;
+  }
+
+  /* Portrait: the 4/3 strip is WIDER than the screen, and over-constrained
+     inset+margin:auto centring pins it LEFT (auto margins resolve to 0 when the
+     free space is negative). Centre by transform instead. */
+  .lab-gemfest .gf-strip {
+    inset: auto;
+    margin: 0;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
