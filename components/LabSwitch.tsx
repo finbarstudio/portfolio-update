@@ -90,7 +90,7 @@ export default function LabSwitch({ to = "lab", className = "" }: { to?: "lab" |
             data-on={leaving ? "1" : "0"}
             aria-hidden="true"
             onTransitionEnd={(e) => {
-              if (leaving && e.propertyName === "transform") window.location.assign(targetUrl(to));
+              if (leaving && e.propertyName === "clip-path") window.location.assign(targetUrl(to));
             }}
           />,
           document.body,

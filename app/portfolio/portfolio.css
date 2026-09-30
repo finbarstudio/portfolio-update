@@ -10,17 +10,15 @@
    to 2x2. Nothing else changes on a phone. */
 
 html:has(.pf),
-body:has(.pf) { background: #000; }
+body:has(.pf) { background: #f3f1ee; }
 
 .pf {
-  /* inverted to a black ground (30 Sep 2026): the deep brand maroon vanishes
-     on black, so the brand colour is the main pink here */
-  --paper: #000000;
-  --ink: #f3f1ee;
-  --soft: #9a938b;
-  --brand: #e96d89;
+  --paper: #f3f1ee;
+  --ink: #211e1a;
+  --soft: #8c857e;
+  --brand: #510415;
   --pink: #e96d89;
-  --line: #2a2724;
+  --line: #d9d3cc;
   --u: 1cqw;
   background: var(--paper);
   color: var(--ink);
@@ -159,7 +157,7 @@ body:has(.pf) { background: #000; }
   overflow: hidden;
   background: transparent;
 }
-.pf-item.is-framed { border-radius: calc(var(--u) * 0.4); box-shadow: 0 0 0 1px var(--line); background: #161412; }
+.pf-item.is-framed { border-radius: calc(var(--u) * 0.4); box-shadow: 0 0 0 1px var(--line); background: #e8e4df; }
 .pf-item img, .pf-item video { display: block; width: 100%; height: 100%; object-fit: contain; }
 .pf-item .pf-vid { width: 100%; height: 100%; }
 .pf-caption {
@@ -206,18 +204,3 @@ body:has(.pf) { background: #000; }
   .pf-media.is-4 .pf-item { flex: 0 0 calc((100% - 8px) / 2); }
   .pf-media .pf-caption { position: static; padding: 0 18px 16px; }
 }
-
-/* ── the nav on black (app/portfolio/layout.tsx) ────────────────── */
-/* The site's nav and logo read the palette variables, so swapping them here
-   inverts both without touching the main site. The maroon brand dark vanishes
-   on black, so it borrows the main pink, as the rest of this page does. */
-.pf-chrome {
-  --ink: #f3f1ee;
-  --ink-soft: #9a938b;
-  --bg: #000000;
-  --line: #2a2724;
-  --pink-deep: #e96d89;
-}
-.pf-chrome .top-nav-web { color: #9a938b; }
-/* clear the fixed bar */
-.pf { padding-top: var(--menubar-h); }

@@ -2,8 +2,9 @@ import { LAB_ITEMS } from "@/content/lab-items";
 import LabHeader from "@/components/lab/LabHeader";
 
 /**
- * The lab grid: the same shape as web.finbar's catalogue (empty void, a count
- * row, then a strict 3-column grid of 3:4 tiles), on black. Newest first.
+ * The lab grid: the same shape as web.finbar's catalogue (empty void, then a
+ * strict 3-column grid of 3:4 tiles), on black. Plain: each tile carries only
+ * its number. Newest first.
  * No pagination and no submit form yet. Each tile is a looping clip that
  * starts greyscale and goes colour on hover (touch screens get colour).
  */
@@ -15,14 +16,6 @@ export default function LabCatalogue() {
       <LabHeader />
 
       <div className="lb-void" />
-
-      <div className="lb-grid lb-row lb-fade" style={{ "--i": 1 } as React.CSSProperties}>
-        <span>
-          {items.length} {items.length === 1 ? "experiment" : "experiments"}
-        </span>
-        <span />
-        <span />
-      </div>
 
       <div className="lb-grid">
         {items.map((item, i) => (
@@ -48,10 +41,8 @@ export default function LabCatalogue() {
               )}
             </a>
             <div className="lb-label">
-              <a href={item.href}>{item.name}</a>
               <span className="lb-num">{String(item.id).padStart(4, "0")}</span>
             </div>
-            <p className="lb-line">{item.line}</p>
           </article>
         ))}
       </div>

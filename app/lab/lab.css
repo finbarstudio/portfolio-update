@@ -164,11 +164,6 @@ body:has(.lb-root) {
   color: var(--lb-soft);
   font-variant-numeric: tabular-nums;
 }
-.lb-line {
-  margin: 0;
-  line-height: 18px;
-  color: var(--lb-soft);
-}
 
 /* Bottom breathing room in place of a footer (there isn't one). */
 .lb-root main {
