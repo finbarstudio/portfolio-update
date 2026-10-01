@@ -249,3 +249,135 @@
 div.stb-slider {
   margin-bottom: 4px;
 }
+
+/* ── Phone ──────────────────────────────────────────────────────────────────
+   The preview sits across the top and stays put; the controls scroll beneath
+   it, sized for a thumb. The page itself still never scrolls. */
+@media (max-width: 760px) {
+  .stb-tool {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 40dvh minmax(0, 1fr);
+    font-size: 15px;
+  }
+  .stb-stage {
+    order: -1;
+    margin: 12px;
+  }
+  .stb-panel {
+    gap: 18px;
+    padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgb(10 10 51 / 0.15);
+    overscroll-behavior: contain;
+  }
+  .stb-panel h1 {
+    font-size: 18px;
+  }
+  .stb-panel h2 {
+    margin-bottom: 8px;
+    font-size: 11px;
+  }
+  .stb-seg {
+    gap: 6px;
+  }
+  .stb-seg button,
+  .stb-primary {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+  .stb-swatches {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  .stb-seed {
+    margin-bottom: 12px;
+  }
+  /* 16px stops iOS zooming the page when a field is tapped */
+  .stb-tool input[type="number"],
+  .stb-text {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  /* Sliders: the label and value sit on one line, the track gets the full
+     width below with a thumb big enough to grab. */
+  .stb-slider {
+    grid-template-columns: 1fr auto;
+    row-gap: 2px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  .stb-slider output {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .stb-slider input[type="range"] {
+    grid-column: 1 / -1;
+    height: 44px;
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    touch-action: pan-y;
+  }
+  .stb-slider input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 3px;
+    background: rgb(10 10 51 / 0.18);
+  }
+  .stb-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 30px;
+    height: 30px;
+    margin-top: -12px;
+    border: 3px solid var(--rose);
+    border-radius: 50%;
+    background: var(--pink);
+    box-shadow: 0 1px 4px rgb(10 10 51 / 0.35);
+  }
+  .stb-slider input[type="range"]::-moz-range-track {
+    height: 6px;
+    border-radius: 3px;
+    background: rgb(10 10 51 / 0.18);
+  }
+  .stb-slider input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--rose);
+    border-radius: 50%;
+    background: var(--pink);
+  }
+  /* The thickness row is buttons, not a track */
+  div.stb-slider {
+    grid-template-columns: 1fr;
+  }
+  div.stb-slider output {
+    display: none;
+  }
+  .stb-slider .stb-seg button {
+    padding: 10px 12px;
+  }
+
+  .stb-check {
+    height: 44px;
+    gap: 12px;
+  }
+  .stb-check input {
+    width: 22px;
+    height: 22px;
+  }
+  .stb-presets button {
+    padding: 10px 12px;
+  }
+  .stb-presets button i {
+    width: 20px;
+    height: 20px;
+  }
+  .stb-export {
+    margin-top: 0;
+    gap: 10px;
+  }
+  .stb-back {
+    font-size: 13px;
+    padding: 8px 0;
+  }
+}
