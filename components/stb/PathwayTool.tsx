@@ -96,25 +96,54 @@ function locate(cum: number[], d: number) {
   return lo;
 }
 
+/**
+ * Add points from..to to the current path as smooth curves, not straight
+ * pieces. Each curve leaves a point in the direction the next one arrives in
+ * (a Catmull-Rom spline through the walk's points), so there is no corner at
+ * any point and nothing for the renderer to join.
+ *
+ * That matters: fed hundreds of short straight pieces, Safari and iOS treat
+ * the tiny turn between two of them as no turn at all and skip the join, which
+ * leaves a long thin wedge of background showing on the outside of every bend.
+ * Chrome does not. With curves there is no join to skip.
+ *
+ * The directions always come from the whole line, never from the stretch being
+ * drawn, so a stretch laid over the line sits exactly on it.
+ */
+function trace(ctx: CanvasRenderingContext2D, pts: number[], S: number, from: number, to: number) {
+  const last = pts.length / 2 - 1;
+  const x = (i: number) => pts[Math.max(0, Math.min(last, i)) * 2] * S;
+  const y = (i: number) => pts[Math.max(0, Math.min(last, i)) * 2 + 1] * S;
+  ctx.moveTo(x(from), y(from));
+  for (let i = from; i < to; i++) {
+    ctx.bezierCurveTo(
+      x(i) + (x(i + 1) - x(i - 1)) / 6,
+      y(i) + (y(i + 1) - y(i - 1)) / 6,
+      x(i + 1) - (x(i + 2) - x(i)) / 6,
+      y(i + 1) - (y(i + 2) - y(i)) / 6,
+      x(i + 1),
+      y(i + 1),
+    );
+  }
+}
+
 /** Stroke points from..to of the line. */
 function strokeLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, from: number, to: number, look: Look, gPhase: number, w: number, h: number) {
   const { pts, cum } = path;
   if (look.alpha === "line") ctx.globalCompositeOperation = "destination-out"; // cut the line out of the background
   if (look.line === "gradient" && look.flow && look.alpha !== "line") {
     // No canvas gradient can follow a curve, so the line goes down as short
-    // pieces, each its own colour, each overlapping the next to hide the joins.
+    // pieces, each its own colour, each overlapping the next to hide the seams.
     for (let i = from; i < to; i++) {
       ctx.strokeStyle = flowColour(cum[i] / FLOW_PERIOD - gPhase);
       ctx.beginPath();
-      ctx.moveTo(pts[i * 2] * S, pts[i * 2 + 1] * S);
-      for (let j = i + 1; j <= Math.min(i + 2, to); j++) ctx.lineTo(pts[j * 2] * S, pts[j * 2 + 1] * S);
+      trace(ctx, pts, S, i, Math.min(i + 2, to));
       ctx.stroke();
     }
   } else {
     ctx.strokeStyle = look.line === "gradient" ? canvasGradient(ctx, w, h, look.angle, gPhase) : look.line;
     ctx.beginPath();
-    ctx.moveTo(pts[from * 2] * S, pts[from * 2 + 1] * S);
-    for (let i = from + 1; i <= to; i++) ctx.lineTo(pts[i * 2] * S, pts[i * 2 + 1] * S);
+    trace(ctx, pts, S, from, to);
     ctx.stroke();
   }
   ctx.globalCompositeOperation = "source-over";
