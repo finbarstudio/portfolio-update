@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { generatePathway, type Pathway } from "./pathway";
-import { BRANDS, GRADIENT, TEXT_COLOURS, autoTextColours, type BrandKey } from "./palette";
+import { BRANDS, GRADIENT, textPresets, type BrandKey } from "./palette";
 import { media, corsMedia } from "@/lib/media";
 
 /**
@@ -121,15 +121,21 @@ function strokeLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, fro
  * tPhase 0 to 1 slides it forward by one full set of colours, so a loop joins up.
  * `range` (px along the line) limits it to the letters around one stretch.
  */
-function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
+function ticker(ctx: CanvasRenderingContext2D, text: string, strokePx: number) {
   const size = strokePx * 0.42;
   ctx.font = `700 ${size}px ${FONT}`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  const chars = [...look.text.toUpperCase()];
+  const chars = [...text.toUpperCase()];
   const widths = chars.map((ch) => ctx.measureText(ch).width);
   const tracking = size * 0.1;
+  /** One repeat of the text plus the gap after it, in px. */
   const period = widths.reduce((a, b) => a + b + tracking, 0) + size * 1.5;
+  return { size, chars, widths, tracking, period };
+}
+
+function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
+  const { size, chars, widths, tracking, period } = ticker(ctx, look.text, strokePx);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
   const { pts, cum } = path;
   const total = cum[cum.length - 1] * S;
   const n = look.textColours.length;
@@ -209,14 +215,20 @@ export default function PathwayTool() {
   const [seed, setSeed] = useState(1);
   const [p, setP] = useState({ rMin: 0.28, rMax: 0.75, length: 5, loop: 0.3, maxCross: 1 });
   const [text, setText] = useState("");
-  const [textColours, setTextColours] = useState<string[]>([]);
+  const [textPreset, setTextPreset] = useState(0);
+  /** How fast the text travels: % of the short side per second. */
+  const [textSpeed, setTextSpeed] = useState(5);
   const [alpha, setAlpha] = useState<Alpha>("none");
   const [flow, setFlow] = useState(false);
   const [angle, setAngle] = useState(30);
   const [animateGradient, setAnimateGradient] = useState(false);
   const [scrollText, setScrollText] = useState(false);
+  const [gradientSecs, setGradientSecs] = useState(8);
+  /** The length of one seamless loop, worked out in the draw effect. */
   const [loopSecs, setLoopSecs] = useState(8);
-  const [recording, setRecording] = useState(false);
+  /** null, or how far through an MP4 export we are (0 to 1). */
+  const [progress, setProgress] = useState<number | null>(null);
+  const recording = progress !== null;
   const [fontReady, setFontReady] = useState(false);
 
   useEffect(() => {
@@ -242,6 +254,7 @@ export default function PathwayTool() {
   const gradientMoves = animateGradient && isGradient;
   const textMoves = scrollText && shownText !== "";
   const moving = gradientMoves || textMoves;
+  const presets = textPresets(colours.line);
   const path = generatePathway(seed, w / short, h / short, { ...p, stroke: STROKE });
 
   const look: Look = {
@@ -250,18 +263,36 @@ export default function PathwayTool() {
     // Video has no transparency, so anything that moves is always solid.
     alpha: moving ? "none" : alpha,
     text: shownText,
-    textColours: textColours.length ? textColours : autoTextColours(colours.line),
+    textColours: (presets[textPreset] ?? presets[0]).colours,
     angle,
     flow,
   };
 
+  /**
+   * One loop, so that a video always joins up with itself. Scrolling text sets
+   * the length: the time it takes to travel one full set of its colours at the
+   * chosen speed, after which every letter and colour is back where it began.
+   * The gradient then fits a whole number of runs into that time. With no
+   * scrolling text the loop is simply the gradient's own length.
+   */
+  const timing = (ctx: CanvasRenderingContext2D) => {
+    if (!textMoves) return { secs: gradientSecs, cycles: 1 };
+    const set = ticker(ctx, look.text, STROKE * short).period * look.textColours.length;
+    const secs = set / ((textSpeed / 100) * short);
+    return { secs, cycles: Math.max(1, Math.round(secs / gradientSecs)) };
+  };
+  /** Draw the frame at t (0 to 1) through the loop. */
+  const frame = (ctx: CanvasRenderingContext2D, t: number, cycles: number) =>
+    render(ctx, w, h, path, look, gradientMoves ? (t * cycles) % 1 : 0, textMoves ? t : 0);
+
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");
-    if (!ctx) return;
+    if (!ctx || recording) return; // an export draws its own frames
+    const { secs, cycles } = timing(ctx);
+    if (Math.abs(secs - loopSecs) > 0.01) setLoopSecs(secs);
     let raf = 0;
     const draw = () => {
-      const t = moving ? ((performance.now() - clock.current) / 1000 / loopSecs) % 1 : 0;
-      render(ctx, w, h, path, look, gradientMoves ? t : 0, textMoves ? t : 0);
+      frame(ctx, moving ? ((performance.now() - clock.current) / 1000 / secs) % 1 : 0, cycles);
       if (moving) raf = requestAnimationFrame(draw);
     };
     draw();
@@ -275,24 +306,49 @@ export default function PathwayTool() {
 
   const downloadPng = () => canvas.current?.toBlob((b) => b && save(b, `${name}.png`), "image/png");
 
-  const recordVideo = () => {
+  /**
+   * MP4, one loop. Frames are drawn and encoded one at a time, not filmed off
+   * the screen, so frame N is exactly t = N / total and the last frame runs
+   * straight back into the first, whatever the computer's speed.
+   */
+  const exportVideo = async () => {
     const el = canvas.current;
-    if (!el || recording) return;
-    const type = ["video/mp4;codecs=avc1.640033", "video/mp4", "video/webm;codecs=vp9", "video/webm"].find((t) =>
-      MediaRecorder.isTypeSupported(t),
-    );
-    if (!type) return;
-    const rec = new MediaRecorder(el.captureStream(30), { mimeType: type, videoBitsPerSecond: 16_000_000 });
-    const chunks: Blob[] = [];
-    rec.ondataavailable = (e) => chunks.push(e.data);
-    rec.onstop = () => {
-      save(new Blob(chunks, { type }), `${name}.${type.includes("mp4") ? "mp4" : "webm"}`);
-      setRecording(false);
-    };
-    restart(); // record exactly one loop, from its start
-    setRecording(true);
-    rec.start();
-    setTimeout(() => rec.stop(), loopSecs * 1000);
+    const ctx = el?.getContext("2d");
+    if (!el || !ctx || recording) return;
+    if (typeof VideoEncoder === "undefined") {
+      window.alert("This browser cannot export video. Use Chrome, Edge or Safari.");
+      return;
+    }
+    setProgress(0);
+    try {
+      const { Muxer, ArrayBufferTarget } = await import("mp4-muxer");
+      const fps = 30;
+      const { secs, cycles } = timing(ctx);
+      const total = Math.max(1, Math.round(secs * fps));
+      const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: "avc", width: w, height: h }, fastStart: "in-memory" });
+      const encoder = new VideoEncoder({
+        output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+        error: (e) => console.error(e),
+      });
+      encoder.configure({ codec: "avc1.640033", width: w, height: h, bitrate: 16_000_000, framerate: fps });
+      for (let i = 0; i < total; i++) {
+        frame(ctx, i / total, cycles);
+        const picture = new VideoFrame(el, { timestamp: (i * 1e6) / fps, duration: 1e6 / fps });
+        encoder.encode(picture, { keyFrame: i % 60 === 0 });
+        picture.close();
+        if (i % 5 === 0) {
+          setProgress(i / total);
+          await new Promise((r) => setTimeout(r)); // let the encoder and the screen catch up
+        }
+        while (encoder.encodeQueueSize > 8) await new Promise((r) => setTimeout(r, 5));
+      }
+      await encoder.flush();
+      muxer.finalize();
+      save(new Blob([muxer.target.buffer], { type: "video/mp4" }), `${name}.mp4`);
+    } finally {
+      restart();
+      setProgress(null);
+    }
   };
 
   return (
@@ -365,26 +421,21 @@ export default function PathwayTool() {
           <section>
             <h2>Ticker text</h2>
             <input className="stb-text" type="text" placeholder="FREE EVENT" value={text} onChange={(e) => setText(e.target.value)} />
-            <div className="stb-dots">
-              {TEXT_COLOURS.map((t) => (
-                <button
-                  key={t.value}
-                  type="button"
-                  title={t.name}
-                  aria-label={`Text colour: ${t.name}`}
-                  aria-pressed={textColours.includes(t.value)}
-                  style={{ background: t.value }}
-                  onClick={() =>
-                    setTextColours(textColours.includes(t.value) ? textColours.filter((c) => c !== t.value) : [...textColours, t.value])
-                  }
-                />
+            <div className="stb-presets">
+              {presets.map((t, i) => (
+                <button key={t.name} type="button" title={t.name} aria-label={`Text colour: ${t.name}`} aria-pressed={(presets[textPreset] ? textPreset : 0) === i} onClick={() => setTextPreset(i)}>
+                  {t.colours.map((c) => (
+                    <i key={c} style={{ background: c }} />
+                  ))}
+                </button>
               ))}
-              <span className="stb-note">{textColours.length ? "repeats take turns" : "automatic"}</span>
+              <span className="stb-note">{(presets[textPreset] ?? presets[0]).name}</span>
             </div>
             <label className="stb-check">
               <input type="checkbox" checked={scrollText} onChange={(e) => { restart(); setScrollText(e.target.checked); }} />
               Scroll the text
             </label>
+            {scrollText && <Slider label="Speed" value={textSpeed} min={1} max={25} step={1} onChange={setTextSpeed} />}
           </section>
         )}
 
@@ -400,12 +451,14 @@ export default function PathwayTool() {
               <input type="checkbox" checked={animateGradient} onChange={(e) => { restart(); setAnimateGradient(e.target.checked); }} />
               Animate
             </label>
+            {animateGradient && (
+              <Slider label="One run" value={gradientSecs} min={2} max={20} step={1} onChange={setGradientSecs} show={textMoves ? `~${gradientSecs}s` : `${gradientSecs}s`} />
+            )}
           </section>
         )}
 
         <section className="stb-export">
           <h2>Export</h2>
-          {moving && <Slider label="Loop" value={loopSecs} min={2} max={20} step={1} onChange={setLoopSecs} show={`${loopSecs}s`} />}
           <div className="stb-seg">
             {(["none", "bg", "line"] as Alpha[]).map((a) => (
               <button key={a} type="button" aria-pressed={look.alpha === a} disabled={moving} onClick={() => setAlpha(a)}>
@@ -413,12 +466,12 @@ export default function PathwayTool() {
               </button>
             ))}
           </div>
-          <button type="button" className="stb-primary" onClick={downloadPng}>
+          <button type="button" className="stb-primary" onClick={downloadPng} disabled={recording}>
             Download PNG
           </button>
           {moving && (
-            <button type="button" className="stb-primary" onClick={recordVideo} disabled={recording}>
-              {recording ? `Recording ${loopSecs}s…` : "Download MP4"}
+            <button type="button" className="stb-primary" onClick={exportVideo} disabled={recording}>
+              {recording ? `Making the video ${Math.round((progress ?? 0) * 100)}%` : `Download MP4 · ${loopSecs.toFixed(1)}s loop`}
             </button>
           )}
           <p className="stb-note">

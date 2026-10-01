@@ -77,17 +77,34 @@ export const BRANDS = {
 
 export type BrandKey = keyof typeof BRANDS;
 
-/** Ticker text colours. Pick one, or several to alternate from one repeat to the next. */
-export const TEXT_COLOURS = [
-  { name: "Midnight Blue", value: C.midnight },
-  { name: "Rose White", value: C.rose },
-  { name: "Pink", value: C.pink },
-  { name: "Pastel Yellow", value: C.yellow },
-];
+/**
+ * Ticker text colours. Nobody picks a colour by hand: each line colour offers
+ * only the choices the guidelines show (ticker tape, p.53), and the first is
+ * the default. Two colours means each repeat of the text takes the next one.
+ */
+export interface TextPreset {
+  name: string;
+  colours: string[];
+}
 
-/** With none picked: the pairs the guidelines show (p.53). */
-export const autoTextColours = (line: string) =>
-  line !== "gradient" && isDark(line) ? [C.rose, C.yellow] : [C.pink, C.midnight];
+export function textPresets(line: string): TextPreset[] {
+  if (line !== "gradient" && isDark(line)) {
+    return [
+      { name: "Pastel Yellow", colours: [C.yellow] },
+      { name: "Rose White", colours: [C.rose] },
+      { name: "Rose White and Pastel Yellow", colours: [C.rose, C.yellow] },
+    ];
+  }
+  // Pink only reads on Pastel Yellow; every other light line takes Midnight Blue.
+  if (line === C.yellow) {
+    return [
+      { name: "Midnight Blue", colours: [C.midnight] },
+      { name: "Pink", colours: [C.pink] },
+      { name: "Pink and Midnight Blue", colours: [C.pink, C.midnight] },
+    ];
+  }
+  return [{ name: "Midnight Blue", colours: [C.midnight] }];
+}
 
 export function isDark(hex: string) {
   const n = parseInt(hex.slice(1), 16);

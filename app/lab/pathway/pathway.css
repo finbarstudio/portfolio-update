@@ -214,3 +214,31 @@
   opacity: 0.65;
   text-decoration: underline;
 }
+
+/* Text colour presets: one or two dots each, no free colour choice */
+.stb-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.stb-presets button {
+  display: flex;
+  gap: 3px;
+  padding: 4px 6px;
+  border: 1px solid rgb(10 10 51 / 0.3);
+  border-radius: 999px;
+  background: #cfc9cf;
+}
+.stb-presets button i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+.stb-presets button[aria-pressed="true"] {
+  outline: 2px solid var(--pink);
+  outline-offset: 2px;
+}
+.stb-presets .stb-note {
+  margin: 0;
+}

@@ -25,7 +25,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Pathway maker",
     line: "A brand tool for Share to Buy",
     href: "/pathway",
-    image: "/media/lab/pathway/tile.webp",
+    video: "/media/lab/pathway/tile.mp4",
     added: "2026-10-01",
   },
   {
@@ -33,7 +33,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Lindon Homes",
     line: "A builder's site, demo build",
     href: "https://www.finbar.studio/lindon",
-    image: "/media/images/lindon/hero.webp",
+    video: "/media/lab/lindon/tile.mp4",
     added: "2026-09-30",
   },
   {
@@ -41,7 +41,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Moto Technique",
     line: "A restoration workshop, demo build",
     href: "https://www.finbar.studio/mt",
-    image: "/media/images/moto-technique/dino36-profile-900.webp",
+    video: "/media/lab/moto-technique/tile.mp4",
     added: "2026-09-30",
   },
   {
