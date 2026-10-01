@@ -16,7 +16,7 @@
  */
 
 export interface PathParams {
-  /** Line thickness. Fixed by the tool: 150px on a 1080 x 1920 reel, the same share of the short side elsewhere. */
+  /** Line thickness. The tool offers three steps: 100, 150 or 200px on a 1080 x 1920 reel. */
   stroke: number;
   /** Tightest and widest bend radius. */
   rMin: number;

@@ -242,3 +242,10 @@
 .stb-presets .stb-note {
   margin: 0;
 }
+
+.stb-slider .stb-seg button {
+  padding: 1px 8px;
+}
+div.stb-slider {
+  margin-bottom: 4px;
+}

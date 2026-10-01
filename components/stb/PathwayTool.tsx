@@ -20,9 +20,9 @@ const SIZES = [
   { label: "Desktop 16:9", w: LONG, h: 1152 },
 ];
 
-/** Line thickness, as a share of the short side. Not adjustable: it is 150px
- *  on a 1080 x 1920 reel and scales with the format. */
-const STROKE = 150 / 1080;
+/** Line thickness: three steps only, named by their width in px on a
+ *  1080 x 1920 reel. Other formats take the same share of their short side. */
+const THICKNESSES = [100, 150, 200];
 
 /** "Along the path" gradient: how much line one full run of the colours covers
  *  (short side = 1). */
@@ -46,6 +46,8 @@ interface Look {
   /** One colour per repeat of the text, in turn. */
   textColours: string[];
   angle: number;
+  /** Line thickness, as a share of the short side. */
+  stroke: number;
   /** Text reads the other way along the line (and so sits the other way up). */
   flip: boolean;
   /** Gradient runs along the line (water in a pipe) instead of across the canvas. */
@@ -172,6 +174,7 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pathw
     ctx.fillStyle = look.bg;
     ctx.fillRect(0, 0, w, h);
   }
+  const STROKE = look.stroke;
   ctx.lineWidth = STROKE * S;
   ctx.lineJoin = "round";
   ctx.lineCap = "butt";
@@ -220,6 +223,7 @@ export default function PathwayTool() {
   const [text, setText] = useState("");
   const [textPreset, setTextPreset] = useState(0);
   const [flipText, setFlipText] = useState(false);
+  const [thickness, setThickness] = useState(150);
   /** How fast the text travels: % of the short side per second. */
   const [textSpeed, setTextSpeed] = useState(5);
   const [alpha, setAlpha] = useState<Alpha>("none");
@@ -258,8 +262,9 @@ export default function PathwayTool() {
   const gradientMoves = animateGradient && isGradient;
   const textMoves = scrollText && shownText !== "";
   const moving = gradientMoves || textMoves;
+  const stroke = thickness / 1080;
   const presets = textPresets(colours.line);
-  const path = generatePathway(seed, w / short, h / short, { ...p, stroke: STROKE });
+  const path = generatePathway(seed, w / short, h / short, { ...p, stroke });
 
   const look: Look = {
     bg: colours.bg,
@@ -270,6 +275,7 @@ export default function PathwayTool() {
     textColours: (presets[textPreset] ?? presets[0]).colours,
     angle,
     flip: flipText,
+    stroke,
     flow,
   };
 
@@ -282,7 +288,7 @@ export default function PathwayTool() {
    */
   const timing = (ctx: CanvasRenderingContext2D) => {
     if (!textMoves) return { secs: gradientSecs, cycles: 1 };
-    const set = ticker(ctx, look.text, STROKE * short).period * look.textColours.length;
+    const set = ticker(ctx, look.text, stroke * short).period * look.textColours.length;
     const secs = set / ((textSpeed / 100) * short);
     return { secs, cycles: Math.max(1, Math.round(secs / gradientSecs)) };
   };
@@ -414,6 +420,17 @@ export default function PathwayTool() {
               <span>Seed</span>
               <input type="number" value={seed} onChange={(e) => setSeed(Number(e.target.value) || 0)} />
             </label>
+          </div>
+          <div className="stb-slider">
+            <span>Thickness</span>
+            <div className="stb-seg">
+              {THICKNESSES.map((t) => (
+                <button key={t} type="button" aria-pressed={thickness === t} onClick={() => setThickness(t)}>
+                  {t}
+                </button>
+              ))}
+            </div>
+            <output>px</output>
           </div>
           <Slider label="Tightest bend" value={p.rMin} min={0.15} max={0.5} step={0.01} onChange={(v) => set({ rMin: v, rMax: Math.max(p.rMax, v) })} />
           <Slider label="Widest bend" value={p.rMax} min={0.2} max={1.5} step={0.01} onChange={(v) => set({ rMax: v, rMin: Math.min(p.rMin, v) })} />
