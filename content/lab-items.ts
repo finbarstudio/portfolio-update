@@ -21,6 +21,14 @@ export interface LabItem {
 
 const RAW_ITEMS: LabItem[] = [
   {
+    id: 4,
+    name: "Pathway maker",
+    line: "A brand tool for Share to Buy",
+    href: "/pathway",
+    image: "/media/lab/pathway/tile.webp",
+    added: "2026-10-01",
+  },
+  {
     id: 3,
     name: "Lindon Homes",
     line: "A builder's site, demo build",
