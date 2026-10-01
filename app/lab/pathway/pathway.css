@@ -250,6 +250,12 @@ div.stb-slider {
   margin-bottom: 4px;
 }
 
+.stb-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
 /* ── Phone ──────────────────────────────────────────────────────────────────
    The preview sits across the top and stays put; the controls scroll beneath
    it, sized for a thumb. The page itself still never scrolls. */

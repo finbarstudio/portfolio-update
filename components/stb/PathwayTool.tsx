@@ -136,16 +136,25 @@ function ticker(ctx: CanvasRenderingContext2D, text: string, strokePx: number) {
   return { size, chars, widths, tracking, period };
 }
 
-function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
+interface Glyph {
+  ch: string;
+  x: number;
+  y: number;
+  /** radians */
+  angle: number;
+  colour: string;
+}
+
+/** Where every letter of the ticker goes. Shared by the canvas and the SVG export. */
+function layoutText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
   const { size, chars, widths, tracking, period } = ticker(ctx, look.text, strokePx);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
   const { pts, cum } = path;
   const total = cum[cum.length - 1] * S;
   const n = look.textColours.length;
   const shift = tPhase * n * period;
+  const glyphs: Glyph[] = [];
   for (let k = -Math.ceil(shift / period) - 1; k * period + shift < total; k++) {
-    ctx.fillStyle = look.textColours[((k % n) + n) % n];
+    const colour = look.textColours[((k % n) + n) % n];
     let s = k * period + shift;
     for (let c = 0; c < chars.length; c++) {
       // Flipped, the same layout is measured from the far end of the line.
@@ -155,13 +164,30 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
       const i = locate(cum, at / S);
       const t = (at / S - cum[i]) / (cum[i + 1] - cum[i] || 1);
       const x0 = pts[i * 2], y0 = pts[i * 2 + 1], x1 = pts[i * 2 + 2], y1 = pts[i * 2 + 3];
-      ctx.save();
-      ctx.translate((x0 + (x1 - x0) * t) * S, (y0 + (y1 - y0) * t) * S);
-      ctx.rotate(Math.atan2(y1 - y0, x1 - x0) + (look.flip ? Math.PI : 0));
-      // The face sits a touch high on its middle line; nudge to centre the caps.
-      ctx.fillText(chars[c], 0, size * 0.04);
-      ctx.restore();
+      glyphs.push({
+        ch: chars[c],
+        x: (x0 + (x1 - x0) * t) * S,
+        y: (y0 + (y1 - y0) * t) * S,
+        angle: Math.atan2(y1 - y0, x1 - x0) + (look.flip ? Math.PI : 0),
+        colour,
+      });
     }
+  }
+  return { size, glyphs };
+}
+
+function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
+  const { size, glyphs } = layoutText(ctx, path, S, look, strokePx, tPhase, range);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (const g of glyphs) {
+    ctx.fillStyle = g.colour;
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.rotate(g.angle);
+    // The face sits a touch high on its middle line; nudge to centre the caps.
+    ctx.fillText(g.ch, 0, size * 0.04);
+    ctx.restore();
   }
 }
 
@@ -191,6 +217,111 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pathw
     strokeLine(ctx, path, S, locate(path.cum, at - win), Math.min(last, locate(path.cum, at + win) + 1), look, gPhase, w, h);
     drawText(ctx, path, S, look, STROKE * S, tPhase, [(at - win - STROKE) * S, (at + win + STROKE) * S]);
   }
+}
+
+/**
+ * The same picture as an SVG, for Illustrator or Figma.
+ *
+ * The line is ONE path with a stroke, so its width and colour stay editable.
+ * It is drawn as smooth curves through every sixth point of the walk rather
+ * than hundreds of tiny straight pieces. A gradient across the canvas is a
+ * normal linear gradient on that stroke. A gradient ALONG the path is the one
+ * exception: SVG has no such thing, so that mode exports the line as short
+ * coloured pieces, exactly as the canvas draws it.
+ *
+ * Text stays live text in Share to Buy Bold (the font must be installed where
+ * the file is opened), one letter each, already placed and turned.
+ */
+function buildSvg(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pathway, look: Look) {
+  const S = Math.min(w, h);
+  const r = (v: number) => Math.round(v * 10) / 10;
+  const { pts, cum } = path;
+  const last = pts.length / 2 - 1;
+  const sw = r(look.stroke * S);
+
+  /** Points from..to as one smooth path (Catmull-Rom through every `step`th point). */
+  const curve = (from: number, to: number, step = 6) => {
+    const idx: number[] = [];
+    for (let i = from; i < to; i += step) idx.push(i);
+    idx.push(to);
+    const P = idx.map((i) => [pts[i * 2] * S, pts[i * 2 + 1] * S]);
+    let d = `M${r(P[0][0])} ${r(P[0][1])}`;
+    for (let i = 0; i < P.length - 1; i++) {
+      const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(P.length - 1, i + 2)];
+      d += `C${r(p1[0] + (p2[0] - p0[0]) / 6)} ${r(p1[1] + (p2[1] - p0[1]) / 6)} ${r(p2[0] - (p3[0] - p1[0]) / 6)} ${r(p2[1] - (p3[1] - p1[1]) / 6)} ${r(p2[0])} ${r(p2[1])}`;
+    }
+    return d;
+  };
+
+  const flow = look.line === "gradient" && look.flow && look.alpha !== "line";
+  const defs: string[] = [];
+  let paint = look.line;
+  if (look.line === "gradient" && !flow) {
+    const a = (look.angle * Math.PI) / 180;
+    const dx = Math.cos(a), dy = Math.sin(a);
+    const span = Math.abs(w * dx) + Math.abs(h * dy);
+    const n = GRADIENT.length;
+    const stops = Array.from({ length: n + 1 }, (_, i) => `<stop offset="${i / n}" stop-color="${GRADIENT[i % n]}"/>`).join("");
+    defs.push(
+      `<linearGradient id="mix" gradientUnits="userSpaceOnUse" x1="${r(w / 2 - (dx * span) / 2)}" y1="${r(h / 2 - (dy * span) / 2)}" x2="${r(w / 2 + (dx * span) / 2)}" y2="${r(h / 2 + (dy * span) / 2)}">${stops}</linearGradient>`,
+    );
+    paint = "url(#mix)";
+  }
+
+  /** The line, or a stretch of it, as markup. */
+  const line = (from: number, to: number, stroke = paint) => {
+    if (!flow) return `<path d="${curve(from, to)}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+    let out = "";
+    for (let i = from; i < to; i++) {
+      const e = Math.min(i + 2, to);
+      let d = `M${r(pts[i * 2] * S)} ${r(pts[i * 2 + 1] * S)}`;
+      for (let j = i + 1; j <= e; j++) d += `L${r(pts[j * 2] * S)} ${r(pts[j * 2 + 1] * S)}`;
+      out += `<path d="${d}" stroke="${flowColour(cum[i] / FLOW_PERIOD)}"/>`;
+    }
+    return `<g fill="none" stroke-width="${sw}">${out}</g>`;
+  };
+
+  const text = (range?: [number, number]) => {
+    const { size, glyphs } = layoutText(ctx, path, S, look, look.stroke * S, 0, range);
+    const letters = glyphs
+      .map((g) => `<text fill="${g.colour}" transform="translate(${r(g.x)} ${r(g.y)}) rotate(${r((g.angle * 180) / Math.PI)})">${g.ch === "&" ? "&amp;" : g.ch === "<" ? "&lt;" : g.ch}</text>`)
+      .join("");
+    return `<g font-family="Share to Buy" font-weight="700" font-size="${r(size)}" text-anchor="middle" dominant-baseline="central">${letters}</g>`;
+  };
+
+  // The stretches that pass over another, and so hide its text.
+  const win = look.stroke * 0.75;
+  const overs = look.text
+    ? path.over.map((j) => ({
+        from: locate(cum, cum[j] - win),
+        to: Math.min(last, locate(cum, cum[j] + win) + 1),
+        range: [(cum[j] - win - look.stroke) * S, (cum[j] + win + look.stroke) * S] as [number, number],
+      }))
+    : [];
+
+  const body: string[] = [];
+  const rect = `<rect width="${w}" height="${h}" fill="${look.bg}"/>`;
+  if (look.alpha === "line") {
+    // The line is a hole in the background: a mask, still one stroked path.
+    defs.push(`<mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><rect width="${w}" height="${h}" fill="#fff"/>${line(0, last, "#000")}</mask>`);
+    body.push(`<g mask="url(#cut)">${rect}</g>`);
+    if (look.text) {
+      if (overs.length) {
+        defs.push(`<mask id="under" maskUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><rect width="${w}" height="${h}" fill="#fff"/>${overs.map((o) => line(o.from, o.to, "#000")).join("")}</mask>`);
+        body.push(`<g mask="url(#under)">${text()}</g>`);
+        for (const o of overs) body.push(text(o.range));
+      } else body.push(text());
+    }
+  } else {
+    if (look.alpha !== "bg") body.push(rect);
+    body.push(line(0, last));
+    if (look.text) {
+      body.push(text());
+      for (const o of overs) body.push(line(o.from, o.to), text(o.range));
+    }
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${defs.length ? `<defs>${defs.join("")}</defs>` : ""}${body.join("")}</svg>`;
 }
 
 function save(blob: Blob, name: string) {
@@ -315,6 +446,11 @@ export default function PathwayTool() {
   const restart = () => { clock.current = performance.now(); };
   const name = `${brand}-pathway-${seed}-${w}x${h}`;
 
+  /** The still picture: a moving gradient or text exports as its first frame. */
+  const downloadSvg = () => {
+    const ctx = canvas.current?.getContext("2d");
+    if (ctx) save(new Blob([buildSvg(ctx, w, h, path, look)], { type: "image/svg+xml" }), `${name}.svg`);
+  };
   const downloadPng = () => canvas.current?.toBlob((b) => b && save(b, `${name}.png`), "image/png");
 
   /**
@@ -492,9 +628,14 @@ export default function PathwayTool() {
               </button>
             ))}
           </div>
-          <button type="button" className="stb-primary" onClick={downloadPng} disabled={recording}>
-            Download PNG
-          </button>
+          <div className="stb-pair">
+            <button type="button" className="stb-primary" onClick={downloadPng} disabled={recording}>
+              Download PNG
+            </button>
+            <button type="button" className="stb-primary" onClick={downloadSvg} disabled={recording}>
+              Download SVG
+            </button>
+          </div>
           {moving && (
             <button type="button" className="stb-primary" onClick={exportVideo} disabled={recording}>
               {recording ? `Making the video ${Math.round((progress ?? 0) * 100)}%` : `Download MP4 · ${loopSecs.toFixed(1)}s loop`}
