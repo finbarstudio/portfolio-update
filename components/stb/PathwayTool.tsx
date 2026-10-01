@@ -46,6 +46,8 @@ interface Look {
   /** One colour per repeat of the text, in turn. */
   textColours: string[];
   angle: number;
+  /** Text reads the other way along the line (and so sits the other way up). */
+  flip: boolean;
   /** Gradient runs along the line (water in a pipe) instead of across the canvas. */
   flow: boolean;
 }
@@ -144,7 +146,8 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
     ctx.fillStyle = look.textColours[((k % n) + n) % n];
     let s = k * period + shift;
     for (let c = 0; c < chars.length; c++) {
-      const at = s + widths[c] / 2;
+      // Flipped, the same layout is measured from the far end of the line.
+      const at = look.flip ? total - (s + widths[c] / 2) : s + widths[c] / 2;
       s += widths[c] + tracking;
       if (at < 0 || at >= total || (range && (at < range[0] || at > range[1]))) continue;
       const i = locate(cum, at / S);
@@ -152,7 +155,7 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
       const x0 = pts[i * 2], y0 = pts[i * 2 + 1], x1 = pts[i * 2 + 2], y1 = pts[i * 2 + 3];
       ctx.save();
       ctx.translate((x0 + (x1 - x0) * t) * S, (y0 + (y1 - y0) * t) * S);
-      ctx.rotate(Math.atan2(y1 - y0, x1 - x0));
+      ctx.rotate(Math.atan2(y1 - y0, x1 - x0) + (look.flip ? Math.PI : 0));
       // The face sits a touch high on its middle line; nudge to centre the caps.
       ctx.fillText(chars[c], 0, size * 0.04);
       ctx.restore();
@@ -216,6 +219,7 @@ export default function PathwayTool() {
   const [p, setP] = useState({ rMin: 0.28, rMax: 0.75, length: 5, loop: 0.3, maxCross: 1 });
   const [text, setText] = useState("");
   const [textPreset, setTextPreset] = useState(0);
+  const [flipText, setFlipText] = useState(false);
   /** How fast the text travels: % of the short side per second. */
   const [textSpeed, setTextSpeed] = useState(5);
   const [alpha, setAlpha] = useState<Alpha>("none");
@@ -265,6 +269,7 @@ export default function PathwayTool() {
     text: shownText,
     textColours: (presets[textPreset] ?? presets[0]).colours,
     angle,
+    flip: flipText,
     flow,
   };
 
@@ -431,6 +436,10 @@ export default function PathwayTool() {
               ))}
               <span className="stb-note">{(presets[textPreset] ?? presets[0]).name}</span>
             </div>
+            <label className="stb-check">
+              <input type="checkbox" checked={flipText} onChange={(e) => setFlipText(e.target.checked)} />
+              Flip the text
+            </label>
             <label className="stb-check">
               <input type="checkbox" checked={scrollText} onChange={(e) => { restart(); setScrollText(e.target.checked); }} />
               Scroll the text
