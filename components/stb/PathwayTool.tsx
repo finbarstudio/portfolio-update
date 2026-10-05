@@ -387,6 +387,8 @@ export default function PathwayTool() {
   const [textSpeed, setTextSpeed] = useState(5);
   const [alpha, setAlpha] = useState<Alpha>("none");
   const [animateGradient, setAnimateGradient] = useState(false);
+  /** The gradient flows back towards the start of the line instead of away from it. */
+  const [reverseFlow, setReverseFlow] = useState(false);
   const [scrollText, setScrollText] = useState(false);
   const [gradientSecs, setGradientSecs] = useState(8);
   /** The length of one seamless loop, worked out in the draw effect. */
@@ -456,9 +458,15 @@ export default function PathwayTool() {
     const secs = set / ((textSpeed / 100) * S);
     return { secs, cycles: Math.max(1, Math.round(secs / gradientSecs)) };
   };
+  /** Where the gradient is, t (0 to 1) through the loop. Reversed, it runs the other way. */
+  const flowAt = (t: number, cycles: number) => {
+    if (!gradientMoves) return 0;
+    const at = (t * cycles) % 1;
+    return reverseFlow ? (1 - at) % 1 : at;
+  };
   /** Draw panel `i` at full size, at t (0 to 1) through the loop. */
   const drawPanel = (ctx: CanvasRenderingContext2D, i: number, t: number, cycles: number) =>
-    render(ctx, w, h, short, i * w, path, look, gradientMoves ? (t * cycles) % 1 : 0, textMoves ? t : 0);
+    render(ctx, w, h, short, i * w, path, look, flowAt(t, cycles), textMoves ? t : 0);
 
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");
@@ -469,7 +477,7 @@ export default function PathwayTool() {
     let raf = 0;
     const draw = () => {
       const t = moving ? ((performance.now() - clock.current) / 1000 / secs) % 1 : 0;
-      render(ctx, stripW * view, h * view, S, 0, path, look, gradientMoves ? (t * cycles) % 1 : 0, textMoves ? t : 0);
+      render(ctx, stripW * view, h * view, S, 0, path, look, flowAt(t, cycles), textMoves ? t : 0);
       if (moving && !recording) raf = requestAnimationFrame(draw); // an export takes the processor; the preview holds
     };
     draw();
@@ -674,6 +682,12 @@ export default function PathwayTool() {
               <input type="checkbox" checked={animateGradient} onChange={(e) => { restart(); setAnimateGradient(e.target.checked); }} />
               Flow along the path
             </label>
+            {animateGradient && (
+              <label className="stb-check">
+                <input type="checkbox" checked={reverseFlow} onChange={(e) => setReverseFlow(e.target.checked)} />
+                Reverse the flow
+              </label>
+            )}
             {animateGradient && (
               <Slider label="One run" value={gradientSecs} min={2} max={20} step={1} onChange={setGradientSecs} show={textMoves ? `~${gradientSecs}s` : `${gradientSecs}s`} />
             )}
