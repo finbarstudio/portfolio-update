@@ -74,7 +74,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
             <h1 className="pf-poster">
               Finbar
               <br />
-              Skitini<Mark />
+              Skitini
             </h1>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -112,7 +112,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
                 {CV.education.map((e) => (
                   <div className="pf-cv-item pf-copy" key={e.title}>
                     {e.title}
-                    <span className="in">{e.lines.join(", ")}</span>
+                    <Parts list={e.lines} />
                   </div>
                 ))}
               </div>
@@ -121,7 +121,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
                 {CV.experience.flatMap((g) => g.items.map((it) => ({ ...it, group: g.group }))).map((it) => (
                   <div className="pf-cv-item pf-copy" key={it.title + it.lines.join()}>
                     {it.title}
-                    <span className="in">{[...it.lines, it.group].join(", ")}</span>
+                    <Parts list={[...it.lines, it.group]} />
                   </div>
                 ))}
               </div>
@@ -295,6 +295,21 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
         </section>
       );
   }
+}
+
+/** A secondary line made of comma-separated parts. Each part stays whole, so
+ *  the line only ever wraps after a comma, never inside a role or a date. */
+function Parts({ list }: { list: string[] }) {
+  return (
+    <span className="in">
+      {list.map((part, i) => (
+        <span key={part} className="pf-part">
+          {part}
+          {i < list.length - 1 ? ", " : ""}
+        </span>
+      ))}
+    </span>
+  );
 }
 
 function Row({ label, value, href }: { label: string; value: string; href: string }) {

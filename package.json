@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "prebuild": "node scripts/media-check.mjs",
+    "prebuild": "rm -rf .next/cache/turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

@@ -3572,9 +3572,11 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
 /* web.finbar — greyscale is the point (it's a greyscale-logo destination),
    so it does NOT take the pink accent the rest of the nav uses. Same gap as
    the socials: the row is one evenly spaced run. */
-.top-nav-web { color: #6b6560; }
+/* web.finbar: the same ink as the other icons (it was a quiet grey, which
+   read as faded once the bar had its own fill). */
+.top-nav-web { color: var(--ink); }
 .top-nav-web:hover,
-.top-nav-web:focus-visible { color: var(--ink); }
+.top-nav-web:focus-visible { color: var(--pink); }
 .top-nav-web svg { height: 14px; }
 /* CV — a wordmark-style "CV" as the icon: bold Host Grotesk, tight tracking,
    same 14px optical height as the glyphs beside it. */
@@ -4914,3 +4916,12 @@ body:has(.case-study) { background-color: #fff; }
 .contact-skin .lab-switch { color: var(--bg); }
 .contact-skin .lab-switch-track { border-color: var(--bg); }
 .contact-skin .lab-switch-knob { background: var(--bg); color: var(--pink-deep); }
+
+/* The nav's labels and its little dropdown tips are set in Host Grotesk,
+   tracked, like the portfolio's (Oct 2026), not the monospace. */
+.top-nav-inner :is(a, button),
+.top-nav .nav-tip {
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}

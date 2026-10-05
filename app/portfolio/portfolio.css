@@ -28,6 +28,16 @@ body:has(.pf) { background: #1a1a1a; }
   --pink: #e96d89;
   --line: #2a2724;
   --u: 1cqw;
+  /* TRACKING IS OPTICAL: set by the size the type is seen at, on one scale.
+     The bigger the type, the tighter; reading sizes sit at the face's own
+     spacing; small caps labels open right up. Use these, never a loose value. */
+  --tr-poster: -0.055em;  /* the name and "Thank you", 11 to 13.5cqw caps */
+  --tr-display: -0.04em;  /* chapter titles, 7cqw caps */
+  --tr-quote: -0.028em;   /* client quotes, 3cqw */
+  --tr-body: -0.02em;     /* project paragraphs and the projects list, 2cqw */
+  --tr-bio: -0.012em;     /* the about text, 1.5cqw */
+  --tr-copy: 0em;         /* small reading text, about 1cqw */
+  --tr-label: 0.1em;      /* caps labels, 0.7cqw */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -71,7 +81,7 @@ body:has(.pf) { background: #1a1a1a; }
   font-weight: 500;
   font-size: max(calc(var(--u) * 0.7), 10px);
   line-height: 1.5;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
 }
 .pf-soft { color: var(--soft); }
@@ -79,7 +89,7 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-display {
   font-size: calc(var(--u) * 7.2);
   line-height: 0.92;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tr-display);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -87,7 +97,7 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-body {
   font-size: calc(var(--u) * 2.05);
   line-height: 1.22;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tr-body);
   font-weight: 500;
   max-width: 30em;
   text-wrap: pretty;
@@ -96,7 +106,7 @@ body:has(.pf) { background: #1a1a1a; }
   font-size: max(calc(var(--u) * 0.92), 12px);
   line-height: 1.35;
   font-weight: 500;
-  letter-spacing: -0.005em;
+  letter-spacing: var(--tr-copy);
 }
 
 /* the running row across the top of a text page, on the page's four columns */
@@ -114,12 +124,21 @@ body:has(.pf) { background: #1a1a1a; }
   column-gap: calc(var(--u) * 2.4);
 }
 
+/* Optical edges. Tracking adds its space AFTER each letter, the last one
+   included, so a right-aligned caps label stops short of the edge by one
+   unit of tracking: pull it back. And big caps carry side-bearing that makes
+   them look indented from the hairline above: hang them left a touch. */
+.pf-head > :last-child,
+.pf-run > :last-child,
+.pf-list a > :last-child { margin-right: calc(var(--tr-label) * -1); }
+.pf-poster, .pf-display { margin-left: -0.04em; }
+
 /* ── cover + end ────────────────────────────────────────────────── */
 .pf-cover .pf-pad, .pf-end .pf-pad { justify-content: space-between; }
 .pf-poster {
   font-size: calc(var(--u) * 13.5);
   line-height: 0.84;
-  letter-spacing: -0.045em;
+  letter-spacing: var(--tr-poster);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -156,7 +175,7 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-list .n {
   font-size: calc(var(--u) * 1.9);
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tr-body);
 }
 .pf-list a > :last-child { text-align: right; }
 .pf-list a:hover { text-decoration: none; }
@@ -165,11 +184,12 @@ body:has(.pf) { background: #1a1a1a; }
 /* ── about (CV) ─────────────────────────────────────────────────── */
 .pf-cv .pf-pad { justify-content: space-between; }
 .pf-cv-grid { margin-top: calc(var(--u) * 2.6); flex: 1; row-gap: calc(var(--u) * 3.4); align-content: start; }
-.pf-cv-bio { grid-column: 1 / span 2; grid-row: 1 / span 2; font-size: calc(var(--u) * 1.5); line-height: 1.28; letter-spacing: -0.015em; }
+.pf-cv-bio { grid-column: 1 / span 2; grid-row: 1 / span 2; font-size: calc(var(--u) * 1.5); line-height: 1.28; letter-spacing: var(--tr-bio); }
 .pf-cv-bio p + p { margin-top: 0.75em; }
 .pf-cv-block h2 { margin-bottom: calc(var(--u) * 1); }
 .pf-cv-item + .pf-cv-item { margin-top: calc(var(--u) * 0.9); }
 .pf-cv-item .in { display: block; color: var(--soft); }
+.pf-part { display: inline-block; white-space: nowrap; margin-right: 0.28em; }
 .pf-cv-contact { display: grid; grid-template-columns: auto 1fr; column-gap: 0.8em; }
 .pf-cv-foot { display: flex; gap: calc(var(--u) * 3); }
 
@@ -177,8 +197,8 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-title .pf-pad, .pf-text .pf-pad { justify-content: space-between; }
 .pf-text-body { margin-top: calc(var(--u) * 3.6); flex: 1; }
 .pf-meta { row-gap: calc(var(--u) * 0.4); }
-.pf-meta .v { display: block; color: var(--ink); text-transform: none; letter-spacing: 0; font-family: var(--font-host), "Host Grotesk", sans-serif; font-weight: 500; font-size: max(calc(var(--u) * 0.95), 12px); margin-top: 0.3em; }
-.pf-quote .pf-body { font-size: calc(var(--u) * 3); max-width: 22em; }
+.pf-meta .v { display: block; color: var(--ink); text-transform: none; letter-spacing: var(--tr-copy); font-family: var(--font-host), "Host Grotesk", sans-serif; font-weight: 500; font-size: max(calc(var(--u) * 0.95), 12px); margin-top: 0.3em; }
+.pf-quote .pf-body { font-size: calc(var(--u) * 3); max-width: 22em; letter-spacing: var(--tr-quote); }
 .pf-quote .q { color: var(--pink); }
 
 /* ── media pages: inset, framed, never cropped ──────────────────── */
@@ -229,7 +249,7 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-load-n {
   font-size: max(calc(var(--u) * 0.62), 9px);
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
 }
@@ -278,7 +298,7 @@ body:has(.pf) { background: #1a1a1a; }
   z-index: 2;
 }
 .pf-caption b { font-weight: 700; margin-right: 0.8em; }
-.pf-caption span { text-transform: none; letter-spacing: 0.01em; }
+.pf-caption span { text-transform: none; letter-spacing: var(--tr-copy); }
 
 .pf-logo { position: absolute; inset: 0; display: grid; place-items: center; }
 .pf-logoslide.is-dark .pf-run { color: #fae3b1; }
@@ -342,11 +362,6 @@ body:has(.pf) { background: #1a1a1a; }
 }
 /* The bar is filled with this page's desk colour, and the icon row's even
    slots come from the site's own nav styles (globals.css). */
-/* the globe is grey on the main site; here it is white like the rest */
-.pf-chrome .top-nav-web { color: var(--ink); }
-.pf-chrome .top-nav-web:hover,
-.pf-chrome .top-nav-web:focus-visible { color: var(--pink); }
-
 .pf-chrome .top-nav-cv { width: auto; }
 .pf-chrome .top-nav-cv-mark {
   font-size: 10px;
@@ -358,11 +373,3 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-chrome .top-nav-cv + .top-nav-cv { margin-left: 6px; }
 .pf-chrome .top-nav-cv + .top-nav-social-item:not(.top-nav-cv) { margin-left: 10px; }
-
-/* no monospace on this page, the nav's own labels included */
-.pf-chrome .top-nav-inner :is(a, button),
-.pf-chrome .nav-tip {
-  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-}
