@@ -165,8 +165,9 @@ const RAW: Slide[] = [
       "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
     meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
   },
+  one("portfolio/lows/logo-construction.mp4"),
   grid(4, 2, [
-    ["portfolio/lows/logo-construction.mp4", 1, 1, 2, 1],
+    ["portfolio/lows/logo-construction.webp", 1, 1, 2, 1],
     ["portfolio/lows/logomark-construction.webp", 3, 1, 1, 1],
     ["portfolio/lows/logo-glass-3d.webp", 4, 1, 1, 1],
     ["portfolio/lows/logo-glass-mask.webp", 1, 2, 1, 1],
