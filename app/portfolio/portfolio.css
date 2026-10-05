@@ -1,26 +1,39 @@
-/* /portfolio — the PDF portfolio as one scrolling page, in the studio's own
-   dress: warm paper, ink, the deep brand pink, Host Grotesk caps for titles and
-   Space Mono for every label (the same pairing as the site).
+/* /portfolio — the PDF portfolio as one scrolling column of pages.
 
-   Every page is 16:9 and sized in container units (--u = 1cqw), so on a laptop
-   it reads like the PDF would. MEDIA IS ALWAYS INSET, NEVER FULL BLEED, NEVER
-   CROPPED: each image or clip sits in a frame at its true proportions, and a
-   row is sized so the whole row fits the same box (--W x --H) on every page.
-   Below 760px the text pages grow to fit readable type and four-up rows fold
-   to 2x2. Nothing else changes on a phone. */
+   THE LOOK (Oct 2026): a dark grey desk (--desk, 90% grey) with each page a
+   black 16:9 sheet inset on it, as a PDF viewer shows them. Ink is warm white,
+   the accent is the studio's main pink. One typeface: Host Grotesk. Labels are
+   Host set small, in caps and tracked out (.pf-mono keeps its old name; it is
+   no longer a monospace).
+
+   Every page is sized in container units (--u = 1cqw), so on a laptop it reads
+   like the PDF would. MEDIA IS ALWAYS INSET, NEVER FULL BLEED: each image or
+   clip sits at its true proportions, and a row or grid is sized so the whole
+   thing fits the same box (--W x --H) on every page. Below 760px everything
+   is ONE column: text pages grow to fit readable type, and rows and grids
+   stack. */
 
 html:has(.pf),
-body:has(.pf) { background: #f3f1ee; }
+body:has(.pf) { background: #1a1a1a; }
 
 .pf {
-  --paper: #f3f1ee;
-  --ink: #211e1a;
-  --soft: #8c857e;
-  --brand: #510415;
+  /* the deep brand maroon vanishes on black, so the brand colour is the main
+     pink here */
+  --desk: #1a1a1a;
+  --gap: clamp(10px, 1.6vw, 28px);
+  --paper: #000000;
+  --ink: #f3f1ee;
+  --soft: #9a938b;
+  --brand: #e96d89;
   --pink: #e96d89;
-  --line: #d9d3cc;
+  --line: #2a2724;
   --u: 1cqw;
-  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap);
+  padding: calc(var(--menubar-h) + var(--gap)) var(--gap) calc(var(--gap) * 2);
+  background: var(--desk);
   color: var(--ink);
   font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
   font-weight: 500;
@@ -38,12 +51,13 @@ body:has(.pf) { background: #f3f1ee; }
   --H: calc(56.25cqw - var(--T) - var(--B));
   position: relative;
   width: 100%;
+  max-width: 1760px;
+  scroll-margin-top: calc(var(--menubar-h) + var(--gap));
   aspect-ratio: 16 / 9;
   overflow: hidden;
   container-type: inline-size;
   background: var(--ground, var(--paper));
 }
-.pf-slide + .pf-slide { box-shadow: 0 -1px 0 var(--line); }
 .pf-pad {
   position: absolute;
   inset: 0;
@@ -54,11 +68,10 @@ body:has(.pf) { background: #f3f1ee; }
 
 /* ── type ───────────────────────────────────────────────────────── */
 .pf-mono {
-  font-family: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
-  font-weight: 400;
-  font-size: max(calc(var(--u) * 0.74), 10px);
-  line-height: 1.45;
-  letter-spacing: 0.05em;
+  font-weight: 500;
+  font-size: max(calc(var(--u) * 0.7), 10px);
+  line-height: 1.5;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 .pf-soft { color: var(--soft); }
@@ -113,6 +126,42 @@ body:has(.pf) { background: #f3f1ee; }
 .pf-mark { display: inline-block; width: 0.5em; height: 0.5em; margin-left: 0.06em; vertical-align: 0.26em; }
 .pf-mark svg { width: 100%; height: 100%; display: block; }
 
+/* the portrait on the cover: a cut-out on black, so it stands on the bottom
+   edge of the page with no frame */
+.pf-headshot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: 82%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: right bottom;
+}
+.pf-cover .pf-pad { z-index: 1; }
+.pf-cover .pf-poster { font-size: calc(var(--u) * 11); }
+
+/* ── the list of projects ───────────────────────────────────────── */
+.pf-list {
+  list-style: none;
+  margin: auto 0 0;
+  padding: 0;
+}
+.pf-list a {
+  align-items: baseline;
+  padding: calc(var(--u) * 0.72) 0;
+  border-bottom: 1px solid var(--line);
+}
+.pf-list li:first-child a { border-top: 1px solid var(--line); }
+.pf-list .n {
+  font-size: calc(var(--u) * 1.9);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.pf-list a > :last-child { text-align: right; }
+.pf-list a:hover { text-decoration: none; }
+.pf-list a:hover .n { color: var(--pink); }
+
 /* ── about (CV) ─────────────────────────────────────────────────── */
 .pf-cv .pf-pad { justify-content: space-between; }
 .pf-cv-grid { margin-top: calc(var(--u) * 2.6); flex: 1; row-gap: calc(var(--u) * 3.4); align-content: start; }
@@ -157,9 +206,70 @@ body:has(.pf) { background: #f3f1ee; }
   overflow: hidden;
   background: transparent;
 }
-.pf-item.is-framed { border-radius: calc(var(--u) * 0.4); box-shadow: 0 0 0 1px var(--line); background: #e8e4df; }
-.pf-item img, .pf-item video { display: block; width: 100%; height: 100%; object-fit: contain; }
-.pf-item .pf-vid { width: 100%; height: 100%; }
+.pf-item.is-framed { border-radius: calc(var(--u) * 0.4); box-shadow: 0 0 0 1px var(--line); background: #161412; }
+.pf-item img, .pf-item video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.pf-item :is(img, video)[data-in="1"] { opacity: 1; }
+
+/* the loader: a percentage over a hairline, bottom left of the frame */
+.pf-load {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 0 calc(var(--u) * 0.8) calc(var(--u) * 0.8);
+  display: grid;
+  gap: calc(var(--u) * 0.45);
+  color: var(--soft);
+}
+.pf-load-n {
+  font-size: max(calc(var(--u) * 0.62), 9px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+.pf-load-bar { display: block; height: 1px; background: var(--line); overflow: hidden; }
+.pf-load-bar i { display: block; height: 100%; background: var(--ink); transform-origin: left; transition: transform 0.2s linear; }
+/* no size known: the line breathes instead of filling */
+.pf-load-bar[data-open="1"] i { animation: pf-breathe 1.4s ease-in-out infinite; }
+@keyframes pf-breathe { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+/* a full-bleed page: the one exception to "always inset". The image fills
+   the sheet edge to edge and is cropped to 16:9; the running line sits on it. */
+.pf-media.is-bleed .pf-row { inset: 0; }
+/* no running line on these: it cannot be read over a photograph */
+.pf-media.is-bleed .pf-run { display: none; }
+.pf-media.is-bleed .pf-item { width: 100%; height: 100%; aspect-ratio: auto !important; border-radius: 0; box-shadow: none; }
+.pf-media.is-bleed .pf-item :is(img, video) { object-fit: cover; }
+
+/* ── grid pages: tiles on a unit grid (4:3, 1:1 and 2:1 artwork) ── */
+.pf-grid {
+  position: absolute;
+  top: var(--T); bottom: var(--B); left: var(--S); right: var(--S);
+  display: grid;
+  place-content: center;
+}
+.pf-grid-in {
+  --g: calc(var(--u) * 0.7);
+  /* the largest square unit that lets the whole grid fit the media box */
+  --cell: min(
+    calc((var(--W) - (var(--cols) - 1) * var(--g)) / var(--cols)),
+    calc((var(--H) - (var(--rows) - 1) * var(--g)) / var(--rows))
+  );
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-auto-rows: var(--cell);
+  gap: var(--g);
+}
+/* a tile fills its cells; a 2:1 tile is wider than two squares by one gap, so
+   it loses a sliver at the sides rather than leaving a gap */
+.pf-grid-in .pf-item { height: auto; aspect-ratio: auto !important; }
+.pf-grid-in .pf-item :is(img, video) { object-fit: cover; }
 .pf-caption {
   position: absolute;
   left: var(--S); right: var(--S);
@@ -186,21 +296,73 @@ body:has(.pf) { background: #f3f1ee; }
   .pf-text-body { margin: 30px 0 40px; }
   .pf-head { display: flex; flex-wrap: wrap; justify-content: space-between; row-gap: 6px; }
   .pf-head > :empty { display: none; }
-  .pf-cover .pf-head > *, .pf-end .pf-head > * { width: 50%; }
+  .pf-cover .pf-head > *, .pf-end .pf-head > * { width: 100%; }
+  .pf-head > :last-child { text-align: left; }
+  .pf-text .pf-head > :last-child, .pf-cv .pf-head > :last-child, .pf-index .pf-head > :last-child { margin-left: auto; }
   .pf-text .pf-head > :nth-child(3) { display: none; }
-  .pf-cols { grid-template-columns: 1fr 1fr; row-gap: 22px; }
+  .pf-cols { grid-template-columns: 1fr; row-gap: 22px; }
+  .pf-list a { grid-template-columns: 2.2em 1fr; row-gap: 2px; column-gap: 0; padding: 12px 0; }
+  .pf-list a > :nth-child(n + 3) { grid-column: 2; text-align: left; }
+  .pf-list .n { font-size: 19px; }
+  .pf-list { margin-top: 28px; }
+  .pf-headshot { position: static; display: block; width: 100%; height: auto; margin-top: -8vw; }
+  .pf-cover .pf-poster { font-size: 17vw; }
   .pf-cv-bio { grid-column: 1 / -1; grid-row: auto; font-size: 16px; }
   .pf-mono { font-size: 10px; }
   .pf-copy, .pf-meta .v { font-size: 13px; }
 
-  /* media pages grow to fit: running line, the row at full width (items keep
-     their proportions, so a row still shares one height), caption below.
-     Four-up rows fold to 2x2. Logo pages keep their 16:9 page. */
+  /* media pages grow to fit and everything stacks in ONE column: running
+     line, each item at full width and its true proportions, caption below.
+     Logo pages keep their 16:9 page. */
   .pf-slide.pf-media { aspect-ratio: auto; }
-  .pf-media .pf-run { position: static; padding: 14px 18px 0; }
-  .pf-media .pf-row { position: static; padding: 12px 18px 14px; gap: 8px; }
-  .pf-media .pf-item { height: auto; flex: var(--r) 1 0; min-width: 0; }
-  .pf-media.is-4 .pf-row { flex-wrap: wrap; }
-  .pf-media.is-4 .pf-item { flex: 0 0 calc((100% - 8px) / 2); }
-  .pf-media .pf-caption { position: static; padding: 0 18px 16px; }
+  .pf-media .pf-run { position: static; padding: 14px 14px 0; }
+  .pf-media .pf-row { position: static; flex-direction: column; padding: 12px 14px 14px; gap: 8px; }
+  .pf-media .pf-item { width: 100%; height: auto; }
+  .pf-media .pf-caption { position: static; padding: 0 14px 16px; }
+  .pf-media.is-bleed .pf-run { display: none; }
+  .pf-media.is-bleed .pf-row { padding: 0; }
+  .pf-media.is-bleed .pf-item { aspect-ratio: var(--r) !important; }
+  .pf-grid { position: static; display: block; padding: 12px 14px 14px; }
+  .pf-grid-in { display: flex; flex-direction: column; gap: 8px; }
+  .pf-grid-in .pf-item { aspect-ratio: var(--r) !important; }
+  .pf-grid-in .pf-item :is(img, video) { object-fit: contain; }
+  .pf-load { padding: 0 10px 10px; gap: 6px; }
+}
+
+/* ── the nav on black (app/portfolio/layout.tsx) ────────────────── */
+/* The site's nav and logo read the palette variables, so swapping them here
+   inverts both without touching the main site. The maroon brand dark vanishes
+   on black, so it borrows the main pink, as the rest of this page does. */
+.pf-chrome {
+  --ink: #f3f1ee;
+  --ink-soft: #9a938b;
+  --bg: #1a1a1a;
+  --line: #2a2724;
+  --pink-deep: #e96d89;
+}
+/* The bar is filled with this page's desk colour, and the icon row's even
+   slots come from the site's own nav styles (globals.css). */
+/* the globe is grey on the main site; here it is white like the rest */
+.pf-chrome .top-nav-web { color: var(--ink); }
+.pf-chrome .top-nav-web:hover,
+.pf-chrome .top-nav-web:focus-visible { color: var(--pink); }
+
+.pf-chrome .top-nav-cv { width: auto; }
+.pf-chrome .top-nav-cv-mark {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  /* tracking adds space after the last letter: take it back so the word is
+     optically centred in its slot */
+  margin-right: -0.1em;
+}
+.pf-chrome .top-nav-cv + .top-nav-cv { margin-left: 6px; }
+.pf-chrome .top-nav-cv + .top-nav-social-item:not(.top-nav-cv) { margin-left: 10px; }
+
+/* no monospace on this page, the nav's own labels included */
+.pf-chrome .top-nav-inner :is(a, button),
+.pf-chrome .nav-tip {
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
 }

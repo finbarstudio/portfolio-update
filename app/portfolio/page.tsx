@@ -1,24 +1,27 @@
 import type { Metadata } from "next";
-import VideoPlayer from "@/components/VideoPlayer";
+import PfMedia from "@/components/portfolio/PfMedia";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
-import { PORTFOLIO, CV, UPDATED, type Media, type Slide } from "@/content/portfolio";
+import { PORTFOLIO, CV, UPDATED, HEADSHOT, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
 import "./portfolio.css";
 
 /**
- * /portfolio — the PDF portfolio as one scrolling page: cover, about, then per
- * project a chapter page, a text page and its media pages, "Other" at the end
- * and a contact page last. Content lives in content/portfolio.ts; this file
- * only draws the pages. Media is always inset at its true proportions (see
- * portfolio.css), never full bleed, never cropped.
+ * /portfolio — the PDF portfolio as one scrolling column of pages, each a black
+ * 16:9 sheet inset on a dark grey desk, the way a PDF viewer shows one: cover,
+ * about, the list of projects, then per project a chapter page, a text page
+ * and its media pages, "Other" at the end and a contact page last. Content
+ * lives in content/portfolio.ts; this file only draws the pages. Every image
+ * and clip loads when the page opens, each with its own thin progress bar
+ * (components/portfolio/PfMedia.tsx).
  */
 
 export const metadata: Metadata = {
   title: { absolute: "Finbar Skitini, Portfolio" },
   description: "Selected works by Finbar Skitini, graphic and digital designer in London.",
-  robots: { index: false, follow: true },
+  // Shared by direct link only: kept out of search, and not linked from the site.
+  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false, noimageindex: true } },
 };
 
-type Chapter = { no: string; name: string };
+type Chapter = { no: string; name: string; sub: string; year: string; id: string };
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
 function Mark() {
@@ -35,17 +38,13 @@ function Mark() {
   );
 }
 
-function Item({ m, eager }: { m: Media; eager: boolean }) {
+function Item({ m, style }: { m: Media; style?: React.CSSProperties }) {
   return (
-    <div className={`pf-item${m.frame === false ? "" : " is-framed"}`} style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4) } as React.CSSProperties}>
-      {m.video ? (
-        <div className="pf-vid">
-          <VideoPlayer src={m.src} eager={eager} style={{ objectFit: "contain" }} />
-        </div>
-      ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={m.src} alt={m.alt ?? ""} width={m.w} height={m.h} loading={eager ? "eager" : "lazy"} decoding="async" />
-      )}
+    <div
+      className={`pf-item${m.frame === false ? "" : " is-framed"}`}
+      style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...style } as React.CSSProperties}
+    >
+      <PfMedia src={m.src} video={m.video} alt={m.alt} w={m.w} h={m.h} />
     </div>
   );
 }
@@ -60,7 +59,7 @@ function Run({ chap, page }: { chap?: Chapter; page: string }) {
   );
 }
 
-function SlideView({ s, i, chap, page }: { s: Slide; i: number; chap?: Chapter; page: string }) {
+function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page: string; chapters: Chapter[] }) {
   switch (s.kind) {
     case "cover":
       return (
@@ -78,6 +77,8 @@ function SlideView({ s, i, chap, page }: { s: Slide; i: number; chap?: Chapter; 
               Skitini<Mark />
             </h1>
           </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="pf-headshot" src={HEADSHOT} alt="Finbar Skitini" width={1024} height={1024} decoding="async" />
         </section>
       );
     case "cv":
@@ -127,9 +128,53 @@ function SlideView({ s, i, chap, page }: { s: Slide; i: number; chap?: Chapter; 
             </div>
             <div className="pf-cv-foot pf-mono">
               <a href="/cv">Résumé (PDF) ↓</a>
+              {PORTFOLIO_PDF ? <a href="/portfolio.pdf">Portfolio (PDF) ↓</a> : null}
               <span className="pf-soft">Updated {UPDATED.short}</span>
             </div>
           </div>
+        </section>
+      );
+    case "index":
+      return (
+        <section className="pf-slide pf-index is-text" aria-label="Projects">
+          <div className="pf-pad">
+            <div className="pf-head pf-mono">
+              <span>Projects</span>
+              <span />
+              <span />
+              <span className="pf-soft">{page}</span>
+            </div>
+            <ol className="pf-list">
+              {chapters.map((c) => (
+                <li key={c.id}>
+                  <a className="pf-cols" href={`#${c.id}`}>
+                    <span className="pf-mono pf-soft">{c.no}</span>
+                    <span className="n">{c.name}</span>
+                    <span className="pf-mono pf-soft">{c.sub}</span>
+                    <span className="pf-mono pf-soft">{c.year}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      );
+    case "grid":
+      return (
+        <section className="pf-slide pf-media pf-gridslide">
+          <Run chap={chap} page={page} />
+          <div className="pf-grid" style={{ "--cols": s.cols, "--rows": s.rows } as React.CSSProperties}>
+            <div className="pf-grid-in">
+              {s.cells.map((m) => (
+                <Item key={m.src} m={m} style={{ gridColumn: `${m.c} / span ${m.cs}`, gridRow: `${m.r} / span ${m.rs}` }} />
+              ))}
+            </div>
+          </div>
+          {s.caption ? (
+            <p className="pf-caption pf-mono">
+              <span>{s.caption}</span>
+            </p>
+          ) : null}
         </section>
       );
     case "title":
@@ -203,10 +248,10 @@ function SlideView({ s, i, chap, page }: { s: Slide; i: number; chap?: Chapter; 
       const n = s.items.length;
       const h = `min(var(--H), calc((var(--W) - ${n - 1} * var(--G)) / ${ratio.toFixed(4)}))`;
       return (
-        <section className={`pf-slide pf-media${n === 4 ? " is-4" : ""}`}>
+        <section className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}`}>
           <Run chap={chap} page={page} />
           <div className="pf-row" style={{ "--h": h } as React.CSSProperties}>
-            {s.items.map((m) => <Item key={m.src} m={m} eager={i < 4} />)}
+            {s.items.map((m) => <Item key={m.src} m={m} />)}
           </div>
           {s.caption ? (
             <p className="pf-caption pf-mono">
@@ -263,16 +308,17 @@ function Row({ label, value, href }: { label: string; value: string; href: strin
 
 export default function PortfolioPage() {
   const total = PORTFOLIO.length;
-  let chapter: Chapter | undefined;
-  let count = 0;
+  const chapters: Chapter[] = [];
+  for (const s of PORTFOLIO) {
+    if (s.kind === "title") chapters.push({ no: pad2(chapters.length + 1), name: s.name, sub: s.category, year: s.year, id: s.id });
+    if (s.kind === "section") chapters.push({ no: pad2(chapters.length + 1), name: s.title, sub: s.subtitle, year: s.year, id: "other" });
+  }
+  let n = -1;
   return (
     <main className="pf">
       {PORTFOLIO.map((s, i) => {
-        if (s.kind === "title" || s.kind === "section") {
-          count += 1;
-          chapter = { no: pad2(count), name: s.kind === "title" ? s.name : s.title };
-        }
-        return <SlideView key={i} s={s} i={i} chap={chapter} page={`${pad2(i + 1)}/${total}`} />;
+        if (s.kind === "title" || s.kind === "section") n += 1;
+        return <SlideView key={i} s={s} chap={n >= 0 ? chapters[n] : undefined} page={`${pad2(i + 1)}/${total}`} chapters={chapters} />;
       })}
     </main>
   );

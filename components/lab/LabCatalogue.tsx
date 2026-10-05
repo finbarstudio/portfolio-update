@@ -4,7 +4,9 @@ import LabHeader from "@/components/lab/LabHeader";
 /**
  * The lab grid: the same shape as web.finbar's catalogue (empty void, then a
  * strict 3-column grid of 3:4 tiles), on black. Plain: each tile carries only
- * its number. Newest first.
+ * its number. Newest first. Loose tiles sit in the TOP row, so every row
+ * below it is full (the same rule as web.finbar): the row breaks after the
+ * loose ones, by data-r3 / data-r2 on the grid (see lab.css).
  * No pagination and no submit form yet. Each tile is a looping clip that
  * starts greyscale and goes colour on hover (touch screens get colour).
  */
@@ -17,7 +19,7 @@ export default function LabCatalogue() {
 
       <div className="lb-void" />
 
-      <div className="lb-grid">
+      <div className="lb-grid" data-r3={items.length % 3} data-r2={items.length % 2}>
         {items.map((item, i) => (
           <article
             key={item.id}

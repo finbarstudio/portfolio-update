@@ -53,6 +53,11 @@ function GlobeIcon() {
   );
 }
 
+/** The portfolio PDF download. Off until the file exists at
+ *  public/downloads/Finbar-Skitini-Portfolio.pdf; then set this to true (and the
+ *  same flag in content/portfolio.ts) and the buttons appear. */
+const PORTFOLIO_PDF = false;
+
 /** `portfolio`: the /portfolio page wears this nav too, inverted on black (see
  *  app/portfolio/layout.tsx) and carrying the CV download, which the main site
  *  no longer shows. */
@@ -67,8 +72,11 @@ export default function TopNav({ variant = "site" }: { variant?: "site" | "portf
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
     const isHome = pathname === "/";
-    const TOP = 80;  // non-home: px from the top where the bar is always shown
-    const DELTA = 6; // ignore sub-pixel jitter
+    // non-home: px from the top where the bar is always shown. On /portfolio the
+    // first page sits just under the bar, so the bar goes on the first few
+    // pixels of scroll, before that page's top edge can reach it.
+    const TOP = variant === "portfolio" ? 4 : 80;
+    const DELTA = variant === "portfolio" ? 2 : 6; // ignore sub-pixel jitter
     const NAVH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--menubar-h")) || 56;
     const getY = () => Math.max(0, (window.__lenis?.animatedScroll ?? window.scrollY) || 0);
     const root = document.documentElement;
@@ -124,7 +132,7 @@ export default function TopNav({ variant = "site" }: { variant?: "site" | "portf
       window.clearInterval(iv);
       delete root.dataset.nav;
     };
-  }, [pathname]);
+  }, [pathname, variant]);
   const isActive = (href: string) =>
     href === "/"
       ? pathname === "/"
@@ -166,6 +174,12 @@ export default function TopNav({ variant = "site" }: { variant?: "site" | "portf
           <a href="/cv" download aria-label="Download CV (PDF)" className="top-nav-social-item top-nav-cv">
             <span className="top-nav-cv-mark" aria-hidden="true">CV</span>
             <span className="nav-tip" aria-hidden="true">Download CV</span>
+          </a>
+        )}
+        {variant === "portfolio" && PORTFOLIO_PDF && (
+          <a href="/portfolio.pdf" download aria-label="Download portfolio (PDF)" className="top-nav-social-item top-nav-cv">
+            <span className="top-nav-cv-mark" aria-hidden="true">PDF</span>
+            <span className="nav-tip" aria-hidden="true">Download portfolio</span>
           </a>
         )}
         {socials.map((s) => (

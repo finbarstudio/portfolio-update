@@ -170,11 +170,21 @@ body:has(.lb-root) {
   padding-bottom: 48px;
 }
 
+/* Loose tiles go in the top row: the tile after them starts a new row, so
+   every row below is full. */
+@media (min-width: 1024px) {
+  .lb-grid[data-r3="1"] > .lb-cell:nth-child(2),
+  .lb-grid[data-r3="2"] > .lb-cell:nth-child(3) { grid-column-start: 1; }
+}
+
 /* ── Responsive ────────────────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .lb-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .lb-grid[data-r2="1"] > .lb-cell:nth-child(2) { grid-column-start: 1; }
 }
 @media (max-width: 639px) {
   .lb-grid {

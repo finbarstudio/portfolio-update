@@ -3492,10 +3492,9 @@ body:has(.contact-panel.is-open) .sf-cta-pin {
   /* Match the page gutter (px-5 / md:px-10) so the pills line up with content
      and the filter chips below. */
   padding: 0 20px;
-  background: transparent;
-  /* The bar itself is transparent and overlaps content on scroll — let clicks
-     pass through it; only the pills/icons are interactive. */
-  pointer-events: none;
+  /* Filled with the page's own ground (Oct 2026), so content slides under a
+     solid bar instead of showing through it. */
+  background: var(--bg);
 }
 @media (min-width: 768px) {
   .top-nav { padding: 0 40px; }
@@ -3533,18 +3532,22 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 13px;
+  /* Every icon sits centred in the same 20px slot (see .top-nav-social-item),
+     so the row keeps one rhythm, 28px centre to centre, whatever each mark's
+     own width. A fixed gap between marks of different widths read unevenly. */
+  gap: 8px;
   flex: 0 0 auto;
 }
-/* The groups after the socials (CursorMania, web.finbar, the lab switch) each
-   sit a little further from what comes before them (19px, not a full double). */
-.top-nav-apart { margin-left: 6px; }
+/* The lab switch, last, stands a little apart from the icons. */
+.top-nav-apart { margin-left: 0; }
+.top-nav-social .lab-switch { margin-left: 8px; }
 .top-nav-social-item {
   /* Normalise by HEIGHT (not a fixed square) so non-square marks — the wide
      Are.na logo especially — read at the same optical size as the rest.
      position: relative anchors each icon's .nav-tip dropdown. */
   position: relative;
-  height: 14px;
+  width: 20px;
+  height: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3565,14 +3568,14 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
   opacity: 1;
   transform: translate(-50%, 0);
 }
-.top-nav-social-item svg { height: 14px; width: auto; display: block; }
+.top-nav-social-item svg { height: 13px; width: auto; display: block; }
 /* web.finbar — greyscale is the point (it's a greyscale-logo destination),
    so it does NOT take the pink accent the rest of the nav uses. Same gap as
    the socials: the row is one evenly spaced run. */
 .top-nav-web { color: #6b6560; }
 .top-nav-web:hover,
 .top-nav-web:focus-visible { color: var(--ink); }
-.top-nav-web svg { height: 15px; }
+.top-nav-web svg { height: 14px; }
 /* CV — a wordmark-style "CV" as the icon: bold Host Grotesk, tight tracking,
    same 14px optical height as the glyphs beside it. */
 .top-nav-cv-mark {
@@ -3592,7 +3595,7 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
   cursor: pointer;
   font: inherit;
 }
-.top-nav-cursor svg { height: 15px; }
+.top-nav-cursor svg { height: 14px; }
 @media (max-width: 767px), (hover: none) {
   .top-nav-cursor { display: none; }
 }
@@ -3641,7 +3644,7 @@ html[data-nav="up"] .home-intro-mark { transform: translateY(-100%); }
 .top-nav-social-item.is-ig svg { height: 13px; }      /* Instagram, slightly down */
 .top-nav-social-item.is-x svg { height: 12px; }       /* X, down a bit */
 .top-nav-social-item.is-li svg { height: 12px; }      /* LinkedIn, down a bit */
-.top-nav-social-item.is-arena svg { height: 11px; }   /* Are.na, wide + busy */
+.top-nav-social-item.is-arena svg { height: 9px; }   /* Are.na, wide + busy */
 /* Mobile: keep the pills on one row; the socials live in the footer instead. */
 @media (max-width: 767px) {
   .top-nav-social { display: none; }
@@ -4332,6 +4335,8 @@ a.tag-ext:hover .nav-ext-bubble { background: var(--pink); }
    content revealing after the page's own preloader (the brand pulse on the
    same maroon). Chrome: the nav (flipped light) and a © line. */
 html:has(.contact-skin) { background: var(--pink-deep); }
+/* the bar takes this page's ground too */
+.contact-skin .top-nav { background: var(--pink-deep); }
 .contact-skin {
   position: fixed;
   inset: 0;
@@ -4905,3 +4910,7 @@ body:has(.case-study) { background-color: #fff; }
 @media (prefers-reduced-motion: reduce) {
   .lab-switch-knob, .lab-wipe[data-on="1"] { transition: none; }
 }
+/* the lab switch flips light on the maroon contact page, like the icons */
+.contact-skin .lab-switch { color: var(--bg); }
+.contact-skin .lab-switch-track { border-color: var(--bg); }
+.contact-skin .lab-switch-knob { background: var(--bg); color: var(--pink-deep); }

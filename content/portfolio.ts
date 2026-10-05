@@ -5,7 +5,9 @@
  *   title    chapter opener: name, discipline, year
  *   text     the project paragraph + team / year
  *   quote    a verbatim client line (shorten with … only, never reword)
+ *   index    the list of projects, after the about page
  *   media    one to four images or clips in a row
+ *   grid     tiles on a unit grid (see THE NEW IMAGE STANDARD below)
  *   logo     a mark centred on a ground
  *
  * THE MEDIA RULE FOR THIS PAGE: inset, never full bleed, never cropped. Every
@@ -13,33 +15,55 @@
  * content/portfolio-dims.json; after adding media run
  * `node scripts/portfolio-dims.mjs`). Rows are sized so the whole row fits.
  *
+ * THE NEW IMAGE STANDARD (Oct 2026). Finbar makes every portfolio image
+ * himself, to one of three shapes so pages grid cleanly: 4:3, 1:1 and 2:1.
+ * A 4:3 usually has a page to itself (one()); squares and 2:1s tessellate on
+ * a grid page (grid()). His finished files live in the design workspace at
+ * Portfolio/<Project>/Final Portfolio Images and go in at FULL source size as
+ * WebP under public/media/images/portfolio/<project>/ (the 2560px cap in the
+ * media rule is lifted for this page, on his instruction: highest quality).
+ * Lows is done to this standard; the other chapters still use older media
+ * until he supplies theirs. Chapter order is his: Lola Audio, Plated with
+ * Issy, Lows, The Moment You Realise, London Home Show, Rennen Plus, then
+ * the rest.
+ *
  * Facts come from Job:CV/London 2026/FINBAR-CONTEXT.md. Media paths resolve
  * through mediaDeep (Cloudflare R2 in production). Copy: no em dashes,
  * humanizer pass, nothing that is not true.
  */
-import { mediaDeep } from "@/lib/media";
+import { media as mediaOne, mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
 export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string };
+/** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
+export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
 export type Slide =
   | { kind: "cover" }
   | { kind: "cv" }
+  | { kind: "index" }
+  | { kind: "grid"; cols: number; rows: number; cells: Cell[]; caption?: string }
   | { kind: "title"; id: string; name: string; category: string; year: string }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
-  | { kind: "media"; items: Media[]; caption?: string }
+  | { kind: "media"; items: Media[]; caption?: string; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
   | { kind: "end" };
 
-export const UPDATED = { long: "September 2026", short: "24.09.2026" };
+export const UPDATED = { long: "October 2026", short: "05.10.2026" };
+
+/** The portfolio PDF link on the About page. Off until the file exists (see TopNav). */
+export const PORTFOLIO_PDF = false;
+
+/** The opening page's portrait. It is on black, so it sits straight on the page. */
+export const HEADSHOT = mediaOne(`/media/images/${"portfolio/headshot.webp"}`);
 
 export const CV = {
   email: "finbar@finbar.studio",
   bio: [
-    "I’m Finbar, a London-born graphic and digital designer. I studied at Brighton, started in-house at Share to Buy, then spent two years in Brisbane as the only designer at a consulting firm, designing brands, publications and a lot of sales playbooks.",
-    "Since 2025 most of my work has been brands and websites for small businesses, taking them from the first sketch of a mark to a live site the client runs themselves. The sites are coded with Claude Code under my direction. I moved back to London in September 2026 and I’m looking for my next studio or in-house team.",
+    "I’m Finbar, a designer from London with a broad set of skills. I have worked on a lot of different kinds of project across print, screen and motion: brand identities, long brochures and playbooks, social campaigns, event graphics and websites.",
+    "I build websites as well as design them, with working HTML and CSS, and I use AI tools every day and keep up with where they are going. I’m as comfortable holding a fifty-page brochure to a tight brief as I am with a loose one that needs an idea. A design generalist role is where I would be most useful to a team.",
   ],
   eligibility: "British citizen, based in London. Open to studio, in-house and hybrid roles.",
   contact: [
@@ -76,58 +100,38 @@ function m(path: string, o: Partial<Media> = {}): Media {
   return { src: `/media/images/${path}`, w, h, video: /\.(mp4|webm)$/.test(path), frame: true, ...o };
 }
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
+/** One image filling the whole page, edge to edge (cropped to 16:9). */
+const bleed = (path: string): Slide => ({ kind: "media", items: [m(path)], bleed: true });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
+
+/** A grid page. Each tile is [path, column, row, columns spanned, rows spanned], 1-based. */
+const grid = (cols: number, rows: number, tiles: [string, number, number, number, number][], caption?: string): Slide => ({
+  kind: "grid",
+  cols,
+  rows,
+  cells: tiles.map(([p, c, r, cs, rs]) => ({ ...m(p), c, r, cs, rs })),
+  caption,
+});
 
 const ME = { label: "Team members", value: "Finbar Skitini" };
 
 const RAW: Slide[] = [
   { kind: "cover" },
   { kind: "cv" },
+  { kind: "index" },
 
-  /* ── Rennen Plus ───────────────────────────────────────────── */
-  { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
+  /* ── Lola Audio ────────────────────────────────────────────── */
+  { kind: "title", id: "lola", name: "Lola Audio", category: "Logo and Website", year: "2026" },
   {
     kind: "text",
-    name: "Rennen Plus",
-    category: "Website",
+    name: "Lola Audio",
+    category: "Logo and Website",
     body:
-      "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }],
+      "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
+    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }],
   },
-  one("rennen-plus/demos/landing.mp4"),
-  one("rennen-plus/demos/grid.mp4", "Every car on one baseline, each thumbnail cut out and faced the same way"),
-  row(["rennen-plus/demos/phone-1.webp", "rennen-plus/demos/phone-2.webp", "rennen-plus/demos/phone-3.webp"], "The finder, a car page and its package on a phone"),
-  one("rennen-plus/demos/material.mp4", "Trim and finish change the price live; the finish renders as a 3D material"),
-  one("rennen-plus/demos/dealers.mp4", "Forty-five dealers and installers, searchable by postcode"),
-
-  /* ── Lows Design and Build ─────────────────────────────────── */
-  { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
-  {
-    kind: "text",
-    name: "Lows Design + Build",
-    category: "Brand and Website",
-    body:
-      "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
-    meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
-  },
-  { kind: "logo", src: `/media/images/lows-design-build/logo.svg`, alt: "Lows Design + Build logo", bg: "#f3efe6", size: "44cqw" },
-  one("lows-design-build/mockups/business-card-front-back.webp", "Mockups of the identity in use, for Samuel and James"),
-  row(["lows-design-build/mockups/letterhead-envelope-flatlay.webp", "lows-design-build/mockups/business-card-stack.webp"]),
-  one("lows-design-build/mockups/scaffold-banner.webp"),
-  row(["lows-design-build/mockups/site-hoarding.webp", "lows-design-build/mockups/van-livery.webp"]),
-  row(["lows-design-build/mockups/clipboard-quote-sheet.webp", "lows-design-build/mockups/social-post-tiles.webp"]),
-  row(["lows-design-build/mockups/sticker-sheet.webp", "lows-design-build/mockups/notebook-cover.webp"]),
-  row(["lows-design-build/mockups/hi-vis-vest-back.webp", "lows-design-build/mockups/hard-hat-sticker.webp"]),
-  row(["lows-design-build/mockups/embroidered-patch.webp", "lows-design-build/mockups/keyring.webp"]),
-  row(["lows-design-build/mockups/mug-on-site-bench.webp", "lows-design-build/mockups/tape-measure-and-pencil.webp"]),
-  one("lows-design-build/site-scroll-3d.mp4"),
-  one("lows-design-build/project-page.mp4"),
-  {
-    kind: "quote",
-    name: "Lows Design + Build",
-    quote: "He has completely transformed our online presence and taken it to the next level.",
-    by: "Samuel Low",
-  },
+  one("lola-audio/site-scroll-3d.mp4"),
+  one("lola-audio/watch.mp4"),
 
   /* ── Plated with Issy ──────────────────────────────────────── */
   { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
@@ -151,18 +155,76 @@ const RAW: Slide[] = [
   one("plated-with-issy/site-scroll-3d.mp4"),
   row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
 
-  /* ── Lola Audio ────────────────────────────────────────────── */
-  { kind: "title", id: "lola", name: "Lola Audio", category: "Website", year: "2026" },
+  /* ── Lows Design and Build ─────────────────────────────────── */
+  { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
   {
     kind: "text",
-    name: "Lola Audio",
+    name: "Lows Design + Build",
+    category: "Brand and Website",
+    body:
+      "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
+    meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
+  },
+  grid(4, 2, [
+    ["portfolio/lows/logo-construction.webp", 1, 1, 2, 1],
+    ["portfolio/lows/logomark-construction.webp", 3, 1, 1, 1],
+    ["portfolio/lows/logo-glass-3d.webp", 4, 1, 1, 1],
+    ["portfolio/lows/logo-glass-mask.webp", 1, 2, 1, 1],
+    ["portfolio/lows/phone-instagram.webp", 2, 2, 1, 1],
+    ["portfolio/lows/business-card.webp", 3, 2, 2, 1],
+  ]),
+  bleed("portfolio/lows/billboard.webp"),
+  bleed("portfolio/lows/van.webp"),
+  one("portfolio/lows/macbook.webm"),
+  {
+    kind: "quote",
+    name: "Lows Design + Build",
+    quote: "He has completely transformed our online presence and taken it to the next level.",
+    by: "Samuel Low",
+  },
+
+  /* ── The Moment You Realise (Share to Buy) ─────────────────── */
+  { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
+  {
+    kind: "text",
+    name: "The Moment You Realise",
+    category: "Social Campaign for Share to Buy",
+    body:
+      "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
+    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }],
+  },
+  row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
+  row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
+
+  /* ── The London Home Show ──────────────────────────────────── */
+  { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
+  {
+    kind: "text",
+    name: "The London Home Show",
+    category: "Event",
+    body:
+      "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
+    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }],
+  },
+  one("london-home-show/hero.webp"),
+  row(["london-home-show/flags.webp", "london-home-show/booklets.webp"]),
+  one("london-home-show/stage.webp"),
+
+  /* ── Rennen Plus ───────────────────────────────────────────── */
+  { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
+  {
+    kind: "text",
+    name: "Rennen Plus",
     category: "Website",
     body:
-      "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }],
+      "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
+    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }],
   },
-  one("lola-audio/site-scroll-3d.mp4"),
-  one("lola-audio/watch.mp4"),
+  one("rennen-plus/demos/landing.mp4"),
+  one("rennen-plus/demos/grid.mp4", "Every car on one baseline, each thumbnail cut out and faced the same way"),
+  row(["rennen-plus/demos/phone-1.webp", "rennen-plus/demos/phone-2.webp", "rennen-plus/demos/phone-3.webp"], "The finder, a car page and its package on a phone"),
+  one("rennen-plus/demos/material.mp4", "Trim and finish change the price live; the finish renders as a 3D material"),
+  one("rennen-plus/demos/dealers.mp4", "Forty-five dealers and installers, searchable by postcode"),
 
   /* ── Salesmasters ──────────────────────────────────────────── */
   { kind: "title", id: "salesmasters", name: "Salesmasters", category: "Editorial", year: "2024–2025" },
@@ -202,11 +264,11 @@ const RAW: Slide[] = [
   one("kinaya/accessibility.webm", "The text resizer, for carers and people with low vision"),
 
   /* ── Palms Motel ───────────────────────────────────────────── */
-  { kind: "title", id: "palms", name: "Palms Motel", category: "Art Direction", year: "2024" },
+  { kind: "title", id: "palms", name: "Palms Motel", category: "Art Direction and AI", year: "2024" },
   {
     kind: "text",
     name: "Palms Motel",
-    category: "Art Direction",
+    category: "Art Direction and AI",
     body:
       "Palms Motel is a personal project: a 1970s Palm Springs motel that never existed, told through AI imagery on TikTok. I built one Midjourney prompt system from reference photography so every image holds the same light and the same world. 48 posts, 109k likes, and one post seen 770k times.",
     meta: [ME, { label: "Year", value: "2024" }],
@@ -214,33 +276,6 @@ const RAW: Slide[] = [
   one("palmsmotel/scene-1.webp"),
   row(["palmsmotel/poster-2.webp", "palmsmotel/poster-1.webp", "palmsmotel/poster-3.webp", "palmsmotel/poster-4.webp"]),
   one("palmsmotel/scene-3.webp"),
-
-  /* ── Share to Buy ──────────────────────────────────────────── */
-  { kind: "title", id: "share-to-buy", name: "Share to Buy", category: "Social Campaign", year: "2022–2023" },
-  {
-    kind: "text",
-    name: "Share to Buy",
-    category: "Social Campaign",
-    body:
-      "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
-    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }],
-  },
-  row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
-  row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
-
-  /* ── The London Home Show ──────────────────────────────────── */
-  { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
-  {
-    kind: "text",
-    name: "The London Home Show",
-    category: "Event",
-    body:
-      "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
-    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }],
-  },
-  one("london-home-show/hero.webp"),
-  row(["london-home-show/flags.webp", "london-home-show/booklets.webp"]),
-  one("london-home-show/stage.webp"),
 
   /* ── TasWater ──────────────────────────────────────────────── */
   { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
