@@ -10,6 +10,7 @@ import { SiX, SiInstagram } from "@icons-pack/react-simple-icons";
 import { projects } from "@/content/projects";
 import { CursorManiaButton } from "@/components/cursormania/CursorMania";
 import LabSwitch from "@/components/LabSwitch";
+import ThemeSwitch from "@/components/portfolio/ThemeSwitch";
 
 // Count what the /work grid actually shows — hidden projects don't count.
 const PROJECT_COUNT = projects.filter((p) => !p.hidden).length;
@@ -182,7 +183,8 @@ export default function TopNav({ variant = "site" }: { variant?: "site" | "portf
             <span className="nav-tip" aria-hidden="true">Download portfolio</span>
           </a>
         )}
-        {socials.map((s) => (
+        {/* /portfolio keeps the row to the CV and LinkedIn */}
+        {(variant === "portfolio" ? socials.filter((x) => x.cls === "is-li") : socials).map((s) => (
           <a
             key={s.href}
             href={s.href}
@@ -202,20 +204,23 @@ export default function TopNav({ variant = "site" }: { variant?: "site" | "portf
             right-most. */}
         {/* CursorMania: the 2004 cursor picker. Opens the XP window (mounted
             in LayoutShell). */}
-        <CursorManiaButton />
+        {variant === "site" && <CursorManiaButton />}
         {/* web.finbar — the @web.finbar Instagram's site catalogue, a quiet
             greyscale destination distinct from the socials. */}
-        <a
-          href="https://web.finbar.studio"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="web.finbar, a catalogue of good websites (opens in a new tab)"
-          className="top-nav-social-item top-nav-web top-nav-apart"
-        >
-          <GlobeIcon />
-          <span className="nav-tip" aria-hidden="true">web.finbar</span>
-        </a>
-        <LabSwitch className="top-nav-apart" />
+        {variant === "site" && (
+          <a
+            href="https://web.finbar.studio"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="web.finbar, a catalogue of good websites (opens in a new tab)"
+            className="top-nav-social-item top-nav-web top-nav-apart"
+          >
+            <GlobeIcon />
+            <span className="nav-tip" aria-hidden="true">web.finbar</span>
+          </a>
+        )}
+        {/* /portfolio swaps the lab switch for its own light / dark switch */}
+        {variant === "portfolio" ? <ThemeSwitch className="top-nav-apart" /> : <LabSwitch className="top-nav-apart" />}
       </div>
     </header>
   );

@@ -13,6 +13,8 @@ import ContactPanel from "@/components/ContactPanel";
 export default function PortfolioLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      {/* apply a saved light theme before first paint (see ThemeSwitch) */}
+      <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem("pf-theme")==="light")document.documentElement.dataset.pfTheme="light"}catch(e){}` }} />
       <div className="pf-chrome">
         <TopNav variant="portfolio" />
         {/* not "sticky": on the main site the logo stays put when the bar hides;

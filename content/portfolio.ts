@@ -26,9 +26,8 @@
  * the standard inset. That is Finbar's default for a full-size 2:1 (Oct 2026),
  * not full bleed.
  * Lows is done to this standard; the other chapters still use older media
- * until he supplies theirs. Chapter order is his: Lola Audio, Plated with
- * Issy, Lows, The Moment You Realise, London Home Show, Rennen Plus, then
- * the rest.
+ * until he supplies theirs. Chapter order (his, 6 Oct 2026): Lola Audio, Lows, Rennen Plus, Salesmasters;
+ * the rest is ours to order.
  *
  * Facts come from Job:CV/London 2026/FINBAR-CONTEXT.md. Media paths resolve
  * through mediaDeep (Cloudflare R2 in production). Copy: no em dashes,
@@ -136,20 +135,6 @@ const RAW: Slide[] = [
   one("lola-audio/site-scroll-3d.mp4"),
   one("lola-audio/watch.mp4"),
 
-  /* ── Plated with Issy ──────────────────────────────────────── */
-  { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
-  {
-    kind: "text",
-    name: "Plated with Issy",
-    category: "Brand and Website",
-    body:
-      "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
-    meta: [ME, { label: "Year", value: "2026" }],
-  },
-  { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
-  one("plated-with-issy/site-scroll-3d.mp4"),
-  row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
-
   /* ── Lows Design and Build ─────────────────────────────────── */
   { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
   {
@@ -178,33 +163,6 @@ const RAW: Slide[] = [
     quote: "He has completely transformed our online presence and taken it to the next level.",
     by: "Samuel Low",
   },
-
-  /* ── The Moment You Realise (Share to Buy) ─────────────────── */
-  { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
-  {
-    kind: "text",
-    name: "The Moment You Realise",
-    category: "Social Campaign for Share to Buy",
-    body:
-      "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
-    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }],
-  },
-  row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
-  row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
-
-  /* ── The London Home Show ──────────────────────────────────── */
-  { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
-  {
-    kind: "text",
-    name: "The London Home Show",
-    category: "Event",
-    body:
-      "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
-    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }],
-  },
-  one("london-home-show/hero.webp"),
-  row(["london-home-show/flags.webp", "london-home-show/booklets.webp"]),
-  one("london-home-show/stage.webp"),
 
   /* ── Rennen Plus ───────────────────────────────────────────── */
   { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
@@ -236,6 +194,33 @@ const RAW: Slide[] = [
   row(["salesmasters/graphics/active-medical/wheel.webp", "salesmasters/graphics/bus4x4/wheel.webp", "salesmasters/graphics/cutek/wheel.webp", "salesmasters/graphics/site-ware-direct/wheel.webp"], "The Sales Wheel, drawn fresh for each client", { frame: false }),
   row(["salesmasters/playbook/page-1.webp", "salesmasters/playbook/page-8.webp", "salesmasters/playbook/page-14.webp", "salesmasters/playbook/page-17.webp"], "Pages from one edition"),
 
+  /* ── The Moment You Realise (Share to Buy) ─────────────────── */
+  { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
+  {
+    kind: "text",
+    name: "The Moment You Realise",
+    category: "Social Campaign for Share to Buy",
+    body:
+      "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
+    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }],
+  },
+  row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
+  row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
+
+  /* ── The London Home Show ──────────────────────────────────── */
+  { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
+  {
+    kind: "text",
+    name: "The London Home Show",
+    category: "Event",
+    body:
+      "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
+    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }],
+  },
+  one("london-home-show/hero.webp"),
+  row(["london-home-show/flags.webp", "london-home-show/booklets.webp"]),
+  one("london-home-show/stage.webp"),
+
   /* ── KinAya ────────────────────────────────────────────────── */
   { kind: "title", id: "kinaya", name: "KinAya", category: "Brand and Website", year: "2024" },
   {
@@ -250,6 +235,20 @@ const RAW: Slide[] = [
   row(["kinaya/logo-development/asset-30.webp", "kinaya/logo-development/asset-32.webp", "kinaya/logo-development/asset-35.webp", "kinaya/logo-development/asset-38.webp"], "From the client’s sketch to the final mark", { frame: false }),
   row(["web/kinaya-3.webp", "web/kinaya-4.webp"], "The values and team pages"),
   one("kinaya/accessibility.webm", "The text resizer, for carers and people with low vision"),
+
+  /* ── Plated with Issy ──────────────────────────────────────── */
+  { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
+  {
+    kind: "text",
+    name: "Plated with Issy",
+    category: "Brand and Website",
+    body:
+      "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
+    meta: [ME, { label: "Year", value: "2026" }],
+  },
+  { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
+  one("plated-with-issy/site-scroll-3d.mp4"),
+  row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
 
   /* ── Palms Motel ───────────────────────────────────────────── */
   { kind: "title", id: "palms", name: "Palms Motel", category: "Art Direction and AI", year: "2024" },

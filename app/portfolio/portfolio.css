@@ -226,7 +226,7 @@ body:has(.pf) { background: #1a1a1a; }
   overflow: hidden;
   background: transparent;
 }
-.pf-item.is-framed { border-radius: calc(var(--u) * 0.4); box-shadow: 0 0 0 1px var(--line); background: #161412; }
+.pf-item.is-framed { border-radius: calc(var(--u) * 0.4); box-shadow: 0 0 0 1px var(--line); background: var(--well, #161412); }
 .pf-item img, .pf-item video {
   display: block;
   width: 100%;
@@ -373,3 +373,36 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-chrome .top-nav-cv + .top-nav-cv { margin-left: 6px; }
 .pf-chrome .top-nav-cv + .top-nav-social-item:not(.top-nav-cv) { margin-left: 10px; }
+
+/* ── light theme (the switch in the nav; dark is the default) ─────── */
+/* Only the palette changes: a pale desk, white pages, ink type. The deep
+   maroon is the brand colour again, as on the main site. */
+html[data-pf-theme="light"]:has(.pf),
+html[data-pf-theme="light"] body:has(.pf) { background: #e8e5e0; }
+html[data-pf-theme="light"] .pf {
+  --desk: #e8e5e0;
+  --paper: #ffffff;
+  --ink: #211e1a;
+  --soft: #7d766e;
+  --brand: #510415;
+  --line: #dbd6cf;
+  --well: #f1eeea;
+}
+html[data-pf-theme="light"] .pf-chrome {
+  --ink: #211e1a;
+  --ink-soft: #7d766e;
+  --bg: #e8e5e0;
+  --line: #dbd6cf;
+  --pink-deep: #510415;
+}
+/* The cover keeps its black page in both themes: the portrait is a cut-out on
+   black and only sits cleanly on black. */
+html[data-pf-theme="light"] .pf-cover {
+  --paper: #000000;
+  --ink: #f3f1ee;
+  --soft: #9a938b;
+  --line: #2a2724;
+  color: var(--ink);
+}
+/* the theme switch's knob glyph */
+.pf-chrome .lab-switch-knob svg { width: 8px; height: 8px; }
