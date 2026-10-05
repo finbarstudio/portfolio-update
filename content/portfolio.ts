@@ -166,7 +166,7 @@ const RAW: Slide[] = [
     meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
   },
   grid(4, 2, [
-    ["portfolio/lows/logo-construction.webp", 1, 1, 2, 1],
+    ["portfolio/lows/logo-construction.mp4", 1, 1, 2, 1],
     ["portfolio/lows/logomark-construction.webp", 3, 1, 1, 1],
     ["portfolio/lows/logo-glass-3d.webp", 4, 1, 1, 1],
     ["portfolio/lows/logo-glass-mask.webp", 1, 2, 1, 1],
