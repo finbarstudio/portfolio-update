@@ -22,6 +22,9 @@
  * Portfolio/<Project>/Final Portfolio Images and go in at FULL source size as
  * WebP under public/media/images/portfolio/<project>/ (the 2560px cap in the
  * media rule is lifted for this page, on his instruction: highest quality).
+ * A 2:1 shown on its own takes the same page, at the LARGE margin: one(),
+ * the standard inset. That is Finbar's default for a full-size 2:1 (Oct 2026),
+ * not full bleed.
  * Lows is done to this standard; the other chapters still use older media
  * until he supplies theirs. Chapter order is his: Lola Audio, Plated with
  * Issy, Lows, The Moment You Realise, London Home Show, Rennen Plus, then
