@@ -194,20 +194,113 @@
   margin: 0;
 }
 
-/* The canvas is as big as fits, at its own proportions. The checks only show
-   through where the export is transparent. */
+/* THE STAGE. The artwork is as big as fits, at its own proportions (--r, set
+   on .stb-frame: the whole strip, or one panel when previewing as a post). The
+   checks only show through where the export is transparent. */
 .stb-stage {
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   min-height: 0;
-  margin: 28px;
+  margin: 20px 28px 28px;
   container-type: size;
 }
-.stb-stage canvas {
-  display: block;
+.stb-toggle {
+  flex: none;
+  padding: 6px 12px;
+  border: 1px solid var(--midnight);
+  border-radius: 999px;
+  background: none;
+  font-size: 12px;
+}
+.stb-toggle[aria-pressed="true"] { background: var(--midnight); color: var(--rose); }
+.stb-frame {
+  flex: none;
+  width: min(100cqw, calc((100cqh - 46px) * var(--r)));
+}
+.stb-view {
+  position: relative;
+  aspect-ratio: var(--r);
+  overflow: hidden;
   background: repeating-conic-gradient(#d9d3d7 0 25%, #f4f0f2 0 50%) 0 0 / 24px 24px;
   box-shadow: 0 2px 24px rgb(10 10 51 / 0.14);
 }
+.stb-view canvas { display: block; width: 100%; height: 100%; }
+/* where a carousel is cut into panels */
+.stb-cut {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+/* PREVIEW AS A POST: the same canvas, shown one panel at a time inside a plain
+   social-post card, sliding sideways as the carousel is swiped. */
+.stb-frame[data-social="1"] {
+  width: min(100cqw, 420px, calc((100cqh - 46px - 92px) * var(--r)));
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 24px rgb(10 10 51 / 0.18);
+  font-family: system-ui, sans-serif;
+}
+.stb-frame[data-social="1"] .stb-view { box-shadow: none; touch-action: pan-y; cursor: grab; }
+.stb-frame[data-social="1"] canvas {
+  width: calc(var(--n) * 100%);
+  transform: translateX(calc(var(--at) * -100% / var(--n)));
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.stb-post-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.stb-post-head i { width: 26px; height: 26px; border-radius: 50%; background: var(--pink); }
+.stb-post-foot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 12px;
+}
+.stb-icons { display: flex; gap: 12px; }
+.stb-icons svg { width: 22px; height: 22px; fill: none; stroke: var(--midnight); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.stb-pips { position: absolute; left: 50%; display: flex; gap: 4px; transform: translateX(-50%); }
+.stb-pips i { width: 6px; height: 6px; border-radius: 50%; background: rgb(10 10 51 / 0.2); }
+.stb-pips i[data-on="1"] { background: #3897f0; }
+.stb-nav {
+  position: absolute;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.85);
+  font-size: 16px;
+  line-height: 1;
+}
+.stb-nav.is-prev { left: 8px; }
+.stb-nav.is-next { right: 8px; }
+.stb-count {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  font-size: 11px;
+}
+.stb-seg-gap { margin-top: 6px; }
 
 .stb-back {
   font-size: 11px;
@@ -267,8 +360,10 @@ div.stb-slider {
   }
   .stb-stage {
     order: -1;
-    margin: 12px;
+    margin: 8px 12px 12px;
+    gap: 8px;
   }
+  .stb-toggle { min-height: 0; padding: 5px 12px; }
   .stb-panel {
     gap: 18px;
     padding: 16px 16px calc(20px + env(safe-area-inset-bottom));

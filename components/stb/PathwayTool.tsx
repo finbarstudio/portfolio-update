@@ -7,25 +7,37 @@ import { media, corsMedia } from "@/lib/media";
 
 /**
  * Share to Buy pathway maker. One screen, no scroll: controls on the left, the
- * canvas on the right. The canvas is always drawn at export size (long side
- * 2048) and scaled down to fit, so what you see is exactly what downloads.
+ * canvas on the right.
+ *
+ * FORMATS. Three only, the ones social posts use: 1:1, 3:4 and the 9:16 reel,
+ * each exported with its long side at 2048.
+ *
+ * CAROUSEL. One line drawn across three panels side by side, exported as three
+ * files that join edge to edge when swiped. The line is generated once for the
+ * whole strip (three panels wide) and each panel is a window onto it, so the
+ * line, the gradient and the scrolling text all carry straight across the
+ * joins. Every panel shares the same loop length, so each video loops cleanly
+ * on its own and the three stay in step.
+ *
+ * The canvas on screen is a preview (the strip is drawn at half size, to keep
+ * it quick). Every download is drawn fresh at full size, off screen.
  */
 
 const LONG = 2048;
 const SIZES = [
   { label: "1:1", w: LONG, h: LONG },
-  { label: "4:3", w: LONG, h: 1536 },
   { label: "3:4", w: 1536, h: LONG },
   { label: "Reel 9:16", w: 1152, h: LONG },
-  { label: "Desktop 16:9", w: LONG, h: 1152 },
 ];
+/** Panels in a carousel. */
+const PANELS = 3;
 
 /** Line thickness: three steps only, named by their width in px on a
  *  1080 x 1920 reel. Other formats take the same share of their short side. */
 const THICKNESSES = [100, 150, 200];
 
-/** "Along the path" gradient: how much line one full run of the colours covers
- *  (short side = 1). */
+/** The gradient always runs ALONG the line, like water in a pipe. This is how
+ *  much line one full run of the colours covers (short side = 1). */
 const FLOW_PERIOD = 2.5;
 
 const FONT = '"Share to Buy", system-ui, sans-serif';
@@ -45,13 +57,10 @@ interface Look {
   text: string;
   /** One colour per repeat of the text, in turn. */
   textColours: string[];
-  angle: number;
   /** Line thickness, as a share of the short side. */
   stroke: number;
   /** Text reads the other way along the line (and so sits the other way up). */
   flip: boolean;
-  /** Gradient runs along the line (water in a pipe) instead of across the canvas. */
-  flow: boolean;
 }
 
 const RGB = GRADIENT.map((hex) => {
@@ -67,21 +76,6 @@ function flowColour(t: number) {
   const b = RGB[(i + 1) % RGB.length];
   const k = f - Math.floor(f);
   return `rgb(${a.map((v, c) => Math.round(v + (b[c] - v) * k)).join(",")})`;
-}
-
-function canvasGradient(ctx: CanvasRenderingContext2D, w: number, h: number, angle: number, phase: number) {
-  const a = (angle * Math.PI) / 180;
-  const dx = Math.cos(a);
-  const dy = Math.sin(a);
-  const span = Math.abs(w * dx) + Math.abs(h * dy);
-  // The colours repeat every `span`, and the start slides back by one repeat
-  // as phase goes 0 to 1, so the loop joins up with itself.
-  const sx = w / 2 - dx * span * (0.5 + phase);
-  const sy = h / 2 - dy * span * (0.5 + phase);
-  const g = ctx.createLinearGradient(sx, sy, sx + dx * span * 2, sy + dy * span * 2);
-  const n = GRADIENT.length;
-  for (let i = 0; i <= n * 2; i++) g.addColorStop(i / (n * 2), GRADIENT[i % n]);
-  return g;
 }
 
 /** Index of the last point at or before distance d along the line. */
@@ -128,10 +122,10 @@ function trace(ctx: CanvasRenderingContext2D, pts: number[], S: number, from: nu
 }
 
 /** Stroke points from..to of the line. */
-function strokeLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, from: number, to: number, look: Look, gPhase: number, w: number, h: number) {
+function strokeLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, from: number, to: number, look: Look, gPhase: number) {
   const { pts, cum } = path;
   if (look.alpha === "line") ctx.globalCompositeOperation = "destination-out"; // cut the line out of the background
-  if (look.line === "gradient" && look.flow && look.alpha !== "line") {
+  if (look.line === "gradient" && look.alpha !== "line") {
     // No canvas gradient can follow a curve, so the line goes down as short
     // pieces, each its own colour, each overlapping the next to hide the seams.
     for (let i = from; i < to; i++) {
@@ -141,7 +135,7 @@ function strokeLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, fro
       ctx.stroke();
     }
   } else {
-    ctx.strokeStyle = look.line === "gradient" ? canvasGradient(ctx, w, h, look.angle, gPhase) : look.line;
+    ctx.strokeStyle = look.line === "gradient" ? "#000" : look.line; // (a cut-out line has no colour of its own)
     ctx.beginPath();
     trace(ctx, pts, S, from, to);
     ctx.stroke();
@@ -220,8 +214,13 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   }
 }
 
-function render(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pathway, look: Look, gPhase: number, tPhase: number) {
-  const S = Math.min(w, h);
+/**
+ * Draw one picture: a window w by h onto the line, starting `ox` px along it
+ * from the left. S is the px size of the short side of ONE panel, which is the
+ * unit the line is measured in. A single image is ox = 0; the second panel of
+ * a carousel is ox = one panel's width, and so on.
+ */
+function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, ox: number, path: Pathway, look: Look, gPhase: number, tPhase: number) {
   const last = path.pts.length / 2 - 1;
   ctx.globalCompositeOperation = "source-over";
   ctx.clearRect(0, 0, w, h);
@@ -229,23 +228,26 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pathw
     ctx.fillStyle = look.bg;
     ctx.fillRect(0, 0, w, h);
   }
+  ctx.save();
+  ctx.translate(-ox, 0);
   const STROKE = look.stroke;
   ctx.lineWidth = STROKE * S;
   ctx.lineJoin = "round";
   ctx.lineCap = "butt";
-  strokeLine(ctx, path, S, 0, last, look, gPhase, w, h);
-  if (!look.text) return;
-
-  drawText(ctx, path, S, look, STROKE * S, tPhase);
-  // Where the line passes over itself, two runs of text would collide. Lay the
-  // upper stretch down again over the crossing, then its own letters on top,
-  // so the text underneath slides out of sight beneath it.
-  const win = STROKE * 0.75;
-  for (const j of path.over) {
-    const at = path.cum[j];
-    strokeLine(ctx, path, S, locate(path.cum, at - win), Math.min(last, locate(path.cum, at + win) + 1), look, gPhase, w, h);
-    drawText(ctx, path, S, look, STROKE * S, tPhase, [(at - win - STROKE) * S, (at + win + STROKE) * S]);
+  strokeLine(ctx, path, S, 0, last, look, gPhase);
+  if (look.text) {
+    drawText(ctx, path, S, look, STROKE * S, tPhase);
+    // Where the line passes over itself, two runs of text would collide. Lay the
+    // upper stretch down again over the crossing, then its own letters on top,
+    // so the text underneath slides out of sight beneath it.
+    const win = STROKE * 0.75;
+    for (const j of path.over) {
+      const at = path.cum[j];
+      strokeLine(ctx, path, S, locate(path.cum, at - win), Math.min(last, locate(path.cum, at + win) + 1), look, gPhase);
+      drawText(ctx, path, S, look, STROKE * S, tPhase, [(at - win - STROKE) * S, (at + win + STROKE) * S]);
+    }
   }
+  ctx.restore();
 }
 
 /**
@@ -253,16 +255,17 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pathw
  *
  * The line is ONE path with a stroke, so its width and colour stay editable.
  * It is drawn as smooth curves through every sixth point of the walk rather
- * than hundreds of tiny straight pieces. A gradient across the canvas is a
- * normal linear gradient on that stroke. A gradient ALONG the path is the one
- * exception: SVG has no such thing, so that mode exports the line as short
- * coloured pieces, exactly as the canvas draws it.
+ * than hundreds of tiny straight pieces. The gradient is the one exception:
+ * SVG has no gradient that follows a curve, so a gradient line exports as
+ * short coloured pieces, exactly as the canvas draws it.
+ *
+ * `ox` picks the window, as in render(): the file shows w by h starting ox px
+ * along, by its viewBox, so a carousel panel is the same drawing cropped.
  *
  * Text stays live text in Share to Buy Bold (the font must be installed where
  * the file is opened), one letter each, already placed and turned.
  */
-function buildSvg(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pathway, look: Look) {
-  const S = Math.min(w, h);
+function buildSvg(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, ox: number, path: Pathway, look: Look) {
   const r = (v: number) => Math.round(v * 10) / 10;
   const { pts, cum } = path;
   const last = pts.length / 2 - 1;
@@ -282,20 +285,9 @@ function buildSvg(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pat
     return d;
   };
 
-  const flow = look.line === "gradient" && look.flow && look.alpha !== "line";
+  const flow = look.line === "gradient" && look.alpha !== "line";
   const defs: string[] = [];
-  let paint = look.line;
-  if (look.line === "gradient" && !flow) {
-    const a = (look.angle * Math.PI) / 180;
-    const dx = Math.cos(a), dy = Math.sin(a);
-    const span = Math.abs(w * dx) + Math.abs(h * dy);
-    const n = GRADIENT.length;
-    const stops = Array.from({ length: n + 1 }, (_, i) => `<stop offset="${i / n}" stop-color="${GRADIENT[i % n]}"/>`).join("");
-    defs.push(
-      `<linearGradient id="mix" gradientUnits="userSpaceOnUse" x1="${r(w / 2 - (dx * span) / 2)}" y1="${r(h / 2 - (dy * span) / 2)}" x2="${r(w / 2 + (dx * span) / 2)}" y2="${r(h / 2 + (dy * span) / 2)}">${stops}</linearGradient>`,
-    );
-    paint = "url(#mix)";
-  }
+  const paint = look.line === "gradient" ? "#000" : look.line;
 
   /** The line, or a stretch of it, as markup. */
   const line = (from: number, to: number, stroke = paint) => {
@@ -329,14 +321,15 @@ function buildSvg(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pat
     : [];
 
   const body: string[] = [];
-  const rect = `<rect width="${w}" height="${h}" fill="${look.bg}"/>`;
+  const box = `x="${ox}" y="0" width="${w}" height="${h}"`;
+  const rect = `<rect ${box} fill="${look.bg}"/>`;
   if (look.alpha === "line") {
     // The line is a hole in the background: a mask, still one stroked path.
-    defs.push(`<mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><rect width="${w}" height="${h}" fill="#fff"/>${line(0, last, "#000")}</mask>`);
+    defs.push(`<mask id="cut" maskUnits="userSpaceOnUse" ${box}><rect ${box} fill="#fff"/>${line(0, last, "#000")}</mask>`);
     body.push(`<g mask="url(#cut)">${rect}</g>`);
     if (look.text) {
       if (overs.length) {
-        defs.push(`<mask id="under" maskUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><rect width="${w}" height="${h}" fill="#fff"/>${overs.map((o) => line(o.from, o.to, "#000")).join("")}</mask>`);
+        defs.push(`<mask id="under" maskUnits="userSpaceOnUse" ${box}><rect ${box} fill="#fff"/>${overs.map((o) => line(o.from, o.to, "#000")).join("")}</mask>`);
         body.push(`<g mask="url(#under)">${text()}</g>`);
         for (const o of overs) body.push(text(o.range));
       } else body.push(text());
@@ -350,8 +343,10 @@ function buildSvg(ctx: CanvasRenderingContext2D, w: number, h: number, path: Pat
     }
   }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${defs.length ? `<defs>${defs.join("")}</defs>` : ""}${body.join("")}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${ox} 0 ${w} ${h}">${defs.length ? `<defs>${defs.join("")}</defs>` : ""}${body.join("")}</svg>`;
 }
+
+const pause = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 
 function save(blob: Blob, name: string) {
   const a = document.createElement("a");
@@ -377,7 +372,11 @@ function Slider({ label, value, min, max, step, onChange, show }: {
 export default function PathwayTool() {
   const [brand, setBrand] = useState<BrandKey>("stb");
   const [combo, setCombo] = useState(0);
-  const [size, setSize] = useState(4);
+  const [size, setSize] = useState(0);
+  const [carousel, setCarousel] = useState(false);
+  /** Show the canvas inside a mock social post, one panel at a time. */
+  const [social, setSocial] = useState(false);
+  const [slide, setSlide] = useState(0);
   const [seed, setSeed] = useState(1);
   const [p, setP] = useState({ rMin: 0.28, rMax: 0.75, length: 5, loop: 0.3, maxCross: 1 });
   const [text, setText] = useState("");
@@ -387,14 +386,12 @@ export default function PathwayTool() {
   /** How fast the text travels: % of the short side per second. */
   const [textSpeed, setTextSpeed] = useState(5);
   const [alpha, setAlpha] = useState<Alpha>("none");
-  const [flow, setFlow] = useState(false);
-  const [angle, setAngle] = useState(30);
   const [animateGradient, setAnimateGradient] = useState(false);
   const [scrollText, setScrollText] = useState(false);
   const [gradientSecs, setGradientSecs] = useState(8);
   /** The length of one seamless loop, worked out in the draw effect. */
   const [loopSecs, setLoopSecs] = useState(8);
-  /** null, or how far through an MP4 export we are (0 to 1). */
+  /** null, or how far through an export we are (0 to 1). */
   const [progress, setProgress] = useState<number | null>(null);
   const recording = progress !== null;
   const [fontReady, setFontReady] = useState(false);
@@ -412,9 +409,15 @@ export default function PathwayTool() {
 
   const canvas = useRef<HTMLCanvasElement>(null);
   const clock = useRef(0); // when the loop last started
+  const drag = useRef<number | null>(null);
 
   const { w, h } = SIZES[size];
   const short = Math.min(w, h);
+  const n = carousel ? PANELS : 1;
+  /** The whole strip: one panel, or three side by side. */
+  const stripW = w * n;
+  /** The canvas on screen: full size for one image, half size for a strip. */
+  const view = carousel ? 0.5 : 1;
   const colours = BRANDS[brand].combos[combo];
   const live = brand === "live";
   const isGradient = colours.line === "gradient";
@@ -424,7 +427,9 @@ export default function PathwayTool() {
   const moving = gradientMoves || textMoves;
   const stroke = thickness / 1080;
   const presets = textPresets(colours.line);
-  const path = generatePathway(seed, w / short, h / short, { ...p, stroke });
+  // A strip is three panels of ground to cover, so the line is that much longer.
+  const path = generatePathway(seed, stripW / short, h / short, { ...p, length: p.length * (carousel ? 2.4 : 1), stroke, panels: n });
+  const at = Math.min(slide, n - 1);
 
   const look: Look = {
     bg: colours.bg,
@@ -433,10 +438,8 @@ export default function PathwayTool() {
     alpha: moving ? "none" : alpha,
     text: shownText,
     textColours: (presets[textPreset] ?? presets[0]).colours,
-    angle,
     flip: flipText,
     stroke,
-    flow,
   };
 
   /**
@@ -444,27 +447,30 @@ export default function PathwayTool() {
    * the length: the time it takes to travel one full set of its colours at the
    * chosen speed, after which every letter and colour is back where it began.
    * The gradient then fits a whole number of runs into that time. With no
-   * scrolling text the loop is simply the gradient's own length.
+   * scrolling text the loop is simply the gradient's own length. It is the
+   * same for every panel of a carousel. S is the short side being drawn at.
    */
-  const timing = (ctx: CanvasRenderingContext2D) => {
+  const timing = (ctx: CanvasRenderingContext2D, S: number) => {
     if (!textMoves) return { secs: gradientSecs, cycles: 1 };
-    const set = ticker(ctx, look.text, stroke * short).period * look.textColours.length;
-    const secs = set / ((textSpeed / 100) * short);
+    const set = ticker(ctx, look.text, stroke * S).period * look.textColours.length;
+    const secs = set / ((textSpeed / 100) * S);
     return { secs, cycles: Math.max(1, Math.round(secs / gradientSecs)) };
   };
-  /** Draw the frame at t (0 to 1) through the loop. */
-  const frame = (ctx: CanvasRenderingContext2D, t: number, cycles: number) =>
-    render(ctx, w, h, path, look, gradientMoves ? (t * cycles) % 1 : 0, textMoves ? t : 0);
+  /** Draw panel `i` at full size, at t (0 to 1) through the loop. */
+  const drawPanel = (ctx: CanvasRenderingContext2D, i: number, t: number, cycles: number) =>
+    render(ctx, w, h, short, i * w, path, look, gradientMoves ? (t * cycles) % 1 : 0, textMoves ? t : 0);
 
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");
-    if (!ctx || recording) return; // an export draws its own frames
-    const { secs, cycles } = timing(ctx);
+    if (!ctx) return;
+    const S = short * view;
+    const { secs, cycles } = timing(ctx, S);
     if (Math.abs(secs - loopSecs) > 0.01) setLoopSecs(secs);
     let raf = 0;
     const draw = () => {
-      frame(ctx, moving ? ((performance.now() - clock.current) / 1000 / secs) % 1 : 0, cycles);
-      if (moving) raf = requestAnimationFrame(draw);
+      const t = moving ? ((performance.now() - clock.current) / 1000 / secs) % 1 : 0;
+      render(ctx, stripW * view, h * view, S, 0, path, look, gradientMoves ? (t * cycles) % 1 : 0, textMoves ? t : 0);
+      if (moving && !recording) raf = requestAnimationFrame(draw); // an export takes the processor; the preview holds
     };
     draw();
     return () => cancelAnimationFrame(raf);
@@ -473,24 +479,45 @@ export default function PathwayTool() {
 
   const set = (patch: Partial<typeof p>) => setP({ ...p, ...patch });
   const restart = () => { clock.current = performance.now(); };
-  const name = `${brand}-pathway-${seed}-${w}x${h}`;
+  const base = `${brand}-pathway-${seed}-${w}x${h}`;
+  const fileName = (i: number, ext: string) => `${base}${n > 1 ? `-${i + 1}of${n}` : ""}.${ext}`;
+  const files = n > 1 ? ` · ${n} files` : "";
 
-  /** The still picture: a moving gradient or text exports as its first frame. */
-  const downloadSvg = () => {
-    const ctx = canvas.current?.getContext("2d");
-    if (ctx) save(new Blob([buildSvg(ctx, w, h, path, look)], { type: "image/svg+xml" }), `${name}.svg`);
+  /** A full-size canvas, off screen, for the downloads. */
+  const sheet = () => {
+    const el = document.createElement("canvas");
+    el.width = w;
+    el.height = h;
+    return { el, ctx: el.getContext("2d")! };
   };
-  const downloadPng = () => canvas.current?.toBlob((b) => b && save(b, `${name}.png`), "image/png");
+
+  // Stills: a moving gradient or text exports as its first frame. A carousel
+  // saves one file per panel, a moment apart so the browser lets them all through.
+  const downloadPng = async () => {
+    const { el, ctx } = sheet();
+    for (let i = 0; i < n; i++) {
+      drawPanel(ctx, i, 0, 1);
+      const blob = await new Promise<Blob | null>((r) => el.toBlob(r, "image/png"));
+      if (blob) save(blob, fileName(i, "png"));
+      await pause(350);
+    }
+  };
+  const downloadSvg = async () => {
+    const { ctx } = sheet();
+    for (let i = 0; i < n; i++) {
+      save(new Blob([buildSvg(ctx, w, h, short, i * w, path, look)], { type: "image/svg+xml" }), fileName(i, "svg"));
+      await pause(350);
+    }
+  };
 
   /**
-   * MP4, one loop. Frames are drawn and encoded one at a time, not filmed off
-   * the screen, so frame N is exactly t = N / total and the last frame runs
-   * straight back into the first, whatever the computer's speed.
+   * MP4, one loop per panel. Frames are drawn and encoded one at a time, not
+   * filmed off the screen, so frame N is exactly t = N / total and the last
+   * frame runs straight back into the first, whatever the computer's speed.
+   * Every panel gets the same frames at the same times, so they stay in step.
    */
   const exportVideo = async () => {
-    const el = canvas.current;
-    const ctx = el?.getContext("2d");
-    if (!el || !ctx || recording) return;
+    if (recording) return;
     if (typeof VideoEncoder === "undefined") {
       window.alert("This browser cannot export video. Use Chrome, Edge or Safari.");
       return;
@@ -498,34 +525,40 @@ export default function PathwayTool() {
     setProgress(0);
     try {
       const { Muxer, ArrayBufferTarget } = await import("mp4-muxer");
+      const { el, ctx } = sheet();
       const fps = 30;
-      const { secs, cycles } = timing(ctx);
+      const { secs, cycles } = timing(ctx, short);
       const total = Math.max(1, Math.round(secs * fps));
-      const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: "avc", width: w, height: h }, fastStart: "in-memory" });
-      const encoder = new VideoEncoder({
-        output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-        error: (e) => console.error(e),
-      });
-      encoder.configure({ codec: "avc1.640033", width: w, height: h, bitrate: 16_000_000, framerate: fps });
-      for (let i = 0; i < total; i++) {
-        frame(ctx, i / total, cycles);
-        const picture = new VideoFrame(el, { timestamp: (i * 1e6) / fps, duration: 1e6 / fps });
-        encoder.encode(picture, { keyFrame: i % 60 === 0 });
-        picture.close();
-        if (i % 5 === 0) {
-          setProgress(i / total);
-          await new Promise((r) => setTimeout(r)); // let the encoder and the screen catch up
+      for (let panel = 0; panel < n; panel++) {
+        const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: "avc", width: w, height: h }, fastStart: "in-memory" });
+        const encoder = new VideoEncoder({
+          output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+          error: (e) => console.error(e),
+        });
+        encoder.configure({ codec: "avc1.640033", width: w, height: h, bitrate: 16_000_000, framerate: fps });
+        for (let i = 0; i < total; i++) {
+          drawPanel(ctx, panel, i / total, cycles);
+          const picture = new VideoFrame(el, { timestamp: (i * 1e6) / fps, duration: 1e6 / fps });
+          encoder.encode(picture, { keyFrame: i % 60 === 0 });
+          picture.close();
+          if (i % 5 === 0) {
+            setProgress((panel + i / total) / n);
+            await pause(); // let the encoder and the screen catch up
+          }
+          while (encoder.encodeQueueSize > 8) await pause(5);
         }
-        while (encoder.encodeQueueSize > 8) await new Promise((r) => setTimeout(r, 5));
+        await encoder.flush();
+        muxer.finalize();
+        save(new Blob([muxer.target.buffer], { type: "video/mp4" }), fileName(panel, "mp4"));
+        await pause(350);
       }
-      await encoder.flush();
-      muxer.finalize();
-      save(new Blob([muxer.target.buffer], { type: "video/mp4" }), `${name}.mp4`);
     } finally {
       restart();
       setProgress(null);
     }
   };
+
+  const go = (to: number) => setSlide(Math.max(0, Math.min(n - 1, to)));
 
   return (
     <div className="stb-tool" data-font={fontReady ? "in" : "wait"}>
@@ -565,13 +598,17 @@ export default function PathwayTool() {
         </section>
 
         <section>
-          <h2>Size</h2>
-          <div className="stb-seg stb-seg-wrap">
+          <h2>Format</h2>
+          <div className="stb-seg">
             {SIZES.map((s, i) => (
               <button key={s.label} type="button" aria-pressed={size === i} onClick={() => setSize(i)}>
                 {s.label}
               </button>
             ))}
+          </div>
+          <div className="stb-seg stb-seg-gap">
+            <button type="button" aria-pressed={!carousel} onClick={() => { setCarousel(false); setSlide(0); }}>Single</button>
+            <button type="button" aria-pressed={carousel} onClick={() => setCarousel(true)}>Carousel of {PANELS}</button>
           </div>
         </section>
 
@@ -633,14 +670,9 @@ export default function PathwayTool() {
         {isGradient && (
           <section>
             <h2>Gradient</h2>
-            <div className="stb-seg">
-              <button type="button" aria-pressed={!flow} onClick={() => setFlow(false)}>Across canvas</button>
-              <button type="button" aria-pressed={flow} onClick={() => setFlow(true)}>Along the path</button>
-            </div>
-            {!flow && <Slider label="Angle" value={angle} min={0} max={360} step={5} onChange={setAngle} show={`${angle}°`} />}
             <label className="stb-check">
               <input type="checkbox" checked={animateGradient} onChange={(e) => { restart(); setAnimateGradient(e.target.checked); }} />
-              Animate
+              Flow along the path
             </label>
             {animateGradient && (
               <Slider label="One run" value={gradientSecs} min={2} max={20} step={1} onChange={setGradientSecs} show={textMoves ? `~${gradientSecs}s` : `${gradientSecs}s`} />
@@ -671,7 +703,7 @@ export default function PathwayTool() {
             </button>
           )}
           <p className="stb-note">
-            {w} × {h} · seed {seed} · {path.crossings} overlap{path.crossings === 1 ? "" : "s"}
+            {w} × {h}{files} · seed {seed} · {path.crossings} overlap{path.crossings === 1 ? "" : "s"}
             {path.clean ? "" : " · closest fit, try another"}
           </p>
           <a className="stb-back" href="/">Back to the lab</a>
@@ -679,7 +711,51 @@ export default function PathwayTool() {
       </aside>
 
       <main className="stb-stage">
-        <canvas ref={canvas} width={w} height={h} style={{ aspectRatio: `${w} / ${h}`, width: `min(100cqw, calc(100cqh * ${w / h}))` }} />
+        <button type="button" className="stb-toggle" aria-pressed={social} onClick={() => { setSocial(!social); setSlide(0); }}>
+          {social ? "Show the artwork" : "Preview as a post"}
+        </button>
+        <div
+          className="stb-frame"
+          data-social={social ? "1" : "0"}
+          style={{ ["--r" as string]: (social ? w : stripW) / h, ["--n" as string]: n, ["--at" as string]: social ? at : 0 }}
+        >
+          {social && (
+            <div className="stb-post-head">
+              <i aria-hidden="true" />
+              <b>sharetobuy</b>
+            </div>
+          )}
+          <div
+            className="stb-view"
+            onPointerDown={(e) => { drag.current = e.clientX; }}
+            onPointerUp={(e) => {
+              // a swipe moves one panel, as it does on a phone
+              if (social && drag.current !== null && Math.abs(e.clientX - drag.current) > 30) go(at + (e.clientX < drag.current ? 1 : -1));
+              drag.current = null;
+            }}
+          >
+            <canvas ref={canvas} width={Math.round(stripW * view)} height={Math.round(h * view)} />
+            {/* where one panel ends and the next begins */}
+            {!social && Array.from({ length: n - 1 }, (_, i) => <span key={i} className="stb-cut" style={{ left: `${((i + 1) / n) * 100}%` }} aria-hidden="true" />)}
+            {social && n > 1 && at > 0 && <button type="button" className="stb-nav is-prev" aria-label="Previous" onClick={() => go(at - 1)}>‹</button>}
+            {social && n > 1 && at < n - 1 && <button type="button" className="stb-nav is-next" aria-label="Next" onClick={() => go(at + 1)}>›</button>}
+            {social && n > 1 && <span className="stb-count">{at + 1}/{n}</span>}
+          </div>
+          {social && (
+            <div className="stb-post-foot">
+              <span className="stb-icons" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.5c0 5.600-7.5 10-7.500 10z" /></svg>
+                <svg viewBox="0 0 24 24"><path d="M20.500 11.500a8.500 8.500 0 0 1-12.600 7.400L3.500 20.500l1.600-4.400A8.500 8.500 0 1 1 20.500 11.500z" /></svg>
+                <svg viewBox="0 0 24 24"><path d="M21 3 10.500 13.500M21 3l-6.500 18-4-7.500L3 9.500z" /></svg>
+              </span>
+              {n > 1 && (
+                <span className="stb-pips" aria-hidden="true">
+                  {Array.from({ length: n }, (_, i) => <i key={i} data-on={i === at ? "1" : "0"} />)}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );

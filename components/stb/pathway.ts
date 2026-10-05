@@ -27,6 +27,9 @@ export interface PathParams {
   loop: number;
   /** How many times the line may cross itself inside the frame. */
   maxCross: number;
+  /** A carousel: the frame is this many equal panels side by side, and the
+   *  line has to show in every one of them. Default 1. */
+  panels?: number;
 }
 
 export interface Pathway {
@@ -62,12 +65,15 @@ function walk(rng: () => number, W: number, H: number, p: PathParams): number[] 
   const rMin = Math.max(p.rMin, p.stroke * 1.25); // a loop must keep a hole in it
   const rMax = Math.max(p.rMax, rMin);
 
+  // A carousel strip is crossed end to end (see below), so it starts at one end.
+  const strip = (p.panels ?? 1) > 1;
+  const dir = rng() < 0.5 ? 1 : -1; // which way a strip is crossed
   // Start just outside one edge, pointed at somewhere in the middle.
-  const edge = Math.floor(rng() * 4);
+  const edge = strip ? (dir === 1 ? 0 : 1) : Math.floor(rng() * 4);
   const t = 0.15 + 0.7 * rng();
   let x = edge === 0 ? -out : edge === 1 ? W + out : t * W;
   let y = edge === 2 ? -out : edge === 3 ? H + out : t * H;
-  const tx = W * (0.25 + 0.5 * rng());
+  const tx = strip ? x + dir * H : W * (0.25 + 0.5 * rng());
   const ty = H * (0.25 + 0.5 * rng());
   let th = Math.atan2(ty - y, tx - x) + (rng() - 0.5) * 0.6;
 
@@ -84,14 +90,28 @@ function walk(rng: () => number, W: number, H: number, p: PathParams): number[] 
     pts.push(x, y);
   };
 
-  while (total < p.length) {
-    const loop = rng() < p.loop;
+  // A single frame wanders until it has laid down enough line. A strip instead
+  // keeps going until it has crossed to the far end, so every panel gets its
+  // share: whenever it has turned too far from the way it is travelling, or is
+  // drifting off the top or bottom, the next bend turns it back.
+  const more = () => (strip ? (dir === 1 ? x < W + out : x > -out) && total < p.length * 3 : total < p.length);
+  while (more()) {
+    let loop = rng() < p.loop;
+    if (strip) {
+      const want = Math.atan2((H / 2 - y) * 0.9, dir * H);
+      const off = Math.atan2(Math.sin(want - th), Math.cos(want - th));
+      if (Math.abs(off) > 1.15) {
+        sign = off > 0 ? 1 : -1;
+        loop = false;
+      }
+    }
     const r = loop ? lerp(rMin, Math.min(rMax, rMin * 1.5), rng()) : lerp(rMin, rMax, rng());
     const sweep = loop ? rad(210 + 110 * rng()) : rad(60 + 110 * rng());
     const len = r * sweep;
     for (let s = 0; s < len; s += DS) {
       step(sign / r, 0.6 * r);
       if (x < -far || x > W + far || y < -far || y > H + far) return null;
+      if (strip && (dir === 1 ? x > W + out : x < -out)) break; // across: stop here
     }
     total += len;
     if (rng() < 0.8) sign = -sign;
@@ -149,7 +169,9 @@ function score(pts: number[], W: number, H: number, p: PathParams) {
       if (between < rad(50)) bad += 2;
     }
   }
-  if (cross.length > p.maxCross) bad += 3 * (cross.length - p.maxCross);
+  // the limit is per panel's worth of frame
+  const allowed = p.maxCross * (p.panels ?? 1);
+  if (cross.length > allowed) bad += 3 * (cross.length - allowed);
 
   // Clearance: away from a crossing, two stretches of line keep a gap between
   // them so they never merge into a blob.
@@ -178,8 +200,18 @@ function score(pts: number[], W: number, H: number, p: PathParams) {
     x0 = Math.min(x0, xs[i]); x1 = Math.max(x1, xs[i]);
     y0 = Math.min(y0, ys[i]); y1 = Math.max(y1, ys[i]);
   }
-  if (seen * sp < Math.max(1.2, 0.4 * p.length)) bad += 2;
-  if (x1 - x0 < 0.6 * W || y1 - y0 < 0.6 * H) bad += 1;
+  if (seen * sp < Math.max(1.2, (p.panels ?? 1) > 1 ? 0.75 * W : 0.4 * p.length)) bad += 2;
+  const panels = p.panels ?? 1;
+  if (x1 - x0 < (panels > 1 ? 0.88 : 0.6) * W || y1 - y0 < 0.6 * H) bad += 1;
+  // A carousel: every panel gets a decent stretch of line, or it is an empty slide.
+  if (panels > 1) {
+    const inPanel = new Array<number>(panels).fill(0);
+    for (let i = 0; i < n; i++) {
+      if (xs[i] < 0 || xs[i] >= W || ys[i] < 0 || ys[i] > H) continue;
+      inPanel[Math.floor((xs[i] / W) * panels)]++;
+    }
+    for (const count of inPanel) if (count * sp < 0.7) bad += 2;
+  }
 
   return { bad, crossings: cross.length, over: cross.map(([, j]) => j * every) };
 }
