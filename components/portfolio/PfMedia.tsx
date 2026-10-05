@@ -39,7 +39,9 @@ function slot(): Promise<() => void> {
 }
 
 async function download(url: string, onProgress: (pct: number | null) => void, signal: AbortSignal): Promise<string> {
-  const res = await fetch(url, { signal });
+  // On the dev server, always check for a newer file: a hard refresh does not
+  // clear what a scripted download has cached, so a replaced video kept showing.
+  const res = await fetch(url, { signal, cache: process.env.NODE_ENV === "development" ? "reload" : "default" });
   if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
   const total = Number(res.headers.get("content-length")) || 0;
   if (!total) onProgress(null); // no size given: the bar runs without a number
