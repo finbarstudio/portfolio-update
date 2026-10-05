@@ -56,7 +56,9 @@ const nextConfig: NextConfig = {
       {
         source: "/media/:path*",
         headers: [
-          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=86400" },
+          // On the dev server a replaced file must show at once: a day's cache
+          // there meant a re-rendered video kept playing its old version.
+          { key: "Cache-Control", value: process.env.NODE_ENV === "development" ? "no-store" : "public, max-age=86400, stale-while-revalidate=86400" },
         ],
       },
       // Direct downloads. Plain static files under public/downloads: no route
