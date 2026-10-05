@@ -1,0 +1,31 @@
+/* Layout test for /portfolio/mock (dev only). */
+.pfm-box { position: absolute; display: grid; place-items: center; }
+.pfm.is-bleed .pfm-box { inset: 0; }
+.pfm.is-m1 .pfm-box { inset: 2.5cqw; }               /* small: the same all round */
+.pfm.is-m2 .pfm-box { inset: 5.4cqw 6cqw 6.6cqw; }   /* large: the portfolio's current inset */
+
+/* the artwork at its shape: the largest box of ratio --r that fits */
+.pfm-art {
+  --bw: calc(100cqw - 2 * var(--mx));
+  --bh: calc(56.25cqw - var(--my));
+  width: min(var(--bw), calc(var(--bh) * var(--r)));
+  aspect-ratio: var(--r);
+  background: #eeeeee; /* the van's own backdrop, extended */
+  overflow: hidden;
+}
+.pfm.is-m1 .pfm-art { --mx: 2.5cqw; --my: 5cqw; }
+.pfm.is-m2 .pfm-art { --mx: 6cqw; --my: 12cqw; }
+/* full bleed: the shape covers the page and the page crops what does not fit */
+.pfm.is-bleed .pfm-art { width: max(100cqw, calc(56.25cqw * var(--r))); flex: none; }
+.pfm.is-bleed .pfm-box { overflow: hidden; }
+.pfm-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+.pfm-tag {
+  position: absolute;
+  left: 1cqw;
+  top: 0.8cqw;
+  padding: 0.3cqw 0.6cqw;
+  background: #000;
+  color: #f3f1ee;
+  z-index: 2;
+}

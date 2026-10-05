@@ -37,7 +37,7 @@
 import { media as mediaOne, mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -160,8 +160,8 @@ const RAW: Slide[] = [
       "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
     meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
   },
-  one("portfolio/lows/logo-construction.mp4", undefined, { frame: false }),
   one("portfolio/lows/logo-zoom.mp4", undefined, { frame: false }),
+  one("portfolio/lows/macbook.webm", undefined, { frame: false, scale: 1.1 }),
   grid(4, 2, [
     ["portfolio/lows/logo-construction.webp", 1, 1, 2, 1],
     ["portfolio/lows/logomark-construction.webp", 3, 1, 1, 1],
@@ -170,9 +170,8 @@ const RAW: Slide[] = [
     ["portfolio/lows/phone-instagram.webp", 2, 2, 1, 1],
     ["portfolio/lows/business-card.webp", 3, 2, 2, 1],
   ]),
-  bleed("portfolio/lows/billboard.webp"),
+  one("portfolio/lows/billboard.webp"),
   bleed("portfolio/lows/van.webp"),
-  one("portfolio/lows/macbook.webm"),
   {
     kind: "quote",
     name: "Lows Design + Build",

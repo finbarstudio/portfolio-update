@@ -222,7 +222,7 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-item {
   position: relative;
   flex: none;
-  height: var(--h);
+  height: calc(var(--h) * var(--k, 1));
   overflow: hidden;
   background: transparent;
 }

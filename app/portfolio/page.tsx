@@ -42,7 +42,7 @@ function Item({ m, style }: { m: Media; style?: React.CSSProperties }) {
   return (
     <div
       className={`pf-item${m.frame === false ? "" : " is-framed"}`}
-      style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...style } as React.CSSProperties}
+      style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
     >
       <PfMedia src={m.src} video={m.video} alt={m.alt} w={m.w} h={m.h} />
     </div>
