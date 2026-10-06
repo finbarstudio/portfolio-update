@@ -72,6 +72,9 @@ function greyCard(renderer: Renderer, index: number): MediaItem {
 }
 const greyCards = (renderer: Renderer) => GREYS.map((_, index) => greyCard(renderer, index));
 
+/** Finbar's Stripe payment page. Change the link here. */
+const PINT_URL = "https://donate.stripe.com/cNi6oH8vP2f6eHlaoQ8N200";
+
 const RECORDING_TYPES = ["video/mp4;codecs=avc1.640033", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
 
 /** Big photos are drawn down to 2048px so 60 of them still fit on the GPU. */
@@ -640,6 +643,9 @@ export default function MotionTool() {
             </div>
           </section>
         ))}
+        <a className="mp-pint" href={PINT_URL} target="_blank" rel="noopener noreferrer">
+          Buy me a pint
+        </a>
       </nav>
 
       <main className="mp-stage">
