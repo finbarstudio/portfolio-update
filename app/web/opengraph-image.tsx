@@ -78,7 +78,7 @@ export default async function WebOpengraphImage() {
           </div>
         </div>
 
-        <div style={{ display: "flex", marginTop: "auto", fontSize: 22, fontWeight: 400, color: INK }}>
+        <div style={{ display: "flex", marginTop: "auto", fontSize: 22, fontWeight: 500, color: INK }}>
           web.finbar.studio
         </div>
       </div>

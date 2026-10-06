@@ -85,7 +85,7 @@ export default async function FreeRedesignOpengraphImage() {
             textAlign: "center",
             marginTop: 30,
             fontSize: 28,
-            fontWeight: 400,
+            fontWeight: 500,
             lineHeight: 1.4,
             color: INK_SOFT,
             maxWidth: 720,

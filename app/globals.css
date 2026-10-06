@@ -211,9 +211,10 @@
   --color-umber:     var(--umber);
 
   --font-sans: var(--font-primary);
-  /* Space Mono (Google) — wide-tracked caps for small details only: dates,
-     badges/tags, the contact email, and the editorial links. */
-  --font-mono: var(--font-space-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* No monospace on the studio site any more (Oct 2026): everything that
+     used Space Mono is the small Host label face. Only the sandbox tools keep
+     a real monospace (.sb-root in sandbox.css sets this back). */
+  --font-mono: var(--font-label);
 }
 
 /* ─── Keyframes ──────────────────────────────────────────────── */

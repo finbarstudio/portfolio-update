@@ -42,7 +42,7 @@ function Mark({ size: s }: { size: number }) {
 }
 
 export default async function OpengraphImage() {
-  // Host Grotesk = the wordmark face; Space Mono stays for the mono caps labels.
+  // Host Grotesk = the wordmark face; the small caps labels are Host too, at medium weight.
   const fonts = await loadOgFonts();
 
   return new ImageResponse(
@@ -57,7 +57,7 @@ export default async function OpengraphImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "Space Mono, monospace",
+          fontFamily: "Host Grotesk, sans-serif",
           position: "relative",
         }}
       >
@@ -85,9 +85,9 @@ export default async function OpengraphImage() {
             display: "flex",
             marginTop: 40,
             fontSize: 22,
-            fontWeight: 400,
+            fontWeight: 500,
             color: INK_SOFT,
-            letterSpacing: "0.28em",
+            letterSpacing: "0.14em",
             textTransform: "uppercase",
           }}
         >

@@ -1,13 +1,11 @@
 import { ImageResponse } from "next/og";
 import { loadOgFonts } from "@/lib/og-fonts";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
-import { LAB_ITEMS } from "@/content/lab-items";
 
 /**
  * lab.finbar.studio social share card (Open Graph + Twitter), 1200×630.
  * Black like the lab itself: the studio wordmark with LAB set under it in the
- * brand pink, the one-line description, and a catalogue count that keeps
- * itself up to date from content/lab-items.ts.
+ * brand pink, and nothing else.
  */
 
 export const alt = "Finbar Studio Lab. Things made and not published anywhere else yet.";
@@ -16,7 +14,6 @@ export const contentType = "image/png";
 
 const BG = "#000000";
 const INK = "#F3F1EE";
-const SOFT = "#9A938B";
 const PINK = "#E96D89";
 
 function Mark({ size: s }: { size: number }) {
@@ -35,20 +32,12 @@ function Mark({ size: s }: { size: number }) {
   );
 }
 
-const label = { display: "flex", fontFamily: "Space Mono, monospace", fontSize: 22, letterSpacing: "0.2em", textTransform: "uppercase" } as const;
-
 export default async function LabOpengraphImage() {
   const fonts = await loadOgFonts();
-  const count = String(LAB_ITEMS.length).padStart(2, "0");
 
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", background: BG, color: INK, display: "flex", flexDirection: "column", justifyContent: "space-between", fontFamily: "Host Grotesk, sans-serif", padding: 64 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", color: SOFT }}>
-          <div style={label}>lab.finbar.studio</div>
-          <div style={label}>{count} pieces</div>
-        </div>
-
+      <div style={{ width: "100%", height: "100%", background: BG, color: INK, display: "flex", flexDirection: "column", justifyContent: "center", fontFamily: "Host Grotesk, sans-serif", padding: 64 }}>
         <div style={{ display: "flex", flexDirection: "column", fontSize: 136, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 0.9, textTransform: "uppercase" }}>
           <div style={{ display: "flex", alignItems: "center" }}>
             FINBARSTUDIO
@@ -59,7 +48,6 @@ export default async function LabOpengraphImage() {
           <div style={{ display: "flex", color: PINK }}>Lab</div>
         </div>
 
-        <div style={{ ...label, color: INK }}>Things made and not published anywhere else yet</div>
       </div>
     ),
     { ...size, fonts },

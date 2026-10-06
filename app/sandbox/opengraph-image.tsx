@@ -39,7 +39,7 @@ function Mark({ size: s }: { size: number }) {
 }
 
 export default async function SandboxOpengraphImage() {
-  // Host Grotesk = the canonical wordmark; Space Mono stays for the SANDBOX title.
+  // Host Grotesk = the canonical wordmark; the SANDBOX title and labels are Host too.
   const fonts = await loadOgFonts();
 
   return new ImageResponse(
@@ -52,7 +52,7 @@ export default async function SandboxOpengraphImage() {
           color: INK,
           display: "flex",
           flexDirection: "column",
-          fontFamily: "Space Mono, monospace",
+          fontFamily: "Host Grotesk, sans-serif",
           padding: 64,
           position: "relative",
         }}
@@ -82,7 +82,7 @@ export default async function SandboxOpengraphImage() {
             SANDBOX
           </div>
 
-          <div style={{ display: "flex", marginTop: 28, fontSize: 26, fontWeight: 400, color: INK_SOFT, letterSpacing: "0.04em" }}>
+          <div style={{ display: "flex", marginTop: 28, fontSize: 26, fontWeight: 500, color: INK_SOFT, letterSpacing: "0.04em" }}>
             Free creative tools, in the browser.
           </div>
 
@@ -94,7 +94,7 @@ export default async function SandboxOpengraphImage() {
                 style={{
                   display: "flex",
                   fontSize: 18,
-                  fontWeight: 400,
+                  fontWeight: 500,
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
                   color: INK,

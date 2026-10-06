@@ -14,14 +14,13 @@ import path from "node:path";
  */
 export async function loadOgFonts() {
   const dir = path.join(process.cwd(), "assets", "og-fonts");
-  const [host700, mono700, mono400] = await Promise.all([
+  const [host700, host500] = await Promise.all([
     readFile(path.join(dir, "host-grotesk-700.ttf")),
-    readFile(path.join(dir, "space-mono-700.ttf")),
-    readFile(path.join(dir, "space-mono-400.ttf")),
+    readFile(path.join(dir, "host-grotesk-500.ttf")),
   ]);
+  // Host Grotesk only: bold for the wordmark, medium for the small caps labels.
   return [
     { name: "Host Grotesk", data: host700, weight: 700 as const, style: "normal" as const },
-    { name: "Space Mono", data: mono700, weight: 700 as const, style: "normal" as const },
-    { name: "Space Mono", data: mono400, weight: 400 as const, style: "normal" as const },
+    { name: "Host Grotesk", data: host500, weight: 500 as const, style: "normal" as const },
   ];
 }
