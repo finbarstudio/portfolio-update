@@ -31,6 +31,7 @@ import {
   type Look,
   type MotionKey,
   type Options,
+  type Origin,
   type Preset,
   type SavedSetup,
   type TiltMode,
@@ -189,15 +190,44 @@ function Slider({
   value: number;
   onChange: (value: number) => void;
 }) {
+  // While the value is being typed it is text; otherwise it shows the number.
+  const [typed, setTyped] = useState<string | null>(null);
+  const shown = step >= 1 ? String(value) : value.toFixed(step >= 0.1 ? 1 : 2);
   const at = (v: number) => ((clamp(v, min, max) - min) / (max - min)) * 100;
   const zero = min < 0 && max > 0 ? at(0) : 0;
   const fill = { "--from": `${Math.min(zero, at(value))}%`, "--to": `${Math.max(zero, at(value))}%` } as React.CSSProperties;
+  const commit = () => {
+    if (typed !== null) {
+      const parsed = Number(typed);
+      if (typed.trim() !== "" && Number.isFinite(parsed)) onChange(clamp(step >= 1 ? Math.round(parsed) : parsed, min, max));
+    }
+    setTyped(null);
+  };
   return (
-    <label className="mp-slider" style={fill}>
+    <div className="mp-slider" style={fill}>
       <span>{label}</span>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} />
-      <output>{step >= 1 ? value : value.toFixed(step >= 0.1 ? 1 : 2)}</output>
-    </label>
+      <input type="range" aria-label={label} min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} />
+      <input
+        className="mp-slider-value"
+        type="text"
+        inputMode="decimal"
+        aria-label={`${label}, typed`}
+        value={typed ?? shown}
+        onFocus={(event) => {
+          setTyped(shown);
+          event.target.select();
+        }}
+        onChange={(event) => setTyped(event.target.value)}
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") event.currentTarget.blur();
+          if (event.key === "Escape") {
+            setTyped(null);
+            event.currentTarget.blur();
+          }
+        }}
+      />
+    </div>
   );
 }
 
@@ -337,6 +367,13 @@ const DIRECTIONS: { value: Direction; label: string }[] = [
 const WAYS: { value: Direction; label: string }[] = [
   { value: "left", label: "Forward" },
   { value: "right", label: "Reverse" },
+];
+const ORIGINS: { value: Origin; label: string }[] = [
+  { value: "centre", label: "Centre" },
+  { value: "up", label: "Top" },
+  { value: "down", label: "Bottom" },
+  { value: "left", label: "Left" },
+  { value: "right", label: "Right" },
 ];
 const TILTS: { value: TiltMode; label: string }[] = [
   { value: "off", label: "Off" },
@@ -681,6 +718,24 @@ export default function MotionTool() {
       </main>
 
       <aside className="mp-panel mp-panel-right" aria-label="Settings">
+        <Heading title="Canvas" changed={look.width !== BASE_LOOK.width || look.height !== BASE_LOOK.height} onReset={() => patchLook({ width: BASE_LOOK.width, height: BASE_LOOK.height })} />
+        <div className="mp-choices">
+          {CANVAS_SIZES.map((size) => (
+            <button
+              key={size.label}
+              type="button"
+              aria-pressed={look.width === size.width && look.height === size.height}
+              onClick={() => patchLook({ width: size.width, height: size.height })}
+            >
+              {size.label}
+            </button>
+          ))}
+        </div>
+        <div className="mp-pair">
+          <NumberField key={`w${look.width}`} label={`Width, ${CANVAS_MIN} to ${CANVAS_MAX} px`} value={look.width} onCommit={(value) => patchLook({ width: canvasSide(value) })} />
+          <NumberField key={`h${look.height}`} label={`Height, ${CANVAS_MIN} to ${CANVAS_MAX} px`} value={look.height} onCommit={(value) => patchLook({ height: canvasSide(value) })} />
+        </div>
+
         <h2>Media</h2>
         <div className={dragging ? "mp-drop is-over" : "mp-drop"}>
           <button type="button" onClick={() => imageInputRef.current?.click()}>
@@ -722,7 +777,8 @@ export default function MotionTool() {
             setChosen({});
           }}
         />
-        {layout !== "tour" && !(layout === "proximity" && preset.variant.field) && (
+        {layout === "zoom" && <Choice label="Grow from" value={options.origin} options={ORIGINS} onChange={(value) => setOption("origin", value)} />}
+        {layout !== "tour" && layout !== "zoom" && !(layout === "proximity" && preset.variant.field) && (
           <Choice label="Direction" value={fourWay || options.direction === "left" || options.direction === "right" ? options.direction : "left"} options={fourWay ? DIRECTIONS : WAYS} onChange={(value) => setOption("direction", value)} />
         )}
         {focusable && <Choice label="Scale focus" value={options.focus} options={focuses} onChange={(value) => setOption("focus", value)} />}
@@ -764,24 +820,6 @@ export default function MotionTool() {
 
         <Heading title="Camera" changed={changedAny(CAMERA_KEYS)} onReset={() => resetKeys(CAMERA_KEYS)} />
         {CAMERA_KEYS.map(slider)}
-
-        <Heading title="Canvas" changed={look.width !== BASE_LOOK.width || look.height !== BASE_LOOK.height} onReset={() => patchLook({ width: BASE_LOOK.width, height: BASE_LOOK.height })} />
-        <div className="mp-choices">
-          {CANVAS_SIZES.map((size) => (
-            <button
-              key={size.label}
-              type="button"
-              aria-pressed={look.width === size.width && look.height === size.height}
-              onClick={() => patchLook({ width: size.width, height: size.height })}
-            >
-              {size.label}
-            </button>
-          ))}
-        </div>
-        <div className="mp-pair">
-          <NumberField key={`w${look.width}`} label={`Width, ${CANVAS_MIN} to ${CANVAS_MAX} px`} value={look.width} onCommit={(value) => patchLook({ width: canvasSide(value) })} />
-          <NumberField key={`h${look.height}`} label={`Height, ${CANVAS_MIN} to ${CANVAS_MAX} px`} value={look.height} onCommit={(value) => patchLook({ height: canvasSide(value) })} />
-        </div>
 
         <Heading title="Card shape" changed={look.cardW !== BASE_LOOK.cardW || look.cardH !== BASE_LOOK.cardH} onReset={() => patchLook({ cardW: BASE_LOOK.cardW, cardH: BASE_LOOK.cardH })} />
         <div className="mp-choices">

@@ -103,9 +103,10 @@ export interface Variant {
   pan?: "x" | "diag" | "alt" | "pulse";
   rows?: number;
   field?: boolean;
-  /** zoom: arrive oversized and shrink, or grow from an edge */
+  /** zoom: cards arrive big and shrink away instead */
   out?: boolean;
-  edge?: boolean;
+  /** orbit: an upright wheel seen from an angle */
+  wheel?: boolean;
   horizontal?: boolean;
   tornado?: boolean;
   close?: boolean;
@@ -159,6 +160,7 @@ export interface Motion {
 export type MotionKey = keyof Motion;
 
 export type Direction = "left" | "right" | "up" | "down";
+export type Origin = "centre" | Direction;
 export type Focus = "off" | "start" | "centre" | "end";
 export type TiltMode = "off" | "fan" | "uniform" | "alternate";
 
@@ -174,6 +176,8 @@ export interface Options {
   centre: boolean;
   /** orbit: cards face the viewer, or face outwards like a carousel */
   faceCamera: boolean;
+  /** zoom: the point cards grow from */
+  origin: Origin;
 }
 
 export interface Preset {
@@ -259,6 +263,12 @@ const ringRadius = (c: Context) =>
   (c.v.inside ? Math.max(2.4, ((c.w + c.g) * c.n) / TAU) : Math.max(c.w * 1.1, ((c.w + c.g) * c.n) / TAU)) * c.m.radius;
 export const gridCols = (n: number) => Math.ceil(Math.sqrt(n));
 const GOLDEN_ANGLE = 2.39996323;
+/** An upright wheel's cards and radius: sized so the whole wheel sits inside the frame. */
+const WHEEL_CARD = 0.5;
+const wheelRadius = (c: Context, cards: number) => Math.max(0.95, ((c.w * WHEEL_CARD + c.g) * cards) / TAU) * c.m.radius;
+/** A zoom card is born at ZOOM_MIN of its size and leaves at ZOOM_MAX. */
+const ZOOM_MIN = 0.08;
+const ZOOM_MAX = 3.4;
 /** Pins for a field's focus path sit on a coarse grid this many cells wide and tall. */
 export const PIN_COLS = 5;
 
@@ -316,11 +326,17 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       const R = 0.8 * c.m.radius;
       return { ...square, x: Math.cos(angle) * Math.min(c.A, 1) * R, y: Math.sin(angle) * R, z: -0.05, s: small * 0.8, p: centred(k + (c.T - 0.25) * m, m) };
     }
+    if (c.v.wheel) {
+      // An upright wheel. The camera's yaw is what makes it sit in 3D space.
+      const angle = TAU * (k / m + c.T) + Math.PI / 2;
+      const R = wheelRadius(c, m);
+      return { ...square, x: Math.cos(angle) * R, y: Math.sin(angle) * R, s: WHEEL_CARD, p: centred(k + c.T * m, m) };
+    }
     const outer = Boolean(c.v.two) && k % 2 === 1;
     const turn = outer ? -c.T : c.T;
     const angle = TAU * (k / m + turn);
-    const R = ((outer ? 2 : 1.25) + c.g) * c.m.radius;
-    const y = c.v.two ? (outer ? 0.36 : -0.36) : 0;
+    const R = ((outer ? 1.6 : c.v.two ? 1.05 : 1.25) + c.g) * c.m.radius;
+    const y = c.v.two ? (outer ? 0.3 : -0.3) : 0;
     // Facing outwards, a card at the side is edge-on, so the far row never crowds the near one.
     const facing = c.o.faceCamera ? square : { ry: Math.PI / 2 - angle };
     return { ...facing, x: Math.cos(angle) * R, y, z: Math.sin(angle) * R, s: small, p: centred(k + (turn - 0.25) * m, m) };
@@ -412,27 +428,25 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const recentre = (bumpArea(-last / 2 - f, reach) + bumpArea(last / 2 - f, reach)) / 2; // keeps the row centred as it swells
     return { u: p * (c.pitch + c.g) + c.pitch * growth * (bumpArea(p - f, reach) - recentre), s: 1 + growth * bump(p - f, reach), p, f, scaled: true };
   },
-  // One card at a time grows over the last, from the middle or from an edge.
+  // A stream of cards growing out of one point: the newest, smallest card in
+  // front, the older, bigger ones behind it, the biggest leaving past the frame.
   zoom(i, c) {
-    const age = mod(c.Tg * c.n - i, c.n); // 0 as this card starts to arrive
-    if (age >= 2 - c.m.hold) return null; // the card after it has fully arrived and covers it
-    const arrived = c.ease(clamp(age / (1 - c.m.hold)));
-    const out = { x: 0, y: 0, z: -age * 0.01, rz: (1 - arrived) * c.m.cardTilt * DEG, s: 1, a: 1 };
-    if (c.v.out) {
-      // Zoom out: arrives oversized and see-through, settles to size.
-      out.s = lerp(1.7, 1, arrived);
-      out.a = clamp(arrived * 1.5);
-      return out;
-    }
-    out.s = Math.max(arrived, 0.0001);
-    if (c.v.edge) {
-      // Grows out of the edge it travels from.
-      const offset = 1 - arrived;
-      if (c.o.direction === "left") out.x = offset * (c.A + c.w / 2);
-      if (c.o.direction === "right") out.x = -offset * (c.A + c.w / 2);
-      if (c.o.direction === "up") out.y = -offset * (1 + c.h / 2);
-      if (c.o.direction === "down") out.y = offset * (1 + c.h / 2);
-    }
+    const flow = c.glide(Math.abs(c.Tg) * c.n);
+    const age = mod(flow - i, c.n); // 0 as a card is born, n as it leaves
+    const life = age / c.n;
+    const grow = c.v.out ? 1 - life : life;
+    // Geometric growth reads as a steady approach.
+    const s = ZOOM_MIN * Math.pow(ZOOM_MAX / ZOOM_MIN, grow);
+    const a = c.v.out ? smooth((1 - life) / 0.2) * smooth(life / 0.12) : smooth((1 - life) / 0.1) * smooth(life / 0.05);
+    // The smallest cards sit in front: the newest when growing, the oldest when shrinking.
+    const out = { x: 0, y: 0, z: (c.v.out ? age : c.n - age) * 0.004, s, a };
+    // Growing from an edge: that edge of the card stays on the frame edge.
+    const halfW = (c.w * s) / 2;
+    const halfH = (c.h * s) / 2;
+    if (c.o.origin === "up") out.y = 1 - halfH;
+    if (c.o.origin === "down") out.y = -1 + halfH;
+    if (c.o.origin === "left") out.x = -c.A + halfW;
+    if (c.o.origin === "right") out.x = c.A - halfW;
     return out;
   },
   marquee(i, c) {
@@ -490,7 +504,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       return { z, a, x: side * (0.55 * c.A + c.w * 0.35), ry: -side * 50 * DEG };
     }
     const angle = c.v.spiral ? TAU * 2 * depth : i * GOLDEN_ANGLE;
-    return { z, a, x: Math.cos(angle) * 0.7 * Math.min(1.4, c.A), y: Math.sin(angle) * 0.7 };
+    return { z, a, x: Math.cos(angle) * 0.95 * Math.min(1.4, c.A), y: Math.sin(angle) * 0.95 };
   },
   fan(i, c) {
     const breathing = c.v.open ? 0.55 + 0.45 * Math.sin(TAU * c.T - Math.PI / 2) : 1;
@@ -605,7 +619,7 @@ export interface Frame {
 }
 
 /** Layouts where up and down mean something. The rest only run forwards or backwards. */
-export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "proximity", "zoom"]);
+export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "proximity"]);
 /** Layouts that know how far each card is from the middle, so focus, fade and solo apply. */
 export const HAS_FOCUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "ring", "wheel", "helix", "orbit", "fan"]);
 export const HAS_RADIUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "wheel", "orbit", "globe", "helix"]);
@@ -670,6 +684,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
       }
     }
     const f = raw.f ?? c.focus;
+    if (layout === "zoom") raw.p = undefined;
     if (raw.p !== undefined) {
       const d = Math.abs(raw.p - f);
       if (o.focus !== "off" && !raw.scaled) s *= 1 + (m.scale - 1) * bump(raw.p - f, m.reach);
@@ -688,7 +703,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
   const camera = { x: 0, y: 0, back: 0 };
   if (layout === "ring") camera.back = c.v.inside ? -camZ + 0.15 * ringRadius(c) : ringRadius(c);
   if (layout === "globe") camera.back = c.v.close ? 0.6 : 0.9;
-  if (layout === "orbit") camera.back = c.v.flat ? 0 : 0.9;
+  if (layout === "orbit") camera.back = c.v.flat ? 0 : c.v.wheel ? wheelRadius(c, o.centre ? n - 1 : n) * 1.15 + 0.4 : 0.9;
   if (layout === "helix") camera.back = 0.8;
   if (layout === "tour" && c.path.length) {
     // Cell to cell, pulling back a little on the way so the wall reads.
@@ -744,7 +759,7 @@ export const BASE_MOTION: Motion = {
   reach: 1.6,
 };
 
-export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true };
+export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre" };
 
 export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max: number; step: number }> = {
   duration: { label: "Loop (sec)", min: 3, max: 120, step: 1 },
@@ -865,10 +880,11 @@ export const PRESETS: Preset[] = [
   preset("Proximity 03", "proximity", { field: true }, { count: 196, size: 0.085, gap: 0.5, scale: 3.6, reach: 3.5, rhythm: 1, hold: 0.15 }, { path: [6, 8, 18, 16] }),
   preset("Proximity 04", "proximity", { field: true }, { count: 144, size: 0.11, gap: 0.45, scale: 3.2, reach: 3.2, rhythm: 1, hold: 0.15, tilt: 40, fade: 0.5 }, { path: [0, 12, 24, 20, 4] }),
   preset("Proximity 05", "proximity", { field: true }, { count: 64, size: 0.2, gap: 0.3, scale: 2.2, reach: 2.4, rhythm: 1, hold: 0.25 }, { path: [12, 2, 14, 22, 10] }),
-  preset("Scale 01", "zoom", {}, { count: 6, size: 1.5, rhythm: 1, hold: 0.45, cardTilt: 0 }),
-  preset("Scale 02", "zoom", { out: true }, { count: 6, size: 1.5, rhythm: 1, hold: 0.45, cardTilt: 0 }),
-  preset("Scale 03", "zoom", { edge: true }, { count: 6, size: 1.4, rhythm: 1, hold: 0.4, cardTilt: 0 }, { options: { direction: "up" } }),
-  preset("Scale 04", "zoom", { edge: true }, { count: 6, size: 1.2, rhythm: 1, hold: 0.4, cardTilt: 0 }, { options: { direction: "left" } }),
+  preset("Scale 01", "zoom", {}, { count: 6, size: 1, duration: 14 }),
+  preset("Scale 02", "zoom", { out: true }, { count: 6, size: 1, duration: 14 }),
+  preset("Scale 03", "zoom", {}, { count: 6, size: 1, duration: 14 }, { options: { origin: "up" } }),
+  preset("Scale 04", "zoom", {}, { count: 6, size: 1, duration: 14 }, { options: { origin: "left" } }),
+  preset("Scale 05", "zoom", {}, { count: 5, size: 1, rhythm: 1, hold: 0.35, duration: 15 }),
   preset("Coverflow 01", "cover", {}, { count: 9, size: 1 }),
   preset("Coverflow 02", "cover", {}, { count: 9, size: 1, rhythm: 1 }),
   preset("Coverflow 03", "cover", {}, { count: 9, size: 0.8, gap: 0.25, tilt: 12, rhythm: 1 }),
@@ -880,16 +896,18 @@ export const PRESETS: Preset[] = [
   preset("Ring 05", "ring", {}, { count: 14, size: 0.6, gap: 0.34, tilt: 14, scale: 1.25, perspective: 55, rhythm: 1 }, { options: { focus: "centre" } }),
   preset("Orbit 01", "orbit", {}, { count: 7, size: 0.9, tilt: 28 }, { options: { centre: false } }),
   preset("Orbit 02", "orbit", {}, { count: 8, size: 0.9, tilt: 28 }),
-  preset("Orbit 03", "orbit", { two: true }, { count: 10, size: 0.8, tilt: 30 }, { options: { centre: false } }),
+  preset("Orbit 03", "orbit", { two: true }, { count: 10, size: 0.75, tilt: 26, gap: 0.05 }, { options: { centre: false } }),
   preset("Orbit 04", "orbit", { flat: true }, { count: 7, size: 0.8 }, { options: { centre: false } }),
   preset("Orbit 05", "orbit", {}, { count: 8, size: 0.9, tilt: 20, gap: 0.2, perspective: 50 }, { options: { centre: false, faceCamera: false } }),
   preset("Orbit 06", "orbit", {}, { count: 9, size: 0.7, tilt: 36, radius: 1.25, perspective: 50 }, { options: { centre: false } }),
+  preset("Orbit 07", "orbit", { wheel: true }, { count: 10, size: 0.8, gap: 0.3, yaw: 40, tilt: 6, perspective: 45 }, { options: { centre: false } }),
+  preset("Orbit 08", "orbit", { wheel: true }, { count: 8, size: 0.8, gap: 0.4, yaw: 28, tilt: 12, perspective: 40, scale: 1.35, rhythm: 1 }, { options: { centre: false, focus: "centre" } }),
   preset("Deck 01", "deck", { fly: "up" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 02", "deck", { fly: "right" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
-  preset("Deck 03", "deck", { fly: "spin" }, { count: 6, size: 1, gap: 0.5, tilt: 10, rhythm: 1 }),
-  preset("Wheel 01", "wheel", {}, { count: 12, size: 0.75, gap: 0.2 }),
-  preset("Wheel 02", "wheel", { side: true }, { count: 12, size: 0.65, gap: 0.25 }),
-  preset("Wheel 03", "wheel", { full: true }, { count: 8, size: 0.32, gap: 0.1 }),
+  preset("Deck 03", "deck", { fly: "spin" }, { count: 6, size: 1, gap: 0.4, rhythm: 1 }),
+  preset("Wheel 01", "wheel", {}, { count: 12, size: 0.7, gap: 0.3, rhythm: 1 }),
+  preset("Wheel 02", "wheel", { side: true }, { count: 12, size: 0.6, gap: 0.35, rhythm: 1 }),
+  preset("Wheel 03", "wheel", { full: true }, { count: 8, size: 0.24, gap: 0.1 }),
   preset("Grid 01", "grid", { pan: "x" }, { count: 24, size: 0.6, gap: 0.1 }),
   preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.1, tilt: 48 }),
   preset("Grid 03", "grid", { pan: "alt" }, { count: 24, size: 0.6, gap: 0.1 }),
@@ -902,27 +920,27 @@ export const PRESETS: Preset[] = [
   preset("Marquee 03", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.1, yaw: 26 }),
   preset("Marquee 04", "marquee", { rows: 3 }, { count: 18, size: 0.7, gap: 0.1 }, { options: { direction: "up" } }),
   preset("Marquee 05", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.1, tilt: 55 }),
-  preset("Helix 01", "helix", {}, { count: 14, size: 0.55 }),
-  preset("Helix 02", "helix", { horizontal: true }, { count: 14, size: 0.5 }),
-  preset("Helix 03", "helix", { tornado: true }, { count: 16, size: 0.45 }),
+  preset("Helix 01", "helix", {}, { count: 12, size: 0.5 }),
+  preset("Helix 02", "helix", { horizontal: true }, { count: 12, size: 0.45 }),
+  preset("Helix 03", "helix", { tornado: true }, { count: 14, size: 0.4 }),
   preset("Globe 01", "globe", {}, { count: 32, size: 0.22 }),
   preset("Globe 02", "globe", {}, { count: 32, size: 0.22, tilt: 24 }),
   preset("Globe 03", "globe", { close: true }, { count: 48, size: 0.28 }),
   preset("Flip 01", "flip", { axis: "y" }, { count: 5, size: 1.3 }),
   preset("Flip 02", "flip", { axis: "x" }, { count: 5, size: 1.3 }),
   preset("Flip 03", "flip", { cube: true }, { count: 5, size: 1.1 }),
-  preset("Tunnel 01", "tunnel", {}, { count: 12, size: 0.8 }),
-  preset("Tunnel 02", "tunnel", { spiral: true }, { count: 14, size: 0.7 }),
+  preset("Tunnel 01", "tunnel", {}, { count: 8, size: 0.55 }),
+  preset("Tunnel 02", "tunnel", { spiral: true }, { count: 10, size: 0.5 }),
   preset("Tunnel 03", "tunnel", { sides: true }, { count: 12, size: 1 }),
-  preset("Fan 01", "fan", { sway: true }, { count: 7, size: 1 }),
-  preset("Fan 02", "fan", { open: true }, { count: 7, size: 1 }),
+  preset("Fan 01", "fan", { sway: true }, { count: 7, size: 0.9, gap: 0.2 }),
+  preset("Fan 02", "fan", { open: true }, { count: 7, size: 0.9, gap: 0.2 }),
   preset("Wave 01", "wave", {}, { count: 12, size: 0.6, gap: 0.14 }),
   preset("Wave 02", "wave", { ribbon: true }, { count: 12, size: 0.7, gap: 0.1 }),
   preset("Stairs 01", "stairs", {}, { count: 9, size: 0.6, gap: 0.3, rhythm: 1 }),
   preset("Stairs 02", "stairs", {}, { count: 9, size: 0.6, gap: 0.3, tilt: 18, yaw: -32, rhythm: 1 }),
-  preset("Float 01", "float", {}, { count: 12, size: 0.55 }),
-  preset("Float 02", "float", { drift: true }, { count: 12, size: 0.55 }),
-  preset("Pulse 01", "pulse", {}, { count: 5, size: 1.3 }),
+  preset("Float 01", "float", {}, { count: 10, size: 0.5 }),
+  preset("Float 02", "float", { drift: true }, { count: 16, size: 0.45 }),
+  preset("Pulse 01", "pulse", {}, { count: 5, size: 1.2, hold: 0.5 }),
 ];
 
 /** The settings that are about the brand, not the motion. They never reset. */
@@ -1016,6 +1034,7 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   if (typeof savedOptions.solo === "boolean") options.solo = savedOptions.solo;
   if (typeof savedOptions.centre === "boolean") options.centre = savedOptions.centre;
   if (typeof savedOptions.faceCamera === "boolean") options.faceCamera = savedOptions.faceCamera;
+  options.origin = oneOf(savedOptions.origin, ["centre", "left", "right", "up", "down"] as const) ?? options.origin;
 
   let easing = BASE_EASING;
   if (Array.isArray(file.easing) && file.easing.length === 4 && file.easing.every((part) => finite(part) !== undefined)) {
