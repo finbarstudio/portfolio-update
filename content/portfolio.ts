@@ -36,7 +36,7 @@
 import { media as mediaOne, mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car sheet: hovering a car brings it up large (PfCars) */ cars?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -169,7 +169,7 @@ const RAW: Slide[] = [
     meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }],
   },
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
-  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline"),
+  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline. Hover one to see it", { frame: false, cars: true }),
   linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, the grid and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
 
   /* ── Salesmasters ──────────────────────────────────────────── */

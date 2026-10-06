@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PfMedia from "@/components/portfolio/PfMedia";
+import PfCars from "@/components/portfolio/PfCars";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 import { PORTFOLIO, CV, UPDATED, HEADSHOT, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
 import "./portfolio.css";
@@ -45,6 +46,7 @@ function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; grou
       style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
     >
       <PfMedia src={m.src} light={m.light} video={m.video} alt={m.alt} w={m.w} h={m.h} group={group} />
+      {m.cars ? <PfCars /> : null}
     </div>
   );
 }

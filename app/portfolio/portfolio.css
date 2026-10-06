@@ -237,6 +237,16 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-item :is(img, video)[data-in="1"] { opacity: 1; }
 
+/* the car sheet: the car under the pointer comes up large in the middle */
+.pf-cars { position: absolute; inset: 0; display: grid; place-items: center; cursor: crosshair; touch-action: pan-y; }
+.pf-item:has(.pf-cars) > img { transition: opacity 0.25s ease; }
+.pf-item:has(.pf-cars[data-on="1"]) > img[data-in="1"] { opacity: 0.16; }
+.pf-cars figure { width: 52%; margin: 0; pointer-events: none; animation: pf-car-in 0.18s ease both; }
+.pf-cars figure img { width: 100%; height: auto; opacity: 1; object-fit: contain; }
+.pf-cars figcaption { margin-top: 0.4em; text-align: center; color: var(--soft); }
+@keyframes pf-car-in { from { opacity: 0; transform: scale(0.96); } }
+@media (prefers-reduced-motion: reduce) { .pf-cars figure { animation: none; } }
+
 /* the loader: a percentage over a hairline, bottom left of the frame */
 .pf-load {
   position: absolute;
@@ -328,6 +338,15 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-headshot { position: static; display: block; width: 100%; height: auto; margin-top: -8vw; }
   .pf-cover .pf-poster { font-size: 17vw; }
   .pf-cv-bio { grid-column: 1 / -1; grid-row: auto; font-size: 16px; }
+  /* the cover: the name sits centred over the portrait, midway between the
+     rule above it and the top of the head */
+  .pf-slide.pf-cover .pf-pad { justify-content: flex-start; min-height: 0; padding-bottom: 0; }
+  .pf-cover .pf-poster { text-align: center; margin: 15vw 0 3vw; }
+  .pf-cover .pf-headshot { margin-top: 0; }
+  /* about: even out the short broken lines, and give the résumé line room */
+  .pf-cv-bio p { text-wrap: pretty; }
+  .pf-cv-item, .pf-cv-block .pf-copy { text-wrap: balance; }
+  .pf-cv-foot { margin-top: 40px; flex-wrap: wrap; row-gap: 8px; }
   .pf-mono { font-size: 10px; }
   .pf-copy, .pf-meta .v { font-size: 13px; }
 
