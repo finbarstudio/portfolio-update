@@ -17,6 +17,20 @@ export const metadata: Metadata = {
   },
   description: LAB_DESC,
   alternates: { canonical: LAB_URL },
+  // The card itself is app/lab/opengraph-image.tsx; Next adds it to both.
+  openGraph: {
+    title: "Finbar Studio Lab",
+    description: LAB_DESC,
+    url: LAB_URL,
+    siteName: "Finbar Studio Lab",
+    locale: "en_GB",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Finbar Studio Lab",
+    description: LAB_DESC,
+  },
   robots: { index: false, follow: false },
 };
 
