@@ -1,20 +1,6 @@
 /** Draws one frame of a motion preset with WebGL: textured, rounded cards in 3D. */
 
-import {
-  CAM_Z,
-  DEG,
-  cameraBack,
-  cardAspect,
-  clamp,
-  itemTime,
-  itemTotal,
-  place,
-  spring,
-  type Context,
-  type Look,
-  type Motion,
-  type Preset,
-} from "./engine";
+import { cardAspect, clamp, layoutFrame, type Look, type Settings } from "./engine";
 
 export interface MediaItem {
   id: number;
@@ -26,9 +12,7 @@ export interface MediaItem {
   url?: string;
 }
 
-export interface Scene {
-  preset: Preset;
-  motion: Motion;
+export interface Scene extends Settings {
   look: Look;
   media: MediaItem[];
 }
@@ -142,7 +126,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       gl.deleteTexture(texture);
     },
 
-    draw(seconds, { preset, motion, look, media }) {
+    draw(seconds, scene) {
+      const { look, media } = scene;
       const { width, height } = look;
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
@@ -163,43 +148,26 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
 
       const aspect = width / height;
       const shape = cardAspect(look);
-      const h = motion.size;
-      const w = h * shape;
-      const T = (seconds / look.duration) * motion.speed;
-      const total = itemTotal(preset.layout, motion.count, preset.variant);
-      const c: Context = {
-        n: total,
-        T,
-        w,
-        h,
-        g: motion.gap * w,
-        A: aspect,
-        v: preset.variant,
-        spring: (x) => spring(x, motion.bounce),
-      };
-      const distance = CAM_Z + cameraBack(preset.layout, c);
+      const { w, h, items, camera } = layoutFrame(scene, seconds, look.duration, aspect, shape);
+      const distance = camera.distance;
+      // The camera turns about the point it looks at, then steps back from it.
       let view = translate(0, 0, -distance);
-      view = multiply(view, rotateX(motion.tilt * DEG));
-      view = multiply(view, rotateY((preset.yaw ?? 0) * DEG));
-      view = multiply(view, rotateZ((preset.roll ?? 0) * DEG));
-      const projection = perspective(35 * DEG, aspect, 0.1, 100);
+      view = multiply(view, rotateX(camera.tilt));
+      view = multiply(view, rotateY(camera.yaw));
+      view = multiply(view, rotateZ(camera.roll));
+      view = multiply(view, translate(-camera.x, -camera.y, 0));
+      const projection = perspective(camera.fov, aspect, 0.1, 100);
 
       const drawn: { i: number; depth: number; alpha: number; s: number; matrix: Matrix }[] = [];
-      for (let i = 0; i < total; i++) {
-        c.T = itemTime(preset.layout, i, c, T, motion);
-        const t = place(preset.layout, i, c);
-        if (!t) continue;
-        const alpha = t.a ?? 1;
-        if (alpha <= 0.003) continue;
-        const s = t.s ?? 1;
-        let model = translate(t.x ?? 0, t.y ?? 0, t.z ?? 0);
+      for (const t of items) {
+        let model = translate(t.x, t.y, t.z);
         if (t.ry) model = multiply(model, rotateY(t.ry));
         if (t.rx) model = multiply(model, rotateX(t.rx));
         if (t.rz) model = multiply(model, rotateZ(t.rz));
-        const modelView = multiply(view, multiply(model, scale(w * s, h * s)));
+        const modelView = multiply(view, multiply(model, scale(w * t.s, h * t.s)));
         const depth = modelView[14];
         if (depth > -0.2) continue; // at or behind the camera
-        drawn.push({ i, depth, alpha, s, matrix: multiply(projection, modelView) });
+        drawn.push({ i: t.i, depth, alpha: t.a, s: t.s, matrix: multiply(projection, modelView) });
       }
       drawn.sort((a, b) => a.depth - b.depth); // far to near
 

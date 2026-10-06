@@ -2,24 +2,38 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  BASE_EASING,
   BASE_LOOK,
   CANVAS_MAX,
   CANVAS_MIN,
   CANVAS_SIZES,
   CARD_SHAPES,
+  EASINGS,
+  FOUR_WAY,
+  HAS_FOCUS,
+  HAS_RADIUS,
   MOTION_KEYS,
   MOTION_RANGES,
   PRESETS,
   adjustmentFor,
   applyAdjustments,
+  bezier,
   canvasSide,
+  clamp,
+  pathGrid,
   parseSetup,
+  presetOptions,
   ratioPart,
   type Adjustments,
+  type Bezier,
+  type Direction,
+  type Focus,
   type Look,
   type MotionKey,
+  type Options,
   type Preset,
   type SavedSetup,
+  type TiltMode,
 } from "./engine";
 import { createRenderer, type MediaItem, type Renderer, type Scene } from "./renderer";
 
@@ -38,10 +52,11 @@ const GROUPS = PRESETS.reduce<{ title: string; presets: Preset[] }[]>((groups, p
   return groups;
 }, []);
 
-/** The little previews on the preset buttons: grey cards on a 4 by 5 frame. */
+/** The little previews on the preset buttons: a 4 by 5 frame. */
 const PREVIEW_LOOK: Look = { ...BASE_LOOK, width: 160, height: 200, background: "#1b1b1e" };
-const PREVIEW_GREYS = [0.82, 0.58, 0.72, 0.46, 0.9, 0.52, 0.66, 0.4];
-/** Previews are redrawn a few per frame, in turn, so fifty of them cost little. */
+/** Shades of the grey cards that stand in for media, in previews and before the first upload. */
+const GREYS = [0.82, 0.58, 0.72, 0.46, 0.9, 0.52, 0.66, 0.4];
+/** Previews are redrawn a few per frame, in turn, so all of them cost little. */
 const PREVIEWS_PER_FRAME = 6;
 
 function greyCard(renderer: Renderer, index: number): MediaItem {
@@ -49,35 +64,15 @@ function greyCard(renderer: Renderer, index: number): MediaItem {
   canvas.width = canvas.height = 4;
   const ctx = canvas.getContext("2d");
   if (ctx) {
-    const level = Math.round(PREVIEW_GREYS[index] * 255);
+    const level = Math.round(GREYS[index] * 255);
     ctx.fillStyle = `rgb(${level} ${level} ${level})`;
     ctx.fillRect(0, 0, 4, 4);
   }
-  return { id: -100 - index, texture: renderer.texture(canvas, false), aspect: 1 };
+  return { id: -1 - index, texture: renderer.texture(canvas, false), aspect: 1 };
 }
+const greyCards = (renderer: Renderer) => GREYS.map((_, index) => greyCard(renderer, index));
 
 const RECORDING_TYPES = ["video/mp4;codecs=avc1.640033", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
-
-/** A numbered colour card, shown until the first upload. */
-function placeholder(renderer: Renderer, index: number): MediaItem {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 512;
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    const hue = (index * 47 + 200) % 360;
-    const fill = ctx.createLinearGradient(0, 0, 512, 512);
-    fill.addColorStop(0, `hsl(${hue} 70% 62%)`);
-    fill.addColorStop(1, `hsl(${(hue + 60) % 360} 70% 38%)`);
-    ctx.fillStyle = fill;
-    ctx.fillRect(0, 0, 512, 512);
-    ctx.fillStyle = "#fffc";
-    ctx.font = "600 150px system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(String(index + 1).padStart(2, "0"), 256, 268);
-  }
-  return { id: -1 - index, texture: renderer.texture(canvas, true), aspect: 1 };
-}
 
 /** Big photos are drawn down to 2048px so 60 of them still fit on the GPU. */
 function shrink(image: HTMLImageElement): TexImageSource {
@@ -159,11 +154,165 @@ function NumberField({ label, value, onCommit }: { label: string; value: number;
   );
 }
 
+/** A row of mutually exclusive buttons. */
+function Choice<T extends string | boolean>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="mp-choice" role="group" aria-label={label}>
+      <span>{label}</span>
+      <div>
+        {options.map((option) => (
+          <button key={String(option.value)} type="button" aria-pressed={option.value === value} onClick={() => onChange(option.value)}>
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// The curve editor's drawing area: x runs 0 to 1, y runs -0.6 to 1.6 so an overshoot has room.
+const PLOT = { left: 8, right: 92, top: 6, bottom: 94, yMin: -0.6, yMax: 1.6 };
+const plotX = (x: number) => PLOT.left + x * (PLOT.right - PLOT.left);
+const plotY = (y: number) => PLOT.bottom - ((y - PLOT.yMin) / (PLOT.yMax - PLOT.yMin)) * (PLOT.bottom - PLOT.top);
+
+/** Drag the two handles to shape how each move speeds up, slows down and settles. */
+function CurveEditor({ curve, onChange }: { curve: Bezier; onChange: (curve: Bezier) => void }) {
+  const dragging = useRef<0 | 1 | null>(null);
+  const [x1, y1, x2, y2] = curve;
+
+  const moveHandle = (handle: 0 | 1, x: number, y: number) => {
+    const next: Bezier = [...curve];
+    next[handle * 2] = clamp(x);
+    next[handle * 2 + 1] = clamp(y, PLOT.yMin, PLOT.yMax);
+    onChange(next);
+  };
+  const fromPointer = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (dragging.current === null) return;
+    const box = event.currentTarget.getBoundingClientRect();
+    const px = ((event.clientX - box.left) / box.width) * 100;
+    const py = ((event.clientY - box.top) / box.height) * 100;
+    moveHandle(
+      dragging.current,
+      (px - PLOT.left) / (PLOT.right - PLOT.left),
+      PLOT.yMin + ((PLOT.bottom - py) / (PLOT.bottom - PLOT.top)) * (PLOT.yMax - PLOT.yMin),
+    );
+  };
+  const points = Array.from({ length: 41 }, (_, k) => `${plotX(k / 40).toFixed(2)},${plotY(bezier(curve, k / 40)).toFixed(2)}`).join(" ");
+  const handles: [0 | 1, number, number, number, number][] = [
+    [0, x1, y1, 0, 0],
+    [1, x2, y2, 1, 1],
+  ];
+
+  return (
+    <svg
+      className="mp-curve"
+      viewBox="0 0 100 100"
+      onPointerMove={fromPointer}
+      onPointerUp={() => {
+        dragging.current = null;
+      }}
+      onPointerLeave={() => {
+        dragging.current = null;
+      }}
+    >
+      <rect x={PLOT.left} y={plotY(1)} width={PLOT.right - PLOT.left} height={plotY(0) - plotY(1)} className="mp-curve-box" />
+      {handles.map(([handle, x, y, anchorX, anchorY]) => (
+        <line key={`arm${handle}`} x1={plotX(anchorX)} y1={plotY(anchorY)} x2={plotX(x)} y2={plotY(y)} className="mp-curve-arm" />
+      ))}
+      <polyline points={points} className="mp-curve-line" />
+      {handles.map(([handle, x, y]) => (
+        <circle
+          key={handle}
+          cx={plotX(x)}
+          cy={plotY(y)}
+          r={4.5}
+          tabIndex={0}
+          role="slider"
+          aria-label={handle === 0 ? "Curve start handle" : "Curve end handle"}
+          aria-valuenow={Number(y.toFixed(2))}
+          aria-valuemin={PLOT.yMin}
+          aria-valuemax={PLOT.yMax}
+          className="mp-curve-handle"
+          onPointerDown={(event) => {
+            dragging.current = handle;
+            event.currentTarget.ownerSVGElement?.setPointerCapture(event.pointerId);
+          }}
+          onKeyDown={(event) => {
+            const step = { ArrowLeft: [-0.05, 0], ArrowRight: [0.05, 0], ArrowUp: [0, 0.05], ArrowDown: [0, -0.05] }[event.key];
+            if (!step) return;
+            event.preventDefault();
+            moveHandle(handle, x + step[0], y + step[1]);
+          }}
+        />
+      ))}
+    </svg>
+  );
+}
+
+/** The wall of cards as a small grid: click cells in the order the camera should visit them. */
+function PathGrid({ cells, cols, path, onChange }: { cells: number; cols: number; path: number[]; onChange: (path: number[]) => void }) {
+  return (
+    <div className="mp-path" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }} role="group" aria-label="Camera path">
+      {Array.from({ length: cells }, (_, cell) => {
+        const stop = path.indexOf(cell);
+        return (
+          <button
+            key={cell}
+            type="button"
+            aria-pressed={stop >= 0}
+            aria-label={stop >= 0 ? `Cell ${cell + 1}, stop ${stop + 1}. Remove from path` : `Cell ${cell + 1}. Add to path`}
+            onClick={() => onChange(stop >= 0 ? path.filter((item) => item !== cell) : [...path, cell])}
+          >
+            {stop >= 0 ? stop + 1 : ""}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+const DIRECTIONS: { value: Direction; label: string }[] = [
+  { value: "left", label: "Left" },
+  { value: "right", label: "Right" },
+  { value: "up", label: "Up" },
+  { value: "down", label: "Down" },
+];
+const WAYS: { value: Direction; label: string }[] = [
+  { value: "left", label: "Forward" },
+  { value: "right", label: "Reverse" },
+];
+const TILTS: { value: TiltMode; label: string }[] = [
+  { value: "off", label: "Off" },
+  { value: "fan", label: "Fan" },
+  { value: "uniform", label: "Uniform" },
+  { value: "alternate", label: "Alternate" },
+];
+const ON_OFF = [
+  { value: false, label: "Off" },
+  { value: true, label: "On" },
+];
+const TIMING_KEYS: MotionKey[] = ["speed", "rhythm", "stagger", "hold"];
+const CAMERA_KEYS: MotionKey[] = ["tilt", "yaw", "roll", "perspective", "distance"];
+
 export default function MotionTool() {
   const [preset, setPreset] = useState<Preset>(PRESETS[0]);
   // What the sliders have been moved by, measured against each preset's own
   // defaults, so a taste for slower, bouncier or tighter follows you around.
   const [adjustments, setAdjustments] = useState<Adjustments>({});
+  // Switches the user has set. They hold across presets until reset.
+  const [chosen, setChosen] = useState<Partial<Options>>({});
+  const [easing, setEasing] = useState<Bezier>(BASE_EASING);
+  const [path, setPath] = useState<number[]>(PRESETS[0].path ?? []);
   const [look, setLook] = useState<Look>(BASE_LOOK);
   const [thumbs, setThumbs] = useState<Thumb[]>([]);
   const [status, setStatus] = useState("");
@@ -172,23 +321,24 @@ export default function MotionTool() {
   const [dragging, setDragging] = useState(false);
 
   const motion = applyAdjustments(preset, adjustments);
+  const options = presetOptions(preset, chosen);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<Renderer | null>(null);
   const mediaRef = useRef<MediaItem[]>([]);
   const placeholdersRef = useRef(true);
-  const sceneRef = useRef<Omit<Scene, "media">>({ preset, motion, look });
+  const sceneRef = useRef<Omit<Scene, "media">>({ preset, motion, options, easing, path, look });
   const loopStartRef = useRef(0);
   const nextIdRef = useRef(0);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const setupInputRef = useRef<HTMLInputElement>(null);
   const previewCanvases = useRef(new Map<string, HTMLCanvasElement>());
-  const adjustmentsRef = useRef(adjustments);
+  const flowRef = useRef({ adjustments, chosen, easing });
 
   // The draw loop reads the latest settings without restarting.
   useEffect(() => {
-    sceneRef.current = { preset, motion, look };
-    adjustmentsRef.current = adjustments;
+    sceneRef.current = { preset, motion, options, easing, path, look };
+    flowRef.current = { adjustments, chosen, easing };
   });
 
   // One small hidden WebGL canvas draws every preview in turn and copies each
@@ -197,7 +347,7 @@ export default function MotionTool() {
     const stage = document.createElement("canvas");
     const renderer = createRenderer(stage);
     if (!renderer) return;
-    const greys = PREVIEW_GREYS.map((_, index) => greyCard(renderer, index));
+    const greys = greyCards(renderer);
     const visible = new Set<string>();
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -217,7 +367,16 @@ export default function MotionTool() {
         const target = previewCanvases.current.get(item.name)?.getContext("2d");
         if (!target) continue;
         const seconds = still ? 1.7 : (now / 1000) % PREVIEW_LOOK.duration;
-        renderer.draw(seconds, { preset: item, motion: applyAdjustments(item, adjustmentsRef.current), look: PREVIEW_LOOK, media: greys });
+        const flow = flowRef.current;
+        renderer.draw(seconds, {
+          preset: item,
+          motion: applyAdjustments(item, flow.adjustments),
+          options: presetOptions(item, flow.chosen),
+          easing: flow.easing,
+          path: item.path ?? [],
+          look: PREVIEW_LOOK,
+          media: greys,
+        });
         target.drawImage(stage, 0, 0);
       }
       frame = requestAnimationFrame(tick);
@@ -238,7 +397,7 @@ export default function MotionTool() {
       return;
     }
     rendererRef.current = renderer;
-    mediaRef.current = Array.from({ length: 8 }, (_, index) => placeholder(renderer, index));
+    mediaRef.current = greyCards(renderer);
     placeholdersRef.current = true;
     loopStartRef.current = performance.now();
     let frame = requestAnimationFrame(function tick(now) {
@@ -286,7 +445,7 @@ export default function MotionTool() {
     discard(renderer, mediaRef.current.filter((item) => item.id === id));
     mediaRef.current = mediaRef.current.filter((item) => item.id !== id);
     if (!mediaRef.current.length) {
-      mediaRef.current = Array.from({ length: 8 }, (_, index) => placeholder(renderer, index));
+      mediaRef.current = greyCards(renderer);
       placeholdersRef.current = true;
     }
     syncThumbs();
@@ -294,15 +453,23 @@ export default function MotionTool() {
 
   function choosePreset(next: Preset) {
     setPreset(next);
+    setPath(next.path ?? []);
     loopStartRef.current = performance.now();
   }
 
   const setMotion = (key: MotionKey, value: number) =>
     setAdjustments((current) => ({ ...current, [key]: adjustmentFor(key, value, preset) }));
+  const setOption = <K extends keyof Options>(key: K, value: Options[K]) => setChosen((current) => ({ ...current, [key]: value }));
   const patchLook = (patch: Partial<Look>) => setLook((current) => ({ ...current, ...patch }));
+  function resetFlow() {
+    setAdjustments({});
+    setChosen({});
+    setEasing(BASE_EASING);
+    setPath(preset.path ?? []);
+  }
 
   function saveSetup() {
-    const setup: SavedSetup = { app: "motion-presets", version: 1, preset: preset.name, motion, look };
+    const setup: SavedSetup = { app: "motion-presets", version: 2, preset: preset.name, motion, options, easing, path, look };
     download(new Blob([JSON.stringify(setup, null, 2)], { type: "application/json" }), `${preset.name.toLowerCase().replace(" ", "-")}-setup.json`);
     setStatus("Setup saved. It holds the settings, not the media.");
   }
@@ -315,8 +482,11 @@ export default function MotionTool() {
     const loaded: Adjustments = {};
     for (const key of MOTION_KEYS) loaded[key] = adjustmentFor(key, parsed.motion[key], parsed.preset);
     setAdjustments(loaded);
+    setChosen(parsed.options);
+    setEasing(parsed.easing);
     setLook(parsed.look);
     choosePreset(parsed.preset);
+    setPath(parsed.path);
     setStatus(`Loaded ${parsed.preset.name}.`);
   }
 
@@ -350,7 +520,41 @@ export default function MotionTool() {
     setTimeout(() => recorder.stop(), duration * 1000);
   }
 
-  const adjusted = Object.keys(adjustments).length > 0;
+  const { layout } = preset;
+  const pins = pathGrid(preset, Math.round(motion.count));
+  const fourWay = FOUR_WAY.has(layout);
+  const upright = fourWay && (options.direction === "up" || options.direction === "down");
+  const focusable = HAS_FOCUS.has(layout);
+  const focuses: { value: Focus; label: string }[] = [
+    { value: "off", label: "Off" },
+    { value: "start", label: upright ? "Top" : "Left" },
+    { value: "centre", label: "Centre" },
+    { value: "end", label: upright ? "Bottom" : "Right" },
+  ];
+  const sceneKeys: MotionKey[] = [
+    ...((focusable && options.focus !== "off") || layout === "proximity" ? (["scale", "reach"] as const) : []),
+    ...(options.tiltMode !== "off" ? (["cardTilt"] as const) : []),
+    "count",
+    "size",
+    "gap",
+    ...(HAS_RADIUS.has(layout) ? (["radius"] as const) : []),
+    "turn",
+    "spin",
+    ...(focusable || layout === "proximity" ? (["fade"] as const) : []),
+    "offsetX",
+    "offsetY",
+  ];
+  const slider = (key: MotionKey) => {
+    const { label, min, max, step } = MOTION_RANGES[key];
+    return (
+      <label className="mp-row" key={key}>
+        {label}
+        <input type="range" min={min} max={max} step={step} value={motion[key]} onChange={(event) => setMotion(key, Number(event.target.value))} />
+        <output>{step >= 1 ? motion[key] : motion[key].toFixed(2)}</output>
+      </label>
+    );
+  };
+  const tuned = Object.keys(adjustments).length > 0 || Object.keys(chosen).length > 0 || easing !== BASE_EASING;
 
   return (
     <div
@@ -434,24 +638,51 @@ export default function MotionTool() {
           </ul>
         )}
 
-        <h2>Motion</h2>
-        {MOTION_KEYS.map((key) => {
-          const { label, min, max, step } = MOTION_RANGES[key];
-          return (
-            <label className="mp-row" key={key}>
-              {label}
-              <input type="range" min={min} max={max} step={step} value={motion[key]} onChange={(event) => setMotion(key, Number(event.target.value))} />
-              <output>{step >= 1 ? motion[key] : motion[key].toFixed(2)}</output>
-            </label>
-          );
-        })}
+        <h2>Scene</h2>
+        {layout !== "tour" && !(layout === "proximity" && preset.variant.field) && (
+          <Choice label="Direction" value={fourWay || options.direction === "left" || options.direction === "right" ? options.direction : "left"} options={fourWay ? DIRECTIONS : WAYS} onChange={(value) => setOption("direction", value)} />
+        )}
+        {focusable && <Choice label="Scale focus" value={options.focus} options={focuses} onChange={(value) => setOption("focus", value)} />}
+        <Choice label="Tilt" value={options.tiltMode} options={TILTS} onChange={(value) => setOption("tiltMode", value)} />
+        {focusable && <Choice label="Solo" value={options.solo} options={ON_OFF} onChange={(value) => setOption("solo", value)} />}
+        {layout === "orbit" && <Choice label="Centre card" value={options.centre} options={ON_OFF} onChange={(value) => setOption("centre", value)} />}
+        {sceneKeys.map(slider)}
+        {pins && (
+          <>
+            <h2>{layout === "tour" ? "Camera path" : "Focus path"}</h2>
+            <PathGrid cells={pins.cells} cols={pins.cols} path={path} onChange={setPath} />
+            <p className="mp-note">
+              {layout === "tour"
+                ? "Click cells in the order the camera should visit them. Your media fills the cells left to right, top to bottom."
+                : "Click spots in the order the focus should travel through them."}
+            </p>
+          </>
+        )}
+
+        <h2>Timing</h2>
+        {TIMING_KEYS.map(slider)}
         <label className="mp-row">
           Loop (sec)
           <input type="range" min={3} max={120} step={1} value={look.duration} onChange={(event) => patchLook({ duration: Number(event.target.value) })} />
           <output>{look.duration}</output>
         </label>
-        <button type="button" disabled={!adjusted} onClick={() => setAdjustments({})}>
-          Reset motion to each preset&apos;s own
+
+        <h2>Easing</h2>
+        <div className="mp-easing">
+          <CurveEditor curve={easing} onChange={setEasing} />
+          <div className="mp-easings">
+            {EASINGS.map((item) => (
+              <button key={item.name} type="button" aria-pressed={item.curve.every((part, index) => part === easing[index])} onClick={() => setEasing(item.curve)}>
+                {item.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <h2>Camera</h2>
+        {CAMERA_KEYS.map(slider)}
+        <button type="button" disabled={!tuned} onClick={resetFlow}>
+          Reset to each preset&apos;s own
         </button>
 
         <h2>Canvas</h2>

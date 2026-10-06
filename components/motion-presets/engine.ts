@@ -3,20 +3,20 @@
  *
  * A layout places item i of n at loop position T. T runs from 0 to `speed`
  * and lands on a whole number at the loop point, which is what makes every
- * preset loop without a jump. Nothing here touches the DOM or WebGL.
+ * preset loop without a jump. On top of the layouts sits one shared set of
+ * controls (direction, scale focus, card tilt, fade, solo, easing) so each
+ * behaves the same way in every preset. Nothing here touches the DOM or WebGL.
  */
 
 export const TAU = Math.PI * 2;
 export const DEG = Math.PI / 180;
-/** Camera distance at which a card 2 units tall fills the frame. */
-export const CAM_Z = 1 / Math.tan((35 * DEG) / 2);
 
 export const clamp = (x: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, x));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const mod = (a: number, n: number) => ((a % n) + n) % n;
 /** Wraps into -n/2..n/2. */
 const centred = (a: number, n: number) => mod(a + n / 2, n) - n / 2;
-const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const easeInOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const smooth = (x: number) => {
   const t = clamp(x);
   return t * t * (3 - 2 * t);
@@ -28,16 +28,46 @@ const hash = (i: number, salt: number) => {
   return x - Math.floor(x);
 };
 
-/** A move that settles like a spring: 0 to 1, overshooting by up to 25% at full bounce. */
-export function spring(x: number, bounce: number): number {
+/** An easing curve as a CSS-style cubic bezier: x1, y1, x2, y2. */
+export type Bezier = [number, number, number, number];
+
+/** The curve's height at x. y1 and y2 may pass 0 or 1, which is how a move overshoots. */
+export function bezier(curve: Bezier, x: number): number {
   if (x <= 0) return 0;
   if (x >= 1) return 1;
-  const damping = 7;
-  const frequency = bounce > 0.01 ? (damping * Math.PI) / Math.log(1 / (bounce * 0.25)) : 1e-4;
-  const at = (t: number) =>
-    1 - Math.exp(-damping * t) * (Math.cos(frequency * t) + (damping / frequency) * Math.sin(frequency * t));
-  return at(x) + (1 - at(1)) * x;
+  const [x1, y1, x2, y2] = curve;
+  const cx = 3 * x1;
+  const bx = 3 * (x2 - x1) - cx;
+  const ax = 1 - cx - bx;
+  const cy = 3 * y1;
+  const by = 3 * (y2 - y1) - cy;
+  const ay = 1 - cy - by;
+  // Newton's method finds the curve parameter whose x matches.
+  let t = x;
+  for (let step = 0; step < 8; step++) {
+    const error = ((ax * t + bx) * t + cx) * t - x;
+    const slope = (3 * ax * t + 2 * bx) * t + cx;
+    if (Math.abs(error) < 1e-5 || Math.abs(slope) < 1e-6) break;
+    t = clamp(t - error / slope);
+  }
+  return ((ay * t + by) * t + cy) * t;
 }
+
+export const EASINGS: { name: string; curve: Bezier }[] = [
+  { name: "Glide", curve: [0.3, 0, 0.1, 1] },
+  { name: "Settle", curve: [0.3, 1.3, 0.35, 1] },
+  { name: "Spring", curve: [0.4, 1.9, 0.5, 0.9] },
+  { name: "Snap", curve: [0.75, 0, 0.1, 1] },
+  { name: "Wind up", curve: [0.6, -0.4, 0.3, 1.3] },
+  { name: "Linear", curve: [0, 0, 1, 1] },
+  { name: "Ease", curve: [0.25, 0.1, 0.25, 1] },
+  { name: "Ease in", curve: [0.42, 0, 1, 1] },
+  { name: "Ease out", curve: [0, 0, 0.58, 1] },
+  { name: "Ease in out", curve: [0.42, 0, 0.58, 1] },
+  { name: "Sine", curve: [0.37, 0, 0.63, 1] },
+  { name: "Expo out", curve: [0.16, 1, 0.3, 1] },
+];
+export const BASE_EASING: Bezier = [0.3, 1.3, 0.35, 1];
 
 export type LayoutName =
   | "slide"
@@ -47,6 +77,9 @@ export type LayoutName =
   | "deck"
   | "wheel"
   | "grid"
+  | "tour"
+  | "proximity"
+  | "zoom"
   | "marquee"
   | "helix"
   | "globe"
@@ -60,9 +93,8 @@ export type LayoutName =
 
 /** What makes one preset of a layout differ from the next. */
 export interface Variant {
-  focus?: boolean;
-  vertical?: boolean;
   inside?: boolean;
+  vertical?: boolean;
   two?: boolean;
   flat?: boolean;
   fly?: "up" | "right" | "spin";
@@ -70,6 +102,10 @@ export interface Variant {
   full?: boolean;
   pan?: "x" | "diag" | "alt" | "pulse";
   rows?: number;
+  field?: boolean;
+  /** zoom: arrive oversized and shrink, or grow from an edge */
+  out?: boolean;
+  edge?: boolean;
   horizontal?: boolean;
   tornado?: boolean;
   close?: boolean;
@@ -83,119 +119,218 @@ export interface Variant {
   drift?: boolean;
 }
 
-/** The sliders that describe motion. Each preset has its own defaults. */
+/** The sliders. Each preset has its own defaults. */
 export interface Motion {
   speed: number;
+  rhythm: number;
+  stagger: number;
+  hold: number;
   count: number;
   size: number;
   gap: number;
+  /** how much bigger the card in focus is */
+  scale: number;
+  /** card rotation in degrees, used by the tilt mode */
+  cardTilt: number;
+  /** each card turned about its own upright axis, degrees */
+  turn: number;
+  /** whole turns each card makes per pass */
+  spin: number;
+  fade: number;
+  offsetX: number;
+  offsetY: number;
+  /** camera: looking down or up, degrees */
   tilt: number;
-  rhythm: number;
-  stagger: number;
-  bounce: number;
+  /** camera: looking from the side, degrees */
+  yaw: number;
+  /** camera: field of view, degrees */
+  perspective: number;
+  /** camera: distance, as a multiple of the default */
+  distance: number;
+  /** camera: turned about its own line of sight, degrees */
+  roll: number;
+  /** ring, orbit, wheel, globe and helix radius, as a multiple of the default */
+  radius: number;
+  /** how many cards either side of the focus grow */
+  reach: number;
 }
 export type MotionKey = keyof Motion;
+
+export type Direction = "left" | "right" | "up" | "down";
+export type Focus = "off" | "start" | "centre" | "end";
+export type TiltMode = "off" | "fan" | "uniform" | "alternate";
+
+/** The switches. */
+export interface Options {
+  direction: Direction;
+  /** where along the row cards grow */
+  focus: Focus;
+  tiltMode: TiltMode;
+  /** only the card in focus shows */
+  solo: boolean;
+  /** orbit: a card in the middle */
+  centre: boolean;
+}
 
 export interface Preset {
   name: string;
   layout: LayoutName;
   variant: Variant;
   defaults: Partial<Motion>;
-  /** Fixed camera angles, in degrees. */
-  roll?: number;
-  yaw?: number;
+  options: Partial<Options>;
+  /** the cells the camera or the focus visits, in order */
+  path?: number[];
 }
 
 export interface Transform {
-  x?: number;
-  y?: number;
-  z?: number;
-  rx?: number;
-  ry?: number;
-  rz?: number;
+  x: number;
+  y: number;
+  z: number;
+  rx: number;
+  ry: number;
+  rz: number;
   /** scale */
-  s?: number;
+  s: number;
   /** opacity */
-  a?: number;
+  a: number;
 }
 
-export interface Context {
+/**
+ * What a layout hands back. `u` and `v` are along and across the direction of
+ * travel, so one layout serves all four directions. `p` is how many cards the
+ * item is from the middle of the row, which is what focus, fade, solo and fan
+ * tilt measure from.
+ */
+interface Raw extends Partial<Transform> {
+  u?: number;
+  v?: number;
+  p?: number;
+  /** a focus point of the layout's own, in the same units as p */
+  f?: number;
+  /** the layout already applied the focus scale */
+  scaled?: boolean;
+}
+
+interface Context {
   n: number;
+  /** this item's own clock, signed by direction */
   T: number;
+  /** the shared clock, signed by direction */
+  Tg: number;
   w: number;
   h: number;
   /** gap between cards */
   g: number;
+  /** card length along and across the direction of travel */
+  pitch: number;
+  cross: number;
   /** frame aspect, width over height */
   A: number;
+  camZ: number;
   v: Variant;
-  spring: (x: number) => number;
+  m: Motion;
+  o: Options;
+  focus: number;
+  path: number[];
+  ease: (x: number) => number;
+  /** the shared clock in steps, with the stop-and-go rhythm applied */
+  glide: (steps: number) => number;
+}
+
+/** How much a card `u` cards from the focus grows, 1 at the focus and 0 from `reach` cards away. */
+const bump = (u: number, reach: number) => {
+  const a = Math.abs(u);
+  return a < reach ? (1 - a / reach) ** 2 : 0;
+};
+/** The area under `bump` from 0 to u: how far a grown card pushes its neighbours. */
+const bumpArea = (u: number, reach: number) => (Math.sign(u) * reach * (1 - (1 - Math.min(Math.abs(u), reach) / reach) ** 3)) / 3;
+
+/** Position along a row, with cards near the focus pushing the others apart. */
+function along(p: number, c: Context): number {
+  const growth = c.o.focus === "off" ? 0 : c.m.scale - 1;
+  return p * (c.pitch + c.g) + c.pitch * growth * (bumpArea(p - c.focus, c.m.reach) - bumpArea(-c.focus, c.m.reach));
 }
 
 const ringRadius = (c: Context) =>
-  c.v.inside ? Math.max(2.4, ((c.w + c.g) * c.n) / TAU) : Math.max(c.w * 1.1, ((c.w + c.g) * c.n) / TAU);
-const gridCols = (n: number) => Math.ceil(Math.sqrt(n));
+  (c.v.inside ? Math.max(2.4, ((c.w + c.g) * c.n) / TAU) : Math.max(c.w * 1.1, ((c.w + c.g) * c.n) / TAU)) * c.m.radius;
+export const gridCols = (n: number) => Math.ceil(Math.sqrt(n));
 const GOLDEN_ANGLE = 2.39996323;
+/** Pins for a field's focus path sit on a coarse grid this many cells wide and tall. */
+export const PIN_COLS = 5;
 
-const layouts: Record<LayoutName, (i: number, c: Context) => Transform | null> = {
+/** The grid a preset's path is picked on, or null when it has no path. */
+export function pathGrid(preset: Preset, count: number): { cells: number; cols: number } | null {
+  if (preset.layout === "tour") {
+    const cells = itemTotal("tour", count, preset.variant);
+    return { cells, cols: gridCols(cells) };
+  }
+  if (preset.layout === "proximity" && preset.variant.field) return { cells: PIN_COLS * PIN_COLS, cols: PIN_COLS };
+  return null;
+}
+
+/** A grid cell's centre, in world units. */
+function cellCentre(cell: number, cols: number, rows: number, c: Context): [number, number] {
+  const col = cell % cols;
+  const row = Math.floor(cell / cols);
+  return [(col - (cols - 1) / 2) * (c.w + c.g), -(row - (rows - 1) / 2) * (c.h + c.g)];
+}
+
+const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
   slide(i, c) {
     const p = centred(i - c.T * c.n, c.n);
-    const s = c.v.focus ? 1 - 0.3 * Math.min(1, Math.abs(p)) : 1;
-    const a = edgeFade(p, c.n);
-    return c.v.vertical ? { y: -p * (c.h + c.g), s, a } : { x: p * (c.w + c.g), s, a };
+    return { u: along(p, c), p, a: edgeFade(p, c.n) };
   },
   cover(i, c) {
     const p = centred(i - c.T * c.n, c.n);
     const d = Math.min(1, Math.abs(p));
     const side = Math.sign(p);
     return {
-      x: side * (d * c.w * 0.75 + Math.max(0, Math.abs(p) - 1) * (c.w * 0.3 + c.g)),
-      z: -d * c.w * 0.6 - Math.abs(p) * 0.02,
+      u: side * (d * c.pitch * 0.75 + Math.max(0, Math.abs(p) - 1) * (c.pitch * 0.3 + c.g)),
+      z: -d * c.pitch * 0.6 - Math.abs(p) * 0.02,
       ry: -side * d * 65 * DEG,
+      p,
       a: edgeFade(p, c.n),
     };
   },
   ring(i, c) {
     const angle = TAU * (i / c.n + c.T);
     const R = ringRadius(c);
-    if (c.v.vertical) return { y: Math.sin(angle) * R, z: Math.cos(angle) * R, rx: -angle };
+    const p = centred(i + c.T * c.n, c.n);
+    if (c.v.vertical) return { y: Math.sin(angle) * R, z: Math.cos(angle) * R, rx: -angle, p };
     if (c.v.inside) return { x: Math.sin(angle) * R, z: Math.cos(angle) * R, ry: angle + Math.PI };
-    return { x: Math.sin(angle) * R, z: Math.cos(angle) * R, ry: angle };
+    return { x: Math.sin(angle) * R, z: Math.cos(angle) * R, ry: angle, p };
   },
   orbit(i, c) {
-    if (i === 0) return { s: 1.15 };
-    const k = i - 1;
-    const m = c.n - 1;
+    if (c.o.centre && i === 0) return { s: 1.15 };
+    const k = c.o.centre ? i - 1 : i;
+    const m = Math.max(1, c.o.centre ? c.n - 1 : c.n);
+    const small = c.o.centre ? 0.42 : 0.62;
     if (c.v.flat) {
       const angle = TAU * (k / m + c.T);
-      return { x: Math.cos(angle) * Math.min(c.A, 1) * 0.78, y: Math.sin(angle) * 0.78, z: -0.05, s: 0.38 };
+      const R = 0.78 * c.m.radius;
+      return { x: Math.cos(angle) * Math.min(c.A, 1) * R, y: Math.sin(angle) * R, z: -0.05, s: small * 0.9, p: centred(k + (c.T - 0.25) * m, m) };
     }
     const outer = Boolean(c.v.two) && k % 2 === 1;
-    const angle = TAU * (k / m + (outer ? -c.T : c.T));
-    const R = (outer ? 1.75 : 1.2) + c.g;
+    const turn = outer ? -c.T : c.T;
+    const angle = TAU * (k / m + turn);
+    const R = ((outer ? 1.75 : 1.2) + c.g) * c.m.radius;
     const y = c.v.two ? (outer ? 0.28 : -0.28) : 0;
-    return { x: Math.cos(angle) * R, y, z: Math.sin(angle) * R, s: 0.42 };
+    return { x: Math.cos(angle) * R, y, z: Math.sin(angle) * R, s: small, p: centred(k + (turn - 0.25) * m, m) };
   },
   deck(i, c) {
     const q = mod(i - c.T * c.n, c.n);
     // The front card leaves, travels to the back, and rejoins the stack.
     const leaving = q > c.n - 1 ? c.n - q : 0;
-    const slot = leaving ? lerp(0, c.n - 1, ease(leaving)) : q;
+    const slot = leaving ? lerp(0, c.n - 1, easeInOut(leaving)) : q;
     const lift = Math.sin(Math.PI * leaving);
-    const out: Transform = {
-      x: slot * c.g * 0.25,
-      y: slot * c.g * 0.2,
-      z: -slot * 0.12,
-      s: 1 - slot * 0.04,
-      a: 1 - clamp((slot - 6) / 2),
-    };
-    if (c.v.fly === "up") out.y = (out.y ?? 0) + lift * c.h * 1.15;
+    const out = { x: slot * c.g * 0.25, y: slot * c.g * 0.2, z: -slot * 0.12, rz: 0, ry: 0, s: 1 - slot * 0.04, a: 1 - clamp((slot - 6) / 2) };
+    if (c.v.fly === "up") out.y += lift * c.h * 1.15;
     if (c.v.fly === "right") {
-      out.x = (out.x ?? 0) + lift * c.w * 1.25;
+      out.x += lift * c.w * 1.25;
       out.rz = -lift * 0.3;
     }
     if (c.v.fly === "spin") {
-      out.x = (out.x ?? 0) - lift * c.w * 1.1;
+      out.x -= lift * c.w * 1.1;
       out.rz = lift * 0.6;
       out.ry = lift * 0.8;
     }
@@ -203,13 +338,14 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Transform | null> =
   },
   wheel(i, c) {
     const angle = TAU * (i / c.n + c.T);
+    const p = centred(i + c.T * c.n, c.n);
     if (c.v.full) {
-      const R = 0.68 * Math.min(1, c.A);
-      return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, rz: -angle };
+      const R = 0.68 * Math.min(1, c.A) * c.m.radius;
+      return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, rz: -angle, p };
     }
-    const R = Math.max(1.6, ((c.w + c.g) * c.n) / TAU);
-    if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, rz: angle };
-    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, rz: -angle };
+    const R = Math.max(1.6, ((c.w + c.g) * c.n) / TAU) * c.m.radius;
+    if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, rz: angle, p };
+    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, rz: -angle, p };
   },
   grid(i, c) {
     const cols = gridCols(c.n);
@@ -235,41 +371,93 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Transform | null> =
     if (c.v.pan === "pulse") s = 0.82 + 0.18 * Math.sin(TAU * (c.T + (col + row) / 6));
     return { x: px * (c.w + c.g), y: -py * (c.h + c.g), s, a };
   },
+  // A still wall of cards. The camera does the moving: see `camera`.
+  tour(i, c) {
+    const cols = gridCols(c.n);
+    const [x, y] = cellCentre(i, cols, Math.ceil(c.n / cols), c);
+    return { x, y };
+  },
+  // Still cards that swell as a point of focus passes over them.
+  proximity(i, c) {
+    const growth = c.m.scale - 1;
+    const reach = c.m.reach;
+    if (c.v.field) {
+      const cols = gridCols(c.n);
+      const rows = Math.ceil(c.n / cols);
+      // The focus travels pin to pin. Pins sit on a coarse grid laid over the whole field.
+      const pin = (cell: number) => [((cell % PIN_COLS) / (PIN_COLS - 1)) * (cols - 1), (Math.floor(cell / PIN_COLS) / (PIN_COLS - 1)) * (rows - 1)];
+      const pins = c.path.length ? c.path : [Math.floor((PIN_COLS * PIN_COLS) / 2)];
+      const steps = c.glide(c.Tg * pins.length);
+      const from = pin(pins[mod(Math.floor(steps), pins.length)]);
+      const to = pin(pins[mod(Math.floor(steps) + 1, pins.length)]);
+      const part = steps - Math.floor(steps);
+      const d = Math.hypot((i % cols) - lerp(from[0], to[0], part), Math.floor(i / cols) - lerp(from[1], to[1], part));
+      const [x, y] = cellCentre(i, cols, rows, c);
+      return { x, y, z: bump(d, reach) * 0.3, s: 1 + growth * bump(d, reach), p: d, f: 0, scaled: true };
+    }
+    // Back and forth along the row.
+    const last = Math.max(1, c.n - 1);
+    const travelled = mod(c.glide(c.Tg * 2 * last), 2 * last);
+    const f = (travelled <= last ? travelled : 2 * last - travelled) - last / 2;
+    const p = i - last / 2;
+    const recentre = (bumpArea(-last / 2 - f, reach) + bumpArea(last / 2 - f, reach)) / 2; // keeps the row centred as it swells
+    return { u: p * (c.pitch + c.g) + c.pitch * growth * (bumpArea(p - f, reach) - recentre), s: 1 + growth * bump(p - f, reach), p, f, scaled: true };
+  },
+  // One card at a time grows over the last, from the middle or from an edge.
+  zoom(i, c) {
+    const age = mod(c.Tg * c.n - i, c.n); // 0 as this card starts to arrive
+    if (age >= 2 - c.m.hold) return null; // the card after it has fully arrived and covers it
+    const arrived = c.ease(clamp(age / (1 - c.m.hold)));
+    const out = { x: 0, y: 0, z: -age * 0.01, rz: (1 - arrived) * c.m.cardTilt * DEG, s: 1, a: 1 };
+    if (c.v.out) {
+      // Zoom out: arrives oversized and see-through, settles to size.
+      out.s = lerp(1.7, 1, arrived);
+      out.a = clamp(arrived * 1.5);
+      return out;
+    }
+    out.s = Math.max(arrived, 0.0001);
+    if (c.v.edge) {
+      // Grows out of the edge it travels from.
+      const offset = 1 - arrived;
+      if (c.o.direction === "left") out.x = offset * (c.A + c.w / 2);
+      if (c.o.direction === "right") out.x = -offset * (c.A + c.w / 2);
+      if (c.o.direction === "up") out.y = -offset * (1 + c.h / 2);
+      if (c.o.direction === "down") out.y = offset * (1 + c.h / 2);
+    }
+    return out;
+  },
   marquee(i, c) {
     const rows = c.v.rows ?? 2;
     const cols = Math.ceil(c.n / rows);
     const row = i % rows;
     const col = Math.floor(i / rows);
-    const along = centred(col + (row % 2 ? 1 : -1) * c.T * cols + row * 0.5, cols);
-    const across = row - (rows - 1) / 2;
-    const a = edgeFade(along, cols, 0.5);
-    return c.v.vertical
-      ? { x: across * (c.w + c.g), y: along * (c.h + c.g), a }
-      : { x: along * (c.w + c.g), y: -across * (c.h + c.g), a };
+    const p = centred(col + (row % 2 ? 1 : -1) * c.T * cols + row * 0.5, cols);
+    return { u: along(p, c), v: -(row - (rows - 1) / 2) * (c.cross + c.g), p, a: edgeFade(p, cols, 0.5) };
   },
   helix(i, c) {
-    const p = mod(i / c.n + c.T, 1);
-    const angle = TAU * 2 * p + TAU * c.T;
-    const R = c.v.tornado ? lerp(0.25, 1.5, p) : 0.95;
-    const a = smooth(p / 0.12) * smooth((1 - p) / 0.12);
+    const along01 = mod(i / c.n + c.T, 1);
+    const angle = TAU * 2 * along01 + TAU * c.T;
+    const R = (c.v.tornado ? lerp(0.25, 1.5, along01) : 0.95) * c.m.radius;
+    const a = smooth(along01 / 0.12) * smooth((1 - along01) / 0.12);
+    const p = (along01 - 0.5) * c.n;
     if (c.v.horizontal) {
-      return { x: (p - 0.5) * 2.6 * Math.max(1, c.A), y: Math.sin(angle) * R, z: Math.cos(angle) * R, rx: -angle, a };
+      return { x: (along01 - 0.5) * 2.6 * Math.max(1, c.A), y: Math.sin(angle) * R, z: Math.cos(angle) * R, rx: -angle, a, p };
     }
-    return { x: Math.sin(angle) * R, y: (p - 0.5) * 2.8, z: Math.cos(angle) * R, ry: angle, a };
+    return { x: Math.sin(angle) * R, y: (along01 - 0.5) * 2.8, z: Math.cos(angle) * R, ry: angle, a, p };
   },
   globe(i, c) {
     const y = 1 - (2 * (i + 0.5)) / c.n;
     const r = Math.sqrt(1 - y * y);
     const theta = i * GOLDEN_ANGLE + TAU * c.T;
-    const R = c.v.close ? 1.7 : 1.05;
+    const R = (c.v.close ? 1.7 : 1.05) * c.m.radius;
     const x = Math.cos(theta) * r;
     const z = Math.sin(theta) * r;
     return { x: x * R, y: y * R, z: z * R, ry: Math.atan2(x, z), rx: -Math.asin(y) };
   },
   flip(i, c) {
-    const v = c.T * c.n;
-    const k = Math.floor(v);
-    const f = c.spring(clamp((v - k) / 0.6));
+    const steps = c.T * c.n;
+    const k = Math.floor(steps);
+    const f = c.ease(clamp((steps - k) / (1 - c.m.hold)));
     const current = i === mod(k, c.n);
     const next = i === mod(k + 1, c.n);
     if (c.v.cube) {
@@ -281,41 +469,42 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Transform | null> =
     if (current && f < 0.5) turn = f * Math.PI;
     else if (next && f >= 0.5) turn = (f - 1) * Math.PI;
     else return null;
-    const z = -Math.sin(Math.PI * f) * 0.5;
+    const z = -Math.sin(Math.PI * clamp(f)) * 0.5;
     return c.v.axis === "x" ? { z, rx: turn } : { z, ry: turn };
   },
   tunnel(i, c) {
-    const p = mod(i / c.n + c.T, 1);
-    const z = lerp(-11, CAM_Z - 0.4, p);
-    const a = smooth(p / 0.15) * smooth((1 - p) / 0.1);
+    const depth = mod(i / c.n + c.T, 1);
+    const z = lerp(-11, c.camZ - 0.4, depth);
+    const a = smooth(depth / 0.15) * smooth((1 - depth) / 0.1);
     if (c.v.sides) {
       const side = i % 2 ? 1 : -1;
       return { z, a, x: side * (0.55 * c.A + c.w * 0.35), ry: -side * 50 * DEG };
     }
-    const angle = c.v.spiral ? TAU * 2 * p : i * GOLDEN_ANGLE;
+    const angle = c.v.spiral ? TAU * 2 * depth : i * GOLDEN_ANGLE;
     return { z, a, x: Math.cos(angle) * 0.7 * Math.min(1.4, c.A), y: Math.sin(angle) * 0.7 };
   },
   fan(i, c) {
     const breathing = c.v.open ? 0.55 + 0.45 * Math.sin(TAU * c.T - Math.PI / 2) : 1;
     const spread = Math.min(0.2 + c.g, 2.4 / c.n) * breathing;
-    const angle = (i - (c.n - 1) / 2) * spread + (c.v.sway ? 0.25 * Math.sin(TAU * c.T) : 0);
+    const p = i - (c.n - 1) / 2;
+    const angle = p * spread + (c.v.sway ? 0.25 * Math.sin(TAU * c.T) : 0);
     const R = 2.2;
-    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R - 0.1, z: i * 0.01, rz: -angle };
+    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R - 0.1, z: i * 0.01, rz: -angle, p };
   },
   wave(i, c) {
     const p = centred(i - c.T * c.n, c.n);
     const phase = (TAU * p * Math.max(1, Math.round(c.n / 6))) / c.n;
     const a = edgeFade(p, c.n);
-    if (c.v.ribbon) return { x: p * (c.w + c.g), z: -Math.cos(phase) * 0.35, ry: Math.sin(phase), a };
-    return { x: p * (c.w + c.g), y: Math.sin(phase) * 0.4, rz: -Math.cos(phase) * 0.2, a };
+    if (c.v.ribbon) return { u: along(p, c), z: -Math.cos(phase) * 0.35, ry: Math.sin(phase), p, a };
+    return { u: along(p, c), v: Math.sin(phase) * 0.4, rz: -Math.cos(phase) * 0.2, p, a };
   },
   stairs(i, c) {
     const p = centred(i - c.T * c.n, c.n);
-    return { x: p * (c.w * 0.7 + c.g), y: -p * c.h * 0.35, z: -p * 0.3, a: edgeFade(p, c.n, 1.5) };
+    return { u: p * (c.pitch * 0.7 + c.g), v: -p * c.cross * 0.35, z: -p * 0.3, p, a: edgeFade(p, c.n, 1.5) };
   },
   float(i, c) {
     const z = lerp(-3, 0.4, hash(i, 1));
-    const reach = (CAM_Z - z) / CAM_Z; // how much wider the view is at this depth
+    const reach = (c.camZ - z) / c.camZ; // how much wider the view is at this depth
     const speed = 1 + (i % 2);
     const sway = 0.06 * Math.sin(TAU * (c.T + hash(i, 4)));
     if (c.v.drift) {
@@ -328,34 +517,24 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Transform | null> =
     return { x: (hash(i, 2) - 0.5) * 2 * c.A * reach + sway, y, z, s: 0.75, a: edgeFade(y, span, 0.6) };
   },
   pulse(i, c) {
-    const v = c.T * c.n;
-    const k = Math.floor(v);
-    const f = c.spring(clamp((v - k) / 0.6));
-    if (i === mod(k, c.n)) return { s: 1 + 0.5 * f, a: 1 - f, z: 0.01 };
-    if (i === mod(k + 1, c.n)) return { s: 0.7 + 0.3 * f, a: f };
+    const steps = c.T * c.n;
+    const k = Math.floor(steps);
+    const f = c.ease(clamp((steps - k) / (1 - c.m.hold)));
+    if (i === mod(k, c.n)) return { s: 1 + 0.5 * f, a: clamp(1 - f), z: 0.01 };
+    if (i === mod(k + 1, c.n)) return { s: 0.7 + 0.3 * f, a: clamp(f) };
     return null;
   },
 };
 
-export function place(layout: LayoutName, i: number, c: Context): Transform | null {
-  return layouts[layout](i, c);
-}
-
 /** Layouts that fill whole rows draw a few more items than asked for. */
 export function itemTotal(layout: LayoutName, n: number, v: Variant): number {
-  if (layout === "grid") return gridCols(n) * Math.ceil(n / gridCols(n));
+  if (layout === "grid" || layout === "tour" || (layout === "proximity" && v.field)) return gridCols(n) * Math.ceil(n / gridCols(n));
   if (layout === "marquee") return (v.rows ?? 2) * Math.ceil(n / (v.rows ?? 2));
   return n;
 }
 
-/** How far the camera steps back so the nearest card sits where a flat card would. */
-export function cameraBack(layout: LayoutName, c: Context): number {
-  if (layout === "ring") return c.v.inside ? -CAM_Z + 0.15 * ringRadius(c) : ringRadius(c);
-  if (layout === "globe") return c.v.close ? 0.6 : 0.9;
-  if (layout === "orbit") return c.v.flat ? 0 : 0.9;
-  if (layout === "helix") return 0.8;
-  return 0;
-}
+/** These pace themselves from the shared clock: one card at a time, or still cards. */
+const SHARED_CLOCK: ReadonlySet<LayoutName> = new Set<LayoutName>(["flip", "pulse", "proximity", "tour", "zoom"]);
 
 /** Motion is a chain of steps, one per item unless a layout says otherwise. */
 function stepsPerLoop(layout: LayoutName, c: Context): number {
@@ -374,8 +553,7 @@ function queuePlace(layout: LayoutName, i: number, c: Context, k: number): numbe
     const rows = c.v.rows ?? 2;
     const cols = Math.ceil(c.n / rows);
     const row = i % rows;
-    const col = Math.floor(i / rows);
-    const spot = mod(col + (row % 2 ? 1 : -1) * k + cols / 2, cols) / cols;
+    const spot = mod(Math.floor(i / rows) + (row % 2 ? 1 : -1) * k + cols / 2, cols) / cols;
     return row % 2 ? 1 - spot : spot;
   }
   if (layout === "grid") {
@@ -387,50 +565,212 @@ function queuePlace(layout: LayoutName, i: number, c: Context, k: number): numbe
 
 /**
  * Each item's own clock. `rhythm` blends a steady glide (0) with stop-and-go
- * steps (1); `stagger` delays items down the queue; `bounce` is the overshoot.
- * Flip and pulse show one item at a time and pace themselves.
+ * steps (1); `hold` is the share of each step spent resting; `stagger` uses
+ * that rest to delay items down the queue.
  */
-export function itemTime(layout: LayoutName, i: number, c: Context, T: number, motion: Motion): number {
-  if (layout === "flip" || layout === "pulse" || motion.rhythm === 0) return T;
+function itemTime(layout: LayoutName, i: number, c: Context, T: number, reversed: boolean): number {
+  if (SHARED_CLOCK.has(layout) || c.m.rhythm === 0) return T;
   const steps = stepsPerLoop(layout, c);
   const v = T * steps;
   const k = Math.floor(v);
-  const x = clamp((v - k - queuePlace(layout, i, c, k) * motion.stagger * 0.4) / 0.6);
-  return lerp(v, k + spring(x, motion.bounce), motion.rhythm) / steps;
+  const spot = queuePlace(layout, i, c, k);
+  const wait = (reversed ? 1 - spot : spot) * c.m.stagger * c.m.hold;
+  return lerp(v, k + c.ease(clamp((v - k - wait) / (1 - c.m.hold))), c.m.rhythm) / steps;
+}
+
+export interface Settings {
+  preset: Preset;
+  motion: Motion;
+  options: Options;
+  easing: Bezier;
+  /** tour: the cells the camera visits */
+  path: number[];
+}
+
+export interface Frame {
+  /** card size at scale 1 */
+  w: number;
+  h: number;
+  items: ({ i: number } & Transform)[];
+  camera: { x: number; y: number; distance: number; fov: number; tilt: number; yaw: number; roll: number };
+}
+
+/** Layouts where up and down mean something. The rest only run forwards or backwards. */
+export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "proximity", "zoom"]);
+/** Layouts that know how far each card is from the middle, so focus, fade and solo apply. */
+export const HAS_FOCUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "ring", "wheel", "helix", "orbit", "fan"]);
+export const HAS_RADIUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "wheel", "orbit", "globe", "helix"]);
+
+/** Everything the renderer needs to draw one moment of a preset. */
+export function layoutFrame(settings: Settings, seconds: number, duration: number, aspect: number, cardShape: number): Frame {
+  const { preset, motion: m, options: o, easing } = settings;
+  const { layout } = preset;
+  const fourWay = FOUR_WAY.has(layout);
+  const vertical = fourWay && (o.direction === "up" || o.direction === "down");
+  const reversed = o.direction === "right" || o.direction === "down";
+  const sign = reversed ? -1 : 1;
+  const h = m.size;
+  const w = h * cardShape;
+  const n = itemTotal(layout, Math.round(m.count), preset.variant);
+  const T = (seconds / duration) * Math.round(m.speed);
+  const hold = clamp(m.hold, 0, 0.9);
+  const ease = (x: number) => bezier(easing, x);
+  const camZ = 1 / Math.tan((m.perspective * DEG) / 2); // a card 2 units tall fills the frame at z = 0
+  const reachable = Math.min(1.5, (n - 1) / 2);
+  const c: Context = {
+    n,
+    T: sign * T,
+    Tg: sign * T,
+    w,
+    h,
+    g: m.gap * w,
+    pitch: vertical ? h : w,
+    cross: vertical ? w : h,
+    A: aspect,
+    camZ,
+    v: preset.variant,
+    m: { ...m, hold },
+    o,
+    focus: o.focus === "start" ? -reachable : o.focus === "end" ? reachable : 0,
+    path: settings.path.filter((cell) => cell >= 0 && cell < (pathGrid(preset, Math.round(m.count))?.cells ?? 0)),
+    ease,
+    glide: (steps) => {
+      const k = Math.floor(steps);
+      return lerp(steps, k + ease(clamp((steps - k) / (1 - hold))), m.rhythm);
+    },
+  };
+
+  const items: Frame["items"] = [];
+  for (let i = 0; i < n; i++) {
+    c.T = sign * itemTime(layout, i, c, T, reversed);
+    const raw = layouts[layout](i, c);
+    if (!raw) continue;
+    let { x = 0, y = 0, rx = 0, ry = 0, rz = 0, s = 1, a = 1 } = raw;
+    const z = raw.z ?? 0;
+    if (raw.u !== undefined || raw.v !== undefined) {
+      const u = raw.u ?? 0;
+      const v = raw.v ?? 0;
+      if (vertical) {
+        x = v;
+        y = -u;
+        rx = ry; // a card that turned to face along the row now turns up or down
+        ry = 0;
+      } else {
+        x = u;
+        y = v;
+      }
+    }
+    const f = raw.f ?? c.focus;
+    if (raw.p !== undefined) {
+      const d = Math.abs(raw.p - f);
+      if (o.focus !== "off" && !raw.scaled) s *= 1 + (m.scale - 1) * bump(raw.p - f, m.reach);
+      if (m.fade > 0) a *= lerp(1, clamp(1 - d / 2.5), m.fade);
+      if (o.solo) a *= clamp(1.5 - d * 2);
+    }
+    const fromFocus = (raw.p ?? i - (n - 1) / 2) - f;
+    if (o.tiltMode === "fan") rz -= fromFocus * m.cardTilt * DEG;
+    if (o.tiltMode === "uniform") rz += m.cardTilt * DEG;
+    if (o.tiltMode === "alternate") rz += (i % 2 ? -1 : 1) * m.cardTilt * DEG;
+    ry += m.turn * DEG + TAU * Math.round(m.spin) * c.T;
+    if (a <= 0.003) continue;
+    items.push({ i, x, y, z, rx, ry, rz, s, a });
+  }
+
+  const camera = { x: 0, y: 0, back: 0 };
+  if (layout === "ring") camera.back = c.v.inside ? -camZ + 0.15 * ringRadius(c) : ringRadius(c);
+  if (layout === "globe") camera.back = c.v.close ? 0.6 : 0.9;
+  if (layout === "orbit") camera.back = c.v.flat ? 0 : 0.9;
+  if (layout === "helix") camera.back = 0.8;
+  if (layout === "tour" && c.path.length) {
+    // Cell to cell, pulling back a little on the way so the wall reads.
+    const cols = gridCols(n);
+    const rows = Math.ceil(n / cols);
+    const steps = c.glide(c.Tg * c.path.length);
+    const from = cellCentre(c.path[mod(Math.floor(steps), c.path.length)], cols, rows, c);
+    const to = cellCentre(c.path[mod(Math.floor(steps) + 1, c.path.length)], cols, rows, c);
+    const part = steps - Math.floor(steps);
+    camera.x = lerp(from[0], to[0], part);
+    camera.y = lerp(from[1], to[1], part);
+    camera.back = Math.sin(Math.PI * clamp(part)) * 0.35 * Math.min(2.5, Math.hypot(to[0] - from[0], to[1] - from[1]));
+  }
+
+  return {
+    w,
+    h,
+    items,
+    camera: {
+      x: camera.x - m.offsetX * aspect,
+      y: camera.y - m.offsetY,
+      distance: camZ * m.distance + camera.back,
+      fov: m.perspective * DEG,
+      tilt: m.tilt * DEG,
+      yaw: m.yaw * DEG,
+      roll: m.roll * DEG,
+    },
+  };
 }
 
 export const BASE_MOTION: Motion = {
   speed: 1,
+  rhythm: 0.45,
+  stagger: 0.7,
+  hold: 0.4,
   count: 8,
   size: 1,
   gap: 0.1,
+  scale: 1.6,
+  cardTilt: 8,
+  turn: 0,
+  spin: 0,
+  fade: 0,
+  offsetX: 0,
+  offsetY: 0,
   tilt: 0,
-  rhythm: 0.45,
-  stagger: 0.7,
-  bounce: 0.3,
+  yaw: 0,
+  perspective: 35,
+  distance: 1,
+  roll: 0,
+  radius: 1,
+  reach: 1.6,
 };
 
+export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true };
+
 export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max: number; step: number }> = {
-  speed: { label: "Speed", min: 1, max: 4, step: 1 },
+  speed: { label: "Passes", min: 1, max: 4, step: 1 },
   rhythm: { label: "Stop and go", min: 0, max: 1, step: 0.01 },
   stagger: { label: "Stagger", min: 0, max: 1, step: 0.01 },
-  bounce: { label: "Bounce", min: 0, max: 1, step: 0.01 },
-  count: { label: "Items", min: 3, max: 60, step: 1 },
-  size: { label: "Size", min: 0.2, max: 1.8, step: 0.01 },
-  gap: { label: "Spacing", min: 0, max: 1, step: 0.01 },
-  tilt: { label: "Tilt", min: -60, max: 60, step: 1 },
+  hold: { label: "Rest", min: 0, max: 0.8, step: 0.01 },
+  count: { label: "Count", min: 2, max: 300, step: 1 },
+  size: { label: "Card size", min: 0.04, max: 1.8, step: 0.01 },
+  gap: { label: "Gap", min: 0, max: 1, step: 0.01 },
+  scale: { label: "Scale amount", min: 0.4, max: 8, step: 0.01 },
+  cardTilt: { label: "Tilt angle", min: -45, max: 45, step: 1 },
+  turn: { label: "Turn", min: -80, max: 80, step: 1 },
+  spin: { label: "Spins", min: 0, max: 3, step: 1 },
+  fade: { label: "Fade", min: 0, max: 1, step: 0.01 },
+  offsetX: { label: "Offset X", min: -1, max: 1, step: 0.01 },
+  offsetY: { label: "Offset Y", min: -1, max: 1, step: 0.01 },
+  tilt: { label: "Look down", min: -70, max: 70, step: 1 },
+  yaw: { label: "Look across", min: -70, max: 70, step: 1 },
+  perspective: { label: "Perspective", min: 10, max: 100, step: 1 },
+  distance: { label: "Distance", min: 0.4, max: 3, step: 0.01 },
+  roll: { label: "Roll", min: -90, max: 90, step: 1 },
+  radius: { label: "Radius", min: 0.4, max: 2.5, step: 0.01 },
+  reach: { label: "Reach", min: 0.5, max: 8, step: 0.1 },
 };
 export const MOTION_KEYS = Object.keys(MOTION_RANGES) as MotionKey[];
 
 /**
- * Size, count and spacing carry between presets as a proportion ("a third
- * bigger than this preset's own size"); the rest carry as an offset.
+ * These carry between presets as a proportion ("a third bigger than this
+ * preset's own size"); the rest carry as an offset.
  */
-const PROPORTIONAL: ReadonlySet<MotionKey> = new Set<MotionKey>(["size", "count", "gap"]);
+const PROPORTIONAL: ReadonlySet<MotionKey> = new Set<MotionKey>(["size", "count", "gap", "scale", "distance", "radius", "perspective", "reach"]);
 
 export type Adjustments = Partial<Record<MotionKey, number>>;
 
 export const presetMotion = (preset: Preset): Motion => ({ ...BASE_MOTION, ...preset.defaults });
+export const presetOptions = (preset: Preset, chosen: Partial<Options> = {}): Options => ({ ...BASE_OPTIONS, ...preset.options, ...chosen });
 
 /** The change a slider value represents, measured against the preset's own default. */
 export function adjustmentFor(key: MotionKey, value: number, preset: Preset): number {
@@ -451,29 +791,53 @@ export function applyAdjustments(preset: Preset, adjustments: Adjustments): Moti
   return motion;
 }
 
-const preset = (name: string, layout: LayoutName, variant: Variant, defaults: Partial<Motion>, camera: { roll?: number; yaw?: number } = {}): Preset => ({
+interface PresetExtras {
+  options?: Partial<Options>;
+  path?: number[];
+}
+const preset = (name: string, layout: LayoutName, variant: Variant, defaults: Partial<Motion>, extras: PresetExtras = {}): Preset => ({
   name,
   layout,
   variant,
   defaults,
-  ...camera,
+  options: extras.options ?? {},
+  path: extras.path,
 });
 
 export const PRESETS: Preset[] = [
   preset("Slide 01", "slide", {}, { count: 7, size: 0.9, gap: 0.08 }),
   preset("Slide 02", "slide", {}, { count: 7, size: 0.9, gap: 0.08, rhythm: 1 }),
-  preset("Slide 03", "slide", { focus: true }, { count: 7, size: 1.05, gap: 0.06, rhythm: 1 }),
-  preset("Slide 04", "slide", { vertical: true }, { count: 7, size: 0.8, gap: 0.08, rhythm: 1, stagger: 1 }),
+  preset("Slide 03", "slide", {}, { count: 7, size: 0.8, gap: 0.08, rhythm: 1, stagger: 1 }, { options: { direction: "up" } }),
+  preset("Slide 04", "slide", {}, { count: 9, size: 0.75, gap: 0.06, rhythm: 1, cardTilt: 7, fade: 0.5 }, { options: { tiltMode: "fan" } }),
+  preset("Slide 05", "slide", {}, { count: 8, size: 0.8, gap: 0.14, rhythm: 0.8, cardTilt: 5 }, { options: { tiltMode: "alternate" } }),
+  preset("Focus 01", "slide", {}, { count: 9, size: 0.55, gap: 0.14, rhythm: 1, scale: 2.1 }, { options: { focus: "centre" } }),
+  preset("Focus 02", "slide", {}, { count: 9, size: 0.42, gap: 0.14, rhythm: 1, scale: 2.2, stagger: 1 }, { options: { focus: "centre", direction: "up" } }),
+  preset("Focus 03", "slide", {}, { count: 9, size: 0.5, gap: 0.12, rhythm: 1, scale: 2, fade: 0.5 }, { options: { focus: "start" } }),
+  preset("Focus 04", "slide", {}, { count: 7, size: 0.7, gap: 0.1, rhythm: 1, scale: 1.7 }, { options: { focus: "centre", solo: true } }),
+  preset("Proximity 01", "proximity", {}, { count: 7, size: 0.42, gap: 0.12, scale: 2.2, rhythm: 0.6 }),
+  preset("Proximity 02", "proximity", {}, { count: 6, size: 0.34, gap: 0.12, scale: 2.2, rhythm: 0.6 }, { options: { direction: "up" } }),
+  preset("Proximity 03", "proximity", { field: true }, { count: 196, size: 0.085, gap: 0.5, scale: 6, reach: 4.5, rhythm: 0.35, hold: 0.2 }, { path: [6, 8, 18, 16] }),
+  preset("Proximity 04", "proximity", { field: true }, { count: 144, size: 0.11, gap: 0.4, scale: 5, reach: 4, rhythm: 0.3, hold: 0.2, tilt: 40, roll: -20, fade: 0.5 }, { path: [0, 12, 24, 20, 4] }),
+  preset("Proximity 05", "proximity", { field: true }, { count: 64, size: 0.2, gap: 0.25, scale: 2.6, reach: 2.6, rhythm: 0.6 }, { path: [12, 2, 14, 22, 10] }),
+  preset("Scale 01", "zoom", {}, { count: 6, size: 1.5, rhythm: 1, hold: 0.45, cardTilt: 0 }),
+  preset("Scale 02", "zoom", { out: true }, { count: 6, size: 1.5, rhythm: 1, hold: 0.45, cardTilt: 0 }),
+  preset("Scale 03", "zoom", { edge: true }, { count: 6, size: 1.4, rhythm: 1, hold: 0.4, cardTilt: 0 }, { options: { direction: "up" } }),
+  preset("Scale 04", "zoom", {}, { count: 6, size: 1.2, rhythm: 1, hold: 0.4, cardTilt: 24 }),
   preset("Coverflow 01", "cover", {}, { count: 9, size: 1 }),
   preset("Coverflow 02", "cover", {}, { count: 9, size: 1, rhythm: 1 }),
-  preset("Coverflow 03", "cover", {}, { count: 9, size: 0.8, gap: 0.25, tilt: 12, rhythm: 1, bounce: 0.6 }),
+  preset("Coverflow 03", "cover", {}, { count: 9, size: 0.8, gap: 0.25, tilt: 12, rhythm: 1 }),
+  preset("Coverflow 04", "cover", {}, { count: 9, size: 0.75, rhythm: 1, stagger: 1 }, { options: { direction: "up" } }),
   preset("Ring 01", "ring", {}, { count: 10, size: 0.8, gap: 0.1 }),
   preset("Ring 02", "ring", {}, { count: 12, size: 0.7, gap: 0.1, tilt: 22 }),
   preset("Ring 03", "ring", { inside: true }, { count: 12, size: 1.1, gap: 0.06 }),
   preset("Ring 04", "ring", { vertical: true }, { count: 10, size: 0.7, gap: 0.12 }),
-  preset("Orbit 01", "orbit", {}, { count: 9, size: 0.9, tilt: 14 }),
-  preset("Orbit 02", "orbit", { two: true }, { count: 13, size: 0.85, tilt: 18 }),
-  preset("Orbit 03", "orbit", { flat: true }, { count: 9, size: 0.8 }),
+  preset("Ring 05", "ring", {}, { count: 14, size: 0.6, gap: 0.08, tilt: 14, scale: 1.5, perspective: 55 }, { options: { focus: "centre" } }),
+  preset("Orbit 01", "orbit", {}, { count: 8, size: 0.9, tilt: 14 }, { options: { centre: false } }),
+  preset("Orbit 02", "orbit", {}, { count: 9, size: 0.9, tilt: 14 }),
+  preset("Orbit 03", "orbit", { two: true }, { count: 12, size: 0.85, tilt: 18 }, { options: { centre: false } }),
+  preset("Orbit 04", "orbit", { flat: true }, { count: 8, size: 0.8 }, { options: { centre: false } }),
+  preset("Orbit 05", "orbit", {}, { count: 8, size: 0.85, tilt: 24, spin: 1, radius: 1.15, perspective: 50 }, { options: { centre: false } }),
+  preset("Orbit 06", "orbit", {}, { count: 10, size: 0.8, tilt: 8, scale: 1.7, fade: 0.5 }, { options: { centre: false, focus: "centre" } }),
   preset("Deck 01", "deck", { fly: "up" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 02", "deck", { fly: "right" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 03", "deck", { fly: "spin" }, { count: 6, size: 1, gap: 0.5, tilt: 10, rhythm: 1 }),
@@ -481,19 +845,22 @@ export const PRESETS: Preset[] = [
   preset("Wheel 02", "wheel", { side: true }, { count: 12, size: 0.7, gap: 0.15 }),
   preset("Wheel 03", "wheel", { full: true }, { count: 10, size: 0.42, gap: 0.1 }),
   preset("Grid 01", "grid", { pan: "x" }, { count: 24, size: 0.6, gap: 0.08 }),
-  preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.08, tilt: 48 }, { roll: -30 }),
+  preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.08, tilt: 48, roll: -30 }),
   preset("Grid 03", "grid", { pan: "alt" }, { count: 24, size: 0.6, gap: 0.08 }),
   preset("Grid 04", "grid", { pan: "pulse" }, { count: 24, size: 0.55, gap: 0.1 }),
+  preset("Grid 05", "tour", {}, { count: 9, size: 1.1, gap: 0.12, rhythm: 1, hold: 0.45 }, { path: [0, 4, 8, 6, 2] }),
+  preset("Grid 06", "tour", {}, { count: 16, size: 0.9, gap: 0.1, rhythm: 1, hold: 0.4, tilt: 24, roll: -8 }, { path: [0, 5, 10, 15, 12, 9, 6, 3] }),
+  preset("Grid 07", "tour", {}, { count: 12, size: 0.8, gap: 0.1, rhythm: 0.5, distance: 1.5 }, { path: [0, 3, 11, 8] }),
   preset("Marquee 01", "marquee", { rows: 2 }, { count: 16, size: 0.85, gap: 0.08 }),
   preset("Marquee 02", "marquee", { rows: 3 }, { count: 24, size: 0.6, gap: 0.08 }),
-  preset("Marquee 03", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.08 }, { roll: -14 }),
-  preset("Marquee 04", "marquee", { rows: 3, vertical: true }, { count: 18, size: 0.7, gap: 0.08 }),
+  preset("Marquee 03", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.08, roll: -14 }),
+  preset("Marquee 04", "marquee", { rows: 3 }, { count: 18, size: 0.7, gap: 0.08 }, { options: { direction: "up" } }),
   preset("Marquee 05", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.08, tilt: 55 }),
   preset("Helix 01", "helix", {}, { count: 14, size: 0.6 }),
   preset("Helix 02", "helix", { horizontal: true }, { count: 14, size: 0.55 }),
   preset("Helix 03", "helix", { tornado: true }, { count: 16, size: 0.5 }),
   preset("Globe 01", "globe", {}, { count: 40, size: 0.34 }),
-  preset("Globe 02", "globe", {}, { count: 40, size: 0.34, tilt: 12 }, { roll: 22 }),
+  preset("Globe 02", "globe", {}, { count: 40, size: 0.34, tilt: 12, roll: 22 }),
   preset("Globe 03", "globe", { close: true }, { count: 60, size: 0.4 }),
   preset("Flip 01", "flip", { axis: "y" }, { count: 5, size: 1.3 }),
   preset("Flip 02", "flip", { axis: "x" }, { count: 5, size: 1.3 }),
@@ -506,7 +873,7 @@ export const PRESETS: Preset[] = [
   preset("Wave 01", "wave", {}, { count: 12, size: 0.6, gap: 0.1 }),
   preset("Wave 02", "wave", { ribbon: true }, { count: 12, size: 0.7, gap: 0.02 }),
   preset("Stairs 01", "stairs", {}, { count: 9, size: 0.8, gap: 0.1 }),
-  preset("Stairs 02", "stairs", {}, { count: 9, size: 0.8, gap: 0.1, tilt: 18 }, { yaw: -32 }),
+  preset("Stairs 02", "stairs", {}, { count: 9, size: 0.8, gap: 0.1, tilt: 18, yaw: -32 }),
   preset("Float 01", "float", {}, { count: 14, size: 0.6, rhythm: 0 }),
   preset("Float 02", "float", { drift: true }, { count: 14, size: 0.6, rhythm: 0 }),
   preset("Pulse 01", "pulse", {}, { count: 5, size: 1.3 }),
@@ -515,6 +882,7 @@ export const PRESETS: Preset[] = [
 /** The settings that are about the brand, not the motion. They never reset. */
 export interface Look {
   duration: number;
+  /** corner radius, as a share of the card's short side */
   radius: number;
   /** canvas size in pixels */
   width: number;
@@ -550,7 +918,7 @@ export const CARD_SHAPES: { label: string; w: number; h: number }[] = [
 
 export const BASE_LOOK: Look = {
   duration: 8,
-  radius: 0.08,
+  radius: 0,
   width: 1080,
   height: 1920,
   cardW: 4,
@@ -561,53 +929,74 @@ export const BASE_LOOK: Look = {
 /** A saved setup: which preset, how it was tuned, and how it looks. No media. */
 export interface SavedSetup {
   app: "motion-presets";
-  version: 1;
+  version: 2;
   preset: string;
   motion: Motion;
+  options: Options;
+  easing: Bezier;
+  path: number[];
   look: Look;
 }
 
+const record = (value: unknown): Record<string, unknown> => (typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {});
+const finite = (value: unknown): number | undefined => (typeof value === "number" && Number.isFinite(value) ? value : undefined);
+const oneOf = <T extends string>(value: unknown, allowed: readonly T[]): T | undefined => allowed.find((item) => item === value);
+
 /** Reads a saved setup from untrusted JSON. Returns a message when it is not one. */
-export function parseSetup(text: string): { preset: Preset; motion: Motion; look: Look } | string {
+export function parseSetup(text: string): (Settings & { look: Look }) | string {
   let data: unknown;
   try {
     data = JSON.parse(text);
   } catch {
     return "That file is not valid JSON.";
   }
-  if (typeof data !== "object" || data === null) return "That file is not a saved setup.";
-  const file = data as Record<string, unknown>;
+  const file = record(data);
   if (file.app !== "motion-presets") return "That file is not a saved setup.";
   const found = PRESETS.find((p) => p.name === file.preset);
   if (!found) return `This version has no preset called "${String(file.preset)}".`;
 
   const motion = presetMotion(found);
-  const savedMotion = typeof file.motion === "object" && file.motion !== null ? (file.motion as Record<string, unknown>) : {};
+  const savedMotion = record(file.motion);
   for (const key of MOTION_KEYS) {
-    const value = savedMotion[key];
-    if (typeof value !== "number" || !Number.isFinite(value)) continue;
+    const value = finite(savedMotion[key]);
+    if (value === undefined) continue;
     const { min, max, step } = MOTION_RANGES[key];
     motion[key] = clamp(step >= 1 ? Math.round(value) : value, min, max);
   }
 
+  const options = presetOptions(found);
+  const savedOptions = record(file.options);
+  options.direction = oneOf(savedOptions.direction, ["left", "right", "up", "down"] as const) ?? options.direction;
+  options.focus = oneOf(savedOptions.focus, ["off", "start", "centre", "end"] as const) ?? options.focus;
+  options.tiltMode = oneOf(savedOptions.tiltMode, ["off", "fan", "uniform", "alternate"] as const) ?? options.tiltMode;
+  if (typeof savedOptions.solo === "boolean") options.solo = savedOptions.solo;
+  if (typeof savedOptions.centre === "boolean") options.centre = savedOptions.centre;
+
+  let easing = BASE_EASING;
+  if (Array.isArray(file.easing) && file.easing.length === 4 && file.easing.every((part) => finite(part) !== undefined)) {
+    const [x1, y1, x2, y2] = file.easing as number[];
+    easing = [clamp(x1), clamp(y1, -1, 2), clamp(x2), clamp(y2, -1, 2)];
+  }
+
+  const path = Array.isArray(file.path)
+    ? file.path.filter((cell): cell is number => Number.isInteger(cell) && cell >= 0 && cell < 64).slice(0, 64)
+    : (found.path ?? []);
+
   const look = { ...BASE_LOOK };
-  const savedLook = typeof file.look === "object" && file.look !== null ? (file.look as Record<string, unknown>) : {};
-  const number = (key: string) => {
-    const value = savedLook[key];
-    return typeof value === "number" && Number.isFinite(value) ? value : undefined;
-  };
-  const duration = number("duration");
+  const savedLook = record(file.look);
+  const duration = finite(savedLook.duration);
   if (duration !== undefined) look.duration = clamp(Math.round(duration), 3, 120);
-  const radius = number("radius");
+  const radius = finite(savedLook.radius);
   if (radius !== undefined) look.radius = clamp(radius, 0, 0.5);
-  const width = number("width");
+  const width = finite(savedLook.width);
   if (width !== undefined) look.width = canvasSide(width);
-  const height = number("height");
+  const height = finite(savedLook.height);
   if (height !== undefined) look.height = canvasSide(height);
-  const cardW = number("cardW");
+  const cardW = finite(savedLook.cardW);
   if (cardW !== undefined && cardW > 0) look.cardW = ratioPart(cardW);
-  const cardH = number("cardH");
+  const cardH = finite(savedLook.cardH);
   if (cardH !== undefined && cardH > 0) look.cardH = ratioPart(cardH);
   if (typeof savedLook.background === "string" && /^#[0-9a-f]{6}$/i.test(savedLook.background)) look.background = savedLook.background;
-  return { preset: found, motion, look };
+
+  return { preset: found, motion, options, easing, path, look };
 }

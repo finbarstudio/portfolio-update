@@ -11,7 +11,7 @@
   inset: 0;
   z-index: 100;
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 300px;
+  grid-template-columns: 220px minmax(0, 1fr) 324px;
   height: 100dvh;
   overflow: hidden;
   background: #0c0c0d;
@@ -172,6 +172,101 @@
   background: var(--mp-field);
   border: 1px solid var(--mp-line);
   border-radius: 6px;
+}
+
+.mp-choice {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+}
+.mp-choice > div {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: #101012;
+  border-radius: 8px;
+}
+.mp-tool .mp-choice button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 26px;
+  padding: 0 2px;
+  font-size: 11px;
+  background: transparent;
+  border-color: transparent;
+}
+.mp-tool .mp-choice button[aria-pressed="true"] {
+  color: var(--mp-text);
+  background: #34343a;
+}
+.mp-note {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--mp-dim);
+}
+
+.mp-easing {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+.mp-curve {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #101012;
+  border-radius: 8px;
+  touch-action: none;
+}
+.mp-curve-box {
+  fill: none;
+  stroke: var(--mp-line);
+  stroke-width: 0.6;
+}
+.mp-curve-arm {
+  stroke: #55555e;
+  stroke-width: 0.8;
+}
+.mp-curve-line {
+  fill: none;
+  stroke: var(--mp-accent);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mp-curve-handle {
+  fill: var(--mp-accent);
+  cursor: grab;
+}
+.mp-curve-handle:focus-visible {
+  outline: none;
+  stroke: #6aa8ff;
+  stroke-width: 2;
+}
+.mp-easings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+}
+.mp-tool .mp-easings button {
+  min-height: 24px;
+  padding: 0 2px;
+  font-size: 11px;
+}
+
+.mp-path {
+  display: grid;
+  gap: 3px;
+  max-width: 180px;
+}
+.mp-tool .mp-path button {
+  min-height: 0;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 .mp-drop {
