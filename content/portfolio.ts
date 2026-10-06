@@ -168,11 +168,9 @@ const RAW: Slide[] = [
       "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
     meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }],
   },
-  one("rennen-plus/demos/landing.mp4"),
-  one("rennen-plus/demos/grid.mp4", "Every car on one baseline, each thumbnail cut out and faced the same way"),
-  row(["rennen-plus/demos/phone-1.webp", "rennen-plus/demos/phone-2.webp", "rennen-plus/demos/phone-3.webp"], "The finder, a car page and its package on a phone"),
-  one("rennen-plus/demos/material.mp4", "Trim and finish change the price live; the finish renders as a 3D material"),
-  one("rennen-plus/demos/dealers.mp4", "Forty-five dealers and installers, searchable by postcode"),
+  linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
+  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline"),
+  linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, the grid and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
 
   /* ── Salesmasters ──────────────────────────────────────────── */
   { kind: "title", id: "salesmasters", name: "Salesmasters", category: "Editorial", year: "2024–2025" },

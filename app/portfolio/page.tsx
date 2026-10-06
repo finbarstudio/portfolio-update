@@ -38,13 +38,13 @@ function Mark() {
   );
 }
 
-function Item({ m, style }: { m: Media; style?: React.CSSProperties }) {
+function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; group?: string }) {
   return (
     <div
       className={`pf-item${m.frame === false ? "" : " is-framed"}`}
       style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
     >
-      <PfMedia src={m.src} light={m.light} video={m.video} alt={m.alt} w={m.w} h={m.h} />
+      <PfMedia src={m.src} light={m.light} video={m.video} alt={m.alt} w={m.w} h={m.h} group={group} />
     </div>
   );
 }
@@ -166,7 +166,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
           <div className="pf-grid" style={{ "--cols": s.cols, "--rows": s.rows } as React.CSSProperties}>
             <div className="pf-grid-in">
               {s.cells.map((m) => (
-                <Item key={m.src} m={m} style={{ gridColumn: `${m.c} / span ${m.cs}`, gridRow: `${m.r} / span ${m.rs}` }} />
+                <Item key={m.src} m={m} group={chap?.id} style={{ gridColumn: `${m.c} / span ${m.cs}`, gridRow: `${m.r} / span ${m.rs}` }} />
               ))}
             </div>
           </div>
@@ -251,7 +251,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
         <section className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}`}>
           <Run chap={chap} page={page} />
           <div className="pf-row" style={{ "--h": h } as React.CSSProperties}>
-            {s.items.map((m) => <Item key={m.src} m={m} />)}
+            {s.items.map((m) => <Item key={m.src} m={m} group={chap?.id} />)}
           </div>
           {s.caption ? (
             <p className="pf-caption pf-mono">

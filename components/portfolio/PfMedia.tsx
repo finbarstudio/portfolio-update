@@ -11,7 +11,8 @@ import { corsMedia } from "@/lib/media";
  * opening pages are text, so by the time a reader reaches the work it is
  * already there at full quality. To show a real percentage the file is fetched
  * by script (a plain <img> or <video> reports no progress) and then handed to
- * the element as a local address. Four files download at a time, in page order.
+ * the element as a local address. Four files download at a time, in page order, except that a project picked
+ * from the project list jumps the queue.
  *
  * On a phone, clips are left to stream the normal way: holding every clip of
  * the portfolio in memory at once is too much for a phone. Images still get
@@ -21,20 +22,33 @@ import { corsMedia } from "@/lib/media";
 
 const MAX = 4;
 let active = 0;
-const waiting: (() => void)[] = [];
+const waiting: { go: () => void; group?: string }[] = [];
+
+/**
+ * The project the reader has jumped to from the project list (the address ends
+ * in #its-id). Its files go to the front of the queue, so the pages they are
+ * about to look at arrive before the ones they skipped.
+ */
+let first = "";
+if (typeof window !== "undefined") {
+  const read = () => (first = decodeURIComponent(window.location.hash.slice(1)));
+  read();
+  window.addEventListener("hashchange", read);
+}
 
 /** Wait for a download slot. Resolves with the function that gives it back. */
-function slot(): Promise<() => void> {
+function slot(group?: string): Promise<() => void> {
   return new Promise((resolve) => {
     const go = () => {
       active += 1;
       resolve(() => {
         active -= 1;
-        waiting.shift()?.();
+        const i = first ? waiting.findIndex((w) => w.group === first) : -1;
+        waiting.splice(Math.max(i, 0), 1)[0]?.go();
       });
     };
     if (active < MAX) go();
-    else waiting.push(go);
+    else waiting.push({ go, group });
   });
 }
 
@@ -58,7 +72,7 @@ async function download(url: string, onProgress: (pct: number | null) => void, s
   return URL.createObjectURL(new Blob(chunks, { type: res.headers.get("content-type") ?? "" }));
 }
 
-export default function PfMedia({ src: dark, light, video, alt, w, h }: { src: string; light?: string; video?: boolean; alt?: string; w: number; h: number }) {
+export default function PfMedia({ src: dark, light, video, alt, w, h, group }: { src: string; light?: string; video?: boolean; alt?: string; w: number; h: number; group?: string }) {
   // A piece can have a second file for the page's light theme. It is swapped
   // the moment the theme switch is flipped (it sets data-pf-theme on <html>).
   const [isLight, setIsLight] = useState(false);
@@ -90,7 +104,7 @@ export default function PfMedia({ src: dark, light, video, alt, w, h }: { src: s
     let made: string | null = null;
     const stop = new AbortController();
     (async () => {
-      const release = await slot();
+      const release = await slot(group);
       try {
         if (dead) return;
         made = await download(corsMedia(src), (p) => !dead && setPct(p), stop.signal);
