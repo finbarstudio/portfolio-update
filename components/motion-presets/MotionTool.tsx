@@ -43,9 +43,10 @@ interface Thumb {
   isVideo: boolean;
 }
 
-/** Presets grouped under their layout's name, in catalogue order. */
+/** Presets grouped under their family name, in catalogue order. */
+const groupOf = (preset: Preset) => preset.name.replace(/ \d+$/, "");
 const GROUPS = PRESETS.reduce<{ title: string; presets: Preset[] }[]>((groups, preset) => {
-  const title = preset.name.replace(/ \d+$/, "");
+  const title = groupOf(preset);
   const last = groups[groups.length - 1];
   if (last?.title === title) last.presets.push(preset);
   else groups.push({ title, presets: [preset] });
@@ -366,6 +367,8 @@ export default function MotionTool() {
   const [chosen, setChosen] = useState<Partial<Options>>({});
   const [easing, setEasing] = useState<Bezier>(BASE_EASING);
   const [path, setPath] = useState<number[]>(PRESETS[0].path ?? []);
+  // Groups start folded, apart from the one holding the chosen preset.
+  const [openGroups, setOpenGroups] = useState<ReadonlySet<string>>(() => new Set([groupOf(PRESETS[0])]));
   const [look, setLook] = useState<Look>(BASE_LOOK);
   const [thumbs, setThumbs] = useState<Thumb[]>([]);
   const [status, setStatus] = useState("");
@@ -507,6 +510,7 @@ export default function MotionTool() {
   function choosePreset(next: Preset) {
     setPreset(next);
     setPath(next.path ?? []);
+    setOpenGroups((current) => (current.has(groupOf(next)) ? current : new Set([...current, groupOf(next)])));
     loopStartRef.current = performance.now();
   }
 
@@ -622,8 +626,25 @@ export default function MotionTool() {
       <nav className="mp-panel mp-panel-left" aria-label="Presets">
         <h1>Motion presets</h1>
         {GROUPS.map((group) => (
-          <section key={group.title}>
-            <h2>{group.title}</h2>
+          <details
+            key={group.title}
+            className="mp-group"
+            open={openGroups.has(group.title)}
+            onToggle={(event) => {
+              const { open } = event.currentTarget;
+              setOpenGroups((current) => {
+                if (current.has(group.title) === open) return current;
+                const next = new Set(current);
+                if (open) next.add(group.title);
+                else next.delete(group.title);
+                return next;
+              });
+            }}
+          >
+            <summary>
+              <h2>{group.title}</h2>
+              <span>{group.presets.length}</span>
+            </summary>
             <div className="mp-presets">
               {group.presets.map((item) => (
                 <button key={item.name} type="button" aria-pressed={item === preset} onClick={() => choosePreset(item)}>
@@ -641,7 +662,7 @@ export default function MotionTool() {
                 </button>
               ))}
             </div>
-          </section>
+          </details>
         ))}
         <a className="mp-pint" href={PINT_URL} target="_blank" rel="noopener noreferrer">
           Buy me a pint

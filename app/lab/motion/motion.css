@@ -122,26 +122,86 @@
   outline-offset: 1px;
 }
 
+/* Preset list: each family folds. A hairline between families, the same 8px rhythm inside. */
+.mp-panel-left h1 {
+  margin: 0 0 8px;
+}
+.mp-group {
+  border-top: 1px solid var(--mp-line);
+}
+.mp-group summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 2px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.mp-group summary::-webkit-details-marker {
+  display: none;
+}
+.mp-group summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin: 0 4px 0 2px;
+  border-right: 1.5px solid var(--mp-dim);
+  border-bottom: 1.5px solid var(--mp-dim);
+  rotate: -45deg;
+  transition: rotate 0.15s;
+}
+.mp-group[open] summary::before {
+  rotate: 45deg;
+}
+.mp-tool .mp-group summary h2 {
+  flex: 1;
+  margin: 0;
+  color: var(--mp-text);
+}
+.mp-group summary span {
+  font-size: 11px;
+  color: var(--mp-dim);
+  font-variant-numeric: tabular-nums;
+}
+.mp-group summary:hover h2 {
+  color: #fff;
+}
+.mp-group summary:focus-visible {
+  outline: 2px solid #6aa8ff;
+  outline-offset: -2px;
+  border-radius: 6px;
+}
 .mp-presets {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 8px;
+  padding: 0 0 16px;
 }
 .mp-tool .mp-presets button {
   display: grid;
-  gap: 4px;
-  padding: 4px 4px 5px;
+  gap: 6px;
+  padding: 6px 6px 8px;
   font-size: 11px;
+  color: var(--mp-dim);
+  border-radius: 9px;
+}
+.mp-tool .mp-presets button:hover {
+  color: var(--mp-text);
+}
+.mp-tool .mp-presets button[aria-pressed="true"] {
+  color: #111;
 }
 .mp-presets canvas {
   display: block;
   width: 100%;
   aspect-ratio: 4 / 5;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .mp-pint {
   display: block;
-  margin-top: 28px;
+  margin-top: 24px;
   padding: 11px 12px;
   text-align: center;
   color: var(--mp-dim);
@@ -160,17 +220,16 @@
   outline: 2px solid #6aa8ff;
   outline-offset: 1px;
 }
-/* The same link, floating over the bottom of the preview. It is not part of the canvas, so it never appears in an export. */
+/* The same link, floating in the bottom right corner of the preview area, clear of the canvas. It is not part of the canvas, so it never appears in an export. */
 .mp-stage {
   position: relative;
 }
 .mp-pint.mp-pint-float {
   position: absolute;
-  bottom: 18px;
-  left: 50%;
+  right: 16px;
+  bottom: 16px;
   margin: 0;
   padding: 8px 16px;
-  translate: -50% 0;
   white-space: nowrap;
   background: rgb(21 21 23 / 0.8);
   backdrop-filter: blur(10px);
@@ -178,17 +237,31 @@
 }
 .mp-choices {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 6px;
+  gap: 2px;
+  margin-bottom: 8px;
+  padding: 3px;
+  background: #101012;
+  border-radius: 9px;
 }
-.mp-choices button {
+.mp-tool .mp-choices button {
   flex: 1 1 0;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0 2px;
+  font-size: 11px;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 7px;
+}
+.mp-tool .mp-choices button[aria-pressed="true"] {
+  color: var(--mp-text);
+  background: #34343a;
 }
 .mp-pair {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .mp-stage {
@@ -196,11 +269,12 @@
   place-items: center;
   min-width: 0;
   min-height: 0;
-  padding: 24px;
+  /* The strip along the bottom is kept clear for the pint link. */
+  padding: 24px 24px 64px;
 }
 .mp-stage canvas {
   max-width: 100%;
-  max-height: calc(100dvh - 48px);
+  max-height: calc(100dvh - 88px);
   border-radius: 6px;
   box-shadow: 0 0 0 1px var(--mp-line);
 }
@@ -467,6 +541,9 @@
   .mp-stage {
     order: -1;
     padding: 12px;
+  }
+  .mp-pint.mp-pint-float {
+    display: none;
   }
   .mp-stage canvas {
     max-height: 60dvh;
