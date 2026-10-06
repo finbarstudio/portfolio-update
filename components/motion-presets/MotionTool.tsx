@@ -166,6 +166,37 @@ function Heading({ title, onReset, changed }: { title: string; onReset: () => vo
   );
 }
 
+/**
+ * A slider drawn as one thick bar: the name and the value sit inside it and
+ * the fill is the value. Sliders that run either side of zero fill from zero.
+ */
+function Slider({
+  label,
+  min,
+  max,
+  step,
+  value,
+  onChange,
+}: {
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  const at = (v: number) => ((clamp(v, min, max) - min) / (max - min)) * 100;
+  const zero = min < 0 && max > 0 ? at(0) : 0;
+  const fill = { "--from": `${Math.min(zero, at(value))}%`, "--to": `${Math.max(zero, at(value))}%` } as React.CSSProperties;
+  return (
+    <label className="mp-slider" style={fill}>
+      <span>{label}</span>
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} />
+      <output>{step >= 1 ? value : value.toFixed(step >= 0.1 ? 1 : 2)}</output>
+    </label>
+  );
+}
+
 /** A row of mutually exclusive buttons. */
 function Choice<T extends string | boolean>({
   label,
@@ -566,14 +597,7 @@ export default function MotionTool() {
     "offsetY",
   ];
   const slider = (key: MotionKey) => {
-    const { label, min, max, step } = MOTION_RANGES[key];
-    return (
-      <label className="mp-row" key={key}>
-        {label}
-        <input type="range" min={min} max={max} step={step} value={motion[key]} onChange={(event) => setMotion(key, Number(event.target.value))} />
-        <output>{step >= 1 ? motion[key] : motion[key].toFixed(2)}</output>
-      </label>
-    );
+    return <Slider key={key} {...MOTION_RANGES[key]} value={motion[key]} onChange={(value) => setMotion(key, value)} />;
   };
   const stepped = ALWAYS_STEPPED.has(layout) || motion.rhythm > 0;
   const tuned = Object.keys(adjustments).length > 0 || Object.keys(chosen).length > 0 || easing !== BASE_EASING;
@@ -748,11 +772,7 @@ export default function MotionTool() {
         </div>
 
         <Heading title="Look" changed={look.radius !== BASE_LOOK.radius || look.background !== BASE_LOOK.background} onReset={() => patchLook({ radius: BASE_LOOK.radius, background: BASE_LOOK.background })} />
-        <label className="mp-row">
-          Corners
-          <input type="range" min={0} max={0.5} step={0.01} value={look.radius} onChange={(event) => patchLook({ radius: Number(event.target.value) })} />
-          <output>{look.radius.toFixed(2)}</output>
-        </label>
+        <Slider label="Corners" min={0} max={0.5} step={0.01} value={look.radius} onChange={(radius) => patchLook({ radius })} />
         <label className="mp-row">
           Background
           <input type="color" value={look.background} onChange={(event) => patchLook({ background: event.target.value })} />
