@@ -21,6 +21,14 @@ export interface LabItem {
 
 const RAW_ITEMS: LabItem[] = [
   {
+    id: 5,
+    name: "Motion presets",
+    line: "Fifty looping layouts for your media",
+    href: "/motion",
+    video: "/media/lab/motion/tile.mp4",
+    added: "2026-10-06",
+  },
+  {
     id: 4,
     name: "Pathway maker",
     line: "A brand tool for Share to Buy",

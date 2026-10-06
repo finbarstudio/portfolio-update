@@ -1,0 +1,244 @@
+/* Motion presets (lab.finbar.studio/motion). Everything is scoped to .mp-tool. */
+
+.mp-tool {
+  --mp-panel: #151517;
+  --mp-line: #26262a;
+  --mp-text: #ececee;
+  --mp-dim: #8b8b93;
+  --mp-accent: #f2f2f3;
+  --mp-field: #202024;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 300px;
+  height: 100dvh;
+  overflow: hidden;
+  background: #0c0c0d;
+  color: var(--mp-text);
+  color-scheme: dark;
+  font: 400 13px/1.4 system-ui, sans-serif;
+}
+
+.mp-panel {
+  min-height: 0;
+  padding: 14px;
+  overflow-y: auto;
+  background: var(--mp-panel);
+}
+.mp-panel-left {
+  border-right: 1px solid var(--mp-line);
+}
+.mp-panel-right {
+  border-left: 1px solid var(--mp-line);
+}
+.mp-tool h1 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+}
+.mp-tool h2 {
+  margin: 16px 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mp-dim);
+}
+.mp-tool h2:first-child {
+  margin-top: 0;
+}
+
+.mp-tool button {
+  min-height: 32px;
+  padding: 0 8px;
+  font: inherit;
+  color: var(--mp-text);
+  background: var(--mp-field);
+  border: 1px solid var(--mp-line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.mp-tool button:hover {
+  background: #2a2a2f;
+}
+.mp-tool button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.mp-tool button[aria-pressed="true"] {
+  color: #111;
+  background: var(--mp-accent);
+  border-color: var(--mp-accent);
+}
+.mp-tool button.mp-primary {
+  width: 100%;
+  min-height: 44px;
+  font-weight: 600;
+  color: #111;
+  background: var(--mp-accent);
+  border-color: var(--mp-accent);
+}
+.mp-tool :is(button, input, select):focus-visible {
+  outline: 2px solid #6aa8ff;
+  outline-offset: 1px;
+}
+
+.mp-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.mp-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.mp-choices button {
+  flex: 1 1 0;
+}
+.mp-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.mp-stage {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 24px;
+}
+.mp-stage canvas {
+  max-width: 100%;
+  max-height: calc(100dvh - 48px);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--mp-line);
+}
+
+.mp-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+.mp-row output {
+  text-align: right;
+  color: var(--mp-dim);
+  font-variant-numeric: tabular-nums;
+}
+.mp-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--mp-accent);
+}
+.mp-row input[type="color"] {
+  grid-column: 2 / 4;
+  width: 100%;
+  height: 28px;
+  padding: 0;
+  background: var(--mp-field);
+  border: 1px solid var(--mp-line);
+  border-radius: 6px;
+}
+.mp-field {
+  display: grid;
+  gap: 2px;
+  color: var(--mp-dim);
+  font-size: 11px;
+}
+.mp-field input {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--mp-text);
+  background: var(--mp-field);
+  border: 1px solid var(--mp-line);
+  border-radius: 6px;
+}
+
+.mp-drop {
+  padding: 12px;
+  text-align: center;
+  color: var(--mp-dim);
+  border: 1px dashed #3a3a40;
+  border-radius: 8px;
+}
+.mp-drop.is-over {
+  color: var(--mp-text);
+  border-color: var(--mp-accent);
+}
+.mp-drop p {
+  margin: 6px 0 0;
+}
+.mp-media {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.mp-media li {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--mp-field);
+  border-radius: 6px;
+}
+.mp-media :is(img, video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mp-tool .mp-media button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 22px;
+  height: 22px;
+  min-height: 0;
+  padding: 0;
+  line-height: 1;
+  background: rgb(0 0 0 / 0.65);
+  border-radius: 50%;
+}
+.mp-status {
+  min-height: 18px;
+  margin: 8px 0 0;
+  color: var(--mp-dim);
+}
+.mp-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Narrow screens: the preview on top, both panels scrolling beneath it. */
+@media (max-width: 900px) {
+  .mp-tool {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: max-content;
+    overflow-y: auto;
+  }
+  .mp-stage {
+    order: -1;
+    padding: 12px;
+  }
+  .mp-stage canvas {
+    max-height: 60dvh;
+  }
+  .mp-panel {
+    overflow: visible;
+    border: 0;
+    border-top: 1px solid var(--mp-line);
+  }
+}
