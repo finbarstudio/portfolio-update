@@ -90,6 +90,18 @@
   grid-template-columns: 1fr 1fr;
   gap: 4px;
 }
+.mp-tool .mp-presets button {
+  display: grid;
+  gap: 4px;
+  padding: 4px 4px 5px;
+  font-size: 11px;
+}
+.mp-presets canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 4px;
+}
 .mp-choices {
   display: flex;
   flex-wrap: wrap;

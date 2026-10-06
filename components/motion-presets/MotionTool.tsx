@@ -38,6 +38,24 @@ const GROUPS = PRESETS.reduce<{ title: string; presets: Preset[] }[]>((groups, p
   return groups;
 }, []);
 
+/** The little previews on the preset buttons: grey cards on a 4 by 5 frame. */
+const PREVIEW_LOOK: Look = { ...BASE_LOOK, width: 160, height: 200, background: "#1b1b1e" };
+const PREVIEW_GREYS = [0.82, 0.58, 0.72, 0.46, 0.9, 0.52, 0.66, 0.4];
+/** Previews are redrawn a few per frame, in turn, so fifty of them cost little. */
+const PREVIEWS_PER_FRAME = 6;
+
+function greyCard(renderer: Renderer, index: number): MediaItem {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 4;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    const level = Math.round(PREVIEW_GREYS[index] * 255);
+    ctx.fillStyle = `rgb(${level} ${level} ${level})`;
+    ctx.fillRect(0, 0, 4, 4);
+  }
+  return { id: -100 - index, texture: renderer.texture(canvas, false), aspect: 1 };
+}
+
 const RECORDING_TYPES = ["video/mp4;codecs=avc1.640033", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
 
 /** A numbered colour card, shown until the first upload. */
@@ -164,11 +182,52 @@ export default function MotionTool() {
   const nextIdRef = useRef(0);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const setupInputRef = useRef<HTMLInputElement>(null);
+  const previewCanvases = useRef(new Map<string, HTMLCanvasElement>());
+  const adjustmentsRef = useRef(adjustments);
 
   // The draw loop reads the latest settings without restarting.
   useEffect(() => {
     sceneRef.current = { preset, motion, look };
+    adjustmentsRef.current = adjustments;
   });
+
+  // One small hidden WebGL canvas draws every preview in turn and copies each
+  // onto its button: browsers allow only a handful of WebGL canvases at once.
+  useEffect(() => {
+    const stage = document.createElement("canvas");
+    const renderer = createRenderer(stage);
+    if (!renderer) return;
+    const greys = PREVIEW_GREYS.map((_, index) => greyCard(renderer, index));
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        const name = (entry.target as HTMLElement).dataset.preset;
+        if (!name) continue;
+        if (entry.isIntersecting) visible.add(name);
+        else visible.delete(name);
+      }
+    });
+    for (const canvas of previewCanvases.current.values()) observer.observe(canvas);
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let cursor = 0;
+    let frame = requestAnimationFrame(function tick(now) {
+      const shown = PRESETS.filter((item) => visible.has(item.name));
+      for (let n = 0; n < Math.min(PREVIEWS_PER_FRAME, shown.length); n++) {
+        const item = shown[cursor++ % shown.length];
+        const target = previewCanvases.current.get(item.name)?.getContext("2d");
+        if (!target) continue;
+        const seconds = still ? 1.7 : (now / 1000) % PREVIEW_LOOK.duration;
+        renderer.draw(seconds, { preset: item, motion: applyAdjustments(item, adjustmentsRef.current), look: PREVIEW_LOOK, media: greys });
+        target.drawImage(stage, 0, 0);
+      }
+      frame = requestAnimationFrame(tick);
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      discard(renderer, greys);
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -315,6 +374,16 @@ export default function MotionTool() {
             <div className="mp-presets">
               {group.presets.map((item) => (
                 <button key={item.name} type="button" aria-pressed={item === preset} onClick={() => choosePreset(item)}>
+                  <canvas
+                    ref={(element) => {
+                      if (element) previewCanvases.current.set(item.name, element);
+                      else previewCanvases.current.delete(item.name);
+                    }}
+                    data-preset={item.name}
+                    width={PREVIEW_LOOK.width}
+                    height={PREVIEW_LOOK.height}
+                    aria-hidden="true"
+                  />
                   {item.name}
                 </button>
               ))}
