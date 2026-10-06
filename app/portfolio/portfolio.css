@@ -414,15 +414,6 @@ html[data-pf-theme="light"] .pf-chrome {
   --line: #dbd6cf;
   --pink-deep: #510415;
 }
-/* The cover keeps its black page in both themes: the portrait is a cut-out on
-   black and only sits cleanly on black. */
-html[data-pf-theme="light"] .pf-cover {
-  --paper: #000000;
-  --ink: #f3f1ee;
-  --soft: #9a938b;
-  --line: #2a2724;
-  color: var(--ink);
-}
 /* the theme switch's knob glyph */
 .pf-chrome .lab-switch-knob svg { width: 8px; height: 8px; }
 
