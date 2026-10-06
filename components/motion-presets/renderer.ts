@@ -64,6 +64,8 @@ void main() {
   float mask = 1.0 - smoothstep(-fwidth(d), fwidth(d), d);
   // Seen from behind, a card would show its picture mirrored.
   vec2 uv = gl_FrontFacing ? vUv : vec2(1.0 - vUv.x, vUv.y);
+  // Nothing of this card here: leave the depth buffer alone so cards behind still show.
+  if (mask * uAlpha < 0.004) discard;
   vec3 rgb = texture(uTexture, uCrop.xy + uv * uCrop.zw).rgb * uShade;
   color = vec4(rgb, 1.0) * mask * uAlpha;
 }`;
@@ -105,6 +107,10 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   const position = gl.getAttribLocation(program, "aPos");
   gl.enableVertexAttribArray(position);
   gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  // Cards that cross are settled pixel by pixel by depth, not by which was drawn last.
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  gl.enable(gl.POLYGON_OFFSET_FILL);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -136,7 +142,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       gl.viewport(0, 0, width, height);
       const bg = look.background;
       gl.clearColor(parseInt(bg.slice(1, 3), 16) / 255, parseInt(bg.slice(3, 5), 16) / 255, parseInt(bg.slice(5, 7), 16) / 255, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       if (!media.length) return;
 
       for (const item of media) {
@@ -148,7 +154,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
 
       const aspect = width / height;
       const shape = cardAspect(look);
-      const { w, h, items, camera } = layoutFrame(scene, seconds, look.duration, aspect, shape);
+      const { w, h, items, camera } = layoutFrame(scene, seconds, aspect, shape);
       const distance = camera.distance;
       // The camera turns about the point it looks at, then steps back from it.
       let view = translate(0, 0, -distance);
@@ -171,7 +177,9 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       }
       drawn.sort((a, b) => a.depth - b.depth); // far to near
 
-      for (const item of drawn) {
+      for (const [order, item] of drawn.entries()) {
+        // Cards on the same plane would flicker; the later, nearer one wins by a hair.
+        gl.polygonOffset(0, -order);
         const source = media[item.i % media.length];
         const cover = source.aspect / shape;
         const crop = cover > 1 ? [(1 - 1 / cover) / 2, 0, 1 / cover, 1] : [0, (1 - cover) / 2, 1, cover];

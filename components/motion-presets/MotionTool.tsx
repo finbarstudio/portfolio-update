@@ -154,6 +154,18 @@ function NumberField({ label, value, onCommit }: { label: string; value: number;
   );
 }
 
+/** A section title with a button that puts that section back to the preset's own values. */
+function Heading({ title, onReset, changed }: { title: string; onReset: () => void; changed: boolean }) {
+  return (
+    <div className="mp-head">
+      <h2>{title}</h2>
+      <button type="button" disabled={!changed} onClick={onReset} aria-label={`Reset ${title.toLowerCase()}`}>
+        Reset
+      </button>
+    </div>
+  );
+}
+
 /** A row of mutually exclusive buttons. */
 function Choice<T extends string | boolean>({
   label,
@@ -301,7 +313,14 @@ const ON_OFF = [
   { value: false, label: "Off" },
   { value: true, label: "On" },
 ];
-const TIMING_KEYS: MotionKey[] = ["speed", "rhythm", "stagger", "hold"];
+const SCENE_KEYS: MotionKey[] = ["scale", "reach", "cardTilt", "count", "size", "gap", "radius", "turn", "spin", "fade", "offsetX", "offsetY"];
+const TIMING_KEYS: MotionKey[] = ["duration", "speed", "rhythm", "stagger", "hold"];
+const PACES = [
+  { value: false, label: "Continuous" },
+  { value: true, label: "Stepped" },
+];
+/** These show one card at a time, so they always move in steps. */
+const ALWAYS_STEPPED = new Set(["flip", "pulse", "zoom"]);
 const CAMERA_KEYS: MotionKey[] = ["tilt", "yaw", "roll", "perspective", "distance"];
 
 export default function MotionTool() {
@@ -366,11 +385,11 @@ export default function MotionTool() {
         const item = shown[cursor++ % shown.length];
         const target = previewCanvases.current.get(item.name)?.getContext("2d");
         if (!target) continue;
-        const seconds = still ? 1.7 : (now / 1000) % PREVIEW_LOOK.duration;
         const flow = flowRef.current;
-        renderer.draw(seconds, {
+        const itemMotion = applyAdjustments(item, flow.adjustments);
+        renderer.draw(still ? 1.7 : (now / 1000) % itemMotion.duration, {
           preset: item,
-          motion: applyAdjustments(item, flow.adjustments),
+          motion: itemMotion,
           options: presetOptions(item, flow.chosen),
           easing: flow.easing,
           path: item.path ?? [],
@@ -401,7 +420,7 @@ export default function MotionTool() {
     placeholdersRef.current = true;
     loopStartRef.current = performance.now();
     let frame = requestAnimationFrame(function tick(now) {
-      const { duration } = sceneRef.current.look;
+      const { duration } = sceneRef.current.motion;
       renderer.draw(((now - loopStartRef.current) / 1000) % duration, { ...sceneRef.current, media: mediaRef.current });
       frame = requestAnimationFrame(tick);
     });
@@ -461,6 +480,8 @@ export default function MotionTool() {
     setAdjustments((current) => ({ ...current, [key]: adjustmentFor(key, value, preset) }));
   const setOption = <K extends keyof Options>(key: K, value: Options[K]) => setChosen((current) => ({ ...current, [key]: value }));
   const patchLook = (patch: Partial<Look>) => setLook((current) => ({ ...current, ...patch }));
+  const changedAny = (keys: MotionKey[]) => keys.some((key) => adjustments[key] !== undefined);
+  const resetKeys = (keys: MotionKey[]) => setAdjustments((current) => Object.fromEntries(Object.entries(current).filter(([key]) => !keys.includes(key as MotionKey))));
   function resetFlow() {
     setAdjustments({});
     setChosen({});
@@ -496,7 +517,7 @@ export default function MotionTool() {
     if (!canvas || typeof MediaRecorder === "undefined") return setStatus("This browser cannot record video.");
     const type = RECORDING_TYPES.find((candidate) => MediaRecorder.isTypeSupported(candidate));
     if (!type) return setStatus("This browser cannot record video.");
-    const { duration } = sceneRef.current.look;
+    const { duration } = sceneRef.current.motion;
     const name = `${sceneRef.current.preset.name.toLowerCase().replace(" ", "-")}.${type.includes("mp4") ? "mp4" : "webm"}`;
     const recorder = new MediaRecorder(canvas.captureStream(60), { mimeType: type, videoBitsPerSecond: 24_000_000 });
     const chunks: Blob[] = [];
@@ -554,6 +575,7 @@ export default function MotionTool() {
       </label>
     );
   };
+  const stepped = ALWAYS_STEPPED.has(layout) || motion.rhythm > 0;
   const tuned = Object.keys(adjustments).length > 0 || Object.keys(chosen).length > 0 || easing !== BASE_EASING;
 
   return (
@@ -638,7 +660,14 @@ export default function MotionTool() {
           </ul>
         )}
 
-        <h2>Scene</h2>
+        <Heading
+          title="Scene"
+          changed={changedAny(SCENE_KEYS) || Object.keys(chosen).length > 0}
+          onReset={() => {
+            resetKeys(SCENE_KEYS);
+            setChosen({});
+          }}
+        />
         {layout !== "tour" && !(layout === "proximity" && preset.variant.field) && (
           <Choice label="Direction" value={fourWay || options.direction === "left" || options.direction === "right" ? options.direction : "left"} options={fourWay ? DIRECTIONS : WAYS} onChange={(value) => setOption("direction", value)} />
         )}
@@ -646,10 +675,11 @@ export default function MotionTool() {
         <Choice label="Tilt" value={options.tiltMode} options={TILTS} onChange={(value) => setOption("tiltMode", value)} />
         {focusable && <Choice label="Solo" value={options.solo} options={ON_OFF} onChange={(value) => setOption("solo", value)} />}
         {layout === "orbit" && <Choice label="Centre card" value={options.centre} options={ON_OFF} onChange={(value) => setOption("centre", value)} />}
+        {layout === "orbit" && !preset.variant.flat && <Choice label="Face viewer" value={options.faceCamera} options={ON_OFF} onChange={(value) => setOption("faceCamera", value)} />}
         {sceneKeys.map(slider)}
         {pins && (
           <>
-            <h2>{layout === "tour" ? "Camera path" : "Focus path"}</h2>
+            <Heading title={layout === "tour" ? "Camera path" : "Focus path"} changed={path.join() !== (preset.path ?? []).join()} onReset={() => setPath(preset.path ?? [])} />
             <PathGrid cells={pins.cells} cols={pins.cols} path={path} onChange={setPath} />
             <p className="mp-note">
               {layout === "tour"
@@ -659,16 +689,15 @@ export default function MotionTool() {
           </>
         )}
 
-        <h2>Timing</h2>
-        {TIMING_KEYS.map(slider)}
-        <label className="mp-row">
-          Loop (sec)
-          <input type="range" min={3} max={120} step={1} value={look.duration} onChange={(event) => patchLook({ duration: Number(event.target.value) })} />
-          <output>{look.duration}</output>
-        </label>
+        <Heading title="Timing" changed={changedAny(TIMING_KEYS)} onReset={() => resetKeys(TIMING_KEYS)} />
+        {!ALWAYS_STEPPED.has(layout) && <Choice label="Motion" value={stepped} options={PACES} onChange={(value) => setMotion("rhythm", value ? 1 : 0)} />}
+        {slider("duration")}
+        {slider("speed")}
+        {stepped && layout !== "proximity" && layout !== "tour" && !ALWAYS_STEPPED.has(layout) && slider("stagger")}
+        {stepped && slider("hold")}
 
-        <h2>Easing</h2>
-        <div className="mp-easing">
+        {stepped && <Heading title="Easing" changed={easing !== BASE_EASING} onReset={() => setEasing(BASE_EASING)} />}
+        <div className="mp-easing" hidden={!stepped}>
           <CurveEditor curve={easing} onChange={setEasing} />
           <div className="mp-easings">
             {EASINGS.map((item) => (
@@ -679,13 +708,10 @@ export default function MotionTool() {
           </div>
         </div>
 
-        <h2>Camera</h2>
+        <Heading title="Camera" changed={changedAny(CAMERA_KEYS)} onReset={() => resetKeys(CAMERA_KEYS)} />
         {CAMERA_KEYS.map(slider)}
-        <button type="button" disabled={!tuned} onClick={resetFlow}>
-          Reset to each preset&apos;s own
-        </button>
 
-        <h2>Canvas</h2>
+        <Heading title="Canvas" changed={look.width !== BASE_LOOK.width || look.height !== BASE_LOOK.height} onReset={() => patchLook({ width: BASE_LOOK.width, height: BASE_LOOK.height })} />
         <div className="mp-choices">
           {CANVAS_SIZES.map((size) => (
             <button
@@ -703,7 +729,7 @@ export default function MotionTool() {
           <NumberField key={`h${look.height}`} label={`Height, ${CANVAS_MIN} to ${CANVAS_MAX} px`} value={look.height} onCommit={(value) => patchLook({ height: canvasSide(value) })} />
         </div>
 
-        <h2>Card shape</h2>
+        <Heading title="Card shape" changed={look.cardW !== BASE_LOOK.cardW || look.cardH !== BASE_LOOK.cardH} onReset={() => patchLook({ cardW: BASE_LOOK.cardW, cardH: BASE_LOOK.cardH })} />
         <div className="mp-choices">
           {CARD_SHAPES.map((shape) => (
             <button
@@ -721,7 +747,7 @@ export default function MotionTool() {
           <NumberField key={`ch${look.cardH}`} label="Ratio, height" value={look.cardH} onCommit={(value) => patchLook({ cardH: ratioPart(value) })} />
         </div>
 
-        <h2>Look</h2>
+        <Heading title="Look" changed={look.radius !== BASE_LOOK.radius || look.background !== BASE_LOOK.background} onReset={() => patchLook({ radius: BASE_LOOK.radius, background: BASE_LOOK.background })} />
         <label className="mp-row">
           Corners
           <input type="range" min={0} max={0.5} step={0.01} value={look.radius} onChange={(event) => patchLook({ radius: Number(event.target.value) })} />
@@ -733,6 +759,9 @@ export default function MotionTool() {
         </label>
 
         <h2>Setup</h2>
+        <button type="button" disabled={!tuned} onClick={resetFlow} style={{ width: "100%", marginBottom: 6 }}>
+          Reset everything to each preset&apos;s own
+        </button>
         <div className="mp-pair">
           <button type="button" onClick={saveSetup}>
             Save setup

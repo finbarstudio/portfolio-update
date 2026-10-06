@@ -46,6 +46,31 @@
   text-transform: uppercase;
   color: var(--mp-dim);
 }
+.mp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 6px;
+}
+.mp-tool .mp-head h2 {
+  margin: 0;
+}
+.mp-tool .mp-head button {
+  min-height: 22px;
+  padding: 0 8px;
+  font-size: 11px;
+  color: var(--mp-dim);
+  background: transparent;
+}
+.mp-tool .mp-head button:not(:disabled) {
+  color: var(--mp-text);
+}
+.mp-tool .mp-head button:disabled {
+  visibility: hidden;
+}
+.mp-easing[hidden] {
+  display: none;
+}
 .mp-tool h2:first-child {
   margin-top: 0;
 }

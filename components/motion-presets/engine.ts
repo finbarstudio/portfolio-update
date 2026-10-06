@@ -121,6 +121,8 @@ export interface Variant {
 
 /** The sliders. Each preset has its own defaults. */
 export interface Motion {
+  /** seconds for one loop */
+  duration: number;
   speed: number;
   rhythm: number;
   stagger: number;
@@ -170,6 +172,8 @@ export interface Options {
   solo: boolean;
   /** orbit: a card in the middle */
   centre: boolean;
+  /** orbit: cards face the viewer, or face outwards like a carousel */
+  faceCamera: boolean;
 }
 
 export interface Preset {
@@ -301,21 +305,25 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     return { x: Math.sin(angle) * R, z: Math.cos(angle) * R, ry: angle, p };
   },
   orbit(i, c) {
-    if (c.o.centre && i === 0) return { s: 1.15 };
+    // Facing the viewer means square to the screen, whatever angle the camera looks from.
+    const square = { rx: -c.m.tilt * DEG, ry: -c.m.yaw * DEG };
+    if (c.o.centre && i === 0) return { ...square, s: 1.1 };
     const k = c.o.centre ? i - 1 : i;
     const m = Math.max(1, c.o.centre ? c.n - 1 : c.n);
-    const small = c.o.centre ? 0.42 : 0.62;
+    const small = c.o.centre ? 0.4 : 0.52;
     if (c.v.flat) {
       const angle = TAU * (k / m + c.T);
-      const R = 0.78 * c.m.radius;
-      return { x: Math.cos(angle) * Math.min(c.A, 1) * R, y: Math.sin(angle) * R, z: -0.05, s: small * 0.9, p: centred(k + (c.T - 0.25) * m, m) };
+      const R = 0.8 * c.m.radius;
+      return { ...square, x: Math.cos(angle) * Math.min(c.A, 1) * R, y: Math.sin(angle) * R, z: -0.05, s: small * 0.8, p: centred(k + (c.T - 0.25) * m, m) };
     }
     const outer = Boolean(c.v.two) && k % 2 === 1;
     const turn = outer ? -c.T : c.T;
     const angle = TAU * (k / m + turn);
-    const R = ((outer ? 1.75 : 1.2) + c.g) * c.m.radius;
-    const y = c.v.two ? (outer ? 0.28 : -0.28) : 0;
-    return { x: Math.cos(angle) * R, y, z: Math.sin(angle) * R, s: small, p: centred(k + (turn - 0.25) * m, m) };
+    const R = ((outer ? 2 : 1.25) + c.g) * c.m.radius;
+    const y = c.v.two ? (outer ? 0.36 : -0.36) : 0;
+    // Facing outwards, a card at the side is edge-on, so the far row never crowds the near one.
+    const facing = c.o.faceCamera ? square : { ry: Math.PI / 2 - angle };
+    return { ...facing, x: Math.cos(angle) * R, y, z: Math.sin(angle) * R, s: small, p: centred(k + (turn - 0.25) * m, m) };
   },
   deck(i, c) {
     const q = mod(i - c.T * c.n, c.n);
@@ -325,14 +333,11 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const lift = Math.sin(Math.PI * leaving);
     const out = { x: slot * c.g * 0.25, y: slot * c.g * 0.2, z: -slot * 0.12, rz: 0, ry: 0, s: 1 - slot * 0.04, a: 1 - clamp((slot - 6) / 2) };
     if (c.v.fly === "up") out.y += lift * c.h * 1.15;
-    if (c.v.fly === "right") {
-      out.x += lift * c.w * 1.25;
-      out.rz = -lift * 0.3;
-    }
+    if (c.v.fly === "right") out.x += lift * c.w * 1.25;
     if (c.v.fly === "spin") {
+      // Swings out like a door and back in behind the stack.
       out.x -= lift * c.w * 1.1;
-      out.rz = lift * 0.6;
-      out.ry = lift * 0.8;
+      out.ry = lift * 0.9;
     }
     return out;
   },
@@ -341,11 +346,11 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const p = centred(i + c.T * c.n, c.n);
     if (c.v.full) {
       const R = 0.68 * Math.min(1, c.A) * c.m.radius;
-      return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, rz: -angle, p };
+      return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, p };
     }
     const R = Math.max(1.6, ((c.w + c.g) * c.n) / TAU) * c.m.radius;
-    if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, rz: angle, p };
-    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, rz: -angle, p };
+    if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, p };
+    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, p };
   },
   grid(i, c) {
     const cols = gridCols(c.n);
@@ -391,9 +396,13 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       const from = pin(pins[mod(Math.floor(steps), pins.length)]);
       const to = pin(pins[mod(Math.floor(steps) + 1, pins.length)]);
       const part = steps - Math.floor(steps);
-      const d = Math.hypot((i % cols) - lerp(from[0], to[0], part), Math.floor(i / cols) - lerp(from[1], to[1], part));
+      const dx = (i % cols) - lerp(from[0], to[0], part);
+      const dy = Math.floor(i / cols) - lerp(from[1], to[1], part);
+      const d = Math.hypot(dx, dy);
       const [x, y] = cellCentre(i, cols, rows, c);
-      return { x, y, z: bump(d, reach) * 0.3, s: 1 + growth * bump(d, reach), p: d, f: 0, scaled: true };
+      // Grown cards push the rest outwards, like a lens, so they do not pile up.
+      const push = d > 1e-6 ? (growth * bumpArea(d, reach)) / d : 0;
+      return { x: x + dx * push * c.w, y: y - dy * push * c.h, s: 1 + growth * bump(d, reach), p: d, f: 0, scaled: true };
     }
     // Back and forth along the row.
     const last = Math.max(1, c.n - 1);
@@ -496,11 +505,11 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const phase = (TAU * p * Math.max(1, Math.round(c.n / 6))) / c.n;
     const a = edgeFade(p, c.n);
     if (c.v.ribbon) return { u: along(p, c), z: -Math.cos(phase) * 0.35, ry: Math.sin(phase), p, a };
-    return { u: along(p, c), v: Math.sin(phase) * 0.4, rz: -Math.cos(phase) * 0.2, p, a };
+    return { u: along(p, c), v: Math.sin(phase) * 0.4, p, a };
   },
   stairs(i, c) {
     const p = centred(i - c.T * c.n, c.n);
-    return { u: p * (c.pitch * 0.7 + c.g), v: -p * c.cross * 0.35, z: -p * 0.3, p, a: edgeFade(p, c.n, 1.5) };
+    return { u: p * (c.pitch + c.g), v: -p * c.cross * 0.35, z: -p * 0.3, p, a: edgeFade(p, c.n, 1.5) };
   },
   float(i, c) {
     const z = lerp(-3, 0.4, hash(i, 1));
@@ -602,7 +611,7 @@ export const HAS_FOCUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", 
 export const HAS_RADIUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "wheel", "orbit", "globe", "helix"]);
 
 /** Everything the renderer needs to draw one moment of a preset. */
-export function layoutFrame(settings: Settings, seconds: number, duration: number, aspect: number, cardShape: number): Frame {
+export function layoutFrame(settings: Settings, seconds: number, aspect: number, cardShape: number): Frame {
   const { preset, motion: m, options: o, easing } = settings;
   const { layout } = preset;
   const fourWay = FOUR_WAY.has(layout);
@@ -612,7 +621,7 @@ export function layoutFrame(settings: Settings, seconds: number, duration: numbe
   const h = m.size;
   const w = h * cardShape;
   const n = itemTotal(layout, Math.round(m.count), preset.variant);
-  const T = (seconds / duration) * Math.round(m.speed);
+  const T = (seconds / m.duration) * Math.round(m.speed);
   const hold = clamp(m.hold, 0, 0.9);
   const ease = (x: number) => bezier(easing, x);
   const camZ = 1 / Math.tan((m.perspective * DEG) / 2); // a card 2 units tall fills the frame at z = 0
@@ -711,8 +720,9 @@ export function layoutFrame(settings: Settings, seconds: number, duration: numbe
 }
 
 export const BASE_MOTION: Motion = {
+  duration: 16,
   speed: 1,
-  rhythm: 0.45,
+  rhythm: 0,
   stagger: 0.7,
   hold: 0.4,
   count: 8,
@@ -734,9 +744,10 @@ export const BASE_MOTION: Motion = {
   reach: 1.6,
 };
 
-export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true };
+export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true };
 
 export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max: number; step: number }> = {
+  duration: { label: "Loop (sec)", min: 3, max: 120, step: 1 },
   speed: { label: "Passes", min: 1, max: 4, step: 1 },
   rhythm: { label: "Stop and go", min: 0, max: 1, step: 0.01 },
   stagger: { label: "Stagger", min: 0, max: 1, step: 0.01 },
@@ -765,11 +776,46 @@ export const MOTION_KEYS = Object.keys(MOTION_RANGES) as MotionKey[];
  * These carry between presets as a proportion ("a third bigger than this
  * preset's own size"); the rest carry as an offset.
  */
-const PROPORTIONAL: ReadonlySet<MotionKey> = new Set<MotionKey>(["size", "count", "gap", "scale", "distance", "radius", "perspective", "reach"]);
+const PROPORTIONAL: ReadonlySet<MotionKey> = new Set<MotionKey>(["duration", "size", "count", "gap", "scale", "distance", "radius", "perspective", "reach"]);
 
 export type Adjustments = Partial<Record<MotionKey, number>>;
 
-export const presetMotion = (preset: Preset): Motion => ({ ...BASE_MOTION, ...preset.defaults });
+/**
+ * A loop length that gives each card an unhurried move: about two and a half
+ * seconds per step, however many steps the preset has.
+ */
+function naturalDuration(preset: Preset): number {
+  const n = itemTotal(preset.layout, preset.defaults.count ?? BASE_MOTION.count, preset.variant);
+  const stops = preset.path?.length ?? 1;
+  const seconds = (() => {
+    switch (preset.layout) {
+      case "marquee":
+        return Math.ceil(n / (preset.variant.rows ?? 2)) * 3.2;
+      case "grid":
+        return gridCols(n) * 4.5;
+      case "tour":
+        return stops * 4.5;
+      case "proximity":
+        return preset.variant.field ? stops * 4.5 : (n - 1) * 2 * 1.6;
+      case "globe":
+        return 36;
+      case "float":
+        return 28;
+      case "fan":
+        return 9;
+      case "helix":
+      case "tunnel":
+        return n * 1.8;
+      case "orbit":
+        return n * 3.2;
+      default:
+        return n * 2.6;
+    }
+  })();
+  return clamp(Math.round(seconds), MOTION_RANGES.duration.min, MOTION_RANGES.duration.max);
+}
+
+export const presetMotion = (preset: Preset): Motion => ({ ...BASE_MOTION, duration: naturalDuration(preset), ...preset.defaults });
 export const presetOptions = (preset: Preset, chosen: Partial<Options> = {}): Options => ({ ...BASE_OPTIONS, ...preset.options, ...chosen });
 
 /** The change a slider value represents, measured against the preset's own default. */
@@ -805,83 +851,82 @@ const preset = (name: string, layout: LayoutName, variant: Variant, defaults: Pa
 });
 
 export const PRESETS: Preset[] = [
-  preset("Slide 01", "slide", {}, { count: 7, size: 0.9, gap: 0.08 }),
-  preset("Slide 02", "slide", {}, { count: 7, size: 0.9, gap: 0.08, rhythm: 1 }),
-  preset("Slide 03", "slide", {}, { count: 7, size: 0.8, gap: 0.08, rhythm: 1, stagger: 1 }, { options: { direction: "up" } }),
-  preset("Slide 04", "slide", {}, { count: 9, size: 0.75, gap: 0.06, rhythm: 1, cardTilt: 7, fade: 0.5 }, { options: { tiltMode: "fan" } }),
-  preset("Slide 05", "slide", {}, { count: 8, size: 0.8, gap: 0.14, rhythm: 0.8, cardTilt: 5 }, { options: { tiltMode: "alternate" } }),
-  preset("Focus 01", "slide", {}, { count: 9, size: 0.55, gap: 0.14, rhythm: 1, scale: 2.1 }, { options: { focus: "centre" } }),
-  preset("Focus 02", "slide", {}, { count: 9, size: 0.42, gap: 0.14, rhythm: 1, scale: 2.2, stagger: 1 }, { options: { focus: "centre", direction: "up" } }),
-  preset("Focus 03", "slide", {}, { count: 9, size: 0.5, gap: 0.12, rhythm: 1, scale: 2, fade: 0.5 }, { options: { focus: "start" } }),
-  preset("Focus 04", "slide", {}, { count: 7, size: 0.7, gap: 0.1, rhythm: 1, scale: 1.7 }, { options: { focus: "centre", solo: true } }),
-  preset("Proximity 01", "proximity", {}, { count: 7, size: 0.42, gap: 0.12, scale: 2.2, rhythm: 0.6 }),
-  preset("Proximity 02", "proximity", {}, { count: 6, size: 0.34, gap: 0.12, scale: 2.2, rhythm: 0.6 }, { options: { direction: "up" } }),
-  preset("Proximity 03", "proximity", { field: true }, { count: 196, size: 0.085, gap: 0.5, scale: 6, reach: 4.5, rhythm: 0.35, hold: 0.2 }, { path: [6, 8, 18, 16] }),
-  preset("Proximity 04", "proximity", { field: true }, { count: 144, size: 0.11, gap: 0.4, scale: 5, reach: 4, rhythm: 0.3, hold: 0.2, tilt: 40, roll: -20, fade: 0.5 }, { path: [0, 12, 24, 20, 4] }),
-  preset("Proximity 05", "proximity", { field: true }, { count: 64, size: 0.2, gap: 0.25, scale: 2.6, reach: 2.6, rhythm: 0.6 }, { path: [12, 2, 14, 22, 10] }),
+  preset("Slide 01", "slide", {}, { count: 7, size: 0.9, gap: 0.1 }),
+  preset("Slide 02", "slide", {}, { count: 7, size: 0.9, gap: 0.1, rhythm: 1 }),
+  preset("Slide 03", "slide", {}, { count: 7, size: 0.8, gap: 0.1, rhythm: 1, stagger: 1 }, { options: { direction: "up" } }),
+  preset("Slide 04", "slide", {}, { count: 9, size: 0.7, gap: 0.14, rhythm: 1, fade: 0.7 }),
+  preset("Slide 05", "slide", {}, { count: 8, size: 0.75, gap: 0.14, rhythm: 1, stagger: 1, hold: 0.55 }, { options: { direction: "right" } }),
+  preset("Focus 01", "slide", {}, { count: 9, size: 0.5, gap: 0.16, rhythm: 1, scale: 2 }, { options: { focus: "centre" } }),
+  preset("Focus 02", "slide", {}, { count: 9, size: 0.4, gap: 0.16, rhythm: 1, scale: 2, stagger: 1 }, { options: { focus: "centre", direction: "up" } }),
+  preset("Focus 03", "slide", {}, { count: 9, size: 0.48, gap: 0.14, rhythm: 1, scale: 1.9, fade: 0.5 }, { options: { focus: "start" } }),
+  preset("Focus 04", "slide", {}, { count: 7, size: 0.7, gap: 0.12, rhythm: 1, scale: 1.6 }, { options: { focus: "centre", solo: true } }),
+  preset("Proximity 01", "proximity", {}, { count: 7, size: 0.4, gap: 0.16, scale: 2.1, rhythm: 1, hold: 0.2 }),
+  preset("Proximity 02", "proximity", {}, { count: 6, size: 0.32, gap: 0.16, scale: 2.1, rhythm: 1, hold: 0.2 }, { options: { direction: "up" } }),
+  preset("Proximity 03", "proximity", { field: true }, { count: 196, size: 0.085, gap: 0.5, scale: 3.6, reach: 3.5, rhythm: 1, hold: 0.15 }, { path: [6, 8, 18, 16] }),
+  preset("Proximity 04", "proximity", { field: true }, { count: 144, size: 0.11, gap: 0.45, scale: 3.2, reach: 3.2, rhythm: 1, hold: 0.15, tilt: 40, fade: 0.5 }, { path: [0, 12, 24, 20, 4] }),
+  preset("Proximity 05", "proximity", { field: true }, { count: 64, size: 0.2, gap: 0.3, scale: 2.2, reach: 2.4, rhythm: 1, hold: 0.25 }, { path: [12, 2, 14, 22, 10] }),
   preset("Scale 01", "zoom", {}, { count: 6, size: 1.5, rhythm: 1, hold: 0.45, cardTilt: 0 }),
   preset("Scale 02", "zoom", { out: true }, { count: 6, size: 1.5, rhythm: 1, hold: 0.45, cardTilt: 0 }),
   preset("Scale 03", "zoom", { edge: true }, { count: 6, size: 1.4, rhythm: 1, hold: 0.4, cardTilt: 0 }, { options: { direction: "up" } }),
-  preset("Scale 04", "zoom", {}, { count: 6, size: 1.2, rhythm: 1, hold: 0.4, cardTilt: 24 }),
+  preset("Scale 04", "zoom", { edge: true }, { count: 6, size: 1.2, rhythm: 1, hold: 0.4, cardTilt: 0 }, { options: { direction: "left" } }),
   preset("Coverflow 01", "cover", {}, { count: 9, size: 1 }),
   preset("Coverflow 02", "cover", {}, { count: 9, size: 1, rhythm: 1 }),
   preset("Coverflow 03", "cover", {}, { count: 9, size: 0.8, gap: 0.25, tilt: 12, rhythm: 1 }),
   preset("Coverflow 04", "cover", {}, { count: 9, size: 0.75, rhythm: 1, stagger: 1 }, { options: { direction: "up" } }),
-  preset("Ring 01", "ring", {}, { count: 10, size: 0.8, gap: 0.1 }),
-  preset("Ring 02", "ring", {}, { count: 12, size: 0.7, gap: 0.1, tilt: 22 }),
-  preset("Ring 03", "ring", { inside: true }, { count: 12, size: 1.1, gap: 0.06 }),
-  preset("Ring 04", "ring", { vertical: true }, { count: 10, size: 0.7, gap: 0.12 }),
-  preset("Ring 05", "ring", {}, { count: 14, size: 0.6, gap: 0.08, tilt: 14, scale: 1.5, perspective: 55 }, { options: { focus: "centre" } }),
-  preset("Orbit 01", "orbit", {}, { count: 8, size: 0.9, tilt: 14 }, { options: { centre: false } }),
-  preset("Orbit 02", "orbit", {}, { count: 9, size: 0.9, tilt: 14 }),
-  preset("Orbit 03", "orbit", { two: true }, { count: 12, size: 0.85, tilt: 18 }, { options: { centre: false } }),
-  preset("Orbit 04", "orbit", { flat: true }, { count: 8, size: 0.8 }, { options: { centre: false } }),
-  preset("Orbit 05", "orbit", {}, { count: 8, size: 0.85, tilt: 24, spin: 1, radius: 1.15, perspective: 50 }, { options: { centre: false } }),
-  preset("Orbit 06", "orbit", {}, { count: 10, size: 0.8, tilt: 8, scale: 1.7, fade: 0.5 }, { options: { centre: false, focus: "centre" } }),
+  preset("Ring 01", "ring", {}, { count: 10, size: 0.8, gap: 0.14, rhythm: 1 }),
+  preset("Ring 02", "ring", {}, { count: 12, size: 0.7, gap: 0.14, tilt: 22 }),
+  preset("Ring 03", "ring", { inside: true }, { count: 12, size: 1.1, gap: 0.1 }),
+  preset("Ring 04", "ring", { vertical: true }, { count: 10, size: 0.7, gap: 0.16, rhythm: 1 }),
+  preset("Ring 05", "ring", {}, { count: 14, size: 0.6, gap: 0.34, tilt: 14, scale: 1.25, perspective: 55, rhythm: 1 }, { options: { focus: "centre" } }),
+  preset("Orbit 01", "orbit", {}, { count: 7, size: 0.9, tilt: 28 }, { options: { centre: false } }),
+  preset("Orbit 02", "orbit", {}, { count: 8, size: 0.9, tilt: 28 }),
+  preset("Orbit 03", "orbit", { two: true }, { count: 10, size: 0.8, tilt: 30 }, { options: { centre: false } }),
+  preset("Orbit 04", "orbit", { flat: true }, { count: 7, size: 0.8 }, { options: { centre: false } }),
+  preset("Orbit 05", "orbit", {}, { count: 8, size: 0.9, tilt: 20, gap: 0.2, perspective: 50 }, { options: { centre: false, faceCamera: false } }),
+  preset("Orbit 06", "orbit", {}, { count: 9, size: 0.7, tilt: 36, radius: 1.25, perspective: 50 }, { options: { centre: false } }),
   preset("Deck 01", "deck", { fly: "up" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 02", "deck", { fly: "right" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 03", "deck", { fly: "spin" }, { count: 6, size: 1, gap: 0.5, tilt: 10, rhythm: 1 }),
-  preset("Wheel 01", "wheel", {}, { count: 12, size: 0.8, gap: 0.1 }),
-  preset("Wheel 02", "wheel", { side: true }, { count: 12, size: 0.7, gap: 0.15 }),
-  preset("Wheel 03", "wheel", { full: true }, { count: 10, size: 0.42, gap: 0.1 }),
-  preset("Grid 01", "grid", { pan: "x" }, { count: 24, size: 0.6, gap: 0.08 }),
-  preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.08, tilt: 48, roll: -30 }),
-  preset("Grid 03", "grid", { pan: "alt" }, { count: 24, size: 0.6, gap: 0.08 }),
-  preset("Grid 04", "grid", { pan: "pulse" }, { count: 24, size: 0.55, gap: 0.1 }),
+  preset("Wheel 01", "wheel", {}, { count: 12, size: 0.75, gap: 0.2 }),
+  preset("Wheel 02", "wheel", { side: true }, { count: 12, size: 0.65, gap: 0.25 }),
+  preset("Wheel 03", "wheel", { full: true }, { count: 8, size: 0.32, gap: 0.1 }),
+  preset("Grid 01", "grid", { pan: "x" }, { count: 24, size: 0.6, gap: 0.1 }),
+  preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.1, tilt: 48 }),
+  preset("Grid 03", "grid", { pan: "alt" }, { count: 24, size: 0.6, gap: 0.1 }),
+  preset("Grid 04", "grid", { pan: "pulse" }, { count: 24, size: 0.55, gap: 0.24 }),
   preset("Grid 05", "tour", {}, { count: 9, size: 1.1, gap: 0.12, rhythm: 1, hold: 0.45 }, { path: [0, 4, 8, 6, 2] }),
-  preset("Grid 06", "tour", {}, { count: 16, size: 0.9, gap: 0.1, rhythm: 1, hold: 0.4, tilt: 24, roll: -8 }, { path: [0, 5, 10, 15, 12, 9, 6, 3] }),
-  preset("Grid 07", "tour", {}, { count: 12, size: 0.8, gap: 0.1, rhythm: 0.5, distance: 1.5 }, { path: [0, 3, 11, 8] }),
-  preset("Marquee 01", "marquee", { rows: 2 }, { count: 16, size: 0.85, gap: 0.08 }),
-  preset("Marquee 02", "marquee", { rows: 3 }, { count: 24, size: 0.6, gap: 0.08 }),
-  preset("Marquee 03", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.08, roll: -14 }),
-  preset("Marquee 04", "marquee", { rows: 3 }, { count: 18, size: 0.7, gap: 0.08 }, { options: { direction: "up" } }),
-  preset("Marquee 05", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.08, tilt: 55 }),
-  preset("Helix 01", "helix", {}, { count: 14, size: 0.6 }),
-  preset("Helix 02", "helix", { horizontal: true }, { count: 14, size: 0.55 }),
-  preset("Helix 03", "helix", { tornado: true }, { count: 16, size: 0.5 }),
-  preset("Globe 01", "globe", {}, { count: 40, size: 0.34 }),
-  preset("Globe 02", "globe", {}, { count: 40, size: 0.34, tilt: 12, roll: 22 }),
-  preset("Globe 03", "globe", { close: true }, { count: 60, size: 0.4 }),
+  preset("Grid 06", "tour", {}, { count: 16, size: 0.9, gap: 0.1, rhythm: 1, hold: 0.4, tilt: 24 }, { path: [0, 5, 10, 15, 12, 9, 6, 3] }),
+  preset("Grid 07", "tour", {}, { count: 12, size: 0.8, gap: 0.1, rhythm: 1, hold: 0.3, distance: 1.5 }, { path: [0, 3, 11, 8] }),
+  preset("Marquee 01", "marquee", { rows: 2 }, { count: 16, size: 0.85, gap: 0.1 }),
+  preset("Marquee 02", "marquee", { rows: 3 }, { count: 24, size: 0.6, gap: 0.1 }),
+  preset("Marquee 03", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.1, yaw: 26 }),
+  preset("Marquee 04", "marquee", { rows: 3 }, { count: 18, size: 0.7, gap: 0.1 }, { options: { direction: "up" } }),
+  preset("Marquee 05", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.1, tilt: 55 }),
+  preset("Helix 01", "helix", {}, { count: 14, size: 0.55 }),
+  preset("Helix 02", "helix", { horizontal: true }, { count: 14, size: 0.5 }),
+  preset("Helix 03", "helix", { tornado: true }, { count: 16, size: 0.45 }),
+  preset("Globe 01", "globe", {}, { count: 32, size: 0.22 }),
+  preset("Globe 02", "globe", {}, { count: 32, size: 0.22, tilt: 24 }),
+  preset("Globe 03", "globe", { close: true }, { count: 48, size: 0.28 }),
   preset("Flip 01", "flip", { axis: "y" }, { count: 5, size: 1.3 }),
   preset("Flip 02", "flip", { axis: "x" }, { count: 5, size: 1.3 }),
   preset("Flip 03", "flip", { cube: true }, { count: 5, size: 1.1 }),
-  preset("Tunnel 01", "tunnel", {}, { count: 12, size: 0.9 }),
-  preset("Tunnel 02", "tunnel", { spiral: true }, { count: 14, size: 0.8 }),
+  preset("Tunnel 01", "tunnel", {}, { count: 12, size: 0.8 }),
+  preset("Tunnel 02", "tunnel", { spiral: true }, { count: 14, size: 0.7 }),
   preset("Tunnel 03", "tunnel", { sides: true }, { count: 12, size: 1 }),
-  preset("Fan 01", "fan", { sway: true }, { count: 7, size: 1, rhythm: 0 }),
-  preset("Fan 02", "fan", { open: true }, { count: 7, size: 1, rhythm: 0 }),
-  preset("Wave 01", "wave", {}, { count: 12, size: 0.6, gap: 0.1 }),
-  preset("Wave 02", "wave", { ribbon: true }, { count: 12, size: 0.7, gap: 0.02 }),
-  preset("Stairs 01", "stairs", {}, { count: 9, size: 0.8, gap: 0.1 }),
-  preset("Stairs 02", "stairs", {}, { count: 9, size: 0.8, gap: 0.1, tilt: 18, yaw: -32 }),
-  preset("Float 01", "float", {}, { count: 14, size: 0.6, rhythm: 0 }),
-  preset("Float 02", "float", { drift: true }, { count: 14, size: 0.6, rhythm: 0 }),
+  preset("Fan 01", "fan", { sway: true }, { count: 7, size: 1 }),
+  preset("Fan 02", "fan", { open: true }, { count: 7, size: 1 }),
+  preset("Wave 01", "wave", {}, { count: 12, size: 0.6, gap: 0.14 }),
+  preset("Wave 02", "wave", { ribbon: true }, { count: 12, size: 0.7, gap: 0.1 }),
+  preset("Stairs 01", "stairs", {}, { count: 9, size: 0.6, gap: 0.3, rhythm: 1 }),
+  preset("Stairs 02", "stairs", {}, { count: 9, size: 0.6, gap: 0.3, tilt: 18, yaw: -32, rhythm: 1 }),
+  preset("Float 01", "float", {}, { count: 12, size: 0.55 }),
+  preset("Float 02", "float", { drift: true }, { count: 12, size: 0.55 }),
   preset("Pulse 01", "pulse", {}, { count: 5, size: 1.3 }),
 ];
 
 /** The settings that are about the brand, not the motion. They never reset. */
 export interface Look {
-  duration: number;
   /** corner radius, as a share of the card's short side */
   radius: number;
   /** canvas size in pixels */
@@ -917,7 +962,6 @@ export const CARD_SHAPES: { label: string; w: number; h: number }[] = [
 ];
 
 export const BASE_LOOK: Look = {
-  duration: 8,
   radius: 0,
   width: 1080,
   height: 1920,
@@ -971,6 +1015,7 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   options.tiltMode = oneOf(savedOptions.tiltMode, ["off", "fan", "uniform", "alternate"] as const) ?? options.tiltMode;
   if (typeof savedOptions.solo === "boolean") options.solo = savedOptions.solo;
   if (typeof savedOptions.centre === "boolean") options.centre = savedOptions.centre;
+  if (typeof savedOptions.faceCamera === "boolean") options.faceCamera = savedOptions.faceCamera;
 
   let easing = BASE_EASING;
   if (Array.isArray(file.easing) && file.easing.length === 4 && file.easing.every((part) => finite(part) !== undefined)) {
@@ -984,8 +1029,6 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
 
   const look = { ...BASE_LOOK };
   const savedLook = record(file.look);
-  const duration = finite(savedLook.duration);
-  if (duration !== undefined) look.duration = clamp(Math.round(duration), 3, 120);
   const radius = finite(savedLook.radius);
   if (radius !== undefined) look.radius = clamp(radius, 0, 0.5);
   const width = finite(savedLook.width);
