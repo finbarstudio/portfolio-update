@@ -654,6 +654,9 @@ export default function MotionTool() {
         ) : (
           <canvas ref={canvasRef} aria-label="Animation preview" style={{ aspectRatio: `${look.width} / ${look.height}` }} />
         )}
+        <a className="mp-pint mp-pint-float" href={PINT_URL} target="_blank" rel="noopener noreferrer">
+          Buy me a pint
+        </a>
       </main>
 
       <aside className="mp-panel mp-panel-right" aria-label="Settings">

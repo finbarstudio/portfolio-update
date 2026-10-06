@@ -160,6 +160,22 @@
   outline: 2px solid #6aa8ff;
   outline-offset: 1px;
 }
+/* The same link, floating over the bottom of the preview. It is not part of the canvas, so it never appears in an export. */
+.mp-stage {
+  position: relative;
+}
+.mp-pint.mp-pint-float {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  margin: 0;
+  padding: 8px 16px;
+  translate: -50% 0;
+  white-space: nowrap;
+  background: rgb(21 21 23 / 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 999px;
+}
 .mp-choices {
   display: flex;
   flex-wrap: wrap;
