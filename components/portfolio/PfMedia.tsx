@@ -58,7 +58,19 @@ async function download(url: string, onProgress: (pct: number | null) => void, s
   return URL.createObjectURL(new Blob(chunks, { type: res.headers.get("content-type") ?? "" }));
 }
 
-export default function PfMedia({ src, video, alt, w, h }: { src: string; video?: boolean; alt?: string; w: number; h: number }) {
+export default function PfMedia({ src: dark, light, video, alt, w, h }: { src: string; light?: string; video?: boolean; alt?: string; w: number; h: number }) {
+  // A piece can have a second file for the page's light theme. It is swapped
+  // the moment the theme switch is flipped (it sets data-pf-theme on <html>).
+  const [isLight, setIsLight] = useState(false);
+  useEffect(() => {
+    if (!light) return;
+    const read = () => setIsLight(document.documentElement.dataset.pfTheme === "light");
+    read();
+    const watch = new MutationObserver(read);
+    watch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-pf-theme"] });
+    return () => watch.disconnect();
+  }, [light]);
+  const src = light && isLight ? light : dark;
   /** 0 to 99 while downloading; null when the size is unknown. */
   const [pct, setPct] = useState<number | null>(0);
   const [url, setUrl] = useState<string | null>(null);
@@ -71,6 +83,9 @@ export default function PfMedia({ src, video, alt, w, h }: { src: string; video?
       setUrl(src);
       return;
     }
+    setShown(false);
+    setUrl(null);
+    setPct(0);
     let dead = false;
     let made: string | null = null;
     const stop = new AbortController();

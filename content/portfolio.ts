@@ -36,7 +36,7 @@
 import { media as mediaOne, mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -104,8 +104,8 @@ function m(path: string, o: Partial<Media> = {}): Media {
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
 /** One image filling the whole page, edge to edge (cropped to 16:9). */
 const bleed = (path: string): Slide => ({ kind: "media", items: [m(path)], bleed: true });
-/** A device video on its own page: no outline, a touch bigger, with a caption and a link out. */
-const linked = (path: string, caption: string, link: { label: string; href: string }): Slide => ({ kind: "media", items: [m(path, { frame: false, scale: 1.1 })], caption, link });
+/** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption and a link out. */
+const linked = (path: string, caption: string, link: { label: string; href: string }): Slide => ({ kind: "media", items: [m(path, { frame: false })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
 
 /** A grid page. Each tile is [path, column, row, columns spanned, rows spanned], 1-based. */
@@ -147,18 +147,9 @@ const RAW: Slide[] = [
       "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
     meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
   },
-  one("portfolio/lows/logo-zoom.mp4", undefined, { frame: false }),
+  one("portfolio/lows/logo-zoom.mp4", "The brand", { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
   linked("portfolio/lows/macbook.webm", "The website", { label: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }),
   linked("portfolio/lows/iphone-instagram.webm", "The Instagram profile", { label: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }),
-  grid(4, 2, [
-    ["portfolio/lows/logo-construction.webp", 1, 1, 2, 1],
-    ["portfolio/lows/logomark-construction.webp", 3, 1, 1, 1],
-    ["portfolio/lows/logo-glass-3d.webp", 4, 1, 1, 1],
-    ["portfolio/lows/logo-glass-mask.webp", 1, 2, 1, 1],
-    ["portfolio/lows/phone-instagram.webp", 2, 2, 1, 1],
-    ["portfolio/lows/business-card.webp", 3, 2, 2, 1],
-  ]),
-  one("portfolio/lows/billboard.webp"),
   bleed("portfolio/lows/van.webp"),
   {
     kind: "quote",
