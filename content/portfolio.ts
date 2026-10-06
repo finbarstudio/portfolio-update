@@ -169,7 +169,7 @@ const RAW: Slide[] = [
     meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }],
   },
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
-  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline. Hover one to see it", { frame: false, cars: true }),
+  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline. Hover one to see it", { frame: false, cars: true, light: `/media/images/${"portfolio/rennen-plus/cars-light.webp"}` }),
   linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, the grid and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
 
   /* ── Salesmasters ──────────────────────────────────────────── */
