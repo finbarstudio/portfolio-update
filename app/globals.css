@@ -212,8 +212,7 @@
 
   --font-sans: var(--font-primary);
   /* No monospace on the studio site any more (Oct 2026): everything that
-     used Space Mono is the small Host label face. Only the sandbox tools keep
-     a real monospace (.sb-root in sandbox.css sets this back). */
+     used Space Mono is the small Host label face. */
   --font-mono: var(--font-label);
 }
 
@@ -2395,17 +2394,12 @@
     flex-shrink: 0;
   }
 
-  /* Subtle Sandbox cross-link — quieter than the primary rows (it lives on a
-     separate subdomain), but lifts to pink on hover like everything else. */
-  .nav-row-sandbox { color: var(--ink-soft); }
-  .nav-row-sandbox:hover { color: var(--pink); }
   .nav-ext {
     font-size: 10px;
     color: var(--ink-soft);
     flex-shrink: 0;
     transition: color var(--dur-fast) var(--ease);
   }
-  .nav-row-sandbox:hover .nav-ext { color: var(--pink); }
   .nav-chevron {
     width: 10px;
     height: 10px;
@@ -2707,65 +2701,6 @@
   /* Hero scroll-driven fade: keep visible, don't animate */
   .hero-scroll-fade { opacity: 1 !important; transform: none !important; }
 }
-
-/* Sandbox tool styles (classes prefixed sb-) moved to app/sandbox/sandbox.css
-   (imported by app/sandbox/layout.tsx) so studio pages stop shipping sandbox
-   CSS and agents analysing the studio site stop ingesting sandbox tokens as
-   studio tokens. A few sandbox-tool classes that don't carry that prefix
-   stayed here: Bezier Studio (bz-*), drum credits (dc-*), and
-   .sandbox-stage-empty. */
-
-/* ── Bezier Studio (Tools): SVG specimen view, reuses the studio shell ─────── */
-/* The SVG is sized to the chosen format (preset) fitted to the stage and centred,
-   so the plate reads as that size format — same as the 3D SVG Studio canvas.
-   (The .bz-studio stage-padding override lives in sandbox.css now, next to
-   the sb-studio-stage rule it overrides.) */
-.bz-svg { display: block; border-radius: 4px; box-shadow: 0 18px 60px rgba(0,0,0,.45); }
-.bz-status, .bz-panel-status { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); }
-.bz-status {
-  position: absolute; left: 16px; bottom: 14px; z-index: 10; max-width: calc(100% - 32px);
-  padding: 6px 10px; border-radius: 7px;
-  background: color-mix(in srgb, #000 55%, var(--bg)); border: 1px solid var(--sb-line);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-}
-.bz-panel-status { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--sb-line); }
-.bz-color-wrap { display: inline-flex; align-items: center; gap: 6px; }
-.bz-hex {
-  width: 76px; background: var(--bg); color: var(--ink); border: 1px solid var(--sb-line);
-  border-radius: 5px; padding: 3px 6px; font-family: var(--font-mono); font-size: 10px;
-}
-/* Draw-on + node entrance / pulse. Export strips these classes, so captures are
-   static and deterministic. */
-.bz-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: bz-draw-on var(--bz-dur, 1.6s) cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-@keyframes bz-draw-on { to { stroke-dashoffset: 0; } }
-.bz-pop { opacity: 0; animation: bz-pop-in 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: var(--bz-delay, 0s); }
-@keyframes bz-pop-in { to { opacity: 1; } }
-.bz-pulse { animation: bz-pulse-an 2.4s ease-in-out infinite; }
-@keyframes bz-pulse-an { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
-@media (prefers-reduced-motion: reduce) {
-  .bz-draw { stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
-  .bz-pop { opacity: 1; animation: none; }
-  .bz-pulse { animation: none; }
-}
-
-/* Drum credits: the full roll on a single "normal" drum (left) beside the three-up
-   stack (right). The stack is three wide, short bands with a 20px gap and no dividers —
-   large type, tight leading, so each shows ~one line with halves curling top + bottom,
-   and the same roll flows up through all three. */
-.dc-split { display: flex; gap: clamp(16px, 2vw, 28px); align-items: stretch; }
-.dc-split > .dc-drum { flex: 0.72 1 0; }
-.dc-stack { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
-.dc-stack > .dc-drum { flex: 0 0 auto; height: clamp(116px, 17vh, 158px); }
-.dc-drum { position: relative; width: 100%; min-width: 0; overflow: hidden; }
-.dc-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-
-@media (max-width: 560px) {
-  .dc-split { flex-direction: column; gap: 16px; }
-  .dc-split > .dc-drum { flex: 1 1 0; min-height: 120px; }
-  .dc-stack > .dc-drum { height: clamp(84px, 12vh, 120px); }
-}
-
-.sandbox-stage-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink-soft); }
 
 /* ── Intro preloader (first arrival): the star outline traces itself, then the
    overlay fades to reveal the page. ────────────────────────────────────────── */

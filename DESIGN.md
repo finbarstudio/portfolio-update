@@ -1,6 +1,6 @@
 # finbar✶studio — Design System Reference
 
-This is the authoritative design-system document for the studio portfolio (not the demo/sandbox/pitch satellite sites — see section 11). Every value below is copied verbatim from source, primarily `app/globals.css`. Where a comment disagrees with the code, the code wins; discrepancies are logged at the end.
+This is the authoritative design-system document for the studio portfolio (not the demo/pitch satellite sites — see section 11). Every value below is copied verbatim from source, primarily `app/globals.css`. Where a comment disagrees with the code, the code wins; discrepancies are logged at the end.
 
 Sources read: `app/globals.css`, `AGENTS.md`, `app/layout.tsx`, `components/BrandMark.tsx`, `components/brand-mark.ts`, `components/BrandWordmark.tsx`, `components/NavLogo.tsx`, `components/ui/loader.tsx`, `components/SiteFooter.tsx`, `components/FooterCopyright.tsx`, `components/BookCall.tsx`, `components/ContactPanel.tsx`, `components/ContactDirect.tsx`, `components/ContactNoteForm.tsx`, `components/Testimonial.tsx`, `components/TopNav.tsx`.
 
@@ -422,7 +422,6 @@ The footer's info row uses its own gutter: `padding: 0 clamp(20px, 3vw, 40px) ..
 | 120 | `.grain-overlay` |
 | 200 | `.skip-link` (focused state) |
 | 300 | `.contact-panel` (the popup — highest of the "real" UI layers) |
-| 9999 | one sandbox-only element (`app/sandbox` tooling, not studio UI) |
 
 Sticky pins (bottom-right, docking into the footer): `.sf-copyright-pin { bottom: 16px }`, `.sf-cta-pin { bottom: 42px }` (Book-a-call sits 26px above the copyright).
 
@@ -524,7 +523,6 @@ Trace (0.55s) → 6 concentric rings bloom centre-out (0.6s–1.7s, `0.22s` step
 The following routes/prefixes carry their **own** design system, independent of everything above. Do not treat their classes or CSS variables as studio tokens:
 
 - `app/qldpools/` — `.qpi-*`, `.qf-*` classes; own `qpi-site.css` token set
-- `app/sandbox/` — `.sb-*` classes; internal tool chrome
 - `app/redesign/` — reuses some studio classes directly (it's a live-home variant) but is a working sandbox route, not the shipped system
 - `archive/` — retired builder-outreach campaign (lindon, /builders, 11 builder demos, partners), restorable via `git mv`
 - `app/imogen*` — `.im-*` classes; SE Asia travel guide, own content file

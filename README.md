@@ -1,8 +1,8 @@
 # finbar.studio
 
 Finbar Skitini's portfolio, at [www.finbar.studio](https://www.finbar.studio). Two subdomains,
-sandbox.finbar.studio and web.finbar.studio, are served from the same Next.js app: `proxy.ts`
-rewrites their hosts into `app/sandbox/` and `app/web/` respectively, so it's one codebase and
+web.finbar.studio and lab.finbar.studio, are served from the same Next.js app: `proxy.ts`
+rewrites their hosts into `app/web/` and `app/lab/` respectively, so it's one codebase and
 one Vercel deploy for all three.
 
 ---
@@ -52,10 +52,9 @@ app/
   contact/               standalone contact page (nav and copyright only, no footer,
                          no booking pin, this page IS the booking/contact surface)
   web/                   web.finbar.studio catalogue (served via the proxy.ts rewrite)
-  sandbox/               sandbox.finbar.studio tools (mockup exporters, bezier, library)
   asia/                  a friend's travel guide, gate-passworded
   free-redesign/         Meta ad landing page (the one page with a Cal booking embed)
-  redesign/               sandbox/prospect redesign pages
+  redesign/               prospect redesign pages
   embed/                 chromeless embeds, framable on any origin
   wallpaper/              standalone page
   globals.css, layout.tsx, sitemap.ts, robots.ts, manifest.ts

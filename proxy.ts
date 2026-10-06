@@ -2,24 +2,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * proxy — host-based rewrite for the Sandbox, web.finbar and lab subdomains.
+ * proxy — host-based rewrite for the web.finbar and lab subdomains.
  *
  * NOTE (Next 16): the `middleware` file convention was renamed to `proxy`
  * (function `proxy`, file `proxy.ts`). This is the same edge/Node entry point.
  *
- * `sandbox.finbar.studio/<path>` is rewritten to `/sandbox/<path>`, and
- * `web.finbar.studio/<path>` is rewritten to `/web/<path>`, so both live in the
- * same app/deploy as the portfolio. `lab.finbar.studio/<path>` is rewritten to
- * `/lab/<path>` the same way (unpublished experiments, e.g. /gemfest).
- * `/embed/*` stays reachable on every host (stable embed URLs) — sandbox only. The sandbox's canonical redirect
- * (www/apex `/sandbox/*` → the subdomain) is unconditional here — same as it
- * always was — this refactor only extracts the shared rewrite logic into
- * `subdomain()`, it does not change sandbox behaviour. The `/web/*` → web.finbar
- * redirect follows the same shape; confirm web.finbar.studio's DNS/Vercel
- * domain is actually configured before relying on that 308 in production.
+ * `web.finbar.studio/<path>` is rewritten to `/web/<path>` and
+ * `lab.finbar.studio/<path>` to `/lab/<path>`, so both live in the same
+ * app/deploy as the portfolio. The old sandbox subdomain was retired in
+ * Oct 2026: anything arriving on it is sent to the studio home page.
  */
 
-const SANDBOX_HOSTS = new Set(["sandbox.finbar.studio", "sandbox.localhost"]);
+const RETIRED_HOSTS = new Set(["sandbox.finbar.studio", "sandbox.localhost"]);
 const WEB_HOSTS = new Set(["web.finbar.studio", "web.localhost"]);
 const LAB_HOSTS = new Set(["lab.finbar.studio", "lab.localhost"]);
 const MAIN_HOSTS = new Set(["www.finbar.studio", "finbar.studio"]);
@@ -27,21 +21,18 @@ const MAIN_HOSTS = new Set(["www.finbar.studio", "finbar.studio"]);
 /**
  * Rewrites a clean-URL subdomain request into its internal `/<prefix>` route
  * tree, keeping the visible URL clean. Public assets (files with an
- * extension) and, optionally, `/embed/*` pass through untouched so they're
+ * extension) pass through untouched so they're
  * served from the root path rather than getting the prefix. If the prefix
  * leaks into the URL it's 308'd to the clean path first.
  */
-function subdomain(request: NextRequest, prefix: string, allowEmbed: boolean): NextResponse {
+function subdomain(request: NextRequest, prefix: string): NextResponse {
   const { pathname } = request.nextUrl;
 
   // Static files from /public (models, images, video, fonts, …) are served
   // from the ROOT path and must NOT get the app-route prefix, or they 404 on
-  // the subdomain — which is what broke the sandbox tools: the page shell
-  // loaded (its JS is under the excluded _next/static) but an asset fetch got
-  // rewritten with the prefix → 404.
+  // the subdomain: the page shell loads (its JS is under the excluded
+  // _next/static) but an asset fetch rewritten with the prefix would 404.
   if (/\.[^/]+$/.test(pathname)) return NextResponse.next();
-  // Embeds are served as-is on every host (stable embed URLs) — sandbox only.
-  if (allowEmbed && pathname.startsWith("/embed")) return NextResponse.next();
   // If the prefix leaked into the URL, 308 it to the clean path.
   // Match the prefix as a whole path segment only: `/web` and `/web/x`, never
   // `/web-design` (a real main-site page whose name merely starts the same).
@@ -67,19 +58,19 @@ export function proxy(request: NextRequest): NextResponse {
   // form: app/(site)/builders/page.tsx checks the auth cookie server-side and
   // renders Gate.tsx (unlock server action in actions.ts) when it's missing.
 
-  // ── Sandbox subdomain: clean URLs (no visible /sandbox prefix) ──────────────
-  if (SANDBOX_HOSTS.has(host)) return subdomain(request, "sandbox", true);
+  // ── Retired subdomain: send everything to the studio home page ──────────────
+  if (RETIRED_HOSTS.has(host)) return NextResponse.redirect("https://www.finbar.studio/", 308);
 
   // ── web.finbar subdomain: clean URLs (no visible /web prefix) ───────────────
-  if (WEB_HOSTS.has(host)) return subdomain(request, "web", false);
+  if (WEB_HOSTS.has(host)) return subdomain(request, "web");
 
   // ── lab subdomain: clean URLs (no visible /lab prefix) ──────────────────────
-  if (LAB_HOSTS.has(host)) return subdomain(request, "lab", false);
+  if (LAB_HOSTS.has(host)) return subdomain(request, "lab");
 
   // ── Main host: subdomain sections live on their own hosts, so 308 their
   //    prefixed paths there if they're ever hit directly on www/apex. ────────
   // Whole-segment match only: `/web-design` is a main-site page, not `/web`.
-  for (const [prefix, canonical] of [["sandbox", "sandbox.finbar.studio"], ["web", "web.finbar.studio"], ["lab", "lab.finbar.studio"]] as const) {
+  for (const [prefix, canonical] of [["web", "web.finbar.studio"], ["lab", "lab.finbar.studio"]] as const) {
     if (MAIN_HOSTS.has(host) && (pathname === `/${prefix}` || pathname.startsWith(`/${prefix}/`))) {
       const url = request.nextUrl.clone();
       url.host = canonical;

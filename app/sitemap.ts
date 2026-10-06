@@ -3,28 +3,16 @@ import { headers } from "next/headers";
 import { projects } from "@/content/projects";
 
 const WWW = "https://www.finbar.studio";
-const SANDBOX = "https://sandbox.finbar.studio";
 const WEB = "https://web.finbar.studio";
 
 /**
- * Host-aware sitemap. On sandbox.finbar.studio it lists the Sandbox's own
- * indexable pages (the landing + the section indexes); the individual tools and
- * embeds are noindex so they're intentionally excluded. On web.finbar.studio it
+ * Host-aware sitemap. On web.finbar.studio it
  * lists the catalogue + submit page. On www it lists the portfolio. (Search
  * engines treat each subdomain as a separate site.)
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const host = (await headers()).get("host")?.split(":")[0].toLowerCase() || "";
-
-  if (host.startsWith("sandbox.")) {
-    return [
-      { url: `${SANDBOX}/`,        lastModified: now, changeFrequency: "weekly",  priority: 1 },
-      { url: `${SANDBOX}/tools`,   lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
-      { url: `${SANDBOX}/mockups`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-      { url: `${SANDBOX}/library`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    ];
-  }
 
   if (host.startsWith("web.")) {
     return [

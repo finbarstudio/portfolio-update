@@ -24,8 +24,8 @@ import {
   type FitMode,
   type PhoneMediaItem,
 } from "./phone-config";
-import { fitRect } from "@/lib/sandbox/fit";
-import { drawNumberCard, isGeneratedSrc, parseCardNumber } from "@/lib/sandbox/demo-cards";
+import { fitRect } from "@/lib/phone/fit";
+import { drawNumberCard, isGeneratedSrc, parseCardNumber } from "@/lib/phone/demo-cards";
 
 export type PhoneTextureDescriptor = {
   kind: "video" | "image";
