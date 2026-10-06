@@ -406,3 +406,6 @@ html[data-pf-theme="light"] .pf-cover {
 }
 /* the theme switch's knob glyph */
 .pf-chrome .lab-switch-knob svg { width: 8px; height: 8px; }
+
+.pf-caption-link { margin-left: 1.2em; text-transform: none; letter-spacing: var(--tr-copy); color: var(--soft); }
+.pf-caption-link:hover { color: var(--ink); }

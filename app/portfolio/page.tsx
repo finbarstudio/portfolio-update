@@ -257,6 +257,11 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
             <p className="pf-caption pf-mono">
               <b>Above</b>
               <span>{s.caption}</span>
+              {s.link ? (
+                <a className="pf-caption-link" href={s.link.href} target="_blank" rel="noopener noreferrer">
+                  {s.link.label} ↗
+                </a>
+              ) : null}
             </p>
           ) : null}
         </section>

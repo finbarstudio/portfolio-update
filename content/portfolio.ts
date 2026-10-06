@@ -48,7 +48,7 @@ export type Slide =
   | { kind: "title"; id: string; name: string; category: string; year: string }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
-  | { kind: "media"; items: Media[]; caption?: string; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean }
+  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
   | { kind: "end" };
@@ -104,6 +104,8 @@ function m(path: string, o: Partial<Media> = {}): Media {
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
 /** One image filling the whole page, edge to edge (cropped to 16:9). */
 const bleed = (path: string): Slide => ({ kind: "media", items: [m(path)], bleed: true });
+/** A device video on its own page: no outline, a touch bigger, with a caption and a link out. */
+const linked = (path: string, caption: string, link: { label: string; href: string }): Slide => ({ kind: "media", items: [m(path, { frame: false, scale: 1.1 })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
 
 /** A grid page. Each tile is [path, column, row, columns spanned, rows spanned], 1-based. */
@@ -146,7 +148,8 @@ const RAW: Slide[] = [
     meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
   },
   one("portfolio/lows/logo-zoom.mp4", undefined, { frame: false }),
-  one("portfolio/lows/macbook.webm", undefined, { frame: false, scale: 1.1 }),
+  linked("portfolio/lows/macbook.webm", "The website", { label: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }),
+  linked("portfolio/lows/iphone-instagram.webm", "The Instagram profile", { label: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }),
   grid(4, 2, [
     ["portfolio/lows/logo-construction.webp", 1, 1, 2, 1],
     ["portfolio/lows/logomark-construction.webp", 3, 1, 1, 1],
