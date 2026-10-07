@@ -57,7 +57,17 @@ export interface Finding {
   a11y?: boolean;
   /** where the claim comes from; empty when it rests on common practice only */
   sources: Source[];
+  /** for something missing: the line to add it after */
+  insertAfter?: number;
+  /** what to change, with the code to use where there is one */
+  howTo?: HowTo;
 }
+
+export interface HowTo {
+  text: string;
+  code?: string;
+}
+
 
 export type SourceKind = "standard" | "test data" | "client docs" | "vendor research";
 
@@ -323,6 +333,112 @@ const USUAL_WIDTH = 700;
 /** Outlook on Windows draws a page-break line through content taller than this. */
 export const OUTLOOK_PAGE_HEIGHT = 1790;
 
+const SPACER_ROW = '<tr>\n  <td height="20" style="font-size:1px; line-height:20px; mso-line-height-rule:exactly;">&nbsp;</td>\n</tr>';
+
+/**
+ * The suggested change for each check, keyed by finding id. Each follows the
+ * same sources as the check it belongs to; where the check is unsourced, so
+ * is the suggestion.
+ */
+const HOW_TO: Record<string, HowTo> = {
+  size: { text: "Minify the file, delete CSS rules nothing uses, and shorten long tracking URLs. If it is still over, split the content across two emails." },
+  "style-size": { text: "Delete rules nothing uses (most templates carry a lot), and put anything that is not a media query inline on the element." },
+  "styles-in-body": { text: "Move the block into the head. Gmail only reads style blocks there." },
+  "nested-at-rules": {
+    text: "Give the at-rule its own style block at the top level, before the media queries.",
+    code: "<style>\n  @font-face { font-family: 'Brand'; src: url(https://…/brand.woff2) format('woff2'); }\n</style>\n<style>\n  @media only screen and (max-width: 599px) { … }\n</style>",
+  },
+  "line-length": { text: "Break the line. A line break between tags or between attributes is safe; inside a long paragraph, break at a space." },
+  "after-html": { text: "Move it inside the body, or delete it." },
+  "empty-blocks": {
+    text: "Delete it. If the gap is wanted, use a spacer row with a fixed height so it is the same in every client. If it keeps coming back, the editor is adding it: turn off automatic paragraphs in the editor's settings.",
+    code: SPACER_ROW,
+  },
+  "br-runs": { text: "Replace the run with one spacer row of the height you want.", code: SPACER_ROW },
+  "nbsp-runs": { text: "Delete the run. For horizontal space use padding on the cell; for vertical space use a spacer row.", code: SPACER_ROW },
+  "nbsp-raw": { text: "Replace each with a normal space, or with &nbsp; where two words must stay together." },
+  "zero-width": { text: "Delete them unless they are padding out a preheader." },
+  indent: { text: "Minify before sending and keep the indented file as your working copy." },
+  doctype: { text: "Make it the first line of the file.", code: "<!DOCTYPE html>" },
+  lang: { text: "Set it to the language the email is written in.", code: '<html lang="en">' },
+  charset: { text: "Add it as the first thing in the head.", code: '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' },
+  viewport: { text: "Add it to the head.", code: '<meta name="viewport" content="width=device-width, initial-scale=1">' },
+  title: { text: "Add it to the head. The subject line is a good default.", code: "<title>Your subject line</title>" },
+  script: { text: "Delete it. Nothing in an email can run script." },
+  preheader: {
+    text: "Type the line into Set the preview line in the source panel, or add this straight after the body tag. Aim for 40 to 90 characters that add to the subject, not repeat it.",
+    code: '<div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">Your preview line</div>',
+  },
+  unsubscribe: { text: "Add a visible unsubscribe link in the footer. Gmail and Yahoo also expect bulk senders to support one-click unsubscribe, which the sending platform sets up in the message headers." },
+  "ac-unsubscribe": { text: "Add ActiveCampaign's tag as the link address in the footer.", code: '<a href="%UNSUBSCRIBELINK%" style="color:#e2187c;">unsubscribe</a>' },
+  "ac-sender": { text: "Add the tag to the footer; ActiveCampaign fills in the postal address from the account.", code: "%SENDER-INFO-SINGLELINE%" },
+  "text-size-adjust": { text: "Add the rule to a style block in the head.", code: "body { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }" },
+  "apple-reformat": { text: "Add it to the head.", code: '<meta name="x-apple-disable-message-reformatting">' },
+  "data-detectors": {
+    text: "Add the rule to a style block in the head.",
+    code: "a[x-apple-data-detectors] {\n  color: inherit !important;\n  text-decoration: none !important;\n  font: inherit !important;\n}",
+  },
+  "color-scheme": {
+    text: "Add both tags to the head, then write your dark colours in a prefers-color-scheme media query. Without the tags the media query is ignored.",
+    code: '<meta name="color-scheme" content="light dark">\n<meta name="supported-color-schemes" content="light dark">\n<style>\n  @media (prefers-color-scheme: dark) {\n    .bg { background-color: #0a0a33 !important; }\n    .text { color: #ffffff !important; }\n  }\n</style>',
+  },
+  "pure-black": { text: "There is no setting that stops a full invert. Check the email in Dark: inverted, and make sure logos and icons still read on a light background (a transparent PNG with a pale outline survives both)." },
+  ppi: {
+    text: "Add this as the first thing in the head, and the Office namespace to the html tag.",
+    code: `<html xmlns:o="${OFFICE_NS}">\n<head>\n<!--[if gte mso 9]><xml>\n  <o:OfficeDocumentSettings>\n    <o:AllowPNG/>\n    <o:PixelsPerInch>96</o:PixelsPerInch>\n  </o:OfficeDocumentSettings>\n</xml><![endif]-->`,
+  },
+  "xmlns-o": { text: "Add the namespace to the html tag.", code: `<html xmlns:o="${OFFICE_NS}">` },
+  "ghost-width": { text: "Repeat every width attribute inside the Outlook conditional as a CSS width.", code: '<table width="650" style="width:650px;" …>\n<td width="650" style="width:650px;" …>' },
+  "max-width": {
+    text: "Wrap the fluid table in a fixed-width one that only Outlook sees.",
+    code: '<!--[if (gte mso 9)|(IE)]>\n<table role="presentation" align="center" width="650" style="width:650px;" cellpadding="0" cellspacing="0" border="0"><tr><td>\n<![endif]-->\n<table role="presentation" width="100%" style="max-width:650px;" …>\n  …\n</table>\n<!--[if (gte mso 9)|(IE)]>\n</td></tr></table>\n<![endif]-->',
+  },
+  width: { text: "Bring the outer table down to 600 to 650px." },
+  "spacer-cells": { text: "Give the cell a line-height equal to its height and a 1px font-size.", code: '<td height="16" style="font-size:1px; line-height:16px; mso-line-height-rule:exactly;">&nbsp;</td>' },
+  "line-height-rule": { text: "Add the rule beside every pixel line-height.", code: "line-height: 20px; mso-line-height-rule: exactly;" },
+  "outlook-typography": {
+    text: "Add this to the head.",
+    code: OUTLOOK_TYPOGRAPHY_BLOCK.replace(/></g, ">\n<"),
+  },
+  "table-align-mso": { text: "Add both properties to the floated table.", code: '<table align="left" style="mso-table-lspace:0pt; mso-table-rspace:0pt;" …>' },
+  "bg-no-vml": {
+    text: "Keep the CSS background for everyone else and repeat the image in VML for Outlook. Set the width and height to the size of the area, and a fill colour for when images are off.",
+    code: '<td background="https://…/bg.png" bgcolor="#080830" style="background-image:url(https://…/bg.png); background-size:cover;">\n<!--[if gte mso 9]>\n<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:650px; height:300px;">\n<v:fill type="frame" src="https://…/bg.png" color="#080830" />\n<v:textbox inset="0,0,0,0">\n<![endif]-->\n  … content …\n<!--[if gte mso 9]>\n</v:textbox>\n</v:rect>\n<![endif]-->\n</td>',
+  },
+  "outlook-spacing": { text: "Move the spacing onto the table cell that holds the element. Outlook only honours padding on cells.", code: '<td style="padding: 20px 0 10px 0;">\n  <p style="margin:0;">…</p>\n</td>' },
+  "img-alt": { text: "Describe what the image says or shows. If it is purely decorative, give it an empty alt so screen readers skip it.", code: '<img src="…" alt="Find your space" …>\n<img src="…" alt="" …>  <!-- decorative -->' },
+  "img-alt-weak": { text: "Rewrite it as what a person would say the image shows.", code: '<img src="…" alt="Couple collecting the keys to their first home" …>' },
+  "img-alt-long": { text: "Cut it to a short description and move the detail into the body copy." },
+  "img-width": { text: "Add the width you want it displayed at, in pixels. For a retina image that is half the file's pixel width.", code: '<img src="…" width="90" style="display:block;" alt="…">' },
+  "img-height-empty": { text: "Remove the attribute." },
+  "img-height-invalid": { text: 'Take it out of the attribute and put it in the style.', code: '<img src="…" width="650" style="display:block; width:100%; height:auto;" alt="…">' },
+  "img-height": { text: "For fixed-size images such as logos and icons, add the height as an attribute so the space is reserved before the image loads. Leave it off images that scale with the screen." },
+  "img-inline": {
+    text: "Add display:block to images that should sit flush. For Outlook.com, which ignores it, also add align.",
+    code: '<img src="…" width="650" align="left" style="display:block; margin:0;" alt="…">',
+  },
+  "img-src": { text: "Upload the image and use its full https address." },
+  "img-http": { text: "Change the address to https." },
+  "table-role": { text: "Add it to every table used for layout.", code: '<table role="presentation" cellpadding="0" cellspacing="0" border="0" …>' },
+  "table-reset": { text: "Add both attributes to every table.", code: '<table role="presentation" cellpadding="0" cellspacing="0" border="0" …>' },
+  "link-empty": { text: "Give the link a real address, or remove the link." },
+  "link-http": { text: "Change the address to https if the site supports it." },
+  "link-color": { text: "Put the colour, and the underline if you want one, on the link itself.", code: '<a href="…" style="color:#e2187c; text-decoration:underline;">…</a>' },
+  "link-no-name": {
+    text: "Say where the link goes, in the image's alt text or an aria-label. If it is an arrow beside a text link to the same place, hide the duplicate from screen readers instead.",
+    code: '<a href="…"><img src="arrow.png" alt="Read about the new scheme" …></a>\n<a href="…" aria-hidden="true" tabindex="-1"><img src="arrow.png" alt="" …></a>  <!-- duplicate -->',
+  },
+  "link-generic": { text: "Rewrite the link text so it makes sense on its own.", code: '<a href="…">View my account</a>' },
+  headings: {
+    text: "Mark the main title and section titles as headings. Reset the margins so they look the same as now.",
+    code: '<h1 style="margin:0; font-size:32px; line-height:38px; font-weight:bold;">You\'re in</h1>\n<td role="heading" aria-level="2" …>What happens next</td>  <!-- or, on a cell -->',
+  },
+  "small-text": { text: "Raise it to at least 12px, with a line-height of about 1.4 times the size." },
+  "unused-fonts": { text: "Remove the link, or name the font first in the font-family where you want it used." },
+  "font-fallbacks": { text: "End every font-family with fonts every device has and a generic family.", code: "font-family: Poppins, Verdana, Arial, sans-serif;" },
+  "merge-tags": { text: "Send yourself a test with the longest realistic value in each tag, and check the layout holds." },
+};
+
 function lineIndex(src: string): (offset: number) => number {
   const starts = [0];
   for (let i = 0; i < src.length; i++) {
@@ -564,6 +680,9 @@ export function getStats(src: string): Stats {
 
 /* ── Checks ────────────────────────────────────────────────────────────── */
 
+/** Checks for something missing from the head: the fix goes after the head tag. */
+const HEAD_INSERTS = new Set(["charset", "viewport", "title", "text-size-adjust", "apple-reformat", "data-detectors", "color-scheme", "ppi", "outlook-typography"]);
+
 const OUTLOOK = ["outlook"];
 const APPLE = ["apple-mail"];
 const GMAIL = ["gmail"];
@@ -580,7 +699,7 @@ export function checkEmail(src: string): Finding[] {
     level: Level,
     title: string,
     detail: string,
-    opts: { lines?: number[]; fix?: FixId; affects?: string[]; a11y?: boolean } = {},
+    opts: { lines?: number[]; fix?: FixId; affects?: string[]; a11y?: boolean; insertAfter?: number; howTo?: HowTo } = {},
   ) => {
     const affects = opts.affects ?? [];
     out.push({
@@ -594,12 +713,15 @@ export function checkEmail(src: string): Finding[] {
       share: affects.length ? sumShare(affects) : sumShare(ALL_FAMILIES),
       a11y: opts.a11y,
       sources: SOURCES[id] ?? [],
+      insertAfter: opts.insertAfter ?? (HEAD_INSERTS.has(id) ? head?.line : id === "preheader" ? bodyTag?.line : undefined),
+      howTo: opts.howTo ?? HOW_TO[id],
     });
   };
   const linesOf = (re: RegExp) => [...src.matchAll(re)].map((m) => lineOf(m.index));
   const html = tags.find((t) => t.name === "html");
   const head = tags.find((t) => t.name === "head" && !t.mso);
   const metas = tags.filter((t) => t.name === "meta");
+  const bodyTag = tags.find((t) => t.name === "body" && !t.mso);
   const hasMeta = (name: string) => metas.some((t) => t.attrs.name?.toLowerCase() === name);
 
   // ── Size and transport ──────────────────────────────────────────────
@@ -818,7 +940,10 @@ export function checkEmail(src: string): Finding[] {
       "warn",
       `${plural(badSelectors.length, "CSS rule")} aimed at an element that does not exist: ${[...new Set(badSelectors.map((b) => b.name))].join(", ")}`,
       "This looks like a class selector missing its dot, so the rule applies to nothing.",
-      { lines: badSelectors.map((b) => b.line) },
+      {
+        lines: badSelectors.map((b) => b.line),
+        howTo: { text: "Add the dot so it matches the class.", code: [...new Set(badSelectors.map((b) => `.${b.name} { … }`))].join("\n") },
+      },
     );
   }
 

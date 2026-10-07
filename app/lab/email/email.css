@@ -501,6 +501,32 @@
   max-width: 70ch;
   padding: 2px 0 8px 18px;
 }
+.ec-howto > summary {
+  min-height: 22px;
+  color: #9ec5ff;
+}
+.ec-howto .ec-note-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: none;
+  padding-left: 0;
+}
+/* Code is set in the text face: the site uses no monospace. */
+.ec-code {
+  margin: 0;
+  padding: 8px 10px;
+  overflow-x: auto;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre;
+  color: var(--ec-text);
+  background: #0c0c0d;
+  border: 1px solid var(--ec-line);
+  border-radius: 4px;
+  cursor: text;
+}
 .ec-note-warn > summary {
   color: var(--ec-warn);
 }

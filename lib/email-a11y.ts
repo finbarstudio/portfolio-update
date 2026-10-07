@@ -11,6 +11,8 @@ export interface ContrastIssue {
   background: string;
   ratio: number;
   required: number;
+  /** the nearest shade of the text colour that passes on this background */
+  suggestion: string;
   /** text under 24px, or under 18.66px bold, needs 4.5:1; larger needs 3:1 */
   large: boolean;
 }
@@ -64,6 +66,26 @@ function contrastRatio(a: [number, number, number, number], b: [number, number, 
 
 function hex([r, g, b]: [number, number, number, number]): string {
   return `#${[r, g, b].map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/**
+ * The closest colour to `color` that reaches `required` against `background`,
+ * found by moving it towards black or white (whichever the background is
+ * further from) in small steps. Keeps the hue, changes only the lightness.
+ */
+function passingShade(color: [number, number, number, number], background: [number, number, number, number], required: number): string {
+  const target = luminance(background) > 0.5 ? 0 : 255;
+  for (let step = 0; step <= 100; step++) {
+    const t = step / 100;
+    const mixed: [number, number, number, number] = [
+      color[0] + (target - color[0]) * t,
+      color[1] + (target - color[1]) * t,
+      color[2] + (target - color[2]) * t,
+      1,
+    ];
+    if (contrastRatio(mixed, background) >= required) return hex(mixed);
+  }
+  return target === 0 ? "#000000" : "#ffffff";
 }
 
 /** Walks up for the first opaque background. Null when an image or gradient sits in the way. */
@@ -157,7 +179,7 @@ export function auditDocument(doc: Document): A11yReport {
     const key = `${hex(color)}/${hex(background)}/${large}`;
     if (ratio < required && !seenPairs.has(key)) {
       seenPairs.add(key);
-      report.contrast.push({ text: snippet(text), color: hex(color), background: hex(background), ratio: Math.round(ratio * 100) / 100, required, large });
+      report.contrast.push({ text: snippet(text), color: hex(color), background: hex(background), ratio: Math.round(ratio * 100) / 100, required, large, suggestion: passingShade(color, background, required) });
     }
   }
   report.contrast.sort((a, b) => a.ratio - b.ratio);

@@ -91,8 +91,47 @@ function lineList(lines: number[]): string {
   return `Line ${shown}${rest > 0 ? ` and ${rest} more` : ""}`;
 }
 
-function plural(n: number, one: string): string {
-  return `${n} ${n === 1 ? one : `${one}s`}`;
+/** Output lines matching a test: how a finding from the rendered page is traced back to the source. */
+function linesWhere(src: string, test: (line: string) => boolean): number[] {
+  const found: number[] = [];
+  src.split("\n").forEach((line, i) => {
+    if (test(line)) found.push(i + 1);
+  });
+  return found;
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Where a missing thing goes, where a present thing is, or that it is about the whole email. */
+function Where({ lines, insertAfter }: { lines: number[]; insertAfter?: number }) {
+  if (lines.length) return <p className="ec-dim">{lineList(lines)}</p>;
+  if (insertAfter) return <p className="ec-dim">Not in the email. Add after line {insertAfter}.</p>;
+  return <p className="ec-dim">No single line: this is about the email as a whole.</p>;
+}
+
+/** The suggested change, collapsed until wanted. Click the code to select it. */
+function HowToFix({ text, code, sources }: { text: string; code?: string; sources?: Source[] }) {
+  return (
+    <details className="ec-note ec-howto">
+      <summary>How to fix</summary>
+      <div className="ec-note-body">
+        <p>
+          {text} {sources && <Sources list={sources} none />}
+        </p>
+        {code && (
+          <pre className="ec-code" tabIndex={0} onClick={(e) => window.getSelection()?.selectAllChildren(e.currentTarget)} title="Click to select, then copy">
+            {code}
+          </pre>
+        )}
+      </div>
+    </details>
+  );
+}
+
+function plural(n: number, one: string, many = `${one}s`): string {
+  return `${n} ${n === 1 ? one : many}`;
 }
 
 function kb(bytes: number): string {
@@ -652,7 +691,7 @@ export default function EmailCheck() {
                 <a href={NOTE_SOURCES.share[0].url} target="_blank" rel="noreferrer">
                   Litmus, {SHARE_DATE}
                 </a>
-                ).
+                ). Line numbers are lines of the Output.
               </p>
               {findings.length === 0 ? (
                 <p className="ec-dim">Nothing flagged.</p>
@@ -677,7 +716,8 @@ export default function EmailCheck() {
                       <p>
                         {f.detail} <Sources list={f.sources} none />
                       </p>
-                      {f.lines.length > 0 && <p className="ec-dim">{lineList(f.lines)}</p>}
+                      <Where lines={f.lines} insertAfter={f.insertAfter} />
+                      {f.howTo && <HowToFix text={f.howTo.text} code={f.howTo.code} sources={f.sources} />}
                     </li>
                   ))}
                 </ul>
@@ -713,9 +753,13 @@ export default function EmailCheck() {
                         <span className="ec-swatch" style={{ color: c.color, background: c.background }}>
                           {c.color} on {c.background}
                         </span>{" "}
-                        &quot;{c.text}&quot;{c.large ? " (large text)" : ""}
+                        &quot;{c.text}&quot;{c.large ? " (large text)" : ""} <Sources list={NOTE_SOURCES.contrast} />
                       </p>
-                      <Sources list={NOTE_SOURCES.contrast} />
+                      <Where lines={linesWhere(output, (l) => new RegExp(`(?<![-\\w])color\\s*:\\s*${escapeRegExp(c.color)}`, "i").test(l))} />
+                      <HowToFix
+                        text={`Darken or lighten the text until it reaches ${c.required}:1. The nearest shade of this colour that passes on ${c.background} is ${c.suggestion}. If the colour is a brand colour you cannot change, make the text larger and bold (24px, or 19px bold, needs only 3:1) or change the background.`}
+                        code={`color: ${c.suggestion};`}
+                      />
                     </li>
                   ))}
                   {a11y.contrastUnknown > 0 && (
@@ -731,22 +775,36 @@ export default function EmailCheck() {
                       <p className="ec-item-title">
                         <span className="ec-level ec-level-fail">Problem</span> Link with no accessible name
                       </p>
-                      <p className="ec-dim">{href}</p>
-                      <Sources list={NOTE_SOURCES.linkName} />
+                      <p className="ec-dim">
+                        {href} <Sources list={NOTE_SOURCES.linkName} />
+                      </p>
+                      <Where
+                        lines={linesWhere(output, (l) =>
+                          [href, href.replace(/&/g, "&amp;")].some((h) => new RegExp(`<a\\b[^>]*href="${escapeRegExp(h)}"[^>]*>\\s*<img\\b`, "i").test(l)),
+                        )}
+                      />
+                      <HowToFix
+                        text="Say where the link goes, in the image's alt text or an aria-label. If it is an arrow beside a text link to the same place, hide the duplicate from screen readers instead."
+                        code={`<a href="${href}"><img src="…" alt="Where this link goes" …></a>\n<a href="${href}" aria-hidden="true" tabindex="-1"><img src="…" alt="" …></a>  <!-- duplicate -->`}
+                      />
                     </li>
                   ))}
                   {a11y.imagesWithoutAlt.map((name) => (
                     <li key={name} className="ec-item">
                       <p className="ec-item-title">
-                        <span className="ec-level ec-level-fail">Problem</span> Image with no alt: {name}
+                        <span className="ec-level ec-level-fail">Problem</span> Image with no alt: {name} <Sources list={NOTE_SOURCES.alt} />
                       </p>
-                      <Sources list={NOTE_SOURCES.alt} />
+                      <Where lines={name ? linesWhere(output, (l) => l.includes(name) && /<img\b/i.test(l)) : []} />
+                      <HowToFix
+                        text="Describe what the image says or shows. If it is purely decorative, give it an empty alt so screen readers skip it."
+                        code={'<img src="…" alt="What the image shows" …>\n<img src="…" alt="" …>  <!-- decorative -->'}
+                      />
                     </li>
                   ))}
                   {a11y.targets.length > 0 && (
                     <li className="ec-item">
                       <p className="ec-item-title">
-                        <span className="ec-level ec-level-warn">Warning</span> {plural(a11y.targets.length, "link or button")} with a tap area under 24px
+                        <span className="ec-level ec-level-warn">Warning</span> {plural(a11y.targets.length, "link or button", "links or buttons")} with a tap area under 24px
                       </p>
                       <p>
                         Only the link itself is clickable, not the padded cell around it, so a text link in a button is as tall as its text. Put the padding on the
@@ -757,34 +815,29 @@ export default function EmailCheck() {
                           .slice(0, 6)
                           .map((t) => `"${t.text}" ${t.width}×${t.height}`)
                           .join(" · ")}
-                        {a11y.targets.length > 6 ? ` and ${a11y.targets.length - 6} more` : ""}
+                        {a11y.targets.length > 6 ? ` and ${a11y.targets.length - 6} more` : ""} <Sources list={NOTE_SOURCES.target} />
                       </p>
-                      <Sources list={NOTE_SOURCES.target} />
+                      <Where
+                        lines={[
+                          ...new Set(
+                            a11y.targets.flatMap((t) => (t.text.length >= 4 ? linesWhere(output, (l) => /<a\b/i.test(l) && l.includes(t.text.replace(/…$/, ""))) : [])),
+                          ),
+                        ].sort((x, y) => x - y)}
+                      />
+                      <HowToFix
+                        text="Move the padding from the cell onto the link and make the link a block, so the whole button is the tap area. Keep the cell's background colour so Outlook, which ignores padding on links, still shows a button."
+                        code={'<td bgcolor="#ff0066" style="border-radius:6px;">\n  <a href="…" style="display:block; padding:12px 20px; font-size:14px; line-height:20px; color:#ffffff; text-decoration:none;">Start your property search</a>\n</td>'}
+                      />
                     </li>
                   )}
                   {a11y.smallTargets > 0 && (
                     <li className="ec-item">
                       <p className="ec-item-title">
-                        <span className="ec-level ec-level-info">Note</span> {plural(a11y.smallTargets, "link or button")} between 24 and 44px
+                        <span className="ec-level ec-level-info">Note</span> {plural(a11y.smallTargets, "link or button", "links or buttons")} between 24 and 44px
                       </p>
                       <p>These pass WCAG but are fiddly for thumbs. Padding on the link itself, not just the cell, enlarges the tap area.</p>
                     </li>
                   )}
-                  {a11y.smallText.length > 0 && (
-                    <li className="ec-item">
-                      <p className="ec-item-title">
-                        <span className="ec-level ec-level-info">Note</span> Text rendered under 12px
-                      </p>
-                      <p className="ec-dim">{a11y.smallText.slice(0, 3).map((t) => `${t.size}px "${t.text}"`).join(" · ")}</p>
-                    </li>
-                  )}
-                  <li className="ec-item">
-                    <p className="ec-item-title">
-                      <span className={`ec-level ${a11y.headings ? "ec-level-ok" : "ec-level-info"}`}>{a11y.headings ? "Pass" : "Note"}</span>{" "}
-                      {a11y.headings ? plural(a11y.headings, "heading") : "No headings"} for screen reader navigation
-                    </p>
-                    <Sources list={NOTE_SOURCES.headings} />
-                  </li>
                 </ul>
               )}
             </details>
