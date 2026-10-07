@@ -553,7 +553,7 @@ function isUnusedFontLink(tag: Tag, declared: string): boolean {
 
 /** A line-height in px on an element that does not tell Outlook to keep it exact. */
 function needsLineHeightRule(tag: Tag): boolean {
-  return !tag.mso && /line-height\s*:\s*\d+(\.\d+)?px/i.test(tag.attrs.style ?? "") && !styleHas(tag.attrs.style, "mso-line-height-rule");
+  return !tag.mso && !isHiddenElement(tag) && /line-height\s*:\s*\d+(\.\d+)?px/i.test(tag.attrs.style ?? "") && !styleHas(tag.attrs.style, "mso-line-height-rule");
 }
 
 function isAlignedTable(tag: Tag): boolean {
@@ -621,7 +621,7 @@ const SAMPLE_VALUES: [RegExp, string][] = [
   [/^(LASTNAME|LNAME|SURNAME|LAST)$/, "Lieb"],
   [/^(FULLNAME|NAME|CONTACTNAME)$/, "Nick Lieb"],
   [/^(EMAIL|EMAILADDRESS)$/, "nick.lieb@example.com"],
-  [/^(LOCATION|DEVELOPMENT|PROPERTY|PROPERTYNAME)$/, "Maple Court, Croydon"],
+  [/^(LOCATION|DEVELOPMENT|PROPERTY|PROPERTYNAME)$/, "Sunderland"],
   [/^(CODE|OTP|PASSCODE|VERIFICATIONCODE)$/, "482913"],
   [/^(POSTCODE)$/, "CR0 2AB"],
 ];
@@ -1323,7 +1323,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       const inner = linkText(t);
       const text = decodeEntities(inner.replace(/<[^>]+>/g, " ")).trim();
       const imgAlt = [...inner.matchAll(/<img\b[^>]*\balt\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)].some((m) => (m[1] ?? m[2] ?? "").trim());
-      return !text && !imgAlt && !t.attrs["aria-label"] && !t.attrs.title;
+      return !text && !imgAlt && !t.attrs["aria-label"] && !t.attrs.title && t.attrs["aria-hidden"] !== "true";
     })
     .map((t) => t.line);
   if (emptyLinks.length) {
@@ -1371,7 +1371,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       { a11y: true },
     );
   }
-  const tinyText = tags.filter((t) => !t.mso && ["td", "p", "span", "div", "a", "li"].includes(t.name) && Number.parseFloat(styleGet(t.attrs.style, "font-size")) < 12 && !/^0/.test(styleGet(t.attrs.style, "font-size"))).map((t) => t.line);
+  const tinyText = tags.filter((t) => !t.mso && ["td", "p", "span", "div", "a", "li"].includes(t.name) && Number.parseFloat(styleGet(t.attrs.style, "font-size")) < 12 && Number.parseFloat(styleGet(t.attrs.style, "font-size")) >= 2 && !isHiddenElement(t)).map((t) => t.line);
   if (tinyText.length) {
     add(
       "small-text",

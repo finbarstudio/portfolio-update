@@ -185,7 +185,8 @@ export function auditDocument(doc: Document): A11yReport {
   report.contrast.sort((a, b) => a.ratio - b.ratio);
 
   for (const link of doc.querySelectorAll<HTMLAnchorElement>("a[href]")) {
-    if (!isVisible(link, view)) continue;
+    // Hidden from screen readers on purpose (a duplicate of the link beside it).
+    if (!isVisible(link, view) || link.getAttribute("aria-hidden") === "true") continue;
     const name = accessibleName(link);
     if (!name) {
       report.linksWithoutName.push(link.getAttribute("href") ?? "");
