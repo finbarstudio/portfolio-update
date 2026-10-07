@@ -203,7 +203,7 @@ const RAW: Slide[] = [
     name: "Salesmasters",
     category: "Editorial",
     body:
-      "Salesmasters writes sales playbooks for businesses in healthcare, manufacturing, technology and storage. Over twelve months I researched, wrote and designed more than fifteen of them, each 30 to 50 pages, with the diagrams drawn for each client. Every book ran on the same InDesign system and took about seventy hours, and every client came back for the next one.",
+      "Salesmasters writes sales playbooks for businesses in healthcare, manufacturing, technology and storage. Over twelve months I researched, wrote and designed more than fifteen of them, each 30 to 50 pages, with the diagrams drawn for each client. Every book ran on the same InDesign system, and each one took about seventy hours of work, roughly two weeks from brief to print-ready files. Every client came back for the next one.",
     meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024–2025" }],
   },
   {
