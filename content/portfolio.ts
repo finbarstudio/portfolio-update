@@ -204,8 +204,6 @@ const RAW: Slide[] = [
       "Salesmasters writes sales playbooks for businesses in healthcare, manufacturing, technology and storage. Over twelve months I researched, wrote and designed more than fifteen of them, each 30 to 50 pages, with the diagrams drawn for each client. Every book ran on the same InDesign system and took about seventy hours, and every client came back for the next one.",
     meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024–2025" }],
   },
-  row(["salesmasters/covers/alpha.webp", "salesmasters/covers/bus4x4.webp", "salesmasters/covers/playbook.webp", "salesmasters/covers/siteware.webp"], "Four of the fifteen covers"),
-  row(["salesmasters/graphics/active-medical/wheel.webp", "salesmasters/graphics/bus4x4/wheel.webp", "salesmasters/graphics/cutek/wheel.webp", "salesmasters/graphics/site-ware-direct/wheel.webp"], "The Sales Wheel, drawn fresh for each client", { frame: false }),
   {
     kind: "booklet",
     books: [

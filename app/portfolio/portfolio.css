@@ -439,13 +439,17 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-media.is-bleed .pf-row { padding: 0; }
   .pf-media.is-bleed .pf-item { aspect-ratio: var(--r) !important; }
   .pf-booklet { position: relative; inset: auto; margin: 12px 14px 0; aspect-ratio: 1.25; }
-  .pf-booklet-phone { position: static; padding: 12px 14px 0; }
+  /* an exception to the tight phone pages: this one is let run taller, for a
+     2 by 2 of spreads and room around the line under them */
+  .pf-booklet-phone { position: static; padding: 22px 18px 0; gap: 26px; }
+  .pf-booklet-phone-spreads { gap: 16px 12px; }
+  .pf-booklet-phone p { font-size: 14px; line-height: 1.5; padding: 0 6px; }
   .pf-booklet-ui { position: static; padding: 0 14px; margin: 6px 0; }
   .pf-booklet-set:first-child, .pf-booklet-set:last-child { margin: 0 -8px; }
   .pf-booklet-where { min-width: 9em; }
   /* the caption is about turning pages, which a phone does not do */
   .pf-bookslide .pf-caption { display: none; }
-  .pf-booklet-phone { padding-bottom: 16px; }
+  .pf-booklet-phone { padding-bottom: 34px; }
   /* the car grid: fewer cars (PfCars picks a sample), in a frame of its own shape */
   .pf-media .pf-item:has(.pf-cars) { aspect-ratio: auto !important; }
   .pf-cars { position: relative; inset: auto; width: 100%; aspect-ratio: var(--shape); cursor: auto; }
