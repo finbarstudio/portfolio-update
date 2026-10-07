@@ -50,11 +50,21 @@ function normaliseHex(text: string): string | null {
   return null;
 }
 
+/** Chrome and Edge offer a screen eyedropper; other browsers do not. */
+interface EyeDropperApi {
+  open(): Promise<{ sRGBHex: string }>;
+}
+const eyeDropper = (): EyeDropperApi | null => {
+  const Ctor = (window as unknown as { EyeDropper?: new () => EyeDropperApi }).EyeDropper;
+  return Ctor ? new Ctor() : null;
+};
+
 export default function ColourPicker({ label, value, onChange }: { label: string; value: string; onChange: (hex: string) => void }) {
   const [open, setOpen] = useState(false);
   // Hue and saturation live here so they survive a trip through black or white.
   const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(value));
   const [hexText, setHexText] = useState<string | null>(null);
+  const [canPick, setCanPick] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const square = useRef<HTMLDivElement>(null);
 
@@ -62,6 +72,10 @@ export default function ColourPicker({ label, value, onChange }: { label: string
   useEffect(() => {
     setHsv((current) => (hsvToHex(current) === value ? current : hexToHsv(value)));
   }, [value]);
+
+  useEffect(() => {
+    setCanPick("EyeDropper" in window);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -103,6 +117,19 @@ export default function ColourPicker({ label, value, onChange }: { label: string
 
   const hue = `hsl(${hsv.h} 100% 50%)`;
 
+  const pickFromScreen = async () => {
+    try {
+      const picked = await eyeDropper()?.open();
+      if (picked) {
+        const hex = picked.sRGBHex.toLowerCase();
+        setHsv(hexToHsv(hex));
+        onChange(hex);
+      }
+    } catch {
+      // Closed without picking.
+    }
+  };
+
   return (
     <div className="mp-colour" ref={root}>
       <button type="button" className="mp-colour-trigger" aria-label={`${label}: ${value}`} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
@@ -136,19 +163,31 @@ export default function ColourPicker({ label, value, onChange }: { label: string
           >
             <span className="mp-colour-dot" style={{ left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%`, background: value }} />
           </div>
-          <input
-            className="mp-colour-hue"
-            type="range"
-            min={0}
-            max={360}
-            step={1}
-            value={Math.round(hsv.h)}
-            aria-label="Hue"
-            onChange={(event) => commit({ ...hsv, h: Number(event.target.value) })}
-          />
-          <div className="mp-colour-row">
+          <div className="mp-colour-hue-row">
+            {canPick && (
+              <button type="button" className="mp-colour-eye" aria-label="Pick a colour from the screen" onClick={pickFromScreen}>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m10.5 6.5 7 7M2 22s4.5-.5 7-3L21 7a2.828 2.828 0 1 0-4-4L5 15c-2.5 2.5-3 7-3 7Z" />
+                </svg>
+              </button>
+            )}
             <input
-              className="mp-colour-hex"
+              className="mp-colour-hue"
+              type="range"
+              min={0}
+              max={360}
+              step={1}
+              value={Math.round(hsv.h)}
+              aria-label="Hue"
+              style={{ "--hue": hue } as React.CSSProperties}
+              onChange={(event) => commit({ ...hsv, h: Number(event.target.value) })}
+            />
+          </div>
+          <div className="mp-colour-row">
+            <label className="mp-colour-field">
+              <span className="mp-colour-chip" style={{ background: value }} />
+              <input
+                className="mp-colour-hex"
               type="text"
               inputMode="text"
               spellCheck={false}
@@ -163,7 +202,8 @@ export default function ColourPicker({ label, value, onChange }: { label: string
               onKeyDown={(event) => {
                 if (event.key === "Enter") event.currentTarget.blur();
               }}
-            />
+              />
+            </label>
             <div className="mp-colour-swatches">
               {SWATCHES.map((swatch) => (
                 <button
