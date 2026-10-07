@@ -238,19 +238,21 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-item :is(img, video)[data-in="1"] { opacity: 1; }
 
 /* the car grid: 12 by 19 cells that fill the frame exactly. The car under the
-   pointer grows where it is and the rest are pushed away from it; the frame
-   cuts off any that are pushed past its edge (positions are set inline by
+   pointer grows to a 5 by 5 block and the rest step aside by whole cells, so
+   the frame only ever cuts off whole cars (positions are set inline by
    PfCars) */
-.pf-cars { position: absolute; inset: 11% 12% 13%; overflow: hidden; cursor: crosshair; touch-action: pan-y; }
+.pf-cars { position: absolute; inset: 8% 12% 9%; overflow: hidden; cursor: crosshair; touch-action: pan-y; }
 .pf-car {
   position: absolute; left: 0; top: 0;
-  width: calc(100% / 12); height: calc(100% / 19);
+  width: calc(100% / var(--cols)); height: calc(100% / var(--rows));
   display: grid; place-items: center;
   transition: transform 0.7s cubic-bezier(0.25, 0.6, 0.2, 1);
   pointer-events: none;
 }
 .pf-car[data-big="1"] { z-index: 1; }
-.pf-car-art { position: relative; width: 90%; aspect-ratio: 2.5; background-repeat: no-repeat; }
+/* a car is a little shorter than its cell, so a row that has stepped out of
+   the frame leaves nothing showing at the edge */
+.pf-car-art { position: relative; width: 82%; aspect-ratio: 2.5; background-repeat: no-repeat; }
 .pf-car-art img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .pf-car { transition: none; } }
 
@@ -418,6 +420,9 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-booklet-set:first-child, .pf-booklet-set:last-child { margin: 0 -8px; }
   .pf-booklet-where { min-width: 9em; }
   .pf-bookslide .pf-caption { left: auto; right: auto; }
+  /* the car grid: fewer cars (PfCars picks a sample), in a frame of its own shape */
+  .pf-media .pf-item:has(.pf-cars) { aspect-ratio: auto !important; }
+  .pf-cars { position: relative; inset: auto; width: 100%; aspect-ratio: var(--shape); cursor: auto; }
   .pf-grid { position: static; display: block; padding: 12px 14px 14px; }
   .pf-grid-in { display: flex; flex-direction: column; gap: 8px; }
   .pf-grid-in .pf-item { aspect-ratio: var(--r) !important; }

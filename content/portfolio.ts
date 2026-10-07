@@ -172,7 +172,7 @@ const RAW: Slide[] = [
   },
   one("portfolio/rennen-plus/pink-porsche.webp", "The brand: Rennen Motorsport’s car, The Pink Porsche, at the Adelaide Rally", { frame: false }),
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
-  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline. Hover one to see it", { frame: false, cars: true }),
+  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
   linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
 
   /* ── Salesmasters ──────────────────────────────────────────── */
