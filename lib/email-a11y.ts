@@ -73,14 +73,15 @@ function hex([r, g, b]: [number, number, number, number]): string {
  * found by moving it towards black or white (whichever the background is
  * further from) in small steps. Keeps the hue, changes only the lightness.
  */
-function passingShade(color: [number, number, number, number], background: [number, number, number, number], required: number): string {
+export function passingShade(color: [number, number, number, number], background: [number, number, number, number], required: number): string {
   const target = luminance(background) > 0.5 ? 0 : 255;
   for (let step = 0; step <= 100; step++) {
     const t = step / 100;
+    // Rounded to whole channel values first: the hex is what gets used, so the hex is what must pass.
     const mixed: [number, number, number, number] = [
-      color[0] + (target - color[0]) * t,
-      color[1] + (target - color[1]) * t,
-      color[2] + (target - color[2]) * t,
+      Math.round(color[0] + (target - color[0]) * t),
+      Math.round(color[1] + (target - color[1]) * t),
+      Math.round(color[2] + (target - color[2]) * t),
       1,
     ];
     if (contrastRatio(mixed, background) >= required) return hex(mixed);
