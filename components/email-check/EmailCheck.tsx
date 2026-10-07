@@ -26,6 +26,7 @@ import {
 } from "@/lib/email-check";
 import { extractFromPreviewPage, isPreviewUrl } from "@/lib/email-extract";
 import { auditDocument, type A11yReport } from "@/lib/email-a11y";
+import { buildReport } from "@/lib/email-report";
 
 /**
  * Email check: paste an HTML email, get a report and a preview, fix what has
@@ -325,6 +326,8 @@ export default function EmailCheck() {
   const [fixes, setFixes] = useState<FixId[]>([]);
   const [preheader, setPreheader] = useState("");
   const [copied, setCopied] = useState(false);
+  const [reportCopied, setReportCopied] = useState(false);
+  const [dropping, setDropping] = useState(false);
   const [width, setWidth] = useState(650);
   const [dark, setDark] = useState<DarkMode>("off");
   const [imagesOff, setImagesOff] = useState(false);
@@ -380,7 +383,24 @@ export default function EmailCheck() {
 
   const onFile = async (file: File | undefined) => {
     if (!file) return;
-    load(await file.text(), file.name);
+    const text = await file.text();
+    // A saved "view online" page is unwrapped, the same as a pasted one.
+    if (/class="[^"]*message-body-container/.test(text) && loadPage(text, file.name)) return;
+    setLinkState({ busy: false, error: "", notes: [] });
+    load(text, file.name);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDropping(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      void onFile(file);
+      return;
+    }
+    // A dragged link or a selection of markup, not a file.
+    const text = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain");
+    if (text) onSourceChange(text);
   };
 
   /** A pasted "view online" page, or a link to one, becomes the email it wraps. */
@@ -441,14 +461,21 @@ export default function EmailCheck() {
     window.setTimeout(() => setCopied(false), 1500);
   };
 
-  const onDownload = () => {
-    const blob = new Blob([output], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
+  const save = (text: string, name: string, type: string) => {
+    const url = URL.createObjectURL(new Blob([text], { type }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = fileName ? fileName.replace(/(\.html?)?$/i, "-fixed$1") : "email-fixed.html";
+    a.download = name;
     a.click();
     URL.revokeObjectURL(url);
+  };
+  const baseName = fileName.replace(/\.html?$/i, "") || "email";
+  const onDownload = () => save(output, `${baseName}-fixed.html`, "text/html");
+  const onDownloadReport = () => save(report, `${baseName}-report.md`, "text/markdown");
+  const onCopyReport = async () => {
+    await navigator.clipboard.writeText(report);
+    setReportCopied(true);
+    window.setTimeout(() => setReportCopied(false), 1500);
   };
 
   const toggleFamily = (family: string) =>
@@ -492,9 +519,27 @@ export default function EmailCheck() {
 
   const columns = [open.source ? "320px" : "44px", open.report ? "minmax(320px, 460px)" : "44px", open.preview ? "minmax(0, 1fr)" : "44px"];
   const tooTall = height !== null && height > OUTLOOK_PAGE_HEIGHT;
+  const report = buildReport({ fileName, stats, findings, a11y, features, families, data, applied, width, height });
 
   return (
-    <main className="ec-tool" style={{ gridTemplateColumns: columns.join(" ") }}>
+    <main
+      className={`ec-tool${dropping ? " is-dropping" : ""}`}
+      style={{ gridTemplateColumns: columns.join(" ") }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDropping(true);
+      }}
+      onDragLeave={(e) => {
+        // Only when the pointer leaves the tool, not when it crosses a child.
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDropping(false);
+      }}
+      onDrop={onDrop}
+    >
+      {dropping && (
+        <div className="ec-drop" aria-hidden="true">
+          Drop the HTML file to check it
+        </div>
+      )}
       <Panel name="source" title="Email check" open={open.source} onToggle={togglePanel} className="ec-source">
         <p className="ec-dim">
           Paste an HTML email, open a file, or paste an ActiveCampaign &quot;view online&quot; link to unwrap the email from it. Checks run in your
@@ -538,7 +583,7 @@ export default function EmailCheck() {
               e.target.value = "";
             }}
           />
-          <span title="Reads the file in your browser; nothing is uploaded">Open an HTML file</span>
+          <span title="Reads the file in your browser; nothing is uploaded. You can also drop a file anywhere on the page.">Open or drop an HTML file</span>
         </label>
         {fileName && <p className="ec-dim">{fileName}</p>}
 
@@ -663,6 +708,18 @@ export default function EmailCheck() {
                 <button type="button" onClick={() => undoFix(fixes[fixes.length - 1])} disabled={fixes.length === 0}>
                   Undo last
                 </button>
+                <span className="ec-row-end">
+                  <button
+                    type="button"
+                    onClick={() => void onCopyReport()}
+                    title={`Copies the whole report as compact text (${kb(new TextEncoder().encode(report).length)}), ready to paste into a chat with an assistant`}
+                  >
+                    {reportCopied ? "Copied" : "Copy report"}
+                  </button>
+                  <button type="button" onClick={onDownloadReport} title="Saves the report as a small .md file">
+                    Save report
+                  </button>
+                </span>
                 {applied.length > 0 && (
                   <details className="ec-note ec-applied-list">
                     <summary>{plural(applied.length, "fix")} applied</summary>
