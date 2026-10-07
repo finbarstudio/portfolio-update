@@ -4,8 +4,8 @@
  * A printed booklet on /portfolio that can be picked up and read: a 3D
  * magazine whose pages turn (click either side, drag a page, or use the
  * arrows), with a switch to lay it flat and square-on for reading, and a
- * third view that sets every spread out at once as small flat pictures (pick
- * one and it opens in the flat view).
+ * third view that sets every spread out at once on a wall leaning in space
+ * (components/booklet/SpreadWall.tsx): click one to bring it up close.
  *
  * The page turning itself is components/booklet/Book.tsx. This file is the
  * stage around it: the two poses, the controls, and not running WebGL until
@@ -17,6 +17,7 @@ import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { corsMedia } from "@/lib/media";
 import Book, { PAGE_H, PAGE_W } from "@/components/booklet/Book";
+import SpreadWall from "@/components/booklet/SpreadWall";
 
 type View = "magazine" | "flat" | "spreads";
 
@@ -83,8 +84,8 @@ export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a sm
     if (v !== "spreads") setPose(v);
     else setPlaying(false);
   };
-  // reader's spreads: the cover alone, then pairs, then the back alone; spread k is sheet position k
-  const spreads = Array.from({ length: sheets + 1 }, (_, k) => [k * 2 - 1, k * 2].filter((n) => n >= 0 && n < pages.length));
+  const smalls = useMemo(() => thumbs.map((p) => corsMedia(p)), [thumbs]);
+  const [close, setClose] = useState<number[] | null>(null); // the pages up close on the wall
   const [sheet, setSheet] = useState(0);
   const [near, setNear] = useState(false); // close enough to start loading
   const [seen, setSeen] = useState(false); // on screen: keep drawing
@@ -136,6 +137,7 @@ export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a sm
   };
 
   const onDown = (e: React.PointerEvent) => {
+    if (view === "spreads") return; // the wall takes its own clicks
     setPlaying(false); // taking hold of a page takes over from play
     drag.current = { x: e.clientX, from: Math.round(pRef.current) };
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -167,7 +169,7 @@ export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a sm
     drag.current = null;
   };
   const onKey = (e: React.KeyboardEvent) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    if (view === "spreads" || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
     setPlaying(false);
     go(sheet + (e.key === "ArrowRight" ? 1 : -1));
   };
@@ -194,39 +196,21 @@ export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a sm
           <Canvas
             flat
             dpr={[1, 2]}
-            frameloop={seen && view !== "spreads" ? "demand" : "never"}
+            frameloop={seen ? "demand" : "never"}
             onCreated={(state) => (wake.current = state.invalidate)}
             camera={{ fov: 30, position: [0, 0, 6], near: 0.5, far: 40 }}
           >
             <ambientLight intensity={2.1} />
             <directionalLight position={[-2.5, 3, 6]} intensity={1.5} />
-            <Stage pages={urls} view={pose} pRef={pRef} onReady={() => setReady(true)} />
+            {/* the book stays loaded behind the wall, just not drawn */}
+            <group visible={view !== "spreads"}>
+              <Stage pages={urls} view={pose} pRef={pRef} onReady={() => setReady(true)} />
+            </group>
+            {view === "spreads" ? <SpreadWall thumbs={smalls} fulls={urls} onWhere={setClose} /> : null}
           </Canvas>
         ) : null}
         {ready || view === "spreads" ? null : <p className="pf-booklet-wait pf-mono pf-soft">Loading booklet</p>}
       </div>
-
-      {view === "spreads" ? (
-        <div className="pf-spreads" style={{ "--n": spreads.length } as React.CSSProperties}>
-          {spreads.map((pp, k) => (
-            <button
-              key={k}
-              type="button"
-              aria-current={k === sheet ? "true" : undefined}
-              aria-label={pp.length === 1 ? `Open page ${pp[0] + 1}` : `Open pages ${pp[0] + 1} and ${pp[1] + 1}`}
-              onClick={() => {
-                go(k);
-                show("flat");
-              }}
-            >
-              {pp.map((n) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={n} src={thumbs[n]} alt="" width={420} height={594} loading="lazy" decoding="async" />
-              ))}
-            </button>
-          ))}
-        </div>
-      ) : null}
 
       <div className="pf-booklet-ui pf-mono">
         <div className="pf-booklet-set">
@@ -240,6 +224,11 @@ export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a sm
             Spreads
           </button>
         </div>
+        {view === "spreads" ? (
+          <span className="pf-booklet-where pf-soft" aria-live="polite">
+            {close ? (close.length === 1 ? `Page ${close[0]}` : `Pages ${close[0]} to ${close[1]}`) : "Click a spread"}
+          </span>
+        ) : null}
         <div className="pf-booklet-set" hidden={view === "spreads"}>
           <button type="button" aria-pressed={playing} onClick={play}>
             {playing ? "Pause" : "Play"}

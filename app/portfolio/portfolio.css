@@ -267,33 +267,7 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-booklet:active { cursor: grabbing; }
 .pf-booklet:focus-visible { outline: 1px solid var(--soft); outline-offset: calc(var(--u) * 0.4); }
-.pf-booklet[data-view="spreads"] { visibility: hidden; }
-/* every spread at once, flat: 8 across in the media box. A spread is two A4
-   pages side by side; the covers stand alone, each on its own side. */
-.pf-spreads {
-  position: absolute;
-  top: var(--T); bottom: var(--B); left: var(--S); right: var(--S);
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: calc(var(--u) * 0.9) calc(var(--u) * 1.1);
-  align-content: center;
-  z-index: 1;
-}
-.pf-spreads button {
-  display: flex;
-  aspect-ratio: 1.4142;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: zoom-in;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-.pf-spreads button:first-child { justify-content: flex-end; }
-.pf-spreads img { display: block; width: 50%; height: 100%; object-fit: cover; }
-.pf-spreads:hover button { opacity: 0.55; }
-.pf-spreads button:hover { opacity: 1; transform: scale(1.06); }
-.pf-spreads button:focus-visible, .pf-spreads button[aria-current] { outline: 1px solid var(--ink); outline-offset: calc(var(--u) * 0.25); }
-@media (prefers-reduced-motion: reduce) { .pf-spreads button { transition: none; } }
+.pf-booklet[data-view="spreads"] { cursor: auto; }
 .pf-booklet-wait { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; pointer-events: none; }
 .pf-booklet-ui {
   position: absolute;
@@ -443,8 +417,6 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-media.is-bleed .pf-row { padding: 0; }
   .pf-media.is-bleed .pf-item { aspect-ratio: var(--r) !important; }
   .pf-booklet { position: relative; inset: auto; margin: 12px 14px 0; aspect-ratio: 1.25; }
-  .pf-booklet[data-view="spreads"] { display: none; }
-  .pf-spreads { position: static; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 14px 0; }
   .pf-booklet-ui { position: static; padding: 0 14px; margin: 6px 0; }
   .pf-booklet-set:first-child, .pf-booklet-set:last-child { margin: 0 -8px; }
   .pf-booklet-where { min-width: 9em; }

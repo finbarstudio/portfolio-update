@@ -70,7 +70,7 @@ const SOFT = 760; // px wide for a page that is near but not the one being read
  * the upload cost, and swapped for the full file when they are turned to. The
  * image on show stays up until its replacement is ready.
  */
-function usePage(url: string | undefined, wanted: boolean, sharp: boolean): THREE.Texture | null {
+export function usePage(url: string | undefined, wanted: boolean, sharp: boolean): THREE.Texture | null {
   const gl = useThree((s) => s.gl);
   const invalidate = useThree((s) => s.invalidate);
   const [tex, setTex] = useState<THREE.Texture | null>(null);
