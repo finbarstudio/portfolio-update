@@ -72,7 +72,9 @@ export default function TopNav({ variant = "site" }: { variant?: "site" | "portf
   // Works with Lenis (native scroll) plus a plain window listener as fallback.
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
-    const isHome = pathname === "/";
+    // The portfolio is served at "/" on its own subdomain, so the path alone
+    // does not say this is the studio home page: the variant has to agree.
+    const isHome = pathname === "/" && variant === "site";
     // non-home: px from the top where the bar is always shown. On /portfolio the
     // first page sits just under the bar, so the bar goes on the first few
     // pixels of scroll, before that page's top edge can reach it.
