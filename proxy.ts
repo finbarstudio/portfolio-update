@@ -19,8 +19,12 @@ const RETIRED_HOSTS = new Set(["sandbox.finbar.studio", "sandbox.localhost"]);
 const WEB_HOSTS = new Set(["web.finbar.studio", "web.localhost"]);
 const LAB_HOSTS = new Set(["lab.finbar.studio", "lab.localhost"]);
 const PORTFOLIO_HOSTS = new Set(["portfolio.finbar.studio", "portfolio.localhost"]);
-/** The pages that exist under app/portfolio, as seen on the subdomain. */
+/** The pages under app/portfolio, as seen on the subdomain. */
 const PORTFOLIO_PATHS = new Set(["/", "/mock", "/portfolio", "/portfolio/mock"]);
+/** Its tab icons and share cards. Next links them at their real /portfolio/...
+ *  address, and they are served there as they are: a link-preview crawler
+ *  should not have to follow a redirect to reach the card. */
+const PORTFOLIO_META = /^\/portfolio\/(icon|apple-icon|opengraph-image|twitter-image)$/;
 const MAIN_HOSTS = new Set(["www.finbar.studio", "finbar.studio"]);
 
 /**
@@ -76,6 +80,7 @@ export function proxy(request: NextRequest): NextResponse {
   //    this host belongs to the main site. Files (and the /cv and
   //    /portfolio.pdf redirects, which run before this) pass straight through.
   if (PORTFOLIO_HOSTS.has(host)) {
+    if (PORTFOLIO_META.test(pathname)) return NextResponse.next();
     if (PORTFOLIO_PATHS.has(pathname.replace(/(.)\/$/, "$1")) || /\.[^/]+$/.test(pathname)) return subdomain(request, "portfolio");
     return NextResponse.redirect(`https://www.finbar.studio${pathname}${request.nextUrl.search}`, 308);
   }

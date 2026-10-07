@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import PfMedia from "@/components/portfolio/PfMedia";
 import PfCars from "@/components/portfolio/PfCars";
 import PfBooklet from "@/components/portfolio/PfBooklet";
@@ -15,29 +14,6 @@ import "./portfolio.css";
  * and clip loads when the page opens, each with its own thin progress bar
  * (components/portfolio/PfMedia.tsx).
  */
-
-// Served at portfolio.finbar.studio (proxy.ts rewrites that host to this route).
-const PORTFOLIO_URL = "https://portfolio.finbar.studio";
-const PORTFOLIO_DESC = "Selected works by Finbar Skitini, graphic and digital designer in London.";
-
-export const metadata: Metadata = {
-  metadataBase: new URL(PORTFOLIO_URL),
-  title: { absolute: "Finbar Skitini, Portfolio" },
-  description: PORTFOLIO_DESC,
-  alternates: { canonical: PORTFOLIO_URL },
-  // what a shared link shows; the card image is the studio's
-  openGraph: {
-    title: "Finbar Skitini, Portfolio",
-    description: PORTFOLIO_DESC,
-    url: PORTFOLIO_URL,
-    siteName: "Finbar Skitini",
-    locale: "en_GB",
-    type: "website",
-    images: [{ url: "https://www.finbar.studio/opengraph-image", width: 1200, height: 630, alt: "Finbar Studio. London web and graphic design." }],
-  },
-  // Shared by direct link only: kept out of search, and not linked from the site.
-  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false, noimageindex: true } },
-};
 
 type Chapter = { no: string; name: string; sub: string; year: string; id: string };
 const pad2 = (n: number) => String(n).padStart(2, "0");
