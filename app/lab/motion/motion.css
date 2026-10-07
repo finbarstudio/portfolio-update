@@ -225,6 +225,18 @@
   outline: 2px solid #6aa8ff;
   outline-offset: 1px;
 }
+.mp-home {
+  display: block;
+  margin-top: 14px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--mp-dim);
+  text-decoration: none;
+}
+.mp-home:hover {
+  color: var(--mp-text);
+  text-decoration: underline;
+}
 /* The same link, floating in the bottom right corner of the preview area, clear of the canvas. It is not part of the canvas, so it never appears in an export. */
 .mp-stage {
   position: relative;

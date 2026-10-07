@@ -13,7 +13,6 @@ import {
   HAS_FOCUS,
   HAS_RADIUS,
   MOTION_KEYS,
-  MOTION_RANGES,
   PRESETS,
   adjustmentFor,
   applyAdjustments,
@@ -23,6 +22,7 @@ import {
   pathGrid,
   parseSetup,
   presetOptions,
+  rangeFor,
   ratioPart,
   type Adjustments,
   type Bezier,
@@ -642,7 +642,7 @@ export default function MotionTool() {
     "offsetY",
   ];
   const slider = (key: MotionKey) => {
-    return <Slider key={key} {...MOTION_RANGES[key]} value={motion[key]} onChange={(value) => setMotion(key, value)} />;
+    return <Slider key={key} {...rangeFor(preset, key)} value={motion[key]} onChange={(value) => setMotion(key, value)} />;
   };
   const stepped = ALWAYS_STEPPED.has(layout) || motion.rhythm > 0;
   const tuned = Object.keys(adjustments).length > 0 || Object.keys(chosen).length > 0 || easing !== BASE_EASING;
@@ -704,6 +704,9 @@ export default function MotionTool() {
         ))}
         <a className="mp-pint" href={PINT_URL} target="_blank" rel="noopener noreferrer">
           Buy me a pint
+        </a>
+        <a className="mp-home" href="/">
+          lab.finbar.studio
         </a>
       </nav>
 

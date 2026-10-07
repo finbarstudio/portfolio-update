@@ -787,6 +787,48 @@ export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max:
 };
 export const MOTION_KEYS = Object.keys(MOTION_RANGES) as MotionKey[];
 
+type Range = { label: string; min: number; max: number; step: number };
+
+/** The most cards each layout can sensibly show. Past this a slider is all dead travel. */
+const COUNT_MAX: Record<LayoutName, number> = {
+  zoom: 12,
+  flip: 12,
+  pulse: 12,
+  deck: 12,
+  fan: 15,
+  slide: 20,
+  cover: 20,
+  stairs: 20,
+  wave: 24,
+  proximity: 16,
+  ring: 30,
+  wheel: 30,
+  orbit: 24,
+  helix: 36,
+  tunnel: 36,
+  float: 48,
+  tour: 36,
+  marquee: 64,
+  grid: 64,
+  globe: 120,
+};
+
+/**
+ * A slider's range for one preset. The wide limits in MOTION_RANGES only suit
+ * the fields of tiny cards; everything else gets a range it can use end to end.
+ */
+export function rangeFor(preset: Preset, key: MotionKey): Range {
+  const base = MOTION_RANGES[key];
+  const field = preset.layout === "proximity" && Boolean(preset.variant.field);
+  if (key === "count") return { ...base, max: field ? base.max : COUNT_MAX[preset.layout], min: field ? 16 : base.min };
+  // Layouts built from many small cards get a size slider scaled to small cards.
+  const smallCards = preset.layout === "globe" || (preset.layout === "wheel" && Boolean(preset.variant.full));
+  if (key === "size") return field ? { ...base, max: 0.5 } : smallCards ? { ...base, min: 0.08, max: 0.8 } : { ...base, min: 0.2 };
+  if (key === "scale") return field ? base : { ...base, max: 3 };
+  if (key === "reach") return field ? base : { ...base, max: 4 };
+  return base;
+}
+
 /**
  * These carry between presets as a proportion ("a third bigger than this
  * preset's own size"); the rest carry as an offset.
@@ -827,7 +869,7 @@ function naturalDuration(preset: Preset): number {
         return n * 2.6;
     }
   })();
-  return clamp(Math.round(seconds), MOTION_RANGES.duration.min, MOTION_RANGES.duration.max);
+  return clamp(Math.round(seconds), 3, 120);
 }
 
 export const presetMotion = (preset: Preset): Motion => ({ ...BASE_MOTION, duration: naturalDuration(preset), ...preset.defaults });
@@ -845,7 +887,7 @@ export function applyAdjustments(preset: Preset, adjustments: Adjustments): Moti
   for (const key of MOTION_KEYS) {
     const change = adjustments[key];
     if (change === undefined) continue;
-    const { min, max, step } = MOTION_RANGES[key];
+    const { min, max, step } = rangeFor(preset, key);
     const raw = PROPORTIONAL.has(key) ? motion[key] * change : motion[key] + change;
     motion[key] = clamp(step >= 1 ? Math.round(raw) : raw, min, max);
   }
@@ -1022,7 +1064,7 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   for (const key of MOTION_KEYS) {
     const value = finite(savedMotion[key]);
     if (value === undefined) continue;
-    const { min, max, step } = MOTION_RANGES[key];
+    const { min, max, step } = rangeFor(found, key);
     motion[key] = clamp(step >= 1 ? Math.round(value) : value, min, max);
   }
 
