@@ -42,7 +42,7 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  */
 
 /** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
-const VERSION = "1.4";
+const VERSION = "1.5";
 
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 
@@ -611,7 +611,11 @@ export default function EmailCheck() {
   const stats = getStats(output);
   const transactional = transactionalChoice ?? looksTransactional(output);
   const findings = checkEmail(output, { transactional });
-  const bulkFixes = [...new Set(findings.map((f) => f.fix).filter((id): id is FixId => !!id && FIXES[id].bulk))];
+  // Fix all leaves out anything marked unverified (common practice with no source behind it).
+  // Those keep their own Fix button, so adding one is always a deliberate choice.
+  const bulkFixes = [...new Set(findings.filter((f) => f.basis !== "practice").map((f) => f.fix).filter((id): id is FixId => !!id && FIXES[id].bulk))];
+  const unverifiedFixes = new Set(findings.filter((f) => f.basis === "practice" && f.fix && FIXES[f.fix].bulk && !bulkFixes.includes(f.fix)).map((f) => f.fix)).size;
+  const minified = fixes.includes("minify");
   const features = data ? matchFeatures(output, data) : [];
   const clientFixes = [...new Set(features.map((f) => f.fix).filter((id): id is FixId => !!id))];
 
@@ -733,6 +737,14 @@ export default function EmailCheck() {
               <span className="ec-dim" title="Size of the output. Gmail clips a message at about 102KB.">
                 {kb(stats.bytes)}
               </span>
+              <button
+                type="button"
+                aria-pressed={minified}
+                onClick={() => (minified ? undoFix("minify") : addFixes(["minify"]))}
+                title="Removes indentation and blank lines from the output to make the file smaller. Nothing else changes, and it looks the same in every mail client. Press again to put the layout back."
+              >
+                {minified ? "Minified" : "Minify"}
+              </button>
               <button type="button" onClick={() => void onCopy()} title="Copies the output, with every applied fix, to the clipboard">
                 {copied ? "Copied" : "Copy"}
               </button>
@@ -847,7 +859,13 @@ export default function EmailCheck() {
           <div aria-live="polite">
             <div className="ec-sticky">
               <div className="ec-row">
-                <button type="button" className="ec-primary" onClick={() => addFixes(bulkFixes)} disabled={bulkFixes.length === 0}>
+                <button
+                  type="button"
+                  className="ec-primary"
+                  onClick={() => addFixes(bulkFixes)}
+                  disabled={bulkFixes.length === 0}
+                  title={`Applies every fix that has a source or can be seen in the file. Unverified ones are left alone${unverifiedFixes ? ` (${unverifiedFixes} here, each with its own Fix button)` : ""}.`}
+                >
                   {bulkFixes.length ? `Fix all (${bulkFixes.length})` : "Nothing left to fix"}
                 </button>
                 <button type="button" onClick={() => undoFix(fixes[fixes.length - 1])} disabled={fixes.length === 0}>
