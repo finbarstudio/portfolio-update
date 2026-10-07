@@ -150,7 +150,7 @@ const RAW: Slide[] = [
   { kind: "cv" },
   { kind: "index" },
 
-  /* ── Lola Audio ────────────────────────────────────────────── */
+  /* ── Lows Design and Build ──────────────────────────────────── */
   { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
   {
     kind: "text",
@@ -171,7 +171,7 @@ const RAW: Slide[] = [
     by: "Samuel Low",
   },
 
-  /* ── Rennen Plus ───────────────────────────────────────────── */
+  /* ── Lola Audio ─────────────────────────────────────────────── */
   { kind: "title", id: "lola", name: "Lola Audio", category: "Logo and Website", year: "2026" },
   {
     kind: "text",
@@ -184,7 +184,7 @@ const RAW: Slide[] = [
   one("lola-audio/site-scroll-3d.mp4"),
   one("lola-audio/watch.mp4"),
 
-  /* ── Lows Design and Build ─────────────────────────────────── */
+  /* ── Rennen Plus ────────────────────────────────────────────── */
   { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
   {
     kind: "text",
@@ -284,21 +284,6 @@ const RAW: Slide[] = [
   row(["london-home-show/flags.webp", "london-home-show/booklets.webp"]),
   one("london-home-show/stage.webp"),
 
-  /* ── KinAya ────────────────────────────────────────────────── */
-  { kind: "title", id: "kinaya", name: "KinAya", category: "Brand and Website", year: "2024" },
-  {
-    kind: "text",
-    name: "KinAya",
-    category: "Brand and Website",
-    body:
-      "KinAya supports people with disabilities in Adelaide. I took the client’s sketch through to a finished mark, built a colour system with a full tint range and a guidelines document, then designed a six-page site with a text resizer for carers and people with low vision.",
-    meta: [ME, { label: "Year", value: "2024" }, { label: "Live", value: "kinaya.com.au", href: "https://kinaya.com.au" }],
-  },
-  { kind: "logo", src: `/media/images/kinaya/final-logos/logo-pink.svg`, alt: "KinAya logo", bg: "#fff", size: "40cqw" },
-  row(["kinaya/logo-development/asset-30.webp", "kinaya/logo-development/asset-32.webp", "kinaya/logo-development/asset-35.webp", "kinaya/logo-development/asset-38.webp"], "From the client’s sketch to the final mark", { frame: false }),
-  row(["web/kinaya-3.webp", "web/kinaya-4.webp"], "The values and team pages"),
-  one("kinaya/accessibility.webm", "The text resizer, for carers and people with low vision"),
-
   /* ── Plated with Issy ──────────────────────────────────────── */
   { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
   {
@@ -312,20 +297,6 @@ const RAW: Slide[] = [
   { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
   one("plated-with-issy/site-scroll-3d.mp4"),
   row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
-
-  /* ── Palms Motel ───────────────────────────────────────────── */
-  { kind: "title", id: "palms", name: "Palms Motel", category: "Art Direction and AI", year: "2024" },
-  {
-    kind: "text",
-    name: "Palms Motel",
-    category: "Art Direction and AI",
-    body:
-      "Palms Motel is a personal project: a 1970s Palm Springs motel that never existed, told through AI imagery on TikTok. I built one Midjourney prompt system from reference photography so every image holds the same light and the same world. 48 posts, 109k likes, and one post seen 770k times.",
-    meta: [ME, { label: "Year", value: "2024" }],
-  },
-  one("palmsmotel/scene-1.webp"),
-  row(["palmsmotel/poster-2.webp", "palmsmotel/poster-1.webp", "palmsmotel/poster-3.webp", "palmsmotel/poster-4.webp"]),
-  one("palmsmotel/scene-3.webp"),
 
   /* ── TasWater ──────────────────────────────────────────────── */
   { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
