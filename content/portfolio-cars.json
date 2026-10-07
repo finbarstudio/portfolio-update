@@ -1,6 +1,6 @@
 {
- "spriteCols": 15,
- "spriteRows": 16,
+ "spriteCols": 12,
+ "spriteRows": 19,
  "cars": [
   {
    "slug": "718-boxster-gts-4-0",
@@ -393,10 +393,6 @@
   {
    "slug": "bmw-m2-f87",
    "name": "BMW M2 F87"
-  },
-  {
-   "slug": "bmw-m2-g87",
-   "name": "BMW M2 G87"
   },
   {
    "slug": "bmw-m235i-m240i-f22",

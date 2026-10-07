@@ -125,19 +125,6 @@ const RAW: Slide[] = [
   { kind: "index" },
 
   /* ── Lola Audio ────────────────────────────────────────────── */
-  { kind: "title", id: "lola", name: "Lola Audio", category: "Logo and Website", year: "2026" },
-  {
-    kind: "text",
-    name: "Lola Audio",
-    category: "Logo and Website",
-    body:
-      "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }],
-  },
-  one("lola-audio/site-scroll-3d.mp4"),
-  one("lola-audio/watch.mp4"),
-
-  /* ── Lows Design and Build ─────────────────────────────────── */
   { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
   {
     kind: "text",
@@ -159,6 +146,19 @@ const RAW: Slide[] = [
   },
 
   /* ── Rennen Plus ───────────────────────────────────────────── */
+  { kind: "title", id: "lola", name: "Lola Audio", category: "Logo and Website", year: "2026" },
+  {
+    kind: "text",
+    name: "Lola Audio",
+    category: "Logo and Website",
+    body:
+      "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
+    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }],
+  },
+  one("lola-audio/site-scroll-3d.mp4"),
+  one("lola-audio/watch.mp4"),
+
+  /* ── Lows Design and Build ─────────────────────────────────── */
   { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
   {
     kind: "text",
