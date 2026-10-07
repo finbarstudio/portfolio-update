@@ -14,7 +14,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
-import { PAGE_H, PAGE_W, usePage } from "./Book";
+import { PAGE_H, PAGE_W, PageUploads, usePage } from "./Book";
 
 const GAP_X = 0.3;
 const GAP_Y = 0.32;
@@ -29,21 +29,35 @@ const pageGeo = new THREE.PlaneGeometry(PAGE_W, PAGE_H);
   for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - uv.getY(i));
 }
 
+// the mark on a picked-out spread: a five-pointed star, in the brand pink
+const starGeo = (() => {
+  const s = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? 0.045 : 0.11;
+    const a = Math.PI / 2 + (i * Math.PI) / 5;
+    if (i) s.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    else s.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  return new THREE.ShapeGeometry(s);
+})();
+const STAR = "#e96d89";
+
 /** Reader's spreads: the cover alone, then pairs, then the back alone. */
-function toSpreads(count: number): number[][] {
+export function toSpreads(count: number): number[][] {
   const out: number[][] = [[0]];
   for (let i = 1; i < count; i += 2) out.push(i + 1 < count ? [i, i + 1] : [i]);
   return out;
 }
 
 function Page({ thumb, full, close, x }: { thumb: string; full: string; close: boolean; x: number }) {
-  const small = usePage(thumb, true, true);
-  const large = usePage(full, close, true);
+  const small = usePage(thumb, true, true, false);
+  const large = usePage(full, close, true, false);
   const map = large ?? small;
   return (
     <mesh geometry={pageGeo} position={[x, 0, 0]}>
       {/* keyed: a material must be rebuilt when it gains its image */}
-      <meshBasicMaterial key={map ? "image" : "paper"} map={map ?? undefined} color={map ? "#ffffff" : "#2a2724"} toneMapped={false} />
+      {/* a blank leaf (no file) is paper; a page still loading is dark, like the ground */}
+      <meshBasicMaterial key={map ? "image" : "paper"} map={map ?? undefined} color={map ? "#ffffff" : thumb ? "#2a2724" : "#f4f1ea"} toneMapped={false} />
     </mesh>
   );
 }
@@ -54,6 +68,7 @@ function Spread({
   fulls,
   position,
   active,
+  starred,
   onPick,
 }: {
   pages: number[];
@@ -61,6 +76,8 @@ function Spread({
   fulls: string[];
   position: [number, number, number];
   active: boolean;
+  /** one of the spreads picked out as a highlight */
+  starred: boolean;
   onPick: () => void;
 }) {
   const ref = useRef<THREE.Group>(null);
@@ -101,6 +118,12 @@ function Spread({
         {pages.map((p, k) => (
           <Page key={p} thumb={thumbs[p]} full={fulls[p]} close={active} x={pages.length === 1 ? 0 : (k - 0.5) * PAGE_W} />
         ))}
+        {/* sits in the gap above the spread's top left corner, clear of the page */}
+        {starred ? (
+          <mesh geometry={starGeo} position={[-(pages.length * PAGE_W) / 2 + 0.11, PAGE_H / 2 + 0.15, 0.01]}>
+            <meshBasicMaterial color={STAR} toneMapped={false} />
+          </mesh>
+        ) : null}
       </group>
     </group>
   );
@@ -109,19 +132,24 @@ function Spread({
 export default function SpreadWall({
   thumbs,
   fulls,
-  onWhere,
+  stars = [],
+  picked,
+  onPick,
 }: {
   /** a small copy of every page, in reading order */
   thumbs: string[];
   /** the full files, for the spread brought up close */
   fulls: string[];
-  /** told which pages are up close (their numbers, from 1), or null for the whole wall */
-  onWhere?: (pages: number[] | null) => void;
+  /** page numbers (from 1) to pick out: the spread each is on gets a star */
+  stars?: number[];
+  /** the spread up close, or null for the whole wall; the parent owns it so its Close button can clear it */
+  picked: number | null;
+  onPick: (spread: number | null) => void;
 }) {
   const { viewport } = useThree();
   const wall = useRef<THREE.Group>(null);
   const placed = useRef(false);
-  const [picked, setPicked] = useState<number | null>(null);
+  const setPicked = onPick;
 
   const spreads = useMemo(() => toSpreads(thumbs.length), [thumbs.length]);
   const cols = viewport.width / viewport.height > 1.1 ? 8 : 4;
@@ -138,10 +166,6 @@ export default function SpreadWall({
   );
 
   useEffect(() => {
-    onWhere?.(picked === null ? null : spreads[picked].map((n) => n + 1));
-  }, [picked, spreads, onWhere]);
-
-  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (picked === null) return;
       if (e.key === "Escape") setPicked(null);
@@ -150,7 +174,7 @@ export default function SpreadWall({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [picked, spreads.length]);
+  }, [picked, spreads.length, setPicked]);
 
   useFrame((state, dt) => {
     const g = wall.current;
@@ -185,6 +209,7 @@ export default function SpreadWall({
 
   return (
     <group ref={wall} onPointerMissed={() => setPicked(null)}>
+      <PageUploads />
       {spreads.map((pages, i) => (
         <Spread
           key={i}
@@ -193,6 +218,7 @@ export default function SpreadWall({
           fulls={fulls}
           position={cells[i]}
           active={picked === i}
+          starred={pages.some((n) => stars.includes(n + 1))}
           onPick={() => setPicked(picked === i ? null : i)}
         />
       ))}

@@ -1,25 +1,44 @@
 "use client";
 
 /**
- * A printed booklet on /portfolio that can be picked up and read: a 3D
- * magazine whose pages turn (click either side, drag a page, or use the
- * arrows), with a switch to lay it flat and square-on for reading, and a
- * third view that sets every spread out at once on a wall leaning in space
- * (components/booklet/SpreadWall.tsx): click one to bring it up close.
+ * Printed booklets on the portfolio that can be picked up and read. One or
+ * more books share the stage, with a switch between them; the first is open
+ * when the page loads.
+ *
+ * Three ways to look at a book: a 3D magazine whose pages turn (click either
+ * side, drag a page, or use the arrows), the same book laid flat and
+ * square-on for reading, and a wall of every spread leaning in space
+ * (components/booklet/SpreadWall.tsx) where a click brings one up close.
  *
  * The page turning itself is components/booklet/Book.tsx. This file is the
- * stage around it: the two poses, the controls, and not running WebGL until
- * the page is near the screen (and pausing it again once it has gone past).
+ * stage around it: the poses, the controls, and not running WebGL until the
+ * page is near the screen (and pausing it again once it has gone past).
+ *
+ * On a phone none of that runs: a small screen cannot show a readable spread
+ * and the WebGL is heavy there, so it gets a still preview of a few spreads
+ * and a line pointing to a desktop.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { corsMedia } from "@/lib/media";
+import { corsMedia, media } from "@/lib/media";
 import Book, { PAGE_H, PAGE_W } from "@/components/booklet/Book";
-import SpreadWall from "@/components/booklet/SpreadWall";
+import SpreadWall, { toSpreads } from "@/components/booklet/SpreadWall";
+
+export interface BookletBook {
+  /** shown on the switch between books */
+  name: string;
+  /** every page in reading order, front cover first */
+  pages: string[];
+  /** the same pages, small, for the spreads view and the phone preview */
+  thumbs: string[];
+  /** page numbers (from 1) whose spreads are starred in the spreads view */
+  stars?: number[];
+}
 
 type View = "magazine" | "flat" | "spreads";
+type Pose = Exclude<View, "spreads">;
 
 const POSE = {
   // share of the box the open book may take, its lean, and how much it follows the pointer
@@ -34,7 +53,7 @@ function Stage({
   onReady,
 }: {
   pages: string[];
-  view: Exclude<View, "spreads">;
+  view: Pose;
   pRef: React.MutableRefObject<number>;
   onReady: () => void;
 }) {
@@ -72,29 +91,68 @@ function Stage({
   );
 }
 
-export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a small copy of every page, for the spreads view */ thumbs: string[] }) {
-  const sheets = Math.ceil(pages.length / 2);
-  const urls = useMemo(() => pages.map((p) => corsMedia(p)), [pages]);
+/** The phone's still preview: the cover and three inside spreads (the starred ones first, then an even spread through the book). */
+function PhonePreview({ book }: { book: BookletBook }) {
+  const spreads = toSpreads(book.pages.length);
+  const inside = spreads.slice(1, -1);
+  const pick = inside.filter((pp) => pp.some((n) => book.stars?.includes(n + 1)));
+  for (let k = 1; pick.length < 3 && k <= 3; k++) {
+    const pp = inside[Math.floor((inside.length * k) / 4)];
+    if (pp && !pick.includes(pp)) pick.push(pp);
+  }
+  const starred = pick.slice(0, 3).sort((a, b) => a[0] - b[0]);
+  return (
+    <div className="pf-booklet-phone">
+      <div className="pf-booklet-phone-spreads">
+        {[spreads[0], ...starred].map((pp) => (
+          <div key={pp[0]} className={pp.length === 1 ? "is-single" : undefined}>
+            {pp.map((n) =>
+              book.thumbs[n] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={n} src={media(book.thumbs[n])} alt="" width={420} height={594} loading="lazy" decoding="async" />
+              ) : (
+                <span key={n} className="is-blank" />
+              ),
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="pf-soft">
+        A few spreads from the {book.pages.filter(Boolean).length} pages. On a desktop the whole book can be picked up and read, page by page.
+      </p>
+    </div>
+  );
+}
+
+export default function PfBooklet({ books }: { books: BookletBook[] }) {
+  const [which, setWhich] = useState(0);
+  const book = books[which];
+  const sheets = Math.ceil(book.pages.length / 2);
+  const urls = useMemo(() => book.pages.map((p) => corsMedia(media(p))), [book.pages]);
+  const smalls = useMemo(() => book.thumbs.map((p) => corsMedia(media(p))), [book.thumbs]);
 
   const [view, setView] = useState<View>("magazine");
   // the book keeps the pose it last had while the spreads are up
-  const [pose, setPose] = useState<Exclude<View, "spreads">>("magazine");
-  const show = (v: View) => {
-    setView(v);
-    if (v !== "spreads") setPose(v);
-    else setPlaying(false);
-  };
-  const smalls = useMemo(() => thumbs.map((p) => corsMedia(p)), [thumbs]);
-  const [close, setClose] = useState<number[] | null>(null); // the pages up close on the wall
+  const [pose, setPose] = useState<Pose>("magazine");
+  const [picked, setPicked] = useState<number | null>(null); // the spread up close on the wall
   const [sheet, setSheet] = useState(0);
   const [near, setNear] = useState(false); // close enough to start loading
   const [seen, setSeen] = useState(false); // on screen: keep drawing
+  const [phone, setPhone] = useState(false);
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const pRef = useRef(0);
   const wake = useRef<() => void>(() => {}); // asks the canvas for a frame
   const drag = useRef<{ x: number; from: number } | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 760px)");
+    const set = () => setPhone(mq.matches);
+    set();
+    mq.addEventListener("change", set);
+    return () => mq.removeEventListener("change", set);
+  }, []);
 
   useEffect(() => {
     const el = box.current;
@@ -107,16 +165,32 @@ export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a sm
       load.disconnect();
       draw.disconnect();
     };
-  }, []);
+  }, [phone]);
 
-  // a change of view, or coming back on screen, needs a frame to start from
-  useEffect(() => wake.current(), [view, seen]);
+  // a change of view or book, or coming back on screen, needs a frame to start from
+  useEffect(() => wake.current(), [view, seen, which]);
 
   const go = (to: number) => {
     const next = Math.min(sheets, Math.max(0, to));
     pRef.current = next;
     wake.current();
     setSheet(next);
+  };
+
+  const show = (v: View) => {
+    setView(v);
+    if (v !== "spreads") setPose(v);
+    else setPlaying(false);
+  };
+
+  // another book: back to its cover, in the same view
+  const open = (i: number) => {
+    if (i === which) return;
+    setWhich(i);
+    setReady(false);
+    setPlaying(false);
+    setPicked(null);
+    go(0);
   };
 
   // play: turn a page every couple of seconds, and stop at the back cover
@@ -175,7 +249,10 @@ export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a sm
   };
 
   const where =
-    sheet <= 0 ? "Cover" : sheet >= sheets ? `Page ${pages.length}` : `Pages ${sheet * 2} to ${sheet * 2 + 1}`;
+    sheet <= 0 ? "Cover" : sheet >= sheets ? "Back cover" : `Pages ${sheet * 2} to ${sheet * 2 + 1}`;
+  const close = picked === null ? null : toSpreads(book.pages.length)[picked].map((n) => n + 1);
+
+  if (phone) return <PhonePreview book={book} />;
 
   return (
     <>
@@ -204,59 +281,78 @@ export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a sm
             <directionalLight position={[-2.5, 3, 6]} intensity={1.5} />
             {/* the book stays loaded behind the wall, just not drawn */}
             <group visible={view !== "spreads"}>
-              <Stage pages={urls} view={pose} pRef={pRef} onReady={() => setReady(true)} />
+              <Stage key={book.name} pages={urls} view={pose} pRef={pRef} onReady={() => setReady(true)} />
             </group>
-            {view === "spreads" ? <SpreadWall thumbs={smalls} fulls={urls} onWhere={setClose} /> : null}
+            {view === "spreads" ? (
+              <SpreadWall key={book.name} thumbs={smalls} fulls={urls} stars={book.stars} picked={picked} onPick={setPicked} />
+            ) : null}
           </Canvas>
         ) : null}
         {ready || view === "spreads" ? null : <p className="pf-booklet-wait pf-mono pf-soft">Loading booklet</p>}
       </div>
 
+      {/* the ways to look at the book, stacked down the right-hand edge */}
+      <div className="pf-booklet-views pf-mono">
+        <button type="button" aria-pressed={view === "magazine"} onClick={() => show("magazine")}>
+          Magazine
+        </button>
+        <button type="button" aria-pressed={view === "flat"} onClick={() => show("flat")}>
+          Flat lay
+        </button>
+        <button type="button" aria-pressed={view === "spreads"} onClick={() => show("spreads")}>
+          Spreads
+        </button>
+        {close ? (
+          <button type="button" className="pf-booklet-close" onClick={() => setPicked(null)}>
+            Close
+          </button>
+        ) : null}
+      </div>
+
       <div className="pf-booklet-ui pf-mono">
         <div className="pf-booklet-set">
-          <button type="button" aria-pressed={view === "magazine"} onClick={() => show("magazine")}>
-            Magazine
-          </button>
-          <button type="button" aria-pressed={view === "flat"} onClick={() => show("flat")}>
-            Flat lay
-          </button>
-          <button type="button" aria-pressed={view === "spreads"} onClick={() => show("spreads")}>
-            Spreads
-          </button>
+          {books.length > 1
+            ? books.map((b, i) => (
+                <button key={b.name} type="button" aria-pressed={i === which} onClick={() => open(i)}>
+                  {b.name}
+                </button>
+              ))
+            : null}
         </div>
         {view === "spreads" ? (
           <span className="pf-booklet-where pf-soft" aria-live="polite">
             {close ? (close.length === 1 ? `Page ${close[0]}` : `Pages ${close[0]} to ${close[1]}`) : "Click a spread"}
           </span>
-        ) : null}
-        <div className="pf-booklet-set" hidden={view === "spreads"}>
-          <button type="button" aria-pressed={playing} onClick={play}>
-            {playing ? "Pause" : "Play"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setPlaying(false);
-              go(sheet - 1);
-            }}
-            disabled={sheet <= 0}
-            aria-label="Previous pages"
-          >
-            ←
-          </button>
-          <span className="pf-booklet-where" aria-live="polite">{where}</span>
-          <button
-            type="button"
-            onClick={() => {
-              setPlaying(false);
-              go(sheet + 1);
-            }}
-            disabled={sheet >= sheets}
-            aria-label="Next pages"
-          >
-            →
-          </button>
-        </div>
+        ) : (
+          <div className="pf-booklet-set">
+            <button type="button" aria-pressed={playing} onClick={play}>
+              {playing ? "Pause" : "Play"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPlaying(false);
+                go(sheet - 1);
+              }}
+              disabled={sheet <= 0}
+              aria-label="Previous pages"
+            >
+              ←
+            </button>
+            <span className="pf-booklet-where" aria-live="polite">{where}</span>
+            <button
+              type="button"
+              onClick={() => {
+                setPlaying(false);
+                go(sheet + 1);
+              }}
+              disabled={sheet >= sheets}
+              aria-label="Next pages"
+            >
+              →
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

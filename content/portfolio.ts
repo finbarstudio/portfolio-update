@@ -50,7 +50,7 @@ export type Slide =
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
   | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean }
-  | { kind: "booklet"; /** every page in reading order, front cover first */ pages: string[]; /** the same pages, small, for the view that shows every spread at once */ thumbs: string[]; caption?: string }
+  | { kind: "booklet"; /** the books on the stage, the first open by default: name, every page in reading order (front cover first), the same pages small, and page numbers to star in the spreads view */ books: { name: string; pages: string[]; thumbs: string[]; stars?: number[] }[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
   | { kind: "end" };
@@ -109,6 +109,25 @@ const bleed = (path: string): Slide => ({ kind: "media", items: [m(path)], bleed
 /** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption and a link out. */
 const linked = (path: string, caption: string, link: { label: string; href: string }): Slide => ({ kind: "media", items: [m(path, { frame: false })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
+
+/**
+ * A whole playbook for the booklet stage: its pages are page-01.webp … under
+ * public/media/images/portfolio/salesmasters/<slug>/, with small copies in
+ * thumbs/. An odd page count means the back cover was exported facing the
+ * last inside page; a blank leaf ("") goes in before it so the book still
+ * closes on its back cover. Stars are page numbers in the FILES, from 1.
+ */
+const book = (name: string, slug: string, count: number, stars?: number[]) => {
+  const file = (i: number) => `page-${String(i + 1).padStart(2, "0")}.webp`;
+  const order = Array.from({ length: count }, (_, i) => i);
+  if (count % 2) order.splice(count - 1, 0, -1);
+  return {
+    name,
+    pages: order.map((i) => (i < 0 ? "" : `/media/images/portfolio/salesmasters/${slug}/${file(i)}`)),
+    thumbs: order.map((i) => (i < 0 ? "" : `/media/images/portfolio/salesmasters/${slug}/thumbs/${file(i)}`)),
+    stars: stars?.map((n) => (n > count - 1 && count % 2 ? n + 1 : n)),
+  };
+};
 
 /** A grid page. Each tile is [path, column, row, columns spanned, rows spanned], 1-based. */
 const grid = (cols: number, rows: number, tiles: [string, number, number, number, number][], caption?: string): Slide => ({
@@ -189,9 +208,11 @@ const RAW: Slide[] = [
   row(["salesmasters/graphics/active-medical/wheel.webp", "salesmasters/graphics/bus4x4/wheel.webp", "salesmasters/graphics/cutek/wheel.webp", "salesmasters/graphics/site-ware-direct/wheel.webp"], "The Sales Wheel, drawn fresh for each client", { frame: false }),
   {
     kind: "booklet",
-    pages: Array.from({ length: 62 }, (_, i) => `/media/images/portfolio/salesmasters/bus4x4/page-${String(i + 1).padStart(2, "0")}.webp`),
-    thumbs: Array.from({ length: 62 }, (_, i) => `/media/images/portfolio/salesmasters/bus4x4/thumbs/page-${String(i + 1).padStart(2, "0")}.webp`),
-    caption: "The Bus4x4 edition, all 62 pages. Click or drag a page to turn it",
+    books: [
+      book("Site Ware Direct", "site-ware-direct", 67, [1, 67]),
+      book("Bus4x4", "bus4x4", 62, [1, 5, 6, 8, 32, 40, 62]),
+    ],
+    caption: "Two editions, every page. Click or drag a page to turn it",
   },
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
