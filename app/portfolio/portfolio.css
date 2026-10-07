@@ -237,15 +237,23 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-item :is(img, video)[data-in="1"] { opacity: 1; }
 
-/* the car sheet: the car under the pointer comes up large in the middle */
-.pf-cars { position: absolute; inset: 0; display: grid; place-items: center; cursor: crosshair; touch-action: pan-y; }
-.pf-item:has(.pf-cars) > img { transition: opacity 0.25s ease; }
-.pf-item:has(.pf-cars[data-on="1"]) > img[data-in="1"] { opacity: 0.16; }
-.pf-cars figure { width: 52%; margin: 0; pointer-events: none; animation: pf-car-in 0.18s ease both; }
-.pf-cars figure img { width: 100%; height: auto; opacity: 1; object-fit: contain; }
-.pf-cars figcaption { margin-top: 0.4em; text-align: center; color: var(--soft); }
-@keyframes pf-car-in { from { opacity: 0; transform: scale(0.96); } }
-@media (prefers-reduced-motion: reduce) { .pf-cars figure { animation: none; } }
+/* the car grid: 15 by 17 cells; the car under the pointer grows to 5 by 5 in
+   place and the rest shuffle along (positions are set inline by PfCars) */
+.pf-cars { position: absolute; inset: 5% 4%; cursor: crosshair; touch-action: pan-y; }
+.pf-car {
+  position: absolute; left: 0; top: 0;
+  width: calc(100% / 15); height: calc(100% / 17);
+  display: grid; place-items: center;
+  transform-origin: 0 0;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+.pf-car[data-big="1"] { z-index: 1; }
+.pf-car-art { position: relative; width: 90%; aspect-ratio: 2.5; background-repeat: no-repeat; }
+.pf-car-art img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 1; }
+.pf-car-name { position: absolute; margin: 0; transform: translate(-50%, -190%); white-space: nowrap; color: var(--soft); pointer-events: none; animation: pf-car-in 0.3s 0.2s ease both; }
+@keyframes pf-car-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pf-car { transition: none; } .pf-car-name { animation: none; } }
 
 /* the loader: a percentage over a hairline, bottom left of the frame */
 .pf-load {

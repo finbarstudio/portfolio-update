@@ -1,13 +1,7 @@
 {
- "cols": 14,
- "rows": 17,
- "mx": 0.0275,
- "my": 0.045,
+ "spriteCols": 15,
+ "spriteRows": 16,
  "cars": [
-  {
-   "slug": "the-pink-porsche",
-   "name": "Rennen Motorsport, The Pink Porsche, Adelaide Rally"
-  },
   {
    "slug": "718-boxster-gts-4-0",
    "name": "Porsche 718 Boxster GTS 4.0"
@@ -803,10 +797,6 @@
   {
    "slug": "maserati-coupe-4200",
    "name": "Maserati GT Coup\u00e9 / Spyder / GranSport 4200GT"
-  },
-  {
-   "slug": "maserati-ghibli-b",
-   "name": "Maserati Ghibli"
   },
   {
    "slug": "maserati-granturismo-b",

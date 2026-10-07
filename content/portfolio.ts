@@ -36,7 +36,7 @@
 import { media as mediaOne, mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car sheet: hovering a car brings it up large (PfCars) */ cars?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -168,9 +168,9 @@ const RAW: Slide[] = [
       "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
     meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }],
   },
-  one("portfolio/rennen-plus/pink-porsche.webp", "Rennen Motorsport’s car, The Pink Porsche, at the Adelaide Rally"),
+  one("portfolio/rennen-plus/pink-porsche.webp", "The brand: Rennen Motorsport’s car, The Pink Porsche, at the Adelaide Rally", { frame: false }),
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
-  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline. Hover one to see it", { frame: false, cars: true, light: `/media/images/${"portfolio/rennen-plus/cars-light.webp"}` }),
+  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline. Hover one to see it", { frame: false, cars: true }),
   linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
 
   /* ── Salesmasters ──────────────────────────────────────────── */
