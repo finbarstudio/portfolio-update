@@ -26,7 +26,7 @@ import {
   type Source,
 } from "@/lib/email-check";
 import { extractFromPreviewPage, isPreviewUrl } from "@/lib/email-extract";
-import { auditDocument, type A11yReport } from "@/lib/email-a11y";
+import { auditDocument, measureNarrow, type A11yReport, type NarrowProbe } from "@/lib/email-a11y";
 import { buildReport } from "@/lib/email-report";
 import { snapshotDocument } from "@/lib/email-snapshot";
 
@@ -342,6 +342,8 @@ export default function EmailCheck() {
   const [open, setOpen] = useState<Record<PanelName, boolean>>({ source: true, report: true, preview: true });
   const [height, setHeight] = useState<number | null>(null);
   const [a11y, setA11y] = useState<A11yReport | null>(null);
+  const [narrow, setNarrow] = useState<NarrowProbe | null>(null);
+  const probeRef = useRef<HTMLIFrameElement>(null);
   const [data, setData] = useState<CanIEmailData | null>(null);
   const [dataError, setDataError] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -378,6 +380,11 @@ export default function EmailCheck() {
   const onFrameLoad = () => {
     measure();
     for (const ms of [600, 2000, 5000]) window.setTimeout(measure, ms);
+  };
+  // A second, unseen copy at phone width with no style blocks: what a client without media queries shows.
+  const onProbeLoad = () => {
+    const doc = probeRef.current?.contentDocument;
+    if (doc?.documentElement) setNarrow(measureNarrow(doc));
   };
 
   const load = (text: string, name: string) => {
@@ -549,7 +556,7 @@ export default function EmailCheck() {
 
   const columns = [open.source ? "320px" : "44px", open.report ? "minmax(320px, 460px)" : "44px", open.preview ? "minmax(0, 1fr)" : "44px"];
   const tooTall = height !== null && height > OUTLOOK_PAGE_HEIGHT;
-  const report = buildReport({ fileName, stats, findings, a11y, features, families, data, applied, transactional, width, height });
+  const report = buildReport({ fileName, stats, findings, a11y, narrow, features, families, data, applied, transactional, width, height });
 
   return (
     <main
@@ -834,7 +841,7 @@ export default function EmailCheck() {
 
             <details className="ec-section" open>
               <summary>
-                <h2>Accessibility, as rendered</h2>
+                <h2>As rendered</h2>
                 <span className="ec-dim">{a11y ? a11y.contrast.length + a11y.targets.length + a11y.linksWithoutName.length + a11y.imagesWithoutAlt.length : ""}</span>
               </summary>
               <p className="ec-dim">
@@ -845,6 +852,44 @@ export default function EmailCheck() {
                 <p className="ec-dim">Waiting for the preview.</p>
               ) : (
                 <ul className="ec-list">
+                  {a11y.overflow > 0 && (
+                    <li className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-fail">Problem</span> Scrolls sideways at this width
+                      </p>
+                      <p>
+                        The content is {a11y.viewport + a11y.overflow}px wide in a {a11y.viewport}px view{stylesOff ? ", with style blocks off" : ""}. Something
+                        has a fixed width wider than the screen.
+                      </p>
+                    </li>
+                  )}
+                  {narrow && narrow.contentWidth > narrow.viewport + 1 && (
+                    <li className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-warn">Warning</span> Without style blocks it is {narrow.contentWidth}px wide on a {narrow.viewport}px
+                        phone
+                      </p>
+                      <p>
+                        The phone layout depends entirely on the media queries in the style block. A client that drops style blocks shows the desktop layout,
+                        which scrolls sideways or is shrunk until the text is tiny. That is the Gmail app when the account is not a Google one, Gmail in a phone
+                        browser, and any Gmail view where the style block has been thrown away for size or an error. There is no published figure for how
+                        many opens that is; it is a small share, not zero. <Sources list={NOTE_SOURCES.stylesOff} />
+                      </p>
+                      <p className="ec-dim">{narrow.offenders.map((o) => o.label).join(" · ")}</p>
+                      <Where lines={[...new Set(narrow.offenders.flatMap((o) => linesWhere(output, (l) => l.includes(o.openTag))))].sort((x, y) => x - y)} />
+                      <HowToFix
+                        text="Make the layout shrink on its own, so the media queries only improve it. Wide images: set the width in the style as a percentage with a pixel max-width (Outlook keeps using the width attribute). Side-by-side columns: build them from inline-block blocks that wrap when there is no room, with a table inside an Outlook conditional to hold them in a row there (the 'hybrid' method), instead of fixed-width cells."
+                        code={'<img src="…" width="600" style="display:block; width:100%; max-width:600px; height:auto;" alt="…">\n\n<!--[if mso]><table role="presentation" width="470"><tr><td width="230" valign="top"><![endif]-->\n<div style="display:inline-block; width:100%; max-width:230px; vertical-align:top;"> … column 1 … </div>\n<!--[if mso]></td><td width="230" valign="top"><![endif]-->\n<div style="display:inline-block; width:100%; max-width:230px; vertical-align:top;"> … column 2 … </div>\n<!--[if mso]></td></tr></table><![endif]-->'}
+                      />
+                    </li>
+                  )}
+                  {narrow && narrow.contentWidth <= narrow.viewport + 1 && (
+                    <li className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-ok">Pass</span> Still fits a {narrow.viewport}px phone with style blocks removed
+                      </p>
+                    </li>
+                  )}
                   {a11y.contrast.length === 0 && a11y.contrastUnknown === 0 && (
                     <li className="ec-item">
                       <p className="ec-item-title">
@@ -887,9 +932,12 @@ export default function EmailCheck() {
                         {href} <Sources list={NOTE_SOURCES.linkName} />
                       </p>
                       <Where
-                        lines={linesWhere(output, (l) =>
-                          [href, href.replace(/&/g, "&amp;")].some((h) => new RegExp(`<a\\b[^>]*href="${escapeRegExp(h)}"[^>]*>\\s*<img\\b`, "i").test(l)),
-                        )}
+                        lines={(() => {
+                          const forms = [href, href.replace(/&/g, "&amp;")];
+                          // The line where the link wraps an image; failing that, any line with the link.
+                          const withImage = linesWhere(output, (l) => forms.some((h) => new RegExp(`<a\\b[^>]*href="${escapeRegExp(h)}"[^>]*>\\s*<img\\b`, "i").test(l)));
+                          return withImage.length ? withImage : linesWhere(output, (l) => forms.some((h) => l.includes(`href="${h}"`)));
+                        })()}
                       />
                       <HowToFix
                         text="Say where the link goes, in the image's alt text or an aria-label. If it is an arrow beside a text link to the same place, hide the duplicate from screen readers instead."
@@ -1141,6 +1189,18 @@ export default function EmailCheck() {
           )}
           {imagesOff && <Note title="Images off" sources={NOTE_SOURCES.imagesOff}>What a reader sees before they allow images, which is Outlook&apos;s default. Alt text and background colours do the work here.</Note>}
         </div>
+        {hasSource && (
+          <iframe
+            ref={probeRef}
+            className="ec-probe"
+            title=""
+            aria-hidden="true"
+            tabIndex={-1}
+            sandbox="allow-same-origin"
+            srcDoc={previewSource(output, true, true, "off")}
+            onLoad={onProbeLoad}
+          />
+        )}
         <div className="ec-stage">
           {hasSource && (
             <iframe

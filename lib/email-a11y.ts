@@ -36,6 +36,58 @@ export interface A11yReport {
   headings: number;
   smallText: { text: string; size: number }[];
   textNodes: number;
+  /** how far the content runs past the right edge at this width; 0 when it fits */
+  overflow: number;
+  viewport: number;
+}
+
+export interface FixedWidthOffender {
+  /** what it is, in words: "image hero.png, fixed at 600px" */
+  label: string;
+  /** the opening tag as written, to find its line in the source */
+  openTag: string;
+}
+
+export interface NarrowProbe {
+  viewport: number;
+  /** the width the email actually takes */
+  contentWidth: number;
+  offenders: FixedWidthOffender[];
+}
+
+const MAX_OFFENDERS = 8;
+
+function openTag(el: Element): string {
+  const html = el.outerHTML;
+  return html.slice(0, html.indexOf(">") + 1);
+}
+
+/**
+ * For a document laid out at phone width with its style blocks removed (what
+ * a client without media-query support shows): how wide the email really is,
+ * and which fixed-width images and rows of fixed-width cells hold it open.
+ */
+export function measureNarrow(doc: Document): NarrowProbe {
+  const root = doc.documentElement;
+  const viewport = root.clientWidth;
+  const probe: NarrowProbe = { viewport, contentWidth: Math.max(root.scrollWidth, doc.body?.scrollWidth ?? 0), offenders: [] };
+  if (probe.contentWidth <= viewport + 1) return probe;
+
+  for (const img of doc.querySelectorAll("img")) {
+    const w = Math.round(img.getBoundingClientRect().width);
+    if (w > viewport) probe.offenders.push({ label: `image ${(img.getAttribute("src") ?? "").split("/").pop()?.slice(0, 24) ?? ""}, fixed at ${w}px`, openTag: openTag(img) });
+  }
+  for (const row of doc.querySelectorAll("tr")) {
+    const cells = [...row.children].filter((c) => c.tagName === "TD" || c.tagName === "TH");
+    // Only pixel widths count; a percentage shrinks with the screen.
+    const fixed = cells.filter((c) => /^\d+$/.test(c.getAttribute("width") ?? ""));
+    const total = fixed.reduce((n, c) => n + Number(c.getAttribute("width")), 0);
+    if (fixed.length > 1 && total > viewport) {
+      probe.offenders.push({ label: `row of fixed-width cells: ${fixed.map((c) => c.getAttribute("width")).join(" + ")} = ${total}px`, openTag: openTag(fixed[0]) });
+    }
+  }
+  probe.offenders = probe.offenders.slice(0, MAX_OFFENDERS);
+  return probe;
 }
 
 const WCAG_MIN_TARGET = 24;
@@ -146,6 +198,8 @@ export function auditDocument(doc: Document): A11yReport {
     headings: doc.querySelectorAll("h1, h2, h3, h4, h5, h6, [role='heading']").length,
     smallText: [],
     textNodes: 0,
+    overflow: Math.max(0, Math.max(doc.documentElement.scrollWidth, doc.body?.scrollWidth ?? 0) - doc.documentElement.clientWidth),
+    viewport: doc.documentElement.clientWidth,
   };
   if (!view || !doc.body) return report;
 

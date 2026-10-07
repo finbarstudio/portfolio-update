@@ -3,7 +3,7 @@
  * chat with an assistant: one line per finding, no explanations (the reader
  * can ask), no HTML. A legend at the top says how to read it.
  */
-import type { A11yReport } from "@/lib/email-a11y";
+import type { A11yReport, NarrowProbe } from "@/lib/email-a11y";
 import { formatShare, type AppliedFix, type CanIEmailData, type FeatureUse, type Finding, type Stats } from "@/lib/email-check";
 
 export interface ReportInput {
@@ -11,6 +11,8 @@ export interface ReportInput {
   stats: Stats;
   findings: Finding[];
   a11y: A11yReport | null;
+  /** the email at phone width with its style blocks removed */
+  narrow: NarrowProbe | null;
   features: FeatureUse[];
   families: string[];
   data: CanIEmailData | null;
@@ -44,7 +46,7 @@ function clients(feature: FeatureUse, status: "n" | "a", families: string[], dat
 }
 
 export function buildReport(input: ReportInput): string {
-  const { stats, findings, a11y, features, families, data, applied } = input;
+  const { stats, findings, a11y, narrow, features, families, data, applied } = input;
   const out: string[] = [];
   const at = input.width ? `${input.width}px` : "full width";
 
@@ -75,7 +77,13 @@ export function buildReport(input: ReportInput): string {
   }
 
   if (a11y) {
-    out.push("", `## Accessibility as rendered (${at})`);
+    out.push("", `## As rendered (${at})`);
+    if (a11y.overflow > 0) out.push(`P | scrolls sideways: content is ${a11y.viewport + a11y.overflow}px wide in a ${a11y.viewport}px view`);
+    if (narrow && narrow.contentWidth > narrow.viewport + 1) {
+      out.push(`W | without style blocks (no media queries) the email is ${narrow.contentWidth}px wide on a ${narrow.viewport}px phone | ${narrow.offenders.map((o) => o.label).join("; ")}`);
+    } else if (narrow) {
+      out.push(`without style blocks the email still fits a ${narrow.viewport}px phone`);
+    }
     for (const c of a11y.contrast) {
       out.push(`P | contrast ${c.ratio}:1, needs ${c.required}:1 | ${c.color} on ${c.background} | "${c.text}" | passing shade ${c.suggestion}`);
     }

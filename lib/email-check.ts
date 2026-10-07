@@ -139,6 +139,7 @@ export const SOURCES: Record<string, Source[]> = {
   "zero-width": [SRC.preheader],
   unsubscribe: [SRC.gmailSenders],
   "ac-unsubscribe": [SRC.acUnsub],
+  "unsubscribe-empty": [SRC.gmailSenders, SRC.acUnsub],
   "bare-placeholder": [SRC.sesTemplates, SRC.sesHandlebars],
   "merge-tags": [SRC.sesHandlebars],
   "text-size-adjust": [SRC.textSize],
@@ -169,7 +170,7 @@ export const SOURCES: Record<string, Source[]> = {
 export const NOTE_SOURCES = {
   height: [SRC.pageBreak, SRC.wordEngine],
   dark: [SRC.darkMode, cie("css-at-media-prefers-color-scheme", "prefers-color-scheme")],
-  stylesOff: [cie("html-style", "<style>, non-Google accounts"), SRC.gmailCss],
+  stylesOff: [cie("html-style", "<style>, non-Google accounts"), cie("css-at-media", "@media"), SRC.gmailCss],
   imagesOff: [wcag("tutorials/images/", "W3C: images tutorial")],
   contrast: [wcag("WCAG21/Understanding/contrast-minimum.html", "WCAG 1.4.3, contrast minimum")],
   target: [wcag("WCAG22/Understanding/target-size-minimum.html", "WCAG 2.5.8, target size minimum"), SRC.buttons],
@@ -1318,7 +1319,45 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
     const close = src.indexOf("</a>", t.end);
     return close === -1 ? "" : src.slice(t.end, close);
   };
+  const isUnsubscribe = (t: Tag) => /%UNSUBSCRIBELINK%|unsub/i.test(t.attrs.href ?? "");
+  const invisibleUnsub = links.filter((t) => isUnsubscribe(t) && !decodeEntities(linkText(t).replace(/<[^>]+>/g, " ")).trim() && !/<img\b/i.test(linkText(t)));
+  if (invisibleUnsub.length) {
+    add(
+      "unsubscribe-empty",
+      "fail",
+      "The unsubscribe link has no text",
+      "The link is in the email but there is nothing between its opening and closing tags, so nobody can see it or click it. For a marketing email that is the same as having no unsubscribe link.",
+      {
+        lines: invisibleUnsub.map((t) => t.line),
+        howTo: { text: "Put the word inside the link.", code: `<a href="${invisibleUnsub[0].attrs.href}" style="color:#161514; text-decoration:underline;">Unsubscribe</a>` },
+      },
+    );
+  }
+  const SOCIAL: [RegExp, RegExp][] = [
+    [/facebook/i, /facebook\.com|fb\.com/i],
+    [/instagram/i, /instagram\.com/i],
+    [/linkedin/i, /linkedin\.com/i],
+    [/youtube/i, /youtube\.com|youtu\.be/i],
+    [/tiktok/i, /tiktok\.com/i],
+    [/^(x|twitter)$/i, /twitter\.com|x\.com/i],
+  ];
+  const wrongSocial = links.filter((t) => {
+    const alt = /<img\b[^>]*\balt\s*=\s*(?:"([^"]*)"|'([^']*)')/i.exec(linkText(t));
+    const name = (alt?.[1] ?? alt?.[2] ?? "").trim();
+    const rule = SOCIAL.find(([label]) => label.test(name));
+    return !!rule && /^https?:/i.test(t.attrs.href ?? "") && !rule[1].test(t.attrs.href ?? "");
+  });
+  if (wrongSocial.length) {
+    add(
+      "social-mismatch",
+      "warn",
+      `${plural(wrongSocial.length, "social icon")} linking to a different site than its label`,
+      "The icon's alt text names one network and the link goes to another, which usually means a link was copied and not updated.",
+      { lines: wrongSocial.map((t) => t.line), howTo: { text: "Point the link at the network the icon shows." } },
+    );
+  }
   const emptyLinks = links
+    .filter((t) => !invisibleUnsub.includes(t))
     .filter((t) => {
       const inner = linkText(t);
       const text = decodeEntities(inner.replace(/<[^>]+>/g, " ")).trim();

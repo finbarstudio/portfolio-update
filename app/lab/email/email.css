@@ -565,6 +565,16 @@
   background: var(--ec-field);
   border-radius: 6px;
 }
+/* Unseen second copy at phone width, used only to measure. */
+.ec-probe {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 375px;
+  height: 800px;
+  visibility: hidden;
+  border: 0;
+}
 /* The email sits in an inset frame; the frame scrolls, not the page. */
 .ec-stage {
   flex: 1 1 auto;
