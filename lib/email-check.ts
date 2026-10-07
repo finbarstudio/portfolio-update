@@ -742,6 +742,10 @@ const SAMPLE_VALUES: [RegExp, string][] = [
   [/^(LOCATION|DEVELOPMENT|PROPERTY|PROPERTYNAME)$/, "Seaburn, Sunderland"],
   [/^(CODE|OTP|PASSCODE|VERIFICATIONCODE)$/, "482913"],
   [/^(POSTCODE)$/, "CR0 2AB"],
+  // ActiveCampaign fills these from the list's sender details: company name, then the postal
+  // address. The shape follows the examples in its Personalization Tags overview.
+  [/^SENDERINFOSINGLELINE$/, "Your Company, 1 Example Street, London, EC1A 1BB, United Kingdom"],
+  [/^SENDERINFO$/, "Your Company<br>1 Example Street, London, EC1A 1BB<br>United Kingdom"],
 ];
 
 /**
@@ -806,7 +810,7 @@ export function fillMergeTags(src: string): SampleFill {
       left.add(tag);
       return tag;
     }
-    filled.add(`${tag} as ${value}`);
+    filled.add(`${tag} as ${value.replace(/<br>/g, ", ")}`);
     return value;
   });
   // Bare words next, from the end so earlier offsets stay true.
