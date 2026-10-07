@@ -837,9 +837,9 @@ export function checkEmail(src: string): Finding[] {
   if (emptyHeight.length) {
     add(
       "img-height-empty",
-      "warn",
+      "info",
       `${plural(emptyHeight.length, "image")} with an empty height attribute`,
-      'height="" is not a valid value and clients disagree on what it means. Remove it or give it a number.',
+      'Usually a leftover from a width/height pair where the value was dropped so height:auto could take over on mobile; ActiveCampaign\'s editor then writes it as a bare "height". Browsers and WebKit-based clients treat it exactly like no attribute at all. It is a tidy-up, not a fix, so it is left out of Fix all.',
       { lines: emptyHeight, fix: "img-height-empty" },
     );
   }
@@ -1095,7 +1095,7 @@ export const FIXES: Record<FixId, Fix> = {
   },
   "img-height-empty": {
     label: "Remove empty height attributes",
-    bulk: true,
+    bulk: false,
     apply(src) {
       const [out, n] = rewriteTags(
         src,
