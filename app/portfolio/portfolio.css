@@ -276,7 +276,7 @@ body:has(.pf) { background: #1a1a1a; }
   position: absolute;
   /* a gutter either side keeps the book clear of the view options on the right
      (and the same on the left, so it stays centred on the page) */
-  top: var(--T); bottom: var(--B); left: calc(var(--S) + 6cqw); right: calc(var(--S) + 6cqw);
+  top: var(--T); bottom: var(--B); left: calc(var(--S) + 8cqw); right: calc(var(--S) + 8cqw);
   cursor: grab;
   touch-action: pan-y;
   user-select: none;
@@ -296,7 +296,7 @@ body:has(.pf) { background: #1a1a1a; }
   pointer-events: none;
 }
 .pf-booklet-set { display: flex; align-items: center; gap: calc(var(--u) * 0.2); pointer-events: auto; }
-.pf-booklet-ui button, .pf-booklet-views button {
+.pf-booklet-ui button, .pf-booklet-views button, .pf-booklet-books button {
   /* small type, full-size target: the padding is the hit area */
   min-width: 44px; min-height: 44px;
   margin: -14px 0;
@@ -309,9 +309,20 @@ body:has(.pf) { background: #1a1a1a; }
   text-transform: inherit;
   cursor: pointer;
 }
-.pf-booklet-ui button:hover, .pf-booklet-ui button[aria-pressed="true"], .pf-booklet-views button:hover, .pf-booklet-views button[aria-pressed="true"] { color: var(--ink); }
+.pf-booklet-ui button:hover, .pf-booklet-ui button[aria-pressed="true"], .pf-booklet-views button:hover, .pf-booklet-views button[aria-pressed="true"], .pf-booklet-books button:hover, .pf-booklet-books button[aria-pressed="true"] { color: var(--ink); }
 .pf-booklet-ui button:disabled { opacity: 0.3; cursor: default; }
-.pf-booklet-ui button:focus-visible, .pf-booklet-views button:focus-visible { outline: 1px solid var(--soft); outline-offset: -8px; }
+.pf-booklet-ui button:focus-visible, .pf-booklet-views button:focus-visible, .pf-booklet-books button:focus-visible { outline: 1px solid var(--soft); outline-offset: -8px; }
+.pf-booklet-books {
+  position: absolute;
+  left: calc(var(--u) * 2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  z-index: 3;
+}
+.pf-booklet-books button { margin: 0; min-height: 32px; text-align: left; }
 .pf-booklet-views {
   position: absolute;
   right: calc(var(--u) * 2);

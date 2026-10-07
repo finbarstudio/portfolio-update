@@ -2,8 +2,8 @@
 
 /**
  * Printed booklets on the portfolio that can be picked up and read. One or
- * more books share the stage, with a switch between them; the first is open
- * when the page loads.
+ * more books share the stage, listed down the left to switch between; the
+ * first is open when the page loads.
  *
  * Three ways to look at a book: a 3D magazine whose pages turn (click either
  * side, drag a page, or use the arrows), the same book laid flat and
@@ -100,7 +100,8 @@ function Stage({
 function PhonePreview({ books }: { books: BookletBook[] }) {
   return (
     <div className="pf-booklet-phone">
-      {books.map((book) => {
+      {/* a phone shows the first two; the rest wait for a desktop */}
+      {books.slice(0, 2).map((book) => {
         const spreads = toSpreads(book.pages.length);
         const inside = spreads.slice(1, -1);
         const pick = inside.filter((pp) => pp.some((n) => book.stars?.includes(n + 1)));
@@ -131,7 +132,9 @@ function PhonePreview({ books }: { books: BookletBook[] }) {
           </div>
         );
       })}
-      <p className="pf-soft">A few spreads from each. On a desktop both books can be picked up and read, page by page.</p>
+      <p className="pf-soft">
+        A few spreads from two of them. On a desktop {books.length > 2 ? `all ${books.length} books` : "both books"} can be picked up and read, page by page.
+      </p>
     </div>
   );
 }
@@ -330,16 +333,19 @@ export default function PfBooklet({ books }: { books: BookletBook[] }) {
         ) : null}
       </div>
 
-      <div className="pf-booklet-ui pf-mono">
-        <div className="pf-booklet-set">
-          {books.length > 1
-            ? books.map((b, i) => (
-                <button key={b.name} type="button" aria-pressed={i === which} onClick={() => open(i)}>
-                  {b.name}
-                </button>
-              ))
-            : null}
+      {/* the books, stacked down the left-hand edge */}
+      {books.length > 1 ? (
+        <div className="pf-booklet-books pf-mono">
+          {books.map((b, i) => (
+            <button key={b.name} type="button" aria-pressed={i === which} onClick={() => open(i)}>
+              {b.name}
+            </button>
+          ))}
         </div>
+      ) : null}
+
+      <div className="pf-booklet-ui pf-mono">
+        <span />
         {view === "spreads" ? (
           <span className="pf-booklet-where pf-soft" aria-live="polite">
             {close ? (close.length === 1 ? `Page ${close[0]}` : `Pages ${close[0]} to ${close[1]}`) : "Click a spread"}

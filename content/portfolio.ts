@@ -218,19 +218,23 @@ const RAW: Slide[] = [
       "portfolio/salesmasters/covers/all-storage-systems.webp",
       "portfolio/salesmasters/covers/connected-platforms.webp",
       "portfolio/salesmasters/covers/prescience.webp",
-      "portfolio/salesmasters/covers/octave.webp",
-      "portfolio/salesmasters/covers/flowcare.webp",
-      "portfolio/salesmasters/covers/excision.webp",
     ].map((p) => m(p, { frame: false })),
-    caption: "The covers of twelve of the playbooks, each in its client’s own brand",
+    caption: "The covers of nine of the playbooks, each in its client’s own brand",
   },
   {
     kind: "booklet",
     books: [
       book("Site Ware Direct", "site-ware-direct", 67, [1, 67]),
       book("Bus4x4", "bus4x4", 62, [1, 5, 6, 8, 32, 40, 62]),
+      book("Cutek", "cutek", 88, [1, 88]),
+      book("Criterion", "criterion", 61, [1, 61]),
+      book("Active Medical", "active-medical", 58, [1, 58]),
+      book("Alpha Lifecare", "alpha-lifecare", 68, [1, 68]),
+      book("All Storage Systems", "all-storage-systems", 77, [1, 77]),
+      book("Connected Platforms", "connected-platforms", 55, [1, 55]),
+      book("Prescience", "prescience", 65, [1, 65]),
     ],
-    caption: "Two editions, every page. Click or drag a page to turn it",
+    caption: "Nine editions, every page. Click or drag a page to turn it",
   },
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
