@@ -156,6 +156,8 @@ export interface Motion {
   radius: number;
   /** how many cards either side of the focus grow */
   reach: number;
+  /** how strongly a layout takes its shape: a fan's curve, a wave's height, a staircase's rise */
+  shape: number;
 }
 export type MotionKey = keyof Motion;
 
@@ -300,8 +302,8 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const side = Math.sign(p);
     return {
       u: side * (d * c.pitch * 0.75 + Math.max(0, Math.abs(p) - 1) * (c.pitch * 0.3 + c.g)),
-      z: -d * c.pitch * 0.6 - Math.abs(p) * 0.02,
-      ry: -side * d * 65 * DEG,
+      z: -d * c.pitch * 0.6 * Math.min(1.5, c.m.shape) - Math.abs(p) * 0.02,
+      ry: -side * d * Math.min(88, 65 * c.m.shape) * DEG,
       p,
       a: edgeFade(p, c.n),
     };
@@ -351,11 +353,11 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const slot = leaving ? lerp(0, c.n - 1, easeInOut(leaving)) : q;
     const lift = Math.sin(Math.PI * leaving);
     const out = { x: slot * c.g * 0.25, y: slot * c.g * 0.2, z: -slot * 0.12, rz: 0, ry: 0, s: 1 - slot * 0.04, a: 1 - clamp((slot - 6) / 2) };
-    if (c.v.fly === "up") out.y += lift * c.h * 1.15;
-    if (c.v.fly === "right") out.x += lift * c.w * 1.25;
+    if (c.v.fly === "up") out.y += lift * c.h * 1.15 * c.m.shape;
+    if (c.v.fly === "right") out.x += lift * c.w * 1.25 * c.m.shape;
     if (c.v.fly === "spin") {
       // Swings out like a door and back in behind the stack.
-      out.x -= lift * c.w * 1.1;
+      out.x -= lift * c.w * 1.1 * c.m.shape;
       out.ry = lift * 0.9;
     }
     return out;
@@ -462,7 +464,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const cols = Math.ceil(c.n / rows);
     const row = i % rows;
     const col = Math.floor(i / rows);
-    const p = centred(col + (row % 2 ? 1 : -1) * c.T * cols + row * 0.5, cols);
+    const p = centred(col + (row % 2 ? 1 : -1) * c.T * cols + row * 0.5 * c.m.shape, cols);
     return { u: along(p, c), v: -(row - (rows - 1) / 2) * (c.cross + c.g), p, a: edgeFade(p, cols, 0.5) };
   },
   helix(i, c) {
@@ -474,9 +476,9 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     if (c.v.horizontal) {
       // Square to the viewer: the depth shading alone says which side of the tube a card is on.
       const turns = TAU * 1.5 * along01 + TAU * c.T;
-      return { x: (along01 - 0.5) * 2.6 * Math.max(1, c.A), y: Math.sin(turns) * R * 0.8, z: Math.cos(turns) * R * 0.8, a, p };
+      return { x: (along01 - 0.5) * 2.6 * Math.max(1, c.A) * c.m.shape, y: Math.sin(turns) * R * 0.8, z: Math.cos(turns) * R * 0.8, a, p };
     }
-    return { x: Math.sin(angle) * R, y: (along01 - 0.5) * 2.8, z: Math.cos(angle) * R, ry: angle, a, p };
+    return { x: Math.sin(angle) * R, y: (along01 - 0.5) * 2.8 * c.m.shape, z: Math.cos(angle) * R, ry: angle, a, p };
   },
   globe(i, c) {
     const y = 1 - (2 * (i + 0.5)) / c.n;
@@ -511,32 +513,36 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const a = smooth(depth / 0.15) * smooth((1 - depth) / 0.1);
     if (c.v.sides) {
       const side = i % 2 ? 1 : -1;
-      return { z, a, x: side * (0.55 * c.A + c.w * 0.35), ry: -side * 50 * DEG };
+      return { z, a, x: side * (0.55 * c.A + c.w * 0.35) * c.m.shape, ry: -side * 50 * DEG };
     }
     const angle = c.v.spiral ? TAU * 2 * depth : i * GOLDEN_ANGLE;
-    return { z, a, x: Math.cos(angle) * 0.95 * Math.min(1.4, c.A), y: Math.sin(angle) * 0.95 };
+    return { z, a, x: Math.cos(angle) * 0.95 * Math.min(1.4, c.A) * c.m.shape, y: Math.sin(angle) * 0.95 * c.m.shape };
   },
   fan(i, c) {
     const breathing = c.v.open ? 0.55 + 0.45 * Math.sin(TAU * c.T - Math.PI / 2) : 1;
-    const spread = Math.min(0.2 + c.g, 2.4 / c.n) * breathing;
     const p = i - (c.n - 1) / 2;
-    const angle = p * spread + (c.v.sway ? 0.25 * Math.sin(TAU * c.T) : 0);
     const R = 2.2;
-    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R - 0.1, z: i * 0.01, rz: -angle, p };
+    // Cards stay the same distance apart along the arc however tightly it curves.
+    const step = Math.min(0.2 + c.g, 2.4 / c.n) * breathing * R;
+    const curve = c.m.shape / R; // 0 is a straight row
+    const angle = p * step * curve + (c.v.sway ? 0.25 * Math.sin(TAU * c.T) * c.m.shape : 0);
+    const z = i * 0.01;
+    if (curve < 1e-4) return { x: p * step, y: -0.1, z, p };
+    return { x: Math.sin(angle) / curve, y: (Math.cos(angle) - 1) / curve - 0.1, z, rz: -angle, p };
   },
   wave(i, c) {
     const p = centred(i - c.T * c.n, c.n);
     const phase = (TAU * p * Math.max(1, Math.round(c.n / 6))) / c.n;
     const a = edgeFade(p, c.n);
-    if (c.v.ribbon) return { u: along(p, c), z: -Math.cos(phase) * 0.35, ry: Math.sin(phase), p, a };
-    return { u: along(p, c), v: Math.sin(phase) * 0.4, p, a };
+    if (c.v.ribbon) return { u: along(p, c), z: -Math.cos(phase) * 0.35 * c.m.shape, ry: Math.sin(phase) * Math.min(1.5, c.m.shape), p, a };
+    return { u: along(p, c), v: Math.sin(phase) * 0.4 * c.m.shape, p, a };
   },
   stairs(i, c) {
     const p = centred(i - c.T * c.n, c.n);
-    return { u: p * (c.pitch + c.g), v: -p * c.cross * 0.35, z: -p * 0.3, p, a: edgeFade(p, c.n, 1.5) };
+    return { u: p * (c.pitch + c.g), v: -p * c.cross * 0.35 * c.m.shape, z: -p * 0.3 * c.m.shape, p, a: edgeFade(p, c.n, 1.5) };
   },
   float(i, c) {
-    const z = lerp(-3, 0.4, hash(i, 1));
+    const z = lerp(-3, 0.4, hash(i, 1)) * c.m.shape;
     const reach = (c.camZ - z) / c.camZ; // how much wider the view is at this depth
     const speed = 1 + (i % 2);
     const sway = 0.06 * Math.sin(TAU * (c.T + hash(i, 4)));
@@ -769,6 +775,7 @@ export const BASE_MOTION: Motion = {
   roll: 0,
   radius: 1,
   reach: 1.6,
+  shape: 1,
 };
 
 export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre" };
@@ -796,6 +803,7 @@ export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max:
   roll: { label: "Roll", min: -90, max: 90, step: 1 },
   radius: { label: "Radius", min: 0.4, max: 2.5, step: 0.01 },
   reach: { label: "Reach", min: 0.5, max: 8, step: 0.1 },
+  shape: { label: "Shape", min: 0, max: 2.5, step: 0.01 },
 };
 export const MOTION_KEYS = Object.keys(MOTION_RANGES) as MotionKey[];
 
@@ -826,6 +834,22 @@ const COUNT_MAX: Record<LayoutName, number> = {
 };
 
 /**
+ * What the shape slider is called in each layout that has one. Layouts built
+ * on a circle use Radius instead; the rest have no single shape to dial.
+ */
+export const SHAPE_LABEL: Partial<Record<LayoutName, string>> = {
+  fan: "Curve",
+  wave: "Wave height",
+  stairs: "Rise",
+  cover: "Fold",
+  deck: "Lift",
+  tunnel: "Spread",
+  helix: "Length",
+  float: "Depth",
+  marquee: "Row offset",
+};
+
+/**
  * A slider's range for one preset. The wide limits in MOTION_RANGES only suit
  * the fields of tiny cards; everything else gets a range it can use end to end.
  */
@@ -838,6 +862,8 @@ export function rangeFor(preset: Preset, key: MotionKey): Range {
   if (key === "size") return field ? { ...base, max: 0.5 } : smallCards ? { ...base, min: 0.08, max: 0.8 } : { ...base, min: 0.2 };
   if (key === "scale") return field ? base : { ...base, max: 3 };
   if (key === "reach") return field ? base : { ...base, max: 4 };
+  // Past 1.6 a fan's ends fold right over.
+  if (key === "shape") return { ...base, label: SHAPE_LABEL[preset.layout] ?? base.label, max: preset.layout === "fan" ? 1.6 : base.max };
   return base;
 }
 
@@ -845,7 +871,7 @@ export function rangeFor(preset: Preset, key: MotionKey): Range {
  * These carry between presets as a proportion ("a third bigger than this
  * preset's own size"); the rest carry as an offset.
  */
-const PROPORTIONAL: ReadonlySet<MotionKey> = new Set<MotionKey>(["duration", "size", "count", "gap", "scale", "distance", "radius", "perspective", "reach"]);
+const PROPORTIONAL: ReadonlySet<MotionKey> = new Set<MotionKey>(["duration", "size", "count", "gap", "scale", "distance", "radius", "perspective", "reach", "shape"]);
 
 export type Adjustments = Partial<Record<MotionKey, number>>;
 

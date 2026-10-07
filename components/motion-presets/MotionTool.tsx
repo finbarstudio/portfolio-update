@@ -14,6 +14,7 @@ import {
   HAS_RADIUS,
   MOTION_KEYS,
   PRESETS,
+  SHAPE_LABEL,
   adjustmentFor,
   applyAdjustments,
   bezier,
@@ -399,7 +400,7 @@ const ON_OFF = [
   { value: false, label: "Off" },
   { value: true, label: "On" },
 ];
-const SCENE_KEYS: MotionKey[] = ["scale", "reach", "cardTilt", "count", "size", "gap", "radius", "turn", "spin", "fade", "offsetX", "offsetY"];
+const SCENE_KEYS: MotionKey[] = ["scale", "reach", "cardTilt", "count", "size", "gap", "radius", "shape", "turn", "spin", "fade", "offsetX", "offsetY"];
 const TIMING_KEYS: MotionKey[] = ["duration", "speed", "rhythm", "stagger", "hold"];
 const PACES = [
   { value: false, label: "Continuous" },
@@ -648,6 +649,7 @@ export default function MotionTool() {
     "size",
     "gap",
     ...(HAS_RADIUS.has(layout) ? (["radius"] as const) : []),
+    ...(SHAPE_LABEL[layout] ? (["shape"] as const) : []),
     "turn",
     "spin",
     ...(focusable || layout === "proximity" ? (["fade"] as const) : []),
