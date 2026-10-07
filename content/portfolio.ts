@@ -247,15 +247,13 @@ const RAW: Slide[] = [
     name: "Packer and Associates",
     category: "In-house Design",
     body:
-      "Packer and Associates is a Brisbane workforce development company that has been running since 1997. I was their in-house designer for a year, full-time and then on contract. I designed the capability statement they give to prospective clients, kept the website current, and made the social posts and reels. I also drew logos for two of their clients, Compass Capability and Stimulà Strategic Consulting.",
+      "Packer and Associates is a Brisbane workforce development company that has been running since 1997. I was their in-house designer for a year, full-time and then on contract. I designed the capability statement they give to prospective clients and kept the website current.",
     meta: [ME, { label: "Year", value: "2024–2025" }, { label: "Live", value: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" }],
   },
   one("packer-associates/pdf-pages/page-0.webp", "The capability statement: twelve pages on who they are, what they do and who they have done it for"),
   stack(["packer-associates/pdf-pages/page-1.webp", "packer-associates/pdf-pages/page-2.webp", "packer-associates/pdf-pages/page-3.webp", "packer-associates/pdf-pages/page-4.webp", "packer-associates/pdf-pages/page-5.webp", "packer-associates/pdf-pages/page-6.webp"], 3, "Who they are, what they do, and the first of the client pages"),
   stack(["packer-associates/pdf-pages/page-7.webp", "packer-associates/pdf-pages/page-8.webp", "packer-associates/pdf-pages/page-9.webp", "packer-associates/pdf-pages/page-10.webp", "packer-associates/pdf-pages/page-11.webp"], 3, "Each client page takes on that client’s own colours, then accreditations and the back cover"),
   { kind: "media", items: [m("packer-associates/3d-model-video.webm")], caption: "The website, which I kept current through the contract", link: { label: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" } },
-  stack(["packer-associates/social/post-1.webp", "packer-associates/social/post-2.webp", "packer-associates/social/post-3.webp", "packer-associates/social/free-elearn-course.webp", "packer-associates/social/graphic-design.webp", "packer-associates/social/stimula.webp"], 3, "Social posts on training topics, and title cards for the service posts"),
-  row(["packer-associates/reels/compass-reel.webm", "packer-associates/reels/stimula-reel.webm"], "Two logos for their clients, each told as a reel: Compass Capability and Stimulà"),
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
   { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
