@@ -621,7 +621,7 @@ const SAMPLE_VALUES: [RegExp, string][] = [
   [/^(LASTNAME|LNAME|SURNAME|LAST)$/, "Lieb"],
   [/^(FULLNAME|NAME|CONTACTNAME)$/, "Nick Lieb"],
   [/^(EMAIL|EMAILADDRESS)$/, "nick.lieb@example.com"],
-  [/^(LOCATION|DEVELOPMENT|PROPERTY|PROPERTYNAME)$/, "Sunderland"],
+  [/^(LOCATION|DEVELOPMENT|PROPERTY|PROPERTYNAME)$/, "Seaburn, Sunderland"],
   [/^(CODE|OTP|PASSCODE|VERIFICATIONCODE)$/, "482913"],
   [/^(POSTCODE)$/, "CR0 2AB"],
 ];
