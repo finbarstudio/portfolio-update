@@ -41,6 +41,9 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  * fix is just taking it off the list.
  */
 
+/** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
+const VERSION = "1.3";
+
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 
 const FAMILIES = ["gmail", "outlook", "apple-mail", "yahoo", "samsung-email", "aol", "protonmail", "thunderbird"];
@@ -639,7 +642,7 @@ export default function EmailCheck() {
 
   const columns = [open.source ? "320px" : "44px", open.report ? "minmax(320px, 460px)" : "44px", open.preview ? "minmax(0, 1fr)" : "44px"];
   const tooTall = height !== null && height > OUTLOOK_PAGE_HEIGHT;
-  const report = buildReport({ fileName, stats, findings, a11y, narrow, features, families, data, applied, transactional, width, height });
+  const report = buildReport({ version: VERSION, fileName, stats, findings, a11y, narrow, features, families, data, applied, transactional, width, height });
 
   return (
     <main
@@ -833,6 +836,7 @@ export default function EmailCheck() {
           {/* Plain link, as in LabHeader: proxy.ts rewrites "/" on the lab host. */}
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a href="/">lab.finbar.studio</a>
+          <span title="Version of the email check tool">v{VERSION}</span>
         </p>
       </Panel>
 

@@ -7,6 +7,8 @@ import type { A11yReport, NarrowProbe } from "@/lib/email-a11y";
 import { formatShare, type AppliedFix, type CanIEmailData, type FeatureUse, type Finding, type Stats } from "@/lib/email-check";
 
 export interface ReportInput {
+  /** version of the tool that made the report */
+  version: string;
   fileName: string;
   stats: Stats;
   findings: Finding[];
@@ -51,7 +53,7 @@ export function buildReport(input: ReportInput): string {
   const out: string[] = [];
   const at = input.width ? `${input.width}px` : "full width";
 
-  out.push("# Email check report");
+  out.push(`# Email check report (tool v${input.version})`);
   out.push(
     [
       input.fileName || "pasted email",
