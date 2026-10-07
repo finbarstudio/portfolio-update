@@ -1,0 +1,186 @@
+/**
+ * Accessibility audit of a rendered email, run against the preview frame's
+ * document. Source checks (lib/email-check.ts) can see attributes; this sees
+ * what a reader gets: computed colours for contrast, real link sizes for
+ * touch targets, and the accessible name a link ends up with.
+ */
+
+export interface ContrastIssue {
+  text: string;
+  color: string;
+  background: string;
+  ratio: number;
+  required: number;
+  /** text under 24px, or under 18.66px bold, needs 4.5:1; larger needs 3:1 */
+  large: boolean;
+}
+
+export interface TargetIssue {
+  text: string;
+  width: number;
+  height: number;
+}
+
+export interface A11yReport {
+  /** text whose background could not be known (an image or gradient behind it) */
+  contrastUnknown: number;
+  contrast: ContrastIssue[];
+  /** standalone links (buttons, image links) smaller than 24px on a side */
+  targets: TargetIssue[];
+  /** standalone links between 24px and 44px: pass WCAG, below the common 44px guide */
+  smallTargets: number;
+  linksWithoutName: string[];
+  imagesWithoutAlt: string[];
+  headings: number;
+  smallText: { text: string; size: number }[];
+  textNodes: number;
+}
+
+const WCAG_MIN_TARGET = 24;
+const GUIDE_TARGET = 44;
+const SMALL_TEXT = 12;
+
+function parseColor(value: string): [number, number, number, number] | null {
+  const m = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+%?))?\s*\)/.exec(value);
+  if (!m) return null;
+  let a = m[4] === undefined ? 1 : Number.parseFloat(m[4]);
+  if (m[4]?.endsWith("%")) a /= 100;
+  return [Number(m[1]), Number(m[2]), Number(m[3]), a];
+}
+
+function luminance([r, g, b]: [number, number, number, number]): number {
+  const channel = (c: number) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+}
+
+function contrastRatio(a: [number, number, number, number], b: [number, number, number, number]): number {
+  const la = luminance(a);
+  const lb = luminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+function hex([r, g, b]: [number, number, number, number]): string {
+  return `#${[r, g, b].map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** Walks up for the first opaque background. Null when an image or gradient sits in the way. */
+function effectiveBackground(el: Element, view: Window): [number, number, number, number] | null {
+  for (let node: Element | null = el; node; node = node.parentElement) {
+    const style = view.getComputedStyle(node);
+    if (style.backgroundImage !== "none") return null;
+    const bg = parseColor(style.backgroundColor);
+    if (bg && bg[3] >= 0.99) return bg;
+  }
+  return [255, 255, 255, 1];
+}
+
+function isVisible(el: Element, view: Window): boolean {
+  for (let node: Element | null = el; node; node = node.parentElement) {
+    const style = view.getComputedStyle(node);
+    if (style.display === "none" || style.visibility === "hidden" || Number.parseFloat(style.opacity) === 0) return false;
+    if (Number.parseFloat(style.fontSize) === 0 && node === el) return false;
+    if (style.overflow === "hidden" && (node as HTMLElement).offsetHeight === 0) return false;
+  }
+  return true;
+}
+
+function snippet(text: string): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  return clean.length > 60 ? `${clean.slice(0, 57)}…` : clean;
+}
+
+function accessibleName(link: HTMLAnchorElement): string {
+  const label = link.getAttribute("aria-label") || link.getAttribute("title");
+  if (label?.trim()) return label.trim();
+  const text = (link.textContent ?? "").replace(/\s+/g, " ").trim();
+  if (text) return text;
+  return [...link.querySelectorAll("img")]
+    .map((img) => (img.getAttribute("alt") ?? "").trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
+/** A link that sits in running text is exempt from target size rules. */
+function isInlineInText(link: HTMLAnchorElement): boolean {
+  const parent = link.parentElement;
+  if (!parent) return false;
+  const others = [...parent.childNodes].filter((n) => n !== link);
+  return others.some((n) => (n.textContent ?? "").trim().length > 0);
+}
+
+export function auditDocument(doc: Document): A11yReport {
+  const view = doc.defaultView;
+  const report: A11yReport = {
+    contrastUnknown: 0,
+    contrast: [],
+    targets: [],
+    smallTargets: 0,
+    linksWithoutName: [],
+    imagesWithoutAlt: [],
+    headings: doc.querySelectorAll("h1, h2, h3, h4, h5, h6, [role='heading']").length,
+    smallText: [],
+    textNodes: 0,
+  };
+  if (!view || !doc.body) return report;
+
+  const seenPairs = new Set<string>();
+  const seenSmall = new Set<string>();
+  const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const text = node.textContent ?? "";
+    if (!text.trim() || !node.parentElement) continue;
+    const el = node.parentElement;
+    if (["STYLE", "SCRIPT", "TITLE"].includes(el.tagName) || !isVisible(el, view)) continue;
+    report.textNodes++;
+
+    const style = view.getComputedStyle(el);
+    const size = Number.parseFloat(style.fontSize);
+    const weight = Number.parseInt(style.fontWeight, 10) || (style.fontWeight === "bold" ? 700 : 400);
+    if (size < SMALL_TEXT && !seenSmall.has(snippet(text))) {
+      seenSmall.add(snippet(text));
+      report.smallText.push({ text: snippet(text), size });
+    }
+
+    const color = parseColor(style.color);
+    if (!color) continue;
+    const background = effectiveBackground(el, view);
+    if (!background) {
+      report.contrastUnknown++;
+      continue;
+    }
+    const ratio = contrastRatio(color, background);
+    const large = size >= 24 || (size >= 18.66 && weight >= 700);
+    const required = large ? 3 : 4.5;
+    const key = `${hex(color)}/${hex(background)}/${large}`;
+    if (ratio < required && !seenPairs.has(key)) {
+      seenPairs.add(key);
+      report.contrast.push({ text: snippet(text), color: hex(color), background: hex(background), ratio: Math.round(ratio * 100) / 100, required, large });
+    }
+  }
+  report.contrast.sort((a, b) => a.ratio - b.ratio);
+
+  for (const link of doc.querySelectorAll<HTMLAnchorElement>("a[href]")) {
+    if (!isVisible(link, view)) continue;
+    const name = accessibleName(link);
+    if (!name) {
+      report.linksWithoutName.push(link.getAttribute("href") ?? "");
+      continue;
+    }
+    if (isInlineInText(link)) continue;
+    const rect = link.getBoundingClientRect();
+    const width = Math.round(rect.width);
+    const height = Math.round(rect.height);
+    if (width === 0 || height === 0) continue;
+    if (width < WCAG_MIN_TARGET || height < WCAG_MIN_TARGET) report.targets.push({ text: snippet(name), width, height });
+    else if (width < GUIDE_TARGET || height < GUIDE_TARGET) report.smallTargets++;
+  }
+
+  for (const img of doc.querySelectorAll("img")) {
+    if (!img.hasAttribute("alt") && isVisible(img, view)) report.imagesWithoutAlt.push(img.getAttribute("src")?.split("/").pop() ?? "");
+  }
+
+  return report;
+}

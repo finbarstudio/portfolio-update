@@ -38,9 +38,9 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   min-height: 0;
-  padding: 4px 18px 28px;
+  padding: 8px 12px 16px;
   overflow-y: auto;
 }
 
@@ -70,9 +70,9 @@
   flex: none;
   align-items: center;
   gap: 10px;
-  min-height: 44px;
-  padding: 0 18px;
-  font-size: 16px;
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 14px;
   font-weight: 600;
   text-align: left;
   background: transparent;
@@ -115,13 +115,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
-  padding: 0 12px;
+  min-height: 26px;
+  padding: 0 8px;
   font: inherit;
+  font-size: 13px;
   color: var(--ec-text);
   background: var(--ec-field);
   border: 1px solid var(--ec-line);
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
 }
 .ec-tool button:hover,
@@ -160,7 +161,7 @@
 .ec-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 .ec-label {
   font-weight: 600;
@@ -182,9 +183,10 @@
 .ec-input {
   flex: 1 1 160px;
   min-width: 0;
-  min-height: 36px;
-  padding: 0 10px;
+  min-height: 26px;
+  padding: 0 8px;
   font: inherit;
+  font-size: 13px;
   color: var(--ec-text);
   background: var(--ec-field);
   border: 1px solid var(--ec-line);
@@ -225,16 +227,33 @@
   border-color: var(--ec-line);
 }
 .ec-tool .ec-fix {
-  min-height: 28px;
-  padding: 0 10px;
+  min-height: 22px;
+  padding: 0 7px;
   font-size: 12px;
   white-space: nowrap;
+}
+.ec-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: -8px -12px 0;
+  padding: 6px 12px;
+  background: var(--ec-panel);
+  border-bottom: 1px solid var(--ec-line);
+}
+.ec-applied-list {
+  flex-basis: 100%;
+}
+.ec-applied-list > summary {
+  min-height: 24px;
 }
 .ec-applied {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin: 12px 0 0;
+  max-height: 40vh;
+  margin: 4px 0 0;
+  overflow-y: auto;
   padding: 0;
   list-style: none;
 }
@@ -395,6 +414,34 @@
 .ec-level-info {
   color: var(--ec-dim);
 }
+.ec-level-ok {
+  color: var(--ec-ok);
+}
+.ec-level-a11y {
+  color: #9ec5ff;
+}
+.ec-refs {
+  font-size: 11px;
+  vertical-align: super;
+  line-height: 0;
+  white-space: nowrap;
+}
+.ec-tool .ec-refs a {
+  padding: 0 1px;
+  color: #9ec5ff;
+  text-decoration: none;
+}
+.ec-tool .ec-refs a:hover {
+  text-decoration: underline;
+}
+.ec-unsourced {
+  color: var(--ec-warn);
+  cursor: help;
+}
+.ec-swatch {
+  padding: 2px 6px;
+  border-radius: 4px;
+}
 .ec-details summary {
   padding: 8px 0;
   cursor: pointer;
@@ -404,10 +451,63 @@
 }
 
 /* ── Preview ───────────────────────────────────────────────────────── */
+.ec-controls > summary,
+.ec-note > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  list-style: none;
+  cursor: pointer;
+  color: var(--ec-dim);
+}
+.ec-controls > summary::-webkit-details-marker,
+.ec-note > summary::-webkit-details-marker {
+  display: none;
+}
+.ec-controls > summary::before,
+.ec-note > summary::before {
+  width: 10px;
+  text-align: center;
+  content: "+";
+}
+.ec-controls[open] > summary::before,
+.ec-note[open] > summary::before {
+  content: "–";
+}
+.ec-controls[open] > summary {
+  margin-bottom: 8px;
+}
+.ec-notes-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 18px;
+}
+.ec-note[open],
+.ec-controls[open] {
+  flex-basis: 100%;
+}
+[title] {
+  cursor: help;
+}
+.ec-tool :is(button, a, summary, textarea, input)[title] {
+  cursor: revert;
+}
+.ec-tool button[title],
+.ec-tool a[title] {
+  cursor: pointer;
+}
+.ec-note-body {
+  max-width: 70ch;
+  padding: 2px 0 8px 18px;
+}
+.ec-note-warn > summary {
+  color: var(--ec-warn);
+}
 .ec-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 18px;
+  gap: 4px 12px;
 }
 .ec-notice {
   padding: 10px 12px;
@@ -426,7 +526,7 @@
   display: flex;
   justify-content: safe center;
   min-height: 0;
-  padding: 16px;
+  padding: 10px;
   overflow: auto;
   background: var(--ec-panel);
   border: 1px solid var(--ec-line);

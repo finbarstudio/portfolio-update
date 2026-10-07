@@ -3,12 +3,16 @@
 import { useDeferredValue, useEffect, useId, useRef, useState } from "react";
 import {
   CANIEMAIL_URL,
+  DARK_MODE_USE,
   FIXES,
+  NOTE_SOURCES,
   OUTLOOK_PAGE_HEIGHT,
   SHARE,
   SHARE_DATE,
   applyFixes,
   checkEmail,
+  darkReach,
+  fillMergeTags,
   formatShare,
   getStats,
   matchFeatures,
@@ -18,8 +22,10 @@ import {
   type FeatureUse,
   type FixId,
   type Level,
+  type Source,
 } from "@/lib/email-check";
 import { extractFromPreviewPage, isPreviewUrl } from "@/lib/email-extract";
+import { auditDocument, type A11yReport } from "@/lib/email-a11y";
 
 /**
  * Email check: paste an HTML email, get a report and a preview, fix what has
@@ -51,6 +57,23 @@ const DARK_MODES: { value: DarkMode; label: string }[] = [
   { value: "invert", label: "Dark: inverted" },
 ];
 
+const DARK_TIPS: Record<DarkMode, string> = {
+  off: "The email as designed",
+  scheme: "Turns on the email's own prefers-color-scheme rules, as Apple Mail does",
+  invert: "Flips every colour, as Outlook on Windows and the Gmail app on iOS do",
+};
+
+/** "about 22% of opens": the clients' share, times how many opens are in dark mode at all. */
+function DarkReach({ behaviour }: { behaviour: "own styles" | "partial invert" | "full invert" }) {
+  const { share, clients } = darkReach(behaviour);
+  return (
+    <>
+      {clients.join(", ")}: {formatShare(share)} of opens between them. With {Math.round(DARK_MODE_USE * 100)}% of opens in dark mode (Litmus, 2022), that is
+      roughly {formatShare(share * DARK_MODE_USE)} of all opens seeing this. The split of a client family between its apps is an estimate.
+    </>
+  );
+}
+
 const ENVIRONMENTS: { key: Environment; label: string }[] = [
   { key: "mobile", label: "Mobile" },
   { key: "webmail", label: "Webmail" },
@@ -66,6 +89,10 @@ function lineList(lines: number[]): string {
   const shown = lines.slice(0, MAX_LINES_SHOWN).join(", ");
   const rest = lines.length - MAX_LINES_SHOWN;
   return `Line ${shown}${rest > 0 ? ` and ${rest} more` : ""}`;
+}
+
+function plural(n: number, one: string): string {
+  return `${n} ${n === 1 ? one : `${one}s`}`;
 }
 
 function kb(bytes: number): string {
@@ -109,6 +136,50 @@ function engineNote(): string {
 
 function supportLabel(status: ClientSupport["status"]): string {
   return { y: "Supported", a: "Partial", n: "Not supported", u: "Unknown" }[status];
+}
+
+/** Where a claim comes from, as numbered links: [1][2]. Says so when there is none. */
+function Sources({ list, none }: { list: Source[]; none?: boolean }) {
+  if (!list.length) {
+    return none ? (
+      <span className="ec-refs ec-unsourced" title="No citation. This rests on common practice among email developers, not on a source that has been checked.">
+        [unsourced]
+      </span>
+    ) : null;
+  }
+  return (
+    <span className="ec-refs">
+      {list.map((s, i) => (
+        <a key={s.url} href={s.url} target="_blank" rel="noreferrer" title={`${s.label} (${s.kind})`} aria-label={`Source ${i + 1}: ${s.label}`}>
+          [{i + 1}]
+        </a>
+      ))}
+    </span>
+  );
+}
+
+/** A titled, collapsible line of information. Closed by default so it costs one line. */
+function Note({
+  title,
+  tone,
+  open,
+  sources,
+  children,
+}: {
+  title: string;
+  tone?: "warn";
+  open?: boolean;
+  sources?: Source[];
+  children: React.ReactNode;
+}) {
+  return (
+    <details className={`ec-note${tone ? ` ec-note-${tone}` : ""}`} open={open}>
+      <summary>{title}</summary>
+      <div className="ec-note-body">
+        {children} {sources && <Sources list={sources} none />}
+      </div>
+    </details>
+  );
 }
 
 function Panel({
@@ -170,7 +241,11 @@ function FeatureRow({
             used {feature.count === 1 ? "once" : `${feature.count} times`}
           </span>
         </p>
-        {affected > 0 && <span className="ec-share">{formatShare(affected)} of opens</span>}
+        {affected > 0 && (
+          <span className="ec-share" title={`Share of opens, in the clients selected, that cannot show this (Litmus, ${SHARE_DATE}; split within a family is an estimate)`}>
+            {formatShare(affected)} of opens
+          </span>
+        )}
         {feature.fix && (
           <button type="button" className="ec-fix" onClick={() => onFix(feature.fix!)}>
             {FIXES[feature.fix].label}
@@ -209,14 +284,17 @@ export default function EmailCheck() {
   const [link, setLink] = useState("");
   const [linkState, setLinkState] = useState<{ busy: boolean; error: string; notes: string[] }>({ busy: false, error: "", notes: [] });
   const [fixes, setFixes] = useState<FixId[]>([]);
+  const [preheader, setPreheader] = useState("");
   const [copied, setCopied] = useState(false);
   const [width, setWidth] = useState(650);
   const [dark, setDark] = useState<DarkMode>("off");
   const [imagesOff, setImagesOff] = useState(false);
   const [stylesOff, setStylesOff] = useState(false);
+  const [sample, setSample] = useState(true);
   const [families, setFamilies] = useState(DEFAULT_FAMILIES);
   const [open, setOpen] = useState<Record<PanelName, boolean>>({ source: true, report: true, preview: true });
   const [height, setHeight] = useState<number | null>(null);
+  const [a11y, setA11y] = useState<A11yReport | null>(null);
   const [data, setData] = useState<CanIEmailData | null>(null);
   const [dataError, setDataError] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -246,7 +324,9 @@ export default function EmailCheck() {
   // The email's height changes as images arrive, so measure a few times.
   const measure = () => {
     const doc = frameRef.current?.contentDocument;
-    if (doc?.documentElement) setHeight(doc.documentElement.scrollHeight);
+    if (!doc?.documentElement) return;
+    setHeight(doc.documentElement.scrollHeight);
+    setA11y(auditDocument(doc));
   };
   const onFrameLoad = () => {
     measure();
@@ -311,6 +391,10 @@ export default function EmailCheck() {
   const addFix = (id: FixId) => setFixes((current) => (current.includes(id) ? current : [...current, id]));
   const addFixes = (ids: FixId[]) => setFixes((current) => [...current, ...ids.filter((id) => !current.includes(id))]);
   const undoFix = (id: FixId) => setFixes((current) => current.filter((f) => f !== id));
+  // Re-applying moves it to the end, so the latest text wins and Undo last undoes it.
+  const applyPreheader = () => {
+    if (preheader.trim()) setFixes((current) => [...current.filter((f) => f !== "preheader"), "preheader"]);
+  };
 
   const onCopy = async () => {
     await navigator.clipboard.writeText(output);
@@ -333,7 +417,8 @@ export default function EmailCheck() {
 
   const togglePanel = (name: PanelName) => setOpen((current) => ({ ...current, [name]: !current[name] }));
 
-  const { src: output, applied } = applyFixes(deferredSource, fixes);
+  const { src: output, applied } = applyFixes(deferredSource, fixes, { preheader });
+  const sampled = fillMergeTags(output);
   const hasSource = deferredSource.trim().length > 0;
   const stats = getStats(output);
   const findings = checkEmail(output);
@@ -392,7 +477,7 @@ export default function EmailCheck() {
             placeholder="Paste a 'view online' link"
             aria-label="Preview link"
           />
-          <button type="submit" disabled={linkState.busy || !link.trim()}>
+          <button type="submit" disabled={linkState.busy || !link.trim()} title="Fetches the page on the server (ActiveCampaign hosts only) and unwraps the email from it">
             {linkState.busy ? "Fetching" : "Fetch"}
           </button>
         </form>
@@ -414,7 +499,7 @@ export default function EmailCheck() {
               e.target.value = "";
             }}
           />
-          <span>Open an HTML file</span>
+          <span title="Reads the file in your browser; nothing is uploaded">Open an HTML file</span>
         </label>
         {fileName && <p className="ec-dim">{fileName}</p>}
 
@@ -438,11 +523,13 @@ export default function EmailCheck() {
               <label htmlFor={outputId} className="ec-label">
                 Output
               </label>
-              <span className="ec-dim">{kb(stats.bytes)}</span>
-              <button type="button" onClick={() => void onCopy()}>
+              <span className="ec-dim" title="Size of the output. Gmail clips a message at about 102KB.">
+                {kb(stats.bytes)}
+              </span>
+              <button type="button" onClick={() => void onCopy()} title="Copies the output, with every applied fix, to the clipboard">
                 {copied ? "Copied" : "Copy"}
               </button>
-              <button type="button" onClick={onDownload}>
+              <button type="button" onClick={onDownload} title="Saves the output as an .html file">
                 Download
               </button>
             </div>
@@ -453,30 +540,31 @@ export default function EmailCheck() {
               readOnly
               spellCheck={false}
               onFocus={(e) => e.target.select()}
+              title="The source with every applied fix. Click to select it all."
             />
 
             <dl className="ec-stats">
-              <div>
+              <div title="Gmail drops a style block over about 16KB">
                 <dt>CSS in style blocks</dt>
                 <dd>{kb(stats.styleBytes)}</dd>
               </div>
-              <div>
+              <div title="The widest fixed width given to a table; 600 to 650px is usual">
                 <dt>Width</dt>
                 <dd>{stats.width ? `${stats.width}px` : "fluid"}</dd>
               </div>
-              <div>
+              <div title="Every non-breaking space in the file; runs of them are what show up as blank space">
                 <dt>Non-breaking spaces</dt>
                 <dd>{stats.nbsp}</dd>
               </div>
-              <div>
+              <div title="The mail standard caps a line at 998 characters">
                 <dt>Longest line</dt>
                 <dd>{stats.longestLine}</dd>
               </div>
-              <div>
+              <div title="Images in the email">
                 <dt>Images</dt>
                 <dd>{stats.images}</dd>
               </div>
-              <div>
+              <div title="Tables in the email, Outlook-only ones included">
                 <dt>Tables</dt>
                 <dd>{stats.tables}</dd>
               </div>
@@ -485,10 +573,34 @@ export default function EmailCheck() {
               <p className="ec-dim">Merge tags</p>
               <p>{stats.platform ? `Looks like ${stats.platform}` : "None found"}</p>
             </div>
-            <div>
-              <p className="ec-dim">Inbox preview line</p>
+            <div title="What inbox lists show under the subject: the hidden preheader if there is one, otherwise the first text in the email.">
+              <p className="ec-dim">Inbox preview line, as it stands</p>
               <p className="ec-preview-text">{stats.previewText || "(no text)"}</p>
             </div>
+            <form
+              className="ec-row"
+              onSubmit={(e) => {
+                e.preventDefault();
+                applyPreheader();
+              }}
+              title="Writes a hidden preheader into the email. It replaces the existing one, or adds one straight after the body tag. It is hidden in every client (mso-hide for Outlook) and padded so the preview stops at the end of your text."
+            >
+              <label htmlFor={`${outputId}-pre`} className="ec-label">
+                Set the preview line
+              </label>
+              <input
+                id={`${outputId}-pre`}
+                type="text"
+                className="ec-input"
+                value={preheader}
+                onChange={(e) => setPreheader(e.target.value)}
+                placeholder="What the inbox should say under the subject"
+                maxLength={200}
+              />
+              <button type="submit" disabled={!preheader.trim()}>
+                {fixes.includes("preheader") ? "Update" : "Apply"}
+              </button>
+            </form>
           </>
         )}
 
@@ -504,32 +616,44 @@ export default function EmailCheck() {
           <p className="ec-dim">The report appears here once there is an email to read.</p>
         ) : (
           <div aria-live="polite">
-            <div className="ec-row">
-              <button type="button" className="ec-primary" onClick={() => addFixes(bulkFixes)} disabled={bulkFixes.length === 0}>
-                {bulkFixes.length ? `Fix all (${bulkFixes.length})` : "Nothing left to fix"}
-              </button>
-              <span className="ec-dim">Each fix can be undone below.</span>
+            <div className="ec-sticky">
+              <div className="ec-row">
+                <button type="button" className="ec-primary" onClick={() => addFixes(bulkFixes)} disabled={bulkFixes.length === 0}>
+                  {bulkFixes.length ? `Fix all (${bulkFixes.length})` : "Nothing left to fix"}
+                </button>
+                <button type="button" onClick={() => undoFix(fixes[fixes.length - 1])} disabled={fixes.length === 0}>
+                  Undo last
+                </button>
+                {applied.length > 0 && (
+                  <details className="ec-note ec-applied-list">
+                    <summary>{plural(applied.length, "fix")} applied</summary>
+                    <ul className="ec-applied" aria-label="Applied fixes">
+                      {applied.map((a) => (
+                        <li key={a.id}>
+                          <span>{a.note || `${FIXES[a.id].label}: nothing to change`}</span>
+                          <button type="button" className="ec-fix" onClick={() => undoFix(a.id)}>
+                            Undo
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+              </div>
             </div>
-
-            {applied.length > 0 && (
-              <ul className="ec-applied" aria-label="Applied fixes">
-                {applied.map((a) => (
-                  <li key={a.id}>
-                    <span>{a.note || `${FIXES[a.id].label}: nothing to change`}</span>
-                    <button type="button" className="ec-fix" onClick={() => undoFix(a.id)}>
-                      Undo
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
 
             <details className="ec-section" open>
               <summary>
                 <h2>Checks</h2>
                 <span className="ec-dim">{findings.length}</span>
               </summary>
-              <p className="ec-dim">Ordered by severity, then by the share of opens each one reaches (Litmus, {SHARE_DATE}).</p>
+              <p className="ec-dim">
+                Ordered by severity, then by the share of opens each one reaches (
+                <a href={NOTE_SOURCES.share[0].url} target="_blank" rel="noreferrer">
+                  Litmus, {SHARE_DATE}
+                </a>
+                ).
+              </p>
               {findings.length === 0 ? (
                 <p className="ec-dim">Nothing flagged.</p>
               ) : (
@@ -538,21 +662,129 @@ export default function EmailCheck() {
                     <li key={f.id} className="ec-item">
                       <div className="ec-item-head">
                         <p className="ec-item-title">
-                          <span className={`ec-level ec-level-${f.level}`}>{LEVEL_LABEL[f.level]}</span> {f.title}
+                          <span className={`ec-level ec-level-${f.level}`}>{LEVEL_LABEL[f.level]}</span>
+                          {f.a11y && <span className="ec-level ec-level-a11y">Accessibility</span>} {f.title}
                         </p>
                         <span className="ec-share" title={f.affects.length ? f.affects.map((a) => data?.nicenames.family[a] ?? a).join(", ") : "Every client"}>
                           {formatShare(f.share)} of opens
                         </span>
                         {f.fix && (
-                          <button type="button" className="ec-fix" onClick={() => addFix(f.fix!)}>
+                          <button type="button" className="ec-fix" onClick={() => addFix(f.fix!)} title="Applies this fix to the output. Undo it from the strip at the top.">
                             {FIXES[f.fix].label}
                           </button>
                         )}
                       </div>
-                      <p>{f.detail}</p>
+                      <p>
+                        {f.detail} <Sources list={f.sources} none />
+                      </p>
                       {f.lines.length > 0 && <p className="ec-dim">{lineList(f.lines)}</p>}
                     </li>
                   ))}
+                </ul>
+              )}
+            </details>
+
+            <details className="ec-section" open>
+              <summary>
+                <h2>Accessibility, as rendered</h2>
+                <span className="ec-dim">{a11y ? a11y.contrast.length + a11y.targets.length + a11y.linksWithoutName.length + a11y.imagesWithoutAlt.length : ""}</span>
+              </summary>
+              <p className="ec-dim">
+                Measured in the preview at {width ? `${width}px` : "the frame's width"}{dark !== "off" ? " in the dark mode shown" : ""}, with the real computed colours and sizes.
+                Contrast is WCAG AA: 4.5:1 for text, 3:1 for large text.
+              </p>
+              {!a11y ? (
+                <p className="ec-dim">Waiting for the preview.</p>
+              ) : (
+                <ul className="ec-list">
+                  {a11y.contrast.length === 0 && a11y.contrastUnknown === 0 && (
+                    <li className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-ok">Pass</span> Every text colour meets AA against its background
+                      </p>
+                    </li>
+                  )}
+                  {a11y.contrast.map((c) => (
+                    <li key={`${c.color}${c.background}${c.large}`} className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-fail">Problem</span> Contrast {c.ratio}:1, needs {c.required}:1
+                      </p>
+                      <p>
+                        <span className="ec-swatch" style={{ color: c.color, background: c.background }}>
+                          {c.color} on {c.background}
+                        </span>{" "}
+                        &quot;{c.text}&quot;{c.large ? " (large text)" : ""}
+                      </p>
+                      <Sources list={NOTE_SOURCES.contrast} />
+                    </li>
+                  ))}
+                  {a11y.contrastUnknown > 0 && (
+                    <li className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-info">Note</span> {a11y.contrastUnknown} text {a11y.contrastUnknown === 1 ? "block sits" : "blocks sit"} on a background image
+                      </p>
+                      <p>Contrast over an image cannot be measured here. Check it by eye, and remember Outlook on Windows shows the background colour instead.</p>
+                    </li>
+                  )}
+                  {a11y.linksWithoutName.map((href) => (
+                    <li key={href} className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-fail">Problem</span> Link with no accessible name
+                      </p>
+                      <p className="ec-dim">{href}</p>
+                      <Sources list={NOTE_SOURCES.linkName} />
+                    </li>
+                  ))}
+                  {a11y.imagesWithoutAlt.map((name) => (
+                    <li key={name} className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-fail">Problem</span> Image with no alt: {name}
+                      </p>
+                      <Sources list={NOTE_SOURCES.alt} />
+                    </li>
+                  ))}
+                  {a11y.targets.length > 0 && (
+                    <li className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-warn">Warning</span> {plural(a11y.targets.length, "link or button")} with a tap area under 24px
+                      </p>
+                      <p>
+                        Only the link itself is clickable, not the padded cell around it, so a text link in a button is as tall as its text. Put the padding on the
+                        link (display:block) to make the whole button tappable. 24×24px passes WCAG 2.2; 44×44px is the usual guide for thumbs.
+                      </p>
+                      <p className="ec-dim">
+                        {a11y.targets
+                          .slice(0, 6)
+                          .map((t) => `"${t.text}" ${t.width}×${t.height}`)
+                          .join(" · ")}
+                        {a11y.targets.length > 6 ? ` and ${a11y.targets.length - 6} more` : ""}
+                      </p>
+                      <Sources list={NOTE_SOURCES.target} />
+                    </li>
+                  )}
+                  {a11y.smallTargets > 0 && (
+                    <li className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-info">Note</span> {plural(a11y.smallTargets, "link or button")} between 24 and 44px
+                      </p>
+                      <p>These pass WCAG but are fiddly for thumbs. Padding on the link itself, not just the cell, enlarges the tap area.</p>
+                    </li>
+                  )}
+                  {a11y.smallText.length > 0 && (
+                    <li className="ec-item">
+                      <p className="ec-item-title">
+                        <span className="ec-level ec-level-info">Note</span> Text rendered under 12px
+                      </p>
+                      <p className="ec-dim">{a11y.smallText.slice(0, 3).map((t) => `${t.size}px "${t.text}"`).join(" · ")}</p>
+                    </li>
+                  )}
+                  <li className="ec-item">
+                    <p className="ec-item-title">
+                      <span className={`ec-level ${a11y.headings ? "ec-level-ok" : "ec-level-info"}`}>{a11y.headings ? "Pass" : "Note"}</span>{" "}
+                      {a11y.headings ? plural(a11y.headings, "heading") : "No headings"} for screen reader navigation
+                    </p>
+                    <Sources list={NOTE_SOURCES.headings} />
+                  </li>
                 </ul>
               )}
             </details>
@@ -563,7 +795,11 @@ export default function EmailCheck() {
                 <span className="ec-dim">{data ? unsupported.length : ""}</span>
               </summary>
               <p className="ec-dim">
-                What this email uses, looked up in the caniemail.com test results{data ? ` (updated ${data.last_update_date.slice(0, 10)})` : ""}, ordered by
+                What this email uses, looked up in the{" "}
+                <a href={NOTE_SOURCES.caniemail[0].url} target="_blank" rel="noreferrer">
+                  caniemail.com
+                </a>{" "}
+                test results{data ? ` (updated ${data.last_update_date.slice(0, 10)})` : ""}, ordered by
                 the share of opens that cannot show it. Shares below a client family are a rough split.
               </p>
 
@@ -581,13 +817,23 @@ export default function EmailCheck() {
                 <>
                   <div className="ec-chips" role="group" aria-label="Clients to include">
                     {FAMILIES.filter((f) => f in data.nicenames.family).map((family) => (
-                      <button key={family} type="button" aria-pressed={families.includes(family)} onClick={() => toggleFamily(family)}>
+                      <button
+                        key={family}
+                        type="button"
+                        aria-pressed={families.includes(family)}
+                        onClick={() => toggleFamily(family)}
+                        title={`${formatShare(SHARE[family] ?? 0)} of opens (Litmus, ${SHARE_DATE}). Click to include or leave out this client family.`}
+                      >
                         {data.nicenames.family[family]} <span className="ec-client-share">{formatShare(SHARE[family] ?? 0)}</span>
                       </button>
                     ))}
                   </div>
 
-                  <dl className="ec-env" aria-label="Opens reaching something unsupported, by environment">
+                  <dl
+                    className="ec-env"
+                    aria-label="Opens reaching something unsupported, by environment"
+                    title="Of the opens on each kind of device, how many land on a client that cannot show at least one thing this email uses. The split of a client family between its apps is an estimate."
+                  >
                     {environmentHit.map((e) => (
                       <div key={e.key}>
                         <dt>{e.label}</dt>
@@ -599,7 +845,13 @@ export default function EmailCheck() {
                   </dl>
 
                   <div className="ec-row">
-                    <button type="button" className="ec-primary" onClick={() => addFixes(clientFixes)} disabled={clientFixes.length === 0}>
+                    <button
+                      type="button"
+                      className="ec-primary"
+                      onClick={() => addFixes(clientFixes)}
+                      disabled={clientFixes.length === 0}
+                      title="Applies the client fixes that need no design decision: styles into the head, unused font links, font fallbacks, a colour behind background images, table roles"
+                    >
                       {clientFixes.length ? `Apply client fixes (${clientFixes.length})` : "No automatic client fixes"}
                     </button>
                     <span className="ec-dim">Only what can be fixed without a design decision.</span>
@@ -633,44 +885,87 @@ export default function EmailCheck() {
       </Panel>
 
       <Panel name="preview" title="Preview" open={open.preview} onToggle={togglePanel} className="ec-preview">
-        <div className="ec-bar">
-          <div className="ec-chips" role="group" aria-label="Preview width">
-            {WIDTHS.map((w) => (
-              <button key={w.label} type="button" aria-pressed={width === w.value} onClick={() => setWidth(w.value)}>
-                {w.label}
-                {w.value ? ` ${w.value}` : ""}
+        <div className="ec-notes-row">
+          <details className="ec-controls" open>
+          <summary>Preview controls</summary>
+          <div className="ec-bar">
+            <div className="ec-chips" role="group" aria-label="Preview width">
+              {WIDTHS.map((w) => (
+                <button
+                  key={w.label}
+                  type="button"
+                  aria-pressed={width === w.value}
+                  onClick={() => setWidth(w.value)}
+                  title={w.value ? `Preview at ${w.value}px wide` : "Preview as wide as the frame"}
+                >
+                  {w.label}
+                  {w.value ? ` ${w.value}` : ""}
+                </button>
+              ))}
+            </div>
+            <div className="ec-chips" role="group" aria-label="Colour scheme">
+              {DARK_MODES.map((m) => (
+                <button key={m.value} type="button" aria-pressed={dark === m.value} onClick={() => setDark(m.value)} title={DARK_TIPS[m.value]}>
+                  {m.label}
+                </button>
+              ))}
+            </div>
+            <div className="ec-chips" role="group" aria-label="Preview conditions">
+              <button type="button" aria-pressed={imagesOff} onClick={() => setImagesOff((v) => !v)} title="Hides every image, as a reader sees the email before allowing them">
+                Images off
               </button>
-            ))}
-          </div>
-          <div className="ec-chips" role="group" aria-label="Colour scheme">
-            {DARK_MODES.map((m) => (
-              <button key={m.value} type="button" aria-pressed={dark === m.value} onClick={() => setDark(m.value)}>
-                {m.label}
+              <button
+                type="button"
+                aria-pressed={sample}
+                onClick={() => setSample((v) => !v)}
+                title="Fills name and email merge tags with a sample person in the preview only. The output keeps the tags."
+              >
+                Sample data
               </button>
-            ))}
+              <button type="button" aria-pressed={stylesOff} onClick={() => setStylesOff((v) => !v)} title="Drops the style blocks and leaves inline styles only, as Gmail does for non-Google accounts">
+                Style blocks off
+              </button>
+            </div>
           </div>
-          <div className="ec-chips" role="group" aria-label="Preview conditions">
-            <button type="button" aria-pressed={imagesOff} onClick={() => setImagesOff((v) => !v)}>
-              Images off
-            </button>
-            <button type="button" aria-pressed={stylesOff} onClick={() => setStylesOff((v) => !v)}>
-              Style blocks off
-            </button>
-          </div>
+          </details>
+          <Note title="What this preview is">
+            Showing the output with every applied fix. <span suppressHydrationWarning>{engineNote()}</span>
+          </Note>
+          {hasSource && height !== null && (
+            <Note title={`Height ${height.toLocaleString()}px${tooTall ? ", over Outlook's page limit" : ""}`} tone={tooTall ? "warn" : undefined} sources={NOTE_SOURCES.height}>
+              {tooTall
+                ? `Taller than ${OUTLOOK_PAGE_HEIGHT.toLocaleString()}px at this width. Outlook on Windows lays long emails out as pages and draws a line where it breaks them, so any single table taller than this gets cut through. Split it into shorter stacked tables.`
+                : `Measured at this width with images loaded. Outlook on Windows draws a page-break line through content taller than ${OUTLOOK_PAGE_HEIGHT.toLocaleString()}px.`}
+            </Note>
+          )}
+          {hasSource && sample && sampled.filled.length + sampled.left.length > 0 && (
+            <Note title={`Sample data: ${plural(sampled.filled.length, "merge tag")} filled`}>
+              {sampled.filled.length > 0 && <>Showing {sampled.filled.join(", ")}. </>}
+              These are still variables in the email. The preview fills them in to show the email as it would be delivered; the output and the report keep
+              the tags as written.
+              {sampled.left.length > 0 && <> No sample value for {sampled.left.join(", ")}, so {sampled.left.length === 1 ? "it is" : "they are"} shown as written.</>}
+            </Note>
+          )}
+          {dark === "scheme" && (
+            <Note title={`Dark: your styles, about ${formatShare(darkReach("own styles").share * DARK_MODE_USE)} of opens`} sources={NOTE_SOURCES.dark} open>
+              Turns on the email&apos;s own prefers-color-scheme rules and changes nothing else. If the email has none, this looks the same as Light, which is
+              what these readers get. <DarkReach behaviour="own styles" />
+            </Note>
+          )}
+          {dark === "invert" && (
+            <Note title={`Dark: inverted, about ${formatShare(darkReach("full invert").share * DARK_MODE_USE)} of opens`} sources={NOTE_SOURCES.dark} open>
+              Flips every colour, light and dark. <DarkReach behaviour="full invert" /> A further {formatShare(darkReach("partial invert").share * DARK_MODE_USE)}{" "}
+              ({darkReach("partial invert").clients.join(", ")}) get a partial invert, where only light backgrounds are darkened: between this and Light, and not
+              previewed here.
+            </Note>
+          )}
+          {stylesOff && (
+            <Note title="Style blocks off" sources={NOTE_SOURCES.stylesOff}>
+              Roughly what clients without style support show, such as the Gmail app on a non-Google account: inline styles only, no media queries.
+            </Note>
+          )}
+          {imagesOff && <Note title="Images off" sources={NOTE_SOURCES.imagesOff}>What a reader sees before they allow images, which is Outlook&apos;s default. Alt text and background colours do the work here.</Note>}
         </div>
-        <p className="ec-dim">
-          Showing the output with every applied fix. <span suppressHydrationWarning>{engineNote()}</span>
-          {hasSource && height !== null && ` The email is ${height.toLocaleString()}px tall at this width.`}
-          {dark === "scheme" && " Dark: your styles turns on the email's own prefers-color-scheme rules, as Apple Mail and Outlook for Mac do."}
-          {dark === "invert" && " Dark: inverted flips every colour, as Outlook for Windows does; the Gmail apps and Samsung Email invert only the light ones, so they land between this and Light."}
-          {stylesOff && " Style blocks off is roughly what clients without style support show, such as the Gmail app on a non-Google account."}
-        </p>
-        {hasSource && tooTall && (
-          <p className="ec-notice">
-            Taller than {OUTLOOK_PAGE_HEIGHT.toLocaleString()}px. Outlook on Windows lays long emails out as pages and draws a line where it breaks them, so
-            any single table taller than this gets cut through. Split it into shorter stacked tables.
-          </p>
-        )}
         <div className="ec-stage">
           {hasSource && (
             <iframe
@@ -678,7 +973,7 @@ export default function EmailCheck() {
               title="Email preview"
               // Same origin so the height can be read; no scripts run in it.
               sandbox="allow-same-origin"
-              srcDoc={previewSource(output, imagesOff, stylesOff, dark)}
+              srcDoc={previewSource(sample ? sampled.src : output, imagesOff, stylesOff, dark)}
               onLoad={onFrameLoad}
               style={{ width: width ? `${width}px` : "100%" }}
             />

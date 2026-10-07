@@ -37,8 +37,9 @@ export type FixId =
   | "styles-to-head"
   | "font-fallbacks"
   | "bg-color-fallback"
-  | "link-target"
-  | "outlook-typography";
+  | "outlook-typography"
+  | "html-lang"
+  | "preheader";
 
 export interface Finding {
   id: string;
@@ -52,7 +53,118 @@ export interface Finding {
   affects: string[];
   /** share of opens reached, 0 to 100 */
   share: number;
+  /** an accessibility finding: who it reaches is about people, not clients */
+  a11y?: boolean;
+  /** where the claim comes from; empty when it rests on common practice only */
+  sources: Source[];
 }
+
+export type SourceKind = "standard" | "test data" | "client docs" | "vendor research";
+
+export interface Source {
+  label: string;
+  url: string;
+  /** how much weight it carries: a standard, published test results, the client maker's own docs, or a testing vendor's write-up */
+  kind: SourceKind;
+}
+
+/**
+ * Sourcing rule: only standards bodies, caniemail's test results, the client
+ * maker's own documentation, or research published by the email-testing
+ * vendors (Litmus, Email on Acid) and the original write-up of a technique.
+ * Every link here was loaded and searched for the claim it backs. A check
+ * with no entry is unsourced: it rests on common practice, and the report
+ * says so.
+ */
+const wcag = (path: string, label: string): Source => ({ label, url: `https://www.w3.org/WAI/${path}`, kind: "standard" });
+const cie = (slug: string, label: string): Source => ({ label: `caniemail: ${label}`, url: `https://www.caniemail.com/features/${slug}/`, kind: "test data" });
+
+const SRC = {
+  gmailCss: { label: "Google: Gmail CSS support", url: "https://developers.google.com/workspace/gmail/design/css", kind: "client docs" },
+  gmailSenders: { label: "Google: email sender guidelines", url: "https://support.google.com/a/answer/81126", kind: "client docs" },
+  gmailEoa: {
+    label: "Email on Acid: developing for Gmail",
+    url: "https://www.emailonacid.com/blog/article/email-development/12-things-you-must-know-when-developing-for-gmail-and-gmail-mobile-apps-2/",
+    kind: "vendor research",
+  },
+  rfc5322: { label: "RFC 5322 §2.1.1, line length limits", url: "https://www.rfc-editor.org/rfc/rfc5322#section-2.1.1", kind: "standard" },
+  dpi: { label: "Courtney Fantinato: correcting Outlook DPI scaling", url: "https://www.courtneyfantinato.com/correcting-outlook-dpi-scaling-issues/", kind: "vendor research" },
+  wordEngine: {
+    label: "Microsoft: Word 2007 HTML and CSS rendering in Outlook",
+    url: "https://learn.microsoft.com/en-us/previous-versions/office/developer/office-2007/aa338201(v=office.12)",
+    kind: "client docs",
+  },
+  pageBreak: {
+    label: "Email on Acid: spacing issues in Outlook (the 23.7 inch limit)",
+    url: "https://www.emailonacid.com/blog/article/email-development/horizontal_spacing_issues_in_outlook_2007_and_2010/",
+    kind: "vendor research",
+  },
+  owaGap: {
+    label: "Email on Acid: image spacing in Outlook Web App",
+    url: "https://www.emailonacid.com/blog/article/email-development/two_fixes_for_image_spacing_in_outlook_web_app_owa/",
+    kind: "vendor research",
+  },
+  vml: {
+    label: "Email on Acid: VML and backgrounds",
+    url: "https://www.emailonacid.com/blog/article/email-development/emailology_vector_markup_language_and_backgrounds/",
+    kind: "vendor research",
+  },
+  buttons: { label: "Litmus: bulletproof buttons", url: "https://www.litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design", kind: "vendor research" },
+  darkMode: { label: "Litmus: guide to dark mode for email", url: "https://www.litmus.com/blog/the-ultimate-guide-to-dark-mode-for-email-marketers", kind: "vendor research" },
+  preheader: { label: "Litmus: the preview text hack", url: "https://www.litmus.com/blog/the-little-known-preview-text-hack-you-may-want-to-use-in-every-email", kind: "vendor research" },
+  share: { label: "Litmus: email client market share", url: "https://www.litmus.com/email-client-market-share", kind: "vendor research" },
+  textSize: { label: "MDN: text-size-adjust", url: "https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust", kind: "standard" },
+  acUnsub: { label: "ActiveCampaign: why unsubscribe links are required", url: "https://help.activecampaign.com/hc/en-us/articles/115001227004", kind: "client docs" },
+} satisfies Record<string, Source>;
+
+/** Reading behind each check, keyed by finding id. No entry means unsourced. */
+export const SOURCES: Record<string, Source[]> = {
+  size: [SRC.gmailEoa],
+  "style-size": [cie("html-style", "<style>, the 16KB note"), SRC.gmailCss],
+  "styles-in-body": [cie("html-style", "<style>, not supported in the body"), SRC.gmailCss],
+  "line-length": [SRC.rfc5322],
+  preheader: [SRC.preheader],
+  "zero-width": [SRC.preheader],
+  unsubscribe: [SRC.gmailSenders],
+  "ac-unsubscribe": [SRC.acUnsub],
+  "text-size-adjust": [SRC.textSize],
+  "color-scheme": [cie("html-meta-color-scheme", "color-scheme meta"), SRC.darkMode],
+  "pure-black": [SRC.darkMode],
+  ppi: [SRC.dpi, cie("html-width", "width attribute, the 120 dpi note")],
+  "xmlns-o": [SRC.dpi],
+  "ghost-width": [cie("html-width", "width attribute, the 120 dpi note"), SRC.dpi],
+  "max-width": [cie("css-max-width", "max-width")],
+  "line-height-rule": [cie("css-line-height", "line-height, the Outlook note")],
+  "spacer-cells": [cie("css-line-height", "line-height, the Outlook note")],
+  "bg-no-vml": [cie("css-background-image", "background-image"), SRC.vml],
+  "outlook-spacing": [cie("css-padding", "padding, table cells only in Outlook"), cie("css-margin", "margin")],
+  "img-width": [cie("html-width", "width attribute")],
+  "img-inline": [SRC.owaGap],
+  "img-alt": [wcag("tutorials/images/", "W3C: images tutorial")],
+  "img-alt-weak": [wcag("tutorials/images/informative/", "W3C: informative images")],
+  lang: [wcag("WCAG21/Understanding/language-of-page.html", "WCAG 3.1.1, language of page")],
+  "table-role": [wcag("tutorials/tables/tips/", "W3C: tables, layout tables"), cie("html-role", "role attribute")],
+  "link-no-name": [wcag("WCAG21/Understanding/link-purpose-in-context.html", "WCAG 2.4.4, link purpose")],
+  "link-generic": [wcag("WCAG21/Understanding/link-purpose-in-context.html", "WCAG 2.4.4, link purpose")],
+  headings: [wcag("WCAG21/Understanding/headings-and-labels.html", "WCAG 2.4.6, headings and labels"), cie("html-h1-h6", "h1 to h6")],
+  "font-fallbacks": [cie("css-at-font-face", "@font-face, the Times New Roman note")],
+  "unused-fonts": [cie("html-link", "<link>")],
+};
+
+/** Reading behind the preview notes and the rendered audit. */
+export const NOTE_SOURCES = {
+  height: [SRC.pageBreak, SRC.wordEngine],
+  dark: [SRC.darkMode, cie("css-at-media-prefers-color-scheme", "prefers-color-scheme")],
+  stylesOff: [cie("html-style", "<style>, non-Google accounts"), SRC.gmailCss],
+  imagesOff: [wcag("tutorials/images/", "W3C: images tutorial")],
+  contrast: [wcag("WCAG21/Understanding/contrast-minimum.html", "WCAG 1.4.3, contrast minimum")],
+  target: [wcag("WCAG22/Understanding/target-size-minimum.html", "WCAG 2.5.8, target size minimum"), SRC.buttons],
+  linkName: [wcag("WCAG21/Understanding/link-purpose-in-context.html", "WCAG 2.4.4, link purpose")],
+  alt: [wcag("tutorials/images/", "W3C: images tutorial")],
+  headings: [wcag("WCAG21/Understanding/headings-and-labels.html", "WCAG 2.4.6, headings and labels")],
+  share: [SRC.share],
+  caniemail: [{ label: "caniemail.com", url: "https://www.caniemail.com/", kind: "test data" }],
+} satisfies Record<string, Source[]>;
 
 export interface Stats {
   bytes: number;
@@ -149,6 +261,35 @@ export function formatShare(share: number): string {
   if (share >= 10) return `${Math.round(share)}%`;
   if (share >= 0.1) return `${share.toFixed(1)}%`;
   return "<0.1%";
+}
+
+/**
+ * What each client does to an email in dark mode, from Litmus's dark mode
+ * guide: leaves it alone and honours the email's own prefers-color-scheme
+ * styles, inverts the light colours only, or inverts everything. Clients not
+ * in their table (Gmail on the web, Yahoo, Samsung) are left out, not guessed.
+ */
+export type DarkBehaviour = "own styles" | "partial invert" | "full invert";
+export const DARK_CLIENTS: { family: string; platform: string; label: string; behaviour: DarkBehaviour }[] = [
+  { family: "apple-mail", platform: "ios", label: "Apple Mail on iPhone and iPad", behaviour: "own styles" },
+  { family: "apple-mail", platform: "macos", label: "Apple Mail on Mac", behaviour: "own styles" },
+  { family: "gmail", platform: "ios", label: "Gmail app on iOS", behaviour: "full invert" },
+  { family: "gmail", platform: "android", label: "Gmail app on Android", behaviour: "partial invert" },
+  { family: "outlook", platform: "windows", label: "Outlook on Windows", behaviour: "full invert" },
+  { family: "outlook", platform: "windows-mail", label: "Windows Mail", behaviour: "full invert" },
+  { family: "outlook", platform: "outlook-com", label: "Outlook.com", behaviour: "partial invert" },
+  { family: "outlook", platform: "ios", label: "Outlook app on iOS", behaviour: "partial invert" },
+  { family: "outlook", platform: "android", label: "Outlook app on Android", behaviour: "partial invert" },
+  { family: "outlook", platform: "macos", label: "Outlook on Mac", behaviour: "partial invert" },
+];
+
+/** Litmus: of the opens it tracked in 2022, an average of 35% were in dark mode. */
+export const DARK_MODE_USE = 0.35;
+
+/** Share of all opens going to clients with this dark mode behaviour, and their names. */
+export function darkReach(behaviour: DarkBehaviour): { share: number; clients: string[] } {
+  const clients = DARK_CLIENTS.filter((c) => c.behaviour === behaviour);
+  return { share: clients.reduce((n, c) => n + shareOf(c.family, c.platform), 0), clients: clients.map((c) => c.label) };
 }
 
 const ALL_FAMILIES = Object.keys(SHARE);
@@ -297,9 +438,13 @@ function isAlignedTable(tag: Tag): boolean {
   return !tag.mso && tag.name === "table" && /^(left|right)$/i.test(tag.attrs.align ?? "") && !styleHas(tag.attrs.style, "mso-table-lspace");
 }
 
+function isHiddenElement(tag: Tag): boolean {
+  return styleGet(tag.attrs.style, "display").startsWith("none");
+}
+
 function isHiddenPreheader(tag: Tag): boolean {
   const s = tag.attrs.style ?? "";
-  return styleGet(s, "display") === "none" && (styleHas(s, "max-height") || styleHas(s, "mso-hide") || styleHas(s, "max-width"));
+  return styleGet(s, "display").startsWith("none") && (styleHas(s, "max-height") || styleHas(s, "mso-hide") || styleHas(s, "max-width"));
 }
 
 function hasBackgroundImage(tag: Tag): boolean {
@@ -348,6 +493,39 @@ function widestTable(tags: Tag[]): number | null {
   return widest;
 }
 
+/** Stand-in values for the preview, so a merge tag shows as it would once delivered. */
+const SAMPLE_VALUES: [RegExp, string][] = [
+  [/^(FIRSTNAME|FNAME|FIRST)$/, "Nick"],
+  [/^(LASTNAME|LNAME|SURNAME|LAST)$/, "Lieb"],
+  [/^(FULLNAME|NAME|CONTACTNAME)$/, "Nick Lieb"],
+  [/^(EMAIL|EMAILADDRESS)$/, "nick.lieb@example.com"],
+];
+
+export interface SampleFill {
+  src: string;
+  /** "%FIRSTNAME% as Nick" */
+  filled: string[];
+  /** tags with no stand-in, shown as written */
+  left: string[];
+}
+
+/** For the preview only: the output keeps its merge tags. */
+export function fillMergeTags(src: string): SampleFill {
+  const filled = new Set<string>();
+  const left = new Set<string>();
+  const out = src.replace(MERGE_TAG, (tag) => {
+    const key = tag.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const value = SAMPLE_VALUES.find(([re]) => re.test(key))?.[1];
+    if (!value) {
+      left.add(tag);
+      return tag;
+    }
+    filled.add(`${tag} as ${value}`);
+    return value;
+  });
+  return { src: out, filled: [...filled], left: [...left] };
+}
+
 function detectPlatform(src: string): string | null {
   if (/%[A-Z][A-Z0-9_-]*%/.test(src)) return "ActiveCampaign";
   if (/\*\|[^|*]+\|\*/.test(src)) return "Mailchimp";
@@ -389,7 +567,7 @@ export function getStats(src: string): Stats {
 const OUTLOOK = ["outlook"];
 const APPLE = ["apple-mail"];
 const GMAIL = ["gmail"];
-const INVERTERS = ["gmail", "outlook", "samsung-email"];
+const INVERTERS = ["gmail", "outlook"];
 
 export function checkEmail(src: string): Finding[] {
   const out: Finding[] = [];
@@ -402,7 +580,7 @@ export function checkEmail(src: string): Finding[] {
     level: Level,
     title: string,
     detail: string,
-    opts: { lines?: number[]; fix?: FixId; affects?: string[] } = {},
+    opts: { lines?: number[]; fix?: FixId; affects?: string[]; a11y?: boolean } = {},
   ) => {
     const affects = opts.affects ?? [];
     out.push({
@@ -414,6 +592,8 @@ export function checkEmail(src: string): Finding[] {
       fix: opts.fix,
       affects,
       share: affects.length ? sumShare(affects) : sumShare(ALL_FAMILIES),
+      a11y: opts.a11y,
+      sources: SOURCES[id] ?? [],
     });
   };
   const linesOf = (re: RegExp) => [...src.matchAll(re)].map((m) => lineOf(m.index));
@@ -570,7 +750,13 @@ export function checkEmail(src: string): Finding[] {
     add("doctype", "warn", "No doctype", "Without one, webmail clients fall back to quirks rendering and spacing changes.");
   }
   if (html && !html.attrs.lang) {
-    add("lang", "info", "No lang on the html tag", "Screen readers use it to pick the right pronunciation.", { lines: [html.line] });
+    add(
+      "lang",
+      "warn",
+      "No lang on the html tag",
+      'Screen readers use it to pick the voice and pronunciation; without it they guess from the reader\'s settings. The fix adds lang="en"; change it if the email is in another language.',
+      { lines: [html.line], fix: "html-lang", a11y: true },
+    );
   }
   if (!metas.some((t) => "charset" in t.attrs || /charset/i.test(t.attrs.content ?? ""))) {
     add("charset", "warn", "No charset meta tag", "Without it, accented letters, pound signs and curly quotes can arrive as garbage.");
@@ -590,7 +776,8 @@ export function checkEmail(src: string): Finding[] {
       "preheader",
       "info",
       "No hidden preheader",
-      `The inbox preview line will show the first text in the email: "${stats.previewText}". A hidden preheader lets you choose that line instead.`,
+      `The inbox preview line will show the first text in the email: "${stats.previewText}". Type a preview line in the source panel to add a hidden preheader.`,
+      { a11y: false },
     );
   }
   if (!/unsubscribe|opt[\s-]?out|manage (your )?preferences|\{\{\s*unsub|%unsub|\*\|unsub/i.test(src)) {
@@ -680,7 +867,7 @@ export function checkEmail(src: string): Finding[] {
       "pure-black",
       "info",
       `${plural(pureBlack.length, "pure black background")}`,
-      "Clients that invert colours for dark mode (Gmail apps, Samsung Email, Outlook on Windows) turn pure black into white. A very dark grey such as #111111 is usually left alone.",
+      "Clients that fully invert colours in dark mode (the Gmail app on iOS, Outlook on Windows) flip dark backgrounds as well as light ones, so pure black can come out white.",
       { lines: pureBlack, affects: INVERTERS },
     );
   }
@@ -817,10 +1004,33 @@ export function checkEmail(src: string): Finding[] {
   if (noAlt.length) {
     add(
       "img-alt",
-      "warn",
+      "fail",
       `${plural(noAlt.length, "image")} with no alt attribute`,
-      'Screen readers read out the file name, and with images blocked the space is blank. Decorative images still need alt="".',
-      { lines: noAlt },
+      'Screen readers read out the file name instead, and with images blocked (Outlook\'s default) the space is blank. Describe what the image says or shows; a purely decorative image gets alt="".',
+      { lines: noAlt, a11y: true },
+    );
+  }
+  const badAlt = imgLines((t) => {
+    const alt = (t.attrs.alt ?? "").trim();
+    return alt.length > 0 && (/\.(png|jpe?g|gif|webp|svg)$/i.test(alt) || /^(image|img|photo|picture|banner|graphic|spacer|untitled)\b/i.test(alt) || /^[\w-]{20,}$/.test(alt));
+  });
+  if (badAlt.length) {
+    add(
+      "img-alt-weak",
+      "warn",
+      `${plural(badAlt.length, "image")} with alt text that says nothing`,
+      "A file name or a word like \"image\" is read aloud as it is. Say what the image shows, or use an empty alt if it is decorative.",
+      { lines: badAlt, a11y: true },
+    );
+  }
+  const longAlt = imgLines((t) => (t.attrs.alt ?? "").length > 125);
+  if (longAlt.length) {
+    add(
+      "img-alt-long",
+      "info",
+      `${plural(longAlt.length, "image")} with alt text over 125 characters`,
+      "Some screen readers cut alt text off around there. Keep the description short and put the rest in the body copy.",
+      { lines: longAlt, a11y: true },
     );
   }
   const noWidth = imgLines((t) => !/^\d+$/.test(t.attrs.width ?? ""));
@@ -839,7 +1049,7 @@ export function checkEmail(src: string): Finding[] {
       "img-height-empty",
       "info",
       `${plural(emptyHeight.length, "image")} with an empty height attribute`,
-      'Usually a leftover from a width/height pair where the value was dropped so height:auto could take over on mobile; ActiveCampaign\'s editor then writes it as a bare "height". Browsers and WebKit-based clients treat it exactly like no attribute at all. It is a tidy-up, not a fix, so it is left out of Fix all.',
+      'Usually a leftover from a width/height pair where the value was dropped so height:auto could take over on mobile; ActiveCampaign\'s editor then writes it as a bare "height". Browsers and WebKit-based clients treat it exactly like no attribute at all. Removing it cannot change how any client renders the image, so it is safe to clean up.',
       { lines: emptyHeight, fix: "img-height-empty" },
     );
   }
@@ -906,8 +1116,8 @@ export function checkEmail(src: string): Finding[] {
       "table-role",
       "info",
       `${plural(noRole.length, "layout table")} without role="presentation"`,
-      "Screen readers announce these as data tables and read out row and column counts.",
-      { lines: noRole, fix: "table-role" },
+      "Screen readers announce these as data tables and read out row and column counts before any content.",
+      { lines: noRole, fix: "table-role", a11y: true },
     );
   }
   const noReset = tables.filter((t) => !("cellpadding" in t.attrs) || !("cellspacing" in t.attrs)).map((t) => t.line);
@@ -926,6 +1136,39 @@ export function checkEmail(src: string): Finding[] {
   if (deadLinks.length) {
     add("link-empty", "warn", `${plural(deadLinks.length, "link")} going nowhere`, "The href is empty or just a # placeholder.", { lines: deadLinks });
   }
+  const linkText = (t: Tag) => {
+    const close = src.indexOf("</a>", t.end);
+    return close === -1 ? "" : src.slice(t.end, close);
+  };
+  const emptyLinks = links
+    .filter((t) => {
+      const inner = linkText(t);
+      const text = decodeEntities(inner.replace(/<[^>]+>/g, " ")).trim();
+      const imgAlt = [...inner.matchAll(/<img\b[^>]*\balt\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)].some((m) => (m[1] ?? m[2] ?? "").trim());
+      return !text && !imgAlt && !t.attrs["aria-label"] && !t.attrs.title;
+    })
+    .map((t) => t.line);
+  if (emptyLinks.length) {
+    add(
+      "link-no-name",
+      "fail",
+      `${plural(emptyLinks.length, "link")} with no accessible name`,
+      "A link wrapping only an image with empty alt, or no text at all, is announced as \"link\" with nowhere to go. Give the image alt text that says where the link leads, or add aria-label. If it is an arrow icon beside a text link to the same place, put the icon inside that link instead, or add aria-hidden=\"true\" to the icon link.",
+      { lines: emptyLinks, a11y: true },
+    );
+  }
+  const genericLinks = links
+    .filter((t) => /^\s*(click here|here|read more|learn more|more|link|this)\s*[.!]?\s*$/i.test(decodeEntities(linkText(t).replace(/<[^>]+>/g, " "))))
+    .map((t) => t.line);
+  if (genericLinks.length) {
+    add(
+      "link-generic",
+      "warn",
+      `${plural(genericLinks.length, "link")} that just says "click here" or similar`,
+      "Screen reader users often jump between links and hear them out of context. Say where the link goes: \"View my account\", not \"click here\".",
+      { lines: genericLinks, a11y: true },
+    );
+  }
   const httpLinks = links.filter((t) => /^http:/i.test(t.attrs.href ?? "")).map((t) => t.line);
   if (httpLinks.length) {
     add("link-http", "info", `${plural(httpLinks.length, "link")} using http`, "Worth switching to https where the destination supports it.", { lines: httpLinks });
@@ -940,14 +1183,24 @@ export function checkEmail(src: string): Finding[] {
       { lines: uncolouredLinks, affects: [...GMAIL, ...OUTLOOK] },
     );
   }
-  const noTarget = links.filter((t) => /^https?:/i.test(t.attrs.href ?? "") && !("target" in t.attrs)).map((t) => t.line);
-  if (noTarget.length) {
+  // ── Reading ─────────────────────────────────────────────────────────
+  if (!tags.some((t) => !t.mso && (/^h[1-6]$/.test(t.name) || t.attrs.role === "heading"))) {
     add(
-      "link-target",
+      "headings",
       "info",
-      `${plural(noTarget.length, "link")} without target="_blank"`,
-      "In webmail, a link without it can open inside the mail window and lose the person's place. Most clients add it, but not all.",
-      { lines: noTarget, fix: "link-target" },
+      "No headings",
+      'Screen reader users navigate by headings. Styled table cells are not headings; use <h1> and <h2> with the margins reset, or add role="heading" aria-level="2" to the cell.',
+      { a11y: true },
+    );
+  }
+  const tinyText = tags.filter((t) => !t.mso && ["td", "p", "span", "div", "a", "li"].includes(t.name) && Number.parseFloat(styleGet(t.attrs.style, "font-size")) < 12 && !/^0/.test(styleGet(t.attrs.style, "font-size"))).map((t) => t.line);
+  if (tinyText.length) {
+    add(
+      "small-text",
+      "info",
+      `Text under 12px on ${plural(tinyText.length, "element")}`,
+      "Hard to read on a phone, and iOS Mail enlarges anything under 13px on its own. Footers are the usual place; 12px with a decent line-height is the floor most guides use.",
+      { lines: tinyText, a11y: true },
     );
   }
 
@@ -1046,11 +1299,30 @@ export interface FixOutcome {
   note: string;
 }
 
+/** Values a fix needs from the person, by fix id. */
+export interface FixParams {
+  preheader?: string;
+}
+
 export interface Fix {
   label: string;
   /** part of Fix all; false for the ones a person should choose */
   bulk: boolean;
-  apply: (src: string) => FixOutcome;
+  apply: (src: string, params: FixParams) => FixOutcome;
+}
+
+/**
+ * The hidden preheader clients show as the inbox preview line. Invisible in
+ * every client that honours display:none, mso-hide for Outlook, and padded
+ * with zero-width characters so the preview line stops at the end of the
+ * text instead of running on into the body copy.
+ */
+const PREHEADER_STYLE = "display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;font-family:sans-serif;";
+// Broken over lines so the padding never builds a line past the 998 character limit.
+const PREHEADER_PAD = `\n${Array.from({ length: 10 }, () => "&#847;&zwnj;&nbsp;".repeat(8)).join("\n")}\n`;
+
+function escapeText(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 const same = (src: string): FixOutcome => ({ src, note: "" });
@@ -1065,7 +1337,7 @@ export const FIXES: Record<FixId, Fix> = {
       const head = tags.find((t) => t.name === "head" && !t.mso);
       if (!head) return same(src);
       let out = applyEdits(src, [{ start: head.end, end: head.end, text: `\n${PPI_BLOCK}` }]);
-      out = FIXES["xmlns-o"].apply(out).src;
+      out = FIXES["xmlns-o"].apply(out, {}).src;
       return { src: out, note: "Added the PixelsPerInch setting for Outlook" };
     },
   },
@@ -1095,7 +1367,7 @@ export const FIXES: Record<FixId, Fix> = {
   },
   "img-height-empty": {
     label: "Remove empty height attributes",
-    bulk: false,
+    bulk: true,
     apply(src) {
       const [out, n] = rewriteTags(
         src,
@@ -1276,6 +1548,48 @@ export const FIXES: Record<FixId, Fix> = {
       return { src: out, note: n ? `Added a white bgcolor behind ${plural(n, "background image")} (change it to suit)` : "" };
     },
   },
+  preheader: {
+    label: "Set the inbox preview line",
+    bulk: false,
+    apply(src, params) {
+      const text = (params.preheader ?? "").replace(/\s+/g, " ").trim();
+      if (!text) return same(src);
+      const content = `${escapeText(text)}${PREHEADER_PAD}`;
+      const { tags } = parse(src);
+      // Only a hidden span or div of plain text, ahead of the first table, is a preheader.
+      // A hidden block further down is mobile-only content and must not be overwritten.
+      const firstTable = tags.find((t) => !t.mso && t.inBody && t.name === "table")?.start ?? Number.POSITIVE_INFINITY;
+      const existing = tags.find((t) => {
+        if (t.mso || !t.inBody || t.start > firstTable || !isHiddenElement(t) || (t.name !== "span" && t.name !== "div")) return false;
+        const close = src.indexOf(`</${t.name}>`, t.end);
+        return close !== -1 && !src.slice(t.end, close).includes("<");
+      });
+      if (existing) {
+        // Replace what is inside the preheader element, keeping its tag and styles.
+        const close = src.indexOf(`</${existing.name}>`, existing.end);
+        const current = src.slice(existing.end, close);
+        if (current === content) return same(src);
+        return { src: `${src.slice(0, existing.end)}${content}${src.slice(close)}`, note: `Set the inbox preview line to "${text}"` };
+      }
+      const body = /<body\b[^>]*>/i.exec(src);
+      if (!body) return same(src);
+      const at = body.index + body[0].length;
+      const block = `\n<div style="${PREHEADER_STYLE}">${content}</div>`;
+      return { src: `${src.slice(0, at)}${block}${src.slice(at)}`, note: `Added a hidden preheader: "${text}"` };
+    },
+  },
+  "html-lang": {
+    label: 'Add lang="en"',
+    bulk: true,
+    apply(src) {
+      const [out, n] = rewriteTags(
+        src,
+        (t) => t.name === "html" && !("lang" in t.attrs),
+        (raw) => addAttr(raw, "lang", "en"),
+      );
+      return { src: out, note: n ? 'Added lang="en" to the html tag' : "" };
+    },
+  },
   "outlook-typography": {
     label: "Turn off Outlook's advanced typography",
     bulk: true,
@@ -1283,18 +1597,6 @@ export const FIXES: Record<FixId, Fix> = {
       if (/DontUseAdvancedTypographyReadingMail/i.test(src)) return same(src);
       const out = insertBeforeHeadClose(src, OUTLOOK_TYPOGRAPHY_BLOCK);
       return out ? { src: out, note: "Turned off Outlook's advanced typography" } : same(src);
-    },
-  },
-  "link-target": {
-    label: 'Add target="_blank" to links',
-    bulk: true,
-    apply(src) {
-      const [out, n] = rewriteTags(
-        src,
-        (t) => !t.mso && t.name === "a" && /^https?:/i.test(t.attrs.href ?? "") && !("target" in t.attrs),
-        (raw) => addAttr(raw, "target", "_blank"),
-      );
-      return { src: out, note: n ? `Added target="_blank" to ${plural(n, "link")}` : "" };
     },
   },
 };
@@ -1307,11 +1609,11 @@ export interface AppliedFix {
 }
 
 /** Folds the fixes over the source in order. Fixes that change nothing are reported with an empty note. */
-export function applyFixes(src: string, ids: FixId[]): { src: string; applied: AppliedFix[] } {
+export function applyFixes(src: string, ids: FixId[], params: FixParams = {}): { src: string; applied: AppliedFix[] } {
   const applied: AppliedFix[] = [];
   let out = src;
   for (const id of ids) {
-    const result = FIXES[id].apply(out);
+    const result = FIXES[id].apply(out, params);
     out = result.src;
     applied.push({ id, note: result.note });
   }
@@ -1369,10 +1671,10 @@ export interface FeatureUse {
 const FEATURE_FIXES: Partial<Record<string, { fix: FixId; applies: (src: string) => boolean }>> = {
   "html-style": { fix: "styles-to-head", applies: (src) => parse(src).styles.some((s) => s.inBody) },
   "html-link": { fix: "unused-fonts", applies: (src) => parse(src).tags.some((t) => isUnusedFontLink(t, declaredFamilies(src))) },
-  "css-at-font-face": { fix: "font-fallbacks", applies: (src) => FIXES["font-fallbacks"].apply(src).note !== "" },
-  "css-background-image": { fix: "bg-color-fallback", applies: (src) => FIXES["bg-color-fallback"].apply(src).note !== "" },
-  "css-background": { fix: "bg-color-fallback", applies: (src) => FIXES["bg-color-fallback"].apply(src).note !== "" },
-  "html-role": { fix: "table-role", applies: (src) => FIXES["table-role"].apply(src).note !== "" },
+  "css-at-font-face": { fix: "font-fallbacks", applies: (src) => FIXES["font-fallbacks"].apply(src, {}).note !== "" },
+  "css-background-image": { fix: "bg-color-fallback", applies: (src) => FIXES["bg-color-fallback"].apply(src, {}).note !== "" },
+  "css-background": { fix: "bg-color-fallback", applies: (src) => FIXES["bg-color-fallback"].apply(src, {}).note !== "" },
+  "html-role": { fix: "table-role", applies: (src) => FIXES["table-role"].apply(src, {}).note !== "" },
 };
 
 /** Longhands that caniemail only tests through their shorthand. */
