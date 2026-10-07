@@ -50,7 +50,7 @@ export type Slide =
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
   | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean }
-  | { kind: "booklet"; /** every page in reading order, front cover first */ pages: string[]; caption?: string }
+  | { kind: "booklet"; /** every page in reading order, front cover first */ pages: string[]; /** the same pages, small, for the view that shows every spread at once */ thumbs: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
   | { kind: "end" };
@@ -190,6 +190,7 @@ const RAW: Slide[] = [
   {
     kind: "booklet",
     pages: Array.from({ length: 62 }, (_, i) => `/media/images/portfolio/salesmasters/bus4x4/page-${String(i + 1).padStart(2, "0")}.webp`),
+    thumbs: Array.from({ length: 62 }, (_, i) => `/media/images/portfolio/salesmasters/bus4x4/thumbs/page-${String(i + 1).padStart(2, "0")}.webp`),
     caption: "The Bus4x4 edition, all 62 pages. Click or drag a page to turn it",
   },
 

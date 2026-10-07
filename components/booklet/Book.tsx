@@ -56,31 +56,81 @@ function bend(pos: THREE.BufferAttribute, t: number, curl: number) {
   pos.needsUpdate = true;
 }
 
+const SOFT = 760; // px wide for a page that is near but not the one being read
+
 /**
  * One page's image, held only while `wanted`. A long book cannot keep every
  * page on the graphics card at once, so pages load as the reader gets near
  * them and are let go again once they are far behind.
+ *
+ * Two things keep page turns smooth. The file is decoded off the main thread
+ * (createImageBitmap), so a page arriving never stalls a turn in progress.
+ * And only the spread being read is held at full size (`sharp`): the pages
+ * waiting behind it are held small, which is a fraction of the memory and of
+ * the upload cost, and swapped for the full file when they are turned to. The
+ * image on show stays up until its replacement is ready.
  */
-function usePage(url: string | undefined, wanted: boolean): THREE.Texture | null {
+function usePage(url: string | undefined, wanted: boolean, sharp: boolean): THREE.Texture | null {
   const gl = useThree((s) => s.gl);
+  const invalidate = useThree((s) => s.invalidate);
   const [tex, setTex] = useState<THREE.Texture | null>(null);
+  const held = useRef<THREE.Texture | null>(null);
+
   useEffect(() => {
-    if (!url || !wanted) return;
-    let live = true;
-    let made: THREE.Texture | null = null;
-    new THREE.TextureLoader().load(url, (t) => {
-      if (!live) return t.dispose();
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.anisotropy = gl.capabilities.getMaxAnisotropy();
-      made = t;
-      setTex(t);
-    });
-    return () => {
-      live = false;
-      made?.dispose();
-      setTex(null);
+    const drop = () => {
+      const t = held.current;
+      held.current = null;
+      if (t) {
+        (t.image as ImageBitmap | undefined)?.close?.();
+        t.dispose();
+      }
     };
-  }, [url, wanted, gl]);
+    if (!url || !wanted) {
+      drop();
+      // the image has just been freed, so the page must stop pointing at it
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTex(null);
+      return;
+    }
+    const stop = new AbortController();
+    (async () => {
+      try {
+        const blob = await (await fetch(url, { mode: "cors", signal: stop.signal })).blob();
+        // handed over exactly as the graphics card wants it (alpha not
+        // premultiplied, colours untouched), or the upload converts every
+        // pixel first and stalls the page for the length of a turn
+        const raw: ImageBitmapOptions = { premultiplyAlpha: "none", colorSpaceConversion: "none" };
+        const opts: ImageBitmapOptions = sharp ? raw : { ...raw, resizeWidth: SOFT, resizeQuality: "high" };
+        // a browser that cannot resize here just gets the file as it is
+        const bitmap = await createImageBitmap(blob, opts).catch(() => createImageBitmap(blob));
+        if (stop.signal.aborted) return bitmap.close();
+        const t = new THREE.Texture(bitmap);
+        t.premultiplyAlpha = false;
+        t.generateMipmaps = sharp; // the small standby copy is shown near its own size
+        if (!sharp) t.minFilter = THREE.LinearFilter;
+        t.flipY = false; // bitmaps cannot be flipped on upload: the page's UVs are flipped instead
+        t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy());
+        t.needsUpdate = true;
+        drop();
+        held.current = t;
+        setTex(t);
+        invalidate();
+      } catch {
+        /* aborted, or the file failed: the page stays as paper */
+      }
+    })();
+    return () => stop.abort();
+  }, [url, wanted, sharp, gl, invalidate]);
+
+  // let go of the image when the book itself goes
+  useEffect(
+    () => () => {
+      (held.current?.image as ImageBitmap | undefined)?.close?.();
+      held.current?.dispose();
+    },
+    [],
+  );
   return tex;
 }
 
@@ -91,6 +141,7 @@ function Sheet({
   frontUrl,
   backUrl,
   wanted,
+  sharp,
   pRef,
   curl,
   onFront,
@@ -99,6 +150,7 @@ function Sheet({
   frontUrl: string;
   backUrl: string | undefined;
   wanted: boolean;
+  sharp: boolean;
   pRef: React.MutableRefObject<number>;
   curl: number;
   /** called once this sheet's front image is showing */
@@ -106,8 +158,8 @@ function Sheet({
 }) {
   const group = useRef<THREE.Group>(null);
   const last = useRef(-1);
-  const front = usePage(frontUrl, wanted);
-  const back = usePage(backUrl, wanted);
+  const front = usePage(frontUrl, wanted, sharp);
+  const back = usePage(backUrl, wanted, sharp);
 
   useEffect(() => {
     if (front) onFront?.();
@@ -119,8 +171,11 @@ function Sheet({
     b.setIndex(f.getIndex());
     b.setAttribute("position", f.getAttribute("position"));
     b.setAttribute("normal", f.getAttribute("normal"));
+    // page images are not flipped on upload (see usePage), so v runs top down
+    const fuv = f.getAttribute("uv") as THREE.BufferAttribute;
+    for (let i = 0; i < fuv.count; i++) fuv.setY(i, 1 - fuv.getY(i));
     // the verso reads from the outer edge inwards, so its u runs backwards
-    const uv = (f.getAttribute("uv") as THREE.BufferAttribute).clone();
+    const uv = fuv.clone();
     for (let i = 0; i < uv.count; i++) uv.setX(i, 1 - uv.getX(i));
     b.setAttribute("uv", uv);
     return { frontGeo: f, backGeo: b };
@@ -133,7 +188,12 @@ function Sheet({
     // them, so there is no step across the spine. A sheet sinks by one
     // thickness for every sheet lying on top of it, and the one in the air is
     // never below either stack.
-    if (group.current) group.current.position.z = -Math.max(0, index - p, p - 1 - index) * THICK;
+    if (group.current) {
+      group.current.position.z = -Math.max(0, index - p, p - 1 - index) * THICK;
+      // only the few sheets at the open spread are drawn: the rest lie hidden
+      // under them, and drawing all of a long book every frame is what costs
+      group.current.visible = index > p - 3.5 && index < p + 2.5;
+    }
     const t = clamp01(p - index);
     const key = t + curl * 10;
     if (key === last.current) return;
@@ -146,22 +206,18 @@ function Sheet({
     <group ref={group}>
       <mesh geometry={frontGeo} frustumCulled={false}>
         {/* keyed: a material must be rebuilt when it gains or loses its image */}
-        <meshStandardMaterial
+        <meshLambertMaterial
           key={front ? "image" : "paper"}
           map={front ?? undefined}
           color={front ? "#ffffff" : PAPER}
-          roughness={0.75}
-          metalness={0}
         />
       </mesh>
       <mesh geometry={backGeo} frustumCulled={false}>
-        <meshStandardMaterial
+        <meshLambertMaterial
           key={back ? "image" : "paper"}
           map={back ?? undefined}
           color={back ? "#ffffff" : PAPER}
           side={THREE.BackSide}
-          roughness={0.75}
-          metalness={0}
         />
       </mesh>
     </group>
@@ -189,12 +245,19 @@ export default function Book({
   const shift = useRef<THREE.Group>(null);
   const eased = useRef(0);
 
-  useFrame((_, dt) => {
+  useFrame((state, dt) => {
     eased.current = THREE.MathUtils.damp(eased.current, pRef.current, 7, Math.min(dt, 0.05));
     if (Math.abs(eased.current - pRef.current) < 0.0005) eased.current = pRef.current;
+    // frames are drawn on demand: ask for the next one only while a page is moving
+    else state.invalidate();
     // a closed book is one page wide: slide it so it sits centred either way
     const p = eased.current;
-    if (Math.round(p) !== at) setAt(Math.round(p));
+    // Pages are loaded and sharpened around `at`. It follows the reader once a
+    // turn has LANDED, so that work never lands in the middle of a turn (the
+    // standby pages already cover the next few). Flicking a long way ahead
+    // moves it at once, or the pages there would stay blank until the end.
+    const to = Math.round(pRef.current);
+    if (to !== at && (p === pRef.current || Math.abs(to - at) > AHEAD - 1)) setAt(to);
     if (shift.current) {
       shift.current.position.x = (PAGE_W / 2) * (smooth(p - (sheets - 1)) - (1 - smooth(p)));
     }
@@ -209,6 +272,7 @@ export default function Book({
           frontUrl={pages[i * 2]}
           backUrl={pages[i * 2 + 1]}
           wanted={i - at >= -AHEAD - 1 && i - at <= AHEAD}
+          sharp={i === at || i === at - 1}
           pRef={eased}
           curl={curl}
           onFront={i === 0 ? onReady : undefined}

@@ -265,7 +265,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
       return (
         <section className="pf-slide pf-media pf-bookslide">
           <Run chap={chap} page={page} />
-          <PfBooklet pages={s.pages} />
+          <PfBooklet pages={s.pages} thumbs={s.thumbs} />
           {s.caption ? (
             <p className="pf-caption pf-mono">
               <b>Above</b>

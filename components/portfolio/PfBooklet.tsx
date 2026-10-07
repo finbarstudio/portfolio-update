@@ -3,7 +3,9 @@
 /**
  * A printed booklet on /portfolio that can be picked up and read: a 3D
  * magazine whose pages turn (click either side, drag a page, or use the
- * arrows), with a switch to lay it flat and square-on for reading.
+ * arrows), with a switch to lay it flat and square-on for reading, and a
+ * third view that sets every spread out at once as small flat pictures (pick
+ * one and it opens in the flat view).
  *
  * The page turning itself is components/booklet/Book.tsx. This file is the
  * stage around it: the two poses, the controls, and not running WebGL until
@@ -16,7 +18,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { corsMedia } from "@/lib/media";
 import Book, { PAGE_H, PAGE_W } from "@/components/booklet/Book";
 
-type View = "magazine" | "flat";
+type View = "magazine" | "flat" | "spreads";
 
 const POSE = {
   // share of the box the open book may take, its lean, and how much it follows the pointer
@@ -31,7 +33,7 @@ function Stage({
   onReady,
 }: {
   pages: string[];
-  view: View;
+  view: Exclude<View, "spreads">;
   pRef: React.MutableRefObject<number>;
   onReady: () => void;
 }) {
@@ -45,14 +47,21 @@ function Stage({
     const g = rig.current;
     if (!g) return;
     const d = Math.min(dt, 0.05);
-    const bob = pose.sway * Math.sin(state.clock.elapsedTime * 0.7) * 0.02;
     // the pointer can sit outside the canvas: keep it in range
     const px = THREE.MathUtils.clamp(state.pointer.x, -1, 1);
     const py = THREE.MathUtils.clamp(state.pointer.y, -1, 1);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pose.rx - py * 0.06 * pose.sway + bob, 5, d);
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, px * 0.16 * pose.sway, 5, d);
-    g.rotation.z = THREE.MathUtils.damp(g.rotation.z, pose.rz, 5, d);
-    g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, fit, 6, d));
+    const to = [pose.rx - py * 0.06 * pose.sway, px * 0.16 * pose.sway, pose.rz, fit];
+    const now = [g.rotation.x, g.rotation.y, g.rotation.z, g.scale.x];
+    // Frames are drawn on demand, so a booklet at rest costs nothing: keep
+    // asking for the next frame only until the pose has settled.
+    if (to.every((v, k) => Math.abs(v - now[k]) < 0.0004)) return;
+    g.rotation.set(
+      THREE.MathUtils.damp(now[0], to[0], 5, d),
+      THREE.MathUtils.damp(now[1], to[1], 5, d),
+      THREE.MathUtils.damp(now[2], to[2], 5, d),
+    );
+    g.scale.setScalar(THREE.MathUtils.damp(now[3], to[3], 6, d));
+    state.invalidate();
   });
 
   return (
@@ -62,11 +71,20 @@ function Stage({
   );
 }
 
-export default function PfBooklet({ pages }: { pages: string[] }) {
+export default function PfBooklet({ pages, thumbs }: { pages: string[]; /** a small copy of every page, for the spreads view */ thumbs: string[] }) {
   const sheets = Math.ceil(pages.length / 2);
   const urls = useMemo(() => pages.map((p) => corsMedia(p)), [pages]);
 
   const [view, setView] = useState<View>("magazine");
+  // the book keeps the pose it last had while the spreads are up
+  const [pose, setPose] = useState<Exclude<View, "spreads">>("magazine");
+  const show = (v: View) => {
+    setView(v);
+    if (v !== "spreads") setPose(v);
+    else setPlaying(false);
+  };
+  // reader's spreads: the cover alone, then pairs, then the back alone; spread k is sheet position k
+  const spreads = Array.from({ length: sheets + 1 }, (_, k) => [k * 2 - 1, k * 2].filter((n) => n >= 0 && n < pages.length));
   const [sheet, setSheet] = useState(0);
   const [near, setNear] = useState(false); // close enough to start loading
   const [seen, setSeen] = useState(false); // on screen: keep drawing
@@ -74,6 +92,7 @@ export default function PfBooklet({ pages }: { pages: string[] }) {
   const [playing, setPlaying] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const pRef = useRef(0);
+  const wake = useRef<() => void>(() => {}); // asks the canvas for a frame
   const drag = useRef<{ x: number; from: number } | null>(null);
 
   useEffect(() => {
@@ -89,15 +108,19 @@ export default function PfBooklet({ pages }: { pages: string[] }) {
     };
   }, []);
 
+  // a change of view, or coming back on screen, needs a frame to start from
+  useEffect(() => wake.current(), [view, seen]);
+
   const go = (to: number) => {
     const next = Math.min(sheets, Math.max(0, to));
     pRef.current = next;
+    wake.current();
     setSheet(next);
   };
 
   // play: turn a page every couple of seconds, and stop at the back cover
   useEffect(() => {
-    if (!playing || !seen) return;
+    if (!playing || !seen || view === "spreads") return;
     const id = setInterval(() => {
       const next = Math.round(pRef.current) + 1;
       go(next);
@@ -105,7 +128,7 @@ export default function PfBooklet({ pages }: { pages: string[] }) {
     }, 2400);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, seen, sheets]);
+  }, [playing, seen, sheets, view]);
 
   const play = () => {
     if (!playing && sheet >= sheets) go(0); // at the end: start again
@@ -118,6 +141,7 @@ export default function PfBooklet({ pages }: { pages: string[] }) {
     e.currentTarget.setPointerCapture(e.pointerId);
   };
   const onMove = (e: React.PointerEvent) => {
+    wake.current(); // the booklet leans towards the pointer
     const d = drag.current;
     if (!d) return;
     const span = (box.current?.clientWidth ?? 1000) * 0.4;
@@ -156,6 +180,7 @@ export default function PfBooklet({ pages }: { pages: string[] }) {
       <div
         ref={box}
         className="pf-booklet"
+        data-view={view}
         role="group"
         aria-label="Booklet. Use the left and right arrow keys to turn the pages."
         tabIndex={0}
@@ -169,27 +194,53 @@ export default function PfBooklet({ pages }: { pages: string[] }) {
           <Canvas
             flat
             dpr={[1, 2]}
-            frameloop={seen ? "always" : "never"}
+            frameloop={seen && view !== "spreads" ? "demand" : "never"}
+            onCreated={(state) => (wake.current = state.invalidate)}
             camera={{ fov: 30, position: [0, 0, 6], near: 0.5, far: 40 }}
           >
             <ambientLight intensity={2.1} />
             <directionalLight position={[-2.5, 3, 6]} intensity={1.5} />
-            <Stage pages={urls} view={view} pRef={pRef} onReady={() => setReady(true)} />
+            <Stage pages={urls} view={pose} pRef={pRef} onReady={() => setReady(true)} />
           </Canvas>
         ) : null}
-        {ready ? null : <p className="pf-booklet-wait pf-mono pf-soft">Loading booklet</p>}
+        {ready || view === "spreads" ? null : <p className="pf-booklet-wait pf-mono pf-soft">Loading booklet</p>}
       </div>
+
+      {view === "spreads" ? (
+        <div className="pf-spreads" style={{ "--n": spreads.length } as React.CSSProperties}>
+          {spreads.map((pp, k) => (
+            <button
+              key={k}
+              type="button"
+              aria-current={k === sheet ? "true" : undefined}
+              aria-label={pp.length === 1 ? `Open page ${pp[0] + 1}` : `Open pages ${pp[0] + 1} and ${pp[1] + 1}`}
+              onClick={() => {
+                go(k);
+                show("flat");
+              }}
+            >
+              {pp.map((n) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={n} src={thumbs[n]} alt="" width={420} height={594} loading="lazy" decoding="async" />
+              ))}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <div className="pf-booklet-ui pf-mono">
         <div className="pf-booklet-set">
-          <button type="button" aria-pressed={view === "magazine"} onClick={() => setView("magazine")}>
+          <button type="button" aria-pressed={view === "magazine"} onClick={() => show("magazine")}>
             Magazine
           </button>
-          <button type="button" aria-pressed={view === "flat"} onClick={() => setView("flat")}>
+          <button type="button" aria-pressed={view === "flat"} onClick={() => show("flat")}>
             Flat lay
           </button>
+          <button type="button" aria-pressed={view === "spreads"} onClick={() => show("spreads")}>
+            Spreads
+          </button>
         </div>
-        <div className="pf-booklet-set">
+        <div className="pf-booklet-set" hidden={view === "spreads"}>
           <button type="button" aria-pressed={playing} onClick={play}>
             {playing ? "Pause" : "Play"}
           </button>
