@@ -341,17 +341,13 @@ body:has(.pf) { background: #1a1a1a; }
 /* the controls have the bottom line to themselves; the caption sits a line up */
 .pf-bookslide .pf-caption { bottom: calc(var(--u) * 4.3); }
 
-/* the phone's still preview (PfBooklet): each book as a 2 by 2 of spreads
-   under its name, and a line pointing to a desktop */
+/* the phone's still preview (PfBooklet): four single pages of one book as a
+   2 by 2, and a note that the rest is on a desktop */
 .pf-booklet-phone { position: absolute; top: var(--T); bottom: var(--B); left: var(--S); right: var(--S); display: grid; gap: 14px; align-content: center; }
-.pf-booklet-phone-book { display: grid; gap: 10px; }
-.pf-booklet-phone-spreads { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.pf-booklet-phone-spreads > div { display: flex; aspect-ratio: 1.4142; }
-.pf-booklet-phone-spreads > div.is-single { justify-content: center; }
-.pf-booklet-phone img, .pf-booklet-phone .is-blank { display: block; width: 50%; height: 100%; object-fit: cover; }
-.pf-booklet-phone .is-blank { background: #fff; }
+.pf-booklet-phone-pages { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pf-booklet-phone img { display: block; width: 100%; height: auto; }
 .pf-booklet-phone p { margin: 0; }
-.pf-booklet-phone > p { text-align: center; text-wrap: balance; font-size: 13px; line-height: 1.4; }
+.pf-booklet-phone-note { text-align: center; text-wrap: balance; font-size: 13px; line-height: 1.4; }
 
 /* the loader: a percentage over a hairline, bottom left of the frame */
 .pf-load {
@@ -469,11 +465,10 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-media.is-bleed .pf-item { aspect-ratio: var(--r) !important; }
   .pf-booklet { position: relative; inset: auto; margin: 12px 14px 0; aspect-ratio: 1.25; }
   /* an exception to the tight phone pages: this one is let run tall, for a
-     2 by 2 of spreads from each book and room around the text */
-  .pf-booklet-phone { position: static; padding: 22px 18px 0; gap: 34px; }
-  .pf-booklet-phone-book { gap: 14px; }
-  .pf-booklet-phone-spreads { gap: 16px 12px; }
-  .pf-booklet-phone > p { font-size: 14px; line-height: 1.5; padding: 0 6px; }
+     2 by 2 of pages and room around the note under them */
+  .pf-booklet-phone { position: static; padding: 22px 18px 0; gap: 18px; }
+  .pf-booklet-phone-pages { gap: 12px; }
+  .pf-booklet-phone-note { font-size: 15px; line-height: 1.45; padding: 12px 6px 0; color: var(--ink); }
   /* the covers sheet: three across, as many rows as it takes */
   .pf-covers { position: static; --g: 8px; padding: 12px 14px 14px; }
   .pf-media .pf-covers .pf-item { width: calc((100% - 16px) / 3); }

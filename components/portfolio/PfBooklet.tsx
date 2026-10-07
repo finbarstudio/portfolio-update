@@ -92,48 +92,33 @@ function Stage({
 }
 
 /**
- * The phone's still preview: every book, each as a 2 by 2 of spreads. The
- * front cover comes first and the back cover last, with two inside spreads
- * between them (the starred ones if there are any, otherwise two taken a
- * third and two thirds of the way through).
+ * The phone's still preview: four single pages of the first book as a 2 by 2
+ * (front cover, two inside pages, back cover), then a plain note that the
+ * rest is on a desktop. The inside pages are the first two starred ones, or
+ * failing that two taken a third and two thirds of the way through.
  */
 function PhonePreview({ books }: { books: BookletBook[] }) {
+  const book = books[0];
+  const last = book.pages.length - 1;
+  const inside = (book.stars ?? []).map((n) => n - 1).filter((n) => n > 0 && n < last && book.thumbs[n]);
+  for (const n of [Math.round(last / 3), Math.round((last * 2) / 3)]) {
+    if (inside.length < 2 && !inside.includes(n) && book.thumbs[n]) inside.push(n);
+  }
+  const shown = [0, ...inside.slice(0, 2).sort((a, b) => a - b), last];
+  const others = books.length - 1;
   return (
     <div className="pf-booklet-phone">
-      {/* a phone shows the first two; the rest wait for a desktop */}
-      {books.slice(0, 2).map((book) => {
-        const spreads = toSpreads(book.pages.length);
-        const inside = spreads.slice(1, -1);
-        const pick = inside.filter((pp) => pp.some((n) => book.stars?.includes(n + 1)));
-        for (let k = 1; pick.length < 2 && k <= 2; k++) {
-          const pp = inside[Math.floor((inside.length * k) / 3)];
-          if (pp && !pick.includes(pp)) pick.push(pp);
-        }
-        const shown = [spreads[0], ...pick.slice(0, 2).sort((a, b) => a[0] - b[0]), spreads[spreads.length - 1]];
-        return (
-          <div key={book.name} className="pf-booklet-phone-book">
-            <p className="pf-mono">
-              {book.name} <span className="pf-soft">{book.pages.filter(Boolean).length} pages</span>
-            </p>
-            <div className="pf-booklet-phone-spreads">
-              {shown.map((pp) => (
-                <div key={pp[0]} className={pp.length === 1 ? "is-single" : undefined}>
-                  {pp.map((n) =>
-                    book.thumbs[n] ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img key={n} src={media(book.thumbs[n])} alt="" width={420} height={594} loading="lazy" decoding="async" />
-                    ) : (
-                      <span key={n} className="is-blank" />
-                    ),
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-      <p className="pf-soft">
-        A few spreads from two of them. On a desktop {books.length > 2 ? `all ${books.length} books` : "both books"} can be picked up and read, page by page.
+      <p className="pf-mono">
+        {book.name} <span className="pf-soft">4 of {book.pages.filter(Boolean).length} pages</span>
+      </p>
+      <div className="pf-booklet-phone-pages">
+        {shown.map((n) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={n} src={media(book.thumbs[n])} alt="" width={420} height={594} loading="lazy" decoding="async" />
+        ))}
+      </div>
+      <p className="pf-booklet-phone-note">
+        This is a small sample. Open this portfolio on a desktop to pick up and read {others > 0 ? `all ${books.length} playbooks` : "the whole playbook"}, every page.
       </p>
     </div>
   );
