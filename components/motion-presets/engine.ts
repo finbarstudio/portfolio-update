@@ -334,12 +334,15 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     }
     const outer = Boolean(c.v.two) && k % 2 === 1;
     const turn = outer ? -c.T : c.T;
-    const angle = TAU * (k / m + turn);
-    const R = ((outer ? 1.6 : c.v.two ? 1.05 : 1.25) + c.g) * c.m.radius;
-    const y = c.v.two ? (outer ? 0.3 : -0.3) : 0;
+    // Two rings share the floor and turn against each other, each with half the cards.
+    const ringCards = c.v.two ? Math.ceil(m / 2) : m;
+    const slot = c.v.two ? Math.floor(k / 2) : k;
+    const angle = TAU * (slot / ringCards + turn);
+    const R = ((outer ? 1.7 : c.v.two ? 0.95 : 1.25) + c.g) * c.m.radius;
+    const y = 0;
     // Facing outwards, a card at the side is edge-on, so the far row never crowds the near one.
     const facing = c.o.faceCamera ? square : { ry: Math.PI / 2 - angle };
-    return { ...facing, x: Math.cos(angle) * R, y, z: Math.sin(angle) * R, s: small, p: centred(k + (turn - 0.25) * m, m) };
+    return { ...facing, x: Math.cos(angle) * R, y, z: Math.sin(angle) * R, s: small, p: centred(slot + (turn - 0.25) * ringCards, ringCards) };
   },
   deck(i, c) {
     const q = mod(i - c.T * c.n, c.n);
@@ -433,7 +436,12 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
   zoom(i, c) {
     const flow = c.glide(Math.abs(c.Tg) * c.n);
     const age = mod(flow - i, c.n); // 0 as a card is born, n as it leaves
-    const life = age / c.n;
+    // The easing curve shapes the whole life, so cards at different stages move at
+    // different rates and the gaps between them breathe. Each card also runs a
+    // little faster or slower than its neighbours.
+    const pace = 1 + (hash(i, 7) - 0.5) * 0.16;
+    const stage = clamp(Math.pow(age / c.n, pace));
+    const life = clamp(0.5 * c.ease(stage) + 0.5 * stage); // half the curve, so no curve starves the middle of the flow
     const grow = c.v.out ? 1 - life : life;
     // Geometric growth reads as a steady approach.
     const s = ZOOM_MIN * Math.pow(ZOOM_MAX / ZOOM_MIN, grow);
@@ -464,7 +472,9 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const a = smooth(along01 / 0.12) * smooth((1 - along01) / 0.12);
     const p = (along01 - 0.5) * c.n;
     if (c.v.horizontal) {
-      return { x: (along01 - 0.5) * 2.6 * Math.max(1, c.A), y: Math.sin(angle) * R, z: Math.cos(angle) * R, rx: -angle, a, p };
+      // Square to the viewer: the depth shading alone says which side of the tube a card is on.
+      const turns = TAU * 1.5 * along01 + TAU * c.T;
+      return { x: (along01 - 0.5) * 2.6 * Math.max(1, c.A), y: Math.sin(turns) * R * 0.8, z: Math.cos(turns) * R * 0.8, a, p };
     }
     return { x: Math.sin(angle) * R, y: (along01 - 0.5) * 2.8, z: Math.cos(angle) * R, ry: angle, a, p };
   },
@@ -597,7 +607,9 @@ function itemTime(layout: LayoutName, i: number, c: Context, T: number, reversed
   const v = T * steps;
   const k = Math.floor(v);
   const spot = queuePlace(layout, i, c, k);
-  const wait = (reversed ? 1 - spot : spot) * c.m.stagger * c.m.hold;
+  // Cards do not all set off on the beat: a slight, fixed unevenness per card.
+  const unevenness = (hash(i, 11) - 0.5) * 0.12;
+  const wait = clamp((reversed ? 1 - spot : spot) + unevenness) * c.m.stagger * c.m.hold;
   return lerp(v, k + c.ease(clamp((v - k - wait) / (1 - c.m.hold))), c.m.rhythm) / steps;
 }
 
@@ -938,7 +950,7 @@ export const PRESETS: Preset[] = [
   preset("Ring 05", "ring", {}, { count: 14, size: 0.6, gap: 0.34, tilt: 14, scale: 1.25, perspective: 55, rhythm: 1 }, { options: { focus: "centre" } }),
   preset("Orbit 01", "orbit", {}, { count: 7, size: 0.9, tilt: 28 }, { options: { centre: false } }),
   preset("Orbit 02", "orbit", {}, { count: 8, size: 0.9, tilt: 28 }),
-  preset("Orbit 03", "orbit", { two: true }, { count: 10, size: 0.75, tilt: 26, gap: 0.05 }, { options: { centre: false } }),
+  preset("Orbit 03", "orbit", { two: true }, { count: 12, size: 0.7, tilt: 34, perspective: 40, radius: 0.88 }, { options: { centre: false } }),
   preset("Orbit 04", "orbit", { flat: true }, { count: 7, size: 0.8 }, { options: { centre: false } }),
   preset("Orbit 05", "orbit", {}, { count: 8, size: 0.9, tilt: 20, gap: 0.2, perspective: 50 }, { options: { centre: false, faceCamera: false } }),
   preset("Orbit 06", "orbit", {}, { count: 9, size: 0.7, tilt: 36, radius: 1.25, perspective: 50 }, { options: { centre: false } }),
@@ -963,7 +975,7 @@ export const PRESETS: Preset[] = [
   preset("Marquee 04", "marquee", { rows: 3 }, { count: 18, size: 0.7, gap: 0.1 }, { options: { direction: "up" } }),
   preset("Marquee 05", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.1, tilt: 55 }),
   preset("Helix 01", "helix", {}, { count: 12, size: 0.5 }),
-  preset("Helix 02", "helix", { horizontal: true }, { count: 12, size: 0.45 }),
+  preset("Helix 02", "helix", { horizontal: true }, { count: 12, size: 0.42 }),
   preset("Helix 03", "helix", { tornado: true }, { count: 14, size: 0.4 }),
   preset("Globe 01", "globe", {}, { count: 32, size: 0.22 }),
   preset("Globe 02", "globe", {}, { count: 32, size: 0.22, tilt: 24 }),
