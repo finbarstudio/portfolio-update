@@ -39,7 +39,8 @@ export type FixId =
   | "bg-color-fallback"
   | "outlook-typography"
   | "html-lang"
-  | "preheader";
+  | "preheader"
+  | "preheader-pad";
 
 export interface Finding {
   id: string;
@@ -93,6 +94,16 @@ const CONTENT_IDS = new Set([
   "text-repeat",
   "text-placeholder",
   "text-old-year",
+  "text-weekday",
+  "text-date-passed",
+  "text-copyright-year",
+  "text-footnote-†",
+  "text-footnote-‡",
+  "text-footnote-§",
+  "link-query",
+  "link-utm-empty",
+  "link-tel",
+  "preheader-unpadded",
 ]);
 
 export interface HowTo {
@@ -171,6 +182,9 @@ export const SOURCES: Record<string, Source[]> = {
   "zero-width": [SRC.preheader],
   unsubscribe: [SRC.gmailSenders],
   "ac-unsubscribe": [SRC.acUnsub],
+  "preheader-unpadded": [SRC.preheader],
+  "ghost-mismatch": [SRC.dpi],
+  "line-height-zero": [cie("css-line-height", "line-height")],
   "unsubscribe-empty": [SRC.gmailSenders, SRC.acUnsub],
   "bare-placeholder": [SRC.sesTemplates, SRC.sesHandlebars],
   "merge-tags": [SRC.sesHandlebars],
@@ -736,6 +750,51 @@ export function fillMergeTags(src: string): SampleFill {
   return { src: withBare, filled: [...filled], left: [...left], bare: [...bare] };
 }
 
+
+/* ── Dates in the copy ─────────────────────────────────────────────────── */
+
+const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+const WEEKDAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+const MONTH_RE = "(January|February|March|April|May|June|July|August|September|October|November|December)";
+const DAY_RE = "(\\d{1,2})(?:st|nd|rd|th)?";
+const WEEKDAY_RE = "(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)";
+/** "Saturday 19th September", "September 19th", "19 September 2026"; groups: weekday, day, month, month, day, year */
+const WRITTEN_DATE = new RegExp(`(?:${WEEKDAY_RE},?\\s+)?(?:${DAY_RE}\\s+(?:of\\s+)?${MONTH_RE}|${MONTH_RE}\\s+${DAY_RE})(?:,?\\s+(20\\d{2}))?`, "gi");
+/** 31.10.26 or 31/10/2026, day first */
+const NUMERIC_DATE = /\b(\d{1,2})[./](\d{1,2})[./](\d{2}|20\d{2})\b/g;
+
+interface FoundDate {
+  text: string;
+  weekday: number | null;
+  day: number;
+  month: number;
+  year: number | null;
+}
+
+function findDates(text: string): FoundDate[] {
+  const found: FoundDate[] = [];
+  for (const m of text.matchAll(WRITTEN_DATE)) {
+    const day = Number(m[2] ?? m[5]);
+    const month = MONTHS.indexOf((m[3] ?? m[4]).toLowerCase());
+    if (day < 1 || day > 31 || month < 0) continue;
+    found.push({ text: m[0].trim(), weekday: m[1] ? WEEKDAYS.indexOf(m[1].toLowerCase()) : null, day, month, year: m[6] ? Number(m[6]) : null });
+  }
+  for (const m of text.matchAll(NUMERIC_DATE)) {
+    const day = Number(m[1]);
+    const month = Number(m[2]) - 1;
+    if (day < 1 || day > 31 || month < 0 || month > 11) continue;
+    found.push({ text: m[0], weekday: null, day, month, year: m[3].length === 2 ? 2000 + Number(m[3]) : Number(m[3]) });
+  }
+  return found;
+}
+
+/** CSS properties email markup actually uses; anything else in an inline style is probably a typo. */
+const KNOWN_CSS = new Set(
+  `align-content align-items align-self background background-attachment background-clip background-color background-image background-origin background-position background-repeat background-size border border-bottom border-bottom-color border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width border-collapse border-color border-left border-left-color border-left-style border-left-width border-radius border-right border-right-color border-right-style border-right-width border-spacing border-style border-top border-top-color border-top-left-radius border-top-right-radius border-top-style border-top-width border-width bottom box-shadow box-sizing clear color color-scheme cursor direction display empty-cells flex flex-direction flex-wrap float font font-family font-size font-style font-variant font-weight gap height hyphens justify-content left letter-spacing line-height list-style list-style-position list-style-type margin margin-bottom margin-left margin-right margin-top max-height max-width min-height min-width object-fit object-position opacity outline overflow overflow-wrap padding padding-bottom padding-left padding-right padding-top position right table-layout text-align text-decoration text-decoration-color text-decoration-line text-decoration-style text-decoration-thickness text-indent text-overflow text-shadow text-size-adjust text-transform text-underline-offset top transition vertical-align visibility white-space width word-break word-spacing word-wrap z-index zoom`.split(
+    " ",
+  ),
+);
+
 function detectPlatform(src: string): string | null {
   if (/%[A-Z][A-Z0-9_-]*%/.test(src)) return "ActiveCampaign";
   if (/\*\|[^|*]+\|\*/.test(src)) return "Mailchimp";
@@ -1243,7 +1302,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   }
   const badAlt = imgLines((t) => {
     const alt = (t.attrs.alt ?? "").trim();
-    return alt.length > 0 && (/\.(png|jpe?g|gif|webp|svg)$/i.test(alt) || /^(image|img|photo|picture|banner|graphic|spacer|untitled)\b/i.test(alt) || /^[\w-]{20,}$/.test(alt));
+    return alt.length > 0 && (/\.(png|jpe?g|gif|webp|svg)$/i.test(alt) || /^(image|img|photo|picture|banner|graphic|spacer|untitled|alt[_ -]?text|alt|placeholder)\b/i.test(alt) || /^[\w-]{20,}$/.test(alt));
   });
   if (badAlt.length) {
     add(
@@ -1462,7 +1521,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       { a11y: true },
     );
   }
-  const tinyText = tags.filter((t) => !t.mso && ["td", "p", "span", "div", "a", "li"].includes(t.name) && Number.parseFloat(styleGet(t.attrs.style, "font-size")) < 12 && Number.parseFloat(styleGet(t.attrs.style, "font-size")) >= 2 && !isHiddenElement(t)).map((t) => t.line);
+  const tinyText = tags.filter((t) => !t.mso && ["td", "p", "span", "div", "a", "li", "sup", "sub", "small", "font"].includes(t.name) && Number.parseFloat(styleGet(t.attrs.style, "font-size")) < 12 && Number.parseFloat(styleGet(t.attrs.style, "font-size")) >= 2 && !isHiddenElement(t)).map((t) => t.line);
   if (tinyText.length) {
     add(
       "small-text",
@@ -1555,7 +1614,10 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       howTo: { text: "Delete one." },
     });
   }
-  const placeholder = inRuns(/lorem ipsum|\bTBC\b|\bTBD\b|\bTODO\b|\bXX+\b|insert [a-z ]{1,20} here|\[(name|date|link|url|text|copy|headline)[^\]]{0,20}\]/gi);
+  const placeholder = inRuns(
+    /lorem ipsum|\bTBC\b|\bTBD\b|\bTODO\b|\bXX+\b|insert [a-z ]{1,20} here|\[(name|date|link|url|text|copy|headline)[^\]]{0,20}\]|£0{1,3}(?:,0{3})+|\b0{2,}%|\b[A-Za-z]+ name(?:\s*\/\s*[a-z]+)? here\b|\b[a-z]+ here$/gi,
+    (m) => !/^(click|tap|right|over|from|out|in|is|are|up|down) here$/i.test(m[0].trim()),
+  );
   if (placeholder.length) {
     add(
       "text-placeholder",
@@ -1637,6 +1699,217 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       `Tracking tags in the links: ${[...tracking.keys()].slice(0, 6).join(", ")}`,
       "Listed so you can check they name this email. A tag naming a different email or campaign is a sign the link was copied from another template, and its clicks will be counted there.",
       { lines: [...tracking.values()].flat(), howTo: { text: "Update any tag that names another email." } },
+    );
+  }
+
+  // ── Dates ───────────────────────────────────────────────────────────
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dated = [
+    ...runs.map((run) => ({ text: readable(run.text), line: lineOf(run.index) })),
+    ...tags.filter((t) => t.name === "img" && t.attrs.alt).map((t) => ({ text: t.attrs.alt, line: t.line })),
+  ].flatMap(({ text, line }) => findDates(text).map((d) => ({ ...d, line })));
+  const wrongDay = dated.filter((d) => {
+    if (d.weekday === null) return false;
+    const years = d.year ? [d.year] : [today.getFullYear(), today.getFullYear() + 1];
+    return years.every((y) => new Date(y, d.month, d.day).getDay() !== d.weekday);
+  });
+  if (wrongDay.length) {
+    add(
+      "text-weekday",
+      "warn",
+      `Day and date do not match: ${[...new Set(wrongDay.map((d) => `"${d.text}"`))].join(", ")}`,
+      `That date does not fall on that day of the week${wrongDay.some((d) => !d.year) ? " this year or next" : ""}. One of the two is wrong.`,
+      { lines: wrongDay.map((d) => d.line), howTo: { text: "Check the date against a calendar and correct the day or the date." } },
+    );
+  }
+  const passed = dated.filter((d) => new Date(d.year ?? today.getFullYear(), d.month, d.day) < today);
+  if (passed.length) {
+    add(
+      "text-date-passed",
+      "info",
+      `Mentions a date that has passed: ${[...new Set(passed.map((d) => `"${d.text}"`))].slice(0, 4).join(", ")}`,
+      `Today is ${today.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}. If this email is about to be sent, an event or deadline on that date is already over. A date with no year is read as this year.`,
+      { lines: passed.map((d) => d.line), howTo: { text: "Update the date, or confirm this is an old email being reviewed." } },
+    );
+  }
+  const copyright = inRuns(/(?:©|&copy;|\(c\)|copyright)\s*(20\d{2})/gi, (m) => Number(m[1]) < thisYear);
+  if (copyright.length) {
+    add("text-copyright-year", "info", `Copyright year is out of date: ${quote(copyright)}`, `It is ${thisYear}.`, {
+      lines: copyright.map((h) => h.line),
+      howTo: { text: "Update the year." },
+    });
+  }
+  for (const mark of ["†", "‡", "§"]) {
+    const uses = inRuns(new RegExp(mark, "g"));
+    if (uses.length === 1) {
+      add(
+        `text-footnote-${mark}`,
+        "info",
+        `Footnote mark ${mark} appears only once`,
+        "A footnote mark normally appears twice: once in the text and once beside the note it points to. One of the pair is missing.",
+        { lines: uses.map((h) => h.line), howTo: { text: "Add the mark where the note applies, or remove the note." } },
+      );
+    }
+  }
+
+  // ── Link addresses ──────────────────────────────────────────────────
+  const twoQueries = links.filter((t) => ((t.attrs.href ?? "").match(/\?/g) ?? []).length > 1);
+  if (twoQueries.length) {
+    add(
+      "link-query",
+      "warn",
+      `${plural(twoQueries.length, "link")} with two question marks in the address`,
+      "An address can only have one question mark. Everything after the second is read as part of the value before it, so those tracking tags are not counted, and some sites reject the link. It usually comes from pasting one tracked link on the end of another.",
+      { lines: twoQueries.map((t) => t.line), howTo: { text: "Keep one set of tracking tags, and join the rest with & instead of a second question mark.", code: "https://example.com/page?utm_source=SHARE_TO_BUY&utm_medium=Email&utm_campaign=name" } },
+    );
+  }
+  const emptyTag = links.filter((t) => /[?&]utm_[a-z]+=(?:&|#|$)/i.test(t.attrs.href ?? ""));
+  if (emptyTag.length) {
+    add(
+      "link-utm-empty",
+      "info",
+      `${plural(emptyTag.length, "link")} with an empty tracking tag`,
+      "A utm tag is present with nothing after the equals sign, so the click is recorded with a blank value.",
+      { lines: emptyTag.map((t) => t.line), howTo: { text: "Give the tag a value or remove it." } },
+    );
+  }
+  const badTel = links.filter((t) => /^tel:.*\s/i.test(t.attrs.href ?? ""));
+  if (badTel.length) {
+    add(
+      "link-tel",
+      "info",
+      `${plural(badTel.length, "phone link")} with spaces in the number`,
+      "Some phones do not dial a tel: link that contains spaces. The visible number can keep its spaces; the link should not.",
+      { lines: badTel.map((t) => t.line), howTo: { text: "Remove the spaces from the link only.", code: '<a href="tel:03336664747">0333 666 4747</a>' } },
+    );
+  }
+
+  // ── Preheader ───────────────────────────────────────────────────────
+  const firstTableAt = tags.find((t) => !t.mso && t.inBody && t.name === "table")?.start ?? src.length;
+  const preheaderTag = tags.find((t) => !t.mso && t.inBody && t.start < firstTableAt && isHiddenElement(t));
+  if (preheaderTag) {
+    const close = src.indexOf(`</${preheaderTag.name}>`, preheaderTag.end);
+    const inner = close === -1 ? "" : src.slice(preheaderTag.end, close);
+    if (inner.trim() && !/&zwnj;|&#8204;|&#847;|&#8199;|&#8203;|[​‌‍͏ ﻿]/.test(inner)) {
+      add(
+        "preheader-unpadded",
+        "info",
+        "The preheader has no padding after it",
+        `Inbox lists show about 90 to 130 characters. This preheader is ${decodeEntities(inner).trim().length}, so the preview carries on into the next text in the email ("${stats.previewText.slice(decodeEntities(inner).trim().length, decodeEntities(inner).trim().length + 40).trim()}…"). Invisible padding after the preheader stops it there.`,
+        { lines: [preheaderTag.line], fix: "preheader-pad" },
+      );
+    }
+  }
+
+  // ── Markup slips ────────────────────────────────────────────────────
+  const msoTable = tags.find((t) => t.mso && t.name === "table" && /^\d+$/.test(t.attrs.width ?? ""));
+  const msoCell = tags.find((t) => t.mso && t.name === "td" && /^\d+$/.test(t.attrs.width ?? ""));
+  if (msoTable && msoCell && msoTable.attrs.width !== msoCell.attrs.width) {
+    add(
+      "ghost-mismatch",
+      "warn",
+      `Outlook-only table is ${msoTable.attrs.width}px but its cell is ${msoCell.attrs.width}px`,
+      "The table that fixes the email's width for Outlook and the cell inside it disagree. Outlook uses one or the other depending on the version, so the email can come out narrower than designed or with a gap down one side.",
+      { lines: [msoTable.line, msoCell.line], howTo: { text: "Give both the same width, matching the max-width of the email." }, affects: OUTLOOK },
+    );
+  }
+  const nestedCells = linesOf(/<td\b[^>]*>\s*<td\b/gi);
+  if (nestedCells.length) {
+    add(
+      "nested-td",
+      "warn",
+      `${plural(nestedCells.length, "table cell")} opened straight after another that was never closed`,
+      "There is a <td> with nothing in it and no closing tag, followed by the real cell. Browsers quietly repair it by adding an empty cell; Outlook's repair is less predictable and can shift the columns.",
+      { lines: nestedCells, howTo: { text: "Delete the stray opening <td>." } },
+    );
+  }
+  const emptyTables = linesOf(/<table\b[^>]*>\s*<\/table>/gi);
+  if (emptyTables.length) {
+    add(
+      "empty-table",
+      "info",
+      `${plural(emptyTables.length, "table")} with nothing inside`,
+      "A table with no rows is not valid and does nothing, but Outlook can still give it height.",
+      { lines: emptyTables, howTo: { text: "Remove it, or remove the cell that holds it if that is empty too." } },
+    );
+  }
+  const unknownProps: { prop: string; line: number }[] = [];
+  const bareColours: number[] = [];
+  const zeroLineText: number[] = [];
+  for (const t of tags) {
+    const style = t.attrs.style;
+    if (!style || t.mso) continue;
+    for (const m of style.matchAll(/(?:^|;)\s*([a-zA-Z-]+)\s*:/g)) {
+      const prop = m[1].toLowerCase();
+      if (!prop.startsWith("-") && !prop.startsWith("mso-") && !KNOWN_CSS.has(prop)) unknownProps.push({ prop, line: t.line });
+    }
+    if (/(?:^|;)\s*(?:background-)?color\s*:\s*[0-9a-f]{6}\s*(?:;|$)/i.test(style)) bareColours.push(t.line);
+    // Hidden elements and zero-size spacers use this on purpose; only visible words are a problem.
+    const wordsFollow = /[A-Za-z]{3}/.test(readable(/^[^<]*/.exec(src.slice(t.end, t.end + 200))?.[0] ?? ""));
+    if (/(?:^|;)\s*line-height\s*:\s*0(?:px)?\s*(?:;|$)/i.test(style) && wordsFollow && !isHiddenElement(t) && Number.parseFloat(styleGet(style, "font-size") || "16") > 0) zeroLineText.push(t.line);
+  }
+  if (unknownProps.length) {
+    add(
+      "css-unknown",
+      "warn",
+      `Unknown CSS property: ${[...new Set(unknownProps.map((u) => u.prop))].join(", ")}`,
+      "This is not a CSS property, so the rule is ignored. It is usually a typing slip.",
+      { lines: unknownProps.map((u) => u.line), howTo: { text: "Correct the property name." } },
+    );
+  }
+  if (bareColours.length) {
+    add(
+      "css-colour-hash",
+      "warn",
+      `${plural(bareColours.length, "colour")} written without the # sign`,
+      "A hex colour needs a # in front. Without it the colour is ignored and the text falls back to the client's default.",
+      { lines: bareColours, howTo: { text: "Add the #.", code: "color: #000000;" } },
+    );
+  }
+  if (zeroLineText.length) {
+    add(
+      "line-height-zero",
+      "warn",
+      `Text inside ${plural(zeroLineText.length, "cell")} with a line-height of 0`,
+      "A line-height of 0 is a trick for removing the gap around an image. On a cell that holds words, the lines of text sit on top of each other, and Outlook can clip them.",
+      { lines: zeroLineText, howTo: { text: "Give the text cell a real line-height, about 1.4 times the font size." } },
+    );
+  }
+  const badValign = tags.filter((t) => t.attrs.valign && !/^(top|middle|bottom|baseline)$/i.test(t.attrs.valign.trim())).map((t) => t.line);
+  if (badValign.length) {
+    add(
+      "valign",
+      "info",
+      `${plural(badValign.length, "cell")} with a valign value that does not exist`,
+      'valign takes top, middle, bottom or baseline. "center" is not one of them, so it is ignored and the cell falls back to the default.',
+      { lines: badValign, howTo: { text: 'Use valign="middle".' } },
+    );
+  }
+  const preconnects = tags.filter((t) => t.name === "link" && /preconnect/i.test(t.attrs.rel ?? "") && /fonts\.(googleapis|gstatic)\.com/.test(t.attrs.href ?? ""));
+  if (preconnects.length && !tags.some(isGoogleFontLink)) {
+    add(
+      "preconnect-orphan",
+      "info",
+      "Google Fonts connection hints with no font loaded",
+      "The head tells the client to connect to Google Fonts, but no font is requested from it. The hints are left over from a removed font.",
+      { lines: preconnects.map((t) => t.line), howTo: { text: "Remove the two preconnect lines." } },
+    );
+  }
+  // First-named font on each text element; images are left out (their font only styles alt text).
+  const fontCounts = new Map<string, number>();
+  for (const t of tags) {
+    if (t.mso || !t.inBody || t.name === "img") continue;
+    const name = styleGet(t.attrs.style, "font-family").split(",")[0].replace(/['"]/g, "").trim();
+    if (name && !/^(inherit|sans-serif|serif|monospace)$/.test(name)) fontCounts.set(name, (fontCounts.get(name) ?? 0) + 1);
+  }
+  if (fontCounts.size > 1) {
+    add(
+      "fonts-mixed",
+      "info",
+      `${fontCounts.size} different fonts in use: ${[...fontCounts].sort((x, y) => y[1] - x[1]).map(([name, n]) => `${name} (${n})`).join(", ")}`,
+      "The first font named differs between parts of the email. That may be the design; it is also what a block pasted in from another template looks like.",
+      { howTo: { text: "Check the smaller group is meant to differ, and match it to the rest if not." } },
     );
   }
 
@@ -2008,6 +2281,21 @@ export const FIXES: Record<FixId, Fix> = {
       const at = body.index + body[0].length;
       const block = `\n<div style="${PREHEADER_STYLE}">${content}</div>`;
       return { src: `${src.slice(0, at)}${block}${src.slice(at)}`, note: `Added a hidden preheader: "${text}"` };
+    },
+  },
+  "preheader-pad": {
+    label: "Pad the preheader",
+    bulk: true,
+    apply(src) {
+      const { tags } = parse(src);
+      const firstTable = tags.find((t) => !t.mso && t.inBody && t.name === "table")?.start ?? src.length;
+      const pre = tags.find((t) => !t.mso && t.inBody && t.start < firstTable && isHiddenElement(t));
+      if (!pre) return same(src);
+      const close = src.indexOf(`</${pre.name}>`, pre.end);
+      if (close === -1) return same(src);
+      const inner = src.slice(pre.end, close);
+      if (!inner.trim() || inner.includes("<") || /&zwnj;|&#847;|&#8199;|&#8204;/.test(inner)) return same(src);
+      return { src: `${src.slice(0, close)}${PREHEADER_PAD}${src.slice(close)}`, note: "Padded the preheader so the inbox preview stops at the end of it" };
     },
   },
   "html-lang": {
