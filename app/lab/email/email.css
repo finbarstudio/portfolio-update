@@ -1,0 +1,257 @@
+/* Email check (lab.finbar.studio/email). Everything is scoped to .ec-tool. */
+
+.ec-tool {
+  --ec-panel: #151517;
+  --ec-line: #26262a;
+  --ec-text: #ececee;
+  --ec-dim: #9a9aa2;
+  --ec-field: #202024;
+  --ec-fail: #ff8a80;
+  --ec-warn: #f2c063;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: 320px minmax(320px, 440px) minmax(0, 1fr);
+  height: 100dvh;
+  overflow: hidden;
+  background: #0c0c0d;
+  color: var(--ec-text);
+  color-scheme: dark;
+  font: 400 14px/1.45 var(--font-host), "Host Grotesk", system-ui, sans-serif;
+}
+
+.ec-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 20px 18px 28px;
+  overflow-y: auto;
+  background: var(--ec-panel);
+  border-right: 1px solid var(--ec-line);
+}
+.ec-preview {
+  background: #0c0c0d;
+  border-right: 0;
+}
+
+.ec-tool h1,
+.ec-tool h2,
+.ec-tool p,
+.ec-tool ul,
+.ec-tool dl,
+.ec-tool dd {
+  margin: 0;
+}
+.ec-tool h1 {
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: none;
+}
+.ec-tool h2 {
+  margin-top: 16px;
+  padding-top: 18px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ec-dim);
+  border-top: 1px solid var(--ec-line);
+}
+.ec-tool h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.ec-tool a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ec-tool a:hover {
+  color: #fff;
+}
+.ec-dim {
+  color: var(--ec-dim);
+}
+
+/* ── Controls ──────────────────────────────────────────────────────── */
+.ec-tool button,
+.ec-file span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--ec-text);
+  background: var(--ec-field);
+  border: 1px solid var(--ec-line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.ec-tool button:hover,
+.ec-file:hover span {
+  background: #2a2a2f;
+}
+.ec-tool button[aria-pressed="true"] {
+  color: #111;
+  background: #f2f2f3;
+  border-color: #f2f2f3;
+}
+.ec-tool :is(button, textarea, a, summary):focus-visible,
+.ec-file input:focus-visible + span {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.ec-file input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.ec-file span {
+  width: 100%;
+}
+.ec-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ec-label {
+  font-weight: 600;
+}
+.ec-textarea {
+  flex: 1 1 220px;
+  min-height: 220px;
+  padding: 10px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ec-text);
+  white-space: pre;
+  background: var(--ec-field);
+  border: 1px solid var(--ec-line);
+  border-radius: 6px;
+  resize: none;
+}
+
+.ec-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+}
+.ec-stats dt {
+  color: var(--ec-dim);
+}
+.ec-foot {
+  margin-top: auto;
+  padding-top: 8px;
+  color: var(--ec-dim);
+}
+
+/* ── Report ────────────────────────────────────────────────────────── */
+.ec-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  list-style: none;
+}
+.ec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0;
+  border-top: 1px solid var(--ec-line);
+}
+.ec-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.ec-item-title {
+  font-weight: 600;
+}
+.ec-item-title .ec-dim {
+  font-weight: 400;
+}
+.ec-level {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 1px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+}
+.ec-level-fail {
+  color: var(--ec-fail);
+}
+.ec-level-warn {
+  color: var(--ec-warn);
+}
+.ec-level-info {
+  color: var(--ec-dim);
+}
+.ec-details summary {
+  padding: 8px 0;
+  cursor: pointer;
+}
+.ec-details[open] summary {
+  margin-bottom: 8px;
+}
+
+/* ── Preview ───────────────────────────────────────────────────────── */
+.ec-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+}
+.ec-stage {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+  overflow-x: auto;
+}
+.ec-stage iframe {
+  flex: 0 0 auto;
+  max-width: none;
+  height: 100%;
+  background: #fff;
+  border: 0;
+  border-radius: 6px;
+}
+
+/* One column once the three panels no longer fit side by side. */
+@media (max-width: 1100px) {
+  .ec-tool {
+    position: static;
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .ec-panel {
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid var(--ec-line);
+  }
+  .ec-textarea {
+    flex: none;
+    height: 240px;
+  }
+  .ec-stage {
+    justify-content: flex-start;
+  }
+  .ec-stage iframe {
+    height: 80dvh;
+  }
+}
+
+@media (pointer: coarse) {
+  .ec-tool button,
+  .ec-file span,
+  .ec-details summary {
+    min-height: 44px;
+  }
+}
