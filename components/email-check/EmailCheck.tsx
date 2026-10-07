@@ -181,6 +181,21 @@ function supportLabel(status: ClientSupport["status"]): string {
   return { y: "Supported", a: "Partial", n: "Not supported", u: "Unknown" }[status];
 }
 
+const BASIS_LABEL = {
+  sourced: { text: "Sourced", tip: "A standard, published test results or the client maker's own documentation says this. Each source was loaded and checked for the claim." },
+  checked: { text: "Seen in the file", tip: "True by looking at this email itself. It makes no claim about how mail clients behave." },
+  practice: { text: "Unverified", tip: "Common practice among email developers, with no source that could be checked. Shown as a note only; treat it as a prompt to test, not as fact." },
+} as const;
+
+/** What a finding rests on, as a small tag. */
+function BasisTag({ basis }: { basis: keyof typeof BASIS_LABEL }) {
+  return (
+    <span className={`ec-basis ec-basis-${basis}`} title={BASIS_LABEL[basis].tip}>
+      {BASIS_LABEL[basis].text}
+    </span>
+  );
+}
+
 /** Where a claim comes from, as numbered links: [1][2]. Says so when there is none. */
 function Sources({ list, none }: { list: Source[]; none?: boolean }) {
   if (!list.length) {
@@ -245,6 +260,7 @@ function FindingSection({
                   <span className={`ec-level ec-level-${f.level}`}>{LEVEL_LABEL[f.level]}</span>
                   {f.a11y && <span className="ec-level ec-level-a11y">Accessibility</span>} {f.title}
                 </p>
+                <BasisTag basis={f.basis} />
                 <span className="ec-share" title={f.affects.length ? f.affects.map((a) => familyNames?.[a] ?? a).join(", ") : "Every client"}>
                   {formatShare(f.share)} of opens
                 </span>
@@ -255,7 +271,7 @@ function FindingSection({
                 )}
               </div>
               <p>
-                {f.detail} <Sources list={f.sources} none />
+                {f.detail} <Sources list={f.sources} />
               </p>
               <Where lines={f.lines} insertAfter={f.insertAfter} />
               {f.howTo && <HowToFix text={f.howTo.text} code={f.howTo.code} sources={f.sources} />}
@@ -864,7 +880,8 @@ export default function EmailCheck() {
             </div>
 
             <p className="ec-dim ec-intro">
-              Each section is ordered by severity, then by the share of opens it reaches (
+              Every finding says what it rests on: <BasisTag basis="sourced" /> <BasisTag basis="checked" /> <BasisTag basis="practice" />. Unverified ones
+              are never more than a note. Each section is ordered by severity, then by the share of opens it reaches (
               <a href={NOTE_SOURCES.share[0].url} target="_blank" rel="noreferrer">
                 Litmus, {SHARE_DATE}
               </a>

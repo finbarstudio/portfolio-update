@@ -433,6 +433,23 @@
 .ec-level-info {
   color: var(--ec-dim);
 }
+.ec-basis {
+  padding: 1px 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  cursor: help;
+}
+.ec-basis-sourced {
+  color: var(--ec-ok);
+}
+.ec-basis-checked {
+  color: #9ec5ff;
+}
+.ec-basis-practice {
+  color: var(--ec-warn);
+}
 .ec-tally {
   display: flex;
   flex-wrap: wrap;

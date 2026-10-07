@@ -24,6 +24,7 @@ export interface ReportInput {
 }
 
 const LEVEL = { fail: "P", warn: "W", info: "N" } as const;
+const BASIS = { sourced: "sourced", checked: "in file", practice: "unverified" } as const;
 const MAX_LINES = 8;
 
 function lines(list: number[], insertAfter?: number): string {
@@ -69,13 +70,13 @@ export function buildReport(input: ReportInput): string {
   out.push(`Inbox preview line: "${stats.previewText}"`);
   const done = applied.filter((a) => a.note);
   out.push(`Fixes already applied: ${done.length ? done.map((a) => a.note).join("; ") : "none"}`);
-  out.push("Key: P problem, W warning, N note; a11y = accessibility; L = line of the HTML; % = share of email opens reached; autofix = the tool can fix it.");
+  out.push("Key: P problem, W warning, N note; a11y = accessibility; L = line of the HTML; % = share of email opens reached; autofix = the tool can fix it. Basis: sourced = a standard, test data or client docs says so; in file = true by inspection of this email; unverified = common practice only, never above a note.");
 
   for (const [group, heading] of [["content", "Content and links"], ["code", "Code"]] as const) {
     const inGroup = findings.filter((f) => f.group === group);
     out.push("", `## ${heading} (${inGroup.length})`);
     for (const f of inGroup) {
-      out.push([`${LEVEL[f.level]}${f.a11y ? " a11y" : ""}`, f.title, lines(f.lines, f.insertAfter), formatShare(f.share), f.fix ? "autofix" : ""].filter(Boolean).join(" | "));
+      out.push([`${LEVEL[f.level]}${f.a11y ? " a11y" : ""}`, f.title, lines(f.lines, f.insertAfter), formatShare(f.share), BASIS[f.basis], f.fix ? "autofix" : ""].filter(Boolean).join(" | "));
     }
   }
 

@@ -60,6 +60,8 @@ export interface Finding {
   sources: Source[];
   /** which report section it belongs in: the words and links, or the markup */
   group: Group;
+  /** what the finding rests on; see Basis */
+  basis: Basis;
   /** for something missing: the line to add it after */
   insertAfter?: number;
   /** what to change, with the code to use where there is one */
@@ -67,6 +69,46 @@ export interface Finding {
 }
 
 export type Group = "content" | "code";
+
+/**
+ * What a finding rests on, shown beside it so nothing is taken on trust:
+ *  - sourced: a standard, published test results or the client maker's own
+ *    documentation says so, and the page was loaded and checked for it;
+ *  - checked: true by looking at this email (a link is empty, a date has
+ *    passed, two widths differ); it makes no claim about how clients behave;
+ *  - practice: what email developers commonly do or believe, with no source
+ *    that could be checked. These are never shown above a note.
+ */
+export type Basis = "sourced" | "checked" | "practice";
+
+/** Findings that only state something visible in the file itself. */
+const CHECKED_IDS = new Set([
+  "after-html",
+  "empty-blocks",
+  "br-runs",
+  "nbsp-runs",
+  "nbsp-raw",
+  "indent",
+  "title",
+  "css-selector",
+  "img-src",
+  "link-empty",
+  "link-http",
+  "social-mismatch",
+  "unused-fonts",
+  "link-text-mismatch",
+  "link-same-text",
+  "link-tracking",
+  "link-utm-empty",
+  "preconnect-orphan",
+  "fonts-mixed",
+  "ghost-mismatch",
+  "line-height-zero",
+  "img-height",
+  "small-text",
+  "img-alt-long",
+  "width",
+]);
 
 /** Findings about what the email says and where its links go, as opposed to how it is built. */
 const CONTENT_IDS = new Set([
@@ -169,6 +211,14 @@ const SRC = {
   textSize: { label: "MDN: text-size-adjust", url: "https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust", kind: "standard" },
   sesTemplates: { label: "AWS: SES templates and rendering failures", url: "https://docs.aws.amazon.com/ses/latest/dg/send-personalized-email-api.html", kind: "client docs" },
   sesHandlebars: { label: "AWS: SES advanced personalisation (Handlebars)", url: "https://docs.aws.amazon.com/ses/latest/dg/send-personalized-email-advanced.html", kind: "client docs" },
+  htmlOptionalTags: { label: "HTML standard: optional tags (a td may be left unclosed)", url: "https://html.spec.whatwg.org/multipage/syntax.html#optional-tags", kind: "standard" },
+  htmlTable: { label: "HTML standard: the table element", url: "https://html.spec.whatwg.org/multipage/tables.html#the-table-element", kind: "standard" },
+  htmlDimensions: { label: "HTML standard: width and height attributes", url: "https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes", kind: "standard" },
+  html4Valign: { label: "HTML 4.01: the valign attribute", url: "https://www.w3.org/TR/html401/struct/tables.html#adef-valign", kind: "standard" },
+  cssErrors: { label: "CSS 2: rules for handling parsing errors", url: "https://www.w3.org/TR/CSS2/syndata.html#parsing-errors", kind: "standard" },
+  rfc3986: { label: "RFC 3986 §3.4, the query part of an address", url: "https://www.rfc-editor.org/rfc/rfc3986#section-3.4", kind: "standard" },
+  rfc3966: { label: "RFC 3966, the tel: address", url: "https://www.rfc-editor.org/rfc/rfc3966#section-3", kind: "standard" },
+  mailchimpCss: { label: "Mailchimp: client-specific CSS (iOS and the 13px minimum)", url: "https://templates.mailchimp.com/development/css/client-specific-styles", kind: "vendor research" },
   acUnsub: { label: "ActiveCampaign: why unsubscribe links are required", url: "https://help.activecampaign.com/hc/en-us/articles/115001227004", kind: "client docs" },
 } satisfies Record<string, Source>;
 
@@ -182,24 +232,32 @@ export const SOURCES: Record<string, Source[]> = {
   "zero-width": [SRC.preheader],
   unsubscribe: [SRC.gmailSenders],
   "ac-unsubscribe": [SRC.acUnsub],
+  doctype: [cie("html-doctype", "HTML5 doctype")],
+  "nested-td": [SRC.htmlOptionalTags],
+  "empty-table": [SRC.htmlTable],
+  "img-height-invalid": [SRC.htmlDimensions],
+  "img-height-empty": [SRC.htmlDimensions],
+  valign: [SRC.html4Valign],
+  "css-unknown": [SRC.cssErrors],
+  "css-colour-hash": [SRC.cssErrors],
+  "link-query": [SRC.rfc3986],
+  "link-tel": [SRC.rfc3966],
+  "link-same-text": [wcag("WCAG21/Understanding/link-purpose-in-context.html", "WCAG 2.4.4, link purpose")],
   "preheader-unpadded": [SRC.preheader],
-  "ghost-mismatch": [SRC.dpi],
-  "line-height-zero": [cie("css-line-height", "line-height")],
+
   "unsubscribe-empty": [SRC.gmailSenders, SRC.acUnsub],
   "bare-placeholder": [SRC.sesTemplates, SRC.sesHandlebars],
   "merge-tags": [SRC.sesHandlebars],
-  "text-size-adjust": [SRC.textSize],
+  "text-size-adjust": [SRC.mailchimpCss, SRC.textSize],
   "color-scheme": [cie("html-meta-color-scheme", "color-scheme meta"), SRC.darkMode],
   "pure-black": [SRC.darkMode],
   ppi: [SRC.dpi, cie("html-width", "width attribute, the 120 dpi note")],
   "xmlns-o": [SRC.dpi],
   "ghost-width": [cie("html-width", "width attribute, the 120 dpi note"), SRC.dpi],
-  "max-width": [cie("css-max-width", "max-width")],
   "line-height-rule": [cie("css-line-height", "line-height, the Outlook note")],
-  "spacer-cells": [cie("css-line-height", "line-height, the Outlook note")],
   "bg-no-vml": [cie("css-background-image", "background-image"), SRC.vml],
   "outlook-spacing": [cie("css-padding", "padding, table cells only in Outlook"), cie("css-margin", "margin")],
-  "img-width": [cie("html-width", "width attribute")],
+  "img-width": [cie("css-width", "width property, not supported on images in Outlook"), cie("html-width", "width attribute")],
   "img-inline": [SRC.owaGap],
   "img-alt": [wcag("tutorials/images/", "W3C: images tutorial")],
   "img-alt-weak": [wcag("tutorials/images/informative/", "W3C: informative images")],
@@ -209,7 +267,6 @@ export const SOURCES: Record<string, Source[]> = {
   "link-generic": [wcag("WCAG21/Understanding/link-purpose-in-context.html", "WCAG 2.4.4, link purpose")],
   headings: [wcag("WCAG21/Understanding/headings-and-labels.html", "WCAG 2.4.6, headings and labels"), cie("html-h1-h6", "h1 to h6")],
   "font-fallbacks": [cie("css-at-font-face", "@font-face, the Times New Roman note")],
-  "unused-fonts": [cie("html-link", "<link>")],
 };
 
 /** Reading behind the preview notes and the rendered audit. */
@@ -866,9 +923,13 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
     opts: { lines?: number[]; fix?: FixId; affects?: string[]; a11y?: boolean; insertAfter?: number; howTo?: HowTo } = {},
   ) => {
     const affects = opts.affects ?? [];
+    const sources = SOURCES[id] ?? [];
+    const basis: Basis = sources.length ? "sourced" : CHECKED_IDS.has(id) || id.startsWith("text-") ? "checked" : "practice";
     out.push({
       id,
-      level,
+      // Common practice with nothing to cite is never more than a note.
+      level: basis === "practice" ? "info" : level,
+      basis,
       title,
       detail,
       lines: [...new Set(opts.lines ?? [])].sort((a, b) => a - b),
@@ -876,7 +937,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       affects,
       share: affects.length ? sumShare(affects) : sumShare(ALL_FAMILIES),
       a11y: opts.a11y,
-      sources: SOURCES[id] ?? [],
+      sources,
       group: CONTENT_IDS.has(id) ? "content" : "code",
       insertAfter: opts.insertAfter ?? (HEAD_INSERTS.has(id) ? head?.line : id === "preheader" ? bodyTag?.line : undefined),
       howTo: opts.howTo ?? HOW_TO[id],
@@ -952,7 +1013,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (longLines.length) {
     add(
       "line-length",
-      "fail",
+      "warn",
       `${plural(longLines.length, "line")} longer than 998 characters`,
       "The mail standard caps a line at 998 characters. A server that enforces it wraps the line wherever it falls, which can split a tag or add stray whitespace. Most platforms encode the message to avoid this, but not all.",
       { lines: longLines },
@@ -963,7 +1024,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (tail && tail[1].trim()) {
     add(
       "after-html",
-      "warn",
+      "info",
       "Content after the closing html tag",
       "Anything after </html> is rendered at the very bottom of the message by most clients.",
       { lines: [lineOf(src.length - tail[1].trimStart().length)] },
@@ -975,9 +1036,9 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (emptyParagraphs.length) {
     add(
       "empty-blocks",
-      "warn",
+      "info",
       `${plural(emptyParagraphs.length, "empty paragraph or div")}`,
-      "Each one is a blank line of space, and they are the usual cause of a gap at the bottom of an email: editors with an editable region add <p><br></p> after the content, and some add another every time the email is saved.",
+      "Each one shows as a blank line of space. Where they sit at the end of the email they are a gap under the footer. Some editors add them on their own when an email is saved.",
       { lines: emptyParagraphs },
     );
   }
@@ -985,7 +1046,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (brRuns.length) {
     add(
       "br-runs",
-      "warn",
+      "info",
       `${plural(brRuns.length, "run")} of three or more line breaks`,
       "Stacked <br> tags are blank lines whose height depends on the client's font size, so the gap is a different size everywhere. Use a spacer cell with a fixed height instead.",
       { lines: brRuns },
@@ -995,7 +1056,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (nbspRuns.length) {
     add(
       "nbsp-runs",
-      "warn",
+      "info",
       `${plural(nbspRuns.length, "run")} of three or more non-breaking spaces`,
       "Each one is a character that takes up a line of height, so a long run reads as a blank block. If you did not type them, a rich-text editor or the sending platform put them there.",
       { lines: nbspRuns },
@@ -1034,7 +1095,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
 
   // ── Document basics ─────────────────────────────────────────────────
   if (!/^\s*<!doctype/i.test(src)) {
-    add("doctype", "warn", "No doctype", "Without one, webmail clients fall back to quirks rendering and spacing changes.");
+    add("doctype", "info", "No doctype", "Clients that honour the doctype use it to pick standards rendering; without one they use the older quirks rules, where sizes and spacing are worked out differently. Outlook on Windows ignores it either way.");
   }
   if (html && !html.attrs.lang) {
     add(
@@ -1198,17 +1259,6 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
     );
   }
 
-  const maxWidth = tags.filter((t) => !t.mso && t.name === "table" && styleHas(t.attrs.style, "max-width"));
-  if (maxWidth.length && !tags.some((t) => t.mso && t.name === "table")) {
-    add(
-      "max-width",
-      "warn",
-      "max-width with no fixed-width table for Outlook",
-      "Outlook on Windows ignores max-width, so the email runs the full width of the window. Wrap it in a fixed-width table inside an mso conditional comment.",
-      { lines: maxWidth.map((t) => t.line), affects: OUTLOOK },
-    );
-  }
-
   if (stats.width !== null && stats.width > USUAL_WIDTH) {
     add(
       "width",
@@ -1329,7 +1379,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "img-width",
       "warn",
       `${plural(noWidth.length, "image")} with no width attribute`,
-      "Outlook on Windows shows the image at its real pixel size, so a retina image comes out double size and breaks the layout.",
+      "Outlook on Windows does not apply a CSS width to an image, so without the attribute it shows the image at the file's own pixel size. An image saved at double size for sharp screens comes out double size.",
       { lines: noWidth, affects: OUTLOOK },
     );
   }
@@ -1339,7 +1389,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "img-height-empty",
       "info",
       `${plural(emptyHeight.length, "image")} with an empty height attribute`,
-      'Usually a leftover from a width/height pair where the value was dropped so height:auto could take over on mobile; ActiveCampaign\'s editor then writes it as a bare "height". Browsers and WebKit-based clients treat it exactly like no attribute at all. Removing it cannot change how any client renders the image, so it is safe to clean up.',
+      'Usually a leftover from a width/height pair where the value was dropped so height:auto could take over on mobile; ActiveCampaign\'s editor then writes it as a bare "height". The attribute takes a whole number, so an empty one is not valid and browsers ignore it. Removing it is a tidy-up.',
       { lines: emptyHeight, fix: "img-height-empty" },
     );
   }
@@ -1347,10 +1397,10 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (badHeight.length) {
     add(
       "img-height-invalid",
-      "warn",
+      "info",
       `${plural(badHeight.length, "image")} with a non-numeric height attribute`,
-      'The attribute only takes a whole number of pixels. height="auto" belongs in the style attribute; Outlook on Windows ignores it here and may stretch the image.',
-      { lines: badHeight, affects: OUTLOOK },
+      'The attribute only takes a whole number of pixels, so a value like "auto" is not valid here and is ignored. height:auto belongs in the style attribute.',
+      { lines: badHeight },
     );
   }
   const noHeight = imgLines((t) => !("height" in t.attrs) && !styleHas(t.attrs.style, "height"));
@@ -1424,7 +1474,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   const links = tags.filter((t) => t.name === "a" && !t.mso);
   const deadLinks = links.filter((t) => !t.attrs.href || t.attrs.href.trim() === "#").map((t) => t.line);
   if (deadLinks.length) {
-    add("link-empty", "warn", `${plural(deadLinks.length, "link")} going nowhere`, "The href is empty or just a # placeholder.", { lines: deadLinks });
+    add("link-empty", "info", `${plural(deadLinks.length, "link")} going nowhere`, "The href is empty or just a # placeholder.", { lines: deadLinks });
   }
   const linkText = (t: Tag) => {
     const close = src.indexOf("</a>", t.end);
@@ -1491,7 +1541,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (genericLinks.length) {
     add(
       "link-generic",
-      "warn",
+      "info",
       `${plural(genericLinks.length, "link")} that just says "click here" or similar`,
       "Screen reader users often jump between links and hear them out of context. Say where the link goes: \"View my account\", not \"click here\".",
       { lines: genericLinks, a11y: true },
@@ -1538,7 +1588,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (unusedFonts.length) {
     add(
       "unused-fonts",
-      "warn",
+      "info",
       `${unusedFonts.flatMap(linkFamilies).join(", ")} loaded but never used`,
       "The stylesheet link is in the head, but no font-family in the email names it. It is a wasted request, and the email is not using the font you expect.",
       { lines: unusedFonts.map((t) => t.line), fix: "unused-fonts" },
@@ -1621,7 +1671,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (placeholder.length) {
     add(
       "text-placeholder",
-      "warn",
+      "info",
       `Placeholder text left in: ${quote(placeholder)}`,
       "This reads like copy that was meant to be replaced before sending.",
       { lines: placeholder.map((h) => h.line), howTo: { text: "Replace it with the final copy." } },
@@ -1660,9 +1710,9 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (textMismatch.length) {
     add(
       "link-text-mismatch",
-      "warn",
+      "info",
       `${plural(textMismatch.length, "link")} showing one web address and going to another`,
-      "The visible text is a web address, and the link behind it goes to a different site. Mail clients treat that as a sign of phishing, and it is usually a copy and paste slip.",
+      "The visible text is a web address, and the link behind it goes to a different site. That is usually a copy and paste slip. Showing one address and linking to another is also the pattern phishing emails use, so it is worth avoiding even when both sites are yours.",
       { lines: textMismatch.map((t) => t.line), howTo: { text: "Make the address in the text and the address in the link the same." } },
     );
   }
@@ -1760,7 +1810,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "link-query",
       "warn",
       `${plural(twoQueries.length, "link")} with two question marks in the address`,
-      "An address can only have one question mark. Everything after the second is read as part of the value before it, so those tracking tags are not counted, and some sites reject the link. It usually comes from pasting one tracked link on the end of another.",
+      "Only the first question mark starts the list of tags. A second one is read as an ordinary character, so the tag straight after it is swallowed into the value before it, and the tags that follow repeat ones already set earlier in the address. Which of the repeated values the destination site counts is up to that site. It usually comes from pasting one tracked link on the end of another.",
       { lines: twoQueries.map((t) => t.line), howTo: { text: "Keep one set of tracking tags, and join the rest with & instead of a second question mark.", code: "https://example.com/page?utm_source=SHARE_TO_BUY&utm_medium=Email&utm_campaign=name" } },
     );
   }
@@ -1780,7 +1830,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "link-tel",
       "info",
       `${plural(badTel.length, "phone link")} with spaces in the number`,
-      "Some phones do not dial a tel: link that contains spaces. The visible number can keep its spaces; the link should not.",
+      "The standard for tel: links does not allow spaces; hyphens, dots and brackets are the permitted separators. Most phones cope with spaces anyway, but it is not guaranteed. The visible number can keep its spaces; the link should not.",
       { lines: badTel.map((t) => t.line), howTo: { text: "Remove the spaces from the link only.", code: '<a href="tel:03336664747">0333 666 4747</a>' } },
     );
   }
@@ -1808,9 +1858,9 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (msoTable && msoCell && msoTable.attrs.width !== msoCell.attrs.width) {
     add(
       "ghost-mismatch",
-      "warn",
+      "info",
       `Outlook-only table is ${msoTable.attrs.width}px but its cell is ${msoCell.attrs.width}px`,
-      "The table that fixes the email's width for Outlook and the cell inside it disagree. Outlook uses one or the other depending on the version, so the email can come out narrower than designed or with a gap down one side.",
+      "The table that sets the email's width for Outlook and the cell inside it give different widths. That is an inconsistency in the file. What Outlook does with it has not been verified here: it may be harmless. Worth making them match, and worth a look in Outlook if the email's width matters.",
       { lines: [msoTable.line, msoCell.line], howTo: { text: "Give both the same width, matching the max-width of the email." }, affects: OUTLOOK },
     );
   }
@@ -1818,9 +1868,9 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (nestedCells.length) {
     add(
       "nested-td",
-      "warn",
-      `${plural(nestedCells.length, "table cell")} opened straight after another that was never closed`,
-      "There is a <td> with nothing in it and no closing tag, followed by the real cell. Browsers quietly repair it by adding an empty cell; Outlook's repair is less predictable and can shift the columns.",
+      "info",
+      `${plural(nestedCells.length, "empty table cell")} with no closing tag, straight before another cell`,
+      "This is valid HTML: a td may be left unclosed when another td follows, and the result is an extra empty cell in the row. It is flagged because an empty cell written this way is almost always a leftover, and it adds a column the layout does not need.",
       { lines: nestedCells, howTo: { text: "Delete the stray opening <td>." } },
     );
   }
@@ -1830,7 +1880,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "empty-table",
       "info",
       `${plural(emptyTables.length, "table")} with nothing inside`,
-      "A table with no rows is not valid and does nothing, but Outlook can still give it height.",
+      "A table with no rows is allowed, and it shows nothing. It is flagged as a leftover that can be removed.",
       { lines: emptyTables, howTo: { text: "Remove it, or remove the cell that holds it if that is empty too." } },
     );
   }
@@ -1870,9 +1920,9 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (zeroLineText.length) {
     add(
       "line-height-zero",
-      "warn",
+      "info",
       `Text inside ${plural(zeroLineText.length, "cell")} with a line-height of 0`,
-      "A line-height of 0 is a trick for removing the gap around an image. On a cell that holds words, the lines of text sit on top of each other, and Outlook can clip them.",
+      "A line-height of 0 is a trick for removing the gap around an image. On a cell that holds words it means the text has no line of its own: one line still shows, but if the words wrap, the lines sit on top of each other.",
       { lines: zeroLineText, howTo: { text: "Give the text cell a real line-height, about 1.4 times the font size." } },
     );
   }
@@ -1882,7 +1932,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "valign",
       "info",
       `${plural(badValign.length, "cell")} with a valign value that does not exist`,
-      'valign takes top, middle, bottom or baseline. "center" is not one of them, so it is ignored and the cell falls back to the default.',
+      'valign takes top, middle, bottom or baseline. "center" is not one of them, so it is ignored. The default is middle, so the cell looks the same; the attribute is just not doing anything.',
       { lines: badValign, howTo: { text: 'Use valign="middle".' } },
     );
   }
