@@ -183,6 +183,7 @@ function Slider({
   step,
   value,
   onChange,
+  onReset,
 }: {
   label: string;
   min: number;
@@ -190,6 +191,8 @@ function Slider({
   step: number;
   value: number;
   onChange: (value: number) => void;
+  /** Double-clicking the bar puts the slider back to its default. */
+  onReset: () => void;
 }) {
   // While the value is being typed it is text; otherwise it shows the number.
   const [typed, setTyped] = useState<string | null>(null);
@@ -207,7 +210,17 @@ function Slider({
   return (
     <div className="mp-slider" style={fill}>
       <span>{label}</span>
-      <input type="range" aria-label={label} min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} />
+      <input
+        type="range"
+        aria-label={label}
+        title="Double-click to reset"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        onDoubleClick={onReset}
+      />
       <input
         className="mp-slider-value"
         type="text"
@@ -642,7 +655,7 @@ export default function MotionTool() {
     "offsetY",
   ];
   const slider = (key: MotionKey) => {
-    return <Slider key={key} {...rangeFor(preset, key)} value={motion[key]} onChange={(value) => setMotion(key, value)} />;
+    return <Slider key={key} {...rangeFor(preset, key)} value={motion[key]} onChange={(value) => setMotion(key, value)} onReset={() => resetKeys([key])} />;
   };
   const stepped = ALWAYS_STEPPED.has(layout) || motion.rhythm > 0;
   const tuned = Object.keys(adjustments).length > 0 || Object.keys(chosen).length > 0 || easing !== BASE_EASING;
@@ -844,7 +857,7 @@ export default function MotionTool() {
         </div>
 
         <Heading title="Look" changed={look.radius !== BASE_LOOK.radius || look.background !== BASE_LOOK.background} onReset={() => patchLook({ radius: BASE_LOOK.radius, background: BASE_LOOK.background })} />
-        <Slider label="Corners" min={0} max={0.5} step={0.01} value={look.radius} onChange={(radius) => patchLook({ radius })} />
+        <Slider label="Corners" min={0} max={0.5} step={0.01} value={look.radius} onChange={(radius) => patchLook({ radius })} onReset={() => patchLook({ radius: BASE_LOOK.radius })} />
         <div className="mp-line">
           <span>Background</span>
           <ColourPicker label="Background" value={look.background} onChange={(background) => patchLook({ background })} />
