@@ -8,11 +8,12 @@
   --ec-field: #202024;
   --ec-fail: #ff8a80;
   --ec-warn: #f2c063;
+  --ec-ok: #7ed49a;
   position: fixed;
   inset: 0;
   z-index: 100;
   display: grid;
-  grid-template-columns: 320px minmax(320px, 440px) minmax(0, 1fr);
+  /* columns are set inline: each panel is 44px when collapsed */
   height: 100dvh;
   overflow: hidden;
   background: #0c0c0d;
@@ -24,16 +25,23 @@
 .ec-panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  min-width: 0;
   min-height: 0;
-  padding: 20px 18px 28px;
-  overflow-y: auto;
   background: var(--ec-panel);
   border-right: 1px solid var(--ec-line);
 }
 .ec-preview {
   background: #0c0c0d;
   border-right: 0;
+}
+.ec-panel-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 4px 18px 28px;
+  overflow-y: auto;
 }
 
 .ec-tool h1,
@@ -43,26 +51,6 @@
 .ec-tool dl,
 .ec-tool dd {
   margin: 0;
-}
-.ec-tool h1 {
-  font-size: 16px;
-  font-weight: 600;
-  text-transform: none;
-}
-.ec-tool h2 {
-  margin-top: 16px;
-  padding-top: 18px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ec-dim);
-  border-top: 1px solid var(--ec-line);
-}
-.ec-tool h2:first-child {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
 }
 .ec-tool a {
   color: inherit;
@@ -74,6 +62,51 @@
 }
 .ec-dim {
   color: var(--ec-dim);
+}
+
+/* ── Panel toggle ──────────────────────────────────────────────────── */
+.ec-tool .ec-toggle {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ec-line);
+  border-radius: 0;
+}
+.ec-tool .ec-toggle:hover {
+  background: var(--ec-field);
+}
+.ec-toggle-mark {
+  width: 12px;
+  color: var(--ec-dim);
+  text-align: center;
+}
+.ec-panel.is-closed .ec-toggle {
+  flex: 1 1 auto;
+  align-items: flex-start;
+  padding: 14px 0 0;
+  border-bottom: 0;
+}
+.ec-panel.is-closed .ec-toggle-mark {
+  width: 44px;
+}
+.ec-panel.is-closed .ec-toggle-text {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+  transform-origin: center;
+  white-space: nowrap;
+}
+.ec-panel.is-closed {
+  position: relative;
 }
 
 /* ── Controls ──────────────────────────────────────────────────────── */
@@ -95,6 +128,13 @@
 .ec-file:hover span {
   background: #2a2a2f;
 }
+.ec-tool button:disabled {
+  color: var(--ec-dim);
+  cursor: default;
+}
+.ec-tool button:disabled:hover {
+  background: var(--ec-field);
+}
 .ec-tool button[aria-pressed="true"] {
   color: #111;
   background: #f2f2f3;
@@ -104,6 +144,9 @@
 .ec-file input:focus-visible + span {
   outline: 2px solid #fff;
   outline-offset: 2px;
+}
+.ec-file {
+  position: relative;
 }
 .ec-file input {
   position: absolute;
@@ -123,8 +166,8 @@
   font-weight: 600;
 }
 .ec-textarea {
-  flex: 1 1 220px;
-  min-height: 220px;
+  flex: 1 1 200px;
+  min-height: 200px;
   padding: 10px;
   font: inherit;
   font-size: 13px;
@@ -135,6 +178,128 @@
   border: 1px solid var(--ec-line);
   border-radius: 6px;
   resize: none;
+}
+.ec-input {
+  flex: 1 1 160px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 10px;
+  font: inherit;
+  color: var(--ec-text);
+  background: var(--ec-field);
+  border: 1px solid var(--ec-line);
+  border-radius: 6px;
+}
+.ec-input:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.ec-notes {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ec-dim);
+}
+.ec-output {
+  color: var(--ec-dim);
+}
+.ec-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ec-row .ec-label {
+  margin-right: auto;
+}
+.ec-tool .ec-primary {
+  color: #111;
+  background: #f2f2f3;
+  border-color: #f2f2f3;
+}
+.ec-tool .ec-primary:hover:not(:disabled) {
+  background: #fff;
+}
+.ec-tool .ec-primary:disabled {
+  color: var(--ec-dim);
+  background: var(--ec-field);
+  border-color: var(--ec-line);
+}
+.ec-tool .ec-fix {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.ec-applied {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ec-applied li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--ec-field);
+  border-radius: 6px;
+}
+.ec-item-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.ec-item-head .ec-item-title {
+  flex: 1 1 auto;
+}
+.ec-share {
+  padding: 1px 6px;
+  font-size: 12px;
+  color: var(--ec-dim);
+  white-space: nowrap;
+  border: 1px solid var(--ec-line);
+  border-radius: 4px;
+}
+.ec-clients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ec-client {
+  --c: var(--ec-dim);
+  padding: 2px 7px;
+  font-size: 12px;
+  color: var(--c);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+}
+.ec-client-n {
+  --c: var(--ec-fail);
+}
+.ec-client-a {
+  --c: var(--ec-warn);
+}
+.ec-client-y {
+  --c: var(--ec-ok);
+}
+.ec-client-share {
+  opacity: 0.7;
+}
+.ec-env {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.ec-env dt {
+  color: var(--ec-dim);
 }
 
 .ec-stats {
@@ -152,6 +317,43 @@
 }
 
 /* ── Report ────────────────────────────────────────────────────────── */
+.ec-section {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--ec-line);
+}
+.ec-section > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+  list-style: none;
+  cursor: pointer;
+}
+.ec-section > summary::-webkit-details-marker {
+  display: none;
+}
+.ec-section > summary::before {
+  width: 12px;
+  color: var(--ec-dim);
+  text-align: center;
+  content: "+";
+}
+.ec-section[open] > summary::before {
+  content: "–";
+}
+.ec-section[open] > summary {
+  margin-bottom: 12px;
+}
+.ec-section > :not(summary) + :not(summary) {
+  margin-top: 12px;
+}
+.ec-tool h2 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ec-dim);
+}
 .ec-list {
   display: flex;
   flex-direction: column;
@@ -207,20 +409,37 @@
   flex-wrap: wrap;
   gap: 10px 18px;
 }
+.ec-notice {
+  padding: 10px 12px;
+  color: var(--ec-warn);
+  border: 1px solid currentColor;
+  border-radius: 6px;
+}
+.ec-preview-text {
+  padding: 8px 10px;
+  background: var(--ec-field);
+  border-radius: 6px;
+}
+/* The email sits in an inset frame; the frame scrolls, not the page. */
 .ec-stage {
   flex: 1 1 auto;
   display: flex;
-  justify-content: center;
+  justify-content: safe center;
   min-height: 0;
-  overflow-x: auto;
+  padding: 16px;
+  overflow: auto;
+  background: var(--ec-panel);
+  border: 1px solid var(--ec-line);
+  border-radius: 8px;
+  box-shadow: inset 0 2px 12px rgb(0 0 0 / 0.5);
 }
 .ec-stage iframe {
   flex: 0 0 auto;
-  max-width: none;
-  height: 100%;
+  min-height: 100%;
   background: #fff;
   border: 0;
-  border-radius: 6px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.4);
 }
 
 /* One column once the three panels no longer fit side by side. */
@@ -236,12 +455,24 @@
     border-right: 0;
     border-bottom: 1px solid var(--ec-line);
   }
+  .ec-panel-body {
+    overflow: visible;
+  }
+  .ec-panel.is-closed .ec-toggle {
+    flex: none;
+    align-items: center;
+    padding: 0 18px;
+  }
+  .ec-panel.is-closed .ec-toggle-mark {
+    width: 12px;
+  }
+  .ec-panel.is-closed .ec-toggle-text {
+    position: static;
+    transform: none;
+  }
   .ec-textarea {
     flex: none;
     height: 240px;
-  }
-  .ec-stage {
-    justify-content: flex-start;
   }
   .ec-stage iframe {
     height: 80dvh;
