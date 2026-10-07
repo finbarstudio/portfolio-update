@@ -42,7 +42,7 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  */
 
 /** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
-const VERSION = "1.3";
+const VERSION = "1.4";
 
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 

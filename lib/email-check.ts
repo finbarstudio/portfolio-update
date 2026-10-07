@@ -696,14 +696,28 @@ function decodeEntities(text: string): string {
     .replace(/&zwnj;|&#8204;|&#847;|&#8203;|[​‌‍͏﻿]/g, "");
 }
 
-/** The first visible text, which is what inbox preview lines show when there is no preheader. */
+/** How many characters of the email an inbox list reads for its preview line. */
+const PREVIEW_CHARS = 110;
+
+/**
+ * What an inbox list shows under the subject: the first text in the email, hidden preheader
+ * included. Invisible padding (zero-width characters and non-breaking spaces) is counted the
+ * way a mail client counts it, as characters that use up the preview, and then left out of
+ * the result because nobody sees it. So a padded preheader comes back as just its own words.
+ */
 function previewText(src: string): string {
   const body = /<body\b[^>]*>([\s\S]*)<\/body>/i.exec(src)?.[1] ?? src;
   const text = body
     .replace(/<!--[\s\S]*?-->/g, " ")
     .replace(/<(style|script|title)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
-    .replace(/<[^>]+>/g, " ");
-  return decodeEntities(text).replace(/\s+/g, " ").trim().slice(0, 110);
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&zwnj;|&#8204;|&#847;|&#8203;|&#8199;|[\u200b\u200c\u200d\u034f\ufeff\u2007]/g, "\u200c")
+    .replace(new RegExp(NBSP.source, "g"), "\u00a0")
+    // Ordinary white space collapses; the padding characters above do not.
+    .replace(/[ \t\r\n\f]+/g, " ")
+    .replace(/ ?([\u200c\u00a0]) ?/g, "$1")
+    .trim();
+  return decodeEntities(text.slice(0, PREVIEW_CHARS).replace(/\u200c/g, "").replace(/\u00a0/g, " ")).replace(/\s+/g, " ").trim();
 }
 
 function widestTable(tags: Tag[]): number | null {
