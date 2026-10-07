@@ -1,18 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { media } from "@/lib/media";
 import sheet from "@/content/portfolio-cars.json";
 
 /**
- * The Rennen Plus car grid on /portfolio: every thumbnail on the site, 12
- * across in 19 full rows. Put the pointer on a car (or tap it) and it grows to
- * three columns wide, right where it is. Only the cars in those three columns
- * move, and only straight up or down to clear it, so the rest of the grid
- * stays still.
+ * The Rennen Plus car grid on the portfolio: every thumbnail on the site, 12
+ * across in 19 full rows. Rest the pointer on a car (or tap it) and it grows
+ * to three cells by three, right where it is, while every other car shuffles
+ * along to make room and stays in the grid.
  *
- * The frame has a few spare rows above and below the grid for those columns
- * to slide into, so nothing leaves the page.
+ * It is kept gentle on purpose: the open car is three cells, not five; a car
+ * only opens once the pointer has rested on it for a moment, so sweeping
+ * across the grid does not set the whole thing churning; and the shuffle is
+ * slow (the transition is in portfolio.css).
+ *
+ * The frame is 12 by 20 cells: room for every car plus the space one open car
+ * takes. At rest the last row is spare, so everything sits half a row lower to
+ * stay centred.
  *
  * Small cars are drawn from one sprite file (so the page makes one request,
  * not hundreds); the open car loads its own larger file on top. The sprite,
@@ -21,25 +26,28 @@ import sheet from "@/content/portfolio-cars.json";
  */
 
 const COLS = 12;
-const ROWS = 19;
-const UP = 3; // rows the cars above an open car move up
-const DOWN = 2; // rows the cars below it move down
-const TRACKS = ROWS + UP + DOWN; // row heights the frame is divided into
-const WIDE = 3; // columns an open car takes
+const ROWS = 20; // 19 rows of cars and one spare
+const SPAN = 3; // cells an open car takes, each way
+const REST = 140; // ms the pointer must stay on a car before it opens
 const CARS = sheet.cars;
 const SPRITE = "/media/images/portfolio/rennen-plus/cars-sprite.webp";
 
-/** The open car, its own cell, and the first of the columns it takes. */
-interface Open { i: number; c: number; r: number; c0: number }
+/** The open car and the top left cell of the block it takes. */
+interface Open { i: number; c: number; r: number }
 
 /** Where every car sits: [column, row], given which one (if any) is open. */
 function layout(open: Open | null): [number, number][] {
-  return CARS.map((_, i) => {
-    const c = i % COLS;
-    const r = Math.floor(i / COLS);
-    if (!open || i === open.i || c < open.c0 || c >= open.c0 + WIDE) return [c, r];
-    return [c, r <= open.r ? r - UP : r + DOWN];
-  });
+  const at: [number, number][] = new Array(CARS.length);
+  let k = 0;
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (open && c >= open.c && c < open.c + SPAN && r >= open.r && r < open.r + SPAN) continue;
+      if (open && k === open.i) k++;
+      if (k < CARS.length) at[k++] = [c, r];
+    }
+  }
+  if (open) at[open.i] = [open.c, open.r];
+  return at;
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -47,28 +55,55 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
 export default function PfCars() {
   const [open, setOpen] = useState<Open | null>(null);
   const box = useRef<HTMLDivElement>(null);
+  const wait = useRef<{ i: number; id: ReturnType<typeof setTimeout> } | null>(null);
   const at = layout(open);
+  const drop = open ? 0 : 0.5; // the half-row that centres the grid at rest
+
+  const cancel = () => {
+    if (wait.current) clearTimeout(wait.current.id);
+    wait.current = null;
+  };
+  useEffect(() => cancel, []);
 
   const point = (e: React.PointerEvent<HTMLDivElement>) => {
     const b = box.current?.getBoundingClientRect();
     if (!b) return;
-    const c = Math.floor(((e.clientX - b.left) / b.width) * COLS);
-    const r = Math.floor(((e.clientY - b.top) / b.height) * TRACKS) - UP;
-    // still on the open car (its three columns, two rows either side): leave it
-    if (open && c >= open.c0 && c < open.c0 + WIDE && Math.abs(r - open.r) <= 2) return;
+    const x = ((e.clientX - b.left) / b.width) * COLS;
+    const y = ((e.clientY - b.top) / b.height) * ROWS;
+    const c = Math.floor(x);
+    // still on the open car: leave it
+    if (open && c >= open.c && c < open.c + SPAN && y >= open.r && y < open.r + SPAN) return cancel();
+    const r = Math.floor(y - drop);
     const i = at.findIndex((p) => p[0] === c && p[1] === r);
     if (i < 0) {
+      cancel();
       if (open) setOpen(null);
       return;
     }
-    const home = { c: i % COLS, r: Math.floor(i / COLS) };
-    setOpen({ i, ...home, c0: clamp(home.c - 1, 0, COLS - WIDE) });
+    // open it around the pointer, so the pointer is still on it afterwards
+    const next = { i, c: clamp(c - 1, 0, COLS - SPAN), r: clamp(Math.floor(y) - 1, 0, ROWS - SPAN) };
+    if (e.type === "pointerdown") {
+      cancel();
+      setOpen(next);
+    } else if (wait.current?.i !== i) {
+      cancel();
+      wait.current = { i, id: setTimeout(() => { wait.current = null; setOpen(next); }, REST) };
+    }
   };
 
   const sprite = `url(${media(SPRITE)})`;
 
   return (
-    <div className="pf-cars" ref={box} onPointerMove={point} onPointerDown={point} onPointerLeave={() => setOpen(null)}>
+    <div
+      className="pf-cars"
+      ref={box}
+      onPointerMove={point}
+      onPointerDown={point}
+      onPointerLeave={() => {
+        cancel();
+        setOpen(null);
+      }}
+    >
       {CARS.map((car, i) => {
         const big = open?.i === i;
         return (
@@ -76,11 +111,7 @@ export default function PfCars() {
             key={car.slug}
             className="pf-car"
             data-big={big ? "1" : "0"}
-            style={{
-              transform: big
-                ? `translate(${open.c0 * 100}%, ${(open.r - 1 + UP) * 100}%) scale(${WIDE})`
-                : `translate(${at[i][0] * 100}%, ${(at[i][1] + UP) * 100}%)`,
-            }}
+            style={{ transform: `translate(${at[i][0] * 100}%, ${(at[i][1] + drop) * 100}%) scale(${big ? SPAN : 1})` }}
           >
             <div
               className="pf-car-art"
@@ -100,11 +131,6 @@ export default function PfCars() {
           </div>
         );
       })}
-      {open ? (
-        <p className="pf-car-name pf-mono" style={{ left: `${((open.c0 + WIDE / 2) / COLS) * 100}%`, top: `${((open.r + 3 + UP) / TRACKS) * 100}%` }}>
-          {CARS[open.i].name}
-        </p>
-      ) : null}
     </div>
   );
 }

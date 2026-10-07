@@ -18,7 +18,7 @@ export const PAGE_W = 1;
 export const PAGE_H = Math.SQRT2; // A4 pages
 
 const SEG = 28; // columns per sheet: enough for a smooth curl
-const THICK = 0.003; // gap between stacked sheets (also stops z-fighting)
+const THICK = 0.0022; // gap between stacked sheets (also stops z-fighting)
 const LAG = 0.4; // how far the spine side trails the outer edge in a turn
 const AHEAD = 3; // sheets either side of the open spread whose pages stay loaded
 const GUTTER = 0.2; // resting rise out of the spine, radians
@@ -88,7 +88,6 @@ const PAPER = "#f4f1ea"; // a page whose image has not arrived yet
 
 function Sheet({
   index,
-  sheets,
   frontUrl,
   backUrl,
   wanted,
@@ -97,7 +96,6 @@ function Sheet({
   onFront,
 }: {
   index: number;
-  sheets: number;
   frontUrl: string;
   backUrl: string | undefined;
   wanted: boolean;
@@ -129,21 +127,19 @@ function Sheet({
   }, []);
 
   useFrame(() => {
-    const t = clamp01(pRef.current - index);
+    const p = pRef.current;
+    // Both stacks are kept level at the open spread: the page facing up on
+    // each side sits at the same height, whatever the split of sheets under
+    // them, so there is no step across the spine. A sheet sinks by one
+    // thickness for every sheet lying on top of it, and the one in the air is
+    // never below either stack.
+    if (group.current) group.current.position.z = -Math.max(0, index - p, p - 1 - index) * THICK;
+    const t = clamp01(p - index);
     const key = t + curl * 10;
     if (key === last.current) return;
     last.current = key;
     bend(frontGeo.getAttribute("position") as THREE.BufferAttribute, t, curl);
     frontGeo.computeVertexNormals();
-    // Top of the right-hand stack when unturned, top of the left when turned.
-    // In flight it rides at whichever is HIGHER, so it clears both stacks:
-    // it climbs before it leaves the right, or sinks only once it has landed.
-    if (group.current) {
-      const right = -index * THICK;
-      const left = -(sheets - 1 - index) * THICK;
-      const k = left > right ? smooth(t / 0.12) : smooth((t - 0.88) / 0.12);
-      group.current.position.z = THREE.MathUtils.lerp(right, left, k);
-    }
   });
 
   return (
@@ -210,7 +206,6 @@ export default function Book({
         <Sheet
           key={i}
           index={i}
-          sheets={sheets}
           frontUrl={pages[i * 2]}
           backUrl={pages[i * 2 + 1]}
           wanted={i - at >= -AHEAD - 1 && i - at <= AHEAD}
