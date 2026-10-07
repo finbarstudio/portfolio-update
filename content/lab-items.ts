@@ -21,6 +21,14 @@ export interface LabItem {
 
 const RAW_ITEMS: LabItem[] = [
   {
+    id: 6,
+    name: "Email check",
+    line: "What breaks in which inbox",
+    href: "/email",
+    video: "/media/lab/email/tile.mp4",
+    added: "2026-10-07",
+  },
+  {
     id: 5,
     name: "Motion presets",
     line: "Fifty looping layouts for your media",
