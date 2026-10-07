@@ -71,9 +71,12 @@ export function buildReport(input: ReportInput): string {
   out.push(`Fixes already applied: ${done.length ? done.map((a) => a.note).join("; ") : "none"}`);
   out.push("Key: P problem, W warning, N note; a11y = accessibility; L = line of the HTML; % = share of email opens reached; autofix = the tool can fix it.");
 
-  out.push("", `## Checks (${findings.length})`);
-  for (const f of findings) {
-    out.push([`${LEVEL[f.level]}${f.a11y ? " a11y" : ""}`, f.title, lines(f.lines, f.insertAfter), formatShare(f.share), f.fix ? "autofix" : ""].filter(Boolean).join(" | "));
+  for (const [group, heading] of [["content", "Content and links"], ["code", "Code"]] as const) {
+    const inGroup = findings.filter((f) => f.group === group);
+    out.push("", `## ${heading} (${inGroup.length})`);
+    for (const f of inGroup) {
+      out.push([`${LEVEL[f.level]}${f.a11y ? " a11y" : ""}`, f.title, lines(f.lines, f.insertAfter), formatShare(f.share), f.fix ? "autofix" : ""].filter(Boolean).join(" | "));
+    }
   }
 
   if (a11y) {

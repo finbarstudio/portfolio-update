@@ -57,11 +57,43 @@ export interface Finding {
   a11y?: boolean;
   /** where the claim comes from; empty when it rests on common practice only */
   sources: Source[];
+  /** which report section it belongs in: the words and links, or the markup */
+  group: Group;
   /** for something missing: the line to add it after */
   insertAfter?: number;
   /** what to change, with the code to use where there is one */
   howTo?: HowTo;
 }
+
+export type Group = "content" | "code";
+
+/** Findings about what the email says and where its links go, as opposed to how it is built. */
+const CONTENT_IDS = new Set([
+  "link-empty",
+  "link-http",
+  "link-generic",
+  "link-text-mismatch",
+  "link-same-text",
+  "link-tracking",
+  "social-mismatch",
+  "unsubscribe",
+  "unsubscribe-empty",
+  "ac-unsubscribe",
+  "ac-sender",
+  "bare-placeholder",
+  "merge-tags",
+  "preheader",
+  "title",
+  "img-alt",
+  "img-alt-weak",
+  "img-alt-long",
+  "text-markdown",
+  "text-spacing-after",
+  "text-spacing-before",
+  "text-repeat",
+  "text-placeholder",
+  "text-old-year",
+]);
 
 export interface HowTo {
   text: string;
@@ -634,6 +666,25 @@ const SAMPLE_VALUES: [RegExp, string][] = [
  */
 const BARE_PLACEHOLDER = /(?<![%{|*\w-])(FIRSTNAME|FIRST_NAME|LASTNAME|LAST_NAME|SURNAME|FULLNAME|USERNAME|EMAIL|LOCATION|POSTCODE|CODE)(?![%}|*\w-])/g;
 
+/** The body's visible text as runs between tags, each with its offset in the source. */
+function textRuns(src: string): { text: string; index: number }[] {
+  const bodyStart = /<body\b[^>]*>/i.exec(src);
+  const from = bodyStart ? bodyStart.index + bodyStart[0].length : 0;
+  const runs: { text: string; index: number }[] = [];
+  let last = from;
+  const push = (end: number) => {
+    const raw = src.slice(last, end);
+    if (raw.trim()) runs.push({ text: raw, index: last });
+  };
+  for (const m of src.matchAll(/<!--[\s\S]*?-->|<(style|script|title)\b[^>]*>[\s\S]*?<\/\1>|<[^>]+>/gi)) {
+    if (m.index < from) continue;
+    push(m.index);
+    last = m.index + m[0].length;
+  }
+  push(src.length);
+  return runs;
+}
+
 /** Matches of BARE_PLACEHOLDER that are in the body's visible text, not inside a tag, style block or comment. */
 function barePlaceholders(src: string): { word: string; index: number }[] {
   const bodyStart = /<body\b/i.exec(src)?.index ?? 0;
@@ -767,6 +818,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       share: affects.length ? sumShare(affects) : sumShare(ALL_FAMILIES),
       a11y: opts.a11y,
       sources: SOURCES[id] ?? [],
+      group: CONTENT_IDS.has(id) ? "content" : "code",
       insertAfter: opts.insertAfter ?? (HEAD_INSERTS.has(id) ? head?.line : id === "preheader" ? bodyTag?.line : undefined),
       howTo: opts.howTo ?? HOW_TO[id],
     });
@@ -1441,6 +1493,150 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       `${plural(noFallback.length, "font-family")} without a generic fallback`,
       "Most clients do not load web fonts, and Outlook on Windows swaps an unknown font for Times New Roman. End every font-family with Arial, Helvetica, sans-serif or similar.",
       { lines: noFallback, fix: "font-fallbacks" },
+    );
+  }
+
+  // ── The words ───────────────────────────────────────────────────────
+  const runs = textRuns(src);
+  // Entities are turned into the characters they stand for first, so "&nbsp;full" is not read as "sp;fu".
+  const readable = (raw: string) => raw.replace(/&(nbsp|#160);/gi, " ").replace(/&amp;/gi, "&").replace(/&[a-z#0-9]+;/gi, "'");
+  const inRuns = (re: RegExp, keep: (m: RegExpMatchArray, run: string) => boolean = () => true) =>
+    runs.flatMap((run) => {
+      const text = readable(run.text);
+      const firstLine = lineOf(run.index);
+      return [...text.matchAll(re)]
+        .filter((m) => keep(m, text))
+        .map((m) => ({ match: m[0].trim(), line: firstLine + (text.slice(0, m.index).match(/\n/g) ?? []).length }));
+    });
+  const quote = (hits: { match: string }[]) =>
+    [...new Set(hits.map((h) => `"${h.match.slice(0, 40)}"`))].slice(0, 4).join(", ");
+
+  const markdown = inRuns(/\[[^\]\n]{1,80}\]\(\s*https?:[^)\s]+\s*\)|\*\*[^*\n]{1,80}\*\*/g);
+  if (markdown.length) {
+    add(
+      "text-markdown",
+      "warn",
+      `Markdown showing in the text: ${quote(markdown)}`,
+      "Square brackets, round brackets or asterisks from Markdown are in the copy as plain characters, so readers see the symbols. It usually comes from pasting text out of a chat or notes app.",
+      { lines: markdown.map((h) => h.line), howTo: { text: "Replace it with the plain words, and make the link with an a tag.", code: '<a href="https://www.sharetobuy.com" style="color:#ff0066;">www.sharetobuy.com</a>' } },
+    );
+  }
+
+  const isAddress = (token: string) => /@|\/\/|www\.|\.(com|co|org|net|uk|io|gov)\b/i.test(token);
+  const tokenAround = (m: RegExpMatchArray, run: string) => {
+    const start = run.lastIndexOf(" ", m.index ?? 0) + 1;
+    const end = run.indexOf(" ", (m.index ?? 0) + m[0].length);
+    return run.slice(start, end === -1 ? undefined : end);
+  };
+  const noSpaceAfter = inRuns(/[A-Za-z]*[a-z]{2}[.!?,;:][A-Za-z]{2,}/g, (m, run) => !isAddress(tokenAround(m, run)) && !/\d/.test(m[0]));
+  if (noSpaceAfter.length) {
+    add(
+      "text-spacing-after",
+      "info",
+      `Missing space after punctuation: ${quote(noSpaceAfter)}`,
+      "A full stop, comma or similar runs straight into the next word.",
+      { lines: noSpaceAfter.map((h) => h.line), howTo: { text: "Add the space." } },
+    );
+  }
+  const spaceBefore = inRuns(/[A-Za-z]+ +[,;:!?](?=\s|$)|[A-Za-z]+ +\.(?=\s|$)/g);
+  if (spaceBefore.length) {
+    add(
+      "text-spacing-before",
+      "info",
+      `Space before punctuation: ${quote(spaceBefore)}`,
+      "There is a space between a word and the punctuation that follows it.",
+      { lines: spaceBefore.map((h) => h.line), howTo: { text: "Remove the space." } },
+    );
+  }
+  const repeated = inRuns(/\b([A-Za-z]{2,})\s+\1\b/gi, (m) => !/^(had|that|very|so|bye|no|ha)$/i.test(m[1]));
+  if (repeated.length) {
+    add("text-repeat", "info", `Repeated word: ${quote(repeated)}`, "The same word appears twice in a row.", {
+      lines: repeated.map((h) => h.line),
+      howTo: { text: "Delete one." },
+    });
+  }
+  const placeholder = inRuns(/lorem ipsum|\bTBC\b|\bTBD\b|\bTODO\b|\bXX+\b|insert [a-z ]{1,20} here|\[(name|date|link|url|text|copy|headline)[^\]]{0,20}\]/gi);
+  if (placeholder.length) {
+    add(
+      "text-placeholder",
+      "warn",
+      `Placeholder text left in: ${quote(placeholder)}`,
+      "This reads like copy that was meant to be replaced before sending.",
+      { lines: placeholder.map((h) => h.line), howTo: { text: "Replace it with the final copy." } },
+    );
+  }
+  const thisYear = new Date().getFullYear();
+  const oldYears = inRuns(/\b20\d{2}\b/g, (m, run) => {
+    const before = run.slice(Math.max(0, (m.index ?? 0) - 24), m.index);
+    return Number(m[0]) < thisYear - 1 && !/(Act|Regulations?|Order|Rules|Directive|since|established|founded|est\.?|©|copyright)\s*\(?$/i.test(before);
+  });
+  if (oldYears.length) {
+    add(
+      "text-old-year",
+      "info",
+      `Mentions an earlier year: ${[...new Set(oldYears.map((h) => h.match))].join(", ")}`,
+      `It is ${thisYear}. If these are figures or dates carried over from an older version of the email, they may need updating.`,
+      { lines: oldYears.map((h) => h.line), howTo: { text: "Check the figures are the latest, and update the year if so." } },
+    );
+  }
+
+  // ── Where the links go ──────────────────────────────────────────────
+  const plainText = (t: Tag) => decodeEntities(linkText(t).replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+  const hostOf = (value: string) => {
+    try {
+      return new URL(/^https?:/i.test(value) ? value : `https://${value}`).hostname.replace(/^www\./, "").toLowerCase();
+    } catch {
+      return "";
+    }
+  };
+  const textMismatch = links.filter((t) => {
+    const text = plainText(t);
+    const href = t.attrs.href ?? "";
+    if (!/^(https?:\/\/)?(www\.)?[\w-]+(\.[\w-]+)+\/?$/i.test(text) || !/^https?:/i.test(href)) return false;
+    return hostOf(text) !== "" && hostOf(text) !== hostOf(href);
+  });
+  if (textMismatch.length) {
+    add(
+      "link-text-mismatch",
+      "warn",
+      `${plural(textMismatch.length, "link")} showing one web address and going to another`,
+      "The visible text is a web address, and the link behind it goes to a different site. Mail clients treat that as a sign of phishing, and it is usually a copy and paste slip.",
+      { lines: textMismatch.map((t) => t.line), howTo: { text: "Make the address in the text and the address in the link the same." } },
+    );
+  }
+  const byText = new Map<string, Map<string, number>>();
+  for (const t of links) {
+    const text = plainText(t).toLowerCase();
+    const href = (t.attrs.href ?? "").split(/[?#]/)[0].replace(/\/$/, "");
+    if (text.length < 4 || !/^https?:/i.test(href)) continue;
+    const seen = byText.get(text) ?? new Map<string, number>();
+    if (!seen.has(href)) seen.set(href, t.line);
+    byText.set(text, seen);
+  }
+  const sameText = [...byText].filter(([, hrefs]) => hrefs.size > 1);
+  if (sameText.length) {
+    add(
+      "link-same-text",
+      "info",
+      `Same link text, different destinations: ${sameText.map(([text]) => `"${text.slice(0, 30)}"`).slice(0, 3).join(", ")}`,
+      "Links with identical wording go to different pages. That may be intended; it is also what a missed update looks like, and screen reader users cannot tell the links apart.",
+      { lines: sameText.flatMap(([, hrefs]) => [...hrefs.values()]), howTo: { text: "Check each destination, and reword one of them if both are right." } },
+    );
+  }
+  const tracking = new Map<string, number[]>();
+  for (const t of links) {
+    for (const m of (t.attrs.href ?? "").matchAll(/[?&](utm_(?:source|campaign))=([^&#"]+)/gi)) {
+      const key = `${m[1].toLowerCase()}=${decodeURIComponent(m[2].replace(/\+/g, " "))}`;
+      tracking.set(key, [...(tracking.get(key) ?? []), t.line]);
+    }
+  }
+  if (tracking.size) {
+    add(
+      "link-tracking",
+      "info",
+      `Tracking tags in the links: ${[...tracking.keys()].slice(0, 6).join(", ")}`,
+      "Listed so you can check they name this email. A tag naming a different email or campaign is a sign the link was copied from another template, and its clicks will be counted there.",
+      { lines: [...tracking.values()].flat(), howTo: { text: "Update any tag that names another email." } },
     );
   }
 

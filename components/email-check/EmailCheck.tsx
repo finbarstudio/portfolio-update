@@ -21,6 +21,7 @@ import {
   type ClientSupport,
   type Environment,
   type FeatureUse,
+  type Finding,
   type FixId,
   type Level,
   type Source,
@@ -197,6 +198,72 @@ function Sources({ list, none }: { list: Source[]; none?: boolean }) {
         </a>
       ))}
     </span>
+  );
+}
+
+/** "2 problems · 1 warning · 3 notes", so a closed section still says what is in it. */
+function Tally({ fail, warn, info }: { fail: number; warn: number; info: number }) {
+  if (!fail && !warn && !info) return <span className="ec-tally ec-dim">nothing flagged</span>;
+  return (
+    <span className="ec-tally">
+      {fail > 0 && <span className="ec-level-fail">{plural(fail, "problem")}</span>}
+      {warn > 0 && <span className="ec-level-warn">{plural(warn, "warning")}</span>}
+      {info > 0 && <span className="ec-level-info">{plural(info, "note")}</span>}
+    </span>
+  );
+}
+
+function FindingSection({
+  title,
+  intro,
+  findings,
+  familyNames,
+  onFix,
+}: {
+  title: string;
+  intro: string;
+  findings: Finding[];
+  familyNames?: Record<string, string>;
+  onFix: (id: FixId) => void;
+}) {
+  const count = (level: Level) => findings.filter((f) => f.level === level).length;
+  return (
+    <details className="ec-section">
+      <summary>
+        <h2>{title}</h2>
+        <Tally fail={count("fail")} warn={count("warn")} info={count("info")} />
+      </summary>
+      <p className="ec-dim">{intro}</p>
+      {findings.length === 0 ? (
+        <p className="ec-dim">Nothing flagged.</p>
+      ) : (
+        <ul className="ec-list">
+          {findings.map((f) => (
+            <li key={f.id} className="ec-item">
+              <div className="ec-item-head">
+                <p className="ec-item-title">
+                  <span className={`ec-level ec-level-${f.level}`}>{LEVEL_LABEL[f.level]}</span>
+                  {f.a11y && <span className="ec-level ec-level-a11y">Accessibility</span>} {f.title}
+                </p>
+                <span className="ec-share" title={f.affects.length ? f.affects.map((a) => familyNames?.[a] ?? a).join(", ") : "Every client"}>
+                  {formatShare(f.share)} of opens
+                </span>
+                {f.fix && (
+                  <button type="button" className="ec-fix" onClick={() => onFix(f.fix!)} title="Applies this fix to the output. Undo it from the strip at the top.">
+                    {FIXES[f.fix].label}
+                  </button>
+                )}
+              </div>
+              <p>
+                {f.detail} <Sources list={f.sources} none />
+              </p>
+              <Where lines={f.lines} insertAfter={f.insertAfter} />
+              {f.howTo && <HowToFix text={f.howTo.text} code={f.howTo.code} sources={f.sources} />}
+            </li>
+          ))}
+        </ul>
+      )}
+    </details>
   );
 }
 
@@ -796,53 +863,24 @@ export default function EmailCheck() {
               </div>
             </div>
 
-            <details className="ec-section" open>
-              <summary>
-                <h2>Checks</h2>
-                <span className="ec-dim">{findings.length}</span>
-              </summary>
-              <p className="ec-dim">
-                Ordered by severity, then by the share of opens each one reaches (
-                <a href={NOTE_SOURCES.share[0].url} target="_blank" rel="noreferrer">
-                  Litmus, {SHARE_DATE}
-                </a>
-                ). Line numbers are lines of the Output.
-              </p>
-              {findings.length === 0 ? (
-                <p className="ec-dim">Nothing flagged.</p>
-              ) : (
-                <ul className="ec-list">
-                  {findings.map((f) => (
-                    <li key={f.id} className="ec-item">
-                      <div className="ec-item-head">
-                        <p className="ec-item-title">
-                          <span className={`ec-level ec-level-${f.level}`}>{LEVEL_LABEL[f.level]}</span>
-                          {f.a11y && <span className="ec-level ec-level-a11y">Accessibility</span>} {f.title}
-                        </p>
-                        <span className="ec-share" title={f.affects.length ? f.affects.map((a) => data?.nicenames.family[a] ?? a).join(", ") : "Every client"}>
-                          {formatShare(f.share)} of opens
-                        </span>
-                        {f.fix && (
-                          <button type="button" className="ec-fix" onClick={() => addFix(f.fix!)} title="Applies this fix to the output. Undo it from the strip at the top.">
-                            {FIXES[f.fix].label}
-                          </button>
-                        )}
-                      </div>
-                      <p>
-                        {f.detail} <Sources list={f.sources} none />
-                      </p>
-                      <Where lines={f.lines} insertAfter={f.insertAfter} />
-                      {f.howTo && <HowToFix text={f.howTo.text} code={f.howTo.code} sources={f.sources} />}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
+            <p className="ec-dim ec-intro">
+              Each section is ordered by severity, then by the share of opens it reaches (
+              <a href={NOTE_SOURCES.share[0].url} target="_blank" rel="noreferrer">
+                Litmus, {SHARE_DATE}
+              </a>
+              ). Line numbers are lines of the Output.
+            </p>
+            <FindingSection title="Content and links" intro="What the email says and where its links go: wording, placeholders, link destinations, alt text." findings={findings.filter((f) => f.group === "content")} familyNames={data?.nicenames.family} onFix={addFix} />
+            <FindingSection title="Code" intro="How the email is built: markup, Outlook, Apple Mail and Gmail quirks, image and table attributes." findings={findings.filter((f) => f.group === "code")} familyNames={data?.nicenames.family} onFix={addFix} />
 
-            <details className="ec-section" open>
+            <details className="ec-section">
               <summary>
                 <h2>As rendered</h2>
-                <span className="ec-dim">{a11y ? a11y.contrast.length + a11y.targets.length + a11y.linksWithoutName.length + a11y.imagesWithoutAlt.length : ""}</span>
+                <Tally
+                  fail={a11y ? a11y.contrast.length + a11y.linksWithoutName.length + a11y.imagesWithoutAlt.length + (a11y.overflow > 0 ? 1 : 0) : 0}
+                  warn={(a11y?.targets.length ? 1 : 0) + (narrow && narrow.contentWidth > narrow.viewport + 1 ? 1 : 0)}
+                  info={(a11y?.smallTargets ? 1 : 0) + (a11y?.contrastUnknown ? 1 : 0)}
+                />
               </summary>
               <p className="ec-dim">
                 Measured in the preview at {width ? `${width}px` : "the frame's width"}{dark !== "off" ? " in the dark mode shown" : ""}, with the real computed colours and sizes.
@@ -998,10 +1036,10 @@ export default function EmailCheck() {
               )}
             </details>
 
-            <details className="ec-section" open>
+            <details className="ec-section">
               <summary>
                 <h2>Client support</h2>
-                <span className="ec-dim">{data ? unsupported.length : ""}</span>
+                <span className="ec-tally ec-dim">{data ? `${plural(unsupported.length, "feature")} unsupported somewhere` : ""}</span>
               </summary>
               <p className="ec-dim">
                 What this email uses, looked up in the{" "}

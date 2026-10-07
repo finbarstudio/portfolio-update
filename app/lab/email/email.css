@@ -433,6 +433,16 @@
 .ec-level-info {
   color: var(--ec-dim);
 }
+.ec-tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
+  margin-left: auto;
+  font-size: 12px;
+}
+.ec-intro {
+  padding: 10px 0 2px;
+}
 .ec-level-ok {
   color: var(--ec-ok);
 }
