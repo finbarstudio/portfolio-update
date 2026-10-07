@@ -36,6 +36,7 @@ import {
   type SavedSetup,
   type TiltMode,
 } from "./engine";
+import ColourPicker from "./ColourPicker";
 import { createRenderer, type MediaItem, type Renderer, type Scene } from "./renderer";
 
 interface Thumb {
@@ -841,10 +842,10 @@ export default function MotionTool() {
 
         <Heading title="Look" changed={look.radius !== BASE_LOOK.radius || look.background !== BASE_LOOK.background} onReset={() => patchLook({ radius: BASE_LOOK.radius, background: BASE_LOOK.background })} />
         <Slider label="Corners" min={0} max={0.5} step={0.01} value={look.radius} onChange={(radius) => patchLook({ radius })} />
-        <label className="mp-row">
-          Background
-          <input type="color" value={look.background} onChange={(event) => patchLook({ background: event.target.value })} />
-        </label>
+        <div className="mp-choice">
+          <span>Background</span>
+          <ColourPicker label="Background" value={look.background} onChange={(background) => patchLook({ background })} />
+        </div>
 
         <h2>Setup</h2>
         <button type="button" disabled={!tuned} onClick={resetFlow} style={{ width: "100%", marginBottom: 6 }}>

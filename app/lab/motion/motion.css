@@ -199,22 +199,27 @@
   aspect-ratio: 4 / 5;
   border-radius: 6px;
 }
+/* A quiet amber tint marks the pint link out from the controls. */
 .mp-pint {
+  --amber: 232 180 82;
   display: block;
   margin-top: 24px;
   padding: 11px 12px;
   text-align: center;
-  color: var(--mp-dim);
+  color: rgb(var(--amber) / 0.9);
   text-decoration: none;
-  border: 1px solid var(--mp-line);
+  background: rgb(var(--amber) / 0.07);
+  border: 1px solid rgb(var(--amber) / 0.3);
   border-radius: 9px;
   transition:
     color 0.15s,
+    background 0.15s,
     border-color 0.15s;
 }
 .mp-pint:hover {
-  color: var(--mp-text);
-  border-color: #3a3a40;
+  color: rgb(var(--amber));
+  background: rgb(var(--amber) / 0.14);
+  border-color: rgb(var(--amber) / 0.55);
 }
 .mp-pint:focus-visible {
   outline: 2px solid #6aa8ff;
@@ -231,7 +236,7 @@
   margin: 0;
   padding: 8px 16px;
   white-space: nowrap;
-  background: rgb(21 21 23 / 0.8);
+  background: rgb(32 28 20 / 0.85);
   backdrop-filter: blur(10px);
   border-radius: 999px;
 }
@@ -374,6 +379,119 @@
   border: 1px solid var(--mp-line);
   border-radius: 6px;
 }
+/* Colour picker: a chip and hex as the trigger, the panel floating above it. */
+.mp-colour {
+  position: relative;
+}
+.mp-tool .mp-colour-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
+  font-variant-numeric: tabular-nums;
+  background: #101012;
+  border-radius: 9px;
+}
+.mp-colour-chip {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+}
+.mp-colour-pop {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  width: 232px;
+  padding: 10px;
+  background: #1a1a1d;
+  border: 1px solid #2e2e34;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+.mp-colour-square {
+  position: relative;
+  height: 140px;
+  border-radius: 8px;
+  background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
+  cursor: crosshair;
+  touch-action: none;
+}
+.mp-colour-square:focus-visible {
+  outline: 2px solid #6aa8ff;
+  outline-offset: 2px;
+}
+.mp-colour-dot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.5);
+  translate: -50% -50%;
+  pointer-events: none;
+}
+.mp-tool .mp-colour-hue {
+  width: 100%;
+  height: 12px;
+  margin: 10px 0;
+  appearance: none;
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+  border-radius: 6px;
+}
+.mp-tool .mp-colour-hue::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.5);
+}
+.mp-tool .mp-colour-hue::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.5);
+}
+.mp-colour-row {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+.mp-tool .mp-colour-hex {
+  height: 30px;
+  padding: 0 8px;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--mp-text);
+  background: #101012;
+  border: 1px solid var(--mp-line);
+  border-radius: 7px;
+}
+.mp-colour-swatches {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+.mp-tool .mp-colour-swatches button {
+  min-height: 0;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 5px;
+}
+.mp-tool .mp-colour-swatches button[aria-pressed="true"] {
+  border-color: #fff;
+  box-shadow: 0 0 0 1px #fff inset;
+}
+
 .mp-field {
   display: grid;
   gap: 2px;
