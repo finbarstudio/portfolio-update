@@ -124,6 +124,8 @@ const SRC = {
   preheader: { label: "Litmus: the preview text hack", url: "https://www.litmus.com/blog/the-little-known-preview-text-hack-you-may-want-to-use-in-every-email", kind: "vendor research" },
   share: { label: "Litmus: email client market share", url: "https://www.litmus.com/email-client-market-share", kind: "vendor research" },
   textSize: { label: "MDN: text-size-adjust", url: "https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust", kind: "standard" },
+  sesTemplates: { label: "AWS: SES templates and rendering failures", url: "https://docs.aws.amazon.com/ses/latest/dg/send-personalized-email-api.html", kind: "client docs" },
+  sesHandlebars: { label: "AWS: SES advanced personalisation (Handlebars)", url: "https://docs.aws.amazon.com/ses/latest/dg/send-personalized-email-advanced.html", kind: "client docs" },
   acUnsub: { label: "ActiveCampaign: why unsubscribe links are required", url: "https://help.activecampaign.com/hc/en-us/articles/115001227004", kind: "client docs" },
 } satisfies Record<string, Source>;
 
@@ -137,6 +139,8 @@ export const SOURCES: Record<string, Source[]> = {
   "zero-width": [SRC.preheader],
   unsubscribe: [SRC.gmailSenders],
   "ac-unsubscribe": [SRC.acUnsub],
+  "bare-placeholder": [SRC.sesTemplates, SRC.sesHandlebars],
+  "merge-tags": [SRC.sesHandlebars],
   "text-size-adjust": [SRC.textSize],
   "color-scheme": [cie("html-meta-color-scheme", "color-scheme meta"), SRC.darkMode],
   "pure-black": [SRC.darkMode],
@@ -436,7 +440,9 @@ const HOW_TO: Record<string, HowTo> = {
   "small-text": { text: "Raise it to at least 12px, with a line-height of about 1.4 times the size." },
   "unused-fonts": { text: "Remove the link, or name the font first in the font-family where you want it used." },
   "font-fallbacks": { text: "End every font-family with fonts every device has and a generic family.", code: "font-family: Poppins, Verdana, Arial, sans-serif;" },
-  "merge-tags": { text: "Send yourself a test with the longest realistic value in each tag, and check the layout holds." },
+  "merge-tags": {
+    text: "Send yourself a test with the longest realistic value in each tag, and check the layout holds. With Amazon SES templates, every tag must be given a value when the email is sent, or SES accepts the message and then fails to deliver it.",
+  },
 };
 
 function lineIndex(src: string): (offset: number) => number {
@@ -615,7 +621,32 @@ const SAMPLE_VALUES: [RegExp, string][] = [
   [/^(LASTNAME|LNAME|SURNAME|LAST)$/, "Lieb"],
   [/^(FULLNAME|NAME|CONTACTNAME)$/, "Nick Lieb"],
   [/^(EMAIL|EMAILADDRESS)$/, "nick.lieb@example.com"],
+  [/^(LOCATION|DEVELOPMENT|PROPERTY|PROPERTYNAME)$/, "Maple Court, Croydon"],
+  [/^(CODE|OTP|PASSCODE|VERIFICATIONCODE)$/, "482913"],
+  [/^(POSTCODE)$/, "CR0 2AB"],
 ];
+
+/**
+ * An all-capitals placeholder word sitting in the text with no merge syntax
+ * round it, such as "Dear FIRSTNAME,". Either the sender swaps the bare word
+ * itself, or it reaches the reader exactly like that.
+ */
+const BARE_PLACEHOLDER = /(?<![%{|*\w-])(FIRSTNAME|FIRST_NAME|LASTNAME|LAST_NAME|SURNAME|FULLNAME|USERNAME|EMAIL|LOCATION|POSTCODE|CODE)(?![%}|*\w-])/g;
+
+/** Matches of BARE_PLACEHOLDER that are in the body's visible text, not inside a tag, style block or comment. */
+function barePlaceholders(src: string): { word: string; index: number }[] {
+  const bodyStart = /<body\b/i.exec(src)?.index ?? 0;
+  const hidden: [number, number][] = [...src.matchAll(/<!--[\s\S]*?-->|<(style|script|title)\b[^>]*>[\s\S]*?<\/\1>|<[^>]+>/gi)].map((m) => [m.index, m.index + m[0].length]);
+  return [...src.matchAll(BARE_PLACEHOLDER)]
+    .filter((m) => m.index > bodyStart && !hidden.some(([a, b]) => m.index >= a && m.index < b))
+    .filter((m) => {
+      // In a line set in capitals ("USE CODE SAVE10") the word is just a word.
+      const before = /([A-Za-z]{2,})[^A-Za-z<>]*$/.exec(src.slice(Math.max(0, m.index - 40), m.index))?.[1];
+      const after = /^[^A-Za-z<>]*([A-Za-z]{2,})/.exec(src.slice(m.index + m[1].length, m.index + m[1].length + 40))?.[1];
+      return ![before, after].some((w) => w && w === w.toUpperCase());
+    })
+    .map((m) => ({ word: m[1], index: m.index }));
+}
 
 export interface SampleFill {
   src: string;
@@ -623,6 +654,8 @@ export interface SampleFill {
   filled: string[];
   /** tags with no stand-in, shown as written */
   left: string[];
+  /** bare placeholder words filled in too: "FIRSTNAME as Nick" */
+  bare: string[];
 }
 
 /** For the preview only: the output keeps its merge tags. */
@@ -639,14 +672,23 @@ export function fillMergeTags(src: string): SampleFill {
     filled.add(`${tag} as ${value}`);
     return value;
   });
-  return { src: out, filled: [...filled], left: [...left] };
+  // Bare words next, from the end so earlier offsets stay true.
+  const bare = new Set<string>();
+  let withBare = out;
+  for (const hit of barePlaceholders(out).reverse()) {
+    const value = SAMPLE_VALUES.find(([re]) => re.test(hit.word.replace(/_/g, "")))?.[1];
+    if (!value) continue;
+    bare.add(`${hit.word} as ${value}`);
+    withBare = withBare.slice(0, hit.index) + value + withBare.slice(hit.index + hit.word.length);
+  }
+  return { src: withBare, filled: [...filled], left: [...left], bare: [...bare] };
 }
 
 function detectPlatform(src: string): string | null {
   if (/%[A-Z][A-Z0-9_-]*%/.test(src)) return "ActiveCampaign";
   if (/\*\|[^|*]+\|\*/.test(src)) return "Mailchimp";
   if (/%%[^%\s]+%%/.test(src)) return "SendGrid";
-  if (/\{\{[^{}]+\}\}/.test(src)) return "a platform with {{ }} merge tags (Klaviyo, Customer.io, Braze, HubSpot, SendGrid templates and most custom senders)";
+  if (/\{\{[^{}]+\}\}/.test(src)) return "Amazon SES or another Handlebars sender ({{ }} tags)";
   return null;
 }
 
@@ -688,7 +730,18 @@ const APPLE = ["apple-mail"];
 const GMAIL = ["gmail"];
 const INVERTERS = ["gmail", "outlook"];
 
-export function checkEmail(src: string): Finding[] {
+export interface CheckOptions {
+  /** receipts, codes and confirmations: the unsubscribe and sender-address rules do not apply */
+  transactional?: boolean;
+}
+
+/** A guess at whether the email is transactional, for when the person has not said. */
+export function looksTransactional(src: string): boolean {
+  if (/%UNSUBSCRIBELINK%|unsubscribe/i.test(src)) return false;
+  return /\{\{[^{}]+\}\}/.test(src) || /\b(verification code|one[- ]time|passcode|reset your password|order (number|confirmation)|receipt)\b/i.test(src);
+}
+
+export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   const out: Finding[] = [];
   if (!src.trim()) return out;
 
@@ -902,7 +955,7 @@ export function checkEmail(src: string): Finding[] {
       { a11y: false },
     );
   }
-  if (!/unsubscribe|opt[\s-]?out|manage (your )?preferences|\{\{\s*unsub|%unsub|\*\|unsub/i.test(src)) {
+  if (!options.transactional && !/unsubscribe|opt[\s-]?out|manage (your )?preferences|\{\{\s*unsub|%unsub|\*\|unsub/i.test(src)) {
     add(
       "unsubscribe",
       "info",
@@ -910,7 +963,7 @@ export function checkEmail(src: string): Finding[] {
       "Marketing email needs one by law and for inbox placement. Transactional email (receipts, codes, confirmations) is exempt.",
     );
   }
-  if (stats.platform === "ActiveCampaign") {
+  if (stats.platform === "ActiveCampaign" && !options.transactional) {
     if (!/%UNSUBSCRIBELINK%/.test(src)) {
       add(
         "ac-unsubscribe",
@@ -1349,6 +1402,25 @@ export function checkEmail(src: string): Finding[] {
       `${plural(noFallback.length, "font-family")} without a generic fallback`,
       "Most clients do not load web fonts, and Outlook on Windows swaps an unknown font for Times New Roman. End every font-family with Arial, Helvetica, sans-serif or similar.",
       { lines: noFallback, fix: "font-fallbacks" },
+    );
+  }
+
+  const bare = barePlaceholders(src);
+  if (bare.length) {
+    const words = [...new Set(bare.map((b) => b.word))];
+    const example = stats.platform === "ActiveCampaign" ? `%${words[0]}%` : `{{${words[0]}}}`;
+    add(
+      "bare-placeholder",
+      "info",
+      `${words.join(", ")} written as a plain word, not a merge tag`,
+      `It reads like a placeholder but has no merge syntax round it, unlike the other variables in this email. If the sending system does not replace the bare word itself, readers get it exactly as written ("Dear ${words[0]},"). Worth confirming with whoever sends it.`,
+      {
+        lines: bare.map((b) => lineOf(b.index)),
+        howTo: {
+          text: "If the sender already swaps the bare word, leave it. Otherwise wrap it in the platform's merge syntax, and make sure the sender supplies a value for it: Amazon SES does not deliver a templated email when a variable in the template has no value.",
+          code: example,
+        },
+      },
     );
   }
 
@@ -1927,7 +1999,7 @@ export function matchFeatures(src: string, data: CanIEmailData): FeatureUse[] {
     if (tag.mso) continue;
     hit(ELEMENT_FEATURES[tag.name] ?? `html-${tag.name}`, tag.line);
     for (const [name, value] of Object.entries(tag.attrs)) {
-      hit(ATTRIBUTE_FEATURES[name], tag.line);
+      if (name !== "target") hit(ATTRIBUTE_FEATURES[name], tag.line);
       if (name === "style") scanDeclarations(value, () => tag.line);
       if (name === "href" && tag.name === "a") {
         if (value.startsWith("#") && value.length > 1) hit("html-anchor-links", tag.line);

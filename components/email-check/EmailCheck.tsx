@@ -14,6 +14,7 @@ import {
   darkReach,
   fillMergeTags,
   formatShare,
+  looksTransactional,
   getStats,
   matchFeatures,
   type CanIEmailData,
@@ -333,6 +334,8 @@ export default function EmailCheck() {
   const [imagesOff, setImagesOff] = useState(false);
   const [stylesOff, setStylesOff] = useState(false);
   const [sample, setSample] = useState(true);
+  // null: go by what the email looks like.
+  const [transactionalChoice, setTransactionalChoice] = useState<boolean | null>(null);
   const [families, setFamilies] = useState(DEFAULT_FAMILIES);
   const [open, setOpen] = useState<Record<PanelName, boolean>>({ source: true, report: true, preview: true });
   const [height, setHeight] = useState<number | null>(null);
@@ -487,7 +490,8 @@ export default function EmailCheck() {
   const sampled = fillMergeTags(output);
   const hasSource = deferredSource.trim().length > 0;
   const stats = getStats(output);
-  const findings = checkEmail(output);
+  const transactional = transactionalChoice ?? looksTransactional(output);
+  const findings = checkEmail(output, { transactional });
   const bulkFixes = [...new Set(findings.map((f) => f.fix).filter((id): id is FixId => !!id && FIXES[id].bulk))];
   const features = data ? matchFeatures(output, data) : [];
   const clientFixes = [...new Set(features.map((f) => f.fix).filter((id): id is FixId => !!id))];
@@ -519,7 +523,7 @@ export default function EmailCheck() {
 
   const columns = [open.source ? "320px" : "44px", open.report ? "minmax(320px, 460px)" : "44px", open.preview ? "minmax(0, 1fr)" : "44px"];
   const tooTall = height !== null && height > OUTLOOK_PAGE_HEIGHT;
-  const report = buildReport({ fileName, stats, findings, a11y, features, families, data, applied, width, height });
+  const report = buildReport({ fileName, stats, findings, a11y, features, families, data, applied, transactional, width, height });
 
   return (
     <main
@@ -656,6 +660,27 @@ export default function EmailCheck() {
             <div>
               <p className="ec-dim">Merge tags</p>
               <p>{stats.platform ? `Looks like ${stats.platform}` : "None found"}</p>
+            </div>
+            <div className="ec-row">
+              <span className="ec-label">Kind of email</span>
+              <div className="ec-chips" role="group" aria-label="Kind of email">
+                <button
+                  type="button"
+                  aria-pressed={!transactional}
+                  onClick={() => setTransactionalChoice(false)}
+                  title="Newsletters and campaigns: an unsubscribe link and sender address are expected"
+                >
+                  Marketing
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={transactional}
+                  onClick={() => setTransactionalChoice(true)}
+                  title="Codes, confirmations and receipts: the unsubscribe and sender-address checks are skipped"
+                >
+                  Transactional
+                </button>
+              </div>
             </div>
             <div title="What inbox lists show under the subject: the hidden preheader if there is one, otherwise the first text in the email.">
               <p className="ec-dim">Inbox preview line, as it stands</p>
@@ -1048,9 +1073,14 @@ export default function EmailCheck() {
                 : `Measured at this width with images loaded. Outlook on Windows draws a page-break line through content taller than ${OUTLOOK_PAGE_HEIGHT.toLocaleString()}px.`}
             </Note>
           )}
-          {hasSource && sample && sampled.filled.length + sampled.left.length > 0 && (
-            <Note title={`Sample data: ${plural(sampled.filled.length, "merge tag")} filled`}>
+          {hasSource && sample && sampled.filled.length + sampled.left.length + sampled.bare.length > 0 && (
+            <Note title={`Sample data: ${plural(sampled.filled.length + sampled.bare.length, "placeholder")} filled`}>
               {sampled.filled.length > 0 && <>Showing {sampled.filled.join(", ")}. </>}
+              {sampled.bare.length > 0 && (
+                <>
+                  Also showing {sampled.bare.join(", ")}: {sampled.bare.length === 1 ? "that is a plain word in the email, not a merge tag" : "those are plain words in the email, not merge tags"}, so check the sender really replaces {sampled.bare.length === 1 ? "it" : "them"}.{" "}
+                </>
+              )}
               These are still variables in the email. The preview fills them in to show the email as it would be delivered; the output and the report keep
               the tags as written.
               {sampled.left.length > 0 && <> No sample value for {sampled.left.join(", ")}, so {sampled.left.length === 1 ? "it is" : "they are"} shown as written.</>}

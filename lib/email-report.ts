@@ -15,6 +15,7 @@ export interface ReportInput {
   families: string[];
   data: CanIEmailData | null;
   applied: AppliedFix[];
+  transactional: boolean;
   /** preview width the height and accessibility audit were measured at; 0 is fluid */
   width: number;
   height: number | null;
@@ -55,6 +56,7 @@ export function buildReport(input: ReportInput): string {
       stats.width ? `${stats.width}px wide` : "fluid width",
       input.height ? `${input.height}px tall at ${at}` : "",
       stats.platform ? `sent via ${stats.platform.split(" (")[0]}` : "",
+      input.transactional ? "transactional" : "marketing",
       `${stats.images} images`,
       `${stats.tables} tables`,
       `${(stats.styleBytes / 1024).toFixed(1)}KB CSS in style blocks`,
