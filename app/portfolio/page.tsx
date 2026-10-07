@@ -43,6 +43,47 @@ function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; grou
   );
 }
 
+/**
+ * The name on the cover, kerned by hand. At this size and this tight a
+ * tracking the face's own spacing leaves the pairs uneven: upright stems
+ * (IN, NB, NI) sit a clear, even distance apart, while a pair with an arm, a
+ * leg or a diagonal is judged by its closest point, and those came out
+ * anywhere from touching (AR) to loose (SK). Each value is an extra gap after
+ * the first letter of the pair, in em, on top of the tracking; they bring every
+ * closest point to about the same distance. Measured from the glyph outlines
+ * of Host Grotesk Bold, then set by eye.
+ */
+const KERN: Record<string, number> = {
+  // upright against upright: opened a touch, so the stems do not read as a
+  // tight picket beside the airier pairs
+  IN: 0.008,
+  NB: 0.008,
+  NI: 0.008,
+  // closest points evened out
+  FI: 0.005,
+  BA: 0.002,
+  AR: 0.014,
+  SK: -0.012,
+  KI: 0.003,
+  IT: -0.002,
+  TI: -0.002,
+};
+function Kerned({ text }: { text: string }) {
+  const up = text.toUpperCase();
+  return (
+    <span aria-hidden="true">
+      {[...text].map((ch, i) => {
+        const k = KERN[up.slice(i, i + 2)];
+        return (
+          <span key={i} style={k ? { marginRight: `${k}em` } : undefined}>
+            {ch}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 /** The running line on a media page: chapter left, page number right. */
 function Run({ chap, page }: { chap?: Chapter; page: string }) {
   return (
@@ -65,10 +106,10 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <span>Graphic and digital designer<br /><span className="pf-soft">London</span></span>
               <span><a href={`mailto:${CV.email}`}>{CV.email}</a><br /><span className="pf-soft">Updated {UPDATED.long}</span></span>
             </div>
-            <h1 className="pf-poster">
-              Finbar
+            <h1 className="pf-poster" aria-label="Finbar Skitini">
+              <Kerned text="Finbar" />
               <br />
-              Skitini
+              <Kerned text="Skitini" />
             </h1>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
