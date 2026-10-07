@@ -28,6 +28,7 @@ import {
 import { extractFromPreviewPage, isPreviewUrl } from "@/lib/email-extract";
 import { auditDocument, type A11yReport } from "@/lib/email-a11y";
 import { buildReport } from "@/lib/email-report";
+import { snapshotDocument } from "@/lib/email-snapshot";
 
 /**
  * Email check: paste an HTML email, get a report and a preview, fix what has
@@ -329,6 +330,7 @@ export default function EmailCheck() {
   const [copied, setCopied] = useState(false);
   const [reportCopied, setReportCopied] = useState(false);
   const [dropping, setDropping] = useState(false);
+  const [shot, setShot] = useState<{ busy: boolean; message: string }>({ busy: false, message: "" });
   const [width, setWidth] = useState(650);
   const [dark, setDark] = useState<DarkMode>("off");
   const [imagesOff, setImagesOff] = useState(false);
@@ -474,6 +476,30 @@ export default function EmailCheck() {
   };
   const baseName = fileName.replace(/\.html?$/i, "") || "email";
   const onDownload = () => save(output, `${baseName}-fixed.html`, "text/html");
+  /** The whole preview, as it is showing now, saved as one small image. */
+  const onSaveImage = async () => {
+    const doc = frameRef.current?.contentDocument;
+    if (!doc) return;
+    setShot({ busy: true, message: "" });
+    try {
+      const snap = await snapshotDocument(doc);
+      const ext = snap.blob.type === "image/webp" ? "webp" : "jpg";
+      const mode = dark === "off" ? "light" : dark === "scheme" ? "dark-styles" : "dark-inverted";
+      const name = `${baseName}-${width || snap.width}px-${mode}${imagesOff ? "-images-off" : ""}${stylesOff ? "-no-style-blocks" : ""}.${ext}`;
+      const url = URL.createObjectURL(snap.blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+      setShot({
+        busy: false,
+        message: `Saved ${name}: ${snap.width}×${snap.height}px, ${kb(snap.blob.size)}.${snap.skipped ? ` ${plural(snap.skipped, "image")} could not be read from ${snap.skipped === 1 ? "its" : "their"} host and ${snap.skipped === 1 ? "is" : "are"} shown as a grey box.` : ""}`,
+      });
+    } catch (err: unknown) {
+      setShot({ busy: false, message: err instanceof Error ? err.message : "The picture could not be made." });
+    }
+  };
   const onDownloadReport = () => save(report, `${baseName}-report.md`, "text/markdown");
   const onCopyReport = async () => {
     await navigator.clipboard.writeText(report);
@@ -1057,6 +1083,14 @@ export default function EmailCheck() {
               >
                 Sample data
               </button>
+              <button
+                type="button"
+                onClick={() => void onSaveImage()}
+                disabled={!hasSource || shot.busy}
+                title="Saves the whole preview, top to bottom, exactly as it is showing now (width, dark mode, images, sample data) as one small image"
+              >
+                {shot.busy ? "Saving" : "Save image"}
+              </button>
               <button type="button" aria-pressed={stylesOff} onClick={() => setStylesOff((v) => !v)} title="Drops the style blocks and leaves inline styles only, as Gmail does for non-Google accounts">
                 Style blocks off
               </button>
@@ -1086,6 +1120,7 @@ export default function EmailCheck() {
               {sampled.left.length > 0 && <> No sample value for {sampled.left.join(", ")}, so {sampled.left.length === 1 ? "it is" : "they are"} shown as written.</>}
             </Note>
           )}
+          {shot.message && <Note title={shot.message.startsWith("Saved") ? "Image saved" : "Image not saved"} open>{shot.message}</Note>}
           {dark === "scheme" && (
             <Note title={`Dark: your styles, about ${formatShare(darkReach("own styles").share * DARK_MODE_USE)} of opens`} sources={NOTE_SOURCES.dark} open>
               Turns on the email&apos;s own prefers-color-scheme rules and changes nothing else. If the email has none, this looks the same as Light, which is
