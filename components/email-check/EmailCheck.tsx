@@ -42,7 +42,7 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  */
 
 /** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
-const VERSION = "1.5";
+const VERSION = "1.6";
 
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 
@@ -605,7 +605,9 @@ export default function EmailCheck() {
 
   const togglePanel = (name: PanelName) => setOpen((current) => ({ ...current, [name]: !current[name] }));
 
-  const { src: output, applied } = applyFixes(deferredSource, fixes, { preheader });
+  // Minify always runs last, so lines added by the other fixes are tidied too.
+  const ordered = fixes.includes("minify") ? [...fixes.filter((id) => id !== "minify"), "minify" as const] : fixes;
+  const { src: output, applied } = applyFixes(deferredSource, ordered, { preheader });
   const sampled = fillMergeTags(output);
   const hasSource = deferredSource.trim().length > 0;
   const stats = getStats(output);
@@ -614,6 +616,8 @@ export default function EmailCheck() {
   // Fix all leaves out anything marked unverified (common practice with no source behind it).
   // Those keep their own Fix button, so adding one is always a deliberate choice.
   const bulkFixes = [...new Set(findings.filter((f) => f.basis !== "practice").map((f) => f.fix).filter((id): id is FixId => !!id && FIXES[id].bulk))];
+  // Minify goes in with Fix all whenever there is indentation left to remove.
+  if (stats.indentPct > 0 && !fixes.includes("minify")) bulkFixes.push("minify");
   const unverifiedFixes = new Set(findings.filter((f) => f.basis === "practice" && f.fix && FIXES[f.fix].bulk && !bulkFixes.includes(f.fix)).map((f) => f.fix)).size;
   const minified = fixes.includes("minify");
   const features = data ? matchFeatures(output, data) : [];

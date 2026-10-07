@@ -1102,7 +1102,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "indent",
       "info",
       `${stats.indentPct}% of the file is indentation`,
-      "Harmless when the file is sent exactly as it is. If the platform passes templates through a rich-text editor, long runs of spaces are what can get turned into non-breaking spaces. Minifying removes the risk and the weight; it is left out of Fix all because it makes the source harder to read.",
+      "Harmless when the file is sent exactly as it is. If the platform passes templates through a rich-text editor, long runs of spaces are what can get turned into non-breaking spaces. Minifying removes the risk and the weight. Fix all includes it; the Minify button on the output turns it off again.",
       { fix: "minify" },
     );
   }
