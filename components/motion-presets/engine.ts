@@ -525,9 +525,11 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     // Cards stay the same distance apart along the arc however tightly it curves.
     const step = Math.min(0.2 + c.g, 2.4 / c.n) * breathing * R;
     const curve = c.m.shape / R; // 0 is a straight row
-    const angle = p * step * curve + (c.v.sway ? 0.25 * Math.sin(TAU * c.T) * c.m.shape : 0);
+    // The sway is a distance along the arc, so a flat fan still slides side to side.
+    const arc = p * step + (c.v.sway ? 0.25 * Math.sin(TAU * c.T) * R : 0);
+    const angle = arc * curve;
     const z = i * 0.01;
-    if (curve < 1e-4) return { x: p * step, y: -0.1, z, p };
+    if (curve < 1e-4) return { x: arc, y: -0.1, z, p };
     return { x: Math.sin(angle) / curve, y: (Math.cos(angle) - 1) / curve - 0.1, z, rz: -angle, p };
   },
   wave(i, c) {
