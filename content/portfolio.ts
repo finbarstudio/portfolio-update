@@ -50,7 +50,7 @@ export type Slide =
   | { kind: "title"; id: string; name: string; category: string; year: string }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
-  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean }
+  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean; /** stack the items in rows of this many, each at its true proportions */ per?: number }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
   | { kind: "booklet"; /** the books on the stage, the first open by default: name, every page in reading order (front cover first), the same pages small, and page numbers to star in the spreads view */ books: { name: string; pages: string[]; thumbs: string[]; stars?: number[] }[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
@@ -111,6 +111,9 @@ const bleed = (path: string): Slide => ({ kind: "media", items: [m(path)], bleed
 /** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption and a link out. */
 const linked = (path: string, caption: string, link: { label: string; href: string }): Slide => ({ kind: "media", items: [m(path, { frame: false })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
+
+/** Several rows of images on one page, `per` to a row, none cropped. */
+const stack = (paths: string[], per: number, caption?: string): Slide => ({ kind: "media", items: paths.map((p) => m(p)), caption, per });
 
 /**
  * A whole playbook for the booklet stage: its pages are page-01.webp … under
@@ -236,6 +239,23 @@ const RAW: Slide[] = [
     ],
     caption: "Nine editions, every page. Click or drag a page to turn it",
   },
+
+  /* ── Packer and Associates ─────────────────────────────────── */
+  { kind: "title", id: "packer", name: "Packer and Associates", category: "In-house Design", year: "2024–2025" },
+  {
+    kind: "text",
+    name: "Packer and Associates",
+    category: "In-house Design",
+    body:
+      "Packer and Associates is a Brisbane workforce development company that has been running since 1997. I was their in-house designer for a year, full-time and then on contract. I designed the capability statement they give to prospective clients, kept the website current, and made the social posts and reels. I also drew logos for two of their clients, Compass Capability and Stimulà Strategic Consulting.",
+    meta: [ME, { label: "Year", value: "2024–2025" }, { label: "Live", value: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" }],
+  },
+  one("packer-associates/pdf-pages/page-0.webp", "The capability statement: twelve pages on who they are, what they do and who they have done it for"),
+  stack(["packer-associates/pdf-pages/page-1.webp", "packer-associates/pdf-pages/page-2.webp", "packer-associates/pdf-pages/page-3.webp", "packer-associates/pdf-pages/page-4.webp", "packer-associates/pdf-pages/page-5.webp", "packer-associates/pdf-pages/page-6.webp"], 3, "Who they are, what they do, and the first of the client pages"),
+  stack(["packer-associates/pdf-pages/page-7.webp", "packer-associates/pdf-pages/page-8.webp", "packer-associates/pdf-pages/page-9.webp", "packer-associates/pdf-pages/page-10.webp", "packer-associates/pdf-pages/page-11.webp"], 3, "Each client page takes on that client’s own colours, then accreditations and the back cover"),
+  { kind: "media", items: [m("packer-associates/3d-model-video.webm")], caption: "The website, which I kept current through the contract", link: { label: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" } },
+  stack(["packer-associates/social/post-1.webp", "packer-associates/social/post-2.webp", "packer-associates/social/post-3.webp", "packer-associates/social/free-elearn-course.webp", "packer-associates/social/graphic-design.webp", "packer-associates/social/stimula.webp"], 3, "Social posts on training topics, and title cards for the service posts"),
+  row(["packer-associates/reels/compass-reel.webm", "packer-associates/reels/stimula-reel.webm"], "Two logos for their clients, each told as a reel: Compass Capability and Stimulà"),
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
   { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },

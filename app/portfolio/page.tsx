@@ -279,14 +279,25 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
         </section>
       );
     case "media": {
-      const ratio = s.items.reduce((a, m) => a + m.w / m.h, 0);
-      const n = s.items.length;
-      const h = `min(var(--H), calc((var(--W) - ${n - 1} * var(--G)) / ${ratio.toFixed(4)}))`;
+      // Stacked pages (`per` to a row) are sized so the widest row and all the
+      // rows together both fit the media box; everything else is one row.
+      const lines: Media[][] = [];
+      for (let i = 0; i < s.items.length; i += s.per ?? s.items.length) lines.push(s.items.slice(i, i + (s.per ?? s.items.length)));
+      const ratio = Math.max(...lines.map((line) => line.reduce((a, m) => a + m.w / m.h, 0)));
+      const n = s.per ?? s.items.length;
+      const down = lines.length;
+      const h = `min(calc((var(--H) - ${down - 1} * var(--G)) / ${down}), calc((var(--W) - ${n - 1} * var(--G)) / ${ratio.toFixed(4)}))`;
       return (
         <section className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}`}>
           <Run chap={chap} page={page} />
-          <div className="pf-row" style={{ "--h": h } as React.CSSProperties}>
-            {s.items.map((m) => <Item key={m.src} m={m} group={chap?.id} />)}
+          <div className={`pf-row${s.per ? " is-stack" : ""}`} style={{ "--h": h } as React.CSSProperties}>
+            {s.per
+              ? lines.map((line) => (
+                  <div className="pf-row-line" key={line[0].src}>
+                    {line.map((m) => <Item key={m.src} m={m} group={chap?.id} />)}
+                  </div>
+                ))
+              : s.items.map((m) => <Item key={m.src} m={m} group={chap?.id} />)}
           </div>
           {s.caption ? (
             <p className="pf-caption pf-mono">
