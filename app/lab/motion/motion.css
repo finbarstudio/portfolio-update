@@ -556,15 +556,21 @@
     grid-auto-rows: max-content;
     overflow-y: auto;
   }
+  /* The preview stays pinned at the top while the panels scroll under it. */
   .mp-stage {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     order: -1;
     padding: 12px;
+    background: #0c0c0d;
+    box-shadow: 0 1px 0 var(--mp-line);
   }
   .mp-pint.mp-pint-float {
     display: none;
   }
   .mp-stage canvas {
-    max-height: 60dvh;
+    max-height: 42dvh;
   }
   .mp-panel {
     overflow: visible;
