@@ -391,6 +391,16 @@
   border: 1px solid var(--mp-line);
   border-radius: 6px;
 }
+/* A labelled row holding one control, lined up with the choice rows. */
+.mp-line {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  margin-bottom: 6px;
+}
+
 /* Colour picker: a chip and hex as the trigger, the panel floating above it. */
 .mp-colour {
   position: relative;
@@ -441,9 +451,9 @@
   outline: 2px solid #6aa8ff;
   outline-offset: 2px;
 }
-/* Both thumbs: a white ring filled with the live colour. */
+/* Every thumb: a white ring filled with the live colour. */
 .mp-colour-dot,
-.mp-tool .mp-colour-hue::-webkit-slider-thumb {
+.mp-tool .mp-colour-range::-webkit-slider-thumb {
   width: 20px;
   height: 20px;
   border: 3px solid #fff;
@@ -455,51 +465,69 @@
   translate: -50% -50%;
   pointer-events: none;
 }
-.mp-colour-hue-row {
+.mp-colour-sliders {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+.mp-colour-sliders > div {
+  display: grid;
+  flex: 1;
+  gap: 14px;
+  min-width: 0;
 }
 .mp-tool .mp-colour-eye {
   flex: none;
+  display: grid;
+  place-items: center;
   width: 36px;
   height: 36px;
   min-height: 0;
   padding: 0;
-  display: grid;
-  place-items: center;
   color: var(--mp-dim);
   border-radius: 9px;
 }
 .mp-tool .mp-colour-eye:hover {
   color: var(--mp-text);
 }
-.mp-tool .mp-colour-hue {
-  flex: 1;
+.mp-tool .mp-colour-range {
+  display: block;
+  width: 100%;
   height: 12px;
   margin: 0;
   appearance: none;
-  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
   border-radius: 999px;
-  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.2);
+  box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.14);
   cursor: pointer;
 }
-.mp-tool .mp-colour-hue::-webkit-slider-thumb {
+.mp-tool .mp-colour-hue {
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+.mp-tool .mp-colour-light {
+  background: linear-gradient(to right, #000, var(--full));
+}
+.mp-tool .mp-colour-range::-webkit-slider-thumb {
   appearance: none;
-  background: var(--hue);
   cursor: grab;
 }
-.mp-tool .mp-colour-hue::-moz-range-thumb {
+.mp-tool .mp-colour-hue::-webkit-slider-thumb {
+  background: var(--hue);
+}
+.mp-tool .mp-colour-light::-webkit-slider-thumb {
+  background: var(--now);
+}
+.mp-tool .mp-colour-range::-moz-range-thumb {
   width: 14px;
   height: 14px;
-  background: var(--hue);
   border: 3px solid #fff;
   border-radius: 50%;
   box-shadow: 0 2px 6px rgb(0 0 0 / 0.45);
 }
-.mp-colour-row {
-  display: grid;
-  gap: 10px;
+.mp-tool .mp-colour-hue::-moz-range-thumb {
+  background: var(--hue);
+}
+.mp-tool .mp-colour-light::-moz-range-thumb {
+  background: var(--now);
 }
 .mp-colour-field {
   display: flex;
@@ -527,23 +555,26 @@
   border: 0;
   outline: none;
 }
+/* Small round swatches, never touching. */
 .mp-colour-swatches {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .mp-tool .mp-colour-swatches button {
+  flex: none;
+  width: 18px;
+  height: 18px;
   min-height: 0;
-  aspect-ratio: 1;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
 }
 .mp-tool .mp-colour-swatches button[aria-pressed="true"] {
   box-shadow:
     0 0 0 2px #1a1a1d,
-    0 0 0 4px #fff;
+    0 0 0 3.5px #fff;
 }
 
 .mp-field {

@@ -2,9 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/** The usual layout: a shade square, a hue strip, a hex box and a few swatches. */
+/**
+ * A compact colour picker: the shade square for the chosen hue, then a hue
+ * and a lightness slider, a hex box, and swatches that remember what you pick.
+ */
 
-const SWATCHES = ["#0e0e10", "#000000", "#1c1c1f", "#2b2b30", "#f2f2f3", "#ffffff", "#ece6df", "#0b1f3a", "#1b3b2a", "#ff0066"];
+/** Always offered. Colours you pick are remembered after these. */
+const FIXED_SWATCHES = ["#000000", "#ffffff"];
+const SAVED_KEY = "motion-presets:swatches";
+const SAVED_MAX = 12;
+const HEX = /^#[0-9a-f]{6}$/;
 
 interface Hsv {
   h: number;
@@ -50,6 +57,25 @@ function normaliseHex(text: string): string | null {
   return null;
 }
 
+/** Picked colours from earlier visits. Anything that is not a plain hex is dropped. */
+function readSaved(): string[] {
+  try {
+    const stored: unknown = JSON.parse(localStorage.getItem(SAVED_KEY) ?? "[]");
+    if (!Array.isArray(stored)) return [];
+    return stored.filter((item): item is string => typeof item === "string" && HEX.test(item) && !FIXED_SWATCHES.includes(item)).slice(0, SAVED_MAX);
+  } catch {
+    return []; // storage blocked or the entry is not JSON
+  }
+}
+
+function writeSaved(swatches: string[]) {
+  try {
+    localStorage.setItem(SAVED_KEY, JSON.stringify(swatches));
+  } catch {
+    // Storage blocked: the swatches still last until the page closes.
+  }
+}
+
 /** Chrome and Edge offer a screen eyedropper; other browsers do not. */
 interface EyeDropperApi {
   open(): Promise<{ sRGBHex: string }>;
@@ -65,25 +91,49 @@ export default function ColourPicker({ label, value, onChange }: { label: string
   const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(value));
   const [hexText, setHexText] = useState<string | null>(null);
   const [canPick, setCanPick] = useState(false);
+  const [saved, setSaved] = useState<string[]>([]);
   const root = useRef<HTMLDivElement>(null);
   const square = useRef<HTMLDivElement>(null);
+  const latest = useRef(value);
 
-  // A colour set from outside (a loaded setup, a reset) updates the wheel.
+  useEffect(() => {
+    latest.current = value;
+  });
+
+  // A colour set from outside (a loaded setup, a reset) updates the sliders.
   useEffect(() => {
     setHsv((current) => (hsvToHex(current) === value ? current : hexToHsv(value)));
   }, [value]);
 
+  // Only the browser knows these, so they are read after the first render.
   useEffect(() => {
     setCanPick("EyeDropper" in window);
+    setSaved(readSaved());
   }, []);
+
+  /** Closing the picker is the moment a colour counts as chosen: it joins the swatches. */
+  const close = () => {
+    setOpen(false);
+    const chosen = latest.current;
+    if (FIXED_SWATCHES.includes(chosen)) return;
+    setSaved((current) => {
+      const next = [chosen, ...current.filter((item) => item !== chosen)].slice(0, SAVED_MAX);
+      writeSaved(next);
+      return next;
+    });
+  };
+  const closeRef = useRef(close);
+  useEffect(() => {
+    closeRef.current = close;
+  });
 
   useEffect(() => {
     if (!open) return;
     const away = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpen(false);
+      if (!root.current?.contains(event.target as Node)) closeRef.current();
     };
     const key = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") closeRef.current();
     };
     document.addEventListener("pointerdown", away);
     document.addEventListener("keydown", key);
@@ -97,6 +147,10 @@ export default function ColourPicker({ label, value, onChange }: { label: string
     setHsv(next);
     onChange(hsvToHex(next));
   };
+  const setHex = (hex: string) => {
+    setHsv(hexToHsv(hex));
+    onChange(hex);
+  };
 
   const pickShade = (event: React.PointerEvent<HTMLDivElement>) => {
     const box = square.current?.getBoundingClientRect();
@@ -105,39 +159,32 @@ export default function ColourPicker({ label, value, onChange }: { label: string
   };
 
   const commitHex = () => {
-    if (hexText !== null) {
-      const hex = normaliseHex(hexText);
-      if (hex) {
-        setHsv(hexToHsv(hex));
-        onChange(hex);
-      }
-    }
+    const hex = hexText === null ? null : normaliseHex(hexText);
+    if (hex) setHex(hex);
     setHexText(null);
   };
-
-  const hue = `hsl(${hsv.h} 100% 50%)`;
 
   const pickFromScreen = async () => {
     try {
       const picked = await eyeDropper()?.open();
-      if (picked) {
-        const hex = picked.sRGBHex.toLowerCase();
-        setHsv(hexToHsv(hex));
-        onChange(hex);
-      }
+      if (picked && HEX.test(picked.sRGBHex.toLowerCase())) setHex(picked.sRGBHex.toLowerCase());
     } catch {
       // Closed without picking.
     }
   };
 
+  const hue = `hsl(${hsv.h} 100% 50%)`;
+  const full = hsvToHex({ ...hsv, v: 1 });
+  const sliderColours = { "--hue": hue, "--full": full, "--now": value } as React.CSSProperties;
+
   return (
     <div className="mp-colour" ref={root}>
-      <button type="button" className="mp-colour-trigger" aria-label={`${label}: ${value}`} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+      <button type="button" className="mp-colour-trigger" aria-label={`${label}: ${value}`} aria-expanded={open} onClick={() => (open ? close() : setOpen(true))}>
         <span className="mp-colour-chip" style={{ background: value }} />
         <span>{value}</span>
       </button>
       {open && (
-        <div className="mp-colour-pop" role="dialog" aria-label={`${label} colour`}>
+        <div className="mp-colour-pop" role="dialog" aria-label={`${label} colour`} style={sliderColours}>
           <div
             ref={square}
             className="mp-colour-square"
@@ -145,7 +192,7 @@ export default function ColourPicker({ label, value, onChange }: { label: string
             role="slider"
             tabIndex={0}
             aria-label="Shade"
-            aria-valuetext={`saturation ${Math.round(hsv.s * 100)}%, brightness ${Math.round(hsv.v * 100)}%`}
+            aria-valuetext={`saturation ${Math.round(hsv.s * 100)}%, lightness ${Math.round(hsv.v * 100)}%`}
             aria-valuenow={Math.round(hsv.v * 100)}
             onPointerDown={(event) => {
               event.currentTarget.setPointerCapture(event.pointerId);
@@ -163,7 +210,8 @@ export default function ColourPicker({ label, value, onChange }: { label: string
           >
             <span className="mp-colour-dot" style={{ left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%`, background: value }} />
           </div>
-          <div className="mp-colour-hue-row">
+
+          <div className="mp-colour-sliders">
             {canPick && (
               <button type="button" className="mp-colour-eye" aria-label="Pick a colour from the screen" onClick={pickFromScreen}>
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -171,26 +219,28 @@ export default function ColourPicker({ label, value, onChange }: { label: string
                 </svg>
               </button>
             )}
-            <input
-              className="mp-colour-hue"
-              type="range"
-              min={0}
-              max={360}
-              step={1}
-              value={Math.round(hsv.h)}
-              aria-label="Hue"
-              style={{ "--hue": hue } as React.CSSProperties}
-              onChange={(event) => commit({ ...hsv, h: Number(event.target.value) })}
-            />
-          </div>
-          <div className="mp-colour-row">
-            <label className="mp-colour-field">
-              <span className="mp-colour-chip" style={{ background: value }} />
+            <div>
+              <input className="mp-colour-range mp-colour-hue" type="range" min={0} max={360} step={1} value={Math.round(hsv.h)} aria-label="Hue" onChange={(event) => commit({ ...hsv, h: Number(event.target.value) })} />
               <input
-                className="mp-colour-hex"
+                className="mp-colour-range mp-colour-light"
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={Math.round(hsv.v * 100)}
+                aria-label="Lightness"
+                onChange={(event) => commit({ ...hsv, v: Number(event.target.value) / 100 })}
+              />
+            </div>
+          </div>
+
+          <label className="mp-colour-field">
+            <span className="mp-colour-chip" style={{ background: value }} />
+            <input
+              className="mp-colour-hex"
               type="text"
-              inputMode="text"
               spellCheck={false}
+              autoComplete="off"
               aria-label="Hex"
               value={hexText ?? value}
               onFocus={(event) => {
@@ -202,23 +252,13 @@ export default function ColourPicker({ label, value, onChange }: { label: string
               onKeyDown={(event) => {
                 if (event.key === "Enter") event.currentTarget.blur();
               }}
-              />
-            </label>
-            <div className="mp-colour-swatches">
-              {SWATCHES.map((swatch) => (
-                <button
-                  key={swatch}
-                  type="button"
-                  aria-label={swatch}
-                  aria-pressed={swatch === value}
-                  style={{ background: swatch }}
-                  onClick={() => {
-                    setHsv(hexToHsv(swatch));
-                    onChange(swatch);
-                  }}
-                />
-              ))}
-            </div>
+            />
+          </label>
+
+          <div className="mp-colour-swatches">
+            {[...FIXED_SWATCHES, ...saved].map((swatch) => (
+              <button key={swatch} type="button" aria-label={swatch} aria-pressed={swatch === value} style={{ background: swatch }} onClick={() => setHex(swatch)} />
+            ))}
           </div>
         </div>
       )}
