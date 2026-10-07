@@ -237,16 +237,16 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-item :is(img, video)[data-in="1"] { opacity: 1; }
 
-/* the car grid: 12 by 20 cells; the car the pointer rests on grows to 3 by 3
-   in place and the rest shuffle along, slowly (positions are set inline by
+/* the car grid: 12 by 19 cells that fill the frame exactly. The car under the
+   pointer grows where it is and the rest are pushed away from it; the frame
+   cuts off any that are pushed past its edge (positions are set inline by
    PfCars) */
-.pf-cars { position: absolute; inset: 10% 12% 12%; cursor: crosshair; touch-action: pan-y; }
+.pf-cars { position: absolute; inset: 11% 12% 13%; overflow: hidden; cursor: crosshair; touch-action: pan-y; }
 .pf-car {
   position: absolute; left: 0; top: 0;
-  width: calc(100% / 12); height: calc(100% / 20);
+  width: calc(100% / 12); height: calc(100% / 19);
   display: grid; place-items: center;
-  transform-origin: 0 0;
-  transition: transform 0.9s cubic-bezier(0.25, 0.6, 0.2, 1);
+  transition: transform 0.7s cubic-bezier(0.25, 0.6, 0.2, 1);
   pointer-events: none;
 }
 .pf-car[data-big="1"] { z-index: 1; }
