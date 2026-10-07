@@ -237,6 +237,13 @@
   color: var(--mp-text);
   text-decoration: underline;
 }
+.mp-version {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 10px;
+  color: #5c5c64;
+  font-variant-numeric: tabular-nums;
+}
 /* The same link, floating in the bottom right corner of the preview area, clear of the canvas. It is not part of the canvas, so it never appears in an export. */
 .mp-stage {
   position: relative;

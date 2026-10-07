@@ -76,6 +76,9 @@ function greyCard(renderer: Renderer, index: number): MediaItem {
 }
 const greyCards = (renderer: Renderer) => GREYS.map((_, index) => greyCard(renderer, index));
 
+/** Shown at the foot of the preset list. Bump it when the tool changes in a way worth naming. */
+const VERSION = "v2.1";
+
 /** Finbar's Stripe payment page. Change the link here. */
 const PINT_URL = "https://donate.stripe.com/cNi6oH8vP2f6eHlaoQ8N200";
 
@@ -723,6 +726,7 @@ export default function MotionTool() {
         <a className="mp-home" href="/">
           lab.finbar.studio
         </a>
+        <p className="mp-version">{VERSION}</p>
       </nav>
 
       <main className="mp-stage">
