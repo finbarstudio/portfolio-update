@@ -54,19 +54,20 @@ function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; grou
  * of Host Grotesk Bold, then set by eye.
  */
 const KERN: Record<string, number> = {
-  // upright against upright: opened a touch, so the stems do not read as a
-  // tight picket beside the airier pairs
-  IN: 0.008,
-  NB: 0.008,
-  NI: 0.008,
-  // closest points evened out
-  FI: 0.005,
+  // upright against upright: left only a little wider than the pairs below.
+  // Opened further (0.008) they stood three times as far apart as the T's bar
+  // from its neighbours, so NI read loose and TI read pinched (7 Oct 2026).
+  IN: -0.01,
+  NB: -0.01,
+  NI: -0.01,
+  // closest points evened out; the T's bar is given room either side
+  FI: 0.01,
   BA: 0.002,
   AR: 0.014,
   SK: -0.012,
-  KI: 0.003,
-  IT: -0.002,
-  TI: -0.002,
+  KI: 0.008,
+  IT: 0.008,
+  TI: 0.008,
 };
 function Kerned({ text }: { text: string }) {
   const up = text.toUpperCase();
