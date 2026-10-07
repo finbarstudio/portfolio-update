@@ -57,7 +57,7 @@ function Page({ thumb, full, close, x }: { thumb: string; full: string; close: b
     <mesh geometry={pageGeo} position={[x, 0, 0]}>
       {/* keyed: a material must be rebuilt when it gains its image */}
       {/* a blank leaf (no file) is paper; a page still loading is dark, like the ground */}
-      <meshBasicMaterial key={map ? "image" : "paper"} map={map ?? undefined} color={map ? "#ffffff" : thumb ? "#2a2724" : "#f4f1ea"} toneMapped={false} />
+      <meshBasicMaterial key={map ? "image" : "paper"} map={map ?? undefined} color={map || !thumb ? "#ffffff" : "#2a2724"} toneMapped={false} />
     </mesh>
   );
 }
@@ -182,8 +182,9 @@ export default function SpreadWall({
     const d = Math.min(dt, 0.05);
     const zoomed = picked !== null;
     // the whole wall fits the view; up close, one spread does
-    const fitAll = Math.min((viewport.width * 0.92) / (cols * CELL_W), (viewport.height * 0.9) / (rows * CELL_H));
-    const fitOne = Math.min((viewport.width * 0.96) / (PAGE_W * 2), (viewport.height * 0.96) / PAGE_H);
+    // the lean pushes the near corners outwards, so the wall is fitted with room to spare
+    const fitAll = Math.min((viewport.width * 0.8) / (cols * CELL_W), (viewport.height * 0.74) / (rows * CELL_H));
+    const fitOne = Math.min((viewport.width * 0.94) / (PAGE_W * 2), (viewport.height * 0.94) / PAGE_H);
     const s = zoomed ? fitOne : fitAll;
     const [cx, cy] = zoomed ? cells[picked] : [0, 0];
     const px = THREE.MathUtils.clamp(state.pointer.x, -1, 1);

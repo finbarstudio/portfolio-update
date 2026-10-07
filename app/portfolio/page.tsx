@@ -261,6 +261,21 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
         </section>
       );
     }
+    case "covers":
+      return (
+        <section className="pf-slide pf-media pf-coverslide">
+          <Run chap={chap} page={page} />
+          <div className="pf-covers" style={{ "--n": Math.ceil(s.items.length / 2) } as React.CSSProperties}>
+            {s.items.map((m) => <Item key={m.src} m={m} group={chap?.id} />)}
+          </div>
+          {s.caption ? (
+            <p className="pf-caption pf-mono">
+              <b>Above</b>
+              <span>{s.caption}</span>
+            </p>
+          ) : null}
+        </section>
+      );
     case "booklet":
       return (
         <section className="pf-slide pf-media pf-bookslide">

@@ -8,6 +8,7 @@
  *   index    the list of projects, after the about page
  *   media    one to four images or clips in a row
  *   grid     tiles on a unit grid (see THE NEW IMAGE STANDARD below)
+ *   covers   a sheet of A4 covers in rows
  *   booklet  a printed piece as a 3D magazine whose pages turn (PfBooklet)
  *   logo     a mark centred on a ground
  *
@@ -50,6 +51,7 @@ export type Slide =
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
   | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean }
+  | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
   | { kind: "booklet"; /** the books on the stage, the first open by default: name, every page in reading order (front cover first), the same pages small, and page numbers to star in the spreads view */ books: { name: string; pages: string[]; thumbs: string[]; stars?: number[] }[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
@@ -203,6 +205,24 @@ const RAW: Slide[] = [
     body:
       "Salesmasters writes sales playbooks for businesses in healthcare, manufacturing, technology and storage. Over twelve months I researched, wrote and designed more than fifteen of them, each 30 to 50 pages, with the diagrams drawn for each client. Every book ran on the same InDesign system and took about seventy hours, and every client came back for the next one.",
     meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024–2025" }],
+  },
+  {
+    kind: "covers",
+    items: [
+      "portfolio/salesmasters/covers/site-ware-direct.webp",
+      "portfolio/salesmasters/covers/bus4x4.webp",
+      "portfolio/salesmasters/covers/cutek.webp",
+      "portfolio/salesmasters/covers/criterion.webp",
+      "portfolio/salesmasters/covers/active-medical.webp",
+      "portfolio/salesmasters/covers/alpha-lifecare.webp",
+      "portfolio/salesmasters/covers/all-storage-systems.webp",
+      "portfolio/salesmasters/covers/connected-platforms.webp",
+      "portfolio/salesmasters/covers/prescience.webp",
+      "portfolio/salesmasters/covers/octave.webp",
+      "portfolio/salesmasters/covers/flowcare.webp",
+      "portfolio/salesmasters/covers/excision.webp",
+    ].map((p) => m(p, { frame: false })),
+    caption: "The covers of twelve of the playbooks, each in its client’s own brand",
   },
   {
     kind: "booklet",

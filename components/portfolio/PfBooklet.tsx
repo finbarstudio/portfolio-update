@@ -91,35 +91,47 @@ function Stage({
   );
 }
 
-/** The phone's still preview: the cover and three inside spreads (the starred ones first, then an even spread through the book). */
-function PhonePreview({ book }: { book: BookletBook }) {
-  const spreads = toSpreads(book.pages.length);
-  const inside = spreads.slice(1, -1);
-  const pick = inside.filter((pp) => pp.some((n) => book.stars?.includes(n + 1)));
-  for (let k = 1; pick.length < 3 && k <= 3; k++) {
-    const pp = inside[Math.floor((inside.length * k) / 4)];
-    if (pp && !pick.includes(pp)) pick.push(pp);
-  }
-  const starred = pick.slice(0, 3).sort((a, b) => a[0] - b[0]);
+/**
+ * The phone's still preview: every book, each as a 2 by 2 of spreads. The
+ * front cover comes first and the back cover last, with two inside spreads
+ * between them (the starred ones if there are any, otherwise two taken a
+ * third and two thirds of the way through).
+ */
+function PhonePreview({ books }: { books: BookletBook[] }) {
   return (
     <div className="pf-booklet-phone">
-      <div className="pf-booklet-phone-spreads">
-        {[spreads[0], ...starred].map((pp) => (
-          <div key={pp[0]} className={pp.length === 1 ? "is-single" : undefined}>
-            {pp.map((n) =>
-              book.thumbs[n] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={n} src={media(book.thumbs[n])} alt="" width={420} height={594} loading="lazy" decoding="async" />
-              ) : (
-                <span key={n} className="is-blank" />
-              ),
-            )}
+      {books.map((book) => {
+        const spreads = toSpreads(book.pages.length);
+        const inside = spreads.slice(1, -1);
+        const pick = inside.filter((pp) => pp.some((n) => book.stars?.includes(n + 1)));
+        for (let k = 1; pick.length < 2 && k <= 2; k++) {
+          const pp = inside[Math.floor((inside.length * k) / 3)];
+          if (pp && !pick.includes(pp)) pick.push(pp);
+        }
+        const shown = [spreads[0], ...pick.slice(0, 2).sort((a, b) => a[0] - b[0]), spreads[spreads.length - 1]];
+        return (
+          <div key={book.name} className="pf-booklet-phone-book">
+            <p className="pf-mono">
+              {book.name} <span className="pf-soft">{book.pages.filter(Boolean).length} pages</span>
+            </p>
+            <div className="pf-booklet-phone-spreads">
+              {shown.map((pp) => (
+                <div key={pp[0]} className={pp.length === 1 ? "is-single" : undefined}>
+                  {pp.map((n) =>
+                    book.thumbs[n] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={n} src={media(book.thumbs[n])} alt="" width={420} height={594} loading="lazy" decoding="async" />
+                    ) : (
+                      <span key={n} className="is-blank" />
+                    ),
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-      <p className="pf-soft">
-        A few spreads from the {book.pages.filter(Boolean).length} pages. On a desktop the whole book can be picked up and read, page by page.
-      </p>
+        );
+      })}
+      <p className="pf-soft">A few spreads from each. On a desktop both books can be picked up and read, page by page.</p>
     </div>
   );
 }
@@ -128,8 +140,8 @@ export default function PfBooklet({ books }: { books: BookletBook[] }) {
   const [which, setWhich] = useState(0);
   const book = books[which];
   const sheets = Math.ceil(book.pages.length / 2);
-  const urls = useMemo(() => book.pages.map((p) => corsMedia(media(p))), [book.pages]);
-  const smalls = useMemo(() => book.thumbs.map((p) => corsMedia(media(p))), [book.thumbs]);
+  const urls = useMemo(() => book.pages.map((p) => (p ? corsMedia(media(p)) : "")), [book.pages]);
+  const smalls = useMemo(() => book.thumbs.map((p) => (p ? corsMedia(media(p)) : "")), [book.thumbs]);
 
   const [view, setView] = useState<View>("magazine");
   // the book keeps the pose it last had while the spreads are up
@@ -252,7 +264,7 @@ export default function PfBooklet({ books }: { books: BookletBook[] }) {
     sheet <= 0 ? "Cover" : sheet >= sheets ? "Back cover" : `Pages ${sheet * 2} to ${sheet * 2 + 1}`;
   const close = picked === null ? null : toSpreads(book.pages.length)[picked].map((n) => n + 1);
 
-  if (phone) return <PhonePreview book={book} />;
+  if (phone) return <PhonePreview books={books} />;
 
   return (
     <>
@@ -302,8 +314,17 @@ export default function PfBooklet({ books }: { books: BookletBook[] }) {
         <button type="button" aria-pressed={view === "spreads"} onClick={() => show("spreads")}>
           Spreads
         </button>
-        {close ? (
-          <button type="button" className="pf-booklet-close" onClick={() => setPicked(null)}>
+        {/* shuts whatever is open: a spread brought close on the wall, or the book back to its front cover */}
+        {(view === "spreads" ? close !== null : sheet > 0) ? (
+          <button
+            type="button"
+            className="pf-booklet-close"
+            onClick={() => {
+              setPlaying(false);
+              if (view === "spreads") setPicked(null);
+              else go(0);
+            }}
+          >
             Close
           </button>
         ) : null}

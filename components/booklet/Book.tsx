@@ -189,7 +189,7 @@ function bend(pos: THREE.BufferAttribute, t: number, curl: number) {
   pos.needsUpdate = true;
 }
 
-const PAPER = "#f4f1ea"; // a page whose image has not arrived yet
+const PAPER = "#ffffff"; // a blank leaf, or a page whose image has not arrived yet
 
 function Sheet({
   index,
