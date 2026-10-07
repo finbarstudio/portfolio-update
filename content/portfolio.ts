@@ -8,6 +8,7 @@
  *   index    the list of projects, after the about page
  *   media    one to four images or clips in a row
  *   grid     tiles on a unit grid (see THE NEW IMAGE STANDARD below)
+ *   booklet  a printed piece as a 3D magazine whose pages turn (PfBooklet)
  *   logo     a mark centred on a ground
  *
  * THE MEDIA RULE FOR THIS PAGE: inset, never full bleed, never cropped. Every
@@ -49,6 +50,7 @@ export type Slide =
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
   | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean }
+  | { kind: "booklet"; /** every page in reading order, front cover first */ pages: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
   | { kind: "end" };
@@ -185,7 +187,11 @@ const RAW: Slide[] = [
   },
   row(["salesmasters/covers/alpha.webp", "salesmasters/covers/bus4x4.webp", "salesmasters/covers/playbook.webp", "salesmasters/covers/siteware.webp"], "Four of the fifteen covers"),
   row(["salesmasters/graphics/active-medical/wheel.webp", "salesmasters/graphics/bus4x4/wheel.webp", "salesmasters/graphics/cutek/wheel.webp", "salesmasters/graphics/site-ware-direct/wheel.webp"], "The Sales Wheel, drawn fresh for each client", { frame: false }),
-  row(["salesmasters/playbook/page-1.webp", "salesmasters/playbook/page-8.webp", "salesmasters/playbook/page-14.webp", "salesmasters/playbook/page-17.webp"], "Pages from one edition"),
+  {
+    kind: "booklet",
+    pages: Array.from({ length: 62 }, (_, i) => `/media/images/portfolio/salesmasters/bus4x4/page-${String(i + 1).padStart(2, "0")}.webp`),
+    caption: "The Bus4x4 edition, all 62 pages. Click or drag a page to turn it",
+  },
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
   { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },

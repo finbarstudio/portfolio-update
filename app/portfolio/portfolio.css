@@ -256,6 +256,51 @@ body:has(.pf) { background: #1a1a1a; }
 @keyframes pf-car-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .pf-car { transition: none; } .pf-car-name { animation: none; } }
 
+/* the booklet: a 3D magazine in the media box (PfBooklet). The view switch
+   and the page arrows sit on the caption line, either side of the caption. */
+.pf-booklet {
+  position: absolute;
+  top: var(--T); bottom: var(--B); left: var(--S); right: var(--S);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+.pf-booklet:active { cursor: grabbing; }
+.pf-booklet:focus-visible { outline: 1px solid var(--soft); outline-offset: calc(var(--u) * 0.4); }
+.pf-booklet-wait { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; pointer-events: none; }
+.pf-booklet-ui {
+  position: absolute;
+  left: var(--S); right: var(--S);
+  bottom: calc(var(--u) * 2.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 3;
+  pointer-events: none;
+}
+.pf-booklet-set { display: flex; align-items: center; gap: calc(var(--u) * 0.2); pointer-events: auto; }
+.pf-booklet-ui button {
+  /* small type, full-size target: the padding is the hit area */
+  min-width: 44px; min-height: 44px;
+  margin: -14px 0;
+  padding: 0 calc(var(--u) * 0.6);
+  border: 0;
+  background: none;
+  color: var(--soft);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+.pf-booklet-ui button:hover, .pf-booklet-ui button[aria-pressed="true"] { color: var(--ink); }
+.pf-booklet-ui button:disabled { opacity: 0.3; cursor: default; }
+.pf-booklet-ui button:focus-visible { outline: 1px solid var(--soft); outline-offset: -8px; }
+.pf-booklet-set:first-child { margin-left: calc(var(--u) * -0.6); }
+.pf-booklet-set:last-child { margin-right: calc(var(--u) * -0.6); }
+.pf-booklet-where { min-width: 11em; text-align: center; font-variant-numeric: tabular-nums; }
+/* leave the ends of the caption line to the controls */
+.pf-bookslide .pf-caption { left: 26cqw; right: 26cqw; }
+
 /* the loader: a percentage over a hairline, bottom left of the frame */
 .pf-load {
   position: absolute;
@@ -370,6 +415,11 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-media.is-bleed .pf-run { display: none; }
   .pf-media.is-bleed .pf-row { padding: 0; }
   .pf-media.is-bleed .pf-item { aspect-ratio: var(--r) !important; }
+  .pf-booklet { position: relative; inset: auto; margin: 12px 14px 0; aspect-ratio: 1.25; }
+  .pf-booklet-ui { position: static; padding: 0 14px; margin: 6px 0; }
+  .pf-booklet-set:first-child, .pf-booklet-set:last-child { margin: 0 -8px; }
+  .pf-booklet-where { min-width: 9em; }
+  .pf-bookslide .pf-caption { left: auto; right: auto; }
   .pf-grid { position: static; display: block; padding: 12px 14px 14px; }
   .pf-grid-in { display: flex; flex-direction: column; gap: 8px; }
   .pf-grid-in .pf-item { aspect-ratio: var(--r) !important; }

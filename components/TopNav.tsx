@@ -145,7 +145,8 @@ export default function TopNav({ variant = "site" }: { variant?: "site" | "portf
         {items.map((it) => (
           <Link
             key={it.href}
-            href={it.href}
+            // the portfolio lives on its own subdomain, so its links leave for the main site
+            href={variant === "portfolio" ? `https://www.finbar.studio${it.href}` : it.href}
             aria-current={isActive(it.href) ? "page" : undefined}
             className={`tag ${isActive(it.href) ? "tag-pink" : "tag-default"}`}
           >

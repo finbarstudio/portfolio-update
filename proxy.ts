@@ -2,20 +2,25 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * proxy — host-based rewrite for the web.finbar and lab subdomains.
+ * proxy — host-based rewrite for the web.finbar, lab and portfolio subdomains.
  *
  * NOTE (Next 16): the `middleware` file convention was renamed to `proxy`
  * (function `proxy`, file `proxy.ts`). This is the same edge/Node entry point.
  *
  * `web.finbar.studio/<path>` is rewritten to `/web/<path>` and
  * `lab.finbar.studio/<path>` to `/lab/<path>`, so both live in the same
- * app/deploy as the portfolio. The old sandbox subdomain was retired in
+ * app/deploy as the main site. `portfolio.finbar.studio` shows `/portfolio`
+ * the same way; it has only its own pages, so any other path on that host
+ * (the nav's Work and About, say) is sent on to the main site. The old sandbox subdomain was retired in
  * Oct 2026: anything arriving on it is sent to the studio home page.
  */
 
 const RETIRED_HOSTS = new Set(["sandbox.finbar.studio", "sandbox.localhost"]);
 const WEB_HOSTS = new Set(["web.finbar.studio", "web.localhost"]);
 const LAB_HOSTS = new Set(["lab.finbar.studio", "lab.localhost"]);
+const PORTFOLIO_HOSTS = new Set(["portfolio.finbar.studio", "portfolio.localhost"]);
+/** The pages that exist under app/portfolio, as seen on the subdomain. */
+const PORTFOLIO_PATHS = new Set(["/", "/mock", "/portfolio", "/portfolio/mock"]);
 const MAIN_HOSTS = new Set(["www.finbar.studio", "finbar.studio"]);
 
 /**
@@ -67,10 +72,18 @@ export function proxy(request: NextRequest): NextResponse {
   // ── lab subdomain: clean URLs (no visible /lab prefix) ──────────────────────
   if (LAB_HOSTS.has(host)) return subdomain(request, "lab");
 
+  // ── portfolio subdomain: its own pages get clean URLs; everything else on
+  //    this host belongs to the main site. Files (and the /cv and
+  //    /portfolio.pdf redirects, which run before this) pass straight through.
+  if (PORTFOLIO_HOSTS.has(host)) {
+    if (PORTFOLIO_PATHS.has(pathname.replace(/(.)\/$/, "$1")) || /\.[^/]+$/.test(pathname)) return subdomain(request, "portfolio");
+    return NextResponse.redirect(`https://www.finbar.studio${pathname}${request.nextUrl.search}`, 308);
+  }
+
   // ── Main host: subdomain sections live on their own hosts, so 308 their
   //    prefixed paths there if they're ever hit directly on www/apex. ────────
   // Whole-segment match only: `/web-design` is a main-site page, not `/web`.
-  for (const [prefix, canonical] of [["web", "web.finbar.studio"], ["lab", "lab.finbar.studio"]] as const) {
+  for (const [prefix, canonical] of [["web", "web.finbar.studio"], ["lab", "lab.finbar.studio"], ["portfolio", "portfolio.finbar.studio"]] as const) {
     if (MAIN_HOSTS.has(host) && (pathname === `/${prefix}` || pathname.startsWith(`/${prefix}/`))) {
       const url = request.nextUrl.clone();
       url.host = canonical;

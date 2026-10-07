@@ -19,10 +19,10 @@ import { scrollToHero } from "@/lib/scroll";
 
 export const GOTO_HERO_KEY = "finbar-goto-hero";
 
-export default function NavLogo({ onHome = false, sticky = false }: { onHome?: boolean; sticky?: boolean }) {
+export default function NavLogo({ onHome = false, sticky = false, href = "/" }: { onHome?: boolean; sticky?: boolean; /** where the logo goes; the portfolio subdomain points it at the main site */ href?: string }) {
   return (
     <Link
-      href="/"
+      href={href}
       className={`nav-logo ${onHome ? "is-home" : ""} ${sticky ? "is-sticky" : ""}`}
       aria-label="finbarstudio, home"
       onClick={(e) => {
