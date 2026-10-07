@@ -720,7 +720,7 @@ export default function PathwayTool() {
             {w} × {h}{files} · seed {seed} · {path.crossings} overlap{path.crossings === 1 ? "" : "s"}
             {path.clean ? "" : " · closest fit, try another"}
           </p>
-          <a className="stb-back" href="/">Back to the lab</a>
+          <a className="stb-back" href="/" target="_blank" rel="noopener">Back to the lab</a>
         </section>
       </aside>
 

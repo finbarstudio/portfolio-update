@@ -835,7 +835,7 @@ export default function EmailCheck() {
         <p className="ec-foot">
           {/* Plain link, as in LabHeader: proxy.ts rewrites "/" on the lab host. */}
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/">lab.finbar.studio</a>
+          <a href="/" target="_blank" rel="noopener">lab.finbar.studio</a>
           <span title="Version of the email check tool">v{VERSION}</span>
         </p>
       </Panel>

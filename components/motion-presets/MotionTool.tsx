@@ -723,7 +723,7 @@ export default function MotionTool() {
         <a className="mp-pint" href={PINT_URL} target="_blank" rel="noopener noreferrer">
           Buy me a pint
         </a>
-        <a className="mp-home" href="/">
+        <a className="mp-home" href="/" target="_blank" rel="noopener">
           lab.finbar.studio
         </a>
         <p className="mp-version">{VERSION}</p>
