@@ -129,7 +129,8 @@ export default function HomeIntro() {
     // back to) and the static nav logo takes over from the lockup.
     const collapse = () => {
       const doc = document.documentElement;
-      if (doc.classList.contains("intro-collapsed")) return;
+      // Whatever else happens, the intro is over: never leave the nav locked.
+      if (doc.classList.contains("intro-collapsed")) { delete doc.dataset.introLock; return; }
       const hero = document.getElementById("hero");
       const lenis = window.__lenis;
       // Pixel-exact handoff: note where the hero sits on screen, remove the
@@ -214,6 +215,7 @@ export default function HomeIntro() {
     let finished = false;
     let phase2Timer: number | undefined;
     let cancelHold: (() => void) | undefined;
+    let cancelGlide: (() => void) | undefined;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
     // Phase 2 — after the lockup assembles, hold a beat then glide the page down to
@@ -235,7 +237,27 @@ export default function HomeIntro() {
       window.addEventListener("wheel", onCancel, { passive: true });
       window.addEventListener("touchstart", onCancel, { passive: true });
       window.addEventListener("keydown", onCancel);
-      phase2Timer = window.setTimeout(() => { stop(); scrollToHero(collapse); }, PHASE2_HOLD_MS);
+      phase2Timer = window.setTimeout(() => {
+        stop();
+        // The glide ends by calling collapse. But if the visitor scrolls while
+        // it is running, Lenis drops the glide and never calls back, which used
+        // to leave the logo screen in the page (you could scroll back up to it)
+        // and the nav locked for good. So collapse is guaranteed three ways:
+        // the glide finishing, the visitor taking over, or a backstop once the
+        // glide's 1.7s has safely passed. collapse() only ever acts once.
+        const events = ["wheel", "touchstart", "keydown"] as const;
+        const off = () => {
+          clearTimeout(backstop);
+          events.forEach((name) => window.removeEventListener(name, takeOver));
+          cancelGlide = undefined;
+        };
+        const end = () => { off(); collapse(); };
+        const takeOver = () => { off(); window.setTimeout(collapse, 80); };
+        const backstop = window.setTimeout(end, 2400);
+        events.forEach((name) => window.addEventListener(name, takeOver, { passive: true }));
+        cancelGlide = off;
+        scrollToHero(end);
+      }, PHASE2_HOLD_MS);
     };
 
     const finish = () => {
@@ -306,6 +328,7 @@ export default function HomeIntro() {
 
     return () => {
       cancelHold?.();
+      cancelGlide?.();
       clearTimeout(failsafe);
       tl.kill();
       document.body.style.overflow = prevOverflow;
