@@ -53,6 +53,7 @@ export type Slide =
   | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean; /** stack the items in rows of this many, each at its true proportions */ per?: number }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
   | { kind: "booklet"; /** the books on the stage, the first open by default: name, every page in reading order (front cover first), the same pages small, and page numbers to star in the spreads view */ books: { name: string; pages: string[]; thumbs: string[]; stars?: number[] }[]; caption?: string }
+  | { kind: "deck"; /** a landscape document to page through: every page in order, and the same pages small */ name: string; pages: string[]; thumbs: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
   | { kind: "end" };
@@ -250,9 +251,13 @@ const RAW: Slide[] = [
       "Packer and Associates is a Brisbane workforce development company that has been running since 1997. I was their in-house designer for a year, full-time and then on contract. I designed the capability statement they give to prospective clients and kept the website current.",
     meta: [ME, { label: "Year", value: "2024–2025" }, { label: "Live", value: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" }],
   },
-  one("packer-associates/pdf-pages/page-0.webp", "The capability statement: twelve pages on who they are, what they do and who they have done it for"),
-  stack(["packer-associates/pdf-pages/page-1.webp", "packer-associates/pdf-pages/page-2.webp", "packer-associates/pdf-pages/page-3.webp", "packer-associates/pdf-pages/page-4.webp", "packer-associates/pdf-pages/page-5.webp", "packer-associates/pdf-pages/page-6.webp"], 3, "Who they are, what they do, and the first of the client pages"),
-  stack(["packer-associates/pdf-pages/page-7.webp", "packer-associates/pdf-pages/page-8.webp", "packer-associates/pdf-pages/page-9.webp", "packer-associates/pdf-pages/page-10.webp", "packer-associates/pdf-pages/page-11.webp"], 3, "Each client page takes on that client’s own colours, then accreditations and the back cover"),
+  {
+    kind: "deck",
+    name: "Packer and Associates capability statement",
+    pages: Array.from({ length: 12 }, (_, i) => `/media/images/packer-associates/pdf-pages/page-${i}.webp`),
+    thumbs: Array.from({ length: 12 }, (_, i) => `/media/images/packer-associates/pdf-pages/page-${i}-thumb.webp`),
+    caption: "The capability statement, twelve pages. Click the page or the strip to read it",
+  },
   { kind: "media", items: [m("packer-associates/3d-model-video.webm")], caption: "The website, which I kept current through the contract", link: { label: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" } },
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */

@@ -1,5 +1,6 @@
 import PfMedia from "@/components/portfolio/PfMedia";
 import PfCars from "@/components/portfolio/PfCars";
+import PfDeck from "@/components/portfolio/PfDeck";
 import PfBooklet from "@/components/portfolio/PfBooklet";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 import { PORTFOLIO, CV, UPDATED, HEADSHOT, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
@@ -334,6 +335,19 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
         <section className="pf-slide pf-media pf-bookslide">
           <Run chap={chap} page={page} />
           <PfBooklet books={s.books} />
+          {s.caption ? (
+            <p className="pf-caption pf-mono">
+              <b>Above</b>
+              <span>{s.caption}</span>
+            </p>
+          ) : null}
+        </section>
+      );
+    case "deck":
+      return (
+        <section className="pf-slide pf-media pf-deckslide">
+          <Run chap={chap} page={page} />
+          <PfDeck name={s.name} pages={s.pages} thumbs={s.thumbs} />
           {s.caption ? (
             <p className="pf-caption pf-mono">
               <b>Above</b>

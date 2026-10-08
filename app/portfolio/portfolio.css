@@ -219,6 +219,38 @@ body:has(.pf) { background: #1a1a1a; }
   align-items: center;
   gap: var(--G);
 }
+/* a document to page through (PfDeck): the page large, every page small in a
+   strip under it with the arrows and the count */
+.pf-deck {
+  position: absolute; top: var(--T); bottom: var(--B); left: var(--S); right: var(--S);
+  display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 0.9);
+  outline: none;
+}
+.pf-deck-page {
+  position: relative; flex: 1; min-height: 0; aspect-ratio: 16 / 9;
+  border-radius: calc(var(--u) * 0.4); box-shadow: 0 0 0 1px var(--line); background: var(--well, #161412);
+  overflow: hidden; cursor: e-resize; touch-action: pan-y; user-select: none;
+}
+.pf-deck-page[data-last="1"] { cursor: w-resize; }
+.pf-deck:focus-visible .pf-deck-page { box-shadow: 0 0 0 1px var(--ink); }
+.pf-deck-page img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-deck-sharp { opacity: 0; transition: opacity 0.2s ease; }
+.pf-deck-sharp[data-in="1"] { opacity: 1; }
+.pf-deck-bar { flex: none; display: flex; align-items: center; gap: calc(var(--u) * 0.8); }
+.pf-deck-bar > button, .pf-deck-count { font: inherit; letter-spacing: inherit; }
+.pf-deck-bar > button { background: none; border: 0; padding: 0 0.4em; color: var(--ink); cursor: pointer; font-size: 1.5em; line-height: 1; }
+.pf-deck-bar > button:disabled { color: var(--line); cursor: default; }
+.pf-deck-strip { display: flex; gap: calc(var(--u) * 0.35); }
+.pf-deck-strip button {
+  width: calc(var(--u) * 4.2); aspect-ratio: 16 / 9; padding: 0; border: 0; background: none; cursor: pointer;
+  border-radius: calc(var(--u) * 0.15); overflow: hidden; opacity: 0.45; transition: opacity 0.15s ease;
+}
+.pf-deck-strip button:hover { opacity: 0.8; }
+.pf-deck-strip button[data-on="1"] { opacity: 1; box-shadow: 0 0 0 1px var(--ink); }
+.pf-deck-strip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-deck-count { min-width: 4em; text-align: right; }
+@media (prefers-reduced-motion: reduce) { .pf-deck-sharp, .pf-deck-strip button { transition: none; } }
+
 /* a stacked page: several rows of items, one under the other */
 .pf-row.is-stack { flex-direction: column; }
 .pf-row-line { display: flex; justify-content: center; gap: var(--G); }
@@ -463,6 +495,13 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-media .pf-row { position: static; flex-direction: column; padding: 12px 14px 14px; gap: 8px; }
   .pf-media .pf-item { width: 100%; height: auto; }
   .pf-row-line { flex-direction: column; gap: 8px; }
+  /* the document: the page at full width, the strip wrapping to two rows of six */
+  .pf-deck { position: static; padding: 12px 14px 14px; gap: 10px; }
+  .pf-deck-page { flex: none; width: 100%; }
+  .pf-deck-bar { width: 100%; flex-wrap: wrap; justify-content: space-between; row-gap: 8px; }
+  .pf-deck-strip { order: 3; width: 100%; display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+  .pf-deck-strip button { width: 100%; }
+  .pf-deck-bar > button { font-size: 22px; min-width: 44px; min-height: 44px; }
   .pf-media .pf-caption { position: static; padding: 0 14px 16px; }
   .pf-media.is-bleed .pf-run { display: none; }
   .pf-media.is-bleed .pf-row { padding: 0; }
