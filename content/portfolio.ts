@@ -145,6 +145,8 @@ const grid = (cols: number, rows: number, tiles: [string, number, number, number
 });
 
 const ME = { label: "Team members", value: "Finbar Skitini" };
+/** The small link on a project's intro card to its full case study on the studio site. */
+const study = (slug: string): Meta => ({ label: "Case study", value: "Read it ↗", href: `https://www.finbar.studio/case-studies/${slug}` });
 
 const RAW: Slide[] = [
   { kind: "cover" },
@@ -159,7 +161,7 @@ const RAW: Slide[] = [
     category: "Brand and Website",
     body:
       "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
-    meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }],
+    meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, study("lows-design-build")],
   },
   one("portfolio/lows/logo-zoom.mp4", "The brand", { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
   linked("portfolio/lows/macbook.webm", "The website", { label: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }),
@@ -180,7 +182,7 @@ const RAW: Slide[] = [
     category: "Logo and Website",
     body:
       "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }],
+    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
   },
   one("lola-audio/site-scroll-3d.mp4"),
   one("lola-audio/watch.mp4"),
@@ -193,7 +195,7 @@ const RAW: Slide[] = [
     category: "Website",
     body:
       "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }],
+    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
   },
   one("portfolio/rennen-plus/pink-porsche.webp", "The brand: Rennen Motorsport’s car, The Pink Porsche, at the Adelaide Rally", { frame: false }),
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
@@ -208,7 +210,7 @@ const RAW: Slide[] = [
     category: "Editorial",
     body:
       "Salesmasters writes sales playbooks for businesses in healthcare, manufacturing, technology and storage. Over twelve months I researched, wrote and designed more than fifteen of them, each 30 to 50 pages, with the diagrams drawn for each client. Every book ran on the same InDesign system, and each one took about seventy hours of work, roughly two weeks from brief to print-ready files. Every client came back for the next one.",
-    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024–2025" }],
+    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024–2025" }, study("salesmasters")],
   },
   {
     kind: "covers",
@@ -249,7 +251,7 @@ const RAW: Slide[] = [
     category: "In-house Design",
     body:
       "Packer and Associates is a Brisbane workforce development company that has been running since 1997. I was their in-house designer for a year, full-time and then on contract. I designed the capability statement they give to prospective clients and kept the website current.",
-    meta: [ME, { label: "Year", value: "2024–2025" }, { label: "Live", value: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" }],
+    meta: [ME, { label: "Year", value: "2024–2025" }, { label: "Live", value: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" }, study("packer-associates")],
   },
   {
     kind: "deck",
@@ -268,7 +270,7 @@ const RAW: Slide[] = [
     category: "Social Campaign for Share to Buy",
     body:
       "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
-    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }],
+    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }, study("tmyr")],
   },
   row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
   row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
@@ -281,7 +283,7 @@ const RAW: Slide[] = [
     category: "Event",
     body:
       "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
-    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }],
+    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }, study("london-home-show")],
   },
   one("london-home-show/hero.webp"),
   row(["london-home-show/flags.webp", "london-home-show/booklets.webp"]),
@@ -295,7 +297,7 @@ const RAW: Slide[] = [
     category: "Brand and Website",
     body:
       "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
-    meta: [ME, { label: "Year", value: "2026" }],
+    meta: [ME, { label: "Year", value: "2026" }, study("plated-with-issy")],
   },
   { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
   one("plated-with-issy/site-scroll-3d.mp4"),
@@ -309,7 +311,7 @@ const RAW: Slide[] = [
     category: "Information Design",
     body:
       "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
-    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }],
+    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
   },
   one("taswater/map.webp"),
   one("taswater/hero.webp"),
