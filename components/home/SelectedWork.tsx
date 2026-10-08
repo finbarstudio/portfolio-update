@@ -16,7 +16,7 @@ import { MdArrowForward } from "@/components/MaterialIcon";
  * types below are kept so a graphic project can be added back by its slug.
  * Edit SELECTED to change the set.
  */
-const SELECTED = ["rennen-plus", "lows-design-build", "plated-with-issy", "lola-audio", "kinaya"];
+const SELECTED = ["rennen-plus", "lows-design-build", "plated-with-issy", "lola-audio"];
 
 function Thumb({ project, priority }: { project: Project; priority: boolean }) {
   if (project.webShots?.length || project.webThumb) {
