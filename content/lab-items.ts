@@ -21,6 +21,14 @@ export interface LabItem {
 
 const RAW_ITEMS: LabItem[] = [
   {
+    id: 7,
+    name: "Invoice maker",
+    line: "Invoices, quotes and receipts",
+    href: "/invoice",
+    video: "/media/lab/invoice/tile.mp4",
+    added: "2026-10-08",
+  },
+  {
     id: 6,
     name: "Email check",
     line: "What breaks in which inbox",
