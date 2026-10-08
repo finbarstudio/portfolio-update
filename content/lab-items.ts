@@ -13,7 +13,7 @@ export interface LabItem {
   /** clean path on the lab host (proxy.ts rewrites it to /lab/...), or a full
    *  URL for a piece that lives on the studio site */
   href: string;
-  /** 3:4 tile: a short looping clip (stays dark until it plays) or a still. */
+  /** 3:4 tile. Every tile is a still (Finbar, 8 Oct 2026: no motion in the lab grid); `video` is kept for the type only. */
   video?: string;
   image?: string;
   added: string; // YYYY-MM-DD
@@ -25,7 +25,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Invoice maker",
     line: "Invoices, quotes and receipts",
     href: "/invoice",
-    video: "/media/lab/invoice/tile.mp4",
+    image: "/media/lab/invoice/tile.webp",
     added: "2026-10-08",
   },
   {
@@ -33,7 +33,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Email check",
     line: "What breaks in which inbox",
     href: "/email",
-    video: "/media/lab/email/tile.mp4",
+    image: "/media/lab/email/tile.webp",
     added: "2026-10-07",
   },
   {
@@ -41,7 +41,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Motion presets",
     line: "Fifty looping layouts for your media",
     href: "/motion",
-    video: "/media/lab/motion/tile.mp4",
+    image: "/media/lab/motion/tile.webp",
     added: "2026-10-06",
   },
   {
@@ -49,7 +49,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Pathway maker",
     line: "A brand tool for Share to Buy",
     href: "/pathway",
-    video: "/media/lab/pathway/tile.mp4",
+    image: "/media/lab/pathway/tile.webp",
     added: "2026-10-01",
   },
   {
@@ -57,7 +57,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Lindon Homes",
     line: "A builder's site, demo build",
     href: "https://www.finbar.studio/lindon",
-    video: "/media/lab/lindon/tile.mp4",
+    image: "/media/lab/lindon/tile.webp",
     added: "2026-09-30",
   },
   {
@@ -65,7 +65,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "Moto Technique",
     line: "A restoration workshop, demo build",
     href: "https://www.finbar.studio/mt",
-    video: "/media/lab/moto-technique/tile.mp4",
+    image: "/media/lab/moto-technique/tile.webp",
     added: "2026-09-30",
   },
   {
@@ -73,7 +73,7 @@ const RAW_ITEMS: LabItem[] = [
     name: "GemFest",
     line: "Scroll the constellation",
     href: "/gemfest",
-    video: "/media/lab/gemfest/hero-web.mp4",
+    image: "/media/lab/gemfest/tile.webp",
     added: "2026-09-30",
   },
 ];
