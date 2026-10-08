@@ -8,15 +8,15 @@ import ZoomImage from "@/components/ZoomImage";
 import { MdArrowForward } from "@/components/MaterialIcon";
 
 /**
- * SelectedWork — the home page's six best pieces in a two-column grid, each a
- * big 16:9 thumbnail that clicks through to its case study. Web projects
- * hover-cycle their section shots; the graphic projects use their own moving
- * thumbs (the TMYR phone carousel, the Salesmasters slideshow, the Packer
- * capability statement paging through). Order is editorial, Rennen Plus first,
- * Lola Audio last. Edit SELECTED to
- * change the set.
+ * SelectedWork — the websites, on the home page: big 16:9 thumbnails that
+ * click through to their case studies and hover-cycle their section shots.
+ * The newest leads at full width when the count is odd, so the two-column
+ * grid under it always ends on a full row. The studio site is web-first
+ * (the wider design work is at portfolio.finbar.studio); the other thumb
+ * types below are kept so a graphic project can be added back by its slug.
+ * Edit SELECTED to change the set.
  */
-const SELECTED = ["rennen-plus", "lows-design-build", "tmyr", "salesmasters", "packer-associates", "lola-audio"];
+const SELECTED = ["rennen-plus", "lows-design-build", "plated-with-issy", "lola-audio", "kinaya"];
 
 function Thumb({ project, priority }: { project: Project; priority: boolean }) {
   if (project.webShots?.length || project.webThumb) {
@@ -45,10 +45,15 @@ function Thumb({ project, priority }: { project: Project; priority: boolean }) {
 export default function SelectedWork() {
   const items = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter((p): p is Project => !!p);
   return (
-    <section className="px-5 md:px-10 pb-20 md:pb-28" aria-label="Selected work">
+    <section className="px-5 md:px-10 pb-20 md:pb-28" aria-label="Websites">
       <div className="home-selected">
         {items.map((project, i) => (
-          <article key={project.slug} className="home-selected-card group">
+          <article
+            key={project.slug}
+            className="home-selected-card group"
+            // an odd number of cards: the first spans the grid, so no row is left half empty
+            style={i === 0 && items.length % 2 ? { gridColumn: "1 / -1" } : undefined}
+          >
             <Link
               href={`/case-studies/${project.slug}`}
               className="block focus-visible:outline-pink focus-visible:outline-2 focus-visible:rounded"

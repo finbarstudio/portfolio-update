@@ -43,7 +43,7 @@ export default function BookCall() {
   const [docked, setDocked] = useState(false);
   // /pricing reads "Start a project" (the page has no other CTA); everywhere
   // else keeps the standard label.
-  const label = pathname === "/pricing" ? "Start a project" : "Get in touch";
+  const label = pathname === "/pricing" ? "Start a project" : "Get a quote";
 
   // Reveal gate: home shows it only after the intro logo scrolls up into the nav;
   // every other page shows it from the start.

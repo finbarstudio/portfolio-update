@@ -7,15 +7,16 @@ import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://www.finbar.studio";
 
+// The studio site is web-first again (Oct 2026): the wider design work for
+// employers lives at portfolio.finbar.studio, so the home page sells websites.
 export const metadata: Metadata = {
-  title: "Finbar Skitini, Graphic & Digital Designer, London",
   description:
-    "The portfolio of Finbar Skitini, a graphic and digital designer in London. Brand, print, motion and websites for clients in the UK and Australia, with the case studies behind each one.",
+    "Finbar Studio is a boutique web development studio in London. Custom-designed and custom-coded websites, backed by years of brand and graphic design, for businesses across the UK and Australia.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Finbar Skitini, Graphic & Digital Designer, London",
+    title: "London Web Design & Development Studio | Finbar Studio",
     description:
-      "Brand, print, motion and websites, with the case studies behind each one. Based in London.",
+      "A boutique web development studio in London. Custom-designed, custom-coded websites, backed by years of brand and graphic design.",
     url: SITE_URL,
     type: "website",
     images: [OG_IMAGE],
@@ -28,9 +29,9 @@ function HomeJsonLd() {
     "@type": "WebPage",
     "@id": `${SITE_URL}/#webpage`,
     url: SITE_URL,
-    name: "Finbar Skitini, Graphic and Digital Designer, London",
+    name: "Finbar Studio, London Web Design & Development",
     description:
-      "The portfolio of a graphic and digital designer in London: brand, print, motion and websites, with the case studies behind each one.",
+      "A boutique web development studio in London, backed by years of brand and graphic design.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#person` },
     primaryImageOfPage: `${SITE_URL}/opengraph-image`,
@@ -51,7 +52,7 @@ function WorkIntro() {
   return (
     <section id="hero" className="min-h-[60vh] flex flex-col items-center justify-center text-center px-5" aria-label="Introduction">
       <h1 className="text-ink font-medium leading-snug max-w-xl text-balance" style={{ fontSize: "clamp(1.05rem, 1.5vw, 1.35rem)" }}>
-        Graphic and digital studio. Brand, motion and websites.
+        Web development with a designer&rsquo;s eye.
       </h1>
     </section>
   );
