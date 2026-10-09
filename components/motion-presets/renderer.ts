@@ -127,6 +127,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
+  let frames = 0;
+
   return {
     texture(source, mipmaps) {
       const texture = gl.createTexture();
@@ -160,8 +162,12 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       if (!media.length) return;
 
+      // While editing, video cards refresh on every other frame: half the copying,
+      // and at card size 30 pictures a second reads the same as 60. Exports refresh on all.
+      frames++;
+      const refreshVideos = scene.fullQuality || frames % 2 === 0;
       for (const item of media) {
-        if (item.video && item.video.readyState >= 2) {
+        if (refreshVideos && item.video && item.video.readyState >= 2) {
           // Sending a 4K frame to the GPU sixty times a second is the slow part of
           // a video card, so the preview sends a small copy of each frame instead.
           let source: TexImageSource = item.video;
