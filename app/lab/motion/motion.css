@@ -373,6 +373,21 @@
   outline-offset: 1px;
 }
 
+/* Restart sits in the strip under the canvas, opposite the pint link. */
+.mp-tool .mp-restart {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  min-height: 34px;
+  padding: 0 14px;
+  color: var(--mp-dim);
+  background: rgb(21 21 23 / 0.8);
+  border-radius: 999px;
+}
+.mp-tool .mp-restart:hover {
+  color: var(--mp-text);
+}
+
 /* Loading screen over the preview while files are read in or an export is made ready. */
 .mp-loading {
   position: absolute;
@@ -868,7 +883,8 @@
     background: #0c0c0d;
     box-shadow: 0 1px 0 var(--mp-line);
   }
-  .mp-pint.mp-pint-float {
+  .mp-pint.mp-pint-float,
+  .mp-tool .mp-restart {
     display: none;
   }
   .mp-stage canvas {

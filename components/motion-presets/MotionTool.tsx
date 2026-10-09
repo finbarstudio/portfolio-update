@@ -488,7 +488,15 @@ export default function MotionTool() {
   /** Set while files are being read in or made ready for an export: drives the loading screen. */
   const [loading, setLoading] = useState<{ label: string; done: number; total: number } | null>(null);
 
+  /** How many pictures and videos are uploaded, or null while the grey cards stand in. */
+  const [mediaCount, setMediaCount] = useState<number | null>(null);
+
   const motion = applyAdjustments(preset, adjustments);
+  // One card per upload, unless Count has been set by hand. Kept inside what this preset can show.
+  if (mediaCount !== null && adjustments.count === undefined) {
+    const { min, max } = rangeFor(preset, "count");
+    motion.count = clamp(mediaCount, min, max);
+  }
   const options = presetOptions(preset, chosen);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -586,6 +594,37 @@ export default function MotionTool() {
     };
   }, []);
 
+  /** After uploads are added or removed, Count goes back to following how many there are. */
+  const followMediaCount = () => {
+    setMediaCount(placeholdersRef.current ? null : mediaRef.current.length);
+    setAdjustments((current) => {
+      if (current.count === undefined) return current;
+      const { count: _dropped, ...rest } = current;
+      return rest;
+    });
+  };
+
+  const restart = () => {
+    loopStartRef.current = performance.now();
+    for (const item of mediaRef.current) if (item.video) item.video.currentTime = 0;
+  };
+
+  // A changed setting starts the loop again, once the slider has stopped moving:
+  // restarting on every step of a drag would hold the preview on its first frame.
+  const settings = JSON.stringify([motion, options, easing, path, look.width, look.height, look.cardW, look.cardH]);
+  const firstSettings = useRef(true);
+  useEffect(() => {
+    if (firstSettings.current) {
+      firstSettings.current = false;
+      return;
+    }
+    if (fullSizeRef.current) return; // never under a recording
+    const timer = setTimeout(() => {
+      loopStartRef.current = performance.now();
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [settings]);
+
   const syncThumbs = () =>
     setThumbs(
       placeholdersRef.current
@@ -627,6 +666,7 @@ export default function MotionTool() {
     }
     mediaRef.current.push(...loaded);
     syncThumbs();
+    if (loaded.length) followMediaCount();
     setStatus(failed.join(" "));
   }
 
@@ -640,6 +680,7 @@ export default function MotionTool() {
       placeholdersRef.current = true;
     }
     syncThumbs();
+    followMediaCount();
   }
 
   /** Moves one upload to another place in the order. The order is the order cards are filled in. */
@@ -874,6 +915,9 @@ export default function MotionTool() {
             </div>
           </div>
         )}
+        <button type="button" className="mp-restart" disabled={exporting} onClick={restart}>
+          Restart
+        </button>
         <a className="mp-pint mp-pint-float" href={PINT_URL} target="_blank" rel="noopener noreferrer">
           Buy me a pint
         </a>
