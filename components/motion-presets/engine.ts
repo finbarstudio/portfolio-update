@@ -724,8 +724,8 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     if (raw.p !== undefined) {
       const d = Math.abs(raw.p - f);
       if (o.focus !== "off" && !raw.scaled) s *= 1 + (m.scale - 1) * bump(raw.p - f, m.reach);
-      if (m.fade > 0) a *= lerp(1, clamp(1 - d / 2.5), m.fade);
-      if (o.solo) a *= clamp(1.5 - d * 2);
+      // Fade steepens with the slider until, at full, it is exactly Solo: only the card in focus shows.
+      a *= clamp(1.5 - d * 2 * (o.solo ? 1 : m.fade));
     }
     const fromFocus = (raw.p ?? i - (n - 1) / 2) - f;
     if (o.tiltMode === "fan") rz -= fromFocus * m.cardTilt * DEG;
@@ -970,16 +970,16 @@ export const PRESETS: Preset[] = [
   preset("Slide 01", "slide", {}, { count: 7, size: 0.9, gap: 0.1 }),
   preset("Slide 02", "slide", {}, { count: 7, size: 0.9, gap: 0.1, rhythm: 1 }),
   preset("Slide 03", "slide", {}, { count: 7, size: 0.8, gap: 0.1, rhythm: 1, stagger: 1 }, { options: { direction: "up" } }),
-  preset("Slide 04", "slide", {}, { count: 9, size: 0.7, gap: 0.14, rhythm: 1, fade: 0.7 }),
+  preset("Slide 04", "slide", {}, { count: 9, size: 0.7, gap: 0.14, rhythm: 1, fade: 0.3 }),
   preset("Slide 05", "slide", {}, { count: 8, size: 0.75, gap: 0.14, rhythm: 1, stagger: 1, hold: 0.55 }, { options: { direction: "right" } }),
   preset("Focus 01", "slide", {}, { count: 9, size: 0.5, gap: 0.16, rhythm: 1, scale: 2 }, { options: { focus: "centre" } }),
   preset("Focus 02", "slide", {}, { count: 9, size: 0.4, gap: 0.16, rhythm: 1, scale: 2, stagger: 1 }, { options: { focus: "centre", direction: "up" } }),
-  preset("Focus 03", "slide", {}, { count: 9, size: 0.48, gap: 0.14, rhythm: 1, scale: 1.9, fade: 0.5 }, { options: { focus: "start" } }),
+  preset("Focus 03", "slide", {}, { count: 9, size: 0.48, gap: 0.14, rhythm: 1, scale: 1.9, fade: 0.25 }, { options: { focus: "start" } }),
   preset("Focus 04", "slide", {}, { count: 7, size: 0.7, gap: 0.12, rhythm: 1, scale: 1.6 }, { options: { focus: "centre", solo: true } }),
   preset("Proximity 01", "proximity", {}, { count: 7, size: 0.4, gap: 0.16, scale: 2.1, rhythm: 1, hold: 0.2 }),
   preset("Proximity 02", "proximity", {}, { count: 6, size: 0.32, gap: 0.16, scale: 2.1, rhythm: 1, hold: 0.2 }, { options: { direction: "up" } }),
   preset("Proximity 03", "proximity", { field: true }, { count: 196, size: 0.085, gap: 0.5, scale: 3.6, reach: 3.5, rhythm: 1, hold: 0.15 }, { path: [6, 8, 18, 16] }),
-  preset("Proximity 04", "proximity", { field: true }, { count: 144, size: 0.11, gap: 0.45, scale: 3.2, reach: 3.2, rhythm: 1, hold: 0.15, tilt: 40, fade: 0.5 }, { path: [0, 12, 24, 20, 4] }),
+  preset("Proximity 04", "proximity", { field: true }, { count: 144, size: 0.11, gap: 0.45, scale: 3.2, reach: 3.2, rhythm: 1, hold: 0.15, tilt: 40, fade: 0.08 }, { path: [0, 12, 24, 20, 4] }),
   preset("Proximity 05", "proximity", { field: true }, { count: 64, size: 0.2, gap: 0.3, scale: 2.2, reach: 2.4, rhythm: 1, hold: 0.25 }, { path: [12, 2, 14, 22, 10] }),
   preset("Scale 01", "zoom", {}, { count: 6, size: 1, duration: 14 }),
   preset("Scale 02", "zoom", { out: true }, { count: 6, size: 1, duration: 14 }),
