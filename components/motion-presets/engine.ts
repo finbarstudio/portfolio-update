@@ -532,7 +532,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     // The sway is a distance along the arc, so a flat fan still slides side to side.
     const arc = p * step + (c.v.sway ? 0.25 * Math.sin(TAU * c.T) * R : 0);
     const angle = arc * curve;
-    const z = i * 0.01;
+    const z = i * 0.002; // just enough to settle the overlap order, less than the lift a card in focus gets
     if (curve < 1e-4) return { x: arc, y: -0.1, z, p };
     return { x: Math.sin(angle) / curve, y: (Math.cos(angle) - 1) / curve - 0.1, z, rz: -angle, p };
   },
