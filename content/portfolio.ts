@@ -253,14 +253,7 @@ const RAW: Slide[] = [
       "Packer and Associates is a Brisbane workforce development company, running since 1997. This is the capability statement they send to prospective clients. In twelve pages it sets out who they are, what they do and who they work with, then walks through five client projects, from BHP and Rio Tinto to TAFE Queensland. I gathered the content, wrote it and designed it as a digital document that goes out in new business conversations and from the team’s email signatures.",
     meta: [ME, { label: "Year", value: "2024–2025" }, { label: "Live", value: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" }, study("packer-associates")],
   },
-  {
-    kind: "deck",
-    name: "Packer and Associates capability statement",
-    pages: Array.from({ length: 12 }, (_, i) => `/media/images/packer-associates/pdf-pages/page-${i}.webp`),
-    thumbs: Array.from({ length: 12 }, (_, i) => `/media/images/packer-associates/pdf-pages/page-${i}-thumb.webp`),
-    caption: "The capability statement, twelve pages. Click the page or the strip to read it",
-  },
-  { kind: "media", items: [m("packer-associates/3d-model-video.webm")], caption: "The website, which I kept current through the contract", link: { label: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" } },
+  one("portfolio/packer/capability-statement.webm", "The capability statement, page by page", { frame: false }),
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
   { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
