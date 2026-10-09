@@ -38,6 +38,7 @@ import {
   type SavedSetup,
   type TiltMode,
 } from "./engine";
+import { ArrayBufferTarget, Muxer } from "mp4-muxer";
 import ColourPicker from "./ColourPicker";
 import { createRenderer, type MediaItem, type Renderer, type Scene } from "./renderer";
 
@@ -82,6 +83,31 @@ const VERSION = "v2.1";
 
 /** Finbar's Stripe payment page. Change the link here. */
 const PINT_URL = "https://donate.stripe.com/cNi6oH8vP2f6eHlaoQ8N200";
+
+/** Frames per second in an exported file. */
+const EXPORT_FPS = 60;
+const EXPORT_BITRATE = 24_000_000;
+/** H.264 High profile, level 5.2: the largest canvas this tool allows fits inside it. */
+const EXPORT_CODEC = "avc1.640034";
+
+/** Puts a video on the exact moment asked for and waits until that picture is ready. */
+function seekTo(video: HTMLVideoElement, seconds: number): Promise<void> {
+  return new Promise((resolve) => {
+    const length = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 1;
+    const target = seconds % length;
+    if (Math.abs(video.currentTime - target) < 1e-3) return resolve();
+    const done = () => {
+      clearTimeout(giveUp);
+      video.removeEventListener("seeked", done);
+      resolve();
+    };
+    const giveUp = setTimeout(done, 2000); // a stuck video must not hang the whole export
+    video.addEventListener("seeked", done);
+    video.currentTime = target;
+  });
+}
+
+const nextTask = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 const RECORDING_TYPES = ["video/mp4;codecs=avc1.640033", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
 
@@ -510,6 +536,8 @@ export default function MotionTool() {
   const nextIdRef = useRef(0);
   /** True while an export records: the loop then draws at full size. */
   const fullSizeRef = useRef(false);
+  /** True while an export draws its own frames one by one: the live loop stands aside. */
+  const offlineRef = useRef(false);
   const draggedRef = useRef<number | null>(null);
   const stageRef = useRef<HTMLElement>(null);
   const [fullScreen, setFullScreen] = useState(false);
@@ -600,6 +628,10 @@ export default function MotionTool() {
     loopStartRef.current = performance.now();
     let frame = requestAnimationFrame(function tick(now) {
       const { duration } = sceneRef.current.motion;
+      if (offlineRef.current) {
+        frame = requestAnimationFrame(tick);
+        return;
+      }
       const { width, height } = sceneRef.current.look;
       // Filling the screen needs more pixels than the small editing preview.
       const longest = fullScreenRef.current ? FULL_SCREEN_CANVAS : PREVIEW_CANVAS;
@@ -639,7 +671,7 @@ export default function MotionTool() {
       firstSettings.current = false;
       return;
     }
-    if (fullSizeRef.current) return; // never under a recording
+    if (fullSizeRef.current || offlineRef.current) return; // never under an export
     const timer = setTimeout(() => {
       loopStartRef.current = performance.now();
     }, 250);
@@ -756,18 +788,22 @@ export default function MotionTool() {
   }
 
   // Records one loop as it plays, so an 8 second loop takes 8 seconds to export.
+  /**
+   * Exports one loop. Every frame is drawn for its exact moment and handed to
+   * the encoder, so the file always holds the whole loop at full quality: a
+   * slow machine, heavy media or a hidden tab make it take longer, never come
+   * out short. Browsers without a video encoder fall back to recording live.
+   */
   async function exportVideo() {
     const canvas = canvasRef.current;
-    if (!canvas || typeof MediaRecorder === "undefined") return setStatus("This browser cannot record video.");
-    const type = RECORDING_TYPES.find((candidate) => MediaRecorder.isTypeSupported(candidate));
-    if (!type) return setStatus("This browser cannot record video.");
-    const { duration } = sceneRef.current.motion;
-    const name = `${sceneRef.current.preset.name.toLowerCase().replace(" ", "-")}.${type.includes("mp4") ? "mp4" : "webm"}`;
     const renderer = rendererRef.current;
-    if (!renderer) return;
+    if (!canvas || !renderer) return;
+    const scene = sceneRef.current;
+    const { duration } = scene.motion;
+    const base = scene.preset.name.toLowerCase().replace(" ", "-");
     setExporting(true);
     setStatus("Preparing full-size pictures…");
-    // Full-size pictures and canvas for the length of the recording, then back to the light ones.
+    // Full-size pictures and canvas for the length of the export, then back to the light ones.
     const previews = new Map<number, WebGLTexture>();
     const heavy = mediaRef.current.filter((item) => item.file && (item.longest ?? 0) > PREVIEW_PICTURE);
     let ready = 0;
@@ -786,9 +822,9 @@ export default function MotionTool() {
       setLoading({ label: "Preparing full-size pictures", done: ++ready, total: heavy.length });
     }
     setLoading(null);
-    fullSizeRef.current = true;
     const restore = () => {
       fullSizeRef.current = false;
+      offlineRef.current = false;
       for (const item of mediaRef.current) {
         const preview = previews.get(item.id);
         if (!preview) continue;
@@ -798,10 +834,78 @@ export default function MotionTool() {
       }
       // Anything removed mid-export took its full-size picture with it; drop its preview too.
       for (const preview of previews.values()) renderer.deleteTexture(preview);
+      for (const item of mediaRef.current) if (item.video) void item.video.play();
+      loopStartRef.current = performance.now();
+      setLoading(null);
+      setExporting(false);
     };
+
+    const config: VideoEncoderConfig = {
+      codec: EXPORT_CODEC,
+      width: scene.look.width,
+      height: scene.look.height,
+      bitrate: EXPORT_BITRATE,
+      framerate: EXPORT_FPS,
+    };
+    const canEncode = typeof VideoEncoder !== "undefined" && (await VideoEncoder.isConfigSupported(config).then((answer) => answer.supported === true, () => false));
+    if (!canEncode) return recordLive(canvas, renderer, duration, base, restore);
+
+    offlineRef.current = true;
+    const total = Math.round(duration * EXPORT_FPS);
+    let failure: string | null = null;
+    const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: "avc", width: config.width, height: config.height, frameRate: EXPORT_FPS }, fastStart: "in-memory" });
+    const encoder = new VideoEncoder({
+      output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      error: (error) => {
+        failure = error.message;
+      },
+    });
+    try {
+      encoder.configure(config);
+      const videos = mediaRef.current.flatMap((item) => (item.video ? [item.video] : []));
+      for (const video of videos) video.pause();
+      setStatus("Rendering…");
+      for (let k = 0; k < total && !failure; k++) {
+        const seconds = k / EXPORT_FPS;
+        if (videos.length) await Promise.all(videos.map((video) => seekTo(video, seconds)));
+        renderer.draw(seconds, { ...scene, media: mediaRef.current, resolution: 1, fullQuality: true });
+        const picture = new VideoFrame(canvas, { timestamp: Math.round((k * 1_000_000) / EXPORT_FPS), duration: Math.round(1_000_000 / EXPORT_FPS) });
+        encoder.encode(picture, { keyFrame: k % (EXPORT_FPS * 2) === 0 });
+        picture.close();
+        // Let the encoder catch up, and let the progress bar paint.
+        while (encoder.encodeQueueSize > 6) await nextTask();
+        if (k % 12 === 0) {
+          setLoading({ label: "Rendering frames", done: k, total });
+          await nextTask();
+        }
+      }
+      await encoder.flush();
+      if (failure) throw new Error(failure);
+      muxer.finalize();
+      const name = `${base}.mp4`;
+      download(new Blob([muxer.target.buffer], { type: "video/mp4" }), name);
+      restore();
+      setStatus(`Saved ${name}`);
+    } catch (error) {
+      restore();
+      setStatus(`Export failed: ${error instanceof Error ? error.message : "unknown error"}.`);
+    } finally {
+      if (encoder.state !== "closed") encoder.close();
+    }
+  }
+
+  /** The fallback: records the canvas as it plays. Needs the tab kept visible for the whole loop. */
+  function recordLive(canvas: HTMLCanvasElement, renderer: Renderer, duration: number, base: string, restore: () => void) {
+    const type = typeof MediaRecorder === "undefined" ? undefined : RECORDING_TYPES.find((candidate) => MediaRecorder.isTypeSupported(candidate));
+    if (!type) {
+      restore();
+      return setStatus("This browser cannot export video.");
+    }
+    const name = `${base}.${type.includes("mp4") ? "mp4" : "webm"}`;
+    fullSizeRef.current = true;
     // The canvas must already be full size when the recorder first looks at it.
     renderer.draw(0, { ...sceneRef.current, media: mediaRef.current, resolution: 1, fullQuality: true });
-    const recorder = new MediaRecorder(canvas.captureStream(60), { mimeType: type, videoBitsPerSecond: 24_000_000 });
+    const recorder = new MediaRecorder(canvas.captureStream(60), { mimeType: type, videoBitsPerSecond: EXPORT_BITRATE });
     const chunks: Blob[] = [];
     recorder.ondataavailable = (event) => {
       if (event.data.size) chunks.push(event.data);
@@ -809,15 +913,13 @@ export default function MotionTool() {
     recorder.onstop = () => {
       restore();
       download(new Blob(chunks, { type: type.split(";")[0] }), name);
-      setExporting(false);
       setStatus(`Saved ${name}`);
     };
     recorder.onerror = () => {
       restore();
-      setExporting(false);
       setStatus("Recording failed.");
     };
-    setStatus(`Recording ${duration} seconds…`);
+    setStatus(`Recording ${duration} seconds. Keep this tab in front until it finishes.`);
     for (const item of mediaRef.current) if (item.video) item.video.currentTime = 0;
     loopStartRef.current = performance.now();
     recorder.start();

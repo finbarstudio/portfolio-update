@@ -973,9 +973,9 @@ const preset = (name: string, layout: LayoutName, variant: Variant, defaults: Pa
 
 export const PRESETS: Preset[] = [
   preset("Slide 01", "slide", {}, { count: 7, size: 0.9, gap: 0.1 }),
-  preset("Slide 02", "slide", {}, { count: 7, size: 0.9, gap: 0.1, rhythm: 1 }),
+  preset("Slide 02", "slide", {}, { count: 7, size: 0.9, gap: 0.1, rhythm: 1, stagger: 1, hold: 0.5 }),
   preset("Slide 03", "slide", {}, { count: 7, size: 0.8, gap: 0.1, rhythm: 1, stagger: 1 }, { options: { direction: "up" } }),
-  preset("Slide 04", "slide", {}, { count: 9, size: 0.7, gap: 0.14, rhythm: 1, fade: 0.3 }),
+  preset("Slide 04", "slide", {}, { count: 9, size: 0.7, gap: 0.14, rhythm: 1, stagger: 1, hold: 0.5, fade: 0.3 }),
   preset("Slide 05", "slide", {}, { count: 8, size: 0.75, gap: 0.14, rhythm: 1, stagger: 1, hold: 0.55 }, { options: { direction: "right" } }),
   preset("Focus 01", "slide", {}, { count: 9, size: 0.5, gap: 0.16, rhythm: 1, scale: 2 }, { options: { focus: "centre" } }),
   preset("Focus 02", "slide", {}, { count: 9, size: 0.4, gap: 0.16, rhythm: 1, scale: 2, stagger: 1 }, { options: { focus: "centre", direction: "up" } }),
@@ -1091,7 +1091,7 @@ export const BASE_LOOK: Look = {
   height: 1920,
   cardW: 4,
   cardH: 5,
-  background: "#0e0e10",
+  background: "#000000",
 };
 
 /** A saved setup: which preset, how it was tuned, and how it looks. No media. */
