@@ -12,6 +12,7 @@ import {
   COUNTER_STYLES,
   EASINGS,
   FOUR_WAY,
+  HARD_LIMITS,
   HAS_FOCUS,
   HAS_LOOP_GAP,
   HAS_RADIUS,
@@ -275,6 +276,8 @@ function Slider({
   value,
   onChange,
   onReset,
+  typedMin = min,
+  typedMax = max,
 }: {
   label: string;
   min: number;
@@ -282,24 +285,28 @@ function Slider({
   step: number;
   value: number;
   onChange: (value: number) => void;
+  /** How far a typed value may go. The bar only covers min to max; typing can go past it. */
+  typedMin?: number;
+  typedMax?: number;
   /** Double-clicking the bar puts the slider back to its default. */
   onReset: () => void;
 }) {
   // While the value is being typed it is text; otherwise it shows the number.
   const [typed, setTyped] = useState<string | null>(null);
   const shown = step >= 1 ? String(value) : value.toFixed(step >= 0.1 ? 1 : 2);
+  const beyond = value < min || value > max; // typed past what the bar can show
   const at = (v: number) => ((clamp(v, min, max) - min) / (max - min)) * 100;
   const zero = min < 0 && max > 0 ? at(0) : 0;
   const fill = { "--from": `${Math.min(zero, at(value))}%`, "--to": `${Math.max(zero, at(value))}%` } as React.CSSProperties;
   const commit = () => {
     if (typed !== null) {
       const parsed = Number(typed);
-      if (typed.trim() !== "" && Number.isFinite(parsed)) onChange(clamp(step >= 1 ? Math.round(parsed) : parsed, min, max));
+      if (typed.trim() !== "" && Number.isFinite(parsed)) onChange(clamp(step >= 1 ? Math.round(parsed) : parsed, typedMin, typedMax));
     }
     setTyped(null);
   };
   return (
-    <div className="mp-slider" style={fill}>
+    <div className={beyond ? "mp-slider is-beyond" : "mp-slider"} style={fill}>
       <span>{label}</span>
       <input
         type="range"
@@ -485,6 +492,79 @@ const COUNTERS: { value: Counter; label: string }[] = [
   { value: "number", label: "01" },
   { value: "fraction", label: "01/10" },
 ];
+/**
+ * Wireframes of what usually sits on top of a finished video, to compose
+ * around. They are drawn over the preview only and never reach an export.
+ * The safe area for reels and stories is Meta's 2026 guidance: 14% at the
+ * top, 6% each side, 35% at the bottom for a reel and 20% for a story.
+ */
+type Guide = "reel" | "story" | "page" | "player" | "margins";
+const GUIDE_NAMES: Record<Guide, string> = { reel: "Reel", story: "Story", page: "Web page", player: "Video player", margins: "Margins" };
+/** The guides that make sense for a canvas of this shape. */
+const guidesFor = (width: number, height: number): Guide[] => (width / height < 0.8 ? ["reel", "story"] : width / height > 1.25 ? ["page", "player"] : ["margins"]);
+
+function GuideOverlay({ guide }: { guide: Guide }) {
+  return (
+    <div className={`mp-guide mp-guide-${guide}`} aria-hidden="true">
+      {(guide === "reel" || guide === "story" || guide === "margins") && <i className="mp-g-safe" />}
+      {guide === "reel" && (
+        <>
+          <i className="mp-g-bar" style={{ top: "5%", left: "6%", width: "18%", height: "1.6%" }} />
+          <i className="mp-g-dot" style={{ top: "4.2%", right: "6%", width: "7%" }} />
+          {[0, 1, 2, 3, 4].map((k) => (
+            <i key={k} className="mp-g-dot" style={{ right: "3.5%", bottom: `${12 + k * 7.5}%`, width: k === 0 ? "7%" : "8.5%" }} />
+          ))}
+          <i className="mp-g-dot" style={{ left: "4%", bottom: "9.5%", width: "8%" }} />
+          <i className="mp-g-bar" style={{ left: "14%", bottom: "10.6%", width: "24%", height: "1.4%" }} />
+          <i className="mp-g-pill" style={{ left: "41%", bottom: "9.9%", width: "16%", height: "2.8%" }} />
+          <i className="mp-g-bar" style={{ left: "4%", bottom: "6.6%", width: "62%", height: "1.2%" }} />
+          <i className="mp-g-bar" style={{ left: "4%", bottom: "4.6%", width: "44%", height: "1.2%" }} />
+          <i className="mp-g-pill" style={{ left: "4%", bottom: "1.4%", width: "40%", height: "2.2%" }} />
+        </>
+      )}
+      {guide === "story" && (
+        <>
+          <i className="mp-g-bar" style={{ top: "1.6%", left: "3%", width: "94%", height: "0.35%" }} />
+          <i className="mp-g-dot" style={{ top: "3.4%", left: "4%", width: "8%" }} />
+          <i className="mp-g-bar" style={{ top: "5%", left: "14%", width: "26%", height: "1.3%" }} />
+          <i className="mp-g-dot" style={{ top: "3.8%", right: "4%", width: "6%" }} />
+          <i className="mp-g-pill" style={{ left: "4%", bottom: "3%", width: "66%", height: "4.6%" }} />
+          <i className="mp-g-dot" style={{ right: "15%", bottom: "3.3%", width: "8%" }} />
+          <i className="mp-g-dot" style={{ right: "4%", bottom: "3.3%", width: "8%" }} />
+        </>
+      )}
+      {guide === "page" && (
+        <>
+          <i className="mp-g-fill" style={{ top: 0, left: 0, width: "100%", height: "10%" }} />
+          <i className="mp-g-pill" style={{ top: "3%", left: "3%", width: "7%", height: "4%" }} />
+          {[0, 1, 2, 3].map((k) => (
+            <i key={k} className="mp-g-bar" style={{ top: "4.2%", left: `${58 + k * 7}%`, width: "5%", height: "1.6%" }} />
+          ))}
+          <i className="mp-g-pill" style={{ top: "2.6%", right: "3%", width: "8%", height: "4.8%" }} />
+          <i className="mp-g-bar" style={{ left: "5%", top: "42%", width: "34%", height: "5%" }} />
+          <i className="mp-g-bar" style={{ left: "5%", top: "50%", width: "26%", height: "5%" }} />
+          <i className="mp-g-bar" style={{ left: "5%", top: "60%", width: "30%", height: "1.6%" }} />
+          <i className="mp-g-bar" style={{ left: "5%", top: "64%", width: "22%", height: "1.6%" }} />
+          <i className="mp-g-pill" style={{ left: "5%", top: "71%", width: "11%", height: "6.5%" }} />
+        </>
+      )}
+      {guide === "player" && (
+        <>
+          <i className="mp-g-fill" style={{ bottom: 0, left: 0, width: "100%", height: "13%" }} />
+          <i className="mp-g-bar" style={{ top: "5%", left: "3%", width: "30%", height: "2.6%" }} />
+          <i className="mp-g-bar" style={{ bottom: "9.5%", left: "2%", width: "96%", height: "0.7%" }} />
+          <i className="mp-g-dot" style={{ bottom: "8.6%", left: "36%", width: "1.4%" }} />
+          <i className="mp-g-dot" style={{ bottom: "2.6%", left: "2%", width: "2.6%" }} />
+          <i className="mp-g-dot" style={{ bottom: "2.6%", left: "5.6%", width: "2.6%" }} />
+          <i className="mp-g-bar" style={{ bottom: "4.2%", left: "10%", width: "9%", height: "1.8%" }} />
+          <i className="mp-g-dot" style={{ bottom: "2.6%", right: "5.6%", width: "2.6%" }} />
+          <i className="mp-g-dot" style={{ bottom: "2.6%", right: "2%", width: "2.6%" }} />
+        </>
+      )}
+    </div>
+  );
+}
+
 const TILTS: { value: TiltMode; label: string }[] = [
   { value: "off", label: "Off" },
   { value: "fan", label: "Fan" },
@@ -495,7 +575,7 @@ const ON_OFF = [
   { value: false, label: "Off" },
   { value: true, label: "On" },
 ];
-const SCENE_KEYS: MotionKey[] = ["scale", "reach", "cardTilt", "count", "size", "gap", "radius", "shape", "turn", "spin", "fade", "offsetX", "offsetY"];
+const SCENE_KEYS: MotionKey[] = ["scale", "reach", "cardTilt", "count", "size", "gap", "radius", "shape", "groupTurn", "groupTilt", "turn", "spin", "fade", "offsetX", "offsetY"];
 const TIMING_KEYS: MotionKey[] = ["duration", "speed", "rhythm", "stagger", "hold", "loopGap"];
 const PACES = [
   { value: false, label: "Continuous" },
@@ -531,8 +611,8 @@ export default function MotionTool() {
   const motion = applyAdjustments(preset, adjustments);
   // One card per upload, unless Count has been set by hand. Kept inside what this preset can show.
   if (mediaCount !== null && adjustments.count === undefined) {
-    const { min, max } = rangeFor(preset, "count");
-    motion.count = clamp(mediaCount, min, max);
+    // At least what the preset needs to work, and no more than the outer limit.
+    motion.count = clamp(mediaCount, rangeFor(preset, "count").min, HARD_LIMITS.count.max);
   }
   const options = presetOptions(preset, chosen);
 
@@ -549,6 +629,8 @@ export default function MotionTool() {
   const offlineRef = useRef(false);
   const draggedRef = useRef<number | null>(null);
   const stageRef = useRef<HTMLElement>(null);
+  /** Which wireframe sits over the preview, if any. */
+  const [guide, setGuide] = useState<Guide | null>(null);
   const [fullScreen, setFullScreen] = useState(false);
   const fullScreenRef = useRef(false);
 
@@ -935,6 +1017,11 @@ export default function MotionTool() {
     setTimeout(() => recorder.stop(), duration * 1000);
   }
 
+  // Only guides that suit the canvas shape are offered; one chosen for another shape is dropped.
+  const guides = guidesFor(look.width, look.height);
+  const shownGuide = guide && guides.includes(guide) ? guide : null;
+  const nextGuide = () => setGuide(shownGuide === null ? guides[0] : (guides[guides.indexOf(shownGuide) + 1] ?? null));
+
   const { layout } = preset;
   const pins = pathGrid(preset, Math.round(motion.count));
   const fourWay = FOUR_WAY.has(layout);
@@ -947,13 +1034,14 @@ export default function MotionTool() {
     { value: "end", label: upright ? "Bottom" : "Right" },
   ];
   const sceneKeys: MotionKey[] = [
-    ...((focusable && options.focus !== "off") || layout === "proximity" ? (["scale", "reach"] as const) : []),
+    ...((focusable && options.focus !== "off") || layout === "proximity" ? (["scale", "reach"] as const) : preset.variant.feature ? (["scale"] as const) : []),
     ...(options.tiltMode !== "off" ? (["cardTilt"] as const) : []),
     "count",
     "size",
     "gap",
     ...(HAS_RADIUS.has(layout) ? (["radius"] as const) : []),
     ...(shapeLabel(preset) ? (["shape"] as const) : []),
+    ...(preset.variant.feature ? (["groupTurn", "groupTilt"] as const) : []),
     "turn",
     "spin",
     ...(focusable || layout === "proximity" ? (["fade"] as const) : []),
@@ -961,7 +1049,17 @@ export default function MotionTool() {
     "offsetY",
   ];
   const slider = (key: MotionKey) => {
-    return <Slider key={key} {...rangeFor(preset, key)} value={motion[key]} onChange={(value) => setMotion(key, value)} onReset={() => resetKeys([key])} />;
+    return (
+      <Slider
+        key={key}
+        {...rangeFor(preset, key)}
+        typedMin={HARD_LIMITS[key].min}
+        typedMax={HARD_LIMITS[key].max}
+        value={motion[key]}
+        onChange={(value) => setMotion(key, value)}
+        onReset={() => resetKeys([key])}
+      />
+    );
   };
   const stepped = ALWAYS_STEPPED.has(layout) || motion.rhythm > 0;
   const tuned = Object.keys(adjustments).length > 0 || Object.keys(chosen).length > 0 || easing !== BASE_EASING;
@@ -1016,7 +1114,10 @@ export default function MotionTool() {
                     height={PREVIEW_LOOK.height}
                     aria-hidden="true"
                   />
-                  {item.name}
+                  <span>
+                    {item.name}
+                    {item.format && <em>{item.format}</em>}
+                  </span>
                 </button>
               ))}
             </div>
@@ -1035,7 +1136,10 @@ export default function MotionTool() {
         {unsupported ? (
           <p>This browser cannot draw the preview. Try a current version of Chrome, Safari or Firefox.</p>
         ) : (
-          <canvas ref={canvasRef} aria-label="Animation preview" style={{ aspectRatio: `${look.width} / ${look.height}` }} />
+          <div className="mp-canvas">
+            <canvas ref={canvasRef} aria-label="Animation preview" style={{ aspectRatio: `${look.width} / ${look.height}` }} />
+            {shownGuide && <GuideOverlay guide={shownGuide} />}
+          </div>
         )}
         {loading && (
           <div className="mp-loading" role="status" aria-live="polite">
@@ -1053,6 +1157,9 @@ export default function MotionTool() {
           </button>
           <button type="button" onClick={toggleFullScreen} aria-pressed={fullScreen}>
             {fullScreen ? "Exit full screen" : "Full screen"}
+          </button>
+          <button type="button" onClick={nextGuide} aria-pressed={shownGuide !== null}>
+            {shownGuide ? `Guides: ${GUIDE_NAMES[shownGuide]}` : "Guides"}
           </button>
         </div>
         <a className="mp-pint mp-pint-float" href={PINT_URL} target="_blank" rel="noopener noreferrer">
@@ -1165,7 +1272,9 @@ export default function MotionTool() {
         <Choice label="Tilt" value={options.tiltMode} options={TILTS} onChange={(value) => setOption("tiltMode", value)} />
         {focusable && <Choice label="Solo" value={options.solo} options={ON_OFF} onChange={(value) => setOption("solo", value)} />}
         {layout === "orbit" && <Choice label="Centre card" value={options.centre} options={ON_OFF} onChange={(value) => setOption("centre", value)} />}
-        {layout === "orbit" && !preset.variant.flat && <Choice label="Face viewer" value={options.faceCamera} options={ON_OFF} onChange={(value) => setOption("faceCamera", value)} />}
+        {((layout === "orbit" && !preset.variant.flat) || layout === "wheel" || (layout === "deck" && preset.variant.feature)) && (
+          <Choice label="Face viewer" value={options.faceCamera} options={ON_OFF} onChange={(value) => setOption("faceCamera", value)} />
+        )}
         {sceneKeys.map(slider)}
         {pins && (
           <>
@@ -1245,7 +1354,7 @@ export default function MotionTool() {
                 ))}
               </div>
             </div>
-            <Slider label="Size" min={0.3} max={4} step={0.05} value={look.counterScale} onChange={(counterScale) => patchLook({ counterScale })} onReset={() => patchLook({ counterScale: BASE_LOOK.counterScale })} />
+            <Slider label="Size" min={0.3} max={4} step={0.05} typedMin={0.1} typedMax={20} value={look.counterScale} onChange={(counterScale) => patchLook({ counterScale })} onReset={() => patchLook({ counterScale: BASE_LOOK.counterScale })} />
             <div className="mp-easings mp-styles">
               {COUNTER_STYLES.map((style) => (
                 <button key={style.id} type="button" aria-pressed={look.counterStyle === style.id} onClick={() => patchLook({ counterStyle: style.id })}>

@@ -193,6 +193,24 @@
 .mp-tool .mp-presets button[aria-pressed="true"] {
   color: #111;
 }
+.mp-presets button span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+/* The canvas shape a preset is composed for. */
+.mp-presets button em {
+  padding: 0 4px;
+  font-size: 9px;
+  font-style: normal;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  opacity: 0.7;
+}
 .mp-presets canvas {
   display: block;
   width: 100%;
@@ -296,6 +314,13 @@
   /* The strip along the bottom is kept clear for the pint link. */
   padding: 24px 24px 64px;
 }
+/* The canvas and anything laid over it. It shrinks to the canvas, so percentages inside mean "of the canvas". */
+.mp-canvas {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+}
 .mp-stage canvas {
   max-width: 100%;
   max-height: calc(100dvh - 88px);
@@ -325,6 +350,10 @@
   background: #2c2c32;
   border-right: 1.5px solid #6c6c76;
   transition: background 0.15s;
+}
+/* A value typed past the end of the bar: the value itself is lit, since the bar can no longer show it. */
+.mp-slider.is-beyond .mp-slider-value {
+  color: var(--mp-accent);
 }
 .mp-slider:hover::before {
   background: #34343b;
@@ -373,6 +402,55 @@
   outline-offset: 1px;
 }
 
+/* Guides: thin white wireframes of the furniture a platform lays over a video. */
+.mp-guide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: 6px;
+}
+.mp-guide i {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+}
+.mp-g-bar {
+  background: rgb(255 255 255 / 0.55);
+  border-radius: 999px;
+}
+.mp-g-dot {
+  aspect-ratio: 1;
+  border: 1.5px solid rgb(255 255 255 / 0.8);
+  border-radius: 50%;
+}
+.mp-g-pill {
+  border: 1.5px solid rgb(255 255 255 / 0.8);
+  border-radius: 999px;
+}
+.mp-g-fill {
+  background: rgb(0 0 0 / 0.35);
+  border-bottom: 1px solid rgb(255 255 255 / 0.3);
+}
+.mp-guide-player .mp-g-fill {
+  border-top: 1px solid rgb(255 255 255 / 0.3);
+  border-bottom: 0;
+}
+/* The area clear of all of it. */
+.mp-g-safe {
+  border: 1px dashed rgb(120 200 255 / 0.9);
+  border-radius: 4px;
+}
+.mp-guide-reel .mp-g-safe {
+  inset: 14% 6% 35%;
+}
+.mp-guide-story .mp-g-safe {
+  inset: 14% 6% 20%;
+}
+.mp-guide-margins .mp-g-safe {
+  inset: 5%;
+}
+
 /* Restart and full screen sit in the strip under the canvas, opposite the pint link. */
 .mp-stage-buttons {
   position: absolute;
@@ -396,6 +474,9 @@
 .mp-stage:fullscreen {
   padding: 0;
   background: #000;
+}
+.mp-stage:fullscreen .mp-canvas {
+  max-height: 100dvh;
 }
 .mp-stage:fullscreen canvas {
   max-height: 100dvh;

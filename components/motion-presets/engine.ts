@@ -107,8 +107,12 @@ export interface Variant {
   out?: boolean;
   /** orbit: an upright wheel seen from an angle */
   wheel?: boolean;
-  /** wheel: the card in focus leaves the wheel and moves out across the frame */
+  /** wheel and deck: the card in focus leaves the group and is shown large across the frame */
   feature?: boolean;
+  /** feature: the group sits on the right and the card comes out to the left */
+  mirror?: boolean;
+  /** feature: composed for a tall frame, group at the bottom and the card above */
+  tall?: boolean;
   horizontal?: boolean;
   tornado?: boolean;
   close?: boolean;
@@ -162,6 +166,9 @@ export interface Motion {
   shape: number;
   /** empty places left between the last card and the first, so the loop has a visible break */
   loopGap: number;
+  /** feature presets: the wheel or stack turned and tilted in space, in degrees. The card pulled out of it stays square. */
+  groupTurn: number;
+  groupTilt: number;
 }
 export type MotionKey = keyof Motion;
 
@@ -196,6 +203,8 @@ export interface Preset {
   options: Partial<Options>;
   /** the cells the camera or the focus visits, in order */
   path?: number[];
+  /** the canvas shape this preset is composed for, when it needs one */
+  format?: "wide" | "tall";
 }
 
 export interface Transform {
@@ -275,6 +284,48 @@ export const gridCols = (n: number) => Math.ceil(Math.sqrt(n));
 const GOLDEN_ANGLE = 2.39996323;
 /** How far each wheel card leans about its spoke, in radians: about 3 degrees, too little to see as a tilt. */
 const WHEEL_LEAN = 0.05;
+/**
+ * Feature presets split the frame in two: a small group of cards at one end
+ * and the card in focus shown large at the other. This turns a position along
+ * that split (`main`, negative towards the group) and across it into x and y,
+ * for a wide frame, a mirrored one, or a tall one.
+ */
+function featurePlace(c: Context, main: number, cross: number): { x: number; y: number } {
+  if (c.v.tall) return { x: cross, y: main };
+  return { x: c.v.mirror ? -main : main, y: cross };
+}
+
+/**
+ * Where a feature preset's card sits. In the group it is at (`main`, `cross`),
+ * `depth` behind the group's face, and the whole group can be turned and
+ * tilted about its own middle at `groupMain`. Shown, it is at `shownMain`,
+ * flat to the viewer. `shown` runs from 0, in the group, to 1, pulled out:
+ * the turn and tilt belong to the group and fall away as a card leaves it.
+ */
+function featureCard(c: Context, main: number, cross: number, depth: number, groupMain: number, shownMain: number, shown: number) {
+  const at = featurePlace(c, main, cross);
+  const middle = featurePlace(c, groupMain, 0);
+  const turn = c.m.groupTurn * DEG;
+  const tilt = c.m.groupTilt * DEG;
+  const dx = at.x - middle.x;
+  const dy = at.y - middle.y;
+  // Turned about the upright through the group's middle, then tilted about the level through it.
+  const x1 = dx * Math.cos(turn) + depth * Math.sin(turn);
+  const z1 = -dx * Math.sin(turn) + depth * Math.cos(turn);
+  const y2 = dy * Math.cos(tilt) - z1 * Math.sin(tilt);
+  const z2 = dy * Math.sin(tilt) + z1 * Math.cos(tilt);
+  const out = featurePlace(c, shownMain, 0);
+  return {
+    x: lerp(middle.x + x1, out.x, shown),
+    y: lerp(middle.y + y2, out.y, shown),
+    z: lerp(z2, 0.3, shown),
+    ry: turn * (1 - shown),
+    rx: tilt * (1 - shown),
+  };
+}
+/** Half the frame's length along the split, and a card's length along it. */
+const featureSpan = (c: Context) => (c.v.tall ? { half: 1, card: c.h } : { half: c.A, card: c.w });
+
 /** An upright wheel's cards and radius: sized so the whole wheel sits inside the frame. */
 const WHEEL_CARD = 0.5;
 const wheelRadius = (c: Context, cards: number) => Math.max(0.95, ((c.w * WHEEL_CARD + c.g) * cards) / TAU) * c.m.radius;
@@ -362,6 +413,20 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const leaving = q > c.n - 1 ? c.n - q : 0;
     const slot = leaving ? lerp(0, c.n - 1, easeInOut(leaving)) : q;
     const lift = Math.sin(Math.PI * leaving);
+    if (c.v.feature) {
+      // The stack waits at one end of the frame. Its front card comes out to
+      // the other end and is shown large, then goes to the back of the stack.
+      const { half } = featureSpan(c);
+      const shown = smooth(1 - slot); // 1 for the front card, 0 from the second card back
+      const placed = featureCard(c, -half * 0.55 + slot * c.g * 0.25, slot * c.g * 0.2, -slot * 0.12, -half * 0.55, half * 0.32 * c.m.shape, shown);
+      return {
+        ...placed,
+        ...(c.o.faceCamera ? { rx: 0, ry: 0 } : {}),
+        s: (1 - slot * 0.04) * lerp(1, c.m.scale, shown),
+        a: 1 - clamp((slot - 6) / 2),
+        lead: slot,
+      };
+    }
     const out = { x: slot * c.g * 0.25, y: slot * c.g * 0.2, z: -slot * 0.12, rz: 0, ry: 0, s: 1 - slot * 0.04, a: 1 - clamp((slot - 6) / 2), lead: slot };
     if (c.v.fly === "up") out.y += lift * c.h * 1.15 * c.m.shape;
     if (c.v.fly === "right") out.x += lift * c.w * 1.25 * c.m.shape;
@@ -379,28 +444,27 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     // the other: somewhere one card would end up under both. So every card leans
     // a hair about the spoke it sits on, leading edge up, like the blades of a
     // shutter, and the overlap is the same all the way round.
-    const lean = (x: number, y: number) => ({ rx: WHEEL_LEAN * x, ry: WHEEL_LEAN * y });
+    // With "face viewer" on, every card stays square to the screen instead, and the
+    // ones nearest the focus are simply drawn in front.
+    const lean = (x: number, y: number) => (c.o.faceCamera ? { rx: 0, ry: 0, z: -Math.abs(p) * 0.004 } : { rx: WHEEL_LEAN * x, ry: WHEEL_LEAN * y });
     if (c.v.full) {
       const R = 0.68 * Math.min(1, c.A) * c.m.radius;
       return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, ...lean(Math.sin(angle), Math.cos(angle)), p };
     }
     const R = Math.max(1.6, ((c.w + c.g) * c.n) / TAU) * c.m.radius;
     if (c.v.feature) {
-      // A tight wheel, whole and inside the left of the frame. As a card comes
-      // into focus it leaves the wheel and travels out to the right, where there
-      // is room to show it large; as it loses focus it goes back to its place.
+      // A tight wheel, whole and inside one end of the frame. As a card comes
+      // into focus it leaves the wheel and travels out to the other end, where
+      // there is room to show it large; as it loses focus it goes back to its place.
+      const { half, card } = featureSpan(c);
       const tight = (((c.w + c.g) * c.n) / TAU) * c.m.radius; // cards a gap apart, no minimum size
-      const centreX = Math.min(-c.A + tight + c.w / 2 + 0.12, -c.A * 0.35);
+      const centre = Math.min(-half + tight + card / 2 + 0.12, -half * 0.35);
       const out = smooth(1 - Math.abs(p)); // 1 in focus, 0 from one place away
-      const tilt = lean(Math.cos(angle), Math.sin(angle));
-      return {
-        x: lerp(centreX + Math.cos(angle) * tight, c.A * 0.4 * c.m.shape, out),
-        y: Math.sin(angle) * tight * (1 - out),
-        z: out * 0.25,
-        rx: tilt.rx * (1 - out),
-        ry: tilt.ry * (1 - out),
-        p,
-      };
+      const blade = lean(Math.cos(angle), Math.sin(angle));
+      const placed = featureCard(c, centre + Math.cos(angle) * tight, Math.sin(angle) * tight, c.o.faceCamera ? -Math.abs(p) * 0.004 : 0, centre, half * (c.v.tall ? 0.52 : 0.4) * c.m.shape, out);
+      // Facing the viewer: the cards go round with the wheel but none of them turns with it.
+      if (c.o.faceCamera) return { ...placed, rx: 0, ry: 0, p };
+      return { ...placed, rx: placed.rx + blade.rx * (1 - out), ry: placed.ry + blade.ry * (1 - out), p };
     }
     if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, ...lean(Math.cos(angle), Math.sin(angle)), p };
     return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, ...lean(Math.sin(angle), Math.cos(angle)), p };
@@ -854,6 +918,8 @@ export const BASE_MOTION: Motion = {
   reach: 1.6,
   shape: 1,
   loopGap: 0,
+  groupTurn: 0,
+  groupTilt: 0,
 };
 
 export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre", loopFade: false };
@@ -867,7 +933,7 @@ export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max:
   count: { label: "Count", min: 2, max: 300, step: 1 },
   size: { label: "Card size", min: 0.04, max: 1.8, step: 0.01 },
   gap: { label: "Gap", min: 0, max: 1, step: 0.01 },
-  scale: { label: "Scale amount", min: 0.4, max: 8, step: 0.01 },
+  scale: { label: "Scale amount", min: 0.4, max: 5, step: 0.01 },
   cardTilt: { label: "Tilt angle", min: -45, max: 45, step: 1 },
   turn: { label: "Turn", min: -90, max: 90, step: 1 },
   spin: { label: "Spins", min: 0, max: 3, step: 1 },
@@ -883,10 +949,52 @@ export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max:
   reach: { label: "Reach", min: 0.5, max: 8, step: 0.1 },
   shape: { label: "Shape", min: 0, max: 2.5, step: 0.01 },
   loopGap: { label: "Loop gap", min: 0, max: 6, step: 1 },
+  groupTurn: { label: "Wheel turn", min: -90, max: 90, step: 1 },
+  groupTilt: { label: "Wheel tilt", min: -90, max: 90, step: 1 },
 };
 export const MOTION_KEYS = Object.keys(MOTION_RANGES) as MotionKey[];
 
 type Range = { label: string; min: number; max: number; step: number };
+
+/**
+ * How far a value may go when it is typed in. The sliders cover the range
+ * that is comfortable to drag; these are the outer limits, set where the
+ * maths stops making sense or a browser would grind, not where taste ends.
+ */
+export const HARD_LIMITS: Record<MotionKey, { min: number; max: number }> = {
+  duration: { min: 1, max: 500 },
+  speed: { min: 1, max: 20 },
+  rhythm: { min: 0, max: 1 }, // a blend between two motions: nothing lies beyond either end
+  stagger: { min: 0, max: 1 }, // a share of the rest between steps
+  hold: { min: 0, max: 0.9 },
+  count: { min: 1, max: 500 },
+  size: { min: 0.01, max: 20 },
+  gap: { min: 0, max: 20 },
+  scale: { min: 0.05, max: 100 },
+  cardTilt: { min: -360, max: 360 },
+  turn: { min: -360, max: 360 },
+  spin: { min: 0, max: 20 },
+  fade: { min: 0, max: 5 },
+  offsetX: { min: -10, max: 10 },
+  offsetY: { min: -10, max: 10 },
+  tilt: { min: -360, max: 360 },
+  yaw: { min: -360, max: 360 },
+  perspective: { min: 1, max: 170 }, // a field of view: 180 degrees is infinitely wide
+  distance: { min: 0.05, max: 100 },
+  roll: { min: -360, max: 360 },
+  radius: { min: 0.05, max: 100 },
+  reach: { min: 0.1, max: 100 },
+  shape: { min: 0, max: 20 },
+  loopGap: { min: 0, max: 100 },
+  groupTurn: { min: -360, max: 360 },
+  groupTilt: { min: -360, max: 360 },
+};
+
+/** A value kept inside its outer limits, and whole where the setting is a count of something. */
+export function limited(key: MotionKey, value: number): number {
+  const { min, max } = HARD_LIMITS[key];
+  return clamp(MOTION_RANGES[key].step >= 1 ? Math.round(value) : value, min, max);
+}
 
 /** The most cards each layout can sensibly show. Past this a slider is all dead travel. */
 const COUNT_MAX: Record<LayoutName, number> = {
@@ -942,8 +1050,9 @@ export function rangeFor(preset: Preset, key: MotionKey): Range {
   // Layouts built from many small cards get a size slider scaled to small cards.
   const smallCards = preset.layout === "globe" || (preset.layout === "wheel" && Boolean(preset.variant.full));
   if (key === "size") return field ? { ...base, max: 0.5 } : smallCards ? { ...base, min: 0.08, max: 0.8 } : { ...base, min: 0.2 };
-  if (key === "scale") return field ? base : { ...base, max: 3 };
   if (key === "reach") return field ? base : { ...base, max: 4 };
+  if (preset.layout === "deck" && key === "groupTurn") return { ...base, label: "Stack turn" };
+  if (preset.layout === "deck" && key === "groupTilt") return { ...base, label: "Stack tilt" };
   // Past 1.6 a fan's ends fold right over.
   if (key === "shape") return { ...base, label: shapeLabel(preset) ?? base.label, max: preset.layout === "fan" ? 1.6 : preset.variant.feature ? 1.6 : base.max };
   return base;
@@ -1007,9 +1116,7 @@ export function applyAdjustments(preset: Preset, adjustments: Adjustments): Moti
   for (const key of MOTION_KEYS) {
     const change = adjustments[key];
     if (change === undefined) continue;
-    const { min, max, step } = rangeFor(preset, key);
-    const raw = PROPORTIONAL.has(key) ? motion[key] * change : motion[key] + change;
-    motion[key] = clamp(step >= 1 ? Math.round(raw) : raw, min, max);
+    motion[key] = limited(key, PROPORTIONAL.has(key) ? motion[key] * change : motion[key] + change);
   }
   return motion;
 }
@@ -1017,6 +1124,7 @@ export function applyAdjustments(preset: Preset, adjustments: Adjustments): Moti
 interface PresetExtras {
   options?: Partial<Options>;
   path?: number[];
+  format?: "wide" | "tall";
 }
 const preset = (name: string, layout: LayoutName, variant: Variant, defaults: Partial<Motion>, extras: PresetExtras = {}): Preset => ({
   name,
@@ -1025,6 +1133,7 @@ const preset = (name: string, layout: LayoutName, variant: Variant, defaults: Pa
   defaults,
   options: extras.options ?? {},
   path: extras.path,
+  format: extras.format,
 });
 
 export const PRESETS: Preset[] = [
@@ -1037,6 +1146,9 @@ export const PRESETS: Preset[] = [
   preset("Focus 02", "slide", {}, { count: 9, size: 0.4, gap: 0.16, rhythm: 1, scale: 2, stagger: 1 }, { options: { focus: "centre", direction: "up" } }),
   preset("Focus 03", "slide", {}, { count: 9, size: 0.48, gap: 0.14, rhythm: 1, scale: 1.9, fade: 0.25 }, { options: { focus: "start" } }),
   preset("Focus 04", "slide", {}, { count: 7, size: 0.7, gap: 0.12, rhythm: 1, scale: 1.6 }, { options: { focus: "centre", solo: true } }),
+  preset("Focus 05", "slide", {}, { count: 11, size: 0.42, gap: 0.16, rhythm: 1, stagger: 1, hold: 0.5, scale: 2.3 }, { options: { focus: "centre" }, format: "wide" }),
+  preset("Focus 06", "slide", {}, { count: 10, size: 0.4, gap: 0.14, rhythm: 1, hold: 0.5, scale: 2.4, fade: 0.2 }, { options: { focus: "start" }, format: "wide" }),
+  preset("Focus 07", "slide", {}, { count: 9, size: 0.24, gap: 0.18, rhythm: 1, stagger: 1, hold: 0.5, scale: 2.9, reach: 1.3 }, { options: { focus: "start", direction: "up" }, format: "tall" }),
   preset("Proximity 01", "proximity", {}, { count: 7, size: 0.4, gap: 0.16, scale: 2.1, rhythm: 1, hold: 0.2 }),
   preset("Proximity 02", "proximity", {}, { count: 6, size: 0.32, gap: 0.16, scale: 2.1, rhythm: 1, hold: 0.2 }, { options: { direction: "up" } }),
   preset("Proximity 03", "proximity", { field: true }, { count: 196, size: 0.085, gap: 0.5, scale: 3.6, reach: 3.5, rhythm: 1, hold: 0.15 }, { path: [6, 8, 18, 16] }),
@@ -1067,10 +1179,14 @@ export const PRESETS: Preset[] = [
   preset("Deck 01", "deck", { fly: "up" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 02", "deck", { fly: "right" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 03", "deck", { fly: "spin" }, { count: 6, size: 1, gap: 0.4, rhythm: 1 }),
-  preset("Wheel 01", "wheel", {}, { count: 12, size: 0.7, gap: 0.3, rhythm: 1 }),
-  preset("Wheel 02", "wheel", { side: true }, { count: 12, size: 0.6, gap: 0.35, rhythm: 1 }),
-  preset("Wheel 04", "wheel", { feature: true }, { count: 12, size: 0.4, gap: 0.25, rhythm: 1, hold: 0.55, stagger: 0.3, scale: 2.8, reach: 1 }, { options: { focus: "centre" } }),
-  preset("Wheel 03", "wheel", { full: true }, { count: 8, size: 0.24, gap: 0.1 }),
+  preset("Deck 04", "deck", { feature: true }, { count: 6, size: 0.55, gap: 0.3, rhythm: 1, hold: 0.55, scale: 2.1 }, { options: { faceCamera: false }, format: "wide" }),
+  preset("Deck 05", "deck", { feature: true, tall: true }, { count: 6, size: 0.4, gap: 0.3, rhythm: 1, hold: 0.55, scale: 2.3 }, { options: { faceCamera: false }, format: "tall" }),
+  preset("Wheel 01", "wheel", {}, { count: 12, size: 0.7, gap: 0.3, rhythm: 1 }, { options: { faceCamera: false } }),
+  preset("Wheel 02", "wheel", { side: true }, { count: 12, size: 0.6, gap: 0.35, rhythm: 1 }, { options: { faceCamera: false } }),
+  preset("Wheel 04", "wheel", { feature: true }, { count: 12, size: 0.4, gap: 0.25, rhythm: 1, hold: 0.55, stagger: 0.3, scale: 2.8, reach: 1 }, { options: { faceCamera: false, focus: "centre" }, format: "wide" }),
+  preset("Wheel 05", "wheel", { feature: true, mirror: true }, { count: 12, size: 0.4, gap: 0.25, rhythm: 1, hold: 0.55, stagger: 0.3, scale: 2.8, reach: 1 }, { options: { faceCamera: false, focus: "centre" }, format: "wide" }),
+  preset("Wheel 06", "wheel", { feature: true, tall: true }, { count: 10, size: 0.22, gap: 0.3, rhythm: 1, hold: 0.55, stagger: 0.3, scale: 3.6, reach: 1 }, { options: { faceCamera: false, focus: "centre" }, format: "tall" }),
+  preset("Wheel 03", "wheel", { full: true }, { count: 8, size: 0.24, gap: 0.1 }, { options: { faceCamera: false } }),
   preset("Grid 01", "grid", { pan: "x" }, { count: 24, size: 0.6, gap: 0.1 }),
   preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.1, tilt: 48 }),
   preset("Grid 03", "grid", { pan: "alt" }, { count: 24, size: 0.6, gap: 0.1 }),
@@ -1161,6 +1277,8 @@ export const CARD_SHAPES: { label: string; w: number; h: number }[] = [
   { label: "4:5", w: 4, h: 5 },
   { label: "1:1", w: 1, h: 1 },
   { label: "16:9", w: 16, h: 9 },
+  { label: "A4", w: 210, h: 297 },
+  { label: "A4 wide", w: 297, h: 210 },
 ];
 
 export const BASE_LOOK: Look = {
@@ -1210,8 +1328,7 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   for (const key of MOTION_KEYS) {
     const value = finite(savedMotion[key]);
     if (value === undefined) continue;
-    const { min, max, step } = rangeFor(found, key);
-    motion[key] = clamp(step >= 1 ? Math.round(value) : value, min, max);
+    motion[key] = limited(key, value);
   }
 
   const options = presetOptions(found);
@@ -1252,7 +1369,7 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   look.counterPosition = oneOf(savedLook.counterPosition, COUNTER_POSITIONS) ?? look.counterPosition;
   look.counterStyle = oneOf(savedLook.counterStyle, COUNTER_STYLES.map((style) => style.id)) ?? look.counterStyle;
   const counterScale = finite(savedLook.counterScale);
-  if (counterScale !== undefined) look.counterScale = clamp(counterScale, 0.3, 4);
+  if (counterScale !== undefined) look.counterScale = clamp(counterScale, 0.1, 20);
 
   return { preset: found, motion, options, easing, path, look };
 }
