@@ -85,51 +85,76 @@ const PINT_URL = "https://donate.stripe.com/cNi6oH8vP2f6eHlaoQ8N200";
 const RECORDING_TYPES = ["video/mp4;codecs=avc1.640033", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
 
 /**
- * While editing, pictures and the canvas are kept small so heavy media stays
- * smooth. An export redraws both at full size for as long as it records.
+ * Uploads are compressed on the way in. A photo straight off a camera is some
+ * 24 million pixels, about 100 MB once decoded; twelve of them held at that
+ * size is what makes a page crawl. So each picture is decoded once, off the
+ * main thread, drawn down to a small copy for the preview and a tiny one for
+ * its thumbnail, and the decoded original is thrown away. Only the file itself
+ * is kept, and an export re-reads it at full quality for as long as it records.
  */
 const PREVIEW_PICTURE = 1024;
 const EXPORT_PICTURE = 2560;
+const THUMB_PICTURE = 160;
 const PREVIEW_CANVAS = 1280;
 
-/** A picture no longer than `longest` on its long side. */
-function shrink(image: HTMLImageElement, longest: number): TexImageSource {
-  const size = Math.max(image.naturalWidth, image.naturalHeight);
-  if (size <= longest) return image;
+/** A copy of a picture no longer than `longest` on its long side. */
+function drawnDown(source: ImageBitmap, longest: number): HTMLCanvasElement {
+  const ratio = Math.min(1, longest / Math.max(source.width, source.height));
   const canvas = document.createElement("canvas");
-  canvas.width = Math.round((image.naturalWidth * longest) / size);
-  canvas.height = Math.round((image.naturalHeight * longest) / size);
-  canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height);
+  canvas.width = Math.max(1, Math.round(source.width * ratio));
+  canvas.height = Math.max(1, Math.round(source.height * ratio));
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+  }
   return canvas;
 }
 
-function loadFile(renderer: Renderer, file: File, id: number): Promise<MediaItem> {
+const toBlob = (canvas: HTMLCanvasElement) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.8));
+
+async function loadPicture(renderer: Renderer, file: File, id: number): Promise<MediaItem> {
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file); // decodes off the main thread, the right way up
+  } catch {
+    throw new Error(`Could not read ${file.name}.`);
+  }
+  try {
+    const thumb = await toBlob(drawnDown(bitmap, THUMB_PICTURE));
+    return {
+      id,
+      texture: renderer.texture(drawnDown(bitmap, PREVIEW_PICTURE), true),
+      aspect: bitmap.width / bitmap.height,
+      url: thumb ? URL.createObjectURL(thumb) : undefined,
+      file,
+      longest: Math.max(bitmap.width, bitmap.height),
+    };
+  } finally {
+    bitmap.close(); // the decoded original is not kept
+  }
+}
+
+function loadVideo(renderer: Renderer, file: File, id: number): Promise<MediaItem> {
   const url = URL.createObjectURL(file);
   return new Promise((resolve, reject) => {
-    const fail = () => {
+    const video = document.createElement("video");
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.onloadeddata = () => {
+      void video.play();
+      resolve({ id, texture: renderer.texture(video, false), aspect: video.videoWidth / video.videoHeight, video, url });
+    };
+    video.onerror = () => {
       URL.revokeObjectURL(url);
       reject(new Error(`Could not read ${file.name}.`));
     };
-    if (file.type.startsWith("video/")) {
-      const video = document.createElement("video");
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.onloadeddata = () => {
-        void video.play();
-        resolve({ id, texture: renderer.texture(video, false), aspect: video.videoWidth / video.videoHeight, video, url });
-      };
-      video.onerror = fail;
-      video.src = url;
-    } else {
-      const image = new Image();
-      image.onload = () =>
-        resolve({ id, texture: renderer.texture(shrink(image, PREVIEW_PICTURE), true), aspect: image.naturalWidth / image.naturalHeight, url, image });
-      image.onerror = fail;
-      image.src = url;
-    }
+    video.src = url;
   });
 }
+
+const loadFile = (renderer: Renderer, file: File, id: number) => (file.type.startsWith("video/") ? loadVideo(renderer, file, id) : loadPicture(renderer, file, id));
 
 function discard(renderer: Renderer, items: MediaItem[]) {
   for (const item of items) {
@@ -627,7 +652,7 @@ export default function MotionTool() {
   }
 
   // Records one loop as it plays, so an 8 second loop takes 8 seconds to export.
-  function exportVideo() {
+  async function exportVideo() {
     const canvas = canvasRef.current;
     if (!canvas || typeof MediaRecorder === "undefined") return setStatus("This browser cannot record video.");
     const type = RECORDING_TYPES.find((candidate) => MediaRecorder.isTypeSupported(candidate));
@@ -636,12 +661,21 @@ export default function MotionTool() {
     const name = `${sceneRef.current.preset.name.toLowerCase().replace(" ", "-")}.${type.includes("mp4") ? "mp4" : "webm"}`;
     const renderer = rendererRef.current;
     if (!renderer) return;
+    setExporting(true);
+    setStatus("Preparing full-size pictures…");
     // Full-size pictures and canvas for the length of the recording, then back to the light ones.
     const previews = new Map<number, WebGLTexture>();
-    for (const item of mediaRef.current) {
-      if (!item.image || Math.max(item.image.naturalWidth, item.image.naturalHeight) <= PREVIEW_PICTURE) continue;
-      previews.set(item.id, item.texture);
-      item.texture = renderer.texture(shrink(item.image, EXPORT_PICTURE), true);
+    for (const item of [...mediaRef.current]) {
+      if (!item.file || (item.longest ?? 0) <= PREVIEW_PICTURE) continue;
+      try {
+        const bitmap = await createImageBitmap(item.file);
+        const full = renderer.texture(drawnDown(bitmap, EXPORT_PICTURE), true);
+        bitmap.close();
+        previews.set(item.id, item.texture);
+        item.texture = full;
+      } catch {
+        // This one stays at preview quality rather than failing the whole export.
+      }
     }
     fullSizeRef.current = true;
     const restore = () => {
@@ -674,7 +708,6 @@ export default function MotionTool() {
       setExporting(false);
       setStatus("Recording failed.");
     };
-    setExporting(true);
     setStatus(`Recording ${duration} seconds…`);
     for (const item of mediaRef.current) if (item.video) item.video.currentTime = 0;
     loopStartRef.current = performance.now();
@@ -976,7 +1009,7 @@ export default function MotionTool() {
         />
 
         <h2>Export</h2>
-        <button type="button" className="mp-primary" disabled={exporting || unsupported} onClick={exportVideo}>
+        <button type="button" className="mp-primary" disabled={exporting || unsupported} onClick={() => void exportVideo()}>
           Export video
         </button>
         <p className="mp-status" role="status">

@@ -10,8 +10,10 @@ export interface MediaItem {
   video?: HTMLVideoElement;
   /** object URL of an uploaded file, also used for its thumbnail */
   url?: string;
-  /** the decoded picture, kept so an export can be drawn from it at full quality */
-  image?: HTMLImageElement;
+  /** the uploaded picture file, re-read at full quality for an export; no decoded pixels are held */
+  file?: File;
+  /** the original picture's long side, in pixels */
+  longest?: number;
 }
 
 export interface Scene extends Settings {
