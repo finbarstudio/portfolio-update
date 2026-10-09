@@ -10,6 +10,10 @@ export interface MediaItem {
   video?: HTMLVideoElement;
   /** object URL of an uploaded file, also used for its thumbnail */
   url?: string;
+  /** a small canvas each video frame is drawn down to for the preview */
+  frame?: HTMLCanvasElement;
+  /** the object URL a video plays from, released when the video is removed */
+  videoUrl?: string;
   /** the uploaded picture file, re-read at full quality for an export; no decoded pixels are held */
   file?: File;
   /** the original picture's long side, in pixels */
@@ -21,6 +25,8 @@ export interface Scene extends Settings {
   media: MediaItem[];
   /** Share of the full canvas size to draw at, 0 to 1. The preview draws small; an export draws at 1. */
   resolution?: number;
+  /** An export: video frames go to the GPU at their own size, not drawn down first. */
+  fullQuality?: boolean;
 }
 
 type Matrix = number[];
@@ -156,8 +162,15 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
 
       for (const item of media) {
         if (item.video && item.video.readyState >= 2) {
+          // Sending a 4K frame to the GPU sixty times a second is the slow part of
+          // a video card, so the preview sends a small copy of each frame instead.
+          let source: TexImageSource = item.video;
+          if (!scene.fullQuality && item.frame) {
+            item.frame.getContext("2d")?.drawImage(item.video, 0, 0, item.frame.width, item.frame.height);
+            source = item.frame;
+          }
           gl.bindTexture(gl.TEXTURE_2D, item.texture);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, item.video);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
         }
       }
 

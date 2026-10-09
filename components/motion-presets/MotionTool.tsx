@@ -95,14 +95,17 @@ const RECORDING_TYPES = ["video/mp4;codecs=avc1.640033", "video/mp4", "video/web
 const PREVIEW_PICTURE = 1024;
 const EXPORT_PICTURE = 2560;
 const THUMB_PICTURE = 160;
+const PREVIEW_VIDEO = 640;
 const PREVIEW_CANVAS = 1280;
 
-/** A copy of a picture no longer than `longest` on its long side. */
-function drawnDown(source: ImageBitmap, longest: number): HTMLCanvasElement {
-  const ratio = Math.min(1, longest / Math.max(source.width, source.height));
+/** A copy of a picture or video frame no longer than `longest` on its long side. */
+function drawnDown(source: ImageBitmap | HTMLVideoElement, longest: number): HTMLCanvasElement {
+  const width = source instanceof HTMLVideoElement ? source.videoWidth : source.width;
+  const height = source instanceof HTMLVideoElement ? source.videoHeight : source.height;
+  const ratio = Math.min(1, longest / Math.max(width, height));
   const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(source.width * ratio));
-  canvas.height = Math.max(1, Math.round(source.height * ratio));
+  canvas.width = Math.max(1, Math.round(width * ratio));
+  canvas.height = Math.max(1, Math.round(height * ratio));
   const ctx = canvas.getContext("2d");
   if (ctx) {
     ctx.imageSmoothingQuality = "high";
@@ -135,22 +138,39 @@ async function loadPicture(renderer: Renderer, file: File, id: number): Promise<
   }
 }
 
+/**
+ * A video cannot be re-compressed in the browser in any reasonable time, but
+ * what makes it heavy here is not the file: it is sending every full-size
+ * frame to the GPU. So the preview draws each frame down to a small canvas
+ * first, and the thumbnail is one still, not a second playing copy.
+ */
 function loadVideo(renderer: Renderer, file: File, id: number): Promise<MediaItem> {
-  const url = URL.createObjectURL(file);
+  const videoUrl = URL.createObjectURL(file);
   return new Promise((resolve, reject) => {
     const video = document.createElement("video");
     video.muted = true;
     video.loop = true;
     video.playsInline = true;
-    video.onloadeddata = () => {
+    video.onloadeddata = async () => {
+      video.onloadeddata = null;
+      const frame = drawnDown(video, PREVIEW_VIDEO);
+      const thumb = await toBlob(drawnDown(video, THUMB_PICTURE));
       void video.play();
-      resolve({ id, texture: renderer.texture(video, false), aspect: video.videoWidth / video.videoHeight, video, url });
+      resolve({
+        id,
+        texture: renderer.texture(frame, false),
+        aspect: video.videoWidth / video.videoHeight,
+        video,
+        frame,
+        videoUrl,
+        url: thumb ? URL.createObjectURL(thumb) : undefined,
+      });
     };
     video.onerror = () => {
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(videoUrl);
       reject(new Error(`Could not read ${file.name}.`));
     };
-    video.src = url;
+    video.src = videoUrl;
   });
 }
 
@@ -160,7 +180,9 @@ function discard(renderer: Renderer, items: MediaItem[]) {
   for (const item of items) {
     renderer.deleteTexture(item.texture);
     item.video?.pause();
+    item.video?.removeAttribute("src");
     if (item.url) URL.revokeObjectURL(item.url);
+    if (item.videoUrl) URL.revokeObjectURL(item.videoUrl);
   }
 }
 
@@ -463,6 +485,8 @@ export default function MotionTool() {
   const [exporting, setExporting] = useState(false);
   const [unsupported, setUnsupported] = useState(false);
   const [dragging, setDragging] = useState(false);
+  /** Set while files are being read in or made ready for an export: drives the loading screen. */
+  const [loading, setLoading] = useState<{ label: string; done: number; total: number } | null>(null);
 
   const motion = applyAdjustments(preset, adjustments);
   const options = presetOptions(preset, chosen);
@@ -551,7 +575,7 @@ export default function MotionTool() {
       const { duration } = sceneRef.current.motion;
       const { width, height } = sceneRef.current.look;
       const resolution = fullSizeRef.current ? 1 : Math.min(1, PREVIEW_CANVAS / Math.max(width, height));
-      renderer.draw(((now - loopStartRef.current) / 1000) % duration, { ...sceneRef.current, media: mediaRef.current, resolution });
+      renderer.draw(((now - loopStartRef.current) / 1000) % duration, { ...sceneRef.current, media: mediaRef.current, resolution, fullQuality: fullSizeRef.current });
       frame = requestAnimationFrame(tick);
     });
     return () => {
@@ -574,7 +598,25 @@ export default function MotionTool() {
     if (!renderer || !files) return;
     const wanted = [...files].filter((file) => file.type.startsWith("image/") || file.type.startsWith("video/"));
     if (!wanted.length) return;
-    const results = await Promise.allSettled(wanted.map((file) => loadFile(renderer, file, nextIdRef.current++)));
+    // Three at a time: decoding a dozen camera photos at once would need over a gigabyte for a moment.
+    const results: PromiseSettledResult<MediaItem>[] = new Array(wanted.length);
+    let next = 0;
+    let done = 0;
+    setLoading({ label: "Preparing media", done, total: wanted.length });
+    const worker = async () => {
+      while (next < wanted.length) {
+        const index = next++;
+        const id = nextIdRef.current++;
+        try {
+          results[index] = { status: "fulfilled", value: await loadFile(renderer, wanted[index], id) };
+        } catch (reason) {
+          results[index] = { status: "rejected", reason };
+        }
+        setLoading({ label: "Preparing media", done: ++done, total: wanted.length });
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(3, wanted.length) }, worker));
+    setLoading(null);
     const loaded = results.flatMap((result) => (result.status === "fulfilled" ? [result.value] : []));
     const failed = results.flatMap((result) => (result.status === "rejected" ? [String((result.reason as Error).message)] : []));
     if (rendererRef.current !== renderer) return discard(renderer, loaded); // left the page while loading
@@ -665,8 +707,11 @@ export default function MotionTool() {
     setStatus("Preparing full-size pictures…");
     // Full-size pictures and canvas for the length of the recording, then back to the light ones.
     const previews = new Map<number, WebGLTexture>();
-    for (const item of [...mediaRef.current]) {
-      if (!item.file || (item.longest ?? 0) <= PREVIEW_PICTURE) continue;
+    const heavy = mediaRef.current.filter((item) => item.file && (item.longest ?? 0) > PREVIEW_PICTURE);
+    let ready = 0;
+    if (heavy.length) setLoading({ label: "Preparing full-size pictures", done: 0, total: heavy.length });
+    for (const item of heavy) {
+      if (!item.file) continue;
       try {
         const bitmap = await createImageBitmap(item.file);
         const full = renderer.texture(drawnDown(bitmap, EXPORT_PICTURE), true);
@@ -676,7 +721,9 @@ export default function MotionTool() {
       } catch {
         // This one stays at preview quality rather than failing the whole export.
       }
+      setLoading({ label: "Preparing full-size pictures", done: ++ready, total: heavy.length });
     }
+    setLoading(null);
     fullSizeRef.current = true;
     const restore = () => {
       fullSizeRef.current = false;
@@ -691,7 +738,7 @@ export default function MotionTool() {
       for (const preview of previews.values()) renderer.deleteTexture(preview);
     };
     // The canvas must already be full size when the recorder first looks at it.
-    renderer.draw(0, { ...sceneRef.current, media: mediaRef.current, resolution: 1 });
+    renderer.draw(0, { ...sceneRef.current, media: mediaRef.current, resolution: 1, fullQuality: true });
     const recorder = new MediaRecorder(canvas.captureStream(60), { mimeType: type, videoBitsPerSecond: 24_000_000 });
     const chunks: Blob[] = [];
     recorder.ondataavailable = (event) => {
@@ -817,6 +864,16 @@ export default function MotionTool() {
         ) : (
           <canvas ref={canvasRef} aria-label="Animation preview" style={{ aspectRatio: `${look.width} / ${look.height}` }} />
         )}
+        {loading && (
+          <div className="mp-loading" role="status" aria-live="polite">
+            <p>
+              {loading.label}, {loading.done} of {loading.total}
+            </p>
+            <div className="mp-loading-bar">
+              <span style={{ scale: `${loading.total ? loading.done / loading.total : 0} 1` }} />
+            </div>
+          </div>
+        )}
         <a className="mp-pint mp-pint-float" href={PINT_URL} target="_blank" rel="noopener noreferrer">
           Buy me a pint
         </a>
@@ -888,7 +945,12 @@ export default function MotionTool() {
                   draggedRef.current = null;
                 }}
               >
-                {thumb.isVideo ? <video src={thumb.url} muted /> : <img src={thumb.url} alt={`Media ${index + 1}`} draggable={false} />}
+                <img src={thumb.url} alt={`${thumb.isVideo ? "Video" : "Media"} ${index + 1}`} draggable={false} />
+                {thumb.isVideo && (
+                  <span className="mp-media-video" aria-hidden="true">
+                    ▶
+                  </span>
+                )}
                 <span className="mp-media-slot">{index + 1}</span>
                 <button type="button" className="mp-media-remove" aria-label={`Remove media ${index + 1}`} onClick={() => removeMedia(thumb.id)}>
                   ×
