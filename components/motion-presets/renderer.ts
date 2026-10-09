@@ -1,6 +1,6 @@
 /** Draws one frame of a motion preset with WebGL: textured, rounded cards in 3D. */
 
-import { cardAspect, clamp, layoutFrame, type Look, type Settings } from "./engine";
+import { cardAspect, clamp, layoutFrame, type CounterStyle, type Look, type Settings } from "./engine";
 
 export interface MediaItem {
   id: number;
@@ -27,6 +27,8 @@ export interface Scene extends Settings {
   resolution?: number;
   /** An export: video frames go to the GPU at their own size, not drawn down first. */
   fullQuality?: boolean;
+  /** How many pictures and videos are uploaded. The number overlay counts these; without any it counts cards. */
+  uploads?: number;
 }
 
 type Matrix = number[];
@@ -69,8 +71,10 @@ void main() { vUv = aPos + 0.5; gl_Position = uMatrix * vec4(aPos, 0.0, 1.0); }`
 const FRAGMENT = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 color;
-uniform sampler2D uTexture; uniform vec2 uSize; uniform vec4 uCrop; uniform float uRadius, uAlpha, uShade;
+uniform sampler2D uTexture; uniform vec2 uSize; uniform vec4 uCrop; uniform float uRadius, uAlpha, uShade, uOverlay;
 void main() {
+  // The number overlay: a picture with its own transparency, drawn flat on the screen.
+  if (uOverlay > 0.5) { color = texture(uTexture, vUv) * uAlpha; return; }
   vec2 q = abs((vUv - 0.5) * uSize) - uSize * 0.5 + uRadius;
   float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - uRadius;
   float mask = 1.0 - smoothstep(-fwidth(d), fwidth(d), d);
@@ -82,7 +86,88 @@ void main() {
   color = vec4(rgb, 1.0) * mask * uAlpha;
 }`;
 
-const UNIFORMS = ["uMatrix", "uSize", "uCrop", "uRadius", "uAlpha", "uShade"] as const;
+const UNIFORMS = ["uMatrix", "uSize", "uCrop", "uRadius", "uAlpha", "uShade", "uOverlay"] as const;
+
+const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+const SERIF = 'Georgia, "Times New Roman", serif';
+
+/** Draws the number in one of the overlay styles. Returns a canvas cut close around it. */
+function counterPicture(text: string, style: CounterStyle, px: number): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+  const font = style === "tag" ? `600 ${px * 0.8}px ${MONO}` : style === "serif" ? `italic 700 ${px * 1.05}px ${SERIF}` : `800 ${px}px ${SANS}`;
+  ctx.font = font;
+  const pad = Math.ceil(px * 0.6); // room for outlines, shadows and the pill
+  canvas.width = Math.ceil(ctx.measureText(text).width) + pad * 2;
+  canvas.height = Math.ceil(px * 1.2) + pad * 2;
+  // Sizing a canvas clears its settings.
+  ctx.font = font;
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  ctx.lineJoin = "round";
+  const x = canvas.width / 2;
+  const y = canvas.height / 2 + px * 0.04;
+  const fill = (colour: string, dx = 0, dy = 0) => {
+    ctx.fillStyle = colour;
+    ctx.fillText(text, x + dx, y + dy);
+  };
+  const stroke = (colour: string, width: number) => {
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = width;
+    ctx.strokeText(text, x, y);
+  };
+  switch (style) {
+    case "white":
+      fill("#fff");
+      break;
+    case "black":
+      fill("#000");
+      break;
+    case "outline":
+      stroke("#000", px * 0.16);
+      fill("#fff");
+      break;
+    case "outline-dark":
+      stroke("#fff", px * 0.16);
+      fill("#000");
+      break;
+    case "hollow":
+      stroke("#fff", px * 0.05);
+      break;
+    case "shadow":
+      ctx.shadowColor = "rgb(0 0 0 / 0.65)";
+      ctx.shadowBlur = px * 0.28;
+      ctx.shadowOffsetY = px * 0.07;
+      fill("#fff");
+      break;
+    case "block": {
+      // A stack of black copies stepping down and right reads as a solid edge.
+      const depth = Math.max(2, Math.round(px * 0.11));
+      for (let step = depth; step >= 1; step--) fill("#000", step, step);
+      stroke("#000", px * 0.05);
+      fill("#fff");
+      break;
+    }
+    case "tag": {
+      const w = ctx.measureText(text).width + px * 0.7;
+      const h = px * 1.15;
+      ctx.fillStyle = "rgb(0 0 0 / 0.72)";
+      ctx.beginPath();
+      ctx.roundRect(x - w / 2, canvas.height / 2 - h / 2, w, h, h / 2);
+      ctx.fill();
+      fill("#fff");
+      break;
+    }
+    case "serif":
+      ctx.shadowColor = "rgb(0 0 0 / 0.5)";
+      ctx.shadowBlur = px * 0.2;
+      fill("#fff");
+      break;
+  }
+  return canvas;
+}
 
 export interface Renderer {
   texture(source: TexImageSource, mipmaps: boolean): WebGLTexture;
@@ -128,6 +213,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
   let frames = 0;
+  // The number overlay's picture, redrawn only when what it shows changes.
+  const counter: { key: string; texture: WebGLTexture | null; width: number; height: number } = { key: "", texture: null, width: 0, height: 0 };
 
   return {
     texture(source, mipmaps) {
@@ -182,7 +269,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
 
       const aspect = width / height;
       const shape = cardAspect(look);
-      const { w, h, items, camera } = layoutFrame(scene, seconds, aspect, shape);
+      const { w, h, items, camera, cards, lead, curtain } = layoutFrame(scene, seconds, aspect, shape);
       const distance = camera.distance;
       // The camera turns about the point it looks at, then steps back from it.
       let view = translate(0, 0, -distance);
@@ -220,6 +307,43 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
         gl.uniform1f(uniform.uShade, clamp(1 + (item.depth + distance) * 0.1, 0.4, 1)); // dimmer further away
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
+
+      if (look.counter === "off" || lead === null) return;
+      const of = scene.uploads ?? cards;
+      const digits = Math.max(2, String(of).length);
+      const current = String((lead % of) + 1).padStart(digits, "0");
+      const text = look.counter === "fraction" ? `${current}/${String(of).padStart(digits, "0")}` : current;
+      // Sized from the canvas actually being drawn, so the preview and the export match.
+      const px = Math.round(Math.min(width, height) * 0.08 * look.counterScale);
+      const key = `${text}|${look.counterStyle}|${px}`;
+      if (key !== counter.key) {
+        const picture = counterPicture(text, look.counterStyle, px);
+        if (counter.texture) gl.deleteTexture(counter.texture);
+        counter.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, counter.texture);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, picture);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        Object.assign(counter, { key, width: picture.width, height: picture.height });
+      }
+      // Its place on the canvas, in pixels from the top left. The picture carries its own padding.
+      const inset = Math.min(width, height) * 0.05 - px * 0.6;
+      const [row, column] = look.counterPosition.includes("-") ? look.counterPosition.split("-") : look.counterPosition === "top" || look.counterPosition === "bottom" ? [look.counterPosition, "centre"] : ["centre", look.counterPosition];
+      const cx = column === "left" ? inset + counter.width / 2 : column === "right" ? width - inset - counter.width / 2 : width / 2;
+      const cy = row === "top" ? inset + counter.height / 2 : row === "bottom" ? height - inset - counter.height / 2 : height / 2;
+      gl.disable(gl.DEPTH_TEST);
+      gl.polygonOffset(0, 0);
+      gl.bindTexture(gl.TEXTURE_2D, counter.texture);
+      gl.uniform1f(uniform.uOverlay, 1);
+      gl.uniform1f(uniform.uAlpha, curtain);
+      gl.uniformMatrix4fv(uniform.uMatrix, false, multiply(translate((cx / width) * 2 - 1, 1 - (cy / height) * 2, 0), scale((counter.width / width) * 2, (counter.height / height) * 2)));
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      gl.uniform1f(uniform.uOverlay, 0);
+      gl.enable(gl.DEPTH_TEST);
     },
   };
 }

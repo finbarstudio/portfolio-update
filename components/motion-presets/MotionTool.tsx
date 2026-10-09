@@ -8,6 +8,8 @@ import {
   CANVAS_MIN,
   CANVAS_SIZES,
   CARD_SHAPES,
+  COUNTER_POSITIONS,
+  COUNTER_STYLES,
   EASINGS,
   FOUR_WAY,
   HAS_FOCUS,
@@ -20,6 +22,7 @@ import {
   applyAdjustments,
   bezier,
   canvasSide,
+  hasCounter,
   clamp,
   pathGrid,
   parseSetup,
@@ -28,6 +31,7 @@ import {
   ratioPart,
   type Adjustments,
   type Bezier,
+  type Counter,
   type Direction,
   type Focus,
   type Look,
@@ -476,6 +480,11 @@ const ORIGINS: { value: Origin; label: string }[] = [
   { value: "left", label: "Left" },
   { value: "right", label: "Right" },
 ];
+const COUNTERS: { value: Counter; label: string }[] = [
+  { value: "off", label: "Off" },
+  { value: "number", label: "01" },
+  { value: "fraction", label: "01/10" },
+];
 const TILTS: { value: TiltMode; label: string }[] = [
   { value: "off", label: "Off" },
   { value: "fan", label: "Fan" },
@@ -636,7 +645,7 @@ export default function MotionTool() {
       // Filling the screen needs more pixels than the small editing preview.
       const longest = fullScreenRef.current ? FULL_SCREEN_CANVAS : PREVIEW_CANVAS;
       const resolution = fullSizeRef.current ? 1 : Math.min(1, longest / Math.max(width, height));
-      renderer.draw(((now - loopStartRef.current) / 1000) % duration, { ...sceneRef.current, media: mediaRef.current, resolution, fullQuality: fullSizeRef.current });
+      renderer.draw(((now - loopStartRef.current) / 1000) % duration, { ...sceneRef.current, media: mediaRef.current, resolution, fullQuality: fullSizeRef.current, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
       frame = requestAnimationFrame(tick);
     });
     return () => {
@@ -868,7 +877,7 @@ export default function MotionTool() {
       for (let k = 0; k < total && !failure; k++) {
         const seconds = k / EXPORT_FPS;
         if (videos.length) await Promise.all(videos.map((video) => seekTo(video, seconds)));
-        renderer.draw(seconds, { ...scene, media: mediaRef.current, resolution: 1, fullQuality: true });
+        renderer.draw(seconds, { ...scene, media: mediaRef.current, resolution: 1, fullQuality: true, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
         const picture = new VideoFrame(canvas, { timestamp: Math.round((k * 1_000_000) / EXPORT_FPS), duration: Math.round(1_000_000 / EXPORT_FPS) });
         encoder.encode(picture, { keyFrame: k % (EXPORT_FPS * 2) === 0 });
         picture.close();
@@ -904,7 +913,7 @@ export default function MotionTool() {
     const name = `${base}.${type.includes("mp4") ? "mp4" : "webm"}`;
     fullSizeRef.current = true;
     // The canvas must already be full size when the recorder first looks at it.
-    renderer.draw(0, { ...sceneRef.current, media: mediaRef.current, resolution: 1, fullQuality: true });
+    renderer.draw(0, { ...sceneRef.current, media: mediaRef.current, resolution: 1, fullQuality: true, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
     const recorder = new MediaRecorder(canvas.captureStream(60), { mimeType: type, videoBitsPerSecond: EXPORT_BITRATE });
     const chunks: Blob[] = [];
     recorder.ondataavailable = (event) => {
@@ -1218,6 +1227,34 @@ export default function MotionTool() {
           <span>Background</span>
           <ColourPicker label="Background" value={look.background} onChange={(background) => patchLook({ background })} />
         </div>
+
+        <Heading
+          title="Number"
+          changed={look.counter !== BASE_LOOK.counter || look.counterPosition !== BASE_LOOK.counterPosition || look.counterScale !== BASE_LOOK.counterScale || look.counterStyle !== BASE_LOOK.counterStyle}
+          onReset={() => patchLook({ counter: BASE_LOOK.counter, counterPosition: BASE_LOOK.counterPosition, counterScale: BASE_LOOK.counterScale, counterStyle: BASE_LOOK.counterStyle })}
+        />
+        <Choice label="Show" value={look.counter} options={COUNTERS} onChange={(counter) => patchLook({ counter })} />
+        {look.counter !== "off" && !hasCounter(preset) && <p className="mp-note">This preset shows many cards at once, so there is no single one to number.</p>}
+        {look.counter !== "off" && hasCounter(preset) && (
+          <>
+            <div className="mp-line">
+              <span>Position</span>
+              <div className="mp-spots" role="group" aria-label="Number position">
+                {COUNTER_POSITIONS.map((spot) => (
+                  <button key={spot} type="button" aria-label={spot.replace("-", " ")} aria-pressed={look.counterPosition === spot} onClick={() => patchLook({ counterPosition: spot })} />
+                ))}
+              </div>
+            </div>
+            <Slider label="Size" min={0.3} max={4} step={0.05} value={look.counterScale} onChange={(counterScale) => patchLook({ counterScale })} onReset={() => patchLook({ counterScale: BASE_LOOK.counterScale })} />
+            <div className="mp-easings mp-styles">
+              {COUNTER_STYLES.map((style) => (
+                <button key={style.id} type="button" aria-pressed={look.counterStyle === style.id} onClick={() => patchLook({ counterStyle: style.id })}>
+                  {style.name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
         <h2>Setup</h2>
         <button type="button" disabled={!tuned} onClick={resetFlow} style={{ width: "100%", marginBottom: 6 }}>

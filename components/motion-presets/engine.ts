@@ -223,6 +223,8 @@ interface Raw extends Partial<Transform> {
   f?: number;
   /** the layout already applied the focus scale */
   scaled?: boolean;
+  /** how far this card is from being "the one showing", for layouts with no row to measure along; lowest wins */
+  lead?: number;
 }
 
 interface Context {
@@ -356,7 +358,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const leaving = q > c.n - 1 ? c.n - q : 0;
     const slot = leaving ? lerp(0, c.n - 1, easeInOut(leaving)) : q;
     const lift = Math.sin(Math.PI * leaving);
-    const out = { x: slot * c.g * 0.25, y: slot * c.g * 0.2, z: -slot * 0.12, rz: 0, ry: 0, s: 1 - slot * 0.04, a: 1 - clamp((slot - 6) / 2) };
+    const out = { x: slot * c.g * 0.25, y: slot * c.g * 0.2, z: -slot * 0.12, rz: 0, ry: 0, s: 1 - slot * 0.04, a: 1 - clamp((slot - 6) / 2), lead: slot };
     if (c.v.fly === "up") out.y += lift * c.h * 1.15 * c.m.shape;
     if (c.v.fly === "right") out.x += lift * c.w * 1.25 * c.m.shape;
     if (c.v.fly === "spin") {
@@ -453,7 +455,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const s = ZOOM_MIN * Math.pow(ZOOM_MAX / ZOOM_MIN, grow);
     const a = c.v.out ? smooth((1 - life) / 0.2) * smooth(life / 0.12) : smooth((1 - life) / 0.1) * smooth(life / 0.05);
     // The smallest cards sit in front: the newest when growing, the oldest when shrinking.
-    const out = { x: 0, y: 0, z: (c.v.out ? age : c.n - age) * 0.004, s, a };
+    const out = { x: 0, y: 0, z: (c.v.out ? age : c.n - age) * 0.004, s, a, lead: Math.abs(Math.log(s)) }; // the card nearest full size leads
     // Growing from an edge: that edge of the card stays on the frame edge.
     const halfW = (c.w * s) / 2;
     const halfH = (c.h * s) / 2;
@@ -502,14 +504,14 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     if (c.v.cube) {
       if (!current && !next) return null;
       const face = (current ? 0 : Math.PI / 2) - (f * Math.PI) / 2;
-      return { x: (Math.sin(face) * c.w) / 2, z: (Math.cos(face) * c.w) / 2 - c.w / 2, ry: face };
+      return { x: (Math.sin(face) * c.w) / 2, z: (Math.cos(face) * c.w) / 2 - c.w / 2, ry: face, lead: (f < 0.5) === current ? 0 : 1 };
     }
     let turn: number;
     if (current && f < 0.5) turn = f * Math.PI;
     else if (next && f >= 0.5) turn = (f - 1) * Math.PI;
     else return null;
     const z = -Math.sin(Math.PI * clamp(f)) * 0.5;
-    return c.v.axis === "x" ? { z, rx: turn } : { z, ry: turn };
+    return c.v.axis === "x" ? { z, rx: turn, lead: 0 } : { z, ry: turn, lead: 0 };
   },
   tunnel(i, c) {
     const depth = mod(i / c.n + c.T, 1);
@@ -517,10 +519,10 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const a = smooth(depth / 0.15) * smooth((1 - depth) / 0.1);
     if (c.v.sides) {
       const side = i % 2 ? 1 : -1;
-      return { z, a, x: side * (0.55 * c.A + c.w * 0.35) * c.m.shape, ry: -side * 50 * DEG };
+      return { z, a, x: side * (0.55 * c.A + c.w * 0.35) * c.m.shape, ry: -side * 50 * DEG, lead: Math.abs(depth - 0.8) };
     }
     const angle = c.v.spiral ? TAU * 2 * depth : i * GOLDEN_ANGLE;
-    return { z, a, x: Math.cos(angle) * 0.95 * Math.min(1.4, c.A) * c.m.shape, y: Math.sin(angle) * 0.95 * c.m.shape };
+    return { z, a, x: Math.cos(angle) * 0.95 * Math.min(1.4, c.A) * c.m.shape, y: Math.sin(angle) * 0.95 * c.m.shape, lead: Math.abs(depth - 0.8) };
   },
   fan(i, c) {
     const breathing = c.v.open ? 0.55 + 0.45 * Math.sin(TAU * c.T - Math.PI / 2) : 1;
@@ -565,8 +567,8 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const steps = c.T * c.n;
     const k = Math.floor(steps);
     const f = c.ease(clamp((steps - k) / (1 - c.m.hold)));
-    if (i === mod(k, c.n)) return { s: 1 + 0.5 * f, a: clamp(1 - f), z: 0.01 };
-    if (i === mod(k + 1, c.n)) return { s: 0.7 + 0.3 * f, a: clamp(f) };
+    if (i === mod(k, c.n)) return { s: 1 + 0.5 * f, a: clamp(1 - f), z: 0.01, lead: f < 0.5 ? 0 : 1 };
+    if (i === mod(k + 1, c.n)) return { s: 0.7 + 0.3 * f, a: clamp(f), lead: f < 0.5 ? 1 : 0 };
     return null;
   },
 };
@@ -639,6 +641,12 @@ export interface Frame {
   w: number;
   h: number;
   items: ({ i: number } & Transform)[];
+  /** how many cards the preset is showing in all */
+  cards: number;
+  /** the card that is "the one showing" right now, for the number overlay; null when no single card is */
+  lead: number | null;
+  /** 1 normally; falls to 0 at the loop point when the loop fade is on */
+  curtain: number;
   camera: { x: number; y: number; distance: number; fov: number; tilt: number; yaw: number; roll: number };
 }
 
@@ -649,6 +657,11 @@ export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "
  * first is a visible join. These can leave empty places between the two.
  */
 export const HAS_LOOP_GAP: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "ring", "wheel", "deck", "helix", "stairs", "wave", "tunnel", "flip", "pulse", "zoom"]);
+const COUNTS_DOWN: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "wheel", "orbit", "tunnel", "helix"]);
+/** Layouts with no single card that is "the one showing", so the number overlay has nothing to count. */
+export const NO_COUNTER: ReadonlySet<LayoutName> = new Set<LayoutName>(["grid", "globe", "float", "marquee", "fan"]);
+/** Whether a preset has one card at a time that the number overlay can count. Two rings turning against each other do not. */
+export const hasCounter = (preset: Preset) => !NO_COUNTER.has(preset.layout) && !preset.variant.two;
 /** How far the card in focus comes forward: enough to win the overlap, too little to see as movement. */
 const FOCUS_LIFT = 0.03;
 /** How long the fade out and the fade in each take, as a share of the loop. */
@@ -664,7 +677,9 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
   const { layout } = preset;
   const fourWay = FOUR_WAY.has(layout);
   const vertical = fourWay && (o.direction === "up" || o.direction === "down");
-  const reversed = o.direction === "right" || o.direction === "down";
+  // These layouts' own maths brings card 3 round before card 2. Forward should mean 1, 2, 3
+  // in every preset, so for them the clock runs the other way.
+  const reversed = (o.direction === "right" || o.direction === "down") !== COUNTS_DOWN.has(layout);
   const sign = reversed ? -1 : 1;
   const h = m.size;
   const w = h * cardShape;
@@ -702,6 +717,8 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
   };
 
   const items: Frame["items"] = [];
+  let lead: number | null = null;
+  let leadScore = Infinity;
   for (let i = 0; i < cards; i++) {
     c.T = sign * itemTime(layout, i, c, T, reversed);
     const raw = layouts[layout](i, c);
@@ -737,6 +754,11 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     if (o.tiltMode === "uniform") rz += m.cardTilt * DEG;
     if (o.tiltMode === "alternate") rz += (i % 2 ? -1 : 1) * m.cardTilt * DEG;
     ry += m.turn * DEG + TAU * Math.round(m.spin) * c.T;
+    const score = raw.lead ?? (raw.p !== undefined ? Math.abs(raw.p - f) : Infinity);
+    if (a > 0.2 && score < leadScore) {
+      leadScore = score;
+      lead = i;
+    }
     a *= curtain;
     if (a <= 0.003) continue;
     items.push({ i, x, y, z, rx, ry, rz, s, a });
@@ -758,12 +780,17 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     camera.x = lerp(from[0], to[0], part);
     camera.y = lerp(from[1], to[1], part);
     camera.back = Math.sin(Math.PI * clamp(part)) * 0.35 * Math.min(2.5, Math.hypot(to[0] - from[0], to[1] - from[1]));
+    lead = c.path[mod(Math.round(steps), c.path.length)]; // the cell the camera is on, or nearest to
   }
+  if (!hasCounter(preset)) lead = null;
 
   return {
     w,
     h,
     items,
+    cards,
+    lead,
+    curtain,
     camera: {
       x: camera.x - m.offsetX * aspect,
       y: camera.y - m.offsetY,
@@ -1060,7 +1087,28 @@ export interface Look {
   cardW: number;
   cardH: number;
   background: string;
+  /** the number overlay: off, the card's number, or the number out of the total */
+  counter: Counter;
+  counterPosition: CounterPosition;
+  counterScale: number;
+  counterStyle: CounterStyle;
 }
+
+export type Counter = "off" | "number" | "fraction";
+export const COUNTER_POSITIONS = ["top-left", "top", "top-right", "left", "centre", "right", "bottom-left", "bottom", "bottom-right"] as const;
+export type CounterPosition = (typeof COUNTER_POSITIONS)[number];
+export const COUNTER_STYLES = [
+  { id: "outline", name: "Outline" },
+  { id: "outline-dark", name: "Outline dark" },
+  { id: "white", name: "White" },
+  { id: "black", name: "Black" },
+  { id: "shadow", name: "Shadow" },
+  { id: "block", name: "Block" },
+  { id: "hollow", name: "Hollow" },
+  { id: "tag", name: "Tag" },
+  { id: "serif", name: "Serif" },
+] as const;
+export type CounterStyle = (typeof COUNTER_STYLES)[number]["id"];
 
 export const CANVAS_MIN = 200;
 export const CANVAS_MAX = 3000;
@@ -1092,6 +1140,10 @@ export const BASE_LOOK: Look = {
   cardW: 4,
   cardH: 5,
   background: "#000000",
+  counter: "off",
+  counterPosition: "bottom-left",
+  counterScale: 1,
+  counterStyle: "outline",
 };
 
 /** A saved setup: which preset, how it was tuned, and how it looks. No media. */
@@ -1166,6 +1218,11 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   const cardH = finite(savedLook.cardH);
   if (cardH !== undefined && cardH > 0) look.cardH = ratioPart(cardH);
   if (typeof savedLook.background === "string" && /^#[0-9a-f]{6}$/i.test(savedLook.background)) look.background = savedLook.background;
+  look.counter = oneOf(savedLook.counter, ["off", "number", "fraction"] as const) ?? look.counter;
+  look.counterPosition = oneOf(savedLook.counterPosition, COUNTER_POSITIONS) ?? look.counterPosition;
+  look.counterStyle = oneOf(savedLook.counterStyle, COUNTER_STYLES.map((style) => style.id)) ?? look.counterStyle;
+  const counterScale = finite(savedLook.counterScale);
+  if (counterScale !== undefined) look.counterScale = clamp(counterScale, 0.3, 4);
 
   return { preset: found, motion, options, easing, path, look };
 }

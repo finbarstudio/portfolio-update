@@ -480,6 +480,47 @@
   margin-bottom: 6px;
 }
 
+/* Where the number sits: nine spots laid out like the canvas. */
+.mp-spots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  width: 96px;
+  padding: 3px;
+  background: #101012;
+  border-radius: 9px;
+}
+.mp-tool .mp-spots button {
+  min-height: 0;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 6px;
+}
+.mp-tool .mp-spots button::after {
+  content: "";
+  display: block;
+  width: 5px;
+  height: 5px;
+  margin: auto;
+  background: #55555e;
+  border-radius: 50%;
+}
+.mp-tool .mp-spots button:hover::after {
+  background: var(--mp-text);
+}
+.mp-tool .mp-spots button[aria-pressed="true"] {
+  background: #34343a;
+}
+.mp-tool .mp-spots button[aria-pressed="true"]::after {
+  background: var(--mp-accent);
+}
+.mp-styles {
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 8px;
+}
+
 /* Colour picker: a chip and hex as the trigger, the panel floating above it. */
 .mp-colour {
   position: relative;
