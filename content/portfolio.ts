@@ -244,13 +244,13 @@ const RAW: Slide[] = [
   },
 
   /* ── Packer and Associates ─────────────────────────────────── */
-  { kind: "title", id: "packer", name: "Packer and Associates", category: "In-house Design", year: "2024–2025" },
+  { kind: "title", id: "packer", name: "Packer and Associates", category: "Capability Statement", year: "2024–2025" },
   {
     kind: "text",
     name: "Packer and Associates",
-    category: "In-house Design",
+    category: "Capability Statement",
     body:
-      "Packer and Associates is a Brisbane workforce development company that has been running since 1997. I was their in-house designer for a year, full-time and then on contract. I designed the capability statement they give to prospective clients and kept the website current.",
+      "Packer and Associates is a Brisbane workforce development company, running since 1997. This is the capability statement they send to prospective clients. In twelve pages it sets out who they are, what they do and who they work with, then walks through five client projects, from BHP and Rio Tinto to TAFE Queensland. I gathered the content, wrote it and designed it as a digital document that goes out in new business conversations and from the team’s email signatures.",
     meta: [ME, { label: "Year", value: "2024–2025" }, { label: "Live", value: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" }, study("packer-associates")],
   },
   {
