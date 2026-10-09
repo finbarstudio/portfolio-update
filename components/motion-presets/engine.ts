@@ -158,6 +158,8 @@ export interface Motion {
   reach: number;
   /** how strongly a layout takes its shape: a fan's curve, a wave's height, a staircase's rise */
   shape: number;
+  /** empty places left between the last card and the first, so the loop has a visible break */
+  loopGap: number;
 }
 export type MotionKey = keyof Motion;
 
@@ -180,6 +182,8 @@ export interface Options {
   faceCamera: boolean;
   /** zoom: the point cards grow from */
   origin: Origin;
+  /** everything fades out to the background at the end of the loop and back in at the start */
+  loopFade: boolean;
 }
 
 export interface Preset {
@@ -640,6 +644,14 @@ export interface Frame {
 
 /** Layouts where up and down mean something. The rest only run forwards or backwards. */
 export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "proximity"]);
+/**
+ * Layouts that show their cards one after another, where the last meeting the
+ * first is a visible join. These can leave empty places between the two.
+ */
+export const HAS_LOOP_GAP: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "ring", "wheel", "deck", "helix", "stairs", "wave", "tunnel", "flip", "pulse", "zoom"]);
+/** How long the fade out and the fade in each take, as a share of the loop. */
+const LOOP_FADE = 0.07;
+
 /** Layouts that know how far each card is from the middle, so focus, fade and solo apply. */
 export const HAS_FOCUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "ring", "wheel", "helix", "orbit", "fan"]);
 export const HAS_RADIUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "wheel", "orbit", "globe", "helix"]);
@@ -654,8 +666,12 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
   const sign = reversed ? -1 : 1;
   const h = m.size;
   const w = h * cardShape;
-  const n = itemTotal(layout, Math.round(m.count), preset.variant);
+  const cards = itemTotal(layout, Math.round(m.count), preset.variant);
+  // Empty places after the last card: they take a turn in the loop like any card, but nothing is drawn in them.
+  const n = cards + (HAS_LOOP_GAP.has(layout) ? Math.round(m.loopGap) : 0);
   const T = (seconds / m.duration) * Math.round(m.speed);
+  const loopAt = mod(seconds / m.duration, 1);
+  const curtain = o.loopFade ? smooth(loopAt / LOOP_FADE) * smooth((1 - loopAt) / LOOP_FADE) : 1;
   const hold = clamp(m.hold, 0, 0.9);
   const ease = (x: number) => bezier(easing, x);
   const camZ = 1 / Math.tan((m.perspective * DEG) / 2); // a card 2 units tall fills the frame at z = 0
@@ -684,7 +700,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
   };
 
   const items: Frame["items"] = [];
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < cards; i++) {
     c.T = sign * itemTime(layout, i, c, T, reversed);
     const raw = layouts[layout](i, c);
     if (!raw) continue;
@@ -716,6 +732,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     if (o.tiltMode === "uniform") rz += m.cardTilt * DEG;
     if (o.tiltMode === "alternate") rz += (i % 2 ? -1 : 1) * m.cardTilt * DEG;
     ry += m.turn * DEG + TAU * Math.round(m.spin) * c.T;
+    a *= curtain;
     if (a <= 0.003) continue;
     items.push({ i, x, y, z, rx, ry, rz, s, a });
   }
@@ -778,9 +795,10 @@ export const BASE_MOTION: Motion = {
   radius: 1,
   reach: 1.6,
   shape: 1,
+  loopGap: 0,
 };
 
-export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre" };
+export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre", loopFade: false };
 
 export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max: number; step: number }> = {
   duration: { label: "Loop (sec)", min: 3, max: 120, step: 1 },
@@ -806,6 +824,7 @@ export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max:
   radius: { label: "Radius", min: 0.4, max: 2.5, step: 0.01 },
   reach: { label: "Reach", min: 0.5, max: 8, step: 0.1 },
   shape: { label: "Shape", min: 0, max: 2.5, step: 0.01 },
+  loopGap: { label: "Loop gap", min: 0, max: 6, step: 1 },
 };
 export const MOTION_KEYS = Object.keys(MOTION_RANGES) as MotionKey[];
 
@@ -1116,6 +1135,7 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   if (typeof savedOptions.solo === "boolean") options.solo = savedOptions.solo;
   if (typeof savedOptions.centre === "boolean") options.centre = savedOptions.centre;
   if (typeof savedOptions.faceCamera === "boolean") options.faceCamera = savedOptions.faceCamera;
+  if (typeof savedOptions.loopFade === "boolean") options.loopFade = savedOptions.loopFade;
   options.origin = oneOf(savedOptions.origin, ["centre", "left", "right", "up", "down"] as const) ?? options.origin;
 
   let easing = BASE_EASING;

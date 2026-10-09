@@ -11,6 +11,7 @@ import {
   EASINGS,
   FOUR_WAY,
   HAS_FOCUS,
+  HAS_LOOP_GAP,
   HAS_RADIUS,
   MOTION_KEYS,
   PRESETS,
@@ -459,7 +460,7 @@ const ON_OFF = [
   { value: true, label: "On" },
 ];
 const SCENE_KEYS: MotionKey[] = ["scale", "reach", "cardTilt", "count", "size", "gap", "radius", "shape", "turn", "spin", "fade", "offsetX", "offsetY"];
-const TIMING_KEYS: MotionKey[] = ["duration", "speed", "rhythm", "stagger", "hold"];
+const TIMING_KEYS: MotionKey[] = ["duration", "speed", "rhythm", "stagger", "hold", "loopGap"];
 const PACES = [
   { value: false, label: "Continuous" },
   { value: true, label: "Stepped" },
@@ -1048,6 +1049,8 @@ export default function MotionTool() {
         {slider("speed")}
         {stepped && layout !== "proximity" && layout !== "tour" && !ALWAYS_STEPPED.has(layout) && slider("stagger")}
         {stepped && slider("hold")}
+        {HAS_LOOP_GAP.has(layout) && slider("loopGap")}
+        <Choice label="Loop fade" value={options.loopFade} options={ON_OFF} onChange={(value) => setOption("loopFade", value)} />
 
         {stepped && <Heading title="Easing" changed={easing !== BASE_EASING} onReset={() => setEasing(BASE_EASING)} />}
         <div className="mp-easing" hidden={!stepped}>
