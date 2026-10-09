@@ -107,6 +107,8 @@ export interface Variant {
   out?: boolean;
   /** orbit: an upright wheel seen from an angle */
   wheel?: boolean;
+  /** wheel: the card in focus leaves the wheel and moves out across the frame */
+  feature?: boolean;
   horizontal?: boolean;
   tornado?: boolean;
   close?: boolean;
@@ -383,6 +385,23 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, ...lean(Math.sin(angle), Math.cos(angle)), p };
     }
     const R = Math.max(1.6, ((c.w + c.g) * c.n) / TAU) * c.m.radius;
+    if (c.v.feature) {
+      // A tight wheel, whole and inside the left of the frame. As a card comes
+      // into focus it leaves the wheel and travels out to the right, where there
+      // is room to show it large; as it loses focus it goes back to its place.
+      const tight = (((c.w + c.g) * c.n) / TAU) * c.m.radius; // cards a gap apart, no minimum size
+      const centreX = Math.min(-c.A + tight + c.w / 2 + 0.12, -c.A * 0.35);
+      const out = smooth(1 - Math.abs(p)); // 1 in focus, 0 from one place away
+      const tilt = lean(Math.cos(angle), Math.sin(angle));
+      return {
+        x: lerp(centreX + Math.cos(angle) * tight, c.A * 0.4 * c.m.shape, out),
+        y: Math.sin(angle) * tight * (1 - out),
+        z: out * 0.25,
+        rx: tilt.rx * (1 - out),
+        ry: tilt.ry * (1 - out),
+        p,
+      };
+    }
     if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, ...lean(Math.cos(angle), Math.sin(angle)), p };
     return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, ...lean(Math.sin(angle), Math.cos(angle)), p };
   },
@@ -897,7 +916,10 @@ const COUNT_MAX: Record<LayoutName, number> = {
  * What the shape slider is called in each layout that has one. Layouts built
  * on a circle use Radius instead; the rest have no single shape to dial.
  */
-export const SHAPE_LABEL: Partial<Record<LayoutName, string>> = {
+/** The shape slider's name for a preset, or undefined when it has none. */
+export const shapeLabel = (preset: Preset): string | undefined => (preset.variant.feature ? "Pull out" : SHAPE_LABEL[preset.layout]);
+
+const SHAPE_LABEL: Partial<Record<LayoutName, string>> = {
   fan: "Curve",
   wave: "Wave height",
   stairs: "Rise",
@@ -923,7 +945,7 @@ export function rangeFor(preset: Preset, key: MotionKey): Range {
   if (key === "scale") return field ? base : { ...base, max: 3 };
   if (key === "reach") return field ? base : { ...base, max: 4 };
   // Past 1.6 a fan's ends fold right over.
-  if (key === "shape") return { ...base, label: SHAPE_LABEL[preset.layout] ?? base.label, max: preset.layout === "fan" ? 1.6 : base.max };
+  if (key === "shape") return { ...base, label: shapeLabel(preset) ?? base.label, max: preset.layout === "fan" ? 1.6 : preset.variant.feature ? 1.6 : base.max };
   return base;
 }
 
@@ -1047,6 +1069,7 @@ export const PRESETS: Preset[] = [
   preset("Deck 03", "deck", { fly: "spin" }, { count: 6, size: 1, gap: 0.4, rhythm: 1 }),
   preset("Wheel 01", "wheel", {}, { count: 12, size: 0.7, gap: 0.3, rhythm: 1 }),
   preset("Wheel 02", "wheel", { side: true }, { count: 12, size: 0.6, gap: 0.35, rhythm: 1 }),
+  preset("Wheel 04", "wheel", { feature: true }, { count: 12, size: 0.4, gap: 0.25, rhythm: 1, hold: 0.55, stagger: 0.3, scale: 2.8, reach: 1 }, { options: { focus: "centre" } }),
   preset("Wheel 03", "wheel", { full: true }, { count: 8, size: 0.24, gap: 0.1 }),
   preset("Grid 01", "grid", { pan: "x" }, { count: 24, size: 0.6, gap: 0.1 }),
   preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.1, tilt: 48 }),
