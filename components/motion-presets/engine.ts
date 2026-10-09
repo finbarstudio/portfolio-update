@@ -193,6 +193,8 @@ export interface Options {
   origin: Origin;
   /** everything fades out to the background at the end of the loop and back in at the start */
   loopFade: boolean;
+  /** wheel: cards turned to lie along their spokes, like rays, instead of all standing upright */
+  sunray: boolean;
 }
 
 export interface Preset {
@@ -444,12 +446,14 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     // the other: somewhere one card would end up under both. So every card leans
     // a hair about the spoke it sits on, leading edge up, like the blades of a
     // shutter, and the overlap is the same all the way round.
-    // With "face viewer" on, every card stays square to the screen instead, and the
-    // ones nearest the focus are simply drawn in front.
+    // With Face viewer on the cards lie flat to the screen instead, the one in focus on top.
     const lean = (x: number, y: number) => (c.o.faceCamera ? { rx: 0, ry: 0, z: -Math.abs(p) * 0.004 } : { rx: WHEEL_LEAN * x, ry: WHEEL_LEAN * y });
+    // Sunray: each card turned in its own plane so its centre line runs along
+    // its spoke, top edge outwards. `spokeX` and `spokeY` point from the hub to the card.
+    const ray = (spokeX: number, spokeY: number) => (c.o.sunray ? Math.atan2(-spokeX, spokeY) : 0);
     if (c.v.full) {
       const R = 0.68 * Math.min(1, c.A) * c.m.radius;
-      return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, ...lean(Math.sin(angle), Math.cos(angle)), p };
+      return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, ...lean(Math.sin(angle), Math.cos(angle)), rz: ray(Math.sin(angle), Math.cos(angle)), p };
     }
     const R = Math.max(1.6, ((c.w + c.g) * c.n) / TAU) * c.m.radius;
     if (c.v.feature) {
@@ -462,12 +466,13 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       const out = smooth(1 - Math.abs(p)); // 1 in focus, 0 from one place away
       const blade = lean(Math.cos(angle), Math.sin(angle));
       const placed = featureCard(c, centre + Math.cos(angle) * tight, Math.sin(angle) * tight, c.o.faceCamera ? -Math.abs(p) * 0.004 : 0, centre, half * (c.v.tall ? 0.52 : 0.4) * c.m.shape, out);
-      // Facing the viewer: the cards go round with the wheel but none of them turns with it.
-      if (c.o.faceCamera) return { ...placed, rx: 0, ry: 0, p };
-      return { ...placed, rx: placed.rx + blade.rx * (1 - out), ry: placed.ry + blade.ry * (1 - out), p };
+      const spoke = featurePlace(c, Math.cos(angle), Math.sin(angle));
+      // The card stands upright as it is pulled out of the wheel.
+      if (c.o.faceCamera) return { ...placed, rx: 0, ry: 0, rz: ray(spoke.x, spoke.y) * (1 - out), p };
+      return { ...placed, rx: placed.rx + blade.rx * (1 - out), ry: placed.ry + blade.ry * (1 - out), rz: ray(spoke.x, spoke.y) * (1 - out), p };
     }
-    if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, ...lean(Math.cos(angle), Math.sin(angle)), p };
-    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, ...lean(Math.sin(angle), Math.cos(angle)), p };
+    if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, ...lean(Math.cos(angle), Math.sin(angle)), rz: ray(Math.cos(angle), Math.sin(angle)), p };
+    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, ...lean(Math.sin(angle), Math.cos(angle)), rz: ray(Math.sin(angle), Math.cos(angle)), p };
   },
   grid(i, c) {
     const cols = gridCols(c.n);
@@ -922,7 +927,7 @@ export const BASE_MOTION: Motion = {
   groupTilt: 0,
 };
 
-export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre", loopFade: false };
+export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre", loopFade: false, sunray: false };
 
 export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max: number; step: number }> = {
   duration: { label: "Loop (sec)", min: 3, max: 120, step: 1 },
@@ -1340,6 +1345,7 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   if (typeof savedOptions.centre === "boolean") options.centre = savedOptions.centre;
   if (typeof savedOptions.faceCamera === "boolean") options.faceCamera = savedOptions.faceCamera;
   if (typeof savedOptions.loopFade === "boolean") options.loopFade = savedOptions.loopFade;
+  if (typeof savedOptions.sunray === "boolean") options.sunray = savedOptions.sunray;
   options.origin = oneOf(savedOptions.origin, ["centre", "left", "right", "up", "down"] as const) ?? options.origin;
 
   let easing = BASE_EASING;

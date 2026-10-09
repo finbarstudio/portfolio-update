@@ -571,6 +571,10 @@ const TILTS: { value: TiltMode; label: string }[] = [
   { value: "uniform", label: "Uniform" },
   { value: "alternate", label: "Alternate" },
 ];
+const CARD_FACINGS = [
+  { value: false, label: "Upright" },
+  { value: true, label: "Sunray" },
+];
 const ON_OFF = [
   { value: false, label: "Off" },
   { value: true, label: "On" },
@@ -1272,9 +1276,8 @@ export default function MotionTool() {
         <Choice label="Tilt" value={options.tiltMode} options={TILTS} onChange={(value) => setOption("tiltMode", value)} />
         {focusable && <Choice label="Solo" value={options.solo} options={ON_OFF} onChange={(value) => setOption("solo", value)} />}
         {layout === "orbit" && <Choice label="Centre card" value={options.centre} options={ON_OFF} onChange={(value) => setOption("centre", value)} />}
-        {((layout === "orbit" && !preset.variant.flat) || layout === "wheel" || (layout === "deck" && preset.variant.feature)) && (
-          <Choice label="Face viewer" value={options.faceCamera} options={ON_OFF} onChange={(value) => setOption("faceCamera", value)} />
-        )}
+        {((layout === "orbit" && !preset.variant.flat) || layout === "wheel" || (layout === "deck" && preset.variant.feature)) && <Choice label="Face viewer" value={options.faceCamera} options={ON_OFF} onChange={(value) => setOption("faceCamera", value)} />}
+        {layout === "wheel" && <Choice label="Cards" value={options.sunray} options={CARD_FACINGS} onChange={(value) => setOption("sunray", value)} />}
         {sceneKeys.map(slider)}
         {pins && (
           <>
