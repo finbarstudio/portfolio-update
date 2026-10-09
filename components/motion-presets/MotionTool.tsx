@@ -84,13 +84,21 @@ const PINT_URL = "https://donate.stripe.com/cNi6oH8vP2f6eHlaoQ8N200";
 
 const RECORDING_TYPES = ["video/mp4;codecs=avc1.640033", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
 
-/** Big photos are drawn down to 2048px so 60 of them still fit on the GPU. */
-function shrink(image: HTMLImageElement): TexImageSource {
-  const longest = Math.max(image.naturalWidth, image.naturalHeight);
-  if (longest <= 2048) return image;
+/**
+ * While editing, pictures and the canvas are kept small so heavy media stays
+ * smooth. An export redraws both at full size for as long as it records.
+ */
+const PREVIEW_PICTURE = 1024;
+const EXPORT_PICTURE = 2560;
+const PREVIEW_CANVAS = 1280;
+
+/** A picture no longer than `longest` on its long side. */
+function shrink(image: HTMLImageElement, longest: number): TexImageSource {
+  const size = Math.max(image.naturalWidth, image.naturalHeight);
+  if (size <= longest) return image;
   const canvas = document.createElement("canvas");
-  canvas.width = Math.round((image.naturalWidth * 2048) / longest);
-  canvas.height = Math.round((image.naturalHeight * 2048) / longest);
+  canvas.width = Math.round((image.naturalWidth * longest) / size);
+  canvas.height = Math.round((image.naturalHeight * longest) / size);
   canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height);
   return canvas;
 }
@@ -116,7 +124,7 @@ function loadFile(renderer: Renderer, file: File, id: number): Promise<MediaItem
     } else {
       const image = new Image();
       image.onload = () =>
-        resolve({ id, texture: renderer.texture(shrink(image), true), aspect: image.naturalWidth / image.naturalHeight, url });
+        resolve({ id, texture: renderer.texture(shrink(image, PREVIEW_PICTURE), true), aspect: image.naturalWidth / image.naturalHeight, url, image });
       image.onerror = fail;
       image.src = url;
     }
@@ -441,6 +449,9 @@ export default function MotionTool() {
   const sceneRef = useRef<Omit<Scene, "media">>({ preset, motion, options, easing, path, look });
   const loopStartRef = useRef(0);
   const nextIdRef = useRef(0);
+  /** True while an export records: the loop then draws at full size. */
+  const fullSizeRef = useRef(false);
+  const draggedRef = useRef<number | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const setupInputRef = useRef<HTMLInputElement>(null);
   const previewCanvases = useRef(new Map<string, HTMLCanvasElement>());
@@ -513,7 +524,9 @@ export default function MotionTool() {
     loopStartRef.current = performance.now();
     let frame = requestAnimationFrame(function tick(now) {
       const { duration } = sceneRef.current.motion;
-      renderer.draw(((now - loopStartRef.current) / 1000) % duration, { ...sceneRef.current, media: mediaRef.current });
+      const { width, height } = sceneRef.current.look;
+      const resolution = fullSizeRef.current ? 1 : Math.min(1, PREVIEW_CANVAS / Math.max(width, height));
+      renderer.draw(((now - loopStartRef.current) / 1000) % duration, { ...sceneRef.current, media: mediaRef.current, resolution });
       frame = requestAnimationFrame(tick);
     });
     return () => {
@@ -559,6 +572,15 @@ export default function MotionTool() {
       mediaRef.current = greyCards(renderer);
       placeholdersRef.current = true;
     }
+    syncThumbs();
+  }
+
+  /** Moves one upload to another place in the order. The order is the order cards are filled in. */
+  function moveMedia(id: number, to: number) {
+    const from = mediaRef.current.findIndex((item) => item.id === id);
+    if (from < 0 || to < 0 || to >= mediaRef.current.length || from === to) return;
+    const [moved] = mediaRef.current.splice(from, 1);
+    mediaRef.current.splice(to, 0, moved);
     syncThumbs();
   }
 
@@ -612,17 +634,43 @@ export default function MotionTool() {
     if (!type) return setStatus("This browser cannot record video.");
     const { duration } = sceneRef.current.motion;
     const name = `${sceneRef.current.preset.name.toLowerCase().replace(" ", "-")}.${type.includes("mp4") ? "mp4" : "webm"}`;
+    const renderer = rendererRef.current;
+    if (!renderer) return;
+    // Full-size pictures and canvas for the length of the recording, then back to the light ones.
+    const previews = new Map<number, WebGLTexture>();
+    for (const item of mediaRef.current) {
+      if (!item.image || Math.max(item.image.naturalWidth, item.image.naturalHeight) <= PREVIEW_PICTURE) continue;
+      previews.set(item.id, item.texture);
+      item.texture = renderer.texture(shrink(item.image, EXPORT_PICTURE), true);
+    }
+    fullSizeRef.current = true;
+    const restore = () => {
+      fullSizeRef.current = false;
+      for (const item of mediaRef.current) {
+        const preview = previews.get(item.id);
+        if (!preview) continue;
+        renderer.deleteTexture(item.texture);
+        item.texture = preview;
+        previews.delete(item.id);
+      }
+      // Anything removed mid-export took its full-size picture with it; drop its preview too.
+      for (const preview of previews.values()) renderer.deleteTexture(preview);
+    };
+    // The canvas must already be full size when the recorder first looks at it.
+    renderer.draw(0, { ...sceneRef.current, media: mediaRef.current, resolution: 1 });
     const recorder = new MediaRecorder(canvas.captureStream(60), { mimeType: type, videoBitsPerSecond: 24_000_000 });
     const chunks: Blob[] = [];
     recorder.ondataavailable = (event) => {
       if (event.data.size) chunks.push(event.data);
     };
     recorder.onstop = () => {
+      restore();
       download(new Blob(chunks, { type: type.split(";")[0] }), name);
       setExporting(false);
       setStatus(`Saved ${name}`);
     };
     recorder.onerror = () => {
+      restore();
       setExporting(false);
       setStatus("Recording failed.");
     };
@@ -670,13 +718,14 @@ export default function MotionTool() {
       className="mp-tool"
       onDragOver={(event) => {
         event.preventDefault();
-        setDragging(true);
+        // Dragging a thumbnail to reorder it is not a file drop.
+        if (event.dataTransfer.types.includes("Files")) setDragging(true);
       }}
       onDragLeave={() => setDragging(false)}
       onDrop={(event) => {
         event.preventDefault();
         setDragging(false);
-        void addFiles(event.dataTransfer.files);
+        if (event.dataTransfer.types.includes("Files")) void addFiles(event.dataTransfer.files);
       }}
     >
       <nav className="mp-panel mp-panel-left" aria-label="Presets">
@@ -782,11 +831,43 @@ export default function MotionTool() {
         {thumbs.length > 0 && (
           <ul className="mp-media">
             {thumbs.map((thumb, index) => (
-              <li key={thumb.id}>
-                {thumb.isVideo ? <video src={thumb.url} muted /> : <img src={thumb.url} alt={`Media ${index + 1}`} />}
-                <button type="button" aria-label={`Remove media ${index + 1}`} onClick={() => removeMedia(thumb.id)}>
+              <li
+                key={thumb.id}
+                draggable
+                onDragStart={(event) => {
+                  draggedRef.current = thumb.id;
+                  event.dataTransfer.effectAllowed = "move";
+                  event.dataTransfer.setData("text/plain", String(index + 1));
+                }}
+                onDragOver={(event) => {
+                  if (draggedRef.current === null) return;
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = "move";
+                }}
+                onDrop={(event) => {
+                  if (draggedRef.current === null) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  moveMedia(draggedRef.current, index);
+                  draggedRef.current = null;
+                }}
+                onDragEnd={() => {
+                  draggedRef.current = null;
+                }}
+              >
+                {thumb.isVideo ? <video src={thumb.url} muted /> : <img src={thumb.url} alt={`Media ${index + 1}`} draggable={false} />}
+                <span className="mp-media-slot">{index + 1}</span>
+                <button type="button" className="mp-media-remove" aria-label={`Remove media ${index + 1}`} onClick={() => removeMedia(thumb.id)}>
                   ×
                 </button>
+                <span className="mp-media-move">
+                  <button type="button" aria-label={`Move media ${index + 1} earlier`} disabled={index === 0} onClick={() => moveMedia(thumb.id, index - 1)}>
+                    ‹
+                  </button>
+                  <button type="button" aria-label={`Move media ${index + 1} later`} disabled={index === thumbs.length - 1} onClick={() => moveMedia(thumb.id, index + 1)}>
+                    ›
+                  </button>
+                </span>
               </li>
             ))}
           </ul>

@@ -10,11 +10,15 @@ export interface MediaItem {
   video?: HTMLVideoElement;
   /** object URL of an uploaded file, also used for its thumbnail */
   url?: string;
+  /** the decoded picture, kept so an export can be drawn from it at full quality */
+  image?: HTMLImageElement;
 }
 
 export interface Scene extends Settings {
   look: Look;
   media: MediaItem[];
+  /** Share of the full canvas size to draw at, 0 to 1. The preview draws small; an export draws at 1. */
+  resolution?: number;
 }
 
 type Matrix = number[];
@@ -134,7 +138,10 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
 
     draw(seconds, scene) {
       const { look, media } = scene;
-      const { width, height } = look;
+      // Sides stay even at any resolution: H.264 cannot encode an odd one.
+      const resolution = clamp(scene.resolution ?? 1, 0.1, 1);
+      const width = Math.max(2, Math.round((look.width * resolution) / 2) * 2);
+      const height = Math.max(2, Math.round((look.height * resolution) / 2) * 2);
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
