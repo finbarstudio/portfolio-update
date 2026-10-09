@@ -271,6 +271,8 @@ const ringRadius = (c: Context) =>
   (c.v.inside ? Math.max(2.4, ((c.w + c.g) * c.n) / TAU) : Math.max(c.w * 1.1, ((c.w + c.g) * c.n) / TAU)) * c.m.radius;
 export const gridCols = (n: number) => Math.ceil(Math.sqrt(n));
 const GOLDEN_ANGLE = 2.39996323;
+/** How far each wheel card leans about its spoke, in radians: about 3 degrees, too little to see as a tilt. */
+const WHEEL_LEAN = 0.05;
 /** An upright wheel's cards and radius: sized so the whole wheel sits inside the frame. */
 const WHEEL_CARD = 0.5;
 const wheelRadius = (c: Context, cards: number) => Math.max(0.95, ((c.w * WHEEL_CARD + c.g) * cards) / TAU) * c.m.radius;
@@ -371,13 +373,18 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
   wheel(i, c) {
     const angle = TAU * (i / c.n + c.T);
     const p = centred(i + c.T * c.n, c.n);
+    // Flat cards in a closed circle cannot each sit over one neighbour and under
+    // the other: somewhere one card would end up under both. So every card leans
+    // a hair about the spoke it sits on, leading edge up, like the blades of a
+    // shutter, and the overlap is the same all the way round.
+    const lean = (x: number, y: number) => ({ rx: WHEEL_LEAN * x, ry: WHEEL_LEAN * y });
     if (c.v.full) {
       const R = 0.68 * Math.min(1, c.A) * c.m.radius;
-      return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, p };
+      return { x: Math.sin(angle) * R, y: Math.cos(angle) * R, ...lean(Math.sin(angle), Math.cos(angle)), p };
     }
     const R = Math.max(1.6, ((c.w + c.g) * c.n) / TAU) * c.m.radius;
-    if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, p };
-    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, p };
+    if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, ...lean(Math.cos(angle), Math.sin(angle)), p };
+    return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, ...lean(Math.sin(angle), Math.cos(angle)), p };
   },
   grid(i, c) {
     const cols = gridCols(c.n);
