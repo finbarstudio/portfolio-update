@@ -2092,7 +2092,7 @@ export const PRESETS: AnimationPreset[] = [
     id: "walk-past",
     name: "Walk Past",
     description: "",
-    ids: ["sign-1", "sign-2", "sign-3", "sign-4", "billboard"],
+    ids: ["sign-1", "sign-2", "sign-3", "sign-4", "billboard", "framed-poster"],
     shots: [
       {
         name: "Walk",

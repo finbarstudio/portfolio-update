@@ -368,6 +368,23 @@ export const DEVICES: DeviceDef[] = [
     rotation: [0, -45, 0],
     screenAspect: 26.98 / 10.43,
   },
+  {
+    id: "framed-poster",
+    category: "Signage",
+    name: "Framed Poster",
+    // Built for this studio: a frame, a mat board and the poster face. Only the frame takes a colour.
+    url: "/media/lab/mockup/models/signage/framed-poster/model.glb",
+    screenMesh: "poster_screen",
+    bodyMaterials: /^frame$/,
+    colors: [
+      { name: "Black", hex: null },
+      { name: "White", hex: "#f1f1f1" },
+      { name: "Oak", hex: "#b08a5a" },
+      { name: "Walnut", hex: "#5a3d2b" },
+    ],
+    screenPixels: [5000, 7000],
+    screenAspect: 5 / 7,
+  },
 ];
 
 export const DEFAULT_DEVICE_ID = DEVICES[0].id;
