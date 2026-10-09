@@ -21,6 +21,14 @@ export interface LabItem {
 
 const RAW_ITEMS: LabItem[] = [
   {
+    id: 8,
+    name: "Mockup studio",
+    line: "3D device mockups, animated and exported",
+    href: "/mockup",
+    image: "/media/lab/mockup/tile.webp",
+    added: "2026-10-09",
+  },
+  {
     id: 7,
     name: "Invoice maker",
     line: "Invoices, quotes and receipts",
