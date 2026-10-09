@@ -649,6 +649,8 @@ export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "
  * first is a visible join. These can leave empty places between the two.
  */
 export const HAS_LOOP_GAP: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "ring", "wheel", "deck", "helix", "stairs", "wave", "tunnel", "flip", "pulse", "zoom"]);
+/** How far the card in focus comes forward: enough to win the overlap, too little to see as movement. */
+const FOCUS_LIFT = 0.03;
 /** How long the fade out and the fade in each take, as a share of the loop. */
 const LOOP_FADE = 0.07;
 
@@ -705,7 +707,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     const raw = layouts[layout](i, c);
     if (!raw) continue;
     let { x = 0, y = 0, rx = 0, ry = 0, rz = 0, s = 1, a = 1 } = raw;
-    const z = raw.z ?? 0;
+    let z = raw.z ?? 0;
     if (raw.u !== undefined || raw.v !== undefined) {
       const u = raw.u ?? 0;
       const v = raw.v ?? 0;
@@ -724,6 +726,9 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     if (raw.p !== undefined) {
       const d = Math.abs(raw.p - f);
       if (o.focus !== "off" && !raw.scaled) s *= 1 + (m.scale - 1) * bump(raw.p - f, m.reach);
+      // The nearer a card is to the focus, the further forward it sits, so the
+      // card in focus is always drawn over its neighbours when they overlap.
+      if (o.focus !== "off" || raw.scaled) z += FOCUS_LIFT * bump(raw.p - f, m.reach);
       // Fade steepens with the slider until, at full, it is exactly Solo: only the card in focus shows.
       a *= clamp(1.5 - d * 2 * (o.solo ? 1 : m.fade));
     }
