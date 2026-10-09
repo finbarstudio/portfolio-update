@@ -98,6 +98,7 @@ const EXPORT_PICTURE = 2560;
 const THUMB_PICTURE = 160;
 const PREVIEW_VIDEO = 640;
 const PREVIEW_CANVAS = 1280;
+const FULL_SCREEN_CANVAS = 2560;
 
 /** A copy of a picture or video frame no longer than `longest` on its long side. */
 function drawnDown(source: ImageBitmap | HTMLVideoElement, longest: number): HTMLCanvasElement {
@@ -510,6 +511,23 @@ export default function MotionTool() {
   /** True while an export records: the loop then draws at full size. */
   const fullSizeRef = useRef(false);
   const draggedRef = useRef<number | null>(null);
+  const stageRef = useRef<HTMLElement>(null);
+  const [fullScreen, setFullScreen] = useState(false);
+  const fullScreenRef = useRef(false);
+
+  useEffect(() => {
+    const changed = () => {
+      fullScreenRef.current = document.fullscreenElement === stageRef.current;
+      setFullScreen(fullScreenRef.current);
+    };
+    document.addEventListener("fullscreenchange", changed);
+    return () => document.removeEventListener("fullscreenchange", changed);
+  }, []);
+
+  const toggleFullScreen = () => {
+    if (document.fullscreenElement) void document.exitFullscreen();
+    else void stageRef.current?.requestFullscreen().catch(() => setStatus("This browser would not go full screen."));
+  };
   const imageInputRef = useRef<HTMLInputElement>(null);
   const setupInputRef = useRef<HTMLInputElement>(null);
   const previewCanvases = useRef(new Map<string, HTMLCanvasElement>());
@@ -583,7 +601,9 @@ export default function MotionTool() {
     let frame = requestAnimationFrame(function tick(now) {
       const { duration } = sceneRef.current.motion;
       const { width, height } = sceneRef.current.look;
-      const resolution = fullSizeRef.current ? 1 : Math.min(1, PREVIEW_CANVAS / Math.max(width, height));
+      // Filling the screen needs more pixels than the small editing preview.
+      const longest = fullScreenRef.current ? FULL_SCREEN_CANVAS : PREVIEW_CANVAS;
+      const resolution = fullSizeRef.current ? 1 : Math.min(1, longest / Math.max(width, height));
       renderer.draw(((now - loopStartRef.current) / 1000) % duration, { ...sceneRef.current, media: mediaRef.current, resolution, fullQuality: fullSizeRef.current });
       frame = requestAnimationFrame(tick);
     });
@@ -900,7 +920,7 @@ export default function MotionTool() {
         <p className="mp-version">{VERSION}</p>
       </nav>
 
-      <main className="mp-stage">
+      <main className="mp-stage" ref={stageRef}>
         {unsupported ? (
           <p>This browser cannot draw the preview. Try a current version of Chrome, Safari or Firefox.</p>
         ) : (
@@ -916,9 +936,14 @@ export default function MotionTool() {
             </div>
           </div>
         )}
-        <button type="button" className="mp-restart" disabled={exporting} onClick={restart}>
-          Restart
-        </button>
+        <div className="mp-stage-buttons">
+          <button type="button" disabled={exporting} onClick={restart}>
+            Restart
+          </button>
+          <button type="button" onClick={toggleFullScreen} aria-pressed={fullScreen}>
+            {fullScreen ? "Exit full screen" : "Full screen"}
+          </button>
+        </div>
         <a className="mp-pint mp-pint-float" href={PINT_URL} target="_blank" rel="noopener noreferrer">
           Buy me a pint
         </a>

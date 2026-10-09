@@ -373,19 +373,45 @@
   outline-offset: 1px;
 }
 
-/* Restart sits in the strip under the canvas, opposite the pint link. */
-.mp-tool .mp-restart {
+/* Restart and full screen sit in the strip under the canvas, opposite the pint link. */
+.mp-stage-buttons {
   position: absolute;
   bottom: 16px;
   left: 16px;
+  display: flex;
+  gap: 6px;
+}
+.mp-tool .mp-stage-buttons button {
   min-height: 34px;
   padding: 0 14px;
   color: var(--mp-dim);
   background: rgb(21 21 23 / 0.8);
   border-radius: 999px;
 }
-.mp-tool .mp-restart:hover {
+.mp-tool .mp-stage-buttons button:hover,
+.mp-tool .mp-stage-buttons button[aria-pressed="true"] {
   color: var(--mp-text);
+}
+/* Full screen: only the picture, as large as it goes. The buttons wait until the pointer is over them. */
+.mp-stage:fullscreen {
+  padding: 0;
+  background: #000;
+}
+.mp-stage:fullscreen canvas {
+  max-height: 100dvh;
+  border-radius: 0;
+  box-shadow: none;
+}
+.mp-stage:fullscreen .mp-pint-float {
+  display: none;
+}
+.mp-stage:fullscreen .mp-stage-buttons {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.mp-stage:fullscreen .mp-stage-buttons:hover,
+.mp-stage:fullscreen .mp-stage-buttons:focus-within {
+  opacity: 1;
 }
 
 /* Loading screen over the preview while files are read in or an export is made ready. */
@@ -883,9 +909,13 @@
     background: #0c0c0d;
     box-shadow: 0 1px 0 var(--mp-line);
   }
-  .mp-pint.mp-pint-float,
-  .mp-tool .mp-restart {
+  .mp-pint.mp-pint-float {
     display: none;
+  }
+  .mp-stage-buttons {
+    position: static;
+    justify-content: center;
+    margin-top: 10px;
   }
   .mp-stage canvas {
     max-height: 42dvh;
