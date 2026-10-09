@@ -197,7 +197,6 @@ const RAW: Slide[] = [
       "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
     meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
   },
-  one("portfolio/rennen-plus/pink-porsche.webp", "The brand: Rennen Motorsport’s car, The Pink Porsche, at the Adelaide Rally", { frame: false }),
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
   one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
   linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
