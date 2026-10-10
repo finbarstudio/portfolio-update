@@ -4865,13 +4865,13 @@ body:has(.case-study) { background-color: #fff; }
 /* ── Website brief form (/webform) ─────────────────────────────────────────────
    Prospect questionnaire. Boxed light text fields and tag-style choice chips.
    Unlayered on purpose. */
-.brief-form { margin-top: 2.5rem; display: grid; gap: 3rem; }
-.brief-section { border: 0; padding: 0; margin: 0; display: grid; gap: 1.5rem; min-width: 0; }
-.brief-section > legend { padding: 0 0 0.9rem; margin-bottom: 0.25rem; width: 100%; border-bottom: 1px solid var(--line); }
+.brief-form { margin-top: 2.75rem; display: grid; gap: 4.5rem; }
+.brief-section { border: 0; padding: 0; margin: 0; display: grid; gap: 2.5rem; min-width: 0; }
+.brief-section > legend { padding: 0 0 0.9rem; margin-bottom: 1rem; width: 100%; border-bottom: 1px solid var(--line); }
 .brief-grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
 @media (min-width: 640px) { .brief-grid { grid-template-columns: 1fr 1fr; } }
-.brief-field { display: grid; gap: 0.45rem; min-width: 0; }
-.brief-label { font-size: var(--text-body); font-weight: 500; color: var(--ink); line-height: 1.35; }
+.brief-field { display: grid; gap: 0.6rem; min-width: 0; }
+.brief-label { font-size: 1.125rem; font-weight: 600; color: var(--ink); line-height: 1.3; letter-spacing: -0.005em; }
 .brief-hint { font-size: var(--text-small); color: var(--ink-soft); line-height: 1.4; }
 .brief-input {
   width: 100%;
@@ -4935,4 +4935,5 @@ textarea.brief-input { resize: vertical; min-height: 6.5rem; line-height: 1.5; }
 .brief-error { font-size: var(--text-small); color: var(--pink-deep); }
 .brief-done { margin-top: 2.5rem; display: grid; gap: 0.75rem; max-width: 34rem; font-size: var(--text-body); line-height: 1.6; color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { .brief-input, .brief-chip span { transition: none; } }
+
 
