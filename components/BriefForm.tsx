@@ -25,6 +25,7 @@ const GOALS = [
 ];
 
 const PAGES = [
+  "Exactly as on my site now",
   "Home",
   "About",
   "Services",
