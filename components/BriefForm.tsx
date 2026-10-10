@@ -1,9 +1,12 @@
 "use client";
 
 /**
- * BriefForm — the project brief a prospect fills in so a site can be scoped
- * and quoted. Lives at /webform. Posts to Web3Forms, which emails the answers
- * to Finbar; the mailto branch is only a safety net if the key is ever removed.
+ * BriefForm — the website brief a prospect fills in so a site can be scoped.
+ * Lives at /webform. It asks for what Finbar can NOT see by looking at their
+ * current site: how the business gets work, how the site is run day to day,
+ * and what they want from a new one. No prices here; the quote comes after.
+ * Posts to Web3Forms, which emails the answers to Finbar; the mailto branch is
+ * only a safety net if the key is ever removed.
  */
 
 import { useCallback, useState } from "react";
@@ -15,13 +18,24 @@ const W3F_KEY = "507b6a42-46fc-48a2-91bd-691168385977";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
+const SOURCES = ["Google search", "Word of mouth", "Repeat customers", "Social media", "Directories or review sites", "Paid ads", "Not sure"];
+const CONTACT_WAYS = ["Phone call", "WhatsApp or text", "Email", "The form on my site", "Social media messages"];
+const SITE_WORKS = ["Yes, a lot", "Some", "Hardly any", "No idea"];
+
+const UPDATE_FREQ = ["Every week", "Every month", "A few times a year", "Hardly ever"];
+const UPDATE_WHAT = ["New projects or photos", "Prices or services", "News or blog posts", "Offers", "Opening hours or contact details", "Reviews"];
+const UPDATE_HOW = ["I do it myself", "Someone on my team does", "I pay a web person or agency", "Nobody, it never gets updated"];
+const UPDATE_EASE = ["Easy", "Fiddly but I manage", "Painful, I avoid it"];
+const UPDATE_FUTURE = ["Me or my team", "You, Finbar", "A mix of both", "Not sure"];
+const AI_USE = ["Yes, most days", "Now and then", "No"];
+
 const GOALS = [
   "Get more enquiries",
+  "Get better enquiries, not more",
   "Take quote or booking requests",
   "Show off our work",
   "Look more professional",
-  "Be easier to use on a phone",
-  "Be easier for us to update",
+  "Save us time answering the same questions",
 ];
 
 const PAGES = [
@@ -35,36 +49,11 @@ const PAGES = [
   "Contact",
 ];
 
-const FEATURES = [
-  "Contact form",
-  "Quote or estimate tool",
-  "Online booking",
-  "Photo gallery",
-  "Edit it ourselves (CMS)",
-  "Customer reviews",
-  "Map or service areas",
-  "Animation and motion",
-  "Newsletter sign-up",
-];
-
-/** Guide prices, the same three as /pricing. Each one is a full build. */
-const SIZES = [
-  { value: "Landing page, about £1,750", name: "Landing page", price: "£1,750", note: "One page that does one job properly." },
-  { value: "Small site, about £3,500", name: "Small site", price: "£3,500", note: "Around three pages, such as home, about and contact." },
-  { value: "Custom site, from £4,000", name: "Custom site", price: "from £4,000", note: "More pages, project or blog posts, custom tools, a CMS." },
-  { value: "Not sure yet", name: "Not sure yet", price: "", note: "Tell me what you need and I will suggest the right size." },
-];
-
-const UPDATE_FREQ = ["Every week", "Every month", "A few times a year", "Hardly ever"];
-const UPDATE_WHAT = ["New projects or photos", "Prices or services", "News or blog posts", "Offers", "Opening hours or contact details", "Reviews"];
-const UPDATE_HOW = ["I do it myself", "Someone on my team does", "I pay a web person or agency", "Nobody, it never gets updated"];
-const PLATFORMS = ["WordPress", "Wix", "Squarespace", "Shopify", "GoDaddy", "No idea"];
-const UPDATE_EASE = ["Easy", "Fiddly but I manage", "Painful, I avoid it"];
-const AI_USE = ["Yes, most days", "Now and then", "No"];
-const TIMELINES = ["As soon as possible", "In the next 1 to 2 months", "In 3 months or more", "No deadline"];
+const BRAND = ["Yes, keep them", "Yes, but they could be sharper", "No, I need them"];
 const PHOTOS = ["We have good photos", "We have some, they need work", "We need new photos"];
 const WORDS = ["We will write it", "We need help with the words", "Keep what is on our site now"];
-const HOSTING = ["Yes, host it for me", "No, I have hosting", "Not sure"];
+const TIMELINES = ["As soon as possible", "In the next 1 to 2 months", "In 3 months or more", "No deadline"];
+const DECIDES = ["Just me", "Me and a partner", "A few of us"];
 
 /** Field labels in the order they appear in the email. */
 const ORDER: [string, string][] = [
@@ -73,43 +62,49 @@ const ORDER: [string, string][] = [
   ["email", "Email"],
   ["phone", "Phone"],
   ["website", "Current website"],
-  ["about", "What the business does"],
-  ["goals", "Main goals"],
+  ["best_work", "Work they want more of"],
+  ["ideal_customer", "Ideal customer"],
+  ["sources", "Where enquiries come from"],
+  ["enquiries", "Enquiries in a typical week"],
+  ["contact_ways", "How customers get in touch"],
+  ["questions", "What customers ask before booking"],
+  ["competitors", "Competitors"],
+  ["site_works", "Does the site bring in work"],
   ["current_likes", "What they like about the current site"],
   ["current_dislikes", "What they do not like about it"],
   ["customer_feedback", "What customers say or get stuck on"],
+  ["why_now", "Why now"],
   ["update_freq", "How often they want to update"],
   ["update_what", "What they update"],
   ["update_how", "Who updates it now"],
-  ["platform", "Current platform"],
   ["update_ease", "How updating feels now"],
   ["update_future", "Who will update the new site"],
   ["ai_use", "Uses AI tools"],
   ["ai_tools", "Which AI tools"],
+  ["goals", "Main goals"],
+  ["one_thing", "The one thing it must do"],
   ["pages", "Pages needed"],
-  ["services", "Number of services or products"],
-  ["features", "Features wanted"],
-  ["feature_notes", "Feature notes"],
+  ["new_ideas", "New things they want on the site"],
   ["inspo_1", "Inspiration link 1"],
   ["inspo_2", "Inspiration link 2"],
   ["inspo_3", "Inspiration link 3"],
   ["likes", "What they like about those sites"],
+  ["avoid", "What to avoid"],
   ["brand", "Logo and brand"],
   ["photos", "Photos"],
   ["words", "Words"],
-  ["size", "Size of site"],
   ["timeline", "Timeline"],
-  ["hosting", "Hosting"],
+  ["decides", "Who decides"],
   ["notes", "Anything else"],
 ];
 
-function Chips({ name, options, type = "checkbox", required }: { name: string; options: string[]; type?: "checkbox" | "radio"; required?: boolean }) {
+function Chips({ name, options, type = "checkbox" }: { name: string; options: string[]; type?: "checkbox" | "radio" }) {
   return (
     <>
       <div className="brief-chips">
-        {options.map((o, i) => (
+        {options.map((o) => (
           <label key={o} className="brief-chip">
-            <input type={type} name={name} value={o} required={required && type === "radio" && i === 0} />
+            <input type={type} name={name} value={o} />
             <span>{o}</span>
           </label>
         ))}
@@ -117,6 +112,16 @@ function Chips({ name, options, type = "checkbox", required }: { name: string; o
       {/* Same field name, so a typed answer is sent alongside any chips picked. */}
       <input className="brief-input brief-other" name={name} type="text" placeholder="Something else? Type it here" aria-label="Something else" />
     </>
+  );
+}
+
+function Choice({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div className="brief-field">
+      <span className="brief-label">{label}</span>
+      {hint && <span className="brief-hint">{hint}</span>}
+      {children}
+    </div>
   );
 }
 
@@ -128,6 +133,10 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
       {children}
     </label>
   );
+}
+
+function Text({ name, rows = 3 }: { name: string; rows?: number }) {
+  return <textarea className="brief-input" placeholder="Type here" name={name} rows={rows} />;
 }
 
 export default function BriefForm() {
@@ -143,7 +152,7 @@ export default function BriefForm() {
       if (value) answers[label] = value;
     }
     const business = answers["Business"] || answers["Name"] || "new enquiry";
-    const subject = `Project brief: ${business}`;
+    const subject = `Website brief: ${business}`;
 
     if (W3F_KEY) {
       setStatus("sending");
@@ -183,10 +192,7 @@ export default function BriefForm() {
     return (
       <div className="brief-done" role="status">
         <h2 className="mono-heading text-ink">Thanks, that is everything I need.</h2>
-        <p>
-          I will read it through and come back to you within two working days with what I would
-          build and a fixed price.
-        </p>
+        <p>I will read it through and come back to you within two working days with a plan for your site.</p>
       </div>
     );
   }
@@ -212,146 +218,130 @@ export default function BriefForm() {
         <Field label="Your current website" hint="Leave blank if you do not have one">
           <input className="brief-input" name="website" type="text" inputMode="url" placeholder="www." />
         </Field>
-        <Field label="What does your business do, and who are your customers?">
-          <textarea className="brief-input" placeholder="Type here" name="about" rows={3} required />
+      </fieldset>
+
+      <fieldset className="brief-section">
+        <legend className="mono-heading text-ink">2. How your business gets work</legend>
+        <Field label="Which jobs or services do you most want more of?" hint="The ones that pay best, or the ones you enjoy most.">
+          <Text name="best_work" />
+        </Field>
+        <Field label="Describe your ideal customer" hint="Who they are, where they are, and what they usually need from you.">
+          <Text name="ideal_customer" />
+        </Field>
+        <Choice label="Where do most of your enquiries come from now?" hint="Pick any that apply">
+          <Chips name="sources" options={SOURCES} />
+        </Choice>
+        <Field label="Roughly how many enquiries do you get in a typical week?">
+          <input className="brief-input" placeholder="Type here" name="enquiries" type="text" />
+        </Field>
+        <Choice label="How do customers usually get in touch?" hint="Pick any that apply">
+          <Chips name="contact_ways" options={CONTACT_WAYS} />
+        </Choice>
+        <Field label="What do customers nearly always ask before they book?" hint="Price, how long it takes, whether you cover their area, and so on.">
+          <Text name="questions" />
+        </Field>
+        <Field label="Who are your main competitors?" hint="Optional. Names or links. It helps to know who you are up against.">
+          <Text name="competitors" rows={2} />
         </Field>
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">2. What the site needs to do</legend>
-        <div className="brief-field">
-          <span className="brief-label">What should the new site do for you?</span>
-          <span className="brief-hint">Pick any that apply</span>
-          <Chips name="goals" options={GOALS} />
-        </div>
-        <Field label="What do you like about your current site?" hint="Be specific. A page, a photo, the wording, anything worth keeping.">
-          <textarea className="brief-input" placeholder="Type here" name="current_likes" rows={3} />
+        <legend className="mono-heading text-ink">3. Your website now</legend>
+        <Choice label="Does your current site bring in work?">
+          <Chips name="site_works" type="radio" options={SITE_WORKS} />
+        </Choice>
+        <Field label="What do you like about it?" hint="Be specific. A page, a photo, the wording, anything worth keeping.">
+          <Text name="current_likes" />
         </Field>
         <Field label="What do you not like about it?" hint="Be specific. For example: hard to find prices, looks dated on a phone, the gallery is slow.">
-          <textarea className="brief-input" placeholder="Type here" name="current_dislikes" rows={3} />
+          <Text name="current_dislikes" />
         </Field>
         <Field label="Do customers ever say anything about the site, or get stuck on it?" hint="Optional">
-          <textarea className="brief-input" placeholder="Type here" name="customer_feedback" rows={2} />
+          <Text name="customer_feedback" rows={2} />
+        </Field>
+        <Field label="What made you start thinking about a new site now?">
+          <Text name="why_now" rows={2} />
         </Field>
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">3. Keeping it up to date</legend>
-        <div className="brief-field">
-          <span className="brief-label">How often would you like to update the site?</span>
+        <legend className="mono-heading text-ink">4. Keeping it up to date</legend>
+        <Choice label="How often would you like to update the site?">
           <Chips name="update_freq" type="radio" options={UPDATE_FREQ} />
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">What would you be changing?</span>
-          <span className="brief-hint">Pick any that apply</span>
+        </Choice>
+        <Choice label="What would you be changing?" hint="Pick any that apply">
           <Chips name="update_what" options={UPDATE_WHAT} />
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">Who updates your site at the moment?</span>
+        </Choice>
+        <Choice label="Who updates your site at the moment?">
           <Chips name="update_how" type="radio" options={UPDATE_HOW} />
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">What is your current site built on?</span>
-          <Chips name="platform" type="radio" options={PLATFORMS} />
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">How does updating it feel right now?</span>
+        </Choice>
+        <Choice label="How does updating it feel right now?">
           <Chips name="update_ease" type="radio" options={UPDATE_EASE} />
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">On the new site, who should make the updates?</span>
-          <Chips name="update_future" type="radio" options={["Me or my team", "You, Finbar", "A mix of both", "Not sure"]} />
-        </div>
+        </Choice>
+        <Choice label="On the new site, who should make the updates?">
+          <Chips name="update_future" type="radio" options={UPDATE_FUTURE} />
+        </Choice>
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">4. AI tools</legend>
-        <div className="brief-field">
-          <span className="brief-label">Do you use any AI tools, such as ChatGPT or Claude?</span>
-          <span className="brief-hint">I ask because the site can be set up so you make your own updates by asking an AI tool, if you would like to work that way.</span>
+        <legend className="mono-heading text-ink">5. AI tools</legend>
+        <Choice
+          label="Do you use any AI tools, such as ChatGPT or Claude?"
+          hint="I ask because the site can be set up so you make your own updates by asking an AI tool, if you would like to work that way."
+        >
           <Chips name="ai_use" type="radio" options={AI_USE} />
-        </div>
+        </Choice>
         <Field label="Which ones, and what for?" hint="Optional. For example ChatGPT for writing emails.">
           <input className="brief-input" placeholder="Type here" name="ai_tools" type="text" />
         </Field>
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">5. Pages and features</legend>
-        <div className="brief-field">
-          <span className="brief-label">Which pages do you need?</span>
+        <legend className="mono-heading text-ink">6. The new site</legend>
+        <Choice label="What should the new site do for you?" hint="Pick any that apply">
+          <Chips name="goals" options={GOALS} />
+        </Choice>
+        <Field label="If the new site could only do one thing well, what should it be?">
+          <Text name="one_thing" rows={2} />
+        </Field>
+        <Choice label="Which pages do you need?">
           <Chips name="pages" options={PAGES} />
-        </div>
-        <Field label="How many services or products do you offer?" hint="A rough number is fine. It tells me how many pages they need.">
-          <input className="brief-input" placeholder="Type here" name="services" type="text" inputMode="numeric" />
+        </Choice>
+        <Field label="Is there anything new you want the site to do that it does not do now?" hint="Optional. A new tool, a new section, something you have seen elsewhere.">
+          <Text name="new_ideas" />
         </Field>
-        <div className="brief-field">
-          <span className="brief-label">Anything the site should be able to do?</span>
-          <Chips name="features" options={FEATURES} />
-        </div>
-        <Field label="Tell me more about any of those" hint="Optional. For example, what a customer should send you to get a quote.">
-          <textarea className="brief-input" placeholder="Type here" name="feature_notes" rows={3} />
-        </Field>
-      </fieldset>
-
-      <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">6. Look and content</legend>
-        <div className="brief-field">
-          <span className="brief-label">Websites you like the look of</span>
-          <span className="brief-hint">Paste up to three links. They do not need to be in your industry.</span>
+        <Choice label="Websites you like the look of" hint="Paste up to three links. They do not need to be in your industry.">
           <input className="brief-input" name="inspo_1" type="text" inputMode="url" placeholder="www." aria-label="Inspiration link 1" />
           <input className="brief-input" name="inspo_2" type="text" inputMode="url" placeholder="www." aria-label="Inspiration link 2" />
           <input className="brief-input" name="inspo_3" type="text" inputMode="url" placeholder="www." aria-label="Inspiration link 3" />
-        </div>
+        </Choice>
         <Field label="What do you like about them?" hint="The colours, the photos, how simple it is, a particular page.">
-          <textarea className="brief-input" placeholder="Type here" name="likes" rows={3} />
+          <Text name="likes" />
         </Field>
-        <div className="brief-field">
-          <span className="brief-label">Do you have a logo and brand colours you are happy with?</span>
-          <Chips name="brand" type="radio" options={["Yes, keep them", "Yes, but they could be sharper", "No, I need them"]} />
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">Photos</span>
-          <Chips name="photos" type="radio" options={PHOTOS} />
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">The words on the site</span>
-          <Chips name="words" type="radio" options={WORDS} />
-        </div>
+        <Field label="Is there anything you definitely do not want?" hint="Optional. A style, a colour, a feature you find annoying on other sites.">
+          <Text name="avoid" rows={2} />
+        </Field>
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">7. Size and timing</legend>
-        <div className="brief-field">
-          <span className="brief-label">Which size sounds closest?</span>
-          <span className="brief-hint">
-            These are guide prices. Every site is designed and built from scratch, and you get a fixed
-            price before any work starts.
-          </span>
-          <div className="brief-sizes">
-            {SIZES.map((s, i) => (
-              <label key={s.value} className="brief-size">
-                <input type="radio" name="size" value={s.value} required={i === 0} />
-                <span className="brief-size-body">
-                  <span className="brief-size-name">{s.name}</span>
-                  {s.price && <span className="brief-size-price">{s.price}</span>}
-                  <span className="brief-size-note">{s.note}</span>
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">When do you want it live?</span>
+        <legend className="mono-heading text-ink">7. Content and timing</legend>
+        <Choice label="Do you have a logo and brand colours you are happy with?">
+          <Chips name="brand" type="radio" options={BRAND} />
+        </Choice>
+        <Choice label="Photos">
+          <Chips name="photos" type="radio" options={PHOTOS} />
+        </Choice>
+        <Choice label="The words on the site">
+          <Chips name="words" type="radio" options={WORDS} />
+        </Choice>
+        <Choice label="When do you want it live?">
           <Chips name="timeline" type="radio" options={TIMELINES} />
-        </div>
-        <div className="brief-field">
-          <span className="brief-label">Would you like me to host it?</span>
-          <span className="brief-hint">Hosting is £20 a month, charged at cost.</span>
-          <Chips name="hosting" type="radio" options={HOSTING} />
-        </div>
+        </Choice>
+        <Choice label="Who makes the final decision on the site?">
+          <Chips name="decides" type="radio" options={DECIDES} />
+        </Choice>
         <Field label="Anything else I should know?" hint="Optional">
-          <textarea className="brief-input" placeholder="Type here" name="notes" rows={3} />
+          <Text name="notes" />
         </Field>
       </fieldset>
 

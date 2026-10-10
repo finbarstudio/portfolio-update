@@ -159,7 +159,7 @@ Two mechanics to know:
 | `.home-cap-pill` | "How I help businesses" capability pills | Home, /about |
 | `.tag` (+ `.tag-default`, `.tag-ext`) | Small tag chips | Case studies, work filters, contact |
 | `.brand-tile` + `.brand-tile-logo/-swatches` | Brand-filter card: client logo + colour palette | /work brand filter |
-| `.brief-form`, `.brief-input`, `.brief-chip`, `.brief-size` | The website brief questionnaire: boxed light text fields, 44px choice chips (dark pink when picked), outlined size cards carrying the guide prices | /webform |
+| `.brief-form`, `.brief-input`, `.brief-chip` | The website brief questionnaire: boxed light text fields and 44px choice chips (dark pink when picked). No prices on this form. | /webform |
 | `.reveal-open` | Forces hover-reveal project cards to read expanded by default | /web-design, /graphic-design grids |
 
 Demo sites under `app/<client>/site` are scoped exceptions: each carries its

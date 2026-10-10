@@ -4863,8 +4863,8 @@ body:has(.case-study) { background-color: #fff; }
 }
 
 /* ── Website brief form (/webform) ─────────────────────────────────────────────
-   Prospect questionnaire. Underlined inputs, tag-style choice chips, and
-   outlined size cards that carry the guide prices. Unlayered on purpose. */
+   Prospect questionnaire. Boxed light text fields and tag-style choice chips.
+   Unlayered on purpose. */
 .brief-form { margin-top: 2.5rem; display: grid; gap: 3rem; }
 .brief-section { border: 0; padding: 0; margin: 0; display: grid; gap: 1.5rem; min-width: 0; }
 .brief-section > legend { padding: 0 0 0.9rem; margin-bottom: 0.25rem; width: 100%; border-bottom: 1px solid var(--line); }
@@ -4912,30 +4912,10 @@ textarea.brief-input { resize: vertical; min-height: 6.5rem; line-height: 1.5; }
 .brief-chip input:focus-visible + span { outline: 2px solid var(--pink); outline-offset: 2px; }
 @media (hover: hover) { .brief-chip:hover input:not(:checked) + span { border-color: var(--pink); color: var(--pink-deep); } }
 
-.brief-sizes { display: grid; gap: 0.75rem; grid-template-columns: 1fr; margin-top: 0.5rem; }
-@media (min-width: 640px) { .brief-sizes { grid-template-columns: 1fr 1fr; } }
-.brief-size { position: relative; display: block; cursor: pointer; }
-.brief-size input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
-.brief-size-body {
-  display: grid; gap: 0.3rem; height: 100%;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--ink);
-  border-radius: 3px;
-  background: var(--bg);
-  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
-}
-.brief-size-name { font-size: var(--text-body); font-weight: 600; color: var(--ink); }
-.brief-size-price { font-size: 1.25rem; font-weight: 700; color: var(--pink-deep); line-height: 1.1; }
-.brief-size-note { font-size: var(--text-small); color: var(--ink-soft); line-height: 1.4; }
-.brief-size input:checked + .brief-size-body { background: var(--pink-deep); border-color: var(--pink-deep); }
-.brief-size input:checked + .brief-size-body :is(.brief-size-name, .brief-size-price, .brief-size-note) { color: var(--bg); }
-.brief-size input:focus-visible + .brief-size-body { outline: 2px solid var(--pink); outline-offset: 2px; }
-@media (hover: hover) { .brief-size:hover input:not(:checked) + .brief-size-body { border-color: var(--pink); } }
-
 .brief-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .brief-actions { display: grid; gap: 0.75rem; justify-items: start; }
 .brief-actions .sticker-pill { min-height: 44px; padding-inline: 1.4em; cursor: pointer; }
 .brief-actions .sticker-pill:disabled { opacity: 0.6; cursor: default; }
 .brief-error { font-size: var(--text-small); color: var(--pink-deep); }
 .brief-done { margin-top: 2.5rem; display: grid; gap: 0.75rem; max-width: 34rem; font-size: var(--text-body); line-height: 1.6; color: var(--ink); }
-@media (prefers-reduced-motion: reduce) { .brief-input, .brief-chip span, .brief-size-body { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .brief-input, .brief-chip span { transition: none; } }
