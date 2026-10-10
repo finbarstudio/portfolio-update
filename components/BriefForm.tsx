@@ -28,7 +28,7 @@ const PLATFORMS = ["WordPress", "Wix", "Squarespace", "Shopify", "GoDaddy", "Cus
 const PLATFORM_HAPPY = ["Yes, it works for me", "It is fine, but I would change if it were easy", "No, I would prefer something else"];
 const SWITCH = ["Yes, happy to move", "Yes, as long as I can still update it myself", "I would prefer to stay where I am", "Not sure, tell me more"];
 const LOGINS = ["Yes, I have them all", "Some of them", "No, someone else set it up", "Not sure"];
-const UPDATE_WAY = ["A simple editing screen I log in to", "Ask an AI tool to make the change", "Send the change to you", "Not sure yet"];
+const UPDATE_WAY = ["A simple editing screen I log in to", "Send the change to you", "Not sure yet"];
 const AFTER_LAUNCH = ["Hand it all over, I will run it", "Hand it over, but stay on call for changes", "Look after it for me", "Not sure yet"];
 const AI_USE = ["Yes, most days", "Now and then", "No"];
 
