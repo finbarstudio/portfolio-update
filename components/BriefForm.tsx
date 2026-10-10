@@ -40,6 +40,7 @@ const GOALS = [
   "Take quote or booking requests",
   "Show off our work",
   "Look more professional",
+  "Work properly on a phone",
   "Save us time answering the same questions",
 ];
 
@@ -54,6 +55,7 @@ const PAGES = [
   "Contact",
 ];
 
+const DEVICES = ["Mostly on a phone", "Mostly on a computer", "About half and half", "Not sure"];
 const BRAND = ["Yes, keep them", "Yes, but they could be sharper", "No, I need them"];
 const PHOTOS = ["We have good photos", "We have some, they need work", "We need new photos"];
 const WORDS = ["We will write it", "We need help with the words", "Keep what is on our site now"];
@@ -94,6 +96,8 @@ const ORDER: [string, string][] = [
   ["after_launch", "After launch"],
   ["goals", "Main goals"],
   ["one_thing", "The one thing it must do"],
+  ["devices", "How customers visit the site"],
+  ["mobile_issues", "Problems on a phone"],
   ["pages", "Pages needed"],
   ["new_ideas", "New things they want on the site"],
   ["inspo_1", "Inspiration link 1"],
@@ -351,6 +355,12 @@ export default function BriefForm() {
         </Choice>
         <Field label="If the new site could only do one thing well, what should it be?">
           <Text name="one_thing" rows={2} />
+        </Field>
+        <Choice label="How do most of your customers look at your site?" hint="I design the phone version first, because that is where most people will see it.">
+          <Chips name="devices" type="radio" options={DEVICES} />
+        </Choice>
+        <Field label="Is there anything about your current site that is awkward on a phone?" hint="Optional. Small text, buttons that are hard to tap, a menu that hides things.">
+          <Text name="mobile_issues" rows={2} />
         </Field>
         <Choice label="Which pages do you need?">
           <Chips name="pages" options={PAGES} />
