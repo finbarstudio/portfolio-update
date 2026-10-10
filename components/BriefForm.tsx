@@ -57,7 +57,7 @@ const SIZES = [
 const UPDATE_FREQ = ["Every week", "Every month", "A few times a year", "Hardly ever"];
 const UPDATE_WHAT = ["New projects or photos", "Prices or services", "News or blog posts", "Offers", "Opening hours or contact details", "Reviews"];
 const UPDATE_HOW = ["I do it myself", "Someone on my team does", "I pay a web person or agency", "Nobody, it never gets updated"];
-const PLATFORMS = ["WordPress", "Wix", "Squarespace", "Shopify", "GoDaddy", "Something else", "No idea"];
+const PLATFORMS = ["WordPress", "Wix", "Squarespace", "Shopify", "GoDaddy", "No idea"];
 const UPDATE_EASE = ["Easy", "Fiddly but I manage", "Painful, I avoid it"];
 const AI_USE = ["Yes, most days", "Now and then", "No, but I am curious", "No, not interested"];
 const AI_WANT = ["A chatbot that answers customer questions", "Help writing posts or page text", "Faster quotes or replies", "Nothing, keep it simple"];
@@ -106,14 +106,18 @@ const ORDER: [string, string][] = [
 
 function Chips({ name, options, type = "checkbox", required }: { name: string; options: string[]; type?: "checkbox" | "radio"; required?: boolean }) {
   return (
-    <div className="brief-chips">
-      {options.map((o, i) => (
-        <label key={o} className="brief-chip">
-          <input type={type} name={name} value={o} required={required && type === "radio" && i === 0} />
-          <span>{o}</span>
-        </label>
-      ))}
-    </div>
+    <>
+      <div className="brief-chips">
+        {options.map((o, i) => (
+          <label key={o} className="brief-chip">
+            <input type={type} name={name} value={o} required={required && type === "radio" && i === 0} />
+            <span>{o}</span>
+          </label>
+        ))}
+      </div>
+      {/* Same field name, so a typed answer is sent alongside any chips picked. */}
+      <input className="brief-input brief-other" name={name} type="text" placeholder="Something else? Type it here" aria-label="Something else" />
+    </>
   );
 }
 
