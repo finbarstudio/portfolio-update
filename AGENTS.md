@@ -1,7 +1,11 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
-This version has breaking changes, APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
 <!-- END:nextjs-agent-rules -->
 
 # The media rule (HARD RULE, enforced by git hooks and the build)
@@ -155,6 +159,7 @@ Two mechanics to know:
 | `.home-cap-pill` | "How I help businesses" capability pills | Home, /about |
 | `.tag` (+ `.tag-default`, `.tag-ext`) | Small tag chips | Case studies, work filters, contact |
 | `.brand-tile` + `.brand-tile-logo/-swatches` | Brand-filter card: client logo + colour palette | /work brand filter |
+| `.brief-form`, `.brief-input`, `.brief-chip`, `.brief-size` | The website brief questionnaire: boxed light text fields, 44px choice chips (dark pink when picked), outlined size cards carrying the guide prices | /webform |
 | `.reveal-open` | Forces hover-reveal project cards to read expanded by default | /web-design, /graphic-design grids |
 
 Demo sites under `app/<client>/site` are scoped exceptions: each carries its

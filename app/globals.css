@@ -4861,3 +4861,80 @@ body:has(.case-study) { background-color: #fff; }
   font-weight: 500;
   letter-spacing: 0.1em;
 }
+
+/* ── Website brief form (/webform) ─────────────────────────────────────────────
+   Prospect questionnaire. Underlined inputs, tag-style choice chips, and
+   outlined size cards that carry the guide prices. Unlayered on purpose. */
+.brief-form { margin-top: 2.5rem; display: grid; gap: 3rem; }
+.brief-section { border: 0; padding: 0; margin: 0; display: grid; gap: 1.5rem; min-width: 0; }
+.brief-section > legend { padding: 0 0 0.9rem; margin-bottom: 0.25rem; width: 100%; border-bottom: 1px solid var(--line); }
+.brief-grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .brief-grid { grid-template-columns: 1fr 1fr; } }
+.brief-field { display: grid; gap: 0.45rem; min-width: 0; }
+.brief-label { font-size: var(--text-body); font-weight: 500; color: var(--ink); line-height: 1.35; }
+.brief-hint { font-size: var(--text-small); color: var(--ink-soft); line-height: 1.4; }
+.brief-input {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;              /* 16px: stops iOS zooming on focus */
+  color: var(--ink);
+  /* A boxed field, a shade lighter than the page, so it is obvious where to type. */
+  background: color-mix(in srgb, #fff 60%, var(--bg));
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  min-height: 48px;
+  padding: 0.7rem 0.85rem;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+textarea.brief-input { resize: vertical; min-height: 6.5rem; line-height: 1.5; }
+.brief-input + .brief-input { margin-top: 0.5rem; }
+.brief-input::placeholder { color: var(--ink-soft); opacity: 0.75; }
+@media (hover: hover) { .brief-input:hover { border-color: var(--pink-deep); } }
+.brief-input:focus-visible { background: #fff; border-color: var(--pink); outline: 2px solid var(--pink); outline-offset: 1px; }
+
+.brief-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.25rem; }
+.brief-chip { position: relative; display: inline-flex; cursor: pointer; }
+.brief-chip input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.brief-chip span {
+  display: inline-flex; align-items: center;
+  min-height: 44px;             /* touch target */
+  padding: 0 0.95rem;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  font-size: var(--text-small);
+  color: var(--ink);
+  background: var(--bg);
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.brief-chip input:checked + span { background: var(--pink-deep); border-color: var(--pink-deep); color: var(--bg); }
+.brief-chip input:focus-visible + span { outline: 2px solid var(--pink); outline-offset: 2px; }
+@media (hover: hover) { .brief-chip:hover input:not(:checked) + span { border-color: var(--pink); color: var(--pink-deep); } }
+
+.brief-sizes { display: grid; gap: 0.75rem; grid-template-columns: 1fr; margin-top: 0.5rem; }
+@media (min-width: 640px) { .brief-sizes { grid-template-columns: 1fr 1fr; } }
+.brief-size { position: relative; display: block; cursor: pointer; }
+.brief-size input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.brief-size-body {
+  display: grid; gap: 0.3rem; height: 100%;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  background: var(--bg);
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.brief-size-name { font-size: var(--text-body); font-weight: 600; color: var(--ink); }
+.brief-size-price { font-size: 1.25rem; font-weight: 700; color: var(--pink-deep); line-height: 1.1; }
+.brief-size-note { font-size: var(--text-small); color: var(--ink-soft); line-height: 1.4; }
+.brief-size input:checked + .brief-size-body { background: var(--pink-deep); border-color: var(--pink-deep); }
+.brief-size input:checked + .brief-size-body :is(.brief-size-name, .brief-size-price, .brief-size-note) { color: var(--bg); }
+.brief-size input:focus-visible + .brief-size-body { outline: 2px solid var(--pink); outline-offset: 2px; }
+@media (hover: hover) { .brief-size:hover input:not(:checked) + .brief-size-body { border-color: var(--pink); } }
+
+.brief-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.brief-actions { display: grid; gap: 0.75rem; justify-items: start; }
+.brief-actions .sticker-pill { min-height: 44px; padding-inline: 1.4em; cursor: pointer; }
+.brief-actions .sticker-pill:disabled { opacity: 0.6; cursor: default; }
+.brief-error { font-size: var(--text-small); color: var(--pink-deep); }
+.brief-done { margin-top: 2.5rem; display: grid; gap: 0.75rem; max-width: 34rem; font-size: var(--text-body); line-height: 1.6; color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .brief-input, .brief-chip span, .brief-size-body { transition: none; } }
