@@ -292,10 +292,7 @@ export default function BriefForm() {
         <Choice label="What would you be changing?" hint="Pick any that apply">
           <Chips name="update_what" options={UPDATE_WHAT} />
         </Choice>
-        <Choice
-          label="Do you use any AI tools, such as ChatGPT or Claude?"
-          hint="I ask because the site can be set up so you make your own updates by asking an AI tool, if you would like to work that way."
-        >
+        <Choice label="Do you use any AI tools, such as ChatGPT or Claude?">
           <Chips name="ai_use" type="radio" options={AI_USE} />
         </Choice>
         <Field label="Which ones, and what for?" hint="Optional. For example ChatGPT for writing emails.">
