@@ -20,7 +20,7 @@ export default function WebformPage() {
 
       <div className="mt-8 max-w-2xl">
         <p className="text-ink leading-relaxed" style={{ fontSize: "var(--text-body)" }}>
-          This takes about ten minutes. I can already see your current site, so these questions are about the things I cannot see: how your business gets work, how you run the site day to day, and what you want from a new one. Skip anything you are not sure about.
+          This takes about ten minutes. I can already see your current site, so these questions are about the things I cannot see: how you run the site day to day, what you like and do not like about it, and what you want from a new one. Skip anything you are not sure about.
         </p>
 
         <BriefForm />

@@ -3,8 +3,9 @@
 /**
  * BriefForm — the website brief a prospect fills in so a site can be scoped.
  * Lives at /webform. It asks for what Finbar can NOT see by looking at their
- * current site: how the business gets work, how the site is run day to day,
- * and what they want from a new one. No prices here; the quote comes after.
+ * current site: how the site is run day to day, what they like and dislike,
+ * and what they want from a new one. Design and build only: no questions about
+ * leads, marketing or SEO (Finbar does not sell strategy). No build prices.
  * Posts to Web3Forms, which emails the answers to Finbar; the mailto branch is
  * only a safety net if the key is ever removed.
  */
@@ -18,9 +19,6 @@ const W3F_KEY = "507b6a42-46fc-48a2-91bd-691168385977";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-const SOURCES = ["Google search", "Word of mouth", "Repeat customers", "Social media", "Directories or review sites", "Paid ads", "Not sure"];
-const CONTACT_WAYS = ["Phone call", "WhatsApp or text", "Email", "The form on my site", "Social media messages"];
-const SITE_WORKS = ["Yes, a lot", "Some", "Hardly any", "No idea"];
 
 const UPDATE_FREQ = ["Every week", "Every month", "A few times a year", "Hardly ever"];
 const UPDATE_WHAT = ["New projects or photos", "Prices or services", "News or blog posts", "Offers", "Opening hours or contact details", "Reviews"];
@@ -35,13 +33,12 @@ const AFTER_LAUNCH = ["Hand it all over, I will run it", "Hand it over, but stay
 const AI_USE = ["Yes, most days", "Now and then", "No"];
 
 const GOALS = [
-  "Get more enquiries",
-  "Get better enquiries, not more",
-  "Take quote or booking requests",
-  "Show off our work",
   "Look more professional",
+  "Show off our work properly",
+  "Be simpler to find things on",
   "Work properly on a phone",
-  "Save us time answering the same questions",
+  "Make it easy to get in touch",
+  "Be easy for us to keep up to date",
 ];
 
 const PAGES = [
@@ -76,14 +73,6 @@ const ORDER: [string, string][] = [
   ["switch", "Willing to move platform"],
   ["platform_miss", "What they would miss from the platform"],
   ["logins", "Has domain and site logins"],
-  ["best_work", "Work they want more of"],
-  ["ideal_customer", "Ideal customer"],
-  ["sources", "Where enquiries come from"],
-  ["enquiries", "Enquiries in a typical week"],
-  ["contact_ways", "How customers get in touch"],
-  ["questions", "What customers ask before booking"],
-  ["competitors", "Competitors"],
-  ["site_works", "Does the site bring in work"],
   ["current_likes", "What they like about the current site"],
   ["current_dislikes", "What they do not like about it"],
   ["customer_feedback", "What customers say or get stuck on"],
@@ -279,35 +268,7 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">3. How your business gets work</legend>
-        <Field label="Which jobs or services do you most want more of?" hint="The ones that pay best, or the ones you enjoy most.">
-          <Text name="best_work" />
-        </Field>
-        <Field label="Describe your ideal customer" hint="Who they are, where they are, and what they usually need from you.">
-          <Text name="ideal_customer" />
-        </Field>
-        <Choice label="Where do most of your enquiries come from now?" hint="Pick any that apply">
-          <Chips name="sources" options={SOURCES} />
-        </Choice>
-        <Field label="Roughly how many enquiries do you get in a typical week?">
-          <input className="brief-input" placeholder="Type here" name="enquiries" type="text" />
-        </Field>
-        <Choice label="How do customers usually get in touch?" hint="Pick any that apply">
-          <Chips name="contact_ways" options={CONTACT_WAYS} />
-        </Choice>
-        <Field label="What do customers nearly always ask before they book?" hint="Price, how long it takes, whether you cover their area, and so on.">
-          <Text name="questions" />
-        </Field>
-        <Field label="Who are your main competitors?" hint="Optional. Names or links. It helps to know who you are up against.">
-          <Text name="competitors" rows={2} />
-        </Field>
-      </fieldset>
-
-      <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">4. Your website now</legend>
-        <Choice label="Does your current site bring in work?">
-          <Chips name="site_works" type="radio" options={SITE_WORKS} />
-        </Choice>
+        <legend className="mono-heading text-ink">3. Your website now</legend>
         <Field label="What do you like about it?" hint="Be specific. A page, a photo, the wording, anything worth keeping.">
           <Text name="current_likes" />
         </Field>
@@ -323,7 +284,7 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">5. Running the new site</legend>
+        <legend className="mono-heading text-ink">4. Running the new site</legend>
         <Choice label="How often would you like to update the site?">
           <Chips name="update_freq" type="radio" options={UPDATE_FREQ} />
         </Choice>
@@ -348,7 +309,7 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">6. The new site</legend>
+        <legend className="mono-heading text-ink">5. The new site</legend>
         <Choice label="What should the new site do for you?" hint="Pick any that apply">
           <Chips name="goals" options={GOALS} />
         </Choice>
@@ -381,7 +342,7 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">7. Content and timing</legend>
+        <legend className="mono-heading text-ink">6. Content and timing</legend>
         <Choice label="Do you have a logo and brand colours you are happy with?">
           <Chips name="brand" type="radio" options={BRAND} />
         </Choice>
