@@ -4893,6 +4893,17 @@ textarea.brief-input { resize: vertical; min-height: 6.5rem; line-height: 1.5; }
 @media (hover: hover) { .brief-input:hover { border-color: var(--pink-deep); } }
 .brief-input:focus-visible { background: #fff; border-color: var(--pink); outline: 2px solid var(--pink); outline-offset: 1px; }
 
+.brief-note {
+  margin: 0.25rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--pink-deep);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--pink) 10%, var(--bg));
+  font-size: var(--text-small);
+  line-height: 1.55;
+  color: var(--ink);
+}
+.brief-note strong { color: var(--pink-deep); font-weight: 600; }
 .brief-other { margin-top: 0.35rem; max-width: 26rem; }
 .brief-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.25rem; }
 .brief-chip { position: relative; display: inline-flex; cursor: pointer; }

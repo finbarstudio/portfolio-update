@@ -26,7 +26,12 @@ const UPDATE_FREQ = ["Every week", "Every month", "A few times a year", "Hardly 
 const UPDATE_WHAT = ["New projects or photos", "Prices or services", "News or blog posts", "Offers", "Opening hours or contact details", "Reviews"];
 const UPDATE_HOW = ["I do it myself", "Someone on my team does", "I pay a web person or agency", "Nobody, it never gets updated"];
 const UPDATE_EASE = ["Easy", "Fiddly but I manage", "Painful, I avoid it"];
-const UPDATE_FUTURE = ["Me or my team", "You, Finbar", "A mix of both", "Not sure"];
+const PLATFORMS = ["WordPress", "Wix", "Squarespace", "Shopify", "GoDaddy", "Custom built", "No idea"];
+const PLATFORM_HAPPY = ["Yes, it works for me", "It is fine, but I would change if it were easy", "No, I would prefer something else"];
+const SWITCH = ["Yes, happy to move", "Yes, as long as I can still update it myself", "I would prefer to stay where I am", "Not sure, tell me more"];
+const LOGINS = ["Yes, I have them all", "Some of them", "No, someone else set it up", "Not sure"];
+const UPDATE_WAY = ["A simple editing screen I log in to", "Ask an AI tool to make the change", "Send the change to you", "Not sure yet"];
+const AFTER_LAUNCH = ["Hand it all over, I will run it", "Hand it over, but stay on call for changes", "Look after it for me", "Not sure yet"];
 const AI_USE = ["Yes, most days", "Now and then", "No"];
 
 const GOALS = [
@@ -62,6 +67,13 @@ const ORDER: [string, string][] = [
   ["email", "Email"],
   ["phone", "Phone"],
   ["website", "Current website"],
+  ["platform", "Current platform"],
+  ["platform_happy", "Happy with the platform"],
+  ["update_how", "Who updates it now"],
+  ["update_ease", "How updating feels now"],
+  ["switch", "Willing to move platform"],
+  ["platform_miss", "What they would miss from the platform"],
+  ["logins", "Has domain and site logins"],
   ["best_work", "Work they want more of"],
   ["ideal_customer", "Ideal customer"],
   ["sources", "Where enquiries come from"],
@@ -76,11 +88,10 @@ const ORDER: [string, string][] = [
   ["why_now", "Why now"],
   ["update_freq", "How often they want to update"],
   ["update_what", "What they update"],
-  ["update_how", "Who updates it now"],
-  ["update_ease", "How updating feels now"],
-  ["update_future", "Who will update the new site"],
   ["ai_use", "Uses AI tools"],
   ["ai_tools", "Which AI tools"],
+  ["update_way", "How they want to make updates"],
+  ["after_launch", "After launch"],
   ["goals", "Main goals"],
   ["one_thing", "The one thing it must do"],
   ["pages", "Pages needed"],
@@ -221,7 +232,38 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">2. How your business gets work</legend>
+        <legend className="mono-heading text-ink">2. Your current setup</legend>
+        <Choice label="What is your current site built on?">
+          <Chips name="platform" type="radio" options={PLATFORMS} />
+        </Choice>
+        <Choice label="Are you happy with that platform?">
+          <Chips name="platform_happy" type="radio" options={PLATFORM_HAPPY} />
+        </Choice>
+        <Choice label="Who updates your site at the moment?">
+          <Chips name="update_how" type="radio" options={UPDATE_HOW} />
+        </Choice>
+        <Choice label="How does updating it feel right now?">
+          <Chips name="update_ease" type="radio" options={UPDATE_EASE} />
+        </Choice>
+        <p className="brief-note">
+          <strong>Worth knowing before you go on.</strong> I do not work in website builders such as
+          WordPress, Wix or Squarespace. I design and code every site from scratch, which is why they
+          load quickly and do not look like a template. You can still update your site yourself. It
+          just works a different way, and I will set that up around you.
+        </p>
+        <Choice label="Would you be happy to move off your current platform?">
+          <Chips name="switch" type="radio" options={SWITCH} />
+        </Choice>
+        <Field label="Is there anything your current platform does that you would miss?" hint="Optional. For example a booking plugin, a quote form, or a way you post updates.">
+          <Text name="platform_miss" rows={2} />
+        </Field>
+        <Choice label="Do you have the logins for your domain name and your current site?" hint="It is fine if you do not. It just tells me what we need to track down.">
+          <Chips name="logins" type="radio" options={LOGINS} />
+        </Choice>
+      </fieldset>
+
+      <fieldset className="brief-section">
+        <legend className="mono-heading text-ink">3. How your business gets work</legend>
         <Field label="Which jobs or services do you most want more of?" hint="The ones that pay best, or the ones you enjoy most.">
           <Text name="best_work" />
         </Field>
@@ -246,7 +288,7 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">3. Your website now</legend>
+        <legend className="mono-heading text-ink">4. Your website now</legend>
         <Choice label="Does your current site bring in work?">
           <Chips name="site_works" type="radio" options={SITE_WORKS} />
         </Choice>
@@ -265,26 +307,13 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">4. Keeping it up to date</legend>
+        <legend className="mono-heading text-ink">5. Running the new site</legend>
         <Choice label="How often would you like to update the site?">
           <Chips name="update_freq" type="radio" options={UPDATE_FREQ} />
         </Choice>
         <Choice label="What would you be changing?" hint="Pick any that apply">
           <Chips name="update_what" options={UPDATE_WHAT} />
         </Choice>
-        <Choice label="Who updates your site at the moment?">
-          <Chips name="update_how" type="radio" options={UPDATE_HOW} />
-        </Choice>
-        <Choice label="How does updating it feel right now?">
-          <Chips name="update_ease" type="radio" options={UPDATE_EASE} />
-        </Choice>
-        <Choice label="On the new site, who should make the updates?">
-          <Chips name="update_future" type="radio" options={UPDATE_FUTURE} />
-        </Choice>
-      </fieldset>
-
-      <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">5. AI tools</legend>
         <Choice
           label="Do you use any AI tools, such as ChatGPT or Claude?"
           hint="I ask because the site can be set up so you make your own updates by asking an AI tool, if you would like to work that way."
@@ -294,6 +323,12 @@ export default function BriefForm() {
         <Field label="Which ones, and what for?" hint="Optional. For example ChatGPT for writing emails.">
           <input className="brief-input" placeholder="Type here" name="ai_tools" type="text" />
         </Field>
+        <Choice label="How would you like to make updates on the new site?">
+          <Chips name="update_way" type="radio" options={UPDATE_WAY} />
+        </Choice>
+        <Choice label="Once the site is live, how involved would you like me to be?">
+          <Chips name="after_launch" type="radio" options={AFTER_LAUNCH} />
+        </Choice>
       </fieldset>
 
       <fieldset className="brief-section">
