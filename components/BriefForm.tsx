@@ -89,6 +89,7 @@ const ORDER: [string, string][] = [
   ["mobile_issues", "Problems on a phone"],
   ["pages", "Pages needed"],
   ["new_ideas", "New things they want on the site"],
+  ["competitors", "Competitors"],
   ["inspo_1", "Inspiration link 1"],
   ["inspo_2", "Inspiration link 2"],
   ["inspo_3", "Inspiration link 3"],
@@ -327,6 +328,9 @@ export default function BriefForm() {
         </Choice>
         <Field label="Is there anything new you want the site to do that it does not do now?" hint="Optional. A new tool, a new section, something you have seen elsewhere.">
           <Text name="new_ideas" />
+        </Field>
+        <Field label="Who are your main competitors?" hint="Names or links. I will look at their sites so yours stands apart from them.">
+          <Text name="competitors" rows={2} />
         </Field>
         <Choice label="Websites you like the look of" hint="Paste up to three links. They do not need to be in your industry.">
           <input className="brief-input" name="inspo_1" type="text" inputMode="url" placeholder="www." aria-label="Inspiration link 1" />
