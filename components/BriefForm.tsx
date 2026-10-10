@@ -245,12 +245,25 @@ export default function BriefForm() {
         <Choice label="How does updating it feel right now?">
           <Chips name="update_ease" type="radio" options={UPDATE_EASE} />
         </Choice>
-        <p className="brief-note">
-          <strong>Worth knowing before you go on.</strong> I do not work in website builders such as
-          WordPress, Wix or Squarespace. I design and code every site from scratch, which is why they
-          load quickly and do not look like a template. You can still update your site yourself. It
-          just works a different way, and I will set that up around you.
-        </p>
+        <div className="brief-note">
+          <p>
+            <strong>Worth knowing before you go on.</strong> I do not work in website builders such
+            as WordPress, Wix or Squarespace. I design and code every site from scratch.
+          </p>
+          <p>
+            Running the site costs £20 a month. There is no markup on that. It covers what I pay for
+            website hosting, media hosting and an editing system, if you want one.
+          </p>
+          <p>
+            You can stop paying at any time. If you do, I will transfer the whole site and its
+            original code to you, and walk you through it until you are set up.
+          </p>
+          <p>
+            You keep paying for your domain name as you do now. You would no longer pay a monthly fee
+            for a website builder. If your builder and your domain are with the same company, you
+            would keep only the domain.
+          </p>
+        </div>
         <Choice label="Would you be happy to move off your current platform?">
           <Chips name="switch" type="radio" options={SWITCH} />
         </Choice>
