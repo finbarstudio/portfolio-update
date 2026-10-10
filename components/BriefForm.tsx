@@ -263,9 +263,8 @@ export default function BriefForm() {
             original code to you, and walk you through it until you are set up.
           </p>
           <p>
-            You keep paying for your domain name as you do now. You would no longer pay a monthly fee
-            for a website builder. If your builder and your domain are with the same company, you
-            would keep only the domain.
+            You keep paying for your domain name as you do now. If you pay monthly for a website
+            builder at the moment, cancelling it may well cover this cost.
           </p>
         </div>
         <Choice label="Would you be happy to move off your current platform?">
@@ -414,6 +413,10 @@ export default function BriefForm() {
             Something went wrong. Please email {EMAIL} instead.
           </p>
         )}
+        <p className="brief-contact">
+          Any questions before you send this? Email{" "}
+          <a href={`mailto:${EMAIL}`}>{EMAIL}</a> or call <a href="tel:+447876492551">+44 7876 492551</a>.
+        </p>
       </div>
     </form>
   );

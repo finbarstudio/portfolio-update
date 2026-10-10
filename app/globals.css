@@ -4903,7 +4903,7 @@ textarea.brief-input { resize: vertical; min-height: 6.5rem; line-height: 1.5; }
   line-height: 1.55;
   color: var(--ink);
 }
-.brief-note { display: grid; gap: 0.6rem; }
+.brief-note { display: grid; gap: 1rem; padding: 1.15rem 1.25rem; line-height: 1.6; }
 .brief-note p { margin: 0; }
 .brief-note strong { color: var(--pink-deep); font-weight: 600; }
 .brief-other { margin-top: 0.35rem; max-width: 26rem; }
@@ -4929,6 +4929,10 @@ textarea.brief-input { resize: vertical; min-height: 6.5rem; line-height: 1.5; }
 .brief-actions { display: grid; gap: 0.75rem; justify-items: start; }
 .brief-actions .sticker-pill { min-height: 44px; padding-inline: 1.4em; cursor: pointer; }
 .brief-actions .sticker-pill:disabled { opacity: 0.6; cursor: default; }
+.brief-contact { font-size: var(--text-small); color: var(--ink-soft); line-height: 1.5; margin-top: 0.25rem; }
+.brief-contact a { color: var(--pink-deep); text-decoration: underline; text-underline-offset: 2px; }
+@media (hover: hover) { .brief-contact a:hover { color: var(--pink); } }
 .brief-error { font-size: var(--text-small); color: var(--pink-deep); }
 .brief-done { margin-top: 2.5rem; display: grid; gap: 0.75rem; max-width: 34rem; font-size: var(--text-body); line-height: 1.6; color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { .brief-input, .brief-chip span { transition: none; } }
+

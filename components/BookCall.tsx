@@ -80,6 +80,10 @@ export default function BookCall() {
     };
   }, [pathname]);
 
+  // The brief form is its own call to action; a floating button there only
+  // covers the fields.
+  if (pathname === "/webform") return null;
+
   return (
     <span className="sf-cta" ref={anchorRef}>
       {/* Reserves the line + width in the footer credit (above the copyright). */}
