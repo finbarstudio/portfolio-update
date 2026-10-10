@@ -59,8 +59,7 @@ const UPDATE_WHAT = ["New projects or photos", "Prices or services", "News or bl
 const UPDATE_HOW = ["I do it myself", "Someone on my team does", "I pay a web person or agency", "Nobody, it never gets updated"];
 const PLATFORMS = ["WordPress", "Wix", "Squarespace", "Shopify", "GoDaddy", "No idea"];
 const UPDATE_EASE = ["Easy", "Fiddly but I manage", "Painful, I avoid it"];
-const AI_USE = ["Yes, most days", "Now and then", "No, but I am curious", "No, not interested"];
-const AI_WANT = ["A chatbot that answers customer questions", "Help writing posts or page text", "Faster quotes or replies", "Nothing, keep it simple"];
+const AI_USE = ["Yes, most days", "Now and then", "No"];
 const TIMELINES = ["As soon as possible", "In the next 1 to 2 months", "In 3 months or more", "No deadline"];
 const PHOTOS = ["We have good photos", "We have some, they need work", "We need new photos"];
 const WORDS = ["We will write it", "We need help with the words", "Keep what is on our site now"];
@@ -86,7 +85,6 @@ const ORDER: [string, string][] = [
   ["update_future", "Who will update the new site"],
   ["ai_use", "Uses AI tools"],
   ["ai_tools", "Which AI tools"],
-  ["ai_want", "AI on the site"],
   ["pages", "Pages needed"],
   ["services", "Number of services or products"],
   ["features", "Features wanted"],
@@ -268,17 +266,13 @@ export default function BriefForm() {
       <fieldset className="brief-section">
         <legend className="mono-heading text-ink">4. AI tools</legend>
         <div className="brief-field">
-          <span className="brief-label">Do you use any AI tools in the business?</span>
+          <span className="brief-label">Do you use any AI tools, such as ChatGPT or Claude?</span>
+          <span className="brief-hint">I ask because the site can be set up so you make your own updates by asking an AI tool, if you would like to work that way.</span>
           <Chips name="ai_use" type="radio" options={AI_USE} />
         </div>
-        <Field label="Which ones, and what for?" hint="Optional. For example ChatGPT for emails, or an AI phone answering service.">
+        <Field label="Which ones, and what for?" hint="Optional. For example ChatGPT for writing emails.">
           <input className="brief-input" placeholder="Type here" name="ai_tools" type="text" />
         </Field>
-        <div className="brief-field">
-          <span className="brief-label">Would any of these be useful on your site?</span>
-          <span className="brief-hint">Pick any that apply</span>
-          <Chips name="ai_want" options={AI_WANT} />
-        </div>
       </fieldset>
 
       <fieldset className="brief-section">
