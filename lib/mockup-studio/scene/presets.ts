@@ -224,9 +224,19 @@ function journey(
 ): PresetShot["build"] {
   return (duration, framing) => {
     let pose: Required<Pose> = { ...NEUTRAL };
+    const floor = framing.minPitch;
     const stops = points.map(([at, change, ease]) => {
       pose = { ...pose, ...change };
-      return { at, ease: ease ?? defaultEase, ...place(pose, framing) };
+      // On a laptop the camera never drops below the deck, whatever the take asks for.
+      const seen =
+        floor === undefined
+          ? pose
+          : {
+              ...pose,
+              rotX: Math.max(pose.rotX, floor),
+              tilt: Math.max(pose.tilt, 0),
+            };
+      return { at, ease: ease ?? defaultEase, ...place(seen, framing) };
     });
     const optional = (Object.keys(OPTIONAL_PATHS) as OptionalPose[]).filter(
       (name) => points.some(([, change]) => change[name] !== undefined),
@@ -444,183 +454,264 @@ export const PRESETS: AnimationPreset[] = [
       },
     ],
   },
-  // ---- Laptops: rebuilt from mckp.live's MacBook Pro and Galaxy Book presets ----
+  // ---- Laptops: built around the hinge and the keyboard. Always seen from above the deck, one long lens, no
+  // distortion. The lid is part of the choreography, not an afterthought.
   {
-    id: "laptop-long-take",
-    name: "Long Take",
+    id: "unfold",
+    name: "Unfold",
     description: "",
     requires: "lid",
-    featured: true,
     shots: [
       {
-        name: "Take",
-        seconds: 14,
+        name: "Unfold",
+        seconds: 9,
         journey: true,
         build: journey([
-          [0, { fill: 1.16, lens: 100, screen: 0, lamps: 50 }],
-          [0.16, { fill: 1.3, screen: 100, lamps: 100, rotX: 11.6, lid: 100 }],
           [
-            0.29,
+            0,
             {
-              fill: 2.8,
-              rotX: -14,
-              rotY: -4,
-              lid: 122,
-              dof: 90,
-              crt: 25,
-              focus: -0.2,
-              focusX: 0.2,
+              rotX: 34,
+              rotY: -42,
+              fill: 1.12,
+              x: 12,
+              y: 18,
+              lid: 0,
+              screen: 0,
+              lamps: 55,
             },
           ],
+          [0.1, { lid: 0 }, "easeInOutQuint"],
           [
-            0.67,
+            0.52,
             {
-              fill: 3.1,
-              rotX: 19.6,
-              rotY: -50,
-              lid: 114,
-              focusX: -0.2,
-              focus: 0.1,
-            },
-          ],
-          [
-            0.8,
-            {
-              fill: 0.74,
-              rotX: -1,
-              rotY: 0,
+              rotX: 17,
+              rotY: -20,
+              fill: 0.95,
+              x: 0,
+              y: 0,
               lid: 100,
-              dof: 20,
-              crt: 0,
-              focus: 0,
-              focusX: 0,
+              lamps: 100,
             },
           ],
-          [0.93, { lid: 0, lamps: 130 }],
-          [1, { lamps: 0, screen: 0 }],
+          [0.64, { screen: 100 }],
+          [1, { rotX: 12, rotY: -2, fill: 1.12, focus: -0.2 }, "easeOut"],
         ]),
       },
     ],
   },
   {
-    id: "wide-lens-close",
-    name: "Wide Lens Close",
+    id: "first-light",
+    name: "First Light",
     description: "",
     requires: "lid",
-    featured: true,
     shots: [
       {
-        name: "Close",
+        name: "First light",
         seconds: 10,
         journey: true,
         build: journey([
           [
             0,
             {
-              fill: 2.2,
-              rotX: 4.3,
-              rotY: 36,
-              lid: 115,
-              crt: 28,
-              dof: 80,
-              fisheye: 0,
-              focusX: 0.3,
-              focus: -0.2,
+              rotX: 12,
+              rotY: 24,
+              fill: 1.15,
+              lid: 0,
+              screen: 100,
+              lamps: 6,
+              glow: 45,
             },
+            "easeOut",
           ],
-          [0.47, { rotY: -20.6, fisheye: 65, focusX: -0.2, focus: 0 }],
-          [0.72, { fisheye: 80, focus: 0.15 }],
+          [0.26, { lid: 24 }],
+          [0.46, { lid: 24, rotY: 12 }, "easeInOutQuint"],
+          [
+            0.84,
+            { lid: 100, lamps: 100, glow: 0, rotY: -8, rotX: 13, fill: 1 },
+          ],
+          [1, { rotY: -12 }, "easeOut"],
+        ]),
+      },
+    ],
+  },
+  {
+    id: "around-and-in",
+    name: "Around and In",
+    description: "",
+    requires: "lid",
+    shots: [
+      {
+        name: "Around",
+        seconds: 10,
+        journey: true,
+        build: journey([
+          [0, { rotX: 16, rotY: 205, fill: 0.9 }],
+          [0.6, { rotX: 15, rotY: 24, fill: 0.98 }],
           [
             1,
-            {
-              rotY: 0.5,
-              fill: 1.04,
-              lid: 100,
-              fisheye: 0,
-              crt: 0,
-              dof: 20,
-              focusX: 0,
-              focus: 0,
-            },
+            { rotX: 12, rotY: -6, fill: 1.15, focus: -0.2, dof: 30 },
+            "easeOut",
           ],
         ]),
       },
     ],
   },
   {
-    id: "fisheye-swing",
-    name: "Fisheye Swing",
+    id: "keys-to-screen",
+    name: "Keys to Screen",
     description: "",
     requires: "lid",
-    featured: true,
     shots: [
       {
-        name: "Swing",
+        name: "Rise",
         seconds: 9,
         journey: true,
         build: journey([
-          [0, { fill: 0.8, rotX: 8, rotY: 0.5, fisheye: 0, lid: 100 }],
-          [0.34, { fill: 2, rotX: 11, rotY: -54, fisheye: 90, focusX: 0.2 }],
-          [
-            0.67,
-            {
-              fill: 1.88,
-              rotX: -1.3,
-              rotY: 24,
-              fisheye: 2,
-              lid: 114,
-              focusX: -0.1,
-            },
-          ],
+          [0, { rotX: 64, rotY: -22, fill: 1.3, focus: -0.75, dof: 55 }],
+          [0.45, { rotX: 42, rotY: -6, fill: 1.2, focus: -0.45 }],
           [
             1,
-            {
-              fill: 1.04,
-              rotX: -1,
-              rotY: -0.5,
-              fisheye: 0,
-              lid: 100,
-              focusX: 0,
-            },
+            { rotX: 12, rotY: 8, fill: 1.15, focus: -0.15, dof: 25 },
+            "easeOut",
           ],
         ]),
       },
     ],
   },
   {
-    id: "three-cuts",
+    id: "desk-orbit",
+    name: "Desk Orbit",
+    description: "",
+    requires: "lid",
+    shots: [
+      {
+        name: "Orbit",
+        seconds: 10,
+        journey: true,
+        build: journey([
+          [0, { rotX: 17, rotY: -32, fill: 0.9 }],
+          [0.5, { rotX: 13, rotY: 32 }],
+          [1, { rotX: 17, rotY: -32 }],
+        ]),
+      },
+    ],
+  },
+  {
+    id: "screen-glide",
+    name: "Screen Glide",
+    description: "",
+    requires: "lid",
+    shots: [
+      {
+        name: "Glide",
+        seconds: 8,
+        crop: true,
+        detail: true,
+        build: journey(
+          [
+            [
+              0,
+              {
+                rotX: 10,
+                rotY: 15,
+                fill: 1.7,
+                focusX: 0.2,
+                focus: -0.08,
+                dof: 40,
+                crt: 8,
+              },
+            ],
+            [1, { rotY: -15, focusX: -0.2 }],
+          ],
+          "linear",
+        ),
+      },
+    ],
+  },
+  {
+    id: "bow",
+    name: "Bow",
+    description: "",
+    requires: "lid",
+    shots: [
+      {
+        name: "Bow",
+        seconds: 8,
+        journey: true,
+        build: journey([
+          [0, { rotX: 12, rotY: -22, fill: 1, lid: 100 }],
+          [0.5, { rotX: 20, rotY: 0, lid: 58 }],
+          [1, { rotX: 12, rotY: 22, lid: 100 }],
+        ]),
+      },
+    ],
+  },
+  {
+    id: "close-and-sleep",
+    name: "Close and Sleep",
+    description: "",
+    requires: "lid",
+    shots: [
+      {
+        name: "Sleep",
+        seconds: 10,
+        journey: true,
+        build: journey([
+          [0, { rotX: 10, rotY: 12, fill: 1.9, dof: 45, crt: 8 }],
+          [0.36, { rotX: 14, rotY: -10, fill: 1, dof: 20, crt: 0 }],
+          [0.48, { lid: 100, screen: 100 }, "easeInOutQuint"],
+          [0.8, { lid: 0, screen: 0, rotX: 34, rotY: -30, fill: 1.25, y: 14 }],
+          [1, { rotX: 40, rotY: -42, light: 50 }, "easeOut"],
+        ]),
+      },
+    ],
+  },
+  {
+    id: "laptop-three-cuts",
     name: "Three Cuts",
     description: "",
     requires: "lid",
-    featured: true,
     shots: [
       {
-        name: "Over the top",
-        seconds: 4.75,
+        name: "Opening",
+        seconds: 4.4,
         journey: true,
         build: journey([
-          [0, { rotX: 15, rotY: 40, fill: 1, lid: 120 }],
-          [1, { rotX: 21.6, rotY: -19.7 }],
+          [0, { rotX: 27, rotY: 38, fill: 0.94, lid: 70 }],
+          [1, { rotX: 22, rotY: 24, lid: 100 }, "easeOut"],
         ]),
       },
       {
-        name: "Flat across",
-        seconds: 5.19,
+        name: "Across the screen",
+        seconds: 4.6,
         crop: true,
         detail: true,
-        build: journey([
-          [0, { rotX: -1.4, rotY: -0.5, fill: 2.3, lid: 100, focusX: 0.3 }],
-          [1, { focusX: -0.3 }],
-        ]),
+        build: journey(
+          [
+            [
+              0,
+              {
+                rotX: 10,
+                rotY: -16,
+                fill: 1.7,
+                focusX: -0.2,
+                focus: -0.08,
+                dof: 40,
+              },
+            ],
+            [1, { rotY: -4, focusX: 0.18 }],
+          ],
+          "linear",
+        ),
       },
       {
-        name: "Corner",
-        seconds: 3.96,
-        crop: true,
-        detail: true,
+        name: "Shut",
+        seconds: 5,
+        journey: true,
         build: journey([
-          [0, { rotX: 19, rotY: -43, fill: 1.84, lid: 124, focus: -0.3 }],
-          [1, { focus: 0.2, focusX: -0.2 }],
+          [0, { rotX: 13, rotY: 10, fill: 1 }],
+          [0.5, { rotY: 2, lid: 100, screen: 100 }, "easeInOutQuint"],
+          [1, { rotX: 26, rotY: -8, lid: 0, screen: 0, fill: 1.02, y: 18 }],
         ]),
       },
     ],
@@ -1910,69 +2001,6 @@ export const PRESETS: AnimationPreset[] = [
           { fill: 1.2, light: -50 },
           { fill: 1.32, light: 30 },
           "easeOut",
-        ),
-      },
-    ],
-  },
-  {
-    id: "lid-open",
-    name: "Lid Open",
-    description:
-      "Starts shut under a moving light, opens in one slow motion, then settles on the screen.",
-    requires: "lid",
-    shots: [
-      {
-        name: "Shut",
-        seconds: 2.8,
-        build: drift(
-          { lid: 0, rotX: 30, rotY: 28, fill: 0.86, light: -60 },
-          { lid: 0, rotX: 26, rotY: 22, fill: 0.88, light: 20 },
-          "linear",
-        ),
-      },
-      {
-        name: "Opening",
-        seconds: 4.2,
-        build: drift(
-          { lid: 2, rotX: 12, rotY: -22, fill: 0.8, light: 20 },
-          { lid: 100, rotX: 8, rotY: -16, fill: 0.82, light: -10 },
-          "easeInOutQuint",
-        ),
-      },
-      {
-        name: "Screen",
-        seconds: 3.6,
-        build: drift(
-          { rotY: 10, rotX: 4, fill: 0.84, light: -30 },
-          { rotY: 6, rotX: 3, fill: 0.88, light: 15 },
-          "easeOut",
-        ),
-      },
-    ],
-  },
-  {
-    id: "lid-close",
-    name: "Lid Close",
-    description:
-      "The lid lowers gently until it is shut, then the light crosses the closed laptop from above.",
-    requires: "lid",
-    shots: [
-      {
-        name: "Closing",
-        seconds: 4.2,
-        build: drift(
-          { lid: 100, rotY: -24, rotX: 10, fill: 0.8, light: -10 },
-          { lid: 0, rotY: -18, rotX: 14, fill: 0.82, light: 25 },
-          "easeInOutQuint",
-        ),
-      },
-      {
-        name: "Shut",
-        seconds: 3.2,
-        build: drift(
-          { lid: 0, rotX: 32, rotY: 20, fill: 0.86, light: -40 },
-          { lid: 0, rotX: 28, rotY: 26, fill: 0.88, light: 30 },
-          "linear",
         ),
       },
     ],

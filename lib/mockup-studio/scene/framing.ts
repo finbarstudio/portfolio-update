@@ -50,6 +50,11 @@ export interface FramingContext {
   screen?: ScreenBox | null;
   /** Composition width / height. */
   aspect: number;
+  /**
+   * Lowest the camera may sit, in degrees above the device's base. Set for laptops: below this the underside of the
+   * deck comes into view, which no take should ever show.
+   */
+  minPitch?: number;
 }
 
 /**

@@ -25,6 +25,7 @@ function applyPreset(preset: AnimationPreset) {
   const {
     shots,
     playhead,
+    deviceId,
     deviceExtents,
     deviceScreen,
     composition,
@@ -37,6 +38,8 @@ function applyPreset(preset: AnimationPreset) {
     extents: deviceExtents,
     screen: deviceScreen,
     aspect: composition.width / composition.height,
+    // A laptop is always seen from above its deck, never from underneath.
+    minPitch: getDevice(deviceId).lid ? LAPTOP_MIN_PITCH : undefined,
   };
 
   const built = (): Shot[] =>
@@ -92,6 +95,9 @@ function applyPreset(preset: AnimationPreset) {
   setPlaying(true);
 }
 
+/** Degrees above the deck every laptop take stays at or over. */
+const LAPTOP_MIN_PITCH = 6;
+
 /** The families the list folds into, in order. A preset not placed in one lands in the last. */
 const GROUPS = [
   "Cinematic",
@@ -99,7 +105,6 @@ const GROUPS = [
   "Showcase",
   "Turns",
   "Close-ups",
-  "Lid",
   "Simple",
 ] as const;
 
@@ -124,8 +129,6 @@ const GROUP_OF: Record<string, (typeof GROUPS)[number]> = {
   "screen-first": "Close-ups",
   "macro-study": "Close-ups",
   "lean-in": "Close-ups",
-  "lid-open": "Lid",
-  "lid-close": "Lid",
 };
 
 function groupOf(preset: AnimationPreset): (typeof GROUPS)[number] {
