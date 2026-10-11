@@ -178,10 +178,10 @@ export function ScreenMediaSection() {
                 onChange={setSpeakerSound}
               />
               <p className="text-[11px] text-ms-ink-faint text-pretty">
-                Heard while the animation plays. From the speakers, it thins out
-                on small devices, dulls when a lid shuts or the device turns
-                away, and rises as the camera moves in. Not yet in exported
-                video.
+                Heard while the animation plays, and kept in exported video.
+                From the speakers, it thins out on small devices, dulls when a
+                lid shuts or the device turns away, and rises as the camera
+                moves in.
               </p>
             </>
           ) : null}

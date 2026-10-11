@@ -4,6 +4,8 @@
  * level. Browsers only let sound start after a click or key press, so the chain is built on the first one.
  */
 
+import type { SoundShape } from "@/lib/mockup-studio/scene/sound";
+
 interface Chain {
   source: MediaElementAudioSourceNode;
   floor: BiquadFilterNode;
@@ -51,15 +53,6 @@ export function disconnectSound(video: HTMLVideoElement): void {
   chain.level.disconnect();
   chain.source.disconnect();
   chains.delete(video);
-}
-
-export interface SoundShape {
-  /** 0..1 */
-  level: number;
-  /** Hz below which the speaker gives nothing. */
-  floor: number;
-  /** Hz above which the sound is cut off, lower the more it is muffled. */
-  ceiling: number;
 }
 
 export function shapeSound(video: HTMLVideoElement, shape: SoundShape): void {

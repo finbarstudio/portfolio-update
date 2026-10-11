@@ -2,6 +2,7 @@ import { totalDuration } from "@/lib/mockup-studio/scene/animation";
 import { getRenderer } from "@/lib/mockup-studio/scene/bridge";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import { download, fileStamp } from "./download";
+import { renderSoundtrack } from "./sound";
 import { parseSceneDocument } from "./validate";
 
 export interface ExportProgress {
@@ -26,6 +27,7 @@ const MAX_SCENE_FILE_BYTES = 64 * 1024 * 1024;
 const BITS_PER_PIXEL = 0.12;
 const MIN_BITRATE = 2_000_000;
 const MAX_BITRATE = 80_000_000;
+const AUDIO_BITRATE = 192_000;
 
 const even = (n: number) => Math.max(2, Math.round(n / 2) * 2);
 
@@ -88,11 +90,13 @@ export async function exportVideo({
   );
 
   const {
+    AudioBufferSource,
     BufferTarget,
     CanvasSource,
     Mp4OutputFormat,
     Output,
     Quality,
+    canEncodeAudio,
     canEncodeVideo,
   } = await import("mediabunny");
 
@@ -126,7 +130,27 @@ export async function exportVideo({
 
     const source = new CanvasSource(renderer.canvas, { codec: "avc", quality });
     output.addVideoTrack(source, { frameRate: fps });
+
+    // The screen video's sound, if it has any and Sound is on. AAC plays everywhere; Opus is the fallback where the
+    // browser cannot encode AAC.
+    const soundtrack = await renderSoundtrack(fps, frameCount);
+    const audioCodec = !soundtrack
+      ? null
+      : (await canEncodeAudio("aac"))
+        ? "aac"
+        : (await canEncodeAudio("opus"))
+          ? "opus"
+          : null;
+    const audio = audioCodec
+      ? new AudioBufferSource({ codec: audioCodec, bitrate: AUDIO_BITRATE })
+      : null;
+    if (audio) output.addAudioTrack(audio);
+
     await output.start();
+    if (audio && soundtrack) {
+      await audio.add(soundtrack);
+      audio.close();
+    }
 
     for (let i = 0; i < frameCount; i++) {
       if (signal?.aborted)

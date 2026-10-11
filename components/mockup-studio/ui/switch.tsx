@@ -9,7 +9,9 @@ export interface SwitchProps {
 /** A labelled on/off switch built on a native checkbox. */
 export function Switch({ label, checked, onChange }: SwitchProps) {
   return (
-    <label className="flex h-7 cursor-pointer items-center justify-between gap-2 text-ms-ink-muted">
+    // `relative` keeps the hidden checkbox inside this row. Without it the checkbox is placed against the page, and
+    // ticking it makes the browser scroll the whole app to bring it into view.
+    <label className="relative flex h-7 cursor-pointer items-center justify-between gap-2 text-ms-ink-muted">
       <span>{label}</span>
       <input
         type="checkbox"
