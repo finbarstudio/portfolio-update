@@ -13,16 +13,21 @@ export interface LabItem {
   /** clean path on the lab host (proxy.ts rewrites it to /lab/...), or a full
    *  URL for a piece that lives on the studio site */
   href: string;
-  /** 3:4 tile. Every tile is a still (Finbar, 8 Oct 2026: no motion in the lab grid); `video` is kept for the type only. */
+  /** 3:4 tile. Every tile is one word set as a wordmark, text only (Finbar,
+   *  11 Oct 2026); the stills are drawn by _wip/lab-tiles/build.py. `video` is
+   *  kept for the type only. */
   video?: string;
   image?: string;
+  /** a tile drawn live in place of a still: "dino" is the metal badge from the
+   *  Moto Technique demo, the real three.js one */
+  live?: "dino";
   added: string; // YYYY-MM-DD
 }
 
 const RAW_ITEMS: LabItem[] = [
   {
     id: 8,
-    name: "Mockup studio",
+    name: "Plinth",
     line: "3D device mockups, animated and exported",
     href: "/mockup",
     image: "/media/lab/mockup/tile.webp",
@@ -30,7 +35,7 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 7,
-    name: "Invoice maker",
+    name: "Tally",
     line: "Invoices, quotes and receipts",
     href: "/invoice",
     image: "/media/lab/invoice/tile.webp",
@@ -38,7 +43,7 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 6,
-    name: "Email check",
+    name: "Postie",
     line: "What breaks in which inbox",
     href: "/email",
     image: "/media/lab/email/tile.webp",
@@ -46,7 +51,7 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 5,
-    name: "Motion presets",
+    name: "Loop",
     line: "Fifty looping layouts for your media",
     href: "/motion",
     image: "/media/lab/motion/tile.webp",
@@ -54,7 +59,7 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 4,
-    name: "Pathway maker",
+    name: "Pathway",
     line: "A brand tool for Share to Buy",
     href: "/pathway",
     image: "/media/lab/pathway/tile.webp",
@@ -62,7 +67,7 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 3,
-    name: "Lindon Homes",
+    name: "Lindon",
     line: "A builder's site, demo build",
     href: "https://www.finbar.studio/lindon",
     image: "/media/lab/lindon/tile.webp",
@@ -70,10 +75,10 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 2,
-    name: "Moto Technique",
+    name: "Dino",
     line: "A restoration workshop, demo build",
     href: "https://www.finbar.studio/mt",
-    image: "/media/lab/moto-technique/tile.webp",
+    live: "dino",
     added: "2026-09-30",
   },
   {

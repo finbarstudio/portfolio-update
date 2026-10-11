@@ -54,10 +54,14 @@ const FINISH: Record<Finish, { tint: number; roughness: number; env: number }> =
 export default function DinoBadge({
   title,
   active,
+  lab = false,
 }: {
   title: { image: string; normal: string; finish: Finish; alt: string; width: number; height: number };
   /** False while the hero is covered by the page, so it stops drawing. */
   active: boolean;
+  /** The lab's tile: its own class names (the demo's stylesheet is not loaded
+   *  there), and it runs on a phone too, where the tile is all there is. */
+  lab?: boolean;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -72,7 +76,7 @@ export default function DinoBadge({
     const cv = canvas.current;
     if (!host || !cv) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (isPhone()) return; // no WebGL on a phone: the mobile page shows the flat artwork
+    if (!lab && isPhone()) return; // no WebGL on a phone: the mobile page shows the flat artwork
 
     let dead = false;
     // Everything that needs releasing is pushed here the moment it exists, so
@@ -233,14 +237,14 @@ export default function DinoBadge({
       dead = true;
       release();
     };
-  }, [title.image, title.normal, title.finish, title.width, title.height]);
+  }, [title.image, title.normal, title.finish, title.width, title.height, lab]);
 
   return (
-    <div ref={wrap} className="mt-hero-title">
+    <div ref={wrap} className={lab ? "lb-dino" : "mt-hero-title"}>
       {/* Desktop only: a phone shows its own flat wordmark (MobileHome), so it is
           handed a blank here and never fetches this one. See DeskImg. */}
-      <picture className="mt-deskimg">
-        <source media="(max-width: 760px)" srcSet={BLANK} />
+      <picture className={lab ? undefined : "mt-deskimg"}>
+        {lab ? null : <source media="(max-width: 760px)" srcSet={BLANK} />}
         <img
           // The SAME address and the same CORS mode as the texture request above,
           // so the two share one download. It is a CORS-only address (corsMedia):
@@ -251,11 +255,11 @@ export default function DinoBadge({
           alt={title.alt}
           width={title.width}
           height={title.height}
-          className="mt-hero-title-flat"
+          className={lab ? "lb-dino-flat" : "mt-hero-title-flat"}
           decoding="async"
         />
       </picture>
-      <canvas ref={canvas} className="mt-hero-title-metal" aria-hidden="true" />
+      <canvas ref={canvas} className={lab ? "lb-dino-metal" : "mt-hero-title-metal"} aria-hidden="true" />
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import { LAB_ITEMS } from "@/content/lab-items";
 import LabHeader from "@/components/lab/LabHeader";
+import DinoBadge from "@/components/moto-technique/DinoBadge";
+import { heroMark } from "@/content/moto-technique";
 
 /**
  * The lab grid: the same shape as web.finbar's catalogue (empty void, then a
@@ -7,8 +9,9 @@ import LabHeader from "@/components/lab/LabHeader";
  * its number. Newest first. Loose tiles sit in the TOP row, so every row
  * below it is full (the same rule as web.finbar): the row breaks after the
  * loose ones, by data-r3 / data-r2 on the grid (see lab.css).
- * No pagination and no submit form yet. Each tile is a looping clip that
- * starts greyscale and goes colour on hover (touch screens get colour).
+ * No pagination and no submit form yet. Each tile is one word, a wordmark
+ * still, greyscale until hovered (touch screens get colour). The Dino tile is
+ * the one live one: the demo's metal badge itself, tilting to the pointer.
  */
 export default function LabCatalogue() {
   const items = [...LAB_ITEMS].sort((a, b) => b.id - a.id);
@@ -27,7 +30,11 @@ export default function LabCatalogue() {
             style={{ "--i": 2 + i } as React.CSSProperties}
           >
             <a className="lb-tile" href={item.href} aria-label={item.name}>
-              {item.video ? (
+              {item.live === "dino" && heroMark ? (
+                <span className="lb-media lb-live">
+                  <DinoBadge title={heroMark} active lab />
+                </span>
+              ) : item.video ? (
                 <video
                   className="lb-media"
                   src={item.video}

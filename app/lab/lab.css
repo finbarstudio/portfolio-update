@@ -149,6 +149,40 @@ body:has(.lb-root) {
   }
 }
 
+/* The live Dino tile: the badge centred on black. The canvas is 14% larger
+   than the artwork, matching PAD in DinoBadge.tsx. */
+.lb-live {
+  display: grid;
+  place-items: center;
+  background: #0b0b0a;
+}
+.lb-dino {
+  position: relative;
+  width: 74%;
+  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.6));
+}
+.lb-dino-flat {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.9s ease;
+}
+.lb-dino-metal {
+  position: absolute;
+  top: -7%;
+  left: -7%;
+  width: 114%;
+  height: 114%;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.lb-dino[data-ready="1"] .lb-dino-metal {
+  opacity: 1;
+}
+.lb-dino[data-ready="1"] .lb-dino-flat {
+  opacity: 0;
+}
+
 .lb-cell {
   display: flex;
   flex-direction: column;
