@@ -1,13 +1,11 @@
 "use client";
 
 import { PintLink } from "@/components/mockup-studio/ui/pint-link";
+import { VERSION } from "@/lib/mockup-studio/version";
 import { AppHeader } from "./app-header";
 import { MockupSection } from "./mockup-section";
 import { PresetsSection } from "./presets-section";
 import { ScreenMediaSection } from "./screen-media-section";
-
-/** Shown at the foot of the left panel. Bumped by hand as the studio changes. */
-const VERSION = "v0.1";
 
 export function LeftPanel() {
   return (
