@@ -1,3 +1,4 @@
+import { MAX_SHOT_BLEND } from "@/lib/mockup-studio/scene/animation";
 import {
   DEFAULT_FRAME,
   FRAME_STYLES,
@@ -376,6 +377,9 @@ function readShots(value: unknown): Shot[] {
       name: readString(raw.name, `${where}.name`),
       duration,
       tracks: readTracks(raw.tracks, `${where}.tracks`, duration),
+      ...(typeof raw.preset === "string" && raw.preset.length <= 80
+        ? { preset: raw.preset }
+        : null),
     };
   });
 }
@@ -408,6 +412,10 @@ export function parseSceneDocument(input: unknown): SceneDocument {
     media: readMedia(raw.media),
     shots: readShots(raw.shots),
     seamlessLoop: raw.seamlessLoop === true,
+    shotBlend:
+      typeof raw.shotBlend === "number" && Number.isFinite(raw.shotBlend)
+        ? Math.min(MAX_SHOT_BLEND, Math.max(0, raw.shotBlend))
+        : 0,
     frame: readFrame(raw.frame),
   };
 }

@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { evaluate, locateShot, totalDuration } from "./animation";
+import {
+  evaluate,
+  locateShot,
+  MAX_SHOT_BLEND,
+  totalDuration,
+} from "./animation";
 import { DEFAULT_DEVICE_ID } from "./devices";
 import { DEFAULT_FRAME, type MediaFrame } from "./frames";
 import type { ScreenBox } from "./framing";
@@ -122,6 +127,21 @@ function mapShot(
   return shots.map((shot) => (shot.id === shotId ? fn(shot) : shot));
 }
 
+/** A shot at a new length. Its keyframes either stretch with it or stay put, pulled back to the end if past it. */
+function resizeShot(shot: Shot, duration: number, stretch: boolean): Shot {
+  const tracks: Tracks = {};
+  for (const path of Object.keys(shot.tracks) as AnimPath[]) {
+    tracks[path] = shot.tracks[path]?.map((keyframe) => ({
+      ...keyframe,
+      t: Math.min(
+        stretch ? keyframe.t * (duration / shot.duration) : keyframe.t,
+        duration,
+      ),
+    }));
+  }
+  return { ...shot, duration, tracks };
+}
+
 function withTrack(shot: Shot, path: AnimPath, keyframes: Keyframe[]): Shot {
   const tracks: Tracks = { ...shot.tracks };
   if (keyframes.length) tracks[path] = keyframes;
@@ -144,6 +164,8 @@ export interface StudioState {
   shots: Shot[];
   /** The end of the timeline glides back to the first frame, so the animation loops without a jump. */
   seamlessLoop: boolean;
+  /** Milliseconds each cut between shots takes to ease across. 0 is a hard cut. */
+  shotBlend: number;
   /** The window and backdrop the screen media is presented in. */
   frame: MediaFrame;
 
@@ -200,12 +222,19 @@ export interface StudioState {
   moveShot(shotId: string, toIndex: number): void;
   renameShot(shotId: string, name: string): void;
   setShotDuration(shotId: string, duration: number): void;
+  /**
+   * Move the border between a shot and the one after it: this shot gets `duration` and the next gives up or takes
+   * the difference, so the timeline keeps its length.
+   */
+  rollShotEdge(shotId: string, duration: number): void;
   /** Replace the whole timeline, e.g. with a multi-shot preset. */
   setShots(shots: Shot[]): void;
   /** Back to the default pose, camera, effects and an empty timeline. Keeps the device, finish, media, lights and background. */
   resetScene(): void;
   /** Stretch or squeeze every shot and its keyframes so the timeline lasts `totalMs`. */
   fitTimelineTo(totalMs: number): void;
+  /** Outside Pro Mode, make the timeline last as long as the video on the screen, if there is one. */
+  fitToVideo(): void;
 
   // Transport
   setPlayhead(ms: number): void;
@@ -214,6 +243,7 @@ export interface StudioState {
   tick(dtMs: number): void;
   setLoop(loop: boolean): void;
   setSeamlessLoop(seamlessLoop: boolean): void;
+  setShotBlend(ms: number): void;
   setFrame(patch: Partial<MediaFrame>): void;
   setRecording(recording: boolean): void;
   setProMode(proMode: boolean): void;
@@ -278,6 +308,7 @@ export const useStudio = create<StudioState>()((set, get) => {
     playhead: 0,
     playing: false,
     seamlessLoop: false,
+    shotBlend: 0,
     frame: DEFAULT_FRAME,
     loop: true,
     recording: false,
@@ -466,18 +497,34 @@ export const useStudio = create<StudioState>()((set, get) => {
 
     setShotDuration(shotId, raw) {
       const duration = Math.max(MIN_SHOT_MS, Math.round(raw));
-      const shots = mapShot(get().shots, shotId, (shot) => {
-        const tracks: Tracks = {};
-        for (const path of Object.keys(shot.tracks) as AnimPath[]) {
-          // Keyframes past the new end are pulled back to it rather than lost.
-          tracks[path] = shot.tracks[path]?.map((keyframe) => ({
-            ...keyframe,
-            t: Math.min(keyframe.t, duration),
-          }));
-        }
-        return { ...shot, duration, tracks };
-      });
+      // Outside Pro Mode the keyframes stretch with the shot, so the move keeps its shape at any length. In Pro Mode
+      // they stay where they were put.
+      const stretch = !get().proMode;
+      const shots = mapShot(get().shots, shotId, (shot) =>
+        resizeShot(shot, duration, stretch),
+      );
       set({ shots, playhead: Math.min(get().playhead, totalDuration(shots)) });
+    },
+
+    rollShotEdge(shotId, raw) {
+      const { shots, proMode } = get();
+      const index = shots.findIndex((shot) => shot.id === shotId);
+      const next = shots[index + 1];
+      if (index < 0 || !next) return;
+      const pair = shots[index].duration + next.duration;
+      const duration = Math.min(
+        pair - MIN_SHOT_MS,
+        Math.max(MIN_SHOT_MS, Math.round(raw)),
+      );
+      set({
+        shots: shots.map((shot, i) =>
+          i === index
+            ? resizeShot(shot, duration, !proMode)
+            : i === index + 1
+              ? resizeShot(shot, pair - duration, !proMode)
+              : shot,
+        ),
+      });
     },
 
     resetScene() {
@@ -490,7 +537,15 @@ export const useStudio = create<StudioState>()((set, get) => {
     },
 
     setShots(shots) {
-      if (shots.length) set({ shots, playhead: 0 });
+      if (!shots.length) return;
+      set({ shots, playhead: 0 });
+      get().fitToVideo();
+    },
+
+    fitToVideo() {
+      const { media, proMode, fitTimelineTo } = get();
+      if (!proMode && media?.kind === "video" && media.duration)
+        fitTimelineTo(media.duration);
     },
 
     fitTimelineTo(totalMs) {
@@ -498,11 +553,16 @@ export const useStudio = create<StudioState>()((set, get) => {
       const current = totalDuration(shots);
       const target = Math.max(MIN_SHOT_MS * shots.length, Math.round(totalMs));
       const factor = target / current;
-      const scaled = shots.map((shot) => {
+      let left = target;
+      const scaled = shots.map((shot, index) => {
+        // The last shot takes whatever rounding left over, so the total is exact.
         const duration = Math.max(
           MIN_SHOT_MS,
-          Math.round(shot.duration * factor),
+          index === shots.length - 1
+            ? left
+            : Math.round(shot.duration * factor),
         );
+        left -= duration;
         const tracks: Tracks = {};
         for (const path of Object.keys(shot.tracks) as AnimPath[]) {
           tracks[path] = shot.tracks[path]?.map((keyframe) => ({
@@ -545,6 +605,8 @@ export const useStudio = create<StudioState>()((set, get) => {
 
     setLoop: (loop) => set({ loop }),
     setSeamlessLoop: (seamlessLoop) => set({ seamlessLoop }),
+    setShotBlend: (ms) =>
+      set({ shotBlend: Math.min(MAX_SHOT_BLEND, Math.max(0, ms)) }),
     setFrame: (patch) => set({ frame: { ...get().frame, ...patch } }),
     setRecording: (recording) => set({ recording }),
     setProMode: (proMode) => set({ proMode }),
@@ -667,6 +729,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         media,
         shots,
         seamlessLoop,
+        shotBlend,
         frame,
       } = get();
       return {
@@ -681,6 +744,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         media,
         shots,
         seamlessLoop,
+        shotBlend,
         frame,
       };
     },
@@ -698,6 +762,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         media: doc.media,
         shots: doc.shots,
         seamlessLoop: doc.seamlessLoop === true,
+        shotBlend: doc.shotBlend ?? 0,
         frame: { ...DEFAULT_FRAME, ...doc.frame },
         selectedLightId: doc.lights[0]?.id ?? null,
         playhead: 0,
@@ -711,14 +776,18 @@ export const useStudio = create<StudioState>()((set, get) => {
 export function useResolvedValue(path: AnimPath): number {
   return useStudio(
     (state) =>
-      evaluate(state.values, state.shots, state.playhead, state.seamlessLoop)[
-        path
-      ],
+      evaluate(
+        state.values,
+        state.shots,
+        state.playhead,
+        state.seamlessLoop,
+        state.shotBlend,
+      )[path],
   );
 }
 
 /** Scene values at an arbitrary time, for the viewport's frame loop and export. */
 export function resolveAt(ms: number): Values {
-  const { values, shots, seamlessLoop } = useStudio.getState();
-  return evaluate(values, shots, ms, seamlessLoop);
+  const { values, shots, seamlessLoop, shotBlend } = useStudio.getState();
+  return evaluate(values, shots, ms, seamlessLoop, shotBlend);
 }

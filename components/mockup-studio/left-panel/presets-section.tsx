@@ -50,6 +50,7 @@ function applyPreset(preset: AnimationPreset) {
         name: part.name,
         duration,
         tracks: part.build(duration, framing),
+        preset: preset.id,
       };
     });
 
@@ -83,7 +84,12 @@ function applyPreset(preset: AnimationPreset) {
     setShots(
       shots.map((each) =>
         each.id === shot.id
-          ? { ...each, duration, tracks: part.build(duration, framing) }
+          ? {
+              ...each,
+              duration,
+              tracks: part.build(duration, framing),
+              preset: preset.id,
+            }
           : each,
       ),
     );
@@ -129,6 +135,14 @@ const GROUP_OF: Record<string, (typeof GROUPS)[number]> = {
   "screen-first": "Close-ups",
   "macro-study": "Close-ups",
   "lean-in": "Close-ups",
+  "corner-study": "Close-ups",
+  "glide-down": "Close-ups",
+  "side-skim": "Close-ups",
+  "macro-push": "Close-ups",
+  "close-orbit": "Close-ups",
+  "over-the-top": "Close-ups",
+  "into-focus": "Close-ups",
+  "detail-cuts": "Close-ups",
 };
 
 function groupOf(preset: AnimationPreset): (typeof GROUPS)[number] {
@@ -139,6 +153,11 @@ function groupOf(preset: AnimationPreset): (typeof GROUPS)[number] {
 export function PresetsSection() {
   const device = useStudio((s) => getDevice(s.deviceId));
   const presets = PRESETS.filter((preset) => presetSuits(preset, device));
+  // The preset behind the shot under the playhead, so the list shows what is playing.
+  const activeId = useStudio(
+    (s) => locateShot(s.shots, s.playhead).shot.preset ?? null,
+  );
+  const active = PRESETS.find((preset) => preset.id === activeId);
   const groups = GROUPS.map((title) => ({
     title,
     presets: presets.filter((preset) => groupOf(preset) === title),
@@ -146,6 +165,15 @@ export function PresetsSection() {
 
   return (
     <Section title="Animation presets">
+      <p className="mb-2 text-ms-ink-muted">
+        {active ? (
+          <>
+            This shot uses <span className="text-ms-ink">{active.name}</span>
+          </>
+        ) : (
+          "This shot uses no preset"
+        )}
+      </p>
       <div>
         {groups.map((group, index) => (
           <Fold
@@ -162,6 +190,7 @@ export function PresetsSection() {
                     size="auto"
                     justify="start"
                     onClick={() => applyPreset(preset)}
+                    pressed={preset.id === activeId}
                     className="w-full"
                   >
                     <span className="flex flex-col gap-0.5">

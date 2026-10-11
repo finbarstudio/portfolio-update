@@ -2,7 +2,7 @@
 
 import type { KeyboardEvent, PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-import { locateShot } from "@/lib/mockup-studio/scene/animation";
+import { crossoverHalf, locateShot } from "@/lib/mockup-studio/scene/animation";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { Shot } from "@/lib/mockup-studio/scene/types";
 import { formatSeconds, percent, pointerToMs, snapToFrame } from "./geometry";
@@ -68,6 +68,8 @@ interface Resize {
   startX: number;
   startDuration: number;
   startMs: number;
+  /** The border sits between two shots, so dragging it trades time between them. */
+  inner: boolean;
   span: number;
   laneWidth: number;
 }
@@ -78,6 +80,7 @@ const KEY_RESIZE_MS = 100;
 
 export function ShotsRow({ span, laneWidth, onFreezeSpan }: ShotsRowProps) {
   const shots = useStudio((s) => s.shots);
+  const shotBlend = useStudio((s) => s.shotBlend);
   const activeId = useStudio((s) => locateShot(s.shots, s.playhead).shot.id);
   const selectedIds = useShotSelection((s) => s.ids);
   const laneRef = useRef<HTMLDivElement>(null);
@@ -204,6 +207,7 @@ export function ShotsRow({ span, laneWidth, onFreezeSpan }: ShotsRowProps) {
       startX: event.clientX,
       startDuration: shot.duration,
       startMs: start,
+      inner: shots[shots.length - 1]?.id !== shot.id,
       span,
       laneWidth: lane.getBoundingClientRect().width,
     };
@@ -218,6 +222,11 @@ export function ShotsRow({ span, laneWidth, onFreezeSpan }: ShotsRowProps) {
     const wanted =
       Math.round((resize.startDuration + delta) / RESIZE_SNAP_MS) *
       RESIZE_SNAP_MS;
+    // Between two shots the border moves and the total stays; Option changes only this shot's length instead.
+    if (resize.inner && !event.altKey) {
+      useStudio.getState().rollShotEdge(resize.id, wanted);
+      return;
+    }
     // The frozen lane ends at `span`; stop at its right edge rather than overflowing it.
     useStudio
       .getState()
@@ -243,7 +252,10 @@ export function ShotsRow({ span, laneWidth, onFreezeSpan }: ShotsRowProps) {
       (event.shiftKey ? 10 : 1) *
       KEY_RESIZE_MS *
       (event.key === "ArrowLeft" ? -1 : 1);
-    useStudio.getState().setShotDuration(shot.id, shot.duration + amount);
+    const { rollShotEdge, setShotDuration } = useStudio.getState();
+    if (shots[shots.length - 1]?.id !== shot.id && !event.altKey)
+      rollShotEdge(shot.id, shot.duration + amount);
+    else setShotDuration(shot.id, shot.duration + amount);
   };
 
   // Rename --------------------------------------------------------------------
@@ -262,6 +274,22 @@ export function ShotsRow({ span, laneWidth, onFreezeSpan }: ShotsRowProps) {
 
   return (
     <Row className="h-9" label="Shots" laneRef={laneRef}>
+      {shotBlend > 0 && !drag
+        ? shots.slice(1).map((shot, i) => {
+            const half = crossoverHalf(shotBlend, shots[i], shot);
+            return (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 z-10 border-ms-ink/60 border-x bg-ms-ink/15"
+                key={shot.id}
+                style={{
+                  left: percent(starts[i + 1] - half, span),
+                  width: percent(half * 2, span),
+                }}
+              />
+            );
+          })
+        : null}
       {shots.map((shot, index) => {
         const start = starts[index];
         const widthPx = (laneWidth * shot.duration) / span;
@@ -378,7 +406,11 @@ export function ShotsRow({ span, laneWidth, onFreezeSpan }: ShotsRowProps) {
                 onPointerDown={(event) => onEdgeDown(event, shot, start)}
                 onPointerMove={onEdgeMove}
                 onPointerUp={endEdge}
-                title="Drag to change the length (arrow keys: 0.1s, Shift: 1s)"
+                title={
+                  index < shots.length - 1
+                    ? "Drag to move the cut between these two shots; the total length stays. Hold Option to change only this shot (arrow keys: 0.1s, Shift: 1s)"
+                    : "Drag to change the length (arrow keys: 0.1s, Shift: 1s)"
+                }
                 type="button"
               />
             </div>

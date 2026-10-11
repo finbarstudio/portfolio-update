@@ -14,15 +14,21 @@ function kindOf(file: File): Media["kind"] | null {
   return null;
 }
 
-/** Record a video's length on the media once its metadata is in, unless the media has changed meanwhile. */
+/**
+ * Record a video's length on the media once its metadata is in, unless the media has changed meanwhile, and fit
+ * the timeline to it.
+ */
 function readVideoDuration(url: string | undefined): void {
   if (!url) return;
   const probe = document.createElement("video");
   probe.preload = "metadata";
   probe.onloadedmetadata = () => {
-    const { media, updateMedia } = useStudio.getState();
-    if (media?.url === url && Number.isFinite(probe.duration))
+    const { media, updateMedia, fitToVideo } = useStudio.getState();
+    if (media?.url === url && Number.isFinite(probe.duration)) {
       updateMedia({ duration: Math.round(probe.duration * 1000) });
+      // The animation takes the clip's length straight away; Pro Mode leaves the timing alone.
+      fitToVideo();
+    }
     probe.removeAttribute("src");
     probe.load();
   };

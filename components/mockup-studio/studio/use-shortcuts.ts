@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { redo, undo, watchHistory } from "@/lib/mockup-studio/scene/history";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 
 /** Input types that do not take typed text, so shortcuts stay live on them. */
@@ -25,10 +26,27 @@ function isTyping(target: EventTarget | null): boolean {
   );
 }
 
-/** V = select, H = hand, Escape = cancel a pending viewport pick. */
+/** V = select, H = hand, Escape = cancel a pending viewport pick, Cmd/Ctrl+Z = undo, with Shift (or Ctrl+Y) = redo. */
 export function useShortcuts(): void {
+  useEffect(() => watchHistory(), []);
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
+      // In a text box the browser's own undo of the typing wins.
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        !event.altKey &&
+        !event.defaultPrevented &&
+        !isTyping(event.target)
+      ) {
+        const key = event.key.toLowerCase();
+        if (key === "z" || key === "y") {
+          event.preventDefault();
+          if (key === "y" || event.shiftKey) redo();
+          else undo();
+          return;
+        }
+      }
       if (
         event.defaultPrevented ||
         event.metaKey ||

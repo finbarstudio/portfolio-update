@@ -74,15 +74,60 @@ export function locateShot(shots: Shot[], ms: number): ShotLocation {
   throw new Error("locateShot: the timeline has no shots");
 }
 
-/** Rest values overridden by whatever the shot under `ms` animates. */
-function evaluateShots(rest: Values, shots: Shot[], ms: number): Values {
-  const { shot, localMs } = locateShot(shots, ms);
+/** Longest crossover between shots, in milliseconds. */
+export const MAX_SHOT_BLEND = 5000;
+
+/** Rest values overridden by whatever the shot animates at `localMs`. */
+function shotValues(rest: Values, shot: Shot, localMs: number): Values {
   const out = { ...rest };
   for (const path of Object.keys(shot.tracks) as AnimPath[]) {
     const keyframes = shot.tracks[path];
     if (keyframes?.length) out[path] = sampleTrack(keyframes, localMs);
   }
   return out;
+}
+
+/** How long the crossover between two shots can be on each side of the cut: never more than half of either shot. */
+export function crossoverHalf(blendMs: number, a: Shot, b: Shot): number {
+  return Math.max(0, Math.min(blendMs / 2, a.duration / 2, b.duration / 2));
+}
+
+/**
+ * Values at `ms`. With `blendMs` above zero, each cut becomes a crossover of that length centred on it: the
+ * outgoing shot eases into the incoming one instead of jumping.
+ */
+function evaluateShots(
+  rest: Values,
+  shots: Shot[],
+  ms: number,
+  blendMs = 0,
+): Values {
+  const { shot, index, localMs } = locateShot(shots, ms);
+  const now = shotValues(rest, shot, localMs);
+  if (blendMs <= 0) return now;
+
+  const before = shots[index - 1];
+  if (before) {
+    const half = crossoverHalf(blendMs, before, shot);
+    if (localMs < half)
+      return mix(
+        shotValues(rest, before, before.duration),
+        now,
+        EASINGS.easeInOut(0.5 + localMs / (2 * half)),
+      );
+  }
+  const after = shots[index + 1];
+  if (after) {
+    const half = crossoverHalf(blendMs, shot, after);
+    const left = shot.duration - localMs;
+    if (left < half)
+      return mix(
+        now,
+        shotValues(rest, after, 0),
+        EASINGS.easeInOut(0.5 - left / (2 * half)),
+      );
+  }
+  return now;
 }
 
 /** The last stretch of the timeline that a seamless loop spends returning to the first frame. */
@@ -103,6 +148,18 @@ function blendAngle(from: number, to: number, k: number): number {
   return from + delta * k;
 }
 
+/** Every value `k` of the way from one set to another, angles by the short way round. */
+function mix(from: Values, to: Values, k: number): Values {
+  const out = { ...from };
+  for (const path of Object.keys(from) as AnimPath[]) {
+    const a = from[path];
+    const b = to[path];
+    if (a === b) continue;
+    out[path] = ANGLE_PATHS.has(path) ? blendAngle(a, b, k) : a + (b - a) * k;
+  }
+  return out;
+}
+
 /**
  * Scene values at `ms`. With `seamless` on, the end of the timeline glides back to how the first frame looks, so
  * playing on a loop never jumps: whatever the animation did, the last frame equals the first.
@@ -112,8 +169,9 @@ export function evaluate(
   shots: Shot[],
   ms: number,
   seamless = false,
+  blendMs = 0,
 ): Values {
-  const now = evaluateShots(rest, shots, ms);
+  const now = evaluateShots(rest, shots, ms, blendMs);
   if (!seamless) return now;
   const total = totalDuration(shots);
   const window = Math.min(
@@ -123,15 +181,5 @@ export function evaluate(
   const start = total - window;
   if (ms <= start || window <= 0) return now;
   const k = EASINGS.easeInOut(Math.min(1, (ms - start) / window));
-  const first = evaluateShots(rest, shots, 0);
-  const out = { ...now };
-  for (const path of Object.keys(now) as AnimPath[]) {
-    const to = first[path];
-    const from = now[path];
-    if (to === from) continue;
-    out[path] = ANGLE_PATHS.has(path)
-      ? blendAngle(from, to, k)
-      : from + (to - from) * k;
-  }
-  return out;
+  return mix(now, evaluateShots(rest, shots, 0), k);
 }

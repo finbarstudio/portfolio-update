@@ -160,6 +160,65 @@ function SeamlessLoop() {
   );
 }
 
+/** What the crossover is set to when it is first switched on. */
+const DEFAULT_SHOT_BLEND = 800;
+
+/** Turns the cuts between shots into eased crossovers, and sets how long each one takes. Needs two shots or more. */
+function EaseBetweenShots() {
+  const blend = useStudio((s) => s.shotBlend);
+  const several = useStudio((s) => s.shots.length > 1);
+  const setShotBlend = useStudio((s) => s.setShotBlend);
+  if (!several) return null;
+
+  const commit = (input: HTMLInputElement) => {
+    const seconds = Number.parseFloat(input.value);
+    if (Number.isFinite(seconds) && seconds > 0) setShotBlend(seconds * 1000);
+    input.value = (useStudio.getState().shotBlend / 1000).toFixed(2);
+  };
+
+  return (
+    <div
+      className="flex h-7 shrink-0 items-center gap-1.5 rounded-ms-control border border-ms-line pr-1 pl-2 text-ms-ink-muted transition-colors has-checked:border-ms-ink-faint has-checked:text-ms-ink"
+      title="Each shot eases into the next instead of cutting. The time is how long the crossover lasts, centred on the cut"
+    >
+      <label className="flex cursor-pointer items-center gap-1.5 hover:text-ms-ink">
+        <input
+          checked={blend > 0}
+          className="size-3.5 accent-ms-ink"
+          onChange={(event) =>
+            setShotBlend(event.target.checked ? DEFAULT_SHOT_BLEND : 0)
+          }
+          type="checkbox"
+        />
+        Ease between shots
+      </label>
+      {blend > 0 ? (
+        <>
+          <input
+            aria-label="Length of the crossover between shots in seconds"
+            className="h-5 w-12 select-text rounded-ms-control border border-ms-line bg-ms-raised px-1 text-right text-ms-ink tabular-nums"
+            defaultValue={(blend / 1000).toFixed(2)}
+            inputMode="decimal"
+            key={blend}
+            onBlur={(event) => commit(event.currentTarget)}
+            onFocus={(event) => event.currentTarget.select()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") event.currentTarget.blur();
+              if (event.key === "Escape") {
+                event.currentTarget.value = (blend / 1000).toFixed(2);
+                event.currentTarget.blur();
+              }
+            }}
+            spellCheck={false}
+            type="text"
+          />
+          <span aria-hidden="true">s</span>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 export function Transport() {
   const playing = useStudio((s) => s.playing);
   const loop = useStudio((s) => s.loop);
@@ -199,11 +258,13 @@ export function Transport() {
         <TotalLength />
         <FitToClip />
         <SeamlessLoop />
+        <EaseBetweenShots />
         <div className="flex-1" />
         <button
           aria-pressed={proMode}
           className="h-7 shrink-0 rounded-ms-control border border-ms-line px-2.5 text-ms-ink-muted transition-colors hover:bg-ms-hover hover:text-ms-ink aria-pressed:border-ms-ink aria-pressed:bg-ms-ink aria-pressed:text-ms-canvas"
           onClick={() => setProMode(!proMode)}
+          title="Off: timing looks after itself. The animation takes the length of a video on the screen, and keyframes stretch with a shot when you resize it. On: you place everything by hand"
           type="button"
         >
           Pro Mode

@@ -49,6 +49,8 @@ export interface Shot {
   duration: number;
   /** Keyframes sorted by `t`. Paths without a track use the rest values. */
   tracks: Tracks;
+  /** Id of the animation preset this shot was made from, if any. */
+  preset?: string;
 }
 
 export interface Light {
@@ -162,6 +164,8 @@ export interface SceneDocument {
   shots: Shot[];
   /** The end of the timeline returns to the first frame, so it loops without a jump. */
   seamlessLoop?: boolean;
+  /** Milliseconds each cut between shots takes to ease across. Absent or 0: hard cuts. */
+  shotBlend?: number;
   /** The window and backdrop the screen media is presented in. Absent in older files: no framing. */
   frame?: MediaFrame;
 }

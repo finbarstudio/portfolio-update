@@ -1971,6 +1971,324 @@ export const PRESETS: AnimationPreset[] = [
     ],
   },
   {
+    id: "corner-study",
+    name: "Corner Study",
+    description:
+      "One slow drift held tight on the top corner of the screen, tilted, with the rest falling out of focus.",
+    shots: [
+      {
+        name: "Corner",
+        seconds: 5,
+        crop: true,
+        detail: true,
+        build: drift(
+          {
+            rotY: 22,
+            rotX: 10,
+            rotZ: -6,
+            fill: 1.7,
+            focus: 0.6,
+            focusX: -0.5,
+            dof: 45,
+            crt: 25,
+            light: -30,
+          },
+          {
+            rotY: 13,
+            rotX: 6,
+            rotZ: -3,
+            fill: 1.55,
+            focus: 0.45,
+            focusX: -0.3,
+            dof: 35,
+            crt: 25,
+            light: 20,
+          },
+        ),
+      },
+    ],
+  },
+  {
+    id: "glide-down",
+    name: "Glide Down",
+    description:
+      "Close on the screen, sliding from its top to its bottom at a slight angle, like reading down a page.",
+    shots: [
+      {
+        name: "Glide",
+        seconds: 6,
+        crop: true,
+        detail: true,
+        build: drift(
+          {
+            rotY: 14,
+            rotX: 6,
+            fill: 1.6,
+            focus: 0.7,
+            dof: 30,
+            crt: 20,
+            light: -25,
+          },
+          {
+            rotY: 10,
+            rotX: 3,
+            fill: 1.6,
+            focus: -0.7,
+            dof: 30,
+            crt: 20,
+            light: 25,
+          },
+        ),
+      },
+    ],
+  },
+  {
+    id: "side-skim",
+    name: "Side Skim",
+    description:
+      "Skims along the screen from a steep side angle, close enough that the far edge goes soft, then opens up a little.",
+    shots: [
+      {
+        name: "Skim",
+        seconds: 5,
+        crop: true,
+        build: drift(
+          {
+            rotY: 56,
+            rotX: 6,
+            fill: 1.5,
+            focusX: -0.4,
+            dof: 60,
+            crt: 20,
+            light: 30,
+          },
+          {
+            rotY: 40,
+            rotX: 4,
+            fill: 1.3,
+            focusX: 0,
+            dof: 40,
+            crt: 15,
+            light: -10,
+          },
+          "easeOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "macro-push",
+    name: "Macro Push",
+    description:
+      "Dead front and already close, pushing slowly further in until the pixels start to show.",
+    shots: [
+      {
+        name: "Push",
+        seconds: 6,
+        crop: true,
+        build: drift(
+          { rotY: 3, rotX: 2, fill: 1.2, dof: 15, crt: 10, light: -20 },
+          { rotY: 0, rotX: 0, fill: 1.75, dof: 30, crt: 35, light: 20 },
+        ),
+      },
+    ],
+  },
+  {
+    id: "close-orbit",
+    name: "Close Orbit",
+    description:
+      "Stays tight on the screen while swinging from one side to the other, the light moving across the glass.",
+    shots: [
+      {
+        name: "Orbit",
+        seconds: 6,
+        crop: true,
+        build: drift(
+          { rotY: -26, rotX: 7, fill: 1.48, dof: 35, crt: 15, light: -45 },
+          { rotY: 26, rotX: 5, fill: 1.48, dof: 35, crt: 15, light: 45 },
+        ),
+      },
+    ],
+  },
+  {
+    id: "over-the-top",
+    name: "Over the Top",
+    description:
+      "Looks down across the top edge of the device, close, then settles lower towards the middle of the screen.",
+    shots: [
+      {
+        name: "Over",
+        seconds: 5,
+        crop: true,
+        detail: true,
+        build: drift(
+          {
+            rotX: 30,
+            rotY: -10,
+            rotZ: 4,
+            fill: 1.6,
+            focus: 0.8,
+            dof: 50,
+            crt: 20,
+            light: 20,
+          },
+          {
+            rotX: 16,
+            rotY: -6,
+            rotZ: 2,
+            fill: 1.4,
+            focus: 0.3,
+            dof: 35,
+            crt: 15,
+            light: -20,
+          },
+          "easeOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "into-focus",
+    name: "Into Focus",
+    description:
+      "Starts close and soft, then the picture snaps sharp as the camera eases back a touch.",
+    shots: [
+      {
+        name: "Focus",
+        seconds: 4.5,
+        crop: true,
+        build: drift(
+          {
+            rotY: -16,
+            rotX: 8,
+            rotZ: 3,
+            fill: 1.6,
+            blur: 45,
+            dof: 30,
+            crt: 20,
+            light: -30,
+          },
+          {
+            rotY: -10,
+            rotX: 5,
+            rotZ: 2,
+            fill: 1.35,
+            blur: 0,
+            dof: 30,
+            crt: 20,
+            light: 15,
+          },
+          "easeOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "detail-cuts",
+    name: "Detail Cuts",
+    description:
+      "Four quick close cuts around the screen: top corner, opposite side, low edge, then the centre.",
+    shots: [
+      {
+        name: "Top corner",
+        seconds: 2,
+        crop: true,
+        detail: true,
+        build: drift(
+          {
+            rotY: 24,
+            rotX: 10,
+            rotZ: -5,
+            fill: 1.7,
+            focus: 0.6,
+            focusX: -0.45,
+            dof: 45,
+            crt: 25,
+            light: -30,
+          },
+          {
+            rotY: 20,
+            rotX: 8,
+            rotZ: -4,
+            fill: 1.62,
+            focus: 0.55,
+            focusX: -0.4,
+            dof: 45,
+            crt: 25,
+            light: -10,
+          },
+          "linear",
+        ),
+      },
+      {
+        name: "Other side",
+        seconds: 2,
+        crop: true,
+        detail: true,
+        build: drift(
+          {
+            rotY: -30,
+            rotX: 6,
+            rotZ: 4,
+            fill: 1.6,
+            focusX: 0.45,
+            dof: 45,
+            crt: 25,
+            light: 30,
+          },
+          {
+            rotY: -25,
+            rotX: 5,
+            rotZ: 3,
+            fill: 1.66,
+            focusX: 0.4,
+            dof: 45,
+            crt: 25,
+            light: 10,
+          },
+          "linear",
+        ),
+      },
+      {
+        name: "Low edge",
+        seconds: 2,
+        crop: true,
+        detail: true,
+        build: drift(
+          {
+            rotY: 12,
+            rotX: 16,
+            fill: 1.65,
+            focus: -0.6,
+            dof: 50,
+            crt: 25,
+            light: -15,
+          },
+          {
+            rotY: 8,
+            rotX: 13,
+            fill: 1.58,
+            focus: -0.5,
+            dof: 50,
+            crt: 25,
+            light: 15,
+          },
+          "linear",
+        ),
+      },
+      {
+        name: "Centre",
+        seconds: 3,
+        crop: true,
+        build: drift(
+          { rotY: 4, rotX: 3, fill: 1.5, dof: 25, crt: 20, light: -20 },
+          { rotY: 0, rotX: 1, fill: 1.3, dof: 15, crt: 12, light: 10 },
+          "easeOut",
+        ),
+      },
+    ],
+  },
+  {
     id: "edge-and-face",
     name: "Edge and Face",
     description:
