@@ -30,6 +30,7 @@ import {
 import { extractFromPreviewPage, isPreviewUrl } from "@/lib/email-extract";
 import { auditDocument, measureNarrow, type A11yReport, type NarrowProbe } from "@/lib/email-a11y";
 import { auditImages, measureImageBytes, type ImageReport } from "@/lib/email-images";
+import { AS_BUILT, CLIENTS, simulate } from "@/lib/email-simulate";
 import { buildReport } from "@/lib/email-report";
 import { snapshotDocument } from "@/lib/email-snapshot";
 
@@ -44,7 +45,7 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  */
 
 /** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
-const VERSION = "2.3";
+const VERSION = "2.4";
 
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 
@@ -541,6 +542,7 @@ export default function EmailCheck() {
   const [imagesOff, setImagesOff] = useState(false);
   const [stylesOff, setStylesOff] = useState(false);
   const [outlines, setOutlines] = useState(false);
+  const [client, setClient] = useState(AS_BUILT);
   const [inspect, setInspect] = useState(false);
   const [vision, setVision] = useState<Vision>("none");
   const [picked, setPicked] = useState<{ tag: string; line: number | null; text: string } | null>(null);
@@ -771,6 +773,8 @@ export default function EmailCheck() {
   const ordered = fixes.includes("minify") ? [...fixes.filter((id) => id !== "minify"), "minify" as const] : fixes;
   const { src: output, applied } = applyFixes(deferredSource, ordered, { preheader });
   const sampled = fillMergeTags(output);
+  const simulated = simulate(sample ? sampled.src : output, client, data);
+  const clientProfile = CLIENTS.find((c) => c.id === client);
   useEffect(() => {
     inspectRef.current = inspect;
     imagesOffRef.current = imagesOff;
@@ -1362,6 +1366,21 @@ export default function EmailCheck() {
           <details className="ec-controls" open>
           <summary>Preview controls</summary>
           <div className="ec-bar">
+            <select
+              className="ec-select"
+              value={client}
+              onChange={(e) => setClient(e.target.value)}
+              aria-label="Mail client to simulate"
+              title="Rewrites the email the way one mail client would before showing it: unsupported CSS removed, dropped style blocks dropped, Outlook-only markup switched on for classic Outlook. An approximation, not a real render."
+              disabled={!data}
+            >
+              <option value={AS_BUILT}>As built (no client)</option>
+              {CLIENTS.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
             <div className="ec-chips" role="group" aria-label="Preview width">
               {WIDTHS.map((w) => (
                 <button
@@ -1475,6 +1494,16 @@ export default function EmailCheck() {
               previewed here.
             </Note>
           )}
+          {clientProfile && (
+            <Note title={`Simulating ${clientProfile.label}: ${plural(simulated.changes.length, "kind of change", "kinds of change")}`} sources={NOTE_SOURCES.caniemail} tone="warn" open>
+              {clientProfile.about}{" "}
+              {simulated.changes.length > 0 ? `Changed here: ${simulated.changes.join("; ")}.` : "Nothing in this email needed changing for this client."}{" "}
+              This is an approximation built from caniemail&apos;s test data ({data?.last_update_date.slice(0, 10)}), much of it several years old. It shows
+              what the client removes and reveals, not how it then draws the page
+              {client === "outlook-classic" ? ": classic Outlook lays email out with Word, so spacing, DPI scaling, fonts and page breaks will differ from this. VML shapes are drawn as plain boxes" : ""}
+              . Send a real test before relying on it. The report and Find in code still describe the email as built.
+            </Note>
+          )}
           {inspect && (
             <Note title={picked ? `<${picked.tag}> ${picked.line ? `at line ${picked.line}` : "not found in the code"}` : "Find in code is on"} open>
               {picked
@@ -1515,7 +1544,7 @@ export default function EmailCheck() {
               title="Email preview"
               // Same origin so the height can be read; no scripts run in it.
               sandbox="allow-same-origin"
-              srcDoc={previewSource(sample ? sampled.src : output, imagesOff, stylesOff, dark, outlines)}
+              srcDoc={previewSource(simulated.html, imagesOff, stylesOff, dark, outlines)}
               onLoad={onFrameLoad}
               className={inspect ? "ec-inspecting" : undefined}
               style={{ width: width ? `${width}px` : "100%", filter: VISIONS.find((v) => v.value === vision)?.filter || undefined }}
