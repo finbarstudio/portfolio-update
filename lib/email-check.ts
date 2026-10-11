@@ -206,6 +206,7 @@ const SRC = {
   },
   buttons: { label: "Litmus: bulletproof buttons", url: "https://www.litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design", kind: "vendor research" },
   darkMode: { label: "Litmus: guide to dark mode for email", url: "https://www.litmus.com/blog/the-ultimate-guide-to-dark-mode-for-email-marketers", kind: "vendor research" },
+  preheaderPad: { label: "Parcel: preheader spacing (which padding characters each client honours)", url: "https://parcel.io/blog/preheader-spacing", kind: "vendor research" },
   preheader: { label: "Litmus: the preview text hack", url: "https://www.litmus.com/blog/the-little-known-preview-text-hack-you-may-want-to-use-in-every-email", kind: "vendor research" },
   share: { label: "Litmus: email client market share", url: "https://www.litmus.com/email-client-market-share", kind: "vendor research" },
   textSize: { label: "MDN: text-size-adjust", url: "https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust", kind: "standard" },
@@ -243,7 +244,8 @@ export const SOURCES: Record<string, Source[]> = {
   "link-query": [SRC.rfc3986],
   "link-tel": [SRC.rfc3966],
   "link-same-text": [wcag("WCAG21/Understanding/link-purpose-in-context.html", "WCAG 2.4.4, link purpose")],
-  "preheader-unpadded": [SRC.preheader],
+  "preheader-unpadded": [SRC.preheader, SRC.preheaderPad],
+  "preheader-old-pad": [SRC.preheaderPad],
 
   "unsubscribe-empty": [SRC.gmailSenders, SRC.acUnsub],
   "bare-placeholder": [SRC.sesTemplates, SRC.sesHandlebars],
@@ -711,7 +713,7 @@ function previewText(src: string): string {
     .replace(/<!--[\s\S]*?-->/g, " ")
     .replace(/<(style|script|title)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
     .replace(/<[^>]+>/g, " ")
-    .replace(/&zwnj;|&#8204;|&#847;|&#8203;|&#8199;|[\u200b\u200c\u200d\u034f\ufeff\u2007]/g, "\u200c")
+    .replace(/&zwnj;|&#8204;|&#847;|&#8203;|&#8199;|&shy;|&#173;|[\u200b\u200c\u200d\u034f\ufeff\u2007\u00ad]/g, "\u200c")
     .replace(new RegExp(NBSP.source, "g"), "\u00a0")
     // Ordinary white space collapses; the padding characters above do not.
     .replace(/[ \t\r\n\f]+/g, " ")
@@ -1859,12 +1861,22 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (preheaderTag) {
     const close = src.indexOf(`</${preheaderTag.name}>`, preheaderTag.end);
     const inner = close === -1 ? "" : src.slice(preheaderTag.end, close);
-    if (inner.trim() && !/&zwnj;|&#8204;|&#847;|&#8199;|&#8203;|[​‌‍͏ ﻿]/.test(inner)) {
+    const padded = PAD_CHARS.test(inner);
+    if (inner.trim() && !padded) {
       add(
         "preheader-unpadded",
         "info",
         "The preheader has no padding after it",
         `Inbox lists show about 90 to 130 characters. This preheader is ${decodeEntities(inner).trim().length}, so the preview carries on into the next text in the email ("${stats.previewText.slice(decodeEntities(inner).trim().length, decodeEntities(inner).trim().length + 40).trim()}…"). Invisible padding after the preheader stops it there.`,
+        { lines: [preheaderTag.line], fix: "preheader-pad" },
+      );
+    } else if (padded && !(PAD_FIGURE.test(inner) && PAD_SHY.test(inner))) {
+      const missing = [PAD_FIGURE.test(inner) ? "" : "the figure space (&#8199;) that Yahoo and AOL need", PAD_SHY.test(inner) ? "" : "the soft hyphen (&shy;) that Apple Mail on iOS needs"].filter(Boolean).join(" and ");
+      add(
+        "preheader-old-pad",
+        "info",
+        "The preheader padding uses characters some clients now ignore",
+        `Padding made only of zero-width joiners stopped holding the preview line in Yahoo and AOL (around the start of 2023) and in Apple Mail on iOS (from 16.4), so the body text can show after the preheader there. This padding is missing ${missing}.`,
         { lines: [preheaderTag.line], fix: "preheader-pad" },
       );
     }
@@ -2092,7 +2104,27 @@ export interface Fix {
  */
 const PREHEADER_STYLE = "display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;font-family:sans-serif;";
 // Broken over lines so the padding never builds a line past the 998 character limit.
-const PREHEADER_PAD = `\n${Array.from({ length: 10 }, () => "&#847;&zwnj;&nbsp;".repeat(8)).join("\n")}\n`;
+/** Any of the invisible characters used to pad a preheader. */
+const PAD_CHARS = /&zwnj;|&#8204;|&#847;|&#8199;|&#8203;|&shy;|&#173;|[\u200b\u200c\u200d\u034f\u2007\u00ad\ufeff]/;
+const PAD_CHARS_RUN = /(?:\s|&nbsp;|&#160;|\u00a0|&zwnj;|&#8204;|&#847;|&#8199;|&#8203;|&shy;|&#173;|[\u200b\u200c\u200d\u034f\u2007\u00ad\ufeff])+$/;
+const PAD_FIGURE = /&#8199;|\u2007/;
+const PAD_SHY = /&shy;|&#173;|\u00ad/;
+
+/**
+ * Padding for after the preheader text, following Parcel's write-up: figure space plus
+ * grapheme joiner (Yahoo, AOL, Outlook.com, Mail.ru), then soft hyphens (Apple Mail on iOS),
+ * then one non-breaking space. Sized so text and padding together reach about 200 characters,
+ * and broken over lines so no line of the source gets near the 998-character limit.
+ */
+function preheaderPad(textLength: number): string {
+  const count = Math.min(200, Math.max(60, 200 - textLength));
+  const rows = (unit: string, perRow: number) => {
+    const out: string[] = [];
+    for (let left = count; left > 0; left -= perRow) out.push(unit.repeat(Math.min(perRow, left)));
+    return out.join("\n");
+  };
+  return `\n${rows("&#8199;&#847;", 20)}\n${rows("&shy;", 40)}\n&nbsp;\n`;
+}
 
 function escapeText(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -2327,7 +2359,7 @@ export const FIXES: Record<FixId, Fix> = {
     apply(src, params) {
       const text = (params.preheader ?? "").replace(/\s+/g, " ").trim();
       if (!text) return same(src);
-      const content = `${escapeText(text)}${PREHEADER_PAD}`;
+      const content = `${escapeText(text)}${preheaderPad(text.length)}`;
       const { tags } = parse(src);
       // Only a hidden span or div of plain text, ahead of the first table, is a preheader.
       // A hidden block further down is mobile-only content and must not be overwritten.
@@ -2362,8 +2394,15 @@ export const FIXES: Record<FixId, Fix> = {
       const close = src.indexOf(`</${pre.name}>`, pre.end);
       if (close === -1) return same(src);
       const inner = src.slice(pre.end, close);
-      if (!inner.trim() || inner.includes("<") || /&zwnj;|&#847;|&#8199;|&#8204;/.test(inner)) return same(src);
-      return { src: `${src.slice(0, close)}${PREHEADER_PAD}${src.slice(close)}`, note: "Padded the preheader so the inbox preview stops at the end of it" };
+      if (!inner.trim() || inner.includes("<") || (PAD_FIGURE.test(inner) && PAD_SHY.test(inner))) return same(src);
+      // Old padding is taken off first, so the fix also upgrades padding that some clients now ignore.
+      const text = inner.replace(PAD_CHARS_RUN, "");
+      if (!text.trim()) return same(src);
+      const had = text.length !== inner.replace(/\s+$/, "").length;
+      return {
+        src: `${src.slice(0, pre.end)}${text}${preheaderPad(decodeEntities(text).trim().length)}${src.slice(close)}`,
+        note: had ? "Replaced the preheader padding with characters every major client honours" : "Padded the preheader so the inbox preview stops at the end of it",
+      };
     },
   },
   "html-lang": {
