@@ -271,6 +271,8 @@ export const SOURCES: Record<string, Source[]> = {
   "img-width": [cie("css-width", "width property, not supported on images in Outlook"), cie("html-width", "width attribute")],
   "img-inline": [SRC.owaGap],
   "img-alt": [wcag("tutorials/images/", "W3C: images tutorial")],
+  "role-img-no-name": [wcag("WCAG21/Understanding/non-text-content.html", "WCAG 1.1.1, non-text content")],
+  "vml-no-alt": [{ label: "Microsoft: VML alt attribute (archived reference)", url: "https://learn.microsoft.com/en-us/windows/win32/vml/msdn-online-vml-alt-attribute", kind: "client docs" }],
   "img-alt-weak": [wcag("tutorials/images/informative/", "W3C: informative images")],
   lang: [wcag("WCAG21/Understanding/language-of-page.html", "WCAG 3.1.1, language of page")],
   "table-role": [wcag("tutorials/tables/tips/", "W3C: tables, layout tables"), cie("html-role", "role attribute")],
@@ -1443,6 +1445,33 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       `${plural(emptyHeight.length, "image")} with an empty height attribute`,
       'Usually a leftover from a width/height pair where the value was dropped so height:auto could take over on mobile; ActiveCampaign\'s editor then writes it as a bare "height". The attribute takes a whole number, so an empty one is not valid and browsers ignore it. Removing it is a tidy-up.',
       { lines: emptyHeight, fix: "img-height-empty" },
+    );
+  }
+  // Pictures that are not <img>: a background image standing in for one, and Outlook's VML copy of it.
+  const roleImg = tags.filter((t) => !t.mso && t.name !== "img" && t.attrs.role?.toLowerCase() === "img" && !t.attrs["aria-label"]?.trim() && !t.attrs["aria-labelledby"]?.trim());
+  if (roleImg.length) {
+    add(
+      "role-img-no-name",
+      "warn",
+      `${plural(roleImg.length, "element")} marked as an image with no description`,
+      'role="img" tells a screen reader this element is a picture, usually because the picture is a CSS background. Without an aria-label it is announced as an image with nothing to say. Give it the text an alt attribute would have had.',
+      { lines: roleImg.map((t) => t.line), a11y: true, howTo: { text: "Add the description as an aria-label.", code: '<div role="img" aria-label="Couple collecting the keys to their first home" style="background-image:url(…); …"></div>' } },
+    );
+  }
+  const vmlPictures = tags.filter((t) => {
+    if (!t.mso || "alt" in t.attrs) return false;
+    if (t.name === "v:image") return true;
+    if (!/^v:(rect|roundrect|shape|oval)$/.test(t.name)) return false;
+    const close = src.indexOf(`</${t.name}>`, t.end);
+    return /<v:fill\b[^>]*\bsrc\s*=/i.test(src.slice(t.end, close === -1 ? t.end + 600 : close));
+  });
+  if (vmlPictures.length) {
+    add(
+      "vml-no-alt",
+      "info",
+      `${plural(vmlPictures.length, "Outlook-only picture")} with no alt text`,
+      "These VML shapes draw a picture for classic Outlook on Windows. Microsoft's VML reference gives shapes an alt attribute, which it describes as the text for software that reads pages aloud. It is an old reference and whether today's Outlook reads it out has not been verified here, so treat this as low-cost insurance: if the picture carries meaning, add alt to the shape.",
+      { lines: vmlPictures.map((t) => t.line), a11y: true, affects: OUTLOOK, howTo: { text: "Add alt to the VML shape, with the same wording as the image's alt or aria-label.", code: '<v:rect alt="Couple collecting the keys to their first home" fill="true" stroke="false" style="width:600px;height:300px;">\n  <v:fill type="frame" src="…" />\n</v:rect>' } },
     );
   }
   const badHeight = imgLines((t) => "height" in t.attrs && !!t.attrs.height.trim() && !/^\d+$/.test(t.attrs.height.trim()));
