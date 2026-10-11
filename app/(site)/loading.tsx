@@ -9,13 +9,18 @@ import Loader from "@/components/Loader";
  *
  * Just the brand pulse, centred and transparent (bare) — no skeleton slab — so
  * on a fast page it reads as a brief beat rather than a flash of grey boxes.
+ *
+ * A full screen tall, on purpose. The footer comes straight after this in the
+ * page, and at anything shorter it sat on the first screen until the page
+ * streamed in and threw it down: a layout shift of 0.34 on a phone, which was
+ * most of the mobile PageSpeed loss (Oct 2026). Do not shorten it.
  */
 export default function SiteLoading() {
   return (
     <div
       aria-busy="true"
       aria-label="Loading"
-      style={{ position: "relative", minHeight: "60svh" }}
+      style={{ position: "relative", minHeight: "100svh" }}
     >
       <Loader bare />
     </div>

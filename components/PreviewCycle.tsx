@@ -7,20 +7,38 @@
  * consumer: the whole element sits inside a Link to the case study.
  *
  * Fills a positioned parent (absolute inset-0). Reduced motion: no cycling.
+ *
+ * Loading. Only the first shot is in the page to begin with: the others are
+ * added the first time a pointer comes near, so a phone (no hover) never
+ * downloads them. The first shot of each site also has an 800px copy beside it
+ * (web/<site>-1-800.webp), offered through srcset so a phone takes that one.
+ * `priority` is for the one thumbnail that is the largest thing on first paint:
+ * it loads eagerly and at high priority, the rest stay lazy.
  */
 
 import { useEffect, useRef, useState } from "react";
+
+/** The 800px copy of a first shot, or nothing when the image is not one. */
+function small(src: string): string | undefined {
+  const m = src.match(/^(.*\/images\/web\/[a-z0-9-]+-1)\.webp(\?.*)?$/);
+  return m ? `${m[1]}-800.webp?v=1` : undefined;
+}
 
 export default function PreviewCycle({
   images,
   alt,
   interval = 850,
+  priority = false,
+  sizes = "(max-width: 639px) 100vw, 50vw",
 }: {
   images: string[];
   alt: string;
   interval?: number;
+  priority?: boolean;
+  sizes?: string;
 }) {
   const [i, setI] = useState(0);
+  const [armed, setArmed] = useState(false);
   // The shot we're fading AWAY FROM stays fully opaque underneath the incoming
   // one: only the top layer fades, so the ground never shows through mid-fade
   // (a symmetric cross-fade dips to ~75% coverage and blinks white).
@@ -32,6 +50,7 @@ export default function PreviewCycle({
     setI((v) => { prev.current = v; return 0; });
   };
   const start = () => {
+    setArmed(true);
     if (images.length < 2) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     if (timer.current) return;
@@ -46,13 +65,16 @@ export default function PreviewCycle({
       onPointerEnter={start}
       onPointerLeave={stop}
     >
-      {images.map((src, idx) => (
+      {(armed ? images : images.slice(0, 1)).map((src, idx) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           key={src}
           src={src}
+          srcSet={idx === 0 && small(src) ? `${small(src)} 800w, ${src} 1440w` : undefined}
+          sizes={idx === 0 && small(src) ? sizes : undefined}
           alt={idx === 0 ? alt : ""}
-          loading="lazy"
+          loading={idx === 0 && priority ? "eager" : "lazy"}
+          fetchPriority={idx === 0 && priority ? "high" : undefined}
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover"
           style={

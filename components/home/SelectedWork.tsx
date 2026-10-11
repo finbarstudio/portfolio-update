@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { preload } from "react-dom";
 import { projects, type Project } from "@/content/projects";
 import PreviewCycle from "@/components/PreviewCycle";
 import PhoneCarousel from "@/components/PhoneCarousel";
@@ -18,9 +19,16 @@ import { MdArrowForward } from "@/components/MaterialIcon";
  */
 const SELECTED = ["rennen-plus", "lows-design-build", "plated-with-issy", "lola-audio"];
 
-function Thumb({ project, priority }: { project: Project; priority: boolean }) {
+function Thumb({ project, priority, lead }: { project: Project; priority: boolean; lead: boolean }) {
   if (project.webShots?.length || project.webThumb) {
-    return <PreviewCycle images={project.webShots ?? [project.webThumb!]} alt={`${project.name} website`} />;
+    return (
+      <PreviewCycle
+        images={project.webShots ?? [project.webThumb!]}
+        alt={`${project.name} website`}
+        priority={priority}
+        sizes={lead ? "100vw" : undefined}
+      />
+    );
   }
   if (project.heroPdf) {
     return <PdfSlideshowThumb pages={project.heroPdf} />;
@@ -44,6 +52,18 @@ function Thumb({ project, priority }: { project: Project; priority: boolean }) {
 
 export default function SelectedWork() {
   const items = SELECTED.map((slug) => projects.find((p) => p.slug === slug)).filter((p): p is Project => !!p);
+  // The first thumbnail is the largest thing on a phone's first screen. The page
+  // streams in after the shell, so without this the browser only learns the image
+  // exists once the stream lands; a preload in <head> starts it with the page.
+  const first = items[0]?.webShots?.[0] ?? items[0]?.webThumb;
+  const m = first?.match(/^(.*\/images\/web\/[a-z0-9-]+-1)\.webp(\?.*)?$/);
+  if (first) {
+    preload(first, {
+      as: "image",
+      fetchPriority: "high",
+      ...(m ? { imageSrcSet: `${m[1]}-800.webp?v=1 800w, ${first} 1440w`, imageSizes: items.length % 2 ? "100vw" : "(max-width: 639px) 100vw, 50vw" } : {}),
+    });
+  }
   return (
     <section className="px-5 md:px-10 pb-20 md:pb-28" aria-label="Websites">
       <div className="home-selected">
@@ -60,7 +80,7 @@ export default function SelectedWork() {
               aria-label={`${project.name} case study`}
             >
               <div className="home-selected-thumb">
-                <Thumb project={project} priority={i < 3} />
+                <Thumb project={project} priority={i === 0} lead={i === 0 && items.length % 2 === 1} />
               </div>
               <div className="flex items-baseline justify-between gap-4 mt-3">
                 <h2 className="text-ink font-medium group-hover:text-pink transition-colors" style={{ fontSize: "0.95rem" }}>
