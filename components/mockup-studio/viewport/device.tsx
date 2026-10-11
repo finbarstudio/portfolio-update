@@ -256,13 +256,19 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
         (v["screen.spill"] / 100) * (v["screen.opacity"] / 100) * SPILL_MAX;
     }
 
-    if (screen)
+    if (screen) {
+      const { media, lights, background } = useStudio.getState();
       updateScreenSurface(
         screen,
         runtime.values,
-        useStudio.getState().media,
+        media,
         def.screenAspect,
+        lights,
+        !background.transparent &&
+          background.hdriLighting &&
+          (background.hdriFile !== null || background.hdri !== null),
       );
+    }
   }, -5);
 
   useEffect(() => {

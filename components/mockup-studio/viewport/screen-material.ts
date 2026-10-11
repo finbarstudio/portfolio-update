@@ -1,12 +1,15 @@
 import {
   AdditiveBlending,
+  Color,
   MeshPhysicalMaterial,
   ShaderMaterial,
   type Texture,
   Uniform,
   Vector2,
+  Vector3,
 } from "three";
-import type { Media, MediaFit, Values } from "@/lib/mockup-studio/scene/types";
+import { lampPosition } from "@/lib/mockup-studio/scene/lamps";
+import type { Light, Media, MediaFit, Values } from "@/lib/mockup-studio/scene/types";
 import { TONE_GLSL } from "./tone";
 
 /**
@@ -49,10 +52,8 @@ varying vec3 vViewPosition;
 
 ${TONE_GLSL}
 
-// Mask cells across the width of the screen.
+// Pixels across the width of the screen.
 const float CRT_CELLS = 340.0;
-// Average brightness of the mask, used where the cells are too small to draw.
-const float CRT_MEAN = 0.52;
 
 // Video frames arrive sRGB encoded: three uploads them without an sRGB internal format and leaves the decoding to the
 // shader, where its own materials do it. Without this a video reads as linear light and gets gamma applied twice,
@@ -113,18 +114,13 @@ vec2 behindGlass(vec2 s) {
   return s + vec2(dot(across, gradU), dot(across, gradV));
 }
 
-// One phosphor mask sample: red, green and blue stripes in square cells, alternate columns dropped half a cell like a
-// slot mask, with a soft dark gap between rows.
-vec3 phosphorMask(vec2 cell) {
-  float column = floor(cell.x);
-  float within = fract(cell.x) * 3.0;
-  vec3 centres = vec3(0.5, 1.5, 2.5);
-  vec3 offset = abs(within - centres);
-  offset = min(offset, 3.0 - offset);
-  vec3 lit = 1.0 - smoothstep(0.32, 0.6, offset);
-  vec3 stripes = mix(vec3(0.6), vec3(1.0), lit);
-  float row = fract(cell.y + 0.5 * mod(column, 2.0)) - 0.5;
-  float rows = 0.62 + 0.38 * exp(-row * row / 0.03);
+// The panel's own pixel grid, as a macro lens sees it: each pixel is a red, a green and a blue stripe side by side,
+// with a slightly brighter band across the middle of each row. Soft and muted, never a hard mask, and it averages
+// to exactly 1 so the picture is neither darkened nor tinted.
+vec3 pixelGrid(vec2 cell) {
+  vec3 phase = fract(cell.x) - vec3(1.0 / 6.0, 0.5, 5.0 / 6.0);
+  vec3 stripes = 0.7 + 0.3 * (1.0 + cos(6.2831853 * phase));
+  float rows = 1.0 + 0.12 * cos(6.2831853 * fract(cell.y));
   return stripes * rows;
 }
 
@@ -139,20 +135,14 @@ void main() {
   }
 
   if (uCrt > 0.0) {
-    // The mask reads at half the slider: 25 already shows clear phosphor cells up close, like a real panel under a
-    // macro lens, while far away the cells shrink below a pixel and fade to nothing.
-    float mask = min(1.0, uCrt * 2.0);
+    float strength = min(1.0, uCrt * 1.6);
     vec2 cell = vec2(s.x, s.y / uScreenAspect) * CRT_CELLS;
-    // Each cell shows one sample of the picture, so close up the image breaks into real phosphor pixels.
-    vec2 cellCentre = (floor(cell) + 0.5) / CRT_CELLS * vec2(1.0, uScreenAspect);
-    color = mix(color, contentAt(cellCentre), mask);
-    // From far away the cells are smaller than a pixel and would shimmer; fade to the mask's average brightness.
+    // From far away the pixels are smaller than a screen pixel and would shimmer; the grid fades out to nothing.
     float cellPixels = 1.0 / max(fwidth(cell.x), 1e-4);
-    float detail = smoothstep(1.2, 3.5, cellPixels);
-    vec3 phosphor = mix(vec3(CRT_MEAN), phosphorMask(cell), detail);
-    // Applied on display values, not linear light, so the mask has the same weight in dark and bright areas.
+    float detail = smoothstep(1.5, 4.0, cellPixels);
+    // Applied on display values, not linear light, so the grid has the same weight in dark and bright areas.
     vec3 display = pow(max(color, vec3(0.0)), vec3(1.0 / 2.2));
-    display *= mix(vec3(1.0), phosphor, mask);
+    display *= mix(vec3(1.0), pixelGrid(cell), strength * detail);
     color = pow(display, vec3(2.2));
   }
 
@@ -190,6 +180,38 @@ export interface ScreenUniforms {
   uVideo: Uniform<number>;
 }
 
+/** Lamps the glass can show at once. */
+const MAX_LAMPS = 4;
+
+/**
+ * What the cover glass reflects. Not the bare point lights, which would smear into a haze, and not a grey room, which
+ * would veil the blacks: each lamp shows up the way it would on a real shoot, as a softbox with soft edges, standing
+ * where the lamp stands, and everything else in the glass stays black. Strength follows the angle like real glass
+ * does: faint head on, strong at a glance.
+ */
+const GLASS_LAMPS = /* glsl */ `
+reflectedLight.directDiffuse = vec3(0.0);
+reflectedLight.directSpecular = vec3(0.0);
+reflectedLight.indirectDiffuse = vec3(0.0);
+// What is left is the surroundings mirrored in the glass: kept for an environment photo, dropped for the studio.
+reflectedLight.indirectSpecular *= uGlassEnv;
+{
+  vec3 mirrored = reflect(-geometryViewDir, geometryNormal);
+  float fresnel = 0.04 + 0.96 * pow(1.0 - clamp(dot(geometryNormal, geometryViewDir), 0.0, 1.0), 5.0);
+  vec3 up = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz);
+  for (int i = 0; i < ${MAX_LAMPS}; i++) {
+    vec3 toLamp = normalize((viewMatrix * vec4(uLampPos[i], 1.0)).xyz - geometryPosition);
+    vec3 side = normalize(cross(up, toLamp));
+    vec3 top = cross(toLamp, side);
+    float along = dot(mirrored, toLamp);
+    vec2 inBox = vec2(dot(mirrored, side), dot(mirrored, top)) / max(along, 1e-3);
+    // A softbox taller than it is wide, its edges falling off over the last fifth.
+    vec2 edge = 1.0 - smoothstep(vec2(0.13, 0.21), vec2(0.16, 0.26), abs(inBox));
+    reflectedLight.indirectSpecular += uLampColor[i] * (edge.x * edge.y * step(0.0, along) * fresnel);
+  }
+}
+`;
+
 export interface ScreenSurface {
   material: ShaderMaterial;
   uniforms: ScreenUniforms;
@@ -199,6 +221,13 @@ export interface ScreenSurface {
    * surface instead of looking like a sticker on top of it.
    */
   glass: MeshPhysicalMaterial;
+  /** Where each lamp stands, and its colour times its strength in the glass. Unused slots are black. */
+  lamps: {
+    uLampPos: Uniform<Vector3[]>;
+    uLampColor: Uniform<Color[]>;
+    /** How strongly the surroundings show in the glass. 0 in the studio. */
+    uGlassEnv: Uniform<number>;
+  };
 }
 
 export function createScreenSurface(): ScreenSurface {
@@ -236,11 +265,34 @@ export function createScreenSurface(): ScreenSurface {
     polygonOffsetFactor: -2,
     polygonOffsetUnits: -2,
   });
-  return { material, uniforms, glass };
+  const lamps = {
+    uLampPos: new Uniform(
+      Array.from({ length: MAX_LAMPS }, () => new Vector3(0, 0, 1)),
+    ),
+    uLampColor: new Uniform(
+      Array.from({ length: MAX_LAMPS }, () => new Color(0, 0, 0)),
+    ),
+    uGlassEnv: new Uniform(0),
+  };
+  glass.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, lamps);
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        `#include <common>\nuniform vec3 uLampPos[${MAX_LAMPS}];\nuniform vec3 uLampColor[${MAX_LAMPS}];\nuniform float uGlassEnv;`,
+      )
+      .replace(
+        "#include <lights_fragment_end>",
+        `#include <lights_fragment_end>\n${GLASS_LAMPS}`,
+      );
+  };
+  return { material, uniforms, glass, lamps };
 }
 
-/** Reflection 100 shows the studio this many times brighter in the glass than it really is. */
+/** Reflection 100 shows an environment photo this many times brighter in the glass than it really is. */
 const GLASS_MAX_ENV = 2.5;
+/** How bright a lamp of intensity 1 looks in the glass at Reflection 100, before the angle weakens it. */
+const GLASS_LAMP_GAIN = 5;
 
 /** Glass Depth 100 puts the panel this fraction of the screen's width below the glass. */
 const MAX_DEPTH = 0.03;
@@ -257,6 +309,9 @@ export function updateScreenSurface(
   values: Values,
   media: Media | null,
   screenAspect: number,
+  lights: readonly Light[],
+  /** An environment photo is lighting the scene, so the glass should mirror it too. */
+  environment: boolean,
 ) {
   const { uniforms } = surface;
   uniforms.uScreenAspect.value = screenAspect;
@@ -269,6 +324,19 @@ export function updateScreenSurface(
   uniforms.uDepth.value = (values["screen.depth"] / 100) * MAX_DEPTH;
   const reflection = values["screen.reflection"] / 100;
   surface.glass.visible = reflection > 0;
-  surface.glass.envMapIntensity = reflection * GLASS_MAX_ENV;
-  surface.glass.specularIntensity = Math.min(1, reflection * 2);
+  // The procedural studio is not mirrored: its dim walls would lay a grey veil over the blacks. A real place is.
+  surface.lamps.uGlassEnv.value = environment ? reflection * GLASS_MAX_ENV : 0;
+  const level = (values["lights.level"] / 100) * reflection * GLASS_LAMP_GAIN;
+  for (let i = 0; i < MAX_LAMPS; i++) {
+    const light = lights[i];
+    const colour = surface.lamps.uLampColor.value[i];
+    if (!light) {
+      colour.setRGB(0, 0, 0);
+      continue;
+    }
+    surface.lamps.uLampPos.value[i].set(
+      ...lampPosition(light, values["lights.rotation"]),
+    );
+    colour.set(light.color).multiplyScalar(light.intensity * level);
+  }
 }

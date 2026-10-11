@@ -14,16 +14,11 @@ import {
 import { EXRLoader } from "three/addons/loaders/EXRLoader.js";
 import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
 import { getHdri, type HdriFormat } from "@/lib/mockup-studio/scene/hdris";
+import { lampPosition } from "@/lib/mockup-studio/scene/lamps";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { Light } from "@/lib/mockup-studio/scene/types";
 import type { ViewportRuntime } from "./runtime";
 
-/**
- * The lamps sit close to the device, like a product shoot: a spot a device-height and a half away, with inverse-square
- * falloff, lights the near side hard and lets the far side fall into shadow. That contrast is what makes the body
- * read as solid metal and glass instead of a flat print.
- */
-const LIGHT_DISTANCE = 1.5;
 const SPOT_ANGLE = MathUtils.degToRad(30);
 const SPOT_PENUMBRA = 0.5;
 /**
@@ -102,15 +97,8 @@ function StudioLight({ light, runtime }: StudioLightProps) {
     const lamp = lampRef.current;
     if (!lamp) return;
     lamp.intensity = light.intensity * (runtime.values["lights.level"] / 100);
-    // Azimuth 0 is the camera side (+Z), 90 is +X. Elevation lifts the light above the horizon.
-    const azimuth = MathUtils.degToRad(
-      light.azimuth + runtime.values["lights.rotation"],
-    );
-    const elevation = MathUtils.degToRad(light.elevation);
     lamp.position.set(
-      LIGHT_DISTANCE * Math.cos(elevation) * Math.sin(azimuth),
-      LIGHT_DISTANCE * Math.sin(elevation),
-      LIGHT_DISTANCE * Math.cos(elevation) * Math.cos(azimuth),
+      ...lampPosition(light, runtime.values["lights.rotation"]),
     );
     // The aim point is stored in device space, so it follows the device when it moves or turns.
     target.set(...light.target);
