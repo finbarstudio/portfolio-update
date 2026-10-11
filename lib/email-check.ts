@@ -109,6 +109,7 @@ const CHECKED_IDS = new Set([
   "img-alt-long",
   "width",
   "tags-uneven",
+  "link-wraps-table",
 ]);
 
 /** Findings about what the email says and where its links go, as opposed to how it is built. */
@@ -1631,6 +1632,21 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   const httpLinks = links.filter((t) => /^http:/i.test(t.attrs.href ?? "")).map((t) => t.line);
   if (httpLinks.length) {
     add("link-http", "info", `${plural(httpLinks.length, "link")} using http`, "Worth switching to https where the destination supports it.", { lines: httpLinks });
+  }
+  const tableLinks = links
+    .filter((t) => {
+      const close = src.indexOf("</a>", t.end);
+      return close !== -1 && /<table\b/i.test(src.slice(t.end, close));
+    })
+    .map((t) => t.line);
+  if (tableLinks.length) {
+    add(
+      "link-wraps-table",
+      "info",
+      `${plural(tableLinks.length, "link")} wrapped round a table`,
+      "The whole table sits inside the link, usually to make a button or a card clickable. Email developers report that classic Outlook on Windows (2013 to 2019) moves the table out of the link, leaving a link with nothing in it, so the button cannot be clicked there. That report has not been verified against a published test, so it is a note; but a dead button is costly, and the safe pattern costs nothing: put the link inside the cell, round the text.",
+      { lines: tableLinks, affects: OUTLOOK, howTo: { text: "Keep the table as the button's shape and put the link inside the cell.", code: '<table role="presentation" cellpadding="0" cellspacing="0" border="0">\n  <tr>\n    <td bgcolor="#ff0066" style="border-radius:6px;">\n      <a href="…" style="display:block; padding:12px 24px; color:#ffffff; text-decoration:none;">Go to the store</a>\n    </td>\n  </tr>\n</table>' } },
+    );
   }
   const uncolouredLinks = links.filter((t) => !styleHas(t.attrs.style, "color") && isTextLink(t, src)).map((t) => t.line);
   if (uncolouredLinks.length) {
