@@ -132,6 +132,7 @@ const CONTENT_IDS = new Set([
   "img-alt",
   "img-alt-weak",
   "img-alt-long",
+  "nb-hyphen",
   "text-markdown",
   "text-spacing-after",
   "text-spacing-before",
@@ -272,6 +273,7 @@ export const SOURCES: Record<string, Source[]> = {
   "img-width": [cie("css-width", "width property, not supported on images in Outlook"), cie("html-width", "width attribute")],
   "img-inline": [SRC.owaGap],
   "img-alt": [wcag("tutorials/images/", "W3C: images tutorial")],
+  "nb-hyphen": [{ label: "FileFormat.info: fonts that support U+2011, the non-breaking hyphen", url: "https://www.fileformat.info/info/unicode/char/2011/fontsupport.htm", kind: "test data" }],
   "role-img-no-name": [wcag("WCAG21/Understanding/non-text-content.html", "WCAG 1.1.1, non-text content")],
   "vml-no-alt": [{ label: "Microsoft: VML alt attribute (archived reference)", url: "https://learn.microsoft.com/en-us/windows/win32/vml/msdn-online-vml-alt-attribute", kind: "client docs" }],
   "img-alt-weak": [wcag("tutorials/images/informative/", "W3C: informative images")],
@@ -1955,6 +1957,18 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
         { lines: where },
       );
     }
+  }
+
+  // ── Characters a font may not have ──────────────────────────────────
+  const nbHyphen = linesOf(/&#8209;|&#x2011;|\u2011/gi);
+  if (nbHyphen.length) {
+    add(
+      "nb-hyphen",
+      "info",
+      `Non-breaking hyphen used ${nbHyphen.length === 1 ? "once" : `${nbHyphen.length} times`}`,
+      "This is the special hyphen that stops a word such as a product name splitting across two lines. Many common fonts do not include it (the font support list linked here shows Times New Roman, Segoe UI and Roboto with it, and does not list Arial, Verdana, Georgia or Calibri), and where the email's font lacks it the client borrows the character from another font, so it can look thinner, longer or lower than the hyphens around it. Check it by eye in the font the email uses. An ordinary hyphen inside a span set to white-space: nowrap keeps the look, though nowrap is not honoured everywhere either.",
+      { lines: nbHyphen, howTo: { text: "If the borrowed hyphen shows, use an ordinary hyphen and stop the wrap round the whole word.", code: '<span style="white-space:nowrap;">X-chromosomale</span>' } },
+    );
   }
 
   // ── Preheader ───────────────────────────────────────────────────────
