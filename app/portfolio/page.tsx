@@ -39,7 +39,7 @@ function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; grou
       className={`pf-item${m.frame === false ? "" : " is-framed"}`}
       style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
     >
-      {m.cars ? <PfCars /> : <PfMedia src={m.src} light={m.light} video={m.video} alt={m.alt} w={m.w} h={m.h} group={group} />}
+      {m.cars ? <PfCars /> : <PfMedia src={m.src} light={m.light} video={m.video} sound={m.sound} alt={m.alt} w={m.w} h={m.h} group={group} />}
     </div>
   );
 }

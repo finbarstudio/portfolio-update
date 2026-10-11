@@ -272,6 +272,22 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-item :is(img, video)[data-in="1"] { opacity: 1; }
 
+/* the sound switch on a clip with a soundtrack: bottom right of the frame */
+.pf-sound {
+  position: absolute;
+  right: calc(var(--u) * 0.8); bottom: calc(var(--u) * 0.8);
+  min-height: 44px;
+  padding: 0 calc(var(--u) * 1);
+  border: 1px solid var(--soft);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  z-index: 2;
+}
+.pf-sound[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.pf-sound:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+
 /* the car grid: 12 by 19 cells that fill the frame exactly. The car under the
    pointer grows to a 5 by 5 block and the rest step aside by whole cells, so
    the frame only ever cuts off whole cars (positions are set inline by

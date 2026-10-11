@@ -38,7 +38,7 @@
 import { media as mediaOne, mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -110,7 +110,7 @@ const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => (
 /** One image filling the whole page, edge to edge (cropped to 16:9). */
 const bleed = (path: string): Slide => ({ kind: "media", items: [m(path)], bleed: true });
 /** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption and a link out. */
-const linked = (path: string, caption: string, link: { label: string; href: string }): Slide => ({ kind: "media", items: [m(path, { frame: false })], caption, link });
+const linked = (path: string, caption: string, link: { label: string; href: string }, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
 
 /** Several rows of images on one page, `per` to a row, none cropped. */
@@ -184,7 +184,7 @@ const RAW: Slide[] = [
       "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
     meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
   },
-  linked("portfolio/lola-audio/website.webm", "The website", { label: "lola-audio.com", href: "https://www.lola-audio.com" }),
+  linked("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { label: "lola-audio.com", href: "https://www.lola-audio.com" }, { sound: true }),
 
   /* ── Rennen Plus ────────────────────────────────────────────── */
   { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },

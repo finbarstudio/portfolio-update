@@ -72,7 +72,7 @@ async function download(url: string, onProgress: (pct: number | null) => void, s
   return URL.createObjectURL(new Blob(chunks, { type: res.headers.get("content-type") ?? "" }));
 }
 
-export default function PfMedia({ src: dark, light, video, alt, w, h, group }: { src: string; light?: string; video?: boolean; alt?: string; w: number; h: number; group?: string }) {
+export default function PfMedia({ src: dark, light, video, sound, alt, w, h, group }: { src: string; light?: string; video?: boolean; /** the clip has a soundtrack: it starts muted, with a button to turn the sound on */ sound?: boolean; alt?: string; w: number; h: number; group?: string }) {
   // A piece can have a second file for the page's light theme. It is swapped
   // the moment the theme switch is flipped (it sets data-pf-theme on <html>).
   const [isLight, setIsLight] = useState(false);
@@ -90,6 +90,7 @@ export default function PfMedia({ src: dark, light, video, alt, w, h, group }: {
   const [url, setUrl] = useState<string | null>(null);
   const [shown, setShown] = useState(false);
   const clip = useRef<HTMLVideoElement>(null);
+  const [loud, setLoud] = useState(false);
 
   useEffect(() => {
     if (video && window.matchMedia("(max-width: 760px)").matches) {
@@ -133,7 +134,10 @@ export default function PfMedia({ src: dark, light, video, alt, w, h, group }: {
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) v.play().catch(() => {});
-        else v.pause();
+        else {
+          v.pause();
+          setLoud(false); // scrolled away: back to silent, so sound never plays unseen
+        }
       },
       { threshold: 0.2 },
     );
@@ -144,7 +148,14 @@ export default function PfMedia({ src: dark, light, video, alt, w, h, group }: {
   return (
     <>
       {url && video ? (
-        <video ref={clip} src={url} muted loop playsInline preload="auto" data-in={shown ? "1" : "0"} onLoadedData={() => setShown(true)} />
+        <>
+          <video ref={clip} src={url} muted={!loud} loop playsInline preload="auto" data-in={shown ? "1" : "0"} onLoadedData={() => setShown(true)} />
+          {sound && shown ? (
+            <button type="button" className="pf-sound pf-mono" aria-pressed={loud} onClick={() => setLoud(!loud)}>
+              {loud ? "Sound on" : "Sound off"}
+            </button>
+          ) : null}
+        </>
       ) : url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={alt ?? ""} width={w} height={h} decoding="async" data-in={shown ? "1" : "0"} onLoad={() => setShown(true)} />
