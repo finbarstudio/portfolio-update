@@ -225,6 +225,7 @@ export const PARAMS = {
    * How far the picture sits below the cover glass. The picture slides
    * against the bezel as the view turns, and its edges darken, which is what
    * makes it read as a real panel behind glass. 0 = painted on the surface.
+   * Modern panels are laminated to the glass, so the gap is hair-thin: 1 or 2. Higher is for old CRTs and lightboxes.
    */
   "screen.depth": {
     label: "Glass Depth",
@@ -232,7 +233,7 @@ export const PARAMS = {
     min: 0,
     max: 100,
     step: 1,
-    default: 25,
+    default: 2,
   },
   /** How much the lit screen spills its own colour onto nearby surfaces, such as a laptop keyboard. */
   "screen.spill": {
