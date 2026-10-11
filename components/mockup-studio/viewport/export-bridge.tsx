@@ -93,7 +93,7 @@ export function ExportBridge({ runtime }: { runtime: ViewportRuntime }) {
         gl.setPixelRatio(state.viewport.dpr);
         gl.setSize(state.size.width, state.size.height, true);
         state.setFrameloop("always");
-        runtime.video?.play().catch(() => undefined);
+        // The live frame loop puts the video back in step with the timeline.
       },
     };
 

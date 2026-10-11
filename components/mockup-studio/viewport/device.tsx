@@ -42,6 +42,35 @@ interface DeviceProps {
   runtime: ViewportRuntime;
 }
 
+/** Seconds the video may run ahead of or behind the playhead before it is pulled back into step. */
+const VIDEO_DRIFT = 0.3;
+/** Paused, the video is held within about a frame of the playhead. */
+const VIDEO_HOLD = 0.02;
+
+/**
+ * Keep the screen video on the timeline's clock: it plays only while the animation plays, sits on the frame under
+ * the playhead when paused or scrubbed, and loops if it is shorter than the animation. Export seeks it the same way.
+ */
+function followTimeline(
+  video: HTMLVideoElement,
+  playheadMs: number,
+  playing: boolean,
+): void {
+  const { duration } = video;
+  if (!Number.isFinite(duration) || duration <= 0) return;
+  const target = (playheadMs / 1000) % duration;
+  // Measured round the loop, so the last frame and the first count as neighbours.
+  const off = Math.abs(video.currentTime - target);
+  const drift = Math.min(off, duration - off);
+  if (playing) {
+    if (drift > VIDEO_DRIFT) video.currentTime = target;
+    if (video.paused) video.play().catch(() => undefined);
+    return;
+  }
+  if (!video.paused) video.pause();
+  if (drift > VIDEO_HOLD && !video.seeking) video.currentTime = target;
+}
+
 const OPEN_SOUND: SoundShape = { level: 1, floor: 20, ceiling: 20000 };
 const SILENCE: SoundShape = { level: 0, floor: 20, ceiling: 20000 };
 
@@ -155,7 +184,7 @@ function useScreenMedia(
     };
     video.addEventListener("loadeddata", onData);
     video.src = mediaUrl;
-    video.play().catch(() => undefined);
+    // The frame loop starts and stops it with the timeline; see followTimeline.
     runtime.video = video;
     runtime.videoTexture = texture;
     return () => {
@@ -245,7 +274,13 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
     if (prepared.lid) setLid(prepared.lid, runtime.values["object.lid"] / 100);
 
     if (runtime.video) {
-      const { sound, speakerSound, playing } = useStudio.getState();
+      const { sound, speakerSound, playing, playhead } = useStudio.getState();
+      if (runtime.exportMs === null) {
+        followTimeline(runtime.video, playhead, playing);
+        // A paused video draws no new frames on its own, so a scrub has to ask for one.
+        if (!playing && runtime.videoTexture)
+          runtime.videoTexture.needsUpdate = true;
+      }
       // Heard only while the animation plays, and never during an export, which steps the video frame by frame.
       const audible = sound && playing && runtime.exportMs === null;
       shapeSound(
