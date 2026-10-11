@@ -273,6 +273,10 @@ export const SOURCES: Record<string, Source[]> = {
   "img-width": [cie("css-width", "width property, not supported on images in Outlook"), cie("html-width", "width attribute")],
   "img-inline": [SRC.owaGap],
   "img-alt": [wcag("tutorials/images/", "W3C: images tutorial")],
+  "role-button": [{ label: "Good Email Code (Mark Robbins): link button, on role=button and role=link", url: "https://www.goodemailcode.com/email-code/link-button", kind: "vendor research" }, wcag("WCAG21/Understanding/keyboard.html", "WCAG 2.1.1, keyboard")],
+  landmarks: [{ label: "Good Email Code (Mark Robbins): ARIA landmarks in HTML email", url: "https://www.goodemailcode.com/email-accessibility/aria-landmarks-in-html-email", kind: "vendor research" }],
+  "aria-id-ref": [{ label: "Good Email Code (Mark Robbins): ARIA landmarks in HTML email (clients that prefix id values)", url: "https://www.goodemailcode.com/email-accessibility/aria-landmarks-in-html-email", kind: "vendor research" }],
+  "vml-links": [{ label: "email-bugs #77: links not keyboard accessible when inside VML", url: "https://github.com/hteumeuleu/email-bugs/issues/77", kind: "test data" }],
   "row-padding-uneven": [cie("css-padding", "padding (vertical padding is shared across a row)")],
   "nb-hyphen": [{ label: "FileFormat.info: fonts that support U+2011, the non-breaking hyphen", url: "https://www.fileformat.info/info/unicode/char/2011/fontsupport.htm", kind: "test data" }],
   "role-img-no-name": [wcag("WCAG21/Understanding/non-text-content.html", "WCAG 1.1.1, non-text content")],
@@ -1933,6 +1937,55 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "The standard for tel: links does not allow spaces; hyphens, dots and brackets are the permitted separators. Most phones cope with spaces anyway, but it is not guaranteed. The visible number can keep its spaces; the link should not.",
       { lines: badTel.map((t) => t.line), howTo: { text: "Remove the spaces from the link only.", code: '<a href="tel:03336664747">0333 666 4747</a>' } },
     );
+  }
+
+  // ── Roles and landmarks that do not work in email ───────────────────
+  {
+    const fakeButtons = tags.filter((t) => !t.mso && t.inBody && t.name !== "button" && t.attrs.role?.toLowerCase() === "button");
+    const fakeLinks = tags.filter((t) => !t.mso && t.inBody && t.name !== "a" && t.attrs.role?.toLowerCase() === "link");
+    if (fakeButtons.length + fakeLinks.length) {
+      add(
+        "role-button",
+        "warn",
+        `${plural(fakeButtons.length + fakeLinks.length, "element")} given role="button" or role="link"`,
+        'A role only changes what a screen reader announces; it adds no behaviour. On the web the missing keyboard support is added with JavaScript, and email has none. So role="button" on a link, cell or div is announced as a button that pressing Space will not work, and role="link" on anything but a real link cannot be reached or opened from the keyboard. A link styled to look like a button should stay a plain link.',
+        { lines: [...fakeButtons, ...fakeLinks].map((t) => t.line), a11y: true, howTo: { text: "Remove the role and keep a real link.", code: '<a href="…" style="display:inline-block; padding:12px 24px; background:#ff0066; color:#ffffff; text-decoration:none;">Book your place</a>' } },
+      );
+    }
+    const LANDMARK_ROLES = new Set(["banner", "contentinfo", "main", "complementary"]);
+    const landmarks = tags.filter((t) => !t.mso && t.inBody && (["header", "footer", "main", "aside"].includes(t.name) || LANDMARK_ROLES.has(t.attrs.role?.toLowerCase() ?? "")));
+    if (landmarks.length) {
+      add(
+        "landmarks",
+        "info",
+        `${plural(landmarks.length, "page landmark")} used inside the email`,
+        "header, footer, main and aside (and the roles banner, contentinfo, main and complementary) describe the parts of a whole page. In webmail the email is one small piece of the mail client's own page, which already has those landmarks, so a screen reader user jumping to main expecting their inbox can land in the middle of your email. For an email, the advice is to wrap the whole thing in an article and leave the page-level landmarks out.",
+        { lines: landmarks.map((t) => t.line), a11y: true, howTo: { text: "Use plain divs or table cells for these areas, and one labelled article round the whole email.", code: '<div role="article" aria-roledescription="email" aria-label="Your enquiry has been sent" lang="en">\n  …\n</div>' } },
+      );
+    }
+    const idRefs = tags.filter((t) => !t.mso && t.inBody && ("aria-labelledby" in t.attrs || "aria-describedby" in t.attrs));
+    if (idRefs.length) {
+      add(
+        "aria-id-ref",
+        "info",
+        `${plural(idRefs.length, "element")} labelled by pointing at an id`,
+        "aria-labelledby and aria-describedby work by naming the id of another element. Yahoo, AOL and Outlook.com rewrite id values by adding a prefix, so the pointer no longer matches anything and the element is left with no label in those clients. aria-label, which holds the text itself, is not affected.",
+        { lines: idRefs.map((t) => t.line), a11y: true, affects: [...OUTLOOK, "yahoo", "aol"], howTo: { text: "Put the wording in aria-label.", code: '<div role="img" aria-label="Couple collecting the keys to their first home" …></div>' } },
+      );
+    }
+    const vmlLinks: number[] = [];
+    for (const m of src.matchAll(/<v:textbox\b[\s\S]*?<\/v:textbox>/gi)) {
+      for (const a of m[0].matchAll(/<a\b[^>]*\bhref\s*=/gi)) vmlLinks.push(lineOf(m.index + a.index));
+    }
+    if (vmlLinks.length) {
+      add(
+        "vml-links",
+        "info",
+        `${plural(vmlLinks.length, "link")} inside an Outlook background shape`,
+        "These links sit inside a VML text box, the usual way of putting content over a background image for classic Outlook. A bug report that is still open says that in Outlook the keyboard focus lands on the whole shape and never on the links inside it, so someone who cannot use a mouse cannot open them there. It was reported against Outlook for Office 365 on Windows in 2020. If one of these links is the email's main action, repeat it once outside the background section.",
+        { lines: vmlLinks, a11y: true, affects: OUTLOOK },
+      );
+    }
   }
 
   // ── Cells in one row with different vertical padding ───────────────
