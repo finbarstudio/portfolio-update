@@ -273,6 +273,7 @@ export const SOURCES: Record<string, Source[]> = {
   "img-width": [cie("css-width", "width property, not supported on images in Outlook"), cie("html-width", "width attribute")],
   "img-inline": [SRC.owaGap],
   "img-alt": [wcag("tutorials/images/", "W3C: images tutorial")],
+  "row-padding-uneven": [cie("css-padding", "padding (vertical padding is shared across a row)")],
   "nb-hyphen": [{ label: "FileFormat.info: fonts that support U+2011, the non-breaking hyphen", url: "https://www.fileformat.info/info/unicode/char/2011/fontsupport.htm", kind: "test data" }],
   "role-img-no-name": [wcag("WCAG21/Understanding/non-text-content.html", "WCAG 1.1.1, non-text content")],
   "vml-no-alt": [{ label: "Microsoft: VML alt attribute (archived reference)", url: "https://learn.microsoft.com/en-us/windows/win32/vml/msdn-online-vml-alt-attribute", kind: "client docs" }],
@@ -1932,6 +1933,69 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "The standard for tel: links does not allow spaces; hyphens, dots and brackets are the permitted separators. Most phones cope with spaces anyway, but it is not guaranteed. The visible number can keep its spaces; the link should not.",
       { lines: badTel.map((t) => t.line), howTo: { text: "Remove the spaces from the link only.", code: '<a href="tel:03336664747">0333 666 4747</a>' } },
     );
+  }
+
+  // ── Cells in one row with different vertical padding ───────────────
+  {
+    // Top and bottom padding of a cell, from its inline style, as [top, bottom] in the units written.
+    const verticalPadding = (style: string | undefined): [string, string] => {
+      const norm = (v: string) => (/^0[a-z%]*$/i.test(v) ? "0" : v.toLowerCase());
+      let top = "0";
+      let bottom = "0";
+      const shorthand = styleGet(style, "padding").replace(/!important/i, "").trim().split(/\s+/).filter(Boolean);
+      if (shorthand.length) {
+        top = shorthand[0];
+        bottom = shorthand.length >= 3 ? shorthand[2] : shorthand[0];
+      }
+      const t = styleGet(style, "padding-top").replace(/!important/i, "").trim();
+      const b = styleGet(style, "padding-bottom").replace(/!important/i, "").trim();
+      return [norm(t || top), norm(b || bottom)];
+    };
+    const structure = src.replace(/<!--[\s\S]*?-->/g, (c) => c.replace(/[^\n]/g, " "));
+    const rows: { line: number; cells: { pad: [string, string]; empty: boolean }[] }[][] = [];
+    const uneven: number[] = [];
+    const closeRow = () => {
+      const row = rows[rows.length - 1]?.pop();
+      if (!row || row.cells.length < 2) return;
+      // Outlook raises every cell to the row's largest padding. That only shows where a cell with
+      // something in it has less than the largest; an empty gutter cell gaining padding changes nothing.
+      const px = (v: string) => Number.parseFloat(v) || 0;
+      for (const side of [0, 1] as const) {
+        const largest = Math.max(...row.cells.map((c) => px(c.pad[side])));
+        if (row.cells.some((c) => !c.empty && px(c.pad[side]) < largest)) {
+          uneven.push(row.line);
+          return;
+        }
+      }
+    };
+    for (const m of structure.matchAll(/<(\/?)(table|tr|td|th)\b((?:[^>"']|"[^"]*"|'[^']*')*)>/gi)) {
+      const closing = m[1] === "/";
+      const name = m[2].toLowerCase();
+      if (name === "table") {
+        if (closing) {
+          closeRow();
+          rows.pop();
+        } else rows.push([]);
+      } else if (name === "tr") {
+        closeRow();
+        if (!closing) rows[rows.length - 1]?.push({ line: lineOf(m.index), cells: [] });
+      } else if (!closing) {
+        const row = rows[rows.length - 1]?.[rows[rows.length - 1].length - 1];
+        row?.cells.push({
+          pad: verticalPadding(/\bstyle\s*=\s*(?:"([^"]*)"|'([^']*)')/i.exec(m[3])?.slice(1).find((v) => v !== undefined)),
+          empty: /^(?:\s|&nbsp;|&#160;|\u00a0)*<\/t[dh]\s*>/i.test(structure.slice(m.index + m[0].length, m.index + m[0].length + 200)),
+        });
+      }
+    }
+    if (uneven.length) {
+      add(
+        "row-padding-uneven",
+        "info",
+        `${plural(uneven.length, "row")} whose cells have different top or bottom padding`,
+        "Classic Outlook on Windows gives every cell in a row the same vertical padding, taking the largest value in the row. So a cell with no padding beside one with 20px gets 20px too, and its content sits further in than designed (a button pinned to the bottom with valign, say). Only rows where a cell with content has less than the row's largest padding are listed; empty gutter cells are ignored. Give the cells the same top and bottom padding, or move the spacing to a nested table.",
+        { lines: uneven, affects: OUTLOOK },
+      );
+    }
   }
 
   // ── Tags opened and closed ──────────────────────────────────────────
