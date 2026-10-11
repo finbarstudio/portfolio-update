@@ -155,6 +155,10 @@ export interface StudioState {
   proMode: boolean;
   /** Show safe-zone guides over the viewport. Never exported. */
   guides: boolean;
+  /** Play the screen video's sound while the timeline plays. */
+  sound: boolean;
+  /** Shape that sound as if it came from the device: thin from a phone, muffled by a shut lid or a turned back. */
+  speakerSound: boolean;
   tool: Tool;
   /** Set while the next click on the viewport should place something. */
   pick: PickMode | null;
@@ -208,6 +212,8 @@ export interface StudioState {
   setRecording(recording: boolean): void;
   setProMode(proMode: boolean): void;
   setGuides(guides: boolean): void;
+  setSound(sound: boolean): void;
+  setSpeakerSound(speakerSound: boolean): void;
   setTool(tool: Tool): void;
   setPick(pick: PickMode | null): void;
   setDeviceExtents(
@@ -269,6 +275,8 @@ export const useStudio = create<StudioState>()((set, get) => {
     recording: false,
     proMode: false,
     guides: false,
+    sound: true,
+    speakerSound: false,
     tool: "select",
     pick: null,
     deviceExtents: [1, 1, 1],
@@ -531,6 +539,8 @@ export const useStudio = create<StudioState>()((set, get) => {
     setRecording: (recording) => set({ recording }),
     setProMode: (proMode) => set({ proMode }),
     setGuides: (guides) => set({ guides }),
+    setSound: (sound) => set({ sound }),
+    setSpeakerSound: (speakerSound) => set({ speakerSound }),
     setTool: (tool) => set({ tool }),
     setPick: (pick) => set({ pick }),
     setDeviceExtents: (deviceExtents, deviceScreen) =>

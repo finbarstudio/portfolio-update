@@ -8,13 +8,19 @@ import {
   type Group,
   LinearMipmapLinearFilter,
   MathUtils,
+  Quaternion,
   SRGBColorSpace,
   type Texture,
   TextureLoader,
+  Vector3,
   VideoTexture,
 } from "three";
 import { media } from "@/lib/media";
-import { type DeviceDef, getDevice } from "@/lib/mockup-studio/scene/devices";
+import {
+  type DeviceCategory,
+  type DeviceDef,
+  getDevice,
+} from "@/lib/mockup-studio/scene/devices";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import {
   applyBodyColor,
@@ -23,11 +29,64 @@ import {
   setLid,
 } from "./device-model";
 import type { ViewportRuntime } from "./runtime";
+import {
+  connectSound,
+  disconnectSound,
+  type SoundShape,
+  shapeSound,
+  soundUnlocked,
+} from "./screen-audio";
 import { type ScreenSurface, updateScreenSurface } from "./screen-material";
 
 interface DeviceProps {
   runtime: ViewportRuntime;
 }
+
+const OPEN_SOUND: SoundShape = { level: 1, floor: 20, ceiling: 20000 };
+const SILENCE: SoundShape = { level: 0, floor: 20, ceiling: 20000 };
+
+/** Hz below which each kind of device gives no sound: the smaller the speaker, the thinner it is. */
+const SPEAKER_FLOOR: Record<DeviceCategory, number> = {
+  "Phones and tablets": 320,
+  "Computers and displays": 140,
+  Wearables: 520,
+  Retro: 260,
+  Signage: 110,
+};
+
+/** A lid at or past this many percent open no longer muffles anything. */
+const LID_CLEAR = 35;
+
+/**
+ * The sound as it would leave the device. A shut lid sits over the speakers, so it dulls and quietens them; turning
+ * the device away does the same to a lesser degree; and it gets louder as the camera comes close.
+ */
+function speakerShape(
+  def: DeviceDef,
+  runtime: ViewportRuntime,
+  camera: Vector3,
+  facing: Vector3,
+): SoundShape {
+  const v = runtime.values;
+  const open = def.lid ? MathUtils.clamp(v["object.lid"] / LID_CLEAR, 0, 1) : 1;
+  // 1 with the screen towards the camera, 0 with its back to it.
+  facing.set(0, 0, 1);
+  if (runtime.device)
+    facing.applyQuaternion(runtime.device.getWorldQuaternion(QUATERNION));
+  const away = MathUtils.smoothstep(
+    -facing.dot(camera) / camera.length(),
+    -0.2,
+    0.6,
+  );
+  const near = MathUtils.clamp(Math.sqrt(v["camera.zoom"] / 60), 0.45, 1.25);
+  return {
+    level: Math.min(1, (0.18 + 0.82 * open) * (1 - 0.45 * away) * near * 0.85),
+    floor: SPEAKER_FLOOR[def.category],
+    ceiling: Math.min(600 + 17400 * open * open, 18000 - 15000 * away),
+  };
+}
+
+const QUATERNION = new Quaternion();
 
 /** Loads the screen media into the screen shader. Images and videos share one texture slot. */
 function useScreenMedia(
@@ -87,6 +146,8 @@ function useScreenMedia(
     texture.anisotropy = gl.capabilities.getMaxAnisotropy();
     const onData = () => {
       if (video.videoWidth === 0) return;
+      // Sound needs a click or key press first; once the page has had one, a new video can be heard straight away.
+      if (soundUnlocked()) connectSound(video);
       uniforms.uMediaAspect.value = video.videoWidth / video.videoHeight;
       uniforms.uMap.value = texture;
       uniforms.uHasMap.value = 1;
@@ -99,6 +160,7 @@ function useScreenMedia(
     runtime.videoTexture = texture;
     return () => {
       video.removeEventListener("loadeddata", onData);
+      disconnectSound(video);
       video.pause();
       video.removeAttribute("src");
       video.load();
@@ -164,9 +226,37 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
   useEffect(() => applyBodyColor(prepared, bodyColor), [prepared, bodyColor]);
 
   const frame = useRef(0);
+  const [facing] = useState(() => new Vector3());
 
-  useFrame(() => {
+  // The first click or key press anywhere lets the video's sound through.
+  useEffect(() => {
+    const unlock = () => {
+      if (runtime.video) connectSound(runtime.video);
+    };
+    window.addEventListener("pointerdown", unlock);
+    window.addEventListener("keydown", unlock);
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+  }, [runtime]);
+
+  useFrame(({ camera }) => {
     if (prepared.lid) setLid(prepared.lid, runtime.values["object.lid"] / 100);
+
+    if (runtime.video) {
+      const { sound, speakerSound, playing } = useStudio.getState();
+      // Heard only while the animation plays, and never during an export, which steps the video frame by frame.
+      const audible = sound && playing && runtime.exportMs === null;
+      shapeSound(
+        runtime.video,
+        audible
+          ? speakerSound
+            ? speakerShape(def, runtime, camera.position, facing)
+            : OPEN_SOUND
+          : SILENCE,
+      );
+    }
 
     const light = prepared.screenLight;
     if (light) {

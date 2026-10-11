@@ -5,10 +5,10 @@
  * it easy to see whether the video stays in step with the animation.
  */
 
-const SECONDS = 8;
-const FPS = 30;
+const SECONDS = 10;
+const FPS = 60;
 const MAX_LONG_EDGE = 1920;
-const BITS_PER_PIXEL = 0.12;
+const BITS_PER_PIXEL = 0.08;
 const ROWS = 6;
 const HUES = [338, 262, 204, 158, 38, 12];
 
@@ -128,6 +128,8 @@ function videoSize([width, height]: [number, number]): [number, number] {
 /** Draw and encode the test clip for a screen of the given pixel size. */
 export async function createTestFootage(
   screen: [number, number],
+  /** Called with 0..1 as frames are encoded. */
+  onProgress?: (progress: number) => void,
 ): Promise<File> {
   const [width, height] = videoSize(screen);
   const {
@@ -167,6 +169,11 @@ export async function createTestFootage(
     for (let frame = 0; frame < frameCount; frame++) {
       drawFrame(ctx, layout, frame, frameCount);
       await source.add(frame / FPS, 1 / FPS);
+      if (frame % 6 === 5) {
+        onProgress?.((frame + 1) / frameCount);
+        // Awaiting the encoder alone never lets the browser paint; this does.
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      }
     }
     source.close();
     await output.finalize();

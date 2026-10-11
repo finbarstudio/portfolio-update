@@ -8,6 +8,7 @@ import { CloseIcon, UploadIcon } from "@/components/mockup-studio/ui/icons";
 import { Section } from "@/components/mockup-studio/ui/section";
 import { Segmented, type SegmentedOption } from "@/components/mockup-studio/ui/segmented";
 import { Slider } from "@/components/mockup-studio/ui/slider";
+import { Switch } from "@/components/mockup-studio/ui/switch";
 import { createTestFootage } from "@/lib/mockup-studio/media/test-footage";
 import { type DeviceDef, getDevice } from "@/lib/mockup-studio/scene/devices";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
@@ -57,21 +58,26 @@ export function ScreenMediaSection() {
   const updateMedia = useStudio((s) => s.updateMedia);
   const fitTimelineTo = useStudio((s) => s.fitTimelineTo);
   const [error, setError] = useState<string | null>(null);
-  const [making, setMaking] = useState(false);
+  /** 0..1 while the test clip is being made, otherwise null. */
+  const [making, setMaking] = useState<number | null>(null);
+  const sound = useStudio((s) => s.sound);
+  const setSound = useStudio((s) => s.setSound);
+  const speakerSound = useStudio((s) => s.speakerSound);
+  const setSpeakerSound = useStudio((s) => s.setSpeakerSound);
   const device = useStudio((s) => getDevice(s.deviceId));
   const size = screenSize(device);
   const ratio = ratioLabel(device.screenAspect);
 
   const useTestFootage = async () => {
-    setMaking(true);
+    setMaking(0);
     try {
-      setError(setMediaFromFile(await createTestFootage(size)));
+      setError(setMediaFromFile(await createTestFootage(size, setMaking)));
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Could not make test footage.",
       );
     } finally {
-      setMaking(false);
+      setMaking(null);
     }
   };
 
@@ -88,10 +94,29 @@ export function ScreenMediaSection() {
       <p className="text-ms-ink-faint">Or drop a file anywhere in the window.</p>
       <Button
         onClick={useTestFootage}
-        disabled={making}
-        title="Fill the screen with a looping 8 second sample clip made to fit this device"
+        disabled={making !== null}
+        title="Fill the screen with a looping 10 second sample clip made to fit this device"
+        className="relative overflow-hidden"
       >
-        {making ? "Making test footage…" : "Use test footage"}
+        {making !== null ? (
+          <>
+            {/* Fills left to right as frames are encoded. */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 w-full origin-left bg-ms-fill transition-transform duration-150 ease-out"
+              style={{ transform: `scaleX(${making})` }}
+            />
+            <span
+              className="relative tabular-nums"
+              role="status"
+              aria-live="polite"
+            >
+              Making test footage {Math.round(making * 100)}%
+            </span>
+          </>
+        ) : (
+          "Use test footage"
+        )}
       </Button>
       <p className="text-ms-ink-muted">
         Screen is{" "}
@@ -144,6 +169,22 @@ export function ScreenMediaSection() {
               Remove
             </Button>
           </div>
+          {media.kind === "video" ? (
+            <>
+              <Switch label="Sound" checked={sound} onChange={setSound} />
+              <Switch
+                label="From the device's speakers"
+                checked={speakerSound}
+                onChange={setSpeakerSound}
+              />
+              <p className="text-[11px] text-ms-ink-faint text-pretty">
+                Heard while the animation plays. From the speakers, it thins out
+                on small devices, dulls when a lid shuts or the device turns
+                away, and rises as the camera moves in. Not yet in exported
+                video.
+              </p>
+            </>
+          ) : null}
           {media.kind === "video" && media.duration ? (
             <Button
               onClick={() => fitTimelineTo(media.duration ?? 0)}
