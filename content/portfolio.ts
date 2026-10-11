@@ -184,8 +184,7 @@ const RAW: Slide[] = [
       "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
     meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
   },
-  one("lola-audio/site-scroll-3d.mp4"),
-  one("lola-audio/watch.mp4"),
+  linked("portfolio/lola-audio/website.webm", "The website", { label: "lola-audio.com", href: "https://www.lola-audio.com" }),
 
   /* ── Rennen Plus ────────────────────────────────────────────── */
   { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
