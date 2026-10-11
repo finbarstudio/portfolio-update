@@ -1942,6 +1942,9 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       const norm = (v: string) => (/^0[a-z%]*$/i.test(v) ? "0" : v.toLowerCase());
       let top = "0";
       let bottom = "0";
+      // mso-padding-alt is the padding Outlook itself uses, so it wins where it is set.
+      const alt = styleGet(style, "mso-padding-alt").trim().split(/\s+/).filter(Boolean);
+      if (alt.length) return [norm(alt[0]), norm(alt.length >= 3 ? alt[2] : alt[0])];
       const shorthand = styleGet(style, "padding").replace(/!important/i, "").trim().split(/\s+/).filter(Boolean);
       if (shorthand.length) {
         top = shorthand[0];
