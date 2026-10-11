@@ -42,7 +42,7 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  */
 
 /** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
-const VERSION = "1.8";
+const VERSION = "1.9";
 
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 
@@ -67,7 +67,7 @@ const DARK_MODES: { value: DarkMode; label: string }[] = [
 const DARK_TIPS: Record<DarkMode, string> = {
   off: "The email as designed",
   scheme: "Turns on the email's own prefers-color-scheme rules, as Apple Mail does",
-  invert: "Flips every colour, as Outlook on Windows and the Gmail app on iOS do",
+  invert: "Flips every colour, as classic Outlook on Windows and the Gmail app on iOS do",
 };
 
 /** "about 22% of opens": the clients' share, times how many opens are in dark mode at all. */
@@ -76,7 +76,7 @@ function DarkReach({ behaviour }: { behaviour: "own styles" | "partial invert" |
   return (
     <>
       {clients.join(", ")}: {formatShare(share)} of opens between them. With {Math.round(DARK_MODE_USE * 100)}% of opens in dark mode (Litmus, 2022), that is
-      roughly {formatShare(share * DARK_MODE_USE)} of all opens seeing this. The split of a client family between its apps is an estimate.
+      roughly {formatShare(share * DARK_MODE_USE)} of all opens seeing this. The split of a client family between its apps is an estimate. Classic Outlook is the Word-based desktop app, which Microsoft supports until at least 2029; the new Outlook for Windows is replacing it and is not measured separately here. Windows Mail was retired at the end of 2024 and is left out.
     </>
   );
 }
@@ -738,7 +738,7 @@ export default function EmailCheck() {
               <label htmlFor={outputId} className="ec-label">
                 Output
               </label>
-              <span className="ec-dim" title="Size of the output. Gmail clips a message at about 102KB.">
+              <span className="ec-dim" title={`${stats.bytes.toLocaleString("en-GB")} bytes. Gmail clips the HTML somewhere between 102,400 and 104,448 bytes, so stay under 102,000. The platform adds tracking, so the sent email is larger than this.`}>
                 {kb(stats.bytes)}
               </span>
               <button
@@ -1001,7 +1001,7 @@ export default function EmailCheck() {
                       <p className="ec-item-title">
                         <span className="ec-level ec-level-info">Note</span> {a11y.contrastUnknown} text {a11y.contrastUnknown === 1 ? "block sits" : "blocks sit"} on a background image
                       </p>
-                      <p>Contrast over an image cannot be measured here. Check it by eye, and remember Outlook on Windows shows the background colour instead.</p>
+                      <p>Contrast over an image cannot be measured here. Check it by eye, and remember classic Outlook on Windows shows the background colour instead.</p>
                     </li>
                   )}
                   {a11y.linksWithoutName.map((href) => (
@@ -1232,8 +1232,8 @@ export default function EmailCheck() {
           {hasSource && height !== null && (
             <Note title={`Height ${height.toLocaleString()}px${tooTall ? ", over Outlook's page limit" : ""}`} tone={tooTall ? "warn" : undefined} sources={NOTE_SOURCES.height}>
               {tooTall
-                ? `Taller than ${OUTLOOK_PAGE_HEIGHT.toLocaleString()}px at this width. Outlook on Windows lays long emails out as pages and draws a line where it breaks them, so any single table taller than this gets cut through. Split it into shorter stacked tables.`
-                : `Measured at this width with images loaded. Outlook on Windows draws a page-break line through content taller than ${OUTLOOK_PAGE_HEIGHT.toLocaleString()}px.`}
+                ? `Taller than ${OUTLOOK_PAGE_HEIGHT.toLocaleString()}px at this width. Classic Outlook on Windows lays long emails out as pages and draws a line where it breaks them, so any single table taller than this gets cut through. Split it into shorter stacked tables.`
+                : `Measured at this width with images loaded. Classic Outlook on Windows draws a page-break line through content taller than ${OUTLOOK_PAGE_HEIGHT.toLocaleString()}px.`}
             </Note>
           )}
           {hasSource && sample && sampled.filled.length + sampled.left.length + sampled.bare.length > 0 && (

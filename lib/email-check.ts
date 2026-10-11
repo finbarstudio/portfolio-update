@@ -206,6 +206,10 @@ const SRC = {
   },
   buttons: { label: "Litmus: bulletproof buttons", url: "https://www.litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design", kind: "vendor research" },
   darkMode: { label: "Litmus: guide to dark mode for email", url: "https://www.litmus.com/blog/the-ultimate-guide-to-dark-mode-for-email-marketers", kind: "vendor research" },
+  newOutlook: { label: "Microsoft: stages of migration to new Outlook for Windows (classic supported until at least 2029)", url: "https://learn.microsoft.com/en-us/microsoft-365-apps/outlook/get-started/guide-product-availability", kind: "client docs" },
+  windowsMail: { label: "Microsoft: Windows Mail, Calendar and People are becoming new Outlook (support ended 31 December 2024)", url: "https://support.microsoft.com/en-us/outlook/windows-mail-calendar-and-people-are-becoming-new-outlook", kind: "client docs" },
+  gmailLightOnly: { label: "Google issue tracker: Gmail dark mode and color-scheme", url: "https://issuetracker.google.com/issues/201441498", kind: "client docs" },
+  gmailClipTest: { label: "Alice Li: does Gmail clip at 102KB or 100KB? (controlled test, August 2026)", url: "https://alicelicode.medium.com/does-gmail-clip-at-102kb-or-100kb-what-its-actually-counting-728c8c7497d2", kind: "vendor research" },
   preheaderPad: { label: "Parcel: preheader spacing (which padding characters each client honours)", url: "https://parcel.io/blog/preheader-spacing", kind: "vendor research" },
   preheader: { label: "Litmus: the preview text hack", url: "https://www.litmus.com/blog/the-little-known-preview-text-hack-you-may-want-to-use-in-every-email", kind: "vendor research" },
   share: { label: "Litmus: email client market share", url: "https://www.litmus.com/email-client-market-share", kind: "vendor research" },
@@ -225,7 +229,7 @@ const SRC = {
 
 /** Reading behind each check, keyed by finding id. No entry means unsourced. */
 export const SOURCES: Record<string, Source[]> = {
-  size: [SRC.gmailEoa],
+  size: [SRC.gmailClipTest, SRC.gmailEoa],
   "style-size": [cie("html-style", "<style>, the 16KB note"), SRC.gmailCss],
   "styles-in-body": [cie("html-style", "<style>, not supported in the body"), SRC.gmailCss],
   "line-length": [SRC.rfc5322],
@@ -252,7 +256,8 @@ export const SOURCES: Record<string, Source[]> = {
   "merge-tags": [SRC.sesHandlebars],
   "text-size-adjust": [SRC.mailchimpCss, SRC.textSize],
   "color-scheme": [cie("html-meta-color-scheme", "color-scheme meta"), SRC.darkMode],
-  "pure-black": [SRC.darkMode],
+  "pure-black": [SRC.darkMode, cie("html-meta-color-scheme", "color-scheme meta (Gmail apps: light only)")],
+  "link-color": [cie("css-pseudo-class-link", ":link"), cie("html-style", "style blocks")],
   ppi: [SRC.dpi, cie("html-width", "width attribute, the 120 dpi note")],
   "xmlns-o": [SRC.dpi],
   "ghost-width": [cie("html-width", "width attribute, the 120 dpi note"), SRC.dpi],
@@ -274,7 +279,7 @@ export const SOURCES: Record<string, Source[]> = {
 /** Reading behind the preview notes and the rendered audit. */
 export const NOTE_SOURCES = {
   height: [SRC.pageBreak, SRC.wordEngine],
-  dark: [SRC.darkMode, cie("css-at-media-prefers-color-scheme", "prefers-color-scheme")],
+  dark: [SRC.darkMode, cie("css-at-media-prefers-color-scheme", "prefers-color-scheme"), cie("html-meta-color-scheme", "color-scheme meta (Gmail apps: light only)"), SRC.gmailLightOnly, SRC.newOutlook, SRC.windowsMail],
   stylesOff: [cie("html-style", "<style>, non-Google accounts"), cie("css-at-media", "@media"), SRC.gmailCss],
   imagesOff: [wcag("tutorials/images/", "W3C: images tutorial")],
   contrast: [wcag("WCAG21/Understanding/contrast-minimum.html", "WCAG 1.4.3, contrast minimum")],
@@ -359,7 +364,8 @@ export const SHARE: Record<string, number> = {
 const PLATFORM_SPLIT: Record<string, Record<string, number>> = {
   "apple-mail": { ios: 0.92, macos: 0.08 },
   gmail: { "desktop-webmail": 0.5, ios: 0.22, android: 0.26, "mobile-webmail": 0.02 },
-  outlook: { windows: 0.55, macos: 0.1, "outlook-com": 0.15, ios: 0.1, android: 0.07, "windows-mail": 0.03 },
+  // Windows Mail gets nothing: Microsoft ended support for it on 31 December 2024 and it can no longer send or receive.
+  outlook: { windows: 0.58, macos: 0.1, "outlook-com": 0.15, ios: 0.1, android: 0.07, "windows-mail": 0 },
 };
 
 export type Environment = "mobile" | "webmail" | "desktop";
@@ -395,8 +401,7 @@ export const DARK_CLIENTS: { family: string; platform: string; label: string; be
   { family: "apple-mail", platform: "macos", label: "Apple Mail on Mac", behaviour: "own styles" },
   { family: "gmail", platform: "ios", label: "Gmail app on iOS", behaviour: "full invert" },
   { family: "gmail", platform: "android", label: "Gmail app on Android", behaviour: "partial invert" },
-  { family: "outlook", platform: "windows", label: "Outlook on Windows", behaviour: "full invert" },
-  { family: "outlook", platform: "windows-mail", label: "Windows Mail", behaviour: "full invert" },
+  { family: "outlook", platform: "windows", label: "Classic Outlook on Windows", behaviour: "full invert" },
   { family: "outlook", platform: "outlook-com", label: "Outlook.com", behaviour: "partial invert" },
   { family: "outlook", platform: "ios", label: "Outlook app on iOS", behaviour: "partial invert" },
   { family: "outlook", platform: "android", label: "Outlook app on Android", behaviour: "partial invert" },
@@ -435,12 +440,17 @@ const HTML_ELEMENTS = new Set(
   "html body head table thead tbody tfoot tr td th a img p div span ul ol li h1 h2 h3 h4 h5 h6 strong em b i u s br hr center font small big sup sub blockquote pre code label button input form v o w".split(" "),
 );
 
-const GMAIL_CLIP_BYTES = 102 * 1024;
+/**
+ * Gmail's clip point, in bytes. "102KB" is ambiguous: a controlled test in August 2026 found
+ * 102,400 bytes of HTML shown whole and 104,448 bytes clipped, so the line is somewhere in
+ * between. 102,000 is the figure that is safe whichever way a tool counts a kilobyte.
+ */
+const GMAIL_CLIP_BYTES = 102_000;
 const GMAIL_STYLE_BYTES = 16 * 1024;
 const SMTP_LINE_LIMIT = 998;
 const USUAL_WIDTH = 700;
 
-/** Outlook on Windows draws a page-break line through content taller than this. */
+/** classic Outlook on Windows draws a page-break line through content taller than this. */
 export const OUTLOOK_PAGE_HEIGHT = 1790;
 
 const SPACER_ROW = '<tr>\n  <td height="20" style="font-size:1px; line-height:20px; mso-line-height-rule:exactly;">&nbsp;</td>\n</tr>';
@@ -489,10 +499,10 @@ const HOW_TO: Record<string, HowTo> = {
     code: "a[x-apple-data-detectors] {\n  color: inherit !important;\n  text-decoration: none !important;\n  font: inherit !important;\n}",
   },
   "color-scheme": {
-    text: "Add both tags to the head, then write your dark colours in a prefers-color-scheme media query. Without the tags the media query is ignored.",
+    text: "Two choices. To give the email its own dark version, add the tags below and write the dark colours in a prefers-color-scheme media query. To keep the email light everywhere it can be, use content=\"light only\" instead: the Gmail apps then leave the colours alone (reported for Google accounts; test with a real send), and so does Apple Mail. Readers who chose dark mode will get a light email, so use that with care.",
     code: '<meta name="color-scheme" content="light dark">\n<meta name="supported-color-schemes" content="light dark">\n<style>\n  @media (prefers-color-scheme: dark) {\n    .bg { background-color: #0a0a33 !important; }\n    .text { color: #ffffff !important; }\n  }\n</style>',
   },
-  "pure-black": { text: "There is no setting that stops a full invert. Check the email in Dark: inverted, and make sure logos and icons still read on a light background (a transparent PNG with a pale outline survives both)." },
+  "pure-black": { text: "Classic Outlook has no setting that stops a full invert. The Gmail apps now skip it when the head has <meta name=\"color-scheme\" content=\"light only\">. Check the email in Dark: inverted, and make sure logos and icons still read on a light background (a transparent PNG with a pale outline survives both)." },
   ppi: {
     text: "Add this as the first thing in the head, and the Office namespace to the html tag.",
     code: `<html xmlns:o="${OFFICE_NS}">\n<head>\n<!--[if gte mso 9]><xml>\n  <o:OfficeDocumentSettings>\n    <o:AllowPNG/>\n    <o:PixelsPerInch>96</o:PixelsPerInch>\n  </o:OfficeDocumentSettings>\n</xml><![endif]-->`,
@@ -971,21 +981,22 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   const hasMeta = (name: string) => metas.some((t) => t.attrs.name?.toLowerCase() === name);
 
   // ── Size and transport ──────────────────────────────────────────────
-  const kb = (stats.bytes / 1024).toFixed(1);
+  const byteCount = stats.bytes.toLocaleString("en-GB");
+  const clipFacts = "In a controlled test in August 2026, 102,400 bytes of HTML was shown whole and 104,448 bytes was clipped, so 102,000 is the safe line. Only the HTML counts: the plain-text version and images hosted elsewhere do not, but images embedded as Base64 do.";
   if (stats.bytes > GMAIL_CLIP_BYTES) {
     add(
       "size",
       "fail",
-      `${kb}KB is over Gmail's clip limit`,
-      "Gmail cuts messages off at about 102KB and hides the rest behind a link. Whatever sits at the bottom (often the unsubscribe link and the tracking pixel) is lost.",
+      `${byteCount} bytes is over Gmail's clip limit`,
+      `Gmail cuts a long message off and hides the rest behind a link. Whatever sits at the bottom (often the unsubscribe link and the tracking pixel) is lost. ${clipFacts}`,
       { affects: GMAIL, fix: stats.indentPct > 0 ? "minify" : undefined },
     );
   } else if (stats.bytes > GMAIL_CLIP_BYTES * 0.8) {
     add(
       "size",
       "warn",
-      `${kb}KB is close to Gmail's 102KB clip limit`,
-      "The sending platform adds link tracking and its own footer, so the delivered message will be larger than this file.",
+      `${byteCount} bytes is close to Gmail's clip limit of about 102,000`,
+      `The sending platform adds link tracking and its own footer, so the delivered message will be larger than this file. To know for sure, send a test and measure the HTML in Gmail's Show original. ${clipFacts}`,
       { affects: GMAIL, fix: stats.indentPct > 0 ? "minify" : undefined },
     );
   }
@@ -1115,7 +1126,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
 
   // ── Document basics ─────────────────────────────────────────────────
   if (!/^\s*<!doctype/i.test(src)) {
-    add("doctype", "info", "No doctype", "Clients that honour the doctype use it to pick standards rendering; without one they use the older quirks rules, where sizes and spacing are worked out differently. Outlook on Windows ignores it either way.");
+    add("doctype", "info", "No doctype", "Clients that honour the doctype use it to pick standards rendering; without one they use the older quirks rules, where sizes and spacing are worked out differently. Classic Outlook on Windows ignores it either way.");
   }
   if (html && !html.attrs.lang) {
     add(
@@ -1228,7 +1239,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "color-scheme",
       "info",
       "No color-scheme meta tag",
-      'Without <meta name="color-scheme" content="light dark"> and its supported-color-schemes twin, clients that support dark mode will not apply your prefers-color-scheme styles.',
+      '<meta name="color-scheme" content="light dark"> tells clients that support it (Apple Mail) that the email has its own dark colours, written in a prefers-color-scheme media query. Since September 2026 the Gmail apps on iOS and Android also read this tag, but only the value "light only", which asks them not to recolour the email in dark mode at all.',
       { affects: [...APPLE, ...OUTLOOK] },
     );
   }
@@ -1238,7 +1249,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "pure-black",
       "info",
       `${plural(pureBlack.length, "pure black background")}`,
-      "Clients that fully invert colours in dark mode (the Gmail app on iOS, Outlook on Windows) flip dark backgrounds as well as light ones, so pure black can come out white.",
+      "Clients that fully invert colours in dark mode (the Gmail app on iOS, classic Outlook on Windows) flip dark backgrounds as well as light ones, so pure black can come out white.",
       { lines: pureBlack, affects: INVERTERS },
     );
   }
@@ -1294,7 +1305,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "spacer-cells",
       "info",
       "Spacer cells with a height but no font size",
-      "Outlook on Windows will not make a cell shorter than one line of text, so the non-breaking space sets the real height. Give the cell a line-height matching the height you want and a 1px font-size.",
+      "Classic Outlook on Windows will not make a cell shorter than one line of text, so the non-breaking space sets the real height. Give the cell a line-height matching the height you want and a 1px font-size.",
       { lines: spacerCells.map((m) => lineOf(m.index)), fix: "spacer-cells", affects: OUTLOOK },
     );
   }
@@ -1305,7 +1316,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "line-height-rule",
       "info",
       `${plural(lineHeightRule.length, "line-height")} without mso-line-height-rule`,
-      "Outlook on Windows treats line-height as a minimum and rounds it to its own grid. mso-line-height-rule: exactly makes it use the value you gave.",
+      "Classic Outlook on Windows treats line-height as a minimum and rounds it to its own grid. mso-line-height-rule: exactly makes it use the value you gave.",
       { lines: lineHeightRule, fix: "line-height-rule", affects: OUTLOOK },
     );
   }
@@ -1315,7 +1326,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "outlook-typography",
       "info",
       "No DontUseAdvancedTypographyReadingMail setting",
-      "Newer Outlook on Windows applies Word's kerning and ligatures to email text, which changes the letter spacing from what you designed. This Word setting in the head turns that off.",
+      "Classic Outlook on Windows, in its newer versions, applies Word's kerning and ligatures to email text, which changes the letter spacing from what you designed. This Word setting in the head turns that off.",
       { fix: head ? "outlook-typography" : undefined, affects: OUTLOOK },
     );
   }
@@ -1326,7 +1337,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "table-align-mso",
       "info",
       `${plural(alignedTables.length, "floated table")} without mso-table-lspace`,
-      "Outlook on Windows adds a few pixels either side of a table with align left or right, which breaks side-by-side columns. mso-table-lspace: 0 and mso-table-rspace: 0 remove it.",
+      "Classic Outlook on Windows adds a few pixels either side of a table with align left or right, which breaks side-by-side columns. mso-table-lspace: 0 and mso-table-rspace: 0 remove it.",
       { lines: alignedTables, fix: "table-align-mso", affects: OUTLOOK },
     );
   }
@@ -1338,7 +1349,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "bg-no-vml",
       "warn",
       `${plural(bgImages.length, "background image")} with no VML fallback`,
-      `Outlook on Windows does not show CSS background images. It shows the background colour instead, unless the image is repeated in a v:rect or v:fill block inside an mso conditional comment.${noColour ? " Some of these have no background colour either, so Outlook shows nothing behind the text." : ""}`,
+      `Classic Outlook on Windows does not show CSS background images. It shows the background colour instead, unless the image is repeated in a v:rect or v:fill block inside an mso conditional comment.${noColour ? " Some of these have no background colour either, so Outlook shows nothing behind the text." : ""}`,
       { lines: bgImages.map((t) => t.line), fix: noColour ? "bg-color-fallback" : undefined, affects: OUTLOOK },
     );
   }
@@ -1351,7 +1362,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "outlook-spacing",
       "info",
       `Margin or padding on ${plural(outlookIgnores.length, "div, p, span or image")}`,
-      "Outlook on Windows drops margin and padding on these. Put the spacing on the table cell around them instead.",
+      "Classic Outlook on Windows drops margin and padding on these. Put the spacing on the table cell around them instead.",
       { lines: outlookIgnores, affects: OUTLOOK },
     );
   }
@@ -1399,7 +1410,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "img-width",
       "warn",
       `${plural(noWidth.length, "image")} with no width attribute`,
-      "Outlook on Windows does not apply a CSS width to an image, so without the attribute it shows the image at the file's own pixel size. An image saved at double size for sharp screens comes out double size.",
+      "Classic Outlook on Windows does not apply a CSS width to an image, so without the attribute it shows the image at the file's own pixel size. An image saved at double size for sharp screens comes out double size.",
       { lines: noWidth, affects: OUTLOOK },
     );
   }
@@ -1577,8 +1588,8 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "link-color",
       "info",
       `${plural(uncolouredLinks.length, "text link")} without an inline colour`,
-      "Gmail and Outlook ignore link colours set in a style block and show their own blue, purple once visited. Set color on the a tag itself.",
-      { lines: uncolouredLinks, affects: [...GMAIL, ...OUTLOOK] },
+      "These links get their colour from a style block, or have none. Gmail does not support a:link rules, and drops style blocks altogether for non-Google accounts in its apps, so there the links fall back to the client's own blue. A colour on the a tag itself survives everywhere.",
+      { lines: uncolouredLinks, affects: GMAIL },
     );
   }
   // ── Reading ─────────────────────────────────────────────────────────
@@ -1620,7 +1631,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "font-fallbacks",
       "info",
       `${plural(noFallback.length, "font-family")} without a generic fallback`,
-      "Most clients do not load web fonts, and Outlook on Windows swaps an unknown font for Times New Roman. End every font-family with Arial, Helvetica, sans-serif or similar.",
+      "Most clients do not load web fonts, and classic Outlook on Windows swaps an unknown font for Times New Roman. End every font-family with Arial, Helvetica, sans-serif or similar.",
       { lines: noFallback, fix: "font-fallbacks" },
     );
   }
