@@ -4,8 +4,12 @@
  * BriefForm — the website brief a prospect fills in so a site can be scoped.
  * Lives at /webform. It asks for what Finbar can NOT see by looking at their
  * current site: how the site is run day to day, what they like and dislike,
- * and what they want from a new one. Design and build only: no questions about
- * leads, marketing or SEO (Finbar does not sell strategy). No build prices.
+ * and what they want from a new one. Design and build only (Finbar does not
+ * sell strategy), so nothing about marketing. Section 5 does ask what the site
+ * is FOR, because that decides the design: a minimal home page, one built to
+ * win enquiries, one that explains the services, or one written for Google,
+ * and how much search visibility they would trade for a cleaner look. No build
+ * prices.
  * Posts to Web3Forms, which emails the answers to Finbar; the mailto branch is
  * only a safety net if the key is ever removed.
  */
@@ -32,6 +36,29 @@ const LOGINS = ["Yes, I have them all", "Some of them", "No, someone else set it
 const UPDATE_WAY = ["A simple editing screen I log in to", "Send the change to you", "Not sure yet"];
 const AFTER_LAUNCH = ["Hand it all over, I will run it", "Hand it over, but stay on call for changes", "Look after it for me", "Not sure yet"];
 const AI_USE = ["Yes, most days", "Now and then", "No"];
+
+/* Section 5: what the site is for. The same four jobs are offered twice (first
+   and second), so the answer is a ranking and not a list of everything. */
+const JOBS = [
+  "Look the part: a clean, premium site that shows who we are",
+  "Bring in enquiries: get people to ask for a quote, book or call",
+  "Explain what we do: services, detail and photos for people who are deciding",
+  "Be found on Google: show up for what we do, in the places we work",
+];
+const FIRST_ACTION = ["Ask for a quote or fill in a form", "Call us", "Look through our work", "Read about our services", "Just get a feel for who we are"];
+const HOME_WORDS = [
+  "As little as possible: strong photos, a few lines, clear buttons",
+  "A balance: short sections, with more detail a click away",
+  "Everything on the page, even if it looks busier",
+];
+const SEO_TRADE = ["Yes, the look matters more", "On the home page only, keep the detail on the other pages", "No, Google comes first", "Not sure, advise me"];
+const GOOGLE_NOW = ["Most of our work comes from it", "Some of it", "Very little, we run on word of mouth", "Not sure"];
+const CTA_FEEL = [
+  "Always in view: a button that follows you down the page",
+  "Clear but calm: at natural points on the page",
+  "Quiet: the work speaks, contact is there when wanted",
+];
+const READ_FIRST = ["Very little, they already know what they want", "Some: what we do, where, and proof we are good", "A lot: they compare and research first"];
 
 const GOALS = [
   "Look more professional",
@@ -86,6 +113,14 @@ const ORDER: [string, string][] = [
   ["ai_tools", "Which AI tools"],
   ["update_way", "How they want to make updates"],
   ["after_launch", "After launch"],
+  ["job_first", "Main job of the site"],
+  ["job_second", "Second job of the site"],
+  ["first_action", "First thing a visitor should do"],
+  ["read_first", "How much customers read before getting in touch"],
+  ["home_words", "How much the home page should say"],
+  ["google_now", "How much work comes from Google now"],
+  ["seo_trade", "Trade some Google performance for a cleaner look"],
+  ["cta_feel", "How the calls to action should feel"],
   ["goals", "Main goals"],
   ["one_thing", "The one thing it must do"],
   ["devices", "How customers visit the site"],
@@ -316,7 +351,43 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">5. The new site</legend>
+        <legend className="mono-heading text-ink">5. What the site is for</legend>
+        <div className="brief-note">
+          <p>
+            <strong>This section shapes the design more than any other.</strong> A site cannot be
+            best at everything. One built to look minimal says less. One built for Google says
+            more. One built to win enquiries puts a button in front of you at every turn. Your
+            answers tell me which way to lean.
+          </p>
+        </div>
+        <Choice label="What is the main job of the new site?" hint="Pick the one that matters most.">
+          <Chips name="job_first" type="radio" options={JOBS} />
+        </Choice>
+        <Choice label="And the second most important?">
+          <Chips name="job_second" type="radio" options={JOBS} />
+        </Choice>
+        <Choice label="When someone lands on your home page, what should they do first?">
+          <Chips name="first_action" type="radio" options={FIRST_ACTION} />
+        </Choice>
+        <Choice label="How much do your customers need to read before they get in touch?">
+          <Chips name="read_first" type="radio" options={READ_FIRST} />
+        </Choice>
+        <Choice label="How much should the home page say?" hint="More words can help with Google. Fewer words look cleaner. There is no wrong answer.">
+          <Chips name="home_words" type="radio" options={HOME_WORDS} />
+        </Choice>
+        <Choice label="How much of your work comes from Google at the moment?" hint="A rough feel is fine. It tells me how careful to be with what already ranks.">
+          <Chips name="google_now" type="radio" options={GOOGLE_NOW} />
+        </Choice>
+        <Choice label="Would you give up a little Google performance for a cleaner look?" hint="A minimal home page can cost a few percent of search visibility. The other pages can still carry the detail.">
+          <Chips name="seo_trade" type="radio" options={SEO_TRADE} />
+        </Choice>
+        <Choice label="How should the buttons that ask people to get in touch feel?">
+          <Chips name="cta_feel" type="radio" options={CTA_FEEL} />
+        </Choice>
+      </fieldset>
+
+      <fieldset className="brief-section">
+        <legend className="mono-heading text-ink">6. The new site</legend>
         <Choice label="What should the new site do for you?" hint="Pick any that apply">
           <Chips name="goals" options={GOALS} />
         </Choice>
@@ -352,7 +423,7 @@ export default function BriefForm() {
       </fieldset>
 
       <fieldset className="brief-section">
-        <legend className="mono-heading text-ink">6. Content and timing</legend>
+        <legend className="mono-heading text-ink">7. Content and timing</legend>
         <Choice label="Do you have a logo and brand colours you are happy with?">
           <Chips name="brand" type="radio" options={BRAND} />
         </Choice>
