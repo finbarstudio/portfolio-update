@@ -27,7 +27,7 @@ export interface LabItem {
 const RAW_ITEMS: LabItem[] = [
   {
     id: 8,
-    name: "Plinth",
+    name: "Mockup",
     line: "3D device mockups, animated and exported",
     href: "/mockup",
     image: "/media/lab/mockup/tile.webp",
@@ -35,7 +35,7 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 7,
-    name: "Tally",
+    name: "Invoice",
     line: "Invoices, quotes and receipts",
     href: "/invoice",
     image: "/media/lab/invoice/tile.webp",
@@ -43,7 +43,7 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 6,
-    name: "Postie",
+    name: "Email",
     line: "What breaks in which inbox",
     href: "/email",
     image: "/media/lab/email/tile.webp",
@@ -51,7 +51,7 @@ const RAW_ITEMS: LabItem[] = [
   },
   {
     id: 5,
-    name: "Loop",
+    name: "Motion",
     line: "Fifty looping layouts for your media",
     href: "/motion",
     image: "/media/lab/motion/tile.webp",
