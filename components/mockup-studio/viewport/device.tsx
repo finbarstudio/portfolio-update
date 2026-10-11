@@ -4,6 +4,7 @@ import { useGLTF } from "@react-three/drei/core/Gltf";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import {
+  CanvasTexture,
   type Color,
   type Group,
   LinearMipmapLinearFilter,
@@ -15,6 +16,7 @@ import {
 } from "three";
 import { media } from "@/lib/media";
 import { type DeviceDef, getDevice } from "@/lib/mockup-studio/scene/devices";
+import { drawFramed } from "@/lib/mockup-studio/scene/frames";
 import { OPEN_SOUND, SILENCE, speakerShape } from "@/lib/mockup-studio/scene/sound";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import {
@@ -65,18 +67,43 @@ function followTimeline(
   if (drift > VIDEO_HOLD && !video.seeking) video.currentTime = target;
 }
 
-/** Loads the screen media into the screen shader. Images and videos share one texture slot. */
+/** The picture the screen shows, before any framing: an image or a playing video, and its size in pixels. */
+interface ScreenSource {
+  kind: "image" | "video";
+  texture: Texture;
+  element: HTMLImageElement | HTMLVideoElement;
+  width: number;
+  height: number;
+}
+
+/** Longest side of the canvas a framed screen is composed on. */
+const FRAME_LONG_EDGE = 2048;
+
+/** Pixel size of the canvas for a framed screen: the screen's own shape, capped so video can be redrawn every frame. */
+function frameCanvasSize(def: DeviceDef): [number, number] {
+  const aspect = def.screenAspect;
+  return aspect >= 1
+    ? [FRAME_LONG_EDGE, Math.round(FRAME_LONG_EDGE / aspect)]
+    : [Math.round(FRAME_LONG_EDGE * aspect), FRAME_LONG_EDGE];
+}
+
+/**
+ * Loads the screen media and puts it on the screen, either as it is or composed into a window over a backdrop.
+ * Loading and showing are separate steps, so changing the framing never reloads the file.
+ */
 function useScreenMedia(
   screen: ScreenSurface | null,
   runtime: ViewportRuntime,
+  def: DeviceDef,
 ) {
   const mediaUrl = useStudio((s) => s.media?.url ?? null);
   const mediaKind = useStudio((s) => s.media?.kind ?? null);
+  const frame = useStudio((s) => s.frame);
   const gl = useThree((s) => s.gl);
+  const [source, setSource] = useState<ScreenSource | null>(null);
 
   useEffect(() => {
-    if (!screen || !mediaUrl || !mediaKind) return;
-    const { uniforms } = screen;
+    if (!mediaUrl || !mediaKind) return;
 
     if (mediaKind === "image") {
       let cancelled = false;
@@ -90,20 +117,19 @@ function useScreenMedia(
         // glTF-style addressing: v = 0 is the top of the image, matching screenUv.
         texture.flipY = false;
         texture.anisotropy = gl.capabilities.getMaxAnisotropy();
-        uniforms.uMediaAspect.value =
-          (texture.image.naturalWidth || 1) /
-          (texture.image.naturalHeight || 1);
-        uniforms.uMap.value = texture;
-        uniforms.uHasMap.value = 1;
-        uniforms.uVideo.value = 0;
         loaded = texture;
-        sampleAverage(texture.image, runtime.screenColor);
+        setSource({
+          kind: "image",
+          texture,
+          element: texture.image,
+          width: texture.image.naturalWidth || 1,
+          height: texture.image.naturalHeight || 1,
+        });
       });
       return () => {
         cancelled = true;
         loaded?.dispose();
-        uniforms.uMap.value = null;
-        uniforms.uHasMap.value = 0;
+        setSource(null);
       };
     }
 
@@ -125,16 +151,18 @@ function useScreenMedia(
       if (video.videoWidth === 0) return;
       // Sound needs a click or key press first; once the page has had one, a new video can be heard straight away.
       if (soundUnlocked()) connectSound(video);
-      uniforms.uMediaAspect.value = video.videoWidth / video.videoHeight;
-      uniforms.uMap.value = texture;
-      uniforms.uHasMap.value = 1;
-      uniforms.uVideo.value = 1;
+      setSource({
+        kind: "video",
+        texture,
+        element: video,
+        width: video.videoWidth,
+        height: video.videoHeight,
+      });
     };
     video.addEventListener("loadeddata", onData);
     video.src = mediaUrl;
     // The frame loop starts and stops it with the timeline; see followTimeline.
     runtime.video = video;
-    runtime.videoTexture = texture;
     return () => {
       video.removeEventListener("loadeddata", onData);
       disconnectSound(video);
@@ -142,16 +170,93 @@ function useScreenMedia(
       video.removeAttribute("src");
       video.load();
       texture.dispose();
-      if (runtime.video === video) {
-        runtime.video = null;
-        runtime.videoTexture = null;
-      }
+      if (runtime.video === video) runtime.video = null;
+      setSource(null);
+    };
+  }, [mediaUrl, mediaKind, gl, runtime]);
+
+  useEffect(() => {
+    if (!screen || !source) return;
+    const { uniforms } = screen;
+    const clear = () => {
       uniforms.uMap.value = null;
       uniforms.uHasMap.value = 0;
+      runtime.refreshScreen = null;
+      runtime.framed = false;
       runtime.screenColor.setRGB(0, 0, 0);
     };
-  }, [screen, mediaUrl, mediaKind, gl, runtime]);
+
+    if (frame.style === "none") {
+      uniforms.uMediaAspect.value = source.width / source.height;
+      uniforms.uMap.value = source.texture;
+      uniforms.uHasMap.value = 1;
+      // Video frames reach the shader still sRGB encoded; images do not.
+      uniforms.uVideo.value = source.kind === "video" ? 1 : 0;
+      runtime.framed = false;
+      runtime.refreshScreen =
+        source.kind === "video"
+          ? () => {
+              source.texture.needsUpdate = true;
+            }
+          : null;
+      if (source.kind === "image")
+        sampleAverage(source.element, runtime.screenColor);
+      return clear;
+    }
+
+    const [width, height] = frameCanvasSize(def);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const texture = new CanvasTexture(canvas);
+    texture.colorSpace = SRGBColorSpace;
+    texture.flipY = false;
+    texture.anisotropy = gl.capabilities.getMaxAnisotropy();
+    let drawnAt = Number.NaN;
+    const draw = () => {
+      // A video is only redrawn when it has moved on to another frame.
+      const at =
+        source.element instanceof HTMLVideoElement
+          ? source.element.currentTime
+          : 0;
+      if (at === drawnAt) return;
+      drawnAt = at;
+      drawFramed(
+        ctx,
+        width,
+        height,
+        source.element,
+        source.width,
+        source.height,
+        frame,
+      );
+      texture.needsUpdate = true;
+    };
+    draw();
+    // The composed picture is exactly the screen's shape, so it goes on edge to edge.
+    uniforms.uMediaAspect.value = def.screenAspect;
+    uniforms.uMap.value = texture;
+    uniforms.uHasMap.value = 1;
+    uniforms.uVideo.value = 0;
+    runtime.framed = true;
+    runtime.refreshScreen = source.kind === "video" ? draw : null;
+    if (source.kind === "image") sampleAverage(canvas, runtime.screenColor);
+    return () => {
+      texture.dispose();
+      clear();
+    };
+  }, [screen, source, frame, def, gl, runtime]);
 }
+
+/** How a picture already composed to the screen's shape is placed on it. */
+const EDGE_TO_EDGE = {
+  fit: "stretch",
+  scale: 1,
+  offsetX: 0,
+  offsetY: 0,
+} as const;
 
 /** How often the screen's light colour is re-read from a playing video, in frames. */
 const VIDEO_SAMPLE_EVERY = 6;
@@ -198,7 +303,7 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
 
   const bodyColor = useStudio((s) => s.bodyColor);
 
-  useScreenMedia(screen, runtime);
+  useScreenMedia(screen, runtime, def);
 
   useEffect(() => applyBodyColor(prepared, bodyColor), [prepared, bodyColor]);
 
@@ -224,9 +329,9 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
       const { sound, speakerSound, playing, playhead } = useStudio.getState();
       if (runtime.exportMs === null) {
         followTimeline(runtime.video, playhead, playing);
-        // A paused video draws no new frames on its own, so a scrub has to ask for one.
-        if (!playing && runtime.videoTexture)
-          runtime.videoTexture.needsUpdate = true;
+        // A paused video draws no new frames on its own, so a scrub has to ask for one. A framed one is composed by
+        // hand, so it asks every frame.
+        if (!playing || runtime.framed) runtime.refreshScreen?.();
       }
       // Heard only while the animation plays, and never during an export, which steps the video frame by frame.
       const audible = sound && playing && runtime.exportMs === null;
@@ -261,7 +366,8 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
       updateScreenSurface(
         screen,
         runtime.values,
-        media,
+        // A framed screen is already composed to fit, so the fit, scale and offset do not apply to it.
+        media && runtime.framed ? { ...media, ...EDGE_TO_EDGE } : media,
         def.screenAspect,
         lights,
         !background.transparent &&

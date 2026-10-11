@@ -79,7 +79,7 @@ export function ExportBridge({ runtime }: { runtime: ViewportRuntime }) {
           await seekVideo(runtime.video, ms);
           // The video texture normally refreshes from the video's own frame callback, which a seek on a paused video
           // may not deliver before we draw.
-          if (runtime.videoTexture) runtime.videoTexture.needsUpdate = true;
+          runtime.refreshScreen?.();
         }
         fitBuffer();
         runtime.tick += 1 / 60;

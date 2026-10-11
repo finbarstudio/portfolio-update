@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { evaluate, locateShot, totalDuration } from "./animation";
 import { DEFAULT_DEVICE_ID } from "./devices";
+import { DEFAULT_FRAME, type MediaFrame } from "./frames";
 import type { ScreenBox } from "./framing";
 import { clampTyped } from "./limits";
 import { ANIM_PATHS, type AnimPath, PARAMS } from "./params";
@@ -143,6 +144,8 @@ export interface StudioState {
   shots: Shot[];
   /** The end of the timeline glides back to the first frame, so the animation loops without a jump. */
   seamlessLoop: boolean;
+  /** The window and backdrop the screen media is presented in. */
+  frame: MediaFrame;
 
   // Session
   selectedLightId: string | null;
@@ -155,6 +158,8 @@ export interface StudioState {
   proMode: boolean;
   /** Show safe-zone guides over the viewport. Never exported. */
   guides: boolean;
+  /** Draw the preview with fewer pixels so heavy scenes stay smooth. Never affects export. */
+  fastPreview: boolean;
   /** Play the screen video's sound while the timeline plays. */
   sound: boolean;
   /** Shape that sound as if it came from the device: thin from a phone, muffled by a shut lid or a turned back. */
@@ -209,9 +214,11 @@ export interface StudioState {
   tick(dtMs: number): void;
   setLoop(loop: boolean): void;
   setSeamlessLoop(seamlessLoop: boolean): void;
+  setFrame(patch: Partial<MediaFrame>): void;
   setRecording(recording: boolean): void;
   setProMode(proMode: boolean): void;
   setGuides(guides: boolean): void;
+  setFastPreview(fastPreview: boolean): void;
   setSound(sound: boolean): void;
   setSpeakerSound(speakerSound: boolean): void;
   setTool(tool: Tool): void;
@@ -271,10 +278,12 @@ export const useStudio = create<StudioState>()((set, get) => {
     playhead: 0,
     playing: false,
     seamlessLoop: false,
+    frame: DEFAULT_FRAME,
     loop: true,
     recording: false,
     proMode: false,
     guides: false,
+    fastPreview: false,
     sound: true,
     speakerSound: false,
     tool: "select",
@@ -536,9 +545,11 @@ export const useStudio = create<StudioState>()((set, get) => {
 
     setLoop: (loop) => set({ loop }),
     setSeamlessLoop: (seamlessLoop) => set({ seamlessLoop }),
+    setFrame: (patch) => set({ frame: { ...get().frame, ...patch } }),
     setRecording: (recording) => set({ recording }),
     setProMode: (proMode) => set({ proMode }),
     setGuides: (guides) => set({ guides }),
+    setFastPreview: (fastPreview) => set({ fastPreview }),
     setSound: (sound) => set({ sound }),
     setSpeakerSound: (speakerSound) => set({ speakerSound }),
     setTool: (tool) => set({ tool }),
@@ -656,6 +667,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         media,
         shots,
         seamlessLoop,
+        frame,
       } = get();
       return {
         version: 1,
@@ -669,6 +681,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         media,
         shots,
         seamlessLoop,
+        frame,
       };
     },
 
@@ -685,6 +698,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         media: doc.media,
         shots: doc.shots,
         seamlessLoop: doc.seamlessLoop === true,
+        frame: { ...DEFAULT_FRAME, ...doc.frame },
         selectedLightId: doc.lights[0]?.id ?? null,
         playhead: 0,
         playing: false,

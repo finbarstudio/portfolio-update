@@ -1,3 +1,10 @@
+import {
+  DEFAULT_FRAME,
+  FRAME_STYLES,
+  type FrameStyle,
+  getWallpaper,
+  type MediaFrame,
+} from "@/lib/mockup-studio/scene/frames";
 /**
  * Validation for scene files. A .json picked from disk is untrusted input, so
  * everything is narrowed field by field and rebuilt; nothing from the file is
@@ -85,6 +92,41 @@ function readRecord(value: unknown, where: string): Record<string, unknown> {
 function readArray(value: unknown, where: string): unknown[] {
   if (!Array.isArray(value)) fail(where, "must be a list");
   return value;
+}
+
+const FRAME_STYLE_VALUES = new Set(FRAME_STYLES.map((style) => style.value));
+
+/** Framing is optional and forgiving: anything missing or odd falls back to the default for that field. */
+function readFrame(value: unknown): MediaFrame {
+  if (typeof value !== "object" || value === null) return DEFAULT_FRAME;
+  const raw = value as Record<string, unknown>;
+  const number = (key: keyof MediaFrame, max: number) => {
+    const n = raw[key];
+    return typeof n === "number" && Number.isFinite(n)
+      ? Math.min(max, Math.max(0, n))
+      : (DEFAULT_FRAME[key] as number);
+  };
+  const colour = (key: "windowColor" | "backdropColor") => {
+    const c = raw[key];
+    return typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)
+      ? c
+      : DEFAULT_FRAME[key];
+  };
+  return {
+    style: FRAME_STYLE_VALUES.has(raw.style as FrameStyle)
+      ? (raw.style as FrameStyle)
+      : DEFAULT_FRAME.style,
+    windowColor: colour("windowColor"),
+    backdropColor: colour("backdropColor"),
+    wallpaper:
+      typeof raw.wallpaper === "string" && getWallpaper(raw.wallpaper)
+        ? raw.wallpaper
+        : null,
+    screenPadding: number("screenPadding", 40),
+    mediaPadding: number("mediaPadding", 20),
+    radius: number("radius", 100),
+    shadow: number("shadow", 100),
+  };
 }
 
 function readString(value: unknown, where: string): string {
@@ -366,5 +408,6 @@ export function parseSceneDocument(input: unknown): SceneDocument {
     media: readMedia(raw.media),
     shots: readShots(raw.shots),
     seamlessLoop: raw.seamlessLoop === true,
+    frame: readFrame(raw.frame),
   };
 }

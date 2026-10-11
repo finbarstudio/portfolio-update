@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/mockup-studio/ui/button";
+import { cn } from "@/components/mockup-studio/ui/cn";
+import { ColourPicker } from "@/components/mockup-studio/ui/colour-picker";
 import { FileButton } from "@/components/mockup-studio/ui/file-button";
 import { CloseIcon, UploadIcon } from "@/components/mockup-studio/ui/icons";
 import { Section } from "@/components/mockup-studio/ui/section";
@@ -11,6 +13,12 @@ import { Slider } from "@/components/mockup-studio/ui/slider";
 import { Switch } from "@/components/mockup-studio/ui/switch";
 import { createTestFootage } from "@/lib/mockup-studio/media/test-footage";
 import { type DeviceDef, getDevice } from "@/lib/mockup-studio/scene/devices";
+import {
+  DEFAULT_FRAME,
+  FRAME_STYLES,
+  WALLPAPERS,
+  wallpaperCss,
+} from "@/lib/mockup-studio/scene/frames";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { MediaFit } from "@/lib/mockup-studio/scene/types";
 import { clearMedia, setMediaFromFile } from "./media";
@@ -53,10 +61,117 @@ function ratioLabel(aspect: number): string {
   return match ? `${match[0]}:${match[1]}` : `${aspect.toFixed(2)}:1`;
 }
 
+/** What sits behind and around the media when it is shown in a frame rather than filling the screen. */
+function FrameControls() {
+  const frame = useStudio((s) => s.frame);
+  const setFrame = useStudio((s) => s.setFrame);
+  return (
+    <>
+      <fieldset className="flex flex-col gap-1.5">
+        <legend className="mb-1.5 text-ms-ink-muted">Behind</legend>
+        <div className="grid grid-cols-5 gap-1.5">
+          <WallpaperSwatch
+            label="Plain colour"
+            selected={frame.wallpaper === null}
+            background={frame.backdropColor}
+            onSelect={() => setFrame({ wallpaper: null })}
+          />
+          {WALLPAPERS.map((wallpaper) => (
+            <WallpaperSwatch
+              key={wallpaper.id}
+              label={wallpaper.name}
+              selected={frame.wallpaper === wallpaper.id}
+              background={wallpaperCss(wallpaper)}
+              onSelect={() => setFrame({ wallpaper: wallpaper.id })}
+            />
+          ))}
+        </div>
+      </fieldset>
+      {frame.wallpaper === null ? (
+        <ColourPicker
+          label="Behind colour"
+          value={frame.backdropColor}
+          onChange={(backdropColor) => setFrame({ backdropColor })}
+        />
+      ) : null}
+      <ColourPicker
+        label={frame.style === "card" ? "Card colour" : "Window colour"}
+        value={frame.windowColor}
+        onChange={(windowColor) => setFrame({ windowColor })}
+      />
+      <Slider
+        label="Space around"
+        value={frame.screenPadding}
+        min={0}
+        max={40}
+        step={1}
+        defaultValue={DEFAULT_FRAME.screenPadding}
+        onChange={(screenPadding) => setFrame({ screenPadding })}
+      />
+      <Slider
+        label="Space inside"
+        value={frame.mediaPadding}
+        min={0}
+        max={20}
+        step={1}
+        defaultValue={DEFAULT_FRAME.mediaPadding}
+        onChange={(mediaPadding) => setFrame({ mediaPadding })}
+      />
+      <Slider
+        label="Corners"
+        value={frame.radius}
+        min={0}
+        max={100}
+        step={1}
+        defaultValue={DEFAULT_FRAME.radius}
+        onChange={(radius) => setFrame({ radius })}
+      />
+      <Slider
+        label="Shadow"
+        value={frame.shadow}
+        min={0}
+        max={100}
+        step={1}
+        defaultValue={DEFAULT_FRAME.shadow}
+        onChange={(shadow) => setFrame({ shadow })}
+      />
+    </>
+  );
+}
+
+function WallpaperSwatch({
+  label,
+  selected,
+  background,
+  onSelect,
+}: {
+  label: string;
+  selected: boolean;
+  background: string;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      title={label}
+      aria-label={label}
+      aria-pressed={selected}
+      onClick={onSelect}
+      className={cn(
+        "aspect-square rounded-ms-control border border-ms-line outline-offset-2 focus-visible:outline-2 focus-visible:outline-ms-ink",
+        selected && "ring-2 ring-ms-ink",
+      )}
+      style={{ background }}
+    />
+  );
+}
+
 export function ScreenMediaSection() {
   const media = useStudio((s) => s.media);
   const updateMedia = useStudio((s) => s.updateMedia);
   const fitTimelineTo = useStudio((s) => s.fitTimelineTo);
+  const frame = useStudio((s) => s.frame);
+  const setFrame = useStudio((s) => s.setFrame);
   const [error, setError] = useState<string | null>(null);
   /** 0..1 while the test clip is being made, otherwise null. */
   const [making, setMaking] = useState<number | null>(null);
@@ -194,44 +309,56 @@ export function ScreenMediaSection() {
             </Button>
           ) : null}
           <Segmented
-            label="Fit"
-            value={media.fit}
-            options={FIT_OPTIONS}
-            onChange={(fit) => updateMedia({ fit })}
+            label="Frame"
+            value={frame.style}
+            options={FRAME_STYLES}
+            onChange={(style) => setFrame({ style })}
           />
-          <Slider
-            label="Scale"
-            value={media.scale}
-            min={0.2}
-            max={4}
-            typedMin={0.05}
-            typedMax={20}
-            step={0.01}
-            defaultValue={1}
-            onChange={(scale) => updateMedia({ scale })}
-          />
-          <Slider
-            label="Offset X"
-            value={media.offsetX}
-            min={-1}
-            max={1}
-            typedMin={-5}
-            typedMax={5}
-            step={0.01}
-            defaultValue={0}
-            onChange={(offsetX) => updateMedia({ offsetX })}
-          />
-          <Slider
-            label="Offset Y"
-            value={media.offsetY}
-            min={-1}
-            max={1}
-            typedMin={-5}
-            typedMax={5}
-            step={0.01}
-            defaultValue={0}
-            onChange={(offsetY) => updateMedia({ offsetY })}
-          />
+          {frame.style === "none" ? (
+            <>
+              <Segmented
+                label="Fit"
+                value={media.fit}
+                options={FIT_OPTIONS}
+                onChange={(fit) => updateMedia({ fit })}
+              />
+              <Slider
+                label="Scale"
+                value={media.scale}
+                min={0.2}
+                max={4}
+                typedMin={0.05}
+                typedMax={20}
+                step={0.01}
+                defaultValue={1}
+                onChange={(scale) => updateMedia({ scale })}
+              />
+              <Slider
+                label="Offset X"
+                value={media.offsetX}
+                min={-1}
+                max={1}
+                typedMin={-5}
+                typedMax={5}
+                step={0.01}
+                defaultValue={0}
+                onChange={(offsetX) => updateMedia({ offsetX })}
+              />
+              <Slider
+                label="Offset Y"
+                value={media.offsetY}
+                min={-1}
+                max={1}
+                typedMin={-5}
+                typedMax={5}
+                step={0.01}
+                defaultValue={0}
+                onChange={(offsetY) => updateMedia({ offsetY })}
+              />
+            </>
+          ) : (
+            <FrameControls />
+          )}
         </div>
       ) : null}
     </Section>

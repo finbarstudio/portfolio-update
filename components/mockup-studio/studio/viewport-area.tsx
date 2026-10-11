@@ -16,6 +16,7 @@ import { PintLink } from "@/components/mockup-studio/ui/pint-link";
 import { PARAMS } from "@/lib/mockup-studio/scene/params";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { PickMode } from "@/lib/mockup-studio/scene/types";
+import { FullscreenBar } from "./fullscreen-bar";
 
 const Viewport = dynamic(
   () => import("@/components/mockup-studio/viewport/viewport").then((m) => m.Viewport),
@@ -52,7 +53,17 @@ export function ViewportArea() {
   const setPick = useStudio((s) => s.setPick);
   const guides = useStudio((s) => s.guides);
   const setGuides = useStudio((s) => s.setGuides);
+  const fastPreview = useStudio((s) => s.fastPreview);
+  const setFastPreview = useStudio((s) => s.setFastPreview);
   const sectionRef = useRef<HTMLElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+
+  useEffect(() => {
+    const sync = () =>
+      setFullscreen(document.fullscreenElement === sectionRef.current);
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
   const [dragging, setDragging] = useState(false);
   const [dropError, setDropError] = useState<string | null>(null);
   // dragenter/leave fire for every child crossed, so count the depth.
@@ -175,7 +186,20 @@ export function ViewportArea() {
         >
           <FitIcon width={18} height={18} />
         </IconButton>
+        <Button
+          variant="ghost"
+          size="lg"
+          pressed={fastPreview}
+          onClick={() => setFastPreview(!fastPreview)}
+          title="Draw the preview with fewer pixels so it plays smoothly. Export is always full quality."
+        >
+          Fast preview
+        </Button>
       </div>
+
+      {fullscreen ? (
+        <FullscreenBar onExit={() => toggleFullscreen(sectionRef.current)} />
+      ) : null}
 
       <div className="absolute right-4 bottom-4 z-10 [:fullscreen_&]:hidden">
         <PintLink floating />

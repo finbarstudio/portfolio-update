@@ -13,14 +13,27 @@ const FRAME_PADDING = 24;
 // Hoisted so the canvas never sees a "new" config object and re-applies it.
 const GL_PROPS = { preserveDrawingBuffer: true, alpha: true, antialias: true };
 
+/** Most pixels the preview draws per frame. Past this the lens and depth of field passes make playback stutter. */
+const SHARP_PIXELS = 6_000_000;
+/** The budget for the fast preview: about a 1080p frame. */
+const FAST_PIXELS = 2_000_000;
+
 /**
- * Draw more pixels than the screen has: one and a half times its ratio, between 2 and 3. Edges and the fine detail
- * of a device come out crisp instead of faintly soft, which is most of what separates a premium render from a
- * preview. Export sizes its own buffer and ignores this.
+ * How many buffer pixels to draw per CSS pixel. Ideally more than the screen has (one and a half times its ratio,
+ * between 2 and 3), which is what makes edges crisp. But a full-screen frame at that density is tens of millions of
+ * pixels, so the ratio comes down as the frame grows to stay inside a pixel budget, and further for the fast
+ * preview. Export sizes its own buffer and ignores all of this.
  */
-function renderRatio(): number {
+function renderRatio(width: number, height: number, fast: boolean): number {
   const screen = typeof window === "undefined" ? 1 : window.devicePixelRatio;
-  return Math.min(3, Math.max(2, screen * 1.5));
+  const ideal = fast ? 1 : Math.min(3, Math.max(2, screen * 1.5));
+  const budget = fast ? FAST_PIXELS : SHARP_PIXELS;
+  const fits = Math.sqrt(budget / Math.max(1, width * height));
+  return Math.max(0.5, Math.min(ideal, fits));
+}
+
+function screenRatio(): number {
+  return typeof window === "undefined" ? 1 : window.devicePixelRatio;
 }
 const CAMERA_PROPS = {
   fov: 50,
@@ -100,6 +113,7 @@ export function Viewport() {
   const composition = useStudio((s) => s.composition);
   const transparent = useStudio((s) => s.background.transparent);
   const guides = useStudio((s) => s.guides);
+  const fastPreview = useStudio((s) => s.fastPreview);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -119,6 +133,9 @@ export function Viewport() {
   );
   const frameWidth = Math.floor(composition.width * fit);
   const frameHeight = Math.floor(composition.height * fit);
+  const ratio = renderRatio(frameWidth, frameHeight, fastPreview);
+  // Below the screen's own density the preview is visibly softer than the export will be, which is worth saying.
+  const reduced = ratio < screenRatio() - 0.05;
 
   return (
     <div
@@ -137,7 +154,7 @@ export function Viewport() {
           <Canvas
             className="absolute inset-0"
             flat
-            dpr={renderRatio()}
+            dpr={ratio}
             shadows="soft"
             gl={GL_PROPS}
             camera={CAMERA_PROPS}
@@ -145,6 +162,12 @@ export function Viewport() {
             <StudioScene runtime={runtime} />
           </Canvas>
           <LoadingOverlay />
+          {reduced ? (
+            <p className="pointer-events-none absolute top-2 right-2 rounded-full bg-ms-panel/80 px-2.5 py-1 text-[11px] text-ms-ink-muted backdrop-blur-md">
+              Preview at {Math.round((ratio / screenRatio()) * 100)}%
+              resolution. Export is full quality.
+            </p>
+          ) : null}
           {guides ? (
             <Guides tall={composition.height > composition.width} />
           ) : null}

@@ -1,10 +1,4 @@
-import {
-  Color,
-  type Group,
-  type Object3D,
-  Vector3,
-  type VideoTexture,
-} from "three";
+import { Color, type Group, type Object3D, Vector3 } from "three";
 import { defaultValues } from "@/lib/mockup-studio/scene/store";
 import type { Values } from "@/lib/mockup-studio/scene/types";
 
@@ -29,7 +23,10 @@ export interface ViewportRuntime {
   focusTarget: Object3D | null;
   /** Screen video while the media is a video. */
   video: HTMLVideoElement | null;
-  videoTexture: VideoTexture | null;
+  /** Bring the screen's texture up to date with the video's current frame. Null when the media is not a video. */
+  refreshScreen: (() => void) | null;
+  /** The media is being shown in a window over a backdrop, composed to exactly the screen's shape. */
+  framed: boolean;
   /** Monotonic seconds passed to R3F's `advance` while exporting. */
   tick: number;
 }
@@ -44,7 +41,8 @@ export function createRuntime(): ViewportRuntime {
     deviceExtents: new Vector3(1, 1, 1),
     screenColor: new Color(0, 0, 0),
     video: null,
-    videoTexture: null,
+    refreshScreen: null,
+    framed: false,
     tick: 0,
   };
 }

@@ -9,6 +9,8 @@
  *   Their ranges and meaning are documented in ./params.
  */
 
+import type { MediaFrame } from "./frames";
+
 import type { Hdri } from "./hdris";
 import type { AnimPath } from "./params";
 
@@ -160,4 +162,6 @@ export interface SceneDocument {
   shots: Shot[];
   /** The end of the timeline returns to the first frame, so it loops without a jump. */
   seamlessLoop?: boolean;
+  /** The window and backdrop the screen media is presented in. Absent in older files: no framing. */
+  frame?: MediaFrame;
 }
