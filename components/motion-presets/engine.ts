@@ -740,6 +740,8 @@ export interface Frame {
   cards: number;
   /** the card that is "the one showing" right now, for the number overlay; null when no single card is */
   lead: number | null;
+  /** the card in focus right now, whether or not the preset shows a number; null when no single card is */
+  focus: number | null;
   /** 1 normally; falls to 0 at the loop point when the loop fade is on */
   curtain: number;
   camera: { x: number; y: number; distance: number; fov: number; tilt: number; yaw: number; roll: number };
@@ -877,6 +879,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     camera.back = Math.sin(Math.PI * clamp(part)) * 0.35 * Math.min(2.5, Math.hypot(to[0] - from[0], to[1] - from[1]));
     lead = c.path[mod(Math.round(steps), c.path.length)]; // the cell the camera is on, or nearest to
   }
+  const focus = lead;
   if (!hasCounter(preset)) lead = null;
 
   return {
@@ -885,6 +888,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     items,
     cards,
     lead,
+    focus,
     curtain,
     camera: {
       x: camera.x - m.offsetX * aspect,
@@ -1243,6 +1247,63 @@ export interface Look {
   counterPosition: CounterPosition;
   counterScale: number;
   counterStyle: CounterStyle;
+  /** videos run round and round, or each plays through once when its card comes into focus */
+  videoPlay: VideoPlay;
+  /** seconds a card is in focus before its video starts */
+  videoDelay: number;
+  /** once its card has left focus, a video finishes and stays on its last picture, or goes back to its first */
+  videoAfter: VideoAfter;
+}
+
+export type VideoPlay = "loop" | "focus";
+export type VideoAfter = "hold" | "rewind";
+
+/** What "play once on focus" has seen so far in this run of the loop. Start a run with `newFocusPlayback()`. */
+export interface FocusPlayback {
+  last: number;
+  lead: number | null;
+  /** per upload: the loop time its card last came into focus, or null while it waits on its first picture */
+  started: (number | null)[];
+}
+export const newFocusPlayback = (): FocusPlayback => ({ last: Infinity, lead: null, started: [] });
+
+/**
+ * How far into its video each upload should be at `seconds` of the loop, for
+ * "play once on focus". Fed every frame in order; it starts over by itself
+ * when the loop does. `focus` is the card in focus, and with no single card in
+ * focus every video plays once from the start of the loop. `leadIn` says how
+ * long before the loop point the card in focus there came into focus, so its
+ * video carries on across the loop point instead of starting a second time.
+ */
+export function focusTimes(state: FocusPlayback, seconds: number, focus: number | null, uploads: number, look: Look, leadIn: () => number): number[] {
+  if (seconds < state.last || state.started.length !== uploads) {
+    state.started = new Array<number | null>(uploads).fill(focus === null ? seconds : null);
+    state.lead = focus === null ? null : focus % uploads;
+    if (state.lead !== null) state.started[state.lead] = seconds - leadIn();
+  }
+  state.last = seconds;
+  const now = focus === null ? null : focus % uploads;
+  if (now !== state.lead) {
+    if (state.lead !== null && look.videoAfter === "rewind") state.started[state.lead] = null;
+    if (now !== null) state.started[now] = seconds;
+    state.lead = now;
+  }
+  return state.started.map((start) => (start === null ? 0 : Math.max(0, seconds - start - look.videoDelay)));
+}
+
+/**
+ * How many seconds before the loop point the card in focus at the loop point
+ * came into focus. 0 when no single card is in focus there, or one always is.
+ */
+export function focusLeadIn(settings: Settings, aspect: number, cardShape: number): number {
+  const { duration } = settings.motion;
+  const first = layoutFrame(settings, 0, aspect, cardShape).focus;
+  if (first === null) return 0;
+  const step = 1 / 60;
+  for (let back = step; back < duration; back += step) {
+    if (layoutFrame(settings, duration - back, aspect, cardShape).focus !== first) return back - step;
+  }
+  return 0;
 }
 
 export type Counter = "off" | "number" | "fraction";
@@ -1297,6 +1358,9 @@ export const BASE_LOOK: Look = {
   counterPosition: "bottom-left",
   counterScale: 1,
   counterStyle: "outline",
+  videoPlay: "loop",
+  videoDelay: 0.3,
+  videoAfter: "rewind",
 };
 
 /** A saved setup: which preset, how it was tuned, and how it looks. No media. */
@@ -1376,6 +1440,10 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   look.counterStyle = oneOf(savedLook.counterStyle, COUNTER_STYLES.map((style) => style.id)) ?? look.counterStyle;
   const counterScale = finite(savedLook.counterScale);
   if (counterScale !== undefined) look.counterScale = clamp(counterScale, 0.1, 20);
+  look.videoPlay = oneOf(savedLook.videoPlay, ["loop", "focus"] as const) ?? look.videoPlay;
+  look.videoAfter = oneOf(savedLook.videoAfter, ["hold", "rewind"] as const) ?? look.videoAfter;
+  const videoDelay = finite(savedLook.videoDelay);
+  if (videoDelay !== undefined) look.videoDelay = clamp(videoDelay, 0, 60);
 
   return { preset: found, motion, options, easing, path, look };
 }
