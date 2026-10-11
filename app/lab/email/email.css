@@ -679,3 +679,11 @@
     min-height: 44px;
   }
 }
+
+/* Inspect tools: vision filters, find in code, the image list. */
+.ec-filters { position: absolute; width: 0; height: 0; }
+.ec-select { font: inherit; font-size: 12px; padding: 3px 6px; color: inherit; background: transparent; border: 1px solid var(--ec-line); border-radius: 6px; }
+.ec-stage iframe.ec-inspecting { cursor: crosshair; }
+.ec-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+.ec-table th, .ec-table td { text-align: left; padding: 3px 8px 3px 0; border-bottom: 1px solid var(--ec-line); word-break: break-all; }
+.ec-table th { font-weight: 500; color: var(--ec-dim); }

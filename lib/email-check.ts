@@ -108,6 +108,7 @@ const CHECKED_IDS = new Set([
   "small-text",
   "img-alt-long",
   "width",
+  "tags-uneven",
 ]);
 
 /** Findings about what the email says and where its links go, as opposed to how it is built. */
@@ -210,6 +211,8 @@ const SRC = {
   windowsMail: { label: "Microsoft: Windows Mail, Calendar and People are becoming new Outlook (support ended 31 December 2024)", url: "https://support.microsoft.com/en-us/outlook/windows-mail-calendar-and-people-are-becoming-new-outlook", kind: "client docs" },
   gmailLightOnly: { label: "Google issue tracker: Gmail dark mode and color-scheme", url: "https://issuetracker.google.com/issues/201441498", kind: "client docs" },
   gmailClipTest: { label: "Alice Li: does Gmail clip at 102KB or 100KB? (controlled test, August 2026)", url: "https://alicelicode.medium.com/does-gmail-clip-at-102kb-or-100kb-what-its-actually-counting-728c8c7497d2", kind: "vendor research" },
+  msTypography: { label: "Microsoft: typography improvements in Word and Outlook for Windows", url: "https://techcommunity.microsoft.com/blog/microsoft365insiderblog/typography-improvements-in-word-and-outlook-for-windows/4222055", kind: "client docs" },
+  knakTypography: { label: "Knak (Nicole Merlin): Microsoft introduces advanced typography, and the opt-out for senders", url: "https://knak.com/blog/microsoft-introduces-advanced-typography/", kind: "vendor research" },
   preheaderPad: { label: "Parcel: preheader spacing (which padding characters each client honours)", url: "https://parcel.io/blog/preheader-spacing", kind: "vendor research" },
   preheader: { label: "Litmus: the preview text hack", url: "https://www.litmus.com/blog/the-little-known-preview-text-hack-you-may-want-to-use-in-every-email", kind: "vendor research" },
   share: { label: "Litmus: email client market share", url: "https://www.litmus.com/email-client-market-share", kind: "vendor research" },
@@ -256,6 +259,7 @@ export const SOURCES: Record<string, Source[]> = {
   "merge-tags": [SRC.sesHandlebars],
   "text-size-adjust": [SRC.mailchimpCss, SRC.textSize],
   "color-scheme": [cie("html-meta-color-scheme", "color-scheme meta"), SRC.darkMode],
+  "outlook-typography": [SRC.msTypography, SRC.knakTypography],
   "pure-black": [SRC.darkMode, cie("html-meta-color-scheme", "color-scheme meta (Gmail apps: light only)")],
   "link-color": [cie("css-pseudo-class-link", ":link"), cie("html-style", "style blocks")],
   ppi: [SRC.dpi, cie("html-width", "width attribute, the 120 dpi note")],
@@ -743,6 +747,23 @@ function widestTable(tags: Tag[]): number | null {
     }
   }
   return widest;
+}
+
+/**
+ * The source line of the nth element of a kind, counted the way the page counts them
+ * (Outlook-only markup inside conditional comments is not an element in a browser).
+ * Used to jump from a click in the preview to the place in the code.
+ */
+export function lineOfElement(src: string, name: string, index: number): number | null {
+  const { tags } = parse(src);
+  const wanted = name.toLowerCase();
+  let seen = 0;
+  for (const t of tags) {
+    if (t.mso || t.name !== wanted) continue;
+    if (seen === index) return t.line;
+    seen++;
+  }
+  return null;
 }
 
 /** Stand-in values for the preview, so a merge tag shows as it would once delivered. */
@@ -1326,7 +1347,7 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "outlook-typography",
       "info",
       "No DontUseAdvancedTypographyReadingMail setting",
-      "Classic Outlook on Windows, in its newer versions, applies Word's kerning and ligatures to email text, which changes the letter spacing from what you designed. This Word setting in the head turns that off.",
+      "Since 2024, classic Outlook on Windows can restyle text in the Reading Pane on its own: full justification, hyphenation, kerning and ligatures, with letter and word spacing adjusted to suit. Microsoft describes it as automatic and on by default; readers can switch it off in their own options, and this Word setting in the head switches it off for your email.",
       { fix: head ? "outlook-typography" : undefined, affects: OUTLOOK },
     );
   }
@@ -1864,6 +1885,31 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "The standard for tel: links does not allow spaces; hyphens, dots and brackets are the permitted separators. Most phones cope with spaces anyway, but it is not guaranteed. The visible number can keep its spaces; the link should not.",
       { lines: badTel.map((t) => t.line), howTo: { text: "Remove the spaces from the link only.", code: '<a href="tel:03336664747">0333 666 4747</a>' } },
     );
+  }
+
+  // ── Tags opened and closed ──────────────────────────────────────────
+  // Only tags that must always be closed. td, tr, p and li may legally be left open.
+  {
+    const visible = src.replace(/<!--(?!\[if)[\s\S]*?-->/g, (c) => c.replace(/[^\n]/g, " "));
+    const uneven: string[] = [];
+    const where: number[] = [];
+    for (const name of ["table", "a", "div", "span", "center", "strong", "b", "em", "i", "u", "font", "h1", "h2", "h3", "h4", "ul", "ol"]) {
+      const opens = [...visible.matchAll(new RegExp(`<${name}(?=[\\s>/])[^>]*>`, "gi"))].filter((m) => !m[0].endsWith("/>"));
+      const closes = [...visible.matchAll(new RegExp(`</${name}\\s*>`, "gi"))];
+      if (opens.length === closes.length) continue;
+      uneven.push(`<${name}> opened ${opens.length} times, closed ${closes.length}`);
+      const last = opens.length > closes.length ? opens[opens.length - 1] : closes[closes.length - 1];
+      if (last) where.push(lineOf(last.index));
+    }
+    if (uneven.length) {
+      add(
+        "tags-uneven",
+        "warn",
+        `${plural(uneven.length, "tag")} not closed the same number of times as opened`,
+        `${uneven.join("; ")}. The count is a fact about this file. What it does depends on the client: each one repairs broken nesting in its own way, so a style can run on further than intended or a layout can shift in one client and not another. The line given is the last one of that tag, as a place to start counting back from.`,
+        { lines: where },
+      );
+    }
   }
 
   // ── Preheader ───────────────────────────────────────────────────────

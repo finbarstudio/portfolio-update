@@ -10,6 +10,7 @@ import {
   SHARE,
   SHARE_DATE,
   applyFixes,
+  lineOfElement,
   checkEmail,
   darkReach,
   fillMergeTags,
@@ -28,6 +29,7 @@ import {
 } from "@/lib/email-check";
 import { extractFromPreviewPage, isPreviewUrl } from "@/lib/email-extract";
 import { auditDocument, measureNarrow, type A11yReport, type NarrowProbe } from "@/lib/email-a11y";
+import { auditImages, measureImageBytes, type ImageReport } from "@/lib/email-images";
 import { buildReport } from "@/lib/email-report";
 import { snapshotDocument } from "@/lib/email-snapshot";
 
@@ -42,7 +44,7 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  */
 
 /** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
-const VERSION = "1.9";
+const VERSION = "2.0";
 
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 
@@ -62,6 +64,16 @@ const DARK_MODES: { value: DarkMode; label: string }[] = [
   { value: "off", label: "Light" },
   { value: "scheme", label: "Dark: your styles" },
   { value: "invert", label: "Dark: inverted" },
+];
+
+type Vision = "none" | "blur" | "protan" | "deutan" | "tritan" | "grey";
+const VISIONS: { value: Vision; label: string; filter: string; about: string }[] = [
+  { value: "none", label: "Normal vision", filter: "", about: "" },
+  { value: "blur", label: "Blurred", filter: "blur(1.4px)", about: "Roughly what low or uncorrected vision does: small text and thin lines go first." },
+  { value: "protan", label: "No red (protanopia)", filter: "url(#ec-protan)", about: "Red-blind: reds darken and merge with greens and browns." },
+  { value: "deutan", label: "No green (deuteranopia)", filter: "url(#ec-deutan)", about: "Green-blind, the most common kind: reds and greens merge." },
+  { value: "tritan", label: "No blue (tritanopia)", filter: "url(#ec-tritan)", about: "Blue-blind, which is rare: blues and greens merge, yellows and pinks merge." },
+  { value: "grey", label: "No colour", filter: "grayscale(1)", about: "Colour removed entirely. Anything that relies on colour alone, such as a red error or a coloured link with no underline, disappears." },
 ];
 
 const DARK_TIPS: Record<DarkMode, string> = {
@@ -146,7 +158,7 @@ function kb(bytes: number): string {
 }
 
 /** What the preview frame is given: the output, minus whatever is switched off, plus the dark mode treatment. */
-function previewSource(src: string, imagesOff: boolean, stylesOff: boolean, dark: DarkMode): string {
+function previewSource(src: string, imagesOff: boolean, stylesOff: boolean, dark: DarkMode, outlines = false): string {
   let out = src;
   if (stylesOff) out = out.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "");
   if (imagesOff) {
@@ -165,6 +177,11 @@ function previewSource(src: string, imagesOff: boolean, stylesOff: boolean, dark
       /<\/head>/i,
       "<style>html{filter:invert(1) hue-rotate(180deg);background:#fff}img,video,[style*='background-image']{filter:invert(1) hue-rotate(180deg)}</style></head>",
     );
+  }
+  if (outlines) {
+    // Outlines take no space, so the layout and the measured height stay as they are.
+    const css = "<style>table{outline:1px solid rgba(226,24,124,.9)!important;outline-offset:-1px}td,th{outline:1px dashed rgba(0,120,255,.75)!important;outline-offset:-1px}</style>";
+    out = /<\/head>/i.test(out) ? out.replace(/<\/head>/i, `${css}</head>`) : css + out;
   }
   return out;
 }
@@ -287,6 +304,108 @@ function FindingSection({
 }
 
 /** A titled, collapsible line of information. Closed by default so it costs one line. */
+function ImageItems({ report, bytes, output }: { report: ImageReport; bytes: Map<string, number>; output: string }) {
+  const where = (names: string[]) => [...new Set(names.flatMap((n) => linesWhere(output, (l) => /<img\b/i.test(l) && l.includes(n))))].sort((a, b) => a - b);
+  const names = (pick: (r: ImageReport["rows"][number]) => boolean) => report.rows.filter(pick).map((r) => r.name);
+  const measured = report.rows.filter((r) => bytes.has(r.src));
+  const total = measured.reduce((n, r) => n + (bytes.get(r.src) ?? 0), 0);
+  const rows = [...report.rows].sort((a, b) => (bytes.get(b.src) ?? -1) - (bytes.get(a.src) ?? -1));
+  return (
+    <>
+      {report.broken > 0 && (
+        <li className="ec-item">
+          <p className="ec-item-title">
+            <span className="ec-level ec-level-fail">Problem</span> {plural(report.broken, "image")} did not load <BasisTag basis="checked" />
+          </p>
+          <p>The address returned nothing here, so readers get the alt text or an empty box: {names((r) => r.broken).join(", ")}.</p>
+          <Where lines={where(names((r) => r.broken))} />
+        </li>
+      )}
+      {report.stretched > 0 && (
+        <li className="ec-item">
+          <p className="ec-item-title">
+            <span className="ec-level ec-level-warn">Warning</span> {plural(report.stretched, "image")} shown larger than the file <BasisTag basis="checked" />
+          </p>
+          <p>
+            The file has fewer pixels than the space it is stretched over, so it looks soft:{" "}
+            {report.rows
+              .filter((r) => r.stretched)
+              .map((r) => `${r.name} (file ${r.naturalWidth}px, shown ${r.shownWidth}px)`)
+              .join(", ")}
+            .
+          </p>
+          <Where lines={where(names((r) => r.stretched))} />
+        </li>
+      )}
+      {report.distorted > 0 && (
+        <li className="ec-item">
+          <p className="ec-item-title">
+            <span className="ec-level ec-level-warn">Warning</span> {plural(report.distorted, "image")} shown out of proportion <BasisTag basis="checked" />
+          </p>
+          <p>
+            The width and height it is shown at are a different shape from the file, so it is squashed or stretched:{" "}
+            {report.rows
+              .filter((r) => r.distorted)
+              .map((r) => `${r.name} (file ${r.naturalWidth}×${r.naturalHeight}, shown ${r.shownWidth}×${r.shownHeight})`)
+              .join(", ")}
+            . Usually a height attribute left over from a different image.
+          </p>
+          <Where lines={where(names((r) => r.distorted))} />
+        </li>
+      )}
+      {report.lowDensity > 0 && (
+        <li className="ec-item">
+          <p className="ec-item-title">
+            <span className="ec-level ec-level-info">Note</span> {plural(report.lowDensity, "image")} with no spare pixels for sharp screens <BasisTag basis="checked" />
+          </p>
+          <p>
+            Phones and most laptops draw two or three screen pixels for each pixel of layout, so an image looks sharp only when the file is about twice the
+            size it is shown at. These are under one and a half times: {names((r) => r.lowDensity).join(", ")}. It is a quality choice, not a fault; larger
+            files weigh more.
+          </p>
+        </li>
+      )}
+      <li className="ec-item">
+        <details>
+          <summary className="ec-item-title">
+            <span className="ec-level ec-level-info">List</span> {plural(report.rows.length, "image")}
+            {measured.length > 0 ? `, ${kb(total)} in total${measured.length < report.rows.length ? ` (${report.rows.length - measured.length} could not be weighed)` : ""}` : ""}
+          </summary>
+          <table className="ec-table">
+            <thead>
+              <tr>
+                <th scope="col">File</th>
+                <th scope="col">File size</th>
+                <th scope="col">Shown at</th>
+                <th scope="col">Weight</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.src}>
+                  <td title={r.src}>
+                    {r.name}
+                    {r.uses > 1 ? ` ×${r.uses}` : ""}
+                  </td>
+                  <td>{r.broken ? "did not load" : `${r.naturalWidth}×${r.naturalHeight}`}</td>
+                  <td>
+                    {r.shownWidth}×{r.shownHeight}
+                  </td>
+                  <td>{bytes.has(r.src) ? kb(bytes.get(r.src) ?? 0) : "unknown"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="ec-dim">
+            Measured in the preview at its current width. Images are not part of Gmail&apos;s clip limit, but they are what a reader on mobile data waits for.
+            Weight is unknown where the image host does not let a web page read it.
+          </p>
+        </details>
+      </li>
+    </>
+  );
+}
+
 function Note({
   title,
   tone,
@@ -421,6 +540,12 @@ export default function EmailCheck() {
   const [dark, setDark] = useState<DarkMode>("off");
   const [imagesOff, setImagesOff] = useState(false);
   const [stylesOff, setStylesOff] = useState(false);
+  const [outlines, setOutlines] = useState(false);
+  const [inspect, setInspect] = useState(false);
+  const [vision, setVision] = useState<Vision>("none");
+  const [picked, setPicked] = useState<{ tag: string; line: number | null; text: string } | null>(null);
+  const [images, setImages] = useState<ImageReport | null>(null);
+  const [imageBytes, setImageBytes] = useState<Map<string, number>>(new Map());
   const [sample, setSample] = useState(true);
   // null: go by what the email looks like.
   const [transactionalChoice, setTransactionalChoice] = useState<boolean | null>(null);
@@ -436,6 +561,11 @@ export default function EmailCheck() {
   const sourceId = useId();
   const outputId = useId();
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const outputFieldRef = useRef<HTMLTextAreaElement>(null);
+  // Read by handlers attached to the preview document, which outlive a render.
+  const inspectRef = useRef(false);
+  const imagesOffRef = useRef(false);
+  const outputRef = useRef("");
 
   const deferredSource = useDeferredValue(source);
 
@@ -462,8 +592,40 @@ export default function EmailCheck() {
     if (!doc?.documentElement) return;
     setHeight(doc.documentElement.scrollHeight);
     setA11y(auditDocument(doc));
+    // With images switched off there is nothing to measure; keep the last real reading.
+    if (!imagesOffRef.current) setImages(auditImages(doc));
+  };
+  // Find in code: a click in the preview is matched to the same element in the source by counting
+  // elements of that kind in order, then the output field is scrolled to its line.
+  const onPreviewClick = (event: MouseEvent) => {
+    if (!inspectRef.current) return;
+    event.preventDefault();
+    // The preview is another document, so its elements are not instances of this page's Element.
+    const target = event.target as Node | null;
+    const el = target && target.nodeType === 1 ? (target as Element) : (target?.parentElement ?? null);
+    const doc = el?.ownerDocument;
+    if (!el || !doc) return;
+    const tag = el.tagName.toLowerCase();
+    const index = [...doc.getElementsByTagName(tag)].indexOf(el);
+    const src = outputRef.current;
+    const line = index === -1 ? null : lineOfElement(src, tag, index);
+    for (const old of doc.querySelectorAll("[data-ec-picked]")) {
+      old.removeAttribute("data-ec-picked");
+      (old as HTMLElement).style.outline = "";
+    }
+    el.setAttribute("data-ec-picked", "");
+    (el as HTMLElement).style.outline = "2px solid #ff0066";
+    setPicked({ tag, line, text: (el.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 60) });
+    const field = outputFieldRef.current;
+    if (line === null || !field) return;
+    const lines = src.split("\n");
+    const start = lines.slice(0, line - 1).reduce((n, l) => n + l.length + 1, 0);
+    field.focus({ preventScroll: true });
+    field.setSelectionRange(start, start + (lines[line - 1]?.length ?? 0));
+    field.scrollTop = Math.max(0, ((line - 1) / lines.length) * field.scrollHeight - field.clientHeight / 2);
   };
   const onFrameLoad = () => {
+    frameRef.current?.contentDocument?.addEventListener("click", onPreviewClick);
     measure();
     for (const ms of [600, 2000, 5000]) window.setTimeout(measure, ms);
   };
@@ -609,6 +771,21 @@ export default function EmailCheck() {
   const ordered = fixes.includes("minify") ? [...fixes.filter((id) => id !== "minify"), "minify" as const] : fixes;
   const { src: output, applied } = applyFixes(deferredSource, ordered, { preheader });
   const sampled = fillMergeTags(output);
+  useEffect(() => {
+    inspectRef.current = inspect;
+    imagesOffRef.current = imagesOff;
+    outputRef.current = output;
+  }, [inspect, imagesOff, output]);
+  // File sizes are read separately, once per set of images, where the host allows it.
+  const imageKey = images ? images.rows.map((r) => r.src).join("\n") : "";
+  useEffect(() => {
+    if (!imageKey) return;
+    const controller = new AbortController();
+    void measureImageBytes(imageKey.split("\n"), controller.signal).then((sizes) => {
+      if (!controller.signal.aborted) setImageBytes(sizes);
+    });
+    return () => controller.abort();
+  }, [imageKey]);
   const hasSource = deferredSource.trim().length > 0;
   const stats = getStats(output);
   const transactional = transactionalChoice ?? looksTransactional(output);
@@ -758,11 +935,16 @@ export default function EmailCheck() {
             </div>
             <textarea
               id={outputId}
+              ref={outputFieldRef}
               className="ec-textarea ec-output"
               value={output}
               readOnly
               spellCheck={false}
-              onFocus={(e) => e.target.select()}
+              onClick={(e) => {
+                // A plain click selects everything for copying; a line picked from the preview is left alone.
+                const field = e.currentTarget;
+                if (field.selectionStart === field.selectionEnd) field.select();
+              }}
               title="The source with every applied fix. Click to select it all."
             />
 
@@ -920,9 +1102,9 @@ export default function EmailCheck() {
               <summary>
                 <h2>As rendered</h2>
                 <Tally
-                  fail={a11y ? a11y.contrast.length + a11y.linksWithoutName.length + a11y.imagesWithoutAlt.length + (a11y.overflow > 0 ? 1 : 0) : 0}
-                  warn={(a11y?.targets.length ? 1 : 0) + (narrow && narrow.contentWidth > narrow.viewport + 1 ? 1 : 0)}
-                  info={(a11y?.smallTargets ? 1 : 0) + (a11y?.contrastUnknown ? 1 : 0)}
+                  fail={(a11y ? a11y.contrast.length + a11y.linksWithoutName.length + a11y.imagesWithoutAlt.length + (a11y.overflow > 0 ? 1 : 0) : 0) + (images?.broken ? 1 : 0)}
+                  warn={(a11y?.targets.length ? 1 : 0) + (narrow && narrow.contentWidth > narrow.viewport + 1 ? 1 : 0) + (images?.stretched ? 1 : 0) + (images?.distorted ? 1 : 0)}
+                  info={(a11y?.smallTargets ? 1 : 0) + (a11y?.contrastUnknown ? 1 : 0) + (images?.lowDensity ? 1 : 0)}
                 />
               </summary>
               <p className="ec-dim">
@@ -933,6 +1115,7 @@ export default function EmailCheck() {
                 <p className="ec-dim">Waiting for the preview.</p>
               ) : (
                 <ul className="ec-list">
+                  {images && images.rows.length > 0 && <ImageItems report={images} bytes={imageBytes} output={output} />}
                   {a11y.overflow > 0 && (
                     <li className="ec-item">
                       <p className="ec-item-title">
@@ -1224,6 +1407,35 @@ export default function EmailCheck() {
                 Style blocks off
               </button>
             </div>
+            <div className="ec-chips" role="group" aria-label="Inspect">
+              <button type="button" aria-pressed={outlines} onClick={() => setOutlines((v) => !v)} title="Draws a pink line round every table and a dashed blue line round every cell, so the structure and any stray or empty cells are visible">
+                Outlines
+              </button>
+              <button
+                type="button"
+                aria-pressed={inspect}
+                onClick={() => {
+                  setInspect((v) => !v);
+                  setPicked(null);
+                }}
+                title="Click anything in the preview to jump to its line in the Output field. Links do not open while this is on."
+              >
+                Find in code
+              </button>
+              <select
+                className="ec-select"
+                value={vision}
+                onChange={(e) => setVision(e.target.value as Vision)}
+                aria-label="Simulate vision"
+                title="Shows the preview as it might look with blurred vision or a colour vision difference. An approximation, for spotting things that rely on colour or fine detail."
+              >
+                {VISIONS.map((v) => (
+                  <option key={v.value} value={v.value}>
+                    {v.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           </details>
           <Note title="What this preview is">
@@ -1263,6 +1475,20 @@ export default function EmailCheck() {
               previewed here.
             </Note>
           )}
+          {inspect && (
+            <Note title={picked ? `<${picked.tag}> ${picked.line ? `at line ${picked.line}` : "not found in the code"}` : "Find in code is on"} open>
+              {picked
+                ? `${picked.text ? `"${picked.text}". ` : ""}${picked.line ? "That line is selected in the Output field. The match counts elements in order, so in badly nested code it can be a line or two out." : "This element is not in the source as written; the browser added it while repairing the markup."}`
+                : "Click anything in the preview to jump to its line in the Output field. Links do not open while this is on."}
+            </Note>
+          )}
+          {vision !== "none" && (
+            <Note title={`Vision: ${VISIONS.find((v) => v.value === vision)?.label}`} open>
+              {VISIONS.find((v) => v.value === vision)?.about} This is an approximation drawn over the preview, not a medical model, and it is not included in
+              a saved image.
+            </Note>
+          )}
+          {outlines && <Note title="Outlines on">Pink is a table, dashed blue is a cell. Outlook-only tables inside conditional comments are not drawn, because a browser does not see them.</Note>}
           {stylesOff && (
             <Note title="Style blocks off" sources={NOTE_SOURCES.stylesOff}>
               Roughly what clients without style support show, such as the Gmail app on a non-Google account: inline styles only, no media queries.
@@ -1289,11 +1515,23 @@ export default function EmailCheck() {
               title="Email preview"
               // Same origin so the height can be read; no scripts run in it.
               sandbox="allow-same-origin"
-              srcDoc={previewSource(sample ? sampled.src : output, imagesOff, stylesOff, dark)}
+              srcDoc={previewSource(sample ? sampled.src : output, imagesOff, stylesOff, dark, outlines)}
               onLoad={onFrameLoad}
-              style={{ width: width ? `${width}px` : "100%" }}
+              className={inspect ? "ec-inspecting" : undefined}
+              style={{ width: width ? `${width}px` : "100%", filter: VISIONS.find((v) => v.value === vision)?.filter || undefined }}
             />
           )}
+          <svg className="ec-filters" aria-hidden="true" focusable="false">
+            <filter id="ec-protan" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0" />
+            </filter>
+            <filter id="ec-deutan" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0" />
+            </filter>
+            <filter id="ec-tritan" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0" />
+            </filter>
+          </svg>
         </div>
       </Panel>
     </main>
