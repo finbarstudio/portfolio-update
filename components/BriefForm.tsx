@@ -26,6 +26,7 @@ const UPDATE_HOW = ["I do it myself", "Someone on my team does", "I pay a web pe
 const UPDATE_EASE = ["Easy", "Fiddly but I manage", "Painful, I avoid it"];
 const PLATFORMS = ["WordPress", "Wix", "Squarespace", "Shopify", "GoDaddy", "Custom built", "No idea"];
 const PLATFORM_HAPPY = ["Yes, it works for me", "It is fine, but I would change if it were easy", "No, I would prefer something else"];
+const SEO_HOW = ["I write or edit pages and check the SEO scores myself", "It was set up once and left alone", "Someone else looks after it", "I do not do anything for SEO"];
 const SWITCH = ["Yes, happy to move", "Yes, as long as I can still update it myself", "I would prefer to stay where I am", "Not sure, tell me more"];
 const LOGINS = ["Yes, I have them all", "Some of them", "No, someone else set it up", "Not sure"];
 const UPDATE_WAY = ["A simple editing screen I log in to", "Send the change to you", "Not sure yet"];
@@ -70,6 +71,8 @@ const ORDER: [string, string][] = [
   ["platform_happy", "Happy with the platform"],
   ["update_how", "Who updates it now"],
   ["update_ease", "How updating feels now"],
+  ["seo_how", "How SEO is handled now"],
+  ["seo_who", "Who else manages SEO"],
   ["switch", "Willing to move platform"],
   ["platform_miss", "What they would miss from the platform"],
   ["logins", "Has domain and site logins"],
@@ -239,6 +242,12 @@ export default function BriefForm() {
         <Choice label="How does updating it feel right now?">
           <Chips name="update_ease" type="radio" options={UPDATE_EASE} />
         </Choice>
+        <Choice label="How is the SEO on your current site looked after?" hint="SEO means the work that helps your site show up in Google.">
+          <Chips name="seo_how" type="radio" options={SEO_HOW} />
+        </Choice>
+        <Field label="Does anyone else manage your SEO?" hint="Optional. A person, an agency, or a tool you pay for.">
+          <Text name="seo_who" rows={2} />
+        </Field>
         <div className="brief-note">
           <p>
             <strong>Worth knowing before you go on.</strong> I do not work in website builders such
@@ -314,7 +323,7 @@ export default function BriefForm() {
         <Field label="If the new site could only do one thing well, what should it be?">
           <Text name="one_thing" rows={2} />
         </Field>
-        <Choice label="How do most of your customers look at your site?" hint="I design the phone version first, because that is where most people will see it.">
+        <Choice label="How do most of your customers look at your site?" hint="I design the phone version as its own site, so it is never a squeezed-down copy of the desktop one.">
           <Chips name="devices" type="radio" options={DEVICES} />
         </Choice>
         <Field label="Is there anything about your current site that is awkward on a phone?" hint="Optional. Small text, buttons that are hard to tap, a menu that hides things.">
