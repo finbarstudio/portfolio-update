@@ -38,7 +38,7 @@
 import { media as mediaOne, mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number; /** in the dark theme, melt the top and bottom edges of a clip on black into the page */ fade?: boolean };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -276,7 +276,7 @@ const RAW: Slide[] = [
       "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
     meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }, study("london-home-show")],
   },
-  one("portfolio/london-home-show/event-wheel.webm", "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", { frame: false, fade: true }),
+  one("portfolio/london-home-show/event-orbit.webm", "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", { frame: false }),
 
   /* ── Plated with Issy ──────────────────────────────────────── */
   { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },

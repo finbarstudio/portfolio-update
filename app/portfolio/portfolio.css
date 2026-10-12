@@ -271,20 +271,6 @@ body:has(.pf) { background: #1a1a1a; }
   transition: opacity 0.5s ease;
 }
 .pf-item :is(img, video)[data-in="1"] { opacity: 1; }
-/* a clip on black whose pictures run off its top and bottom: in the dark theme
-   those two edges melt into the page instead of ending in a hard cut */
-.pf-item.is-faded::before, .pf-item.is-faded::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 9%;
-  z-index: 1;
-  pointer-events: none;
-}
-.pf-item.is-faded::before { top: 0; background: linear-gradient(to bottom, var(--paper), transparent); }
-.pf-item.is-faded::after { bottom: 0; background: linear-gradient(to top, var(--paper), transparent); }
-html[data-pf-theme="light"] .pf-item.is-faded::before, html[data-pf-theme="light"] .pf-item.is-faded::after { content: none; }
 
 /* the sound switch on a clip with a soundtrack: bottom right of the frame */
 .pf-sound {
