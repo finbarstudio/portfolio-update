@@ -21,6 +21,8 @@ import { corsMedia } from "@/lib/media";
  */
 
 const MAX = 4;
+/** ms a clip rests on its first frame before its first play (longer than its 0.5s fade-in) */
+const START_HOLD = 1100;
 let active = 0;
 const waiting: { go: () => void; group?: string }[] = [];
 
@@ -127,14 +129,26 @@ export default function PfMedia({ src: dark, light, video, sound, alt, w, h, gro
     };
   }, [src, video]);
 
-  // Clips play only while on screen.
+  // Clips play only while on screen. The first time a clip plays it holds on
+  // its opening frame for a moment: if the reader watched it load to 100%, it
+  // fades in and settles before it moves, not jumping straight into motion.
+  const begun = useRef(false);
   useEffect(() => {
     const v = clip.current;
     if (!v || !url) return;
+    begun.current = false;
+    let wait: ReturnType<typeof setTimeout> | undefined;
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) v.play().catch(() => {});
-        else {
+        clearTimeout(wait);
+        if (entry.isIntersecting) {
+          if (begun.current) v.play().catch(() => {});
+          else
+            wait = setTimeout(() => {
+              begun.current = true;
+              v.play().catch(() => {});
+            }, START_HOLD);
+        } else {
           v.pause();
           setLoud(false); // scrolled away: back to silent, so sound never plays unseen
         }
@@ -142,7 +156,10 @@ export default function PfMedia({ src: dark, light, video, sound, alt, w, h, gro
       { threshold: 0.2 },
     );
     io.observe(v);
-    return () => io.disconnect();
+    return () => {
+      clearTimeout(wait);
+      io.disconnect();
+    };
   }, [url]);
 
   return (
