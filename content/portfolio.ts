@@ -166,7 +166,7 @@ const RAW: Slide[] = [
   one("portfolio/lows/logo-zoom.mp4", "The brand", { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
   linked("portfolio/lows/macbook.webm", "The website", { label: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }),
   linked("portfolio/lows/iphone-instagram.webm", "The Instagram profile", { label: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }),
-  bleed("portfolio/lows/van.webp"),
+  one("portfolio/lows/signage-wheel.webm", "The identity on signs, a billboard and a site flag. These are mockups", { frame: false }),
   {
     kind: "quote",
     name: "Lows Design + Build",
