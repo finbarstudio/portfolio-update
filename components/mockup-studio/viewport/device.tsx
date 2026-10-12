@@ -5,7 +5,6 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import {
   CanvasTexture,
-  type Color,
   type Group,
   LinearMipmapLinearFilter,
   MathUtils,
@@ -32,6 +31,7 @@ import {
   shapeSound,
   soundUnlocked,
 } from "./screen-audio";
+import { updateBounceFrame } from "./screen-bounce";
 import { type ScreenSurface, updateScreenSurface } from "./screen-material";
 
 interface DeviceProps {
@@ -183,7 +183,6 @@ function useScreenMedia(
       uniforms.uHasMap.value = 0;
       runtime.refreshScreen = null;
       runtime.framed = false;
-      runtime.screenColor.setRGB(0, 0, 0);
     };
 
     if (frame.style === "none") {
@@ -199,8 +198,6 @@ function useScreenMedia(
               source.texture.needsUpdate = true;
             }
           : null;
-      if (source.kind === "image")
-        sampleAverage(source.element, runtime.screenColor);
       return clear;
     }
 
@@ -242,7 +239,6 @@ function useScreenMedia(
     uniforms.uVideo.value = 0;
     runtime.framed = true;
     runtime.refreshScreen = source.kind === "video" ? draw : null;
-    if (source.kind === "image") sampleAverage(canvas, runtime.screenColor);
     return () => {
       texture.dispose();
       clear();
@@ -258,38 +254,10 @@ const EDGE_TO_EDGE = {
   offsetY: 0,
 } as const;
 
-/** How often the screen's light colour is re-read from a playing video, in frames. */
-const VIDEO_SAMPLE_EVERY = 6;
-/** Area-light intensity for a full-white screen at 100% spill. */
-const SPILL_MAX = 5;
-
-let sampler: CanvasRenderingContext2D | null = null;
-
-/** Average colour of an image or video frame, written into `out` as linear colour. */
-function sampleAverage(source: CanvasImageSource, out: Color): void {
-  if (!sampler) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 8;
-    canvas.height = 8;
-    sampler = canvas.getContext("2d", { willReadFrequently: true });
-  }
-  if (!sampler) return;
-  sampler.clearRect(0, 0, 8, 8);
-  sampler.drawImage(source, 0, 0, 8, 8);
-  const { data } = sampler.getImageData(0, 0, 8, 8);
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    // Transparent pixels show as black on the screen.
-    const alpha = data[i + 3] / 255;
-    r += data[i] * alpha;
-    g += data[i + 1] * alpha;
-    b += data[i + 2] * alpha;
-  }
-  const scale = 1 / (255 * 64);
-  out.setRGB(r * scale, g * scale, b * scale, SRGBColorSpace);
-}
+/** How strongly the picture shows in the body at Body Reflection 100. */
+const BOUNCE_MAX = 10;
+/** How much light the screen throws onto what faces it at Light Spill 100. */
+const SPILL_MAX = 2.5;
 
 interface DeviceModelProps extends DeviceProps {
   def: DeviceDef;
@@ -298,7 +266,9 @@ interface DeviceModelProps extends DeviceProps {
 function DeviceModel({ def, runtime }: DeviceModelProps) {
   // Models are media: they come off the bucket through media(). Compressed ones are unpacked by drei's stock decoder.
   const gltf = useGLTF(media(def.url), true);
-  const [prepared] = useState(() => prepareDevice(gltf.scene, def));
+  const [prepared] = useState(() =>
+    prepareDevice(gltf.scene, def, runtime.bounce),
+  );
   const { screen } = prepared;
 
   const bodyColor = useStudio((s) => s.bodyColor);
@@ -306,8 +276,6 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
   useScreenMedia(screen, runtime, def);
 
   useEffect(() => applyBodyColor(prepared, bodyColor), [prepared, bodyColor]);
-
-  const frame = useRef(0);
 
   // The first click or key press anywhere lets the video's sound through.
   useEffect(() => {
@@ -345,21 +313,15 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
       );
     }
 
-    const light = prepared.screenLight;
-    if (light) {
-      const video = runtime.video;
-      frame.current += 1;
-      if (
-        video &&
-        video.readyState >= 2 &&
-        (runtime.exportMs !== null || frame.current % VIDEO_SAMPLE_EVERY === 0)
-      )
-        sampleAverage(video, runtime.screenColor);
-      const v = runtime.values;
-      light.color.copy(runtime.screenColor);
-      light.intensity =
-        (v["screen.spill"] / 100) * (v["screen.opacity"] / 100) * SPILL_MAX;
+    if (prepared.screenFrame) {
+      prepared.root.updateMatrixWorld(true);
+      updateBounceFrame(runtime.bounce, prepared.screenFrame);
     }
+    const v = runtime.values;
+    runtime.bounce.uBounceAmount.value =
+      (v["screen.bounce"] / 100) * BOUNCE_MAX;
+    runtime.bounce.uBounceSoft.value = v["screen.bounceSoft"] / 100;
+    runtime.bounce.uBounceWash.value = (v["screen.spill"] / 100) * SPILL_MAX;
 
     if (screen) {
       const { media, lights, background } = useStudio.getState();
@@ -380,7 +342,7 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
   useEffect(() => {
     const { x, y, z } = prepared.extents;
     runtime.deviceExtents.copy(prepared.extents);
-    runtime.focusTarget = prepared.screenLight;
+    runtime.focusTarget = prepared.screenAnchor;
     // So the device drops a shadow on the floor when there is one.
     prepared.root.traverse((object) => {
       if ("isMesh" in object && object.isMesh) object.castShadow = true;

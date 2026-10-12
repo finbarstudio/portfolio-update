@@ -9,14 +9,17 @@ import {
   Mesh,
   type MeshPhysicalMaterial,
   MeshStandardMaterial,
-  type Object3D,
+  Object3D,
   Raycaster,
-  RectAreaLight,
   Vector3,
 } from "three";
-import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import type { DeviceDef, ScreenPlane } from "@/lib/mockup-studio/scene/devices";
 import type { ScreenBox } from "@/lib/mockup-studio/scene/framing";
+import {
+  applyScreenBounce,
+  type BounceUniforms,
+  type ScreenFrame,
+} from "./screen-bounce";
 import { createScreenSurface, type ScreenSurface } from "./screen-material";
 
 export interface PreparedDevice {
@@ -31,22 +34,18 @@ export interface PreparedDevice {
   body: BodyMaterial[];
   /** Present when the device has a hinged lid. */
   lid: LidRig | null;
-  /** Light given off by the screen, when there is one. */
-  screenLight: RectAreaLight | null;
+  /** Sits at the centre of the screen and rides with it: where the camera focuses. Null without a screen. */
+  screenAnchor: Object3D | null;
+  /** The screen's corners, for the body to reflect it. Null without a screen. */
+  screenFrame: ScreenFrame | null;
   /** Width, height and depth after normalising, in world units. */
   extents: Vector3;
   /** Where the screen sits in those units, measured from the device's centre. Null without a screen. */
   screenBox: ScreenBox | null;
 }
 
-// Area lights need their lookup textures registered once before any material uses them.
-RectAreaLightUniformsLib.init();
-
-/**
- * A light the size and shape of the screen, facing the way the screen faces, so the display lights whatever is in
- * front of it. It rides on the screen mesh, so it follows a laptop lid.
- */
-function createScreenLight(screenMesh: Mesh, parent: Object3D): RectAreaLight {
+/** An empty object at the centre of the screen, riding on the screen mesh so it follows a laptop lid. */
+function createScreenAnchor(screenMesh: Mesh): Object3D {
   screenMesh.updateWorldMatrix(true, false);
   const position = screenMesh.geometry.getAttribute("position");
   const box = new Box3();
@@ -58,27 +57,10 @@ function createScreenLight(screenMesh: Mesh, parent: Object3D): RectAreaLight {
         .applyMatrix4(screenMesh.matrixWorld),
     );
   }
-  const size = box.getSize(new Vector3());
-  const center = box.getCenter(new Vector3());
-  const normalAttribute = screenMesh.geometry.getAttribute("normal");
-  const normal = normalAttribute
-    ? new Vector3()
-        .fromBufferAttribute(normalAttribute, 0)
-        .transformDirection(screenMesh.matrixWorld)
-    : new Vector3(0, 0, 1);
-
-  // The screen runs across X; a tilted lid spreads its height over Y and Z.
-  const light = new RectAreaLight(
-    0xffffff,
-    0,
-    size.x,
-    Math.hypot(size.y, size.z),
-  );
-  parent.add(light);
-  light.position.copy(center).addScaledVector(normal, size.x * 0.002);
-  light.lookAt(center.clone().add(normal));
-  screenMesh.attach(light);
-  return light;
+  const anchor = new Object3D();
+  anchor.position.copy(box.getCenter(new Vector3()));
+  screenMesh.attach(anchor);
+  return anchor;
 }
 
 export interface LidRig {
@@ -367,7 +349,10 @@ function conformToSurface(plane: Mesh, model: Object3D, width: number): void {
  * top-left), measured in the upright device frame. Deriving it from positions rather than the model's UVs means the
  * content spans exactly the screen and comes out upright however the model's UV islands are laid out.
  */
-function withScreenCoords(mesh: Mesh, flipV: boolean): BufferGeometry {
+function withScreenCoords(
+  mesh: Mesh,
+  flipV: boolean,
+): { geometry: BufferGeometry; frame: ScreenFrame } {
   const geometry = mesh.geometry.clone();
   const position = geometry.getAttribute("position");
   const point = new Vector3();
@@ -411,12 +396,110 @@ function withScreenCoords(mesh: Mesh, flipV: boolean): BufferGeometry {
     coords[i * 2 + 1] = flipV ? 1 - v : v;
   }
   geometry.setAttribute("screenUv", new BufferAttribute(coords, 2));
-  return geometry;
+
+  // The screen's corners in the mesh's own space, from the same measurements: the top-left corner is where both
+  // coordinates are 0, the edges run the full width along `right` and the full height down the face.
+  const down = new Vector3().crossVectors(facing, right).normalize();
+  if (down.y > 0) down.negate();
+  if (flipV) down.negate();
+  const centre = new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0);
+  // The centre's depth: the mean of the vertices, which sits on the face of a flat screen.
+  const mean = new Vector3();
+  for (let i = 0; i < position.count; i++)
+    mean.add(
+      point.fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld),
+    );
+  mean.divideScalar(position.count);
+  const inPlane = new Vector3()
+    .copy(right)
+    .multiplyScalar(centre.x - mean.dot(right));
+  centre.copy(mean).add(inPlane);
+  centre.y = (minY + maxY) / 2;
+  const acrossWorld = right.clone().multiplyScalar(width);
+  const downWorld = down
+    .clone()
+    .multiplyScalar(height / Math.max(Math.abs(down.y), 1e-4));
+  const originWorld = centre
+    .clone()
+    .addScaledVector(acrossWorld, -0.5)
+    .addScaledVector(downWorld, -0.5);
+  const toLocal = mesh.matrixWorld.clone().invert();
+  const origin = originWorld.clone().applyMatrix4(toLocal);
+  const frame: ScreenFrame = {
+    mesh,
+    origin,
+    across: originWorld
+      .clone()
+      .add(acrossWorld)
+      .applyMatrix4(toLocal)
+      .sub(origin),
+    down: originWorld.clone().add(downWorld).applyMatrix4(toLocal).sub(origin),
+    facing: facing.clone().transformDirection(toLocal),
+  };
+  return { geometry, frame };
+}
+
+/**
+ * Every material that is not the screen reflects it. Materials the tint already cloned are patched in place; the
+ * rest are cloned here so the cached glTF stays untouched. `detail` tells a field of keycaps from a slab: triangles
+ * per unit of surface, relative to the device's median, so a finely modelled part scatters the picture more.
+ */
+function collectBounce(
+  model: Object3D,
+  screenMeshes: Mesh[],
+  body: BodyMaterial[],
+  shared: BounceUniforms,
+): Material[] {
+  const owned = new Set(body.map((part) => part.material));
+  const clones = new Map<MeshStandardMaterial, MeshStandardMaterial>();
+  const meshesOf = new Map<MeshStandardMaterial, Mesh[]>();
+  const size = new Vector3();
+  const scale = new Vector3();
+  model.traverse((object) => {
+    if (!isMesh(object) || screenMeshes.includes(object)) return;
+    const source = object.material;
+    if (!(source instanceof MeshStandardMaterial)) return;
+    let material = source;
+    if (!owned.has(source)) {
+      let clone = clones.get(source);
+      if (!clone) {
+        clone = source.clone();
+        clones.set(source, clone);
+      }
+      object.material = clone;
+      material = clone;
+    }
+    meshesOf.set(material, [...(meshesOf.get(material) ?? []), object]);
+  });
+  const densities = new Map<MeshStandardMaterial, number>();
+  for (const [material, meshes] of meshesOf) {
+    let triangles = 0;
+    let area = 0;
+    for (const mesh of meshes) {
+      const geometry = mesh.geometry;
+      triangles +=
+        (geometry.index?.count ?? geometry.getAttribute("position").count) / 3;
+      geometry.computeBoundingBox();
+      geometry.boundingBox?.getSize(size);
+      size.multiply(mesh.getWorldScale(scale));
+      // Surface of the box, rather than its volume, since parts are mostly flat.
+      area += 2 * (size.x * size.y + size.y * size.z + size.z * size.x);
+    }
+    densities.set(material, triangles / Math.max(area, 1e-9));
+  }
+  const sorted = [...densities.values()].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)] || 1;
+  for (const [material, density] of densities) {
+    const detail = Math.min(1.6, Math.max(0.6, Math.sqrt(density / median)));
+    applyScreenBounce(material, shared, detail);
+  }
+  return [...clones.values()];
 }
 
 export function prepareDevice(
   source: Object3D,
   def: DeviceDef,
+  bounce: BounceUniforms,
 ): PreparedDevice {
   const model = source.clone(true);
   const ownedMaterials: Material[] = [];
@@ -437,7 +520,8 @@ export function prepareDevice(
 
   const ownedGeometries: BufferGeometry[] = [];
   let screen: ScreenSurface | null = null;
-  let screenLight: RectAreaLight | null = null;
+  let screenAnchor: Object3D | null = null;
+  let screenFrame: ScreenFrame | null = null;
   let screenMeshes: Mesh[];
   if (def.screenPlane) {
     const plane = createScreenPlane(def.screenPlane);
@@ -452,9 +536,14 @@ export function prepareDevice(
   oriented.updateMatrixWorld(true);
   if (screenMeshes.length) {
     // Every face shares one material, so they all show the same content with the same effects.
-    screen = createScreenSurface();
+    screen = createScreenSurface(bounce);
     for (const screenMesh of screenMeshes) {
-      const geometry = withScreenCoords(screenMesh, def.flipScreenV === true);
+      const { geometry, frame } = withScreenCoords(
+        screenMesh,
+        def.flipScreenV === true,
+      );
+      // The first face is the one the body reflects.
+      screenFrame ??= frame;
       ownedGeometries.push(geometry);
       screenMesh.geometry = geometry;
       screenMesh.material = screen.material;
@@ -462,10 +551,11 @@ export function prepareDevice(
       glass.renderOrder = 1;
       screenMesh.add(glass);
     }
-    screenLight = createScreenLight(screenMeshes[0], oriented);
+    screenAnchor = createScreenAnchor(screenMeshes[0]);
   }
 
   const body = collectBody(model, def, screenMeshes);
+  ownedMaterials.push(...collectBounce(model, screenMeshes, body, bounce));
 
   const box = new Box3().setFromObject(oriented, true);
   const size = box.getSize(new Vector3());
@@ -496,7 +586,8 @@ export function prepareDevice(
     ownedMaterials,
     body,
     lid,
-    screenLight,
+    screenAnchor,
+    screenFrame,
     screenBox,
     extents: size.clone().multiplyScalar(scale),
   };

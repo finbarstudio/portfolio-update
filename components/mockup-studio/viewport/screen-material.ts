@@ -3,13 +3,12 @@ import {
   Color,
   MeshPhysicalMaterial,
   ShaderMaterial,
-  type Texture,
   Uniform,
-  Vector2,
   Vector3,
 } from "three";
 import { lampPosition } from "@/lib/mockup-studio/scene/lamps";
 import type { Light, Media, MediaFit, Values } from "@/lib/mockup-studio/scene/types";
+import { MEDIA_GLSL, type MediaUniforms } from "./screen-bounce";
 import { TONE_GLSL } from "./tone";
 
 /**
@@ -34,60 +33,18 @@ void main() {
 `;
 
 const FRAGMENT = /* glsl */ `
-uniform sampler2D uMap;
-uniform float uHasMap;
-uniform float uMediaAspect;
-uniform float uScreenAspect;
-uniform float uFit;
-uniform float uScale;
-uniform vec2 uOffset;
-uniform float uOpacity;
 uniform float uCrt;
 uniform float uGhosting;
 uniform float uDepth;
-uniform float uVideo;
 
 varying vec2 vScreen;
 varying vec3 vViewPosition;
 
 ${TONE_GLSL}
+${MEDIA_GLSL}
 
 // Pixels across the width of the screen.
 const float CRT_CELLS = 340.0;
-
-// Video frames arrive sRGB encoded: three uploads them without an sRGB internal format and leaves the decoding to the
-// shader, where its own materials do it. Without this a video reads as linear light and gets gamma applied twice,
-// which lifts its blacks.
-vec3 srgbToLinear(vec3 c) {
-  vec3 low = c / 12.92;
-  vec3 high = pow((c + 0.055) / 1.055, vec3(2.4));
-  return mix(high, low, vec3(lessThanEqual(c, vec3(0.04045))));
-}
-
-// Media sampled with the fit, scale and offset applied. s is screen uv with the origin top-left.
-vec3 mediaColor(vec2 s) {
-  float screenOverMedia = uScreenAspect / uMediaAspect;
-  vec2 span = vec2(1.0);
-  if (uFit < 0.5) {
-    span = vec2(min(1.0, screenOverMedia), min(1.0, 1.0 / screenOverMedia));
-  } else if (uFit < 1.5) {
-    span = vec2(max(1.0, screenOverMedia), max(1.0, 1.0 / screenOverMedia));
-  }
-  vec2 m = 0.5 + (s - 0.5 - vec2(uOffset.x, -uOffset.y)) * span / uScale;
-  vec4 texel = texture2D(uMap, clamp(m, 0.0, 1.0));
-  if (uVideo > 0.5) {
-    texel.rgb = srgbToLinear(texel.rgb);
-  }
-  float inside = step(0.0, m.x) * step(m.x, 1.0) * step(0.0, m.y) * step(m.y, 1.0);
-  return texel.rgb * texel.a * inside;
-}
-
-vec3 contentAt(vec2 s) {
-  float onScreen = step(0.0, s.x) * step(s.x, 1.0) * step(0.0, s.y) * step(s.y, 1.0);
-  // With nothing on it the panel is off: true black, like an OLED.
-  vec3 content = uHasMap > 0.5 ? mediaColor(s) : vec3(0.0);
-  return content * onScreen;
-}
 
 // Where the line of sight meets a panel sitting uDepth (a fraction of the screen's width) below the glass, in screen
 // uv. This is what makes the picture read as being behind the glass: it slides against the bezel as the view turns.
@@ -160,24 +117,12 @@ void main() {
 }
 `;
 
-export interface ScreenUniforms {
-  uMap: Uniform<Texture | null>;
-  /** 1 once the media has something to show. */
-  uHasMap: Uniform<number>;
-  uMediaAspect: Uniform<number>;
-  uScreenAspect: Uniform<number>;
-  /** 0 cover, 1 contain, 2 stretch */
-  uFit: Uniform<number>;
-  uScale: Uniform<number>;
-  uOffset: Uniform<Vector2>;
-  /** 0..1, like the next three. */
-  uOpacity: Uniform<number>;
+export interface ScreenUniforms extends MediaUniforms {
+  /** 0..1, like the next one. */
   uCrt: Uniform<number>;
   uGhosting: Uniform<number>;
   /** How far the panel sits below the glass, as a fraction of the screen's width. */
   uDepth: Uniform<number>;
-  /** 1 when uMap is a video, whose frames the shader must decode from sRGB itself. */
-  uVideo: Uniform<number>;
 }
 
 /** Lamps the glass can show at once. */
@@ -230,20 +175,21 @@ export interface ScreenSurface {
   };
 }
 
-export function createScreenSurface(): ScreenSurface {
+/** `media` is shared with the body materials, which reflect whatever the screen shows. */
+export function createScreenSurface(media: MediaUniforms): ScreenSurface {
   const uniforms: ScreenUniforms = {
-    uMap: new Uniform<Texture | null>(null),
-    uHasMap: new Uniform(0),
-    uMediaAspect: new Uniform(1),
-    uScreenAspect: new Uniform(1),
-    uFit: new Uniform(0),
-    uScale: new Uniform(1),
-    uOffset: new Uniform(new Vector2()),
-    uOpacity: new Uniform(1),
+    uMap: media.uMap,
+    uHasMap: media.uHasMap,
+    uMediaAspect: media.uMediaAspect,
+    uScreenAspect: media.uScreenAspect,
+    uFit: media.uFit,
+    uScale: media.uScale,
+    uOffset: media.uOffset,
+    uOpacity: media.uOpacity,
+    uVideo: media.uVideo,
     uCrt: new Uniform(0),
     uGhosting: new Uniform(0),
     uDepth: new Uniform(0),
-    uVideo: new Uniform(0),
   };
   const material = new ShaderMaterial({
     uniforms: { ...uniforms },

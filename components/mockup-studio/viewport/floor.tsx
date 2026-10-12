@@ -13,6 +13,7 @@ import {
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { FloorKind } from "@/lib/mockup-studio/scene/types";
 import type { ViewportRuntime } from "./runtime";
+import { applyScreenBounce } from "./screen-bounce";
 
 /**
  * A ground plane under the device for things that stand on the street or a desk. The surfaces are drawn, not
@@ -279,14 +280,17 @@ export function Floor({ runtime }: { runtime: ViewportRuntime }) {
   const material = useMemo(() => {
     if (kind === "none") return null;
     const p = surface(kind);
-    return new MeshStandardMaterial({
+    const material = new MeshStandardMaterial({
       map: p.map,
       roughnessMap: p.roughnessMap,
       roughness: p.roughness,
       metalness: p.metalness,
       envMapIntensity: 0.35,
     });
-  }, [kind]);
+    // A lit screen shows in the ground it stands on, like it does in the device's own body.
+    applyScreenBounce(material, runtime.bounce, 1);
+    return material;
+  }, [kind, runtime]);
 
   useEffect(() => () => material?.dispose(), [material]);
 

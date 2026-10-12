@@ -235,7 +235,25 @@ export const PARAMS = {
     step: 1,
     default: 2,
   },
-  /** How much the lit screen spills its own colour onto nearby surfaces, such as a laptop keyboard. */
+  /** How strongly the picture on the screen shows in the body: a keyboard, a stand, a desk. 0 = off. */
+  "screen.bounce": {
+    label: "Body Reflection",
+    group: "screen",
+    min: 0,
+    max: 100,
+    step: 1,
+    default: 50,
+  },
+  /** How soft that reflection is, before each surface's own roughness is counted. */
+  "screen.bounceSoft": {
+    label: "Reflection Softness",
+    group: "screen",
+    min: 0,
+    max: 100,
+    step: 1,
+    default: 75,
+  },
+  /** How much light the lit screen throws onto whatever faces it, as a soft wash of its own colours. */
   "screen.spill": {
     label: "Light Spill",
     group: "screen",
