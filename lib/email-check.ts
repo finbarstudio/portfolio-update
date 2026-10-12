@@ -1877,13 +1877,17 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       { lines: wrongDay.map((d) => d.line), howTo: { text: "Check the date against a calendar and correct the day or the date." } },
     );
   }
-  const passed = dated.filter((d) => new Date(d.year ?? today.getFullYear(), d.month, d.day) < today);
+  // A date with no year belongs to next year when the copy names next year ("Spring 2027").
+  const copyYears = [...textRuns(src).map((r) => r.text).join(" ").matchAll(/\b(20\d{2})\b/g)].map((m) => Number(m[1]));
+  const laterYears = copyYears.filter((y) => y > today.getFullYear());
+  const impliedYear = laterYears.length ? Math.min(...laterYears) : today.getFullYear();
+  const passed = dated.filter((d) => new Date(d.year ?? impliedYear, d.month, d.day) < today);
   if (passed.length) {
     add(
       "text-date-passed",
       "info",
       `Mentions a date that has passed: ${[...new Set(passed.map((d) => `"${d.text}"`))].slice(0, 4).join(", ")}`,
-      `Today is ${today.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}. If this email is about to be sent, an event or deadline on that date is already over. A date with no year is read as this year.`,
+      `Today is ${today.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}. If this email is about to be sent, an event or deadline on that date is already over. A date with no year is read as this year, unless the copy names a later year.`,
       { lines: passed.map((d) => d.line), howTo: { text: "Update the date, or confirm this is an old email being reviewed." } },
     );
   }
