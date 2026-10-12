@@ -1,6 +1,6 @@
 /** Draws one frame of a motion preset with WebGL: textured, rounded cards in 3D. */
 
-import { cardAspect, clamp, layoutFrame, type CounterStyle, type Look, type Settings } from "./engine";
+import { cardAspect, clamp, layoutFrame, type CounterStyle, type Frame, type Look, type Settings } from "./engine";
 
 export interface MediaItem {
   id: number;
@@ -93,6 +93,45 @@ const UNIFORMS = ["uMatrix", "uSize", "uCrop", "uRadius", "uAlpha", "uShade", "u
 const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 const SERIF = 'Georgia, "Times New Roman", serif';
+
+/**
+ * The cards of a frame that can actually be seen: drawn, not faded out, and
+ * with some part of them inside the canvas.
+ */
+export function cardsOnScreen(frame: Frame, aspect: number): Set<number> {
+  const { camera } = frame;
+  let view = translate(0, 0, -camera.distance);
+  view = multiply(view, rotateX(camera.tilt));
+  view = multiply(view, rotateY(camera.yaw));
+  view = multiply(view, rotateZ(camera.roll));
+  view = multiply(view, translate(-camera.x, -camera.y, 0));
+  const projection = perspective(camera.fov, aspect, 0.1, 100);
+  const seen = new Set<number>();
+  for (const t of frame.items) {
+    if (t.a < 0.02) continue;
+    let model = translate(t.x, t.y, t.z);
+    if (t.ry) model = multiply(model, rotateY(t.ry));
+    if (t.rx) model = multiply(model, rotateX(t.rx));
+    if (t.rz) model = multiply(model, rotateZ(t.rz));
+    const m = multiply(projection, multiply(view, multiply(model, scale(frame.w * t.s, frame.h * t.s))));
+    let left = Infinity;
+    let right = -Infinity;
+    let bottom = Infinity;
+    let top = -Infinity;
+    for (const [x, y] of [[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]]) {
+      const w = m[3] * x + m[7] * y + m[15];
+      if (w <= 0.01) continue; // behind the camera
+      const px = (m[0] * x + m[4] * y + m[12]) / w;
+      const py = (m[1] * x + m[5] * y + m[13]) / w;
+      left = Math.min(left, px);
+      right = Math.max(right, px);
+      bottom = Math.min(bottom, py);
+      top = Math.max(top, py);
+    }
+    if (left < 1 && right > -1 && bottom < 1 && top > -1) seen.add(t.i);
+  }
+  return seen;
+}
 
 /** A small dark pill with an upload's number, for the corner of its card. */
 function tagPicture(text: string): HTMLCanvasElement {

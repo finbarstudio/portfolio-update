@@ -24,6 +24,7 @@ import {
   canvasSide,
   cardAspect,
   focusTimes,
+  layoutFrame,
   newFocusPlayback,
   hasCounter,
   clamp,
@@ -50,7 +51,7 @@ import {
 } from "./engine";
 import { ArrayBufferTarget, Muxer } from "mp4-muxer";
 import ColourPicker from "./ColourPicker";
-import { createRenderer, type MediaItem, type Renderer, type Scene } from "./renderer";
+import { cardsOnScreen, createRenderer, type MediaItem, type Renderer, type Scene } from "./renderer";
 
 interface Thumb {
   id: number;
@@ -774,42 +775,43 @@ export default function MotionTool() {
     });
   };
 
-  /** How far into its video each upload should be, when videos play once on focus. */
+  /** How far into its video each upload should be at this moment of the loop. */
   const videoTimes = (state: FocusPlayback, seconds: number) => {
     const scene = sceneRef.current;
-    const lengths = mediaRef.current.map((item) => (item.video ? lastMoment(item.video) : 0));
-    return focusTimes(state, seconds, scene, scene.look.width / scene.look.height, cardAspect(scene.look), lengths, scene.look);
+    const media = mediaRef.current;
+    const aspect = scene.look.width / scene.look.height;
+    const shape = cardAspect(scene.look);
+    const lengths = media.map((item) => (item.video ? lastMoment(item.video) : 0));
+    return focusTimes(state, seconds, scene.motion.duration, lengths, scene.look, (moment) => {
+      const frame = layoutFrame(scene, moment, aspect, shape);
+      return { focus: frame.focus === null ? null : frame.focus % media.length, shown: new Set([...cardsOnScreen(frame, aspect)].map((card) => card % media.length)) };
+    });
   };
 
   /**
-   * The live preview: videos either run round and round on their own, or each
-   * is started once as its card comes into focus and left to play through.
+   * The live preview. A video running forwards is left to play by itself and
+   * only pulled back into line if it has drifted; otherwise it is put where it
+   * should be and held there.
    */
   const playbackRef = useRef(newFocusPlayback());
   const wantedRef = useRef<number[]>([]);
   const steerVideos = (seconds: number) => {
     const media = mediaRef.current;
     if (!media.some((item) => item.video)) return;
-    if (sceneRef.current.look.videoPlay === "loop") {
-      for (const { video } of media) {
-        if (!video) continue;
-        video.loop = true;
-        if (video.paused) void video.play();
-      }
-      return;
-    }
+    const looping = sceneRef.current.look.videoPlay === "loop";
     const times = videoTimes(playbackRef.current, seconds);
     const before = wantedRef.current;
     media.forEach(({ video }, index) => {
       if (!video) return;
-      video.loop = false;
+      video.loop = looping;
       const want = times[index];
-      if (want > (before[index] ?? 0) && want < lastMoment(video)) {
-        // Running forwards: left to play by itself, and only pulled back into line if it has drifted well off.
-        if (video.paused || Math.abs(video.currentTime - want) > 0.35) video.currentTime = want;
+      const length = lengthOf(video);
+      const apart = Math.abs(video.currentTime - want);
+      const off = looping ? Math.min(apart, length - apart) : apart;
+      if (looping || (want > (before[index] ?? 0) && want < lastMoment(video))) {
+        if (!video.seeking && (video.paused || off > 0.35)) video.currentTime = want;
         if (video.paused) void video.play();
       } else {
-        // Holding still or running backwards: a video cannot play in reverse, so it is stepped there picture by picture.
         if (!video.paused) video.pause();
         const to = Math.min(want, lastMoment(video));
         if (!video.seeking && Math.abs(video.currentTime - to) > 0.02) video.currentTime = to;
@@ -1030,8 +1032,8 @@ export default function MotionTool() {
       for (let k = 0; k < total && !failure; k++) {
         const seconds = k / EXPORT_FPS;
         if (videos.length) {
-          const times = scene.look.videoPlay === "focus" ? videoTimes(playback, seconds) : null;
-          await Promise.all(mediaRef.current.map((item, index) => (item.video ? seekTo(item.video, times ? times[index] : seconds, times !== null) : undefined)));
+          const times = videoTimes(playback, seconds);
+          await Promise.all(mediaRef.current.map((item, index) => (item.video ? seekTo(item.video, times[index], scene.look.videoPlay === "focus") : undefined)));
         }
         renderer.draw(seconds, { ...scene, media: mediaRef.current, resolution: 1, fullQuality: true, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
         const picture = new VideoFrame(canvas, { timestamp: Math.round((k * 1_000_000) / EXPORT_FPS), duration: Math.round(1_000_000 / EXPORT_FPS) });
@@ -1335,7 +1337,6 @@ export default function MotionTool() {
             {look.videoPlay === "focus" && (
               <>
                 <Slider label="Start delay" min={0} max={3} step={0.05} typedMin={0} typedMax={60} value={look.videoDelay} onChange={(videoDelay) => patchLook({ videoDelay })} onReset={() => patchLook({ videoDelay: BASE_LOOK.videoDelay })} />
-                <Slider label="Reverse speed" min={0.1} max={4} step={0.05} typedMin={0.05} typedMax={60} value={look.videoReverse} onChange={(videoReverse) => patchLook({ videoReverse })} onReset={() => patchLook({ videoReverse: BASE_LOOK.videoReverse })} />
               </>
             )}
           </>
