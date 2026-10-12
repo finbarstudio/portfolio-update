@@ -2098,6 +2098,8 @@ export const PRESETS: AnimationPreset[] = [
     name: "Close Orbit",
     description:
       "Stays tight on the screen while swinging from one side to the other, the light moving across the glass.",
+    // A swing this wide on something as deep as a shelter leaves the frame; the handheld things suit it.
+    categories: ["Phones and tablets", "Computers and displays", "Wearables"],
     shots: [
       {
         name: "Orbit",

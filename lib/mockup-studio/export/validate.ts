@@ -281,7 +281,13 @@ function readBackground(value: unknown): Background {
     hdriBlur: optional("hdriBlur", 25, 0, 100),
     hdriBrightness: optional("hdriBrightness", 100, 0, 200),
     hdriRotation: optional("hdriRotation", 0, -180, 180),
-    hdriLighting: raw.hdriLighting !== false,
+    hdriUse:
+      raw.hdriUse === "backdrop" || raw.hdriUse === "lighting"
+        ? raw.hdriUse
+        : // Files from before the choice existed had a switch for the lighting.
+          raw.hdriLighting === false
+          ? "backdrop"
+          : "both",
     floor:
       raw.floor === "concrete" ||
       raw.floor === "asphalt" ||

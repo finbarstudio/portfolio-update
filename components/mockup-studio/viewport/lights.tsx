@@ -8,12 +8,14 @@ import {
   type AmbientLight,
   EquirectangularReflectionMapping,
   MathUtils,
+  Quaternion,
   type SpotLight,
   Vector3,
 } from "three";
 import { EXRLoader } from "three/addons/loaders/EXRLoader.js";
 import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
-import { getHdri, type HdriFormat } from "@/lib/mockup-studio/scene/hdris";
+import { media } from "@/lib/media";
+import { getHdri, type HdriFormat, type HdriUse } from "@/lib/mockup-studio/scene/hdris";
 import { lampPosition } from "@/lib/mockup-studio/scene/lamps";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { Light } from "@/lib/mockup-studio/scene/types";
@@ -124,30 +126,56 @@ function StudioLight({ light, runtime }: StudioLightProps) {
 }
 
 /**
- * An environment photo behind the device. With lighting on it also replaces the studio reflections, so the device
- * picks up the colours of the place it appears to be in.
+ * An environment photo: behind the device, lighting it in place of the studio so it picks up the colours of the
+ * place it appears to be in, or both. Lighting only keeps the chosen backdrop colour, with the photo in the
+ * reflections.
  */
-function HdriBackdrop({ url, format }: { url: string; format: HdriFormat }) {
+const UP = new Vector3(0, 1, 0);
+const turned = new Quaternion();
+
+function HdriBackdrop({
+  url,
+  format,
+  use,
+  runtime,
+}: {
+  url: string;
+  format: HdriFormat;
+  use: HdriUse;
+  runtime: ViewportRuntime;
+}) {
   const texture = useLoader(format === "exr" ? EXRLoader : HDRLoader, url);
   const scene = useThree((s) => s.scene);
   const blur = useStudio((s) => s.background.hdriBlur);
   const brightness = useStudio((s) => s.background.hdriBrightness);
   const rotation = useStudio((s) => s.background.hdriRotation);
-  const lighting = useStudio((s) => s.background.hdriLighting);
+  const lighting = use !== "backdrop";
+  const shown = use !== "lighting";
 
   useEffect(() => {
     texture.mapping = EquirectangularReflectionMapping;
+  }, [texture]);
+
+  useEffect(() => {
+    if (!shown) return;
     scene.background = texture;
     return () => {
       scene.background = null;
     };
-  }, [texture, scene]);
+  }, [shown, texture, scene]);
 
   useEffect(() => {
     scene.backgroundBlurriness = (blur / 100) * 0.5;
     scene.backgroundIntensity = brightness / 100;
-    scene.backgroundRotation.y = MathUtils.degToRad(rotation);
-  }, [scene, blur, brightness, rotation]);
+  }, [scene, blur, brightness]);
+
+  // The Turn control, then whatever the ground is doing, so the place stays level with the floor.
+  useFrame(() => {
+    turned
+      .setFromAxisAngle(UP, MathUtils.degToRad(rotation))
+      .premultiply(runtime.ground);
+    scene.backgroundRotation.setFromQuaternion(turned);
+  });
 
   useEffect(() => {
     if (!lighting) return;
@@ -162,11 +190,14 @@ function HdriBackdrop({ url, format }: { url: string; format: HdriFormat }) {
 }
 
 export function Lights({ runtime }: { runtime: ViewportRuntime }) {
+  const use = useStudio((s) => s.background.hdriUse);
+  // A transparent canvas has nothing behind the device, but an environment can still light it.
   const hdri = useStudio((s) =>
-    s.background.transparent
+    s.background.transparent && s.background.hdriUse !== "lighting"
       ? null
       : (s.background.hdriFile ?? getHdri(s.background.hdri)),
   );
+  const hdriTurn = useStudio((s) => s.background.hdriRotation);
   const lights = useStudio((s) => s.lights);
   const scene = useThree((s) => s.scene);
   const ambientRef = useRef<AmbientLight>(null);
@@ -176,10 +207,17 @@ export function Lights({ runtime }: { runtime: ViewportRuntime }) {
     if (ambientRef.current)
       ambientRef.current.intensity = ambient * FLAT_AMBIENT_MAX;
     scene.environmentIntensity = ambient * ENVIRONMENT_MAX;
-    // The studio turns with the lights, so the reflections sweep too.
-    scene.environmentRotation.y = MathUtils.degToRad(
-      runtime.values["lights.rotation"],
+    // The studio turns with the lights, so the reflections sweep too. An environment photo that lights the device
+    // also turns with its own Turn control, so what shows in the reflections matches what is behind the device.
+    const photoTurn = hdri && use !== "backdrop" ? hdriTurn : 0;
+    turned.setFromAxisAngle(
+      UP,
+      MathUtils.degToRad(runtime.values["lights.rotation"] + photoTurn),
     );
+    // A real place stays level with the ground; the studio's own softboxes stay with the camera.
+    if (photoTurn !== 0 || (hdri && use !== "backdrop"))
+      turned.premultiply(runtime.ground);
+    scene.environmentRotation.setFromQuaternion(turned);
   });
 
   return (
@@ -188,7 +226,16 @@ export function Lights({ runtime }: { runtime: ViewportRuntime }) {
       {environment}
       {hdri ? (
         <Suspense fallback={null}>
-          <HdriBackdrop key={hdri.url} url={hdri.url} format={hdri.format} />
+          <HdriBackdrop
+            key={hdri.url}
+            // Built-in photos live under the app's base path; uploaded ones are object URLs.
+            url={
+              hdri.url.startsWith("blob:") ? hdri.url : media(hdri.url)
+            }
+            format={hdri.format}
+            use={use}
+            runtime={runtime}
+          />
         </Suspense>
       ) : null}
       {lights.map((light) => (

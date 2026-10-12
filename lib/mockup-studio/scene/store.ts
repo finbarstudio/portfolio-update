@@ -298,7 +298,7 @@ export const useStudio = create<StudioState>()((set, get) => {
       hdriBlur: 25,
       hdriBrightness: 100,
       hdriRotation: 0,
-      hdriLighting: true,
+      hdriUse: "both",
       floor: "none",
     },
     media: null,

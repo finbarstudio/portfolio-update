@@ -333,7 +333,7 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
         def.screenAspect,
         lights,
         !background.transparent &&
-          background.hdriLighting &&
+          background.hdriUse !== "backdrop" &&
           (background.hdriFile !== null || background.hdri !== null),
       );
     }

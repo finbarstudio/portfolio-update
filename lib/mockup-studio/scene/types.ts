@@ -11,7 +11,7 @@
 
 import type { MediaFrame } from "./frames";
 
-import type { Hdri } from "./hdris";
+import type { Hdri, HdriUse } from "./hdris";
 import type { AnimPath } from "./params";
 
 export type Values = Record<AnimPath, number>;
@@ -132,8 +132,8 @@ export interface Background {
   hdriBrightness: number;
   /** Degrees. Turns the environment to choose which part is behind the device. */
   hdriRotation: number;
-  /** Also light the device with the environment, replacing the studio reflections. */
-  hdriLighting: boolean;
+  /** Shown behind the device, used to light it (replacing the studio reflections), or both. */
+  hdriUse: HdriUse;
 }
 
 /** Centre points for effects that have one, in frame UV (0..1, origin top-left). */

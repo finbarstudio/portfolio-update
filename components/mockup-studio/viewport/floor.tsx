@@ -5,10 +5,12 @@ import { useEffect, useMemo, useRef } from "react";
 import {
   CanvasTexture,
   Fog,
+  type Group,
   type Mesh,
   MeshStandardMaterial,
   RepeatWrapping,
   SRGBColorSpace,
+  Vector3,
 } from "three";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { FloorKind } from "@/lib/mockup-studio/scene/types";
@@ -22,6 +24,7 @@ import { applyScreenBounce } from "./screen-bounce";
  */
 
 const SIZE = 30;
+const scale = new Vector3();
 /** World units each painted tile covers. */
 const TILE = 2.4;
 const PIXELS = 1024;
@@ -305,23 +308,38 @@ export function Floor({ runtime }: { runtime: ViewportRuntime }) {
     };
   }, [scene, material, backdrop]);
 
-  // The floor sits under the device's lowest point and rises with it when the device is moved up.
+  // The floor rides with the device: it sits under its lowest point and turns, tilts and slides with it. Nothing
+  // can then sink through the ground, and every move reads as the camera travelling round a thing that stands still.
+  const holderRef = useRef<Group>(null);
   useFrame(() => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
-    mesh.position.y =
-      -runtime.deviceExtents.y / 2 + runtime.values["object.y"] / 100 - 0.002;
-  });
+    const holder = holderRef.current;
+    const device = runtime.device;
+    if (!holder || !device) return;
+    device.updateWorldMatrix(true, false);
+    device.matrixWorld.decompose(holder.position, holder.quaternion, scale);
+    runtime.ground.copy(holder.quaternion);
+    if (meshRef.current)
+      meshRef.current.position.y = -runtime.deviceExtents.y / 2 - 0.002;
+  }, -4);
+
+  useEffect(() => {
+    if (!material) return;
+    return () => {
+      runtime.ground.identity();
+    };
+  }, [material, runtime]);
 
   if (!material) return null;
   return (
-    <mesh
-      ref={meshRef}
-      material={material}
-      receiveShadow
-      rotation={[-Math.PI / 2, 0, 0]}
-    >
-      <planeGeometry args={[SIZE, SIZE]} />
-    </mesh>
+    <group ref={holderRef}>
+      <mesh
+        ref={meshRef}
+        material={material}
+        receiveShadow
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <planeGeometry args={[SIZE, SIZE]} />
+      </mesh>
+    </group>
   );
 }

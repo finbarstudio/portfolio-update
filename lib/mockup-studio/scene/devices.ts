@@ -385,6 +385,159 @@ export const DEVICES: DeviceDef[] = [
     screenPixels: [5000, 7000],
     screenAspect: 5 / 7,
   },
+  {
+    id: "floor-sign",
+    category: "Signage",
+    name: "Pavement Sign",
+    // "Floor sign" by Sousinho (sketchfab.com/sousinho), CC BY 4.0. See license.txt beside the model.
+    url: "/media/lab/mockup/models/signage/floor-sign/model.glb",
+    colors: [
+      { name: "Original", hex: null },
+      { name: "Black", hex: "#1c1c1e" },
+      { name: "White", hex: "#f1f1f1" },
+      { name: "Red", hex: "#b91c1c" },
+      { name: "Blue", hex: "#1e40af" },
+    ],
+    // The model faces +X; turn it to face the camera.
+    rotation: [0, -90, 0],
+    // The poster is baked into the texture of the front leaf of the A-frame, which leans back 15 degrees.
+    screenPlane: {
+      center: [14.26, 68.4, 0],
+      width: 43,
+      height: 78,
+      radius: 0.6,
+      rotation: [-90, 75, 90],
+    },
+    screenPixels: [2000, 3600],
+    screenAspect: 43 / 78,
+  },
+  {
+    id: "bus-shelter",
+    category: "Signage",
+    name: "Bus Shelter",
+    // Built for this studio (scripts/models/bus-shelter.py): a glass shelter with a lit six-sheet on its end.
+    url: "/media/lab/mockup/models/signage/bus-shelter/model.glb",
+    screenMesh: "poster_screen",
+    bodyMaterials: /^frame$/,
+    colors: [
+      { name: "Bronze", hex: null },
+      { name: "Black", hex: "#1c1c1e" },
+      { name: "Silver", hex: "#c8c8cc" },
+      { name: "White", hex: "#f1f1f1" },
+      { name: "Green", hex: "#2f4f3a" },
+    ],
+    screenPixels: [1200, 1800],
+    screenAspect: 1200 / 1800,
+  },
+  {
+    id: "citylight",
+    category: "Signage",
+    name: "Citylight Totem",
+    // From a downloaded OBJ (ModelCG), converted with scripts/models/obj-to-glb.py. Both faces of the poster show
+    // the media.
+    url: "/media/lab/mockup/models/signage/citylight/model.glb",
+    screenMesh: /^Logo_Cube_(px|nx)$/,
+    bodyMaterials: /^CityLight$/,
+    colors: [
+      { name: "Graphite", hex: null },
+      { name: "Black", hex: "#1c1c1e" },
+      { name: "Silver", hex: "#c8c8cc" },
+      { name: "White", hex: "#f1f1f1" },
+      { name: "Red", hex: "#b91c1c" },
+    ],
+    // The poster faces +X in the file; turn it to face the camera.
+    rotation: [0, -90, 0],
+    screenPixels: [1200, 3300],
+    screenAspect: 1.11 / 3.06,
+  },
+  {
+    id: "ad-column",
+    category: "Signage",
+    name: "Advertising Column",
+    // From a downloaded OBJ (130 MB), reduced to a twentieth of its triangles and Draco packed with
+    // scripts/models/obj-to-glb.py and gltf-transform. Four curved poster panels round a cast column.
+    url: "/media/lab/mockup/models/signage/ad-column/model.glb",
+    screenMesh: /^pic_1$/,
+    bodyMaterials: /^(black_gun_steel|steel)$/,
+    colors: [
+      { name: "Gunmetal", hex: null },
+      { name: "Black", hex: "#1c1c1e" },
+      { name: "Green", hex: "#24402f" },
+      { name: "Silver", hex: "#c8c8cc" },
+    ],
+    screenPixels: [1400, 3600],
+    screenAspect: 1.2 / 3.05,
+  },
+  // The four below were downloads in other formats, converted and packed with scripts/models/blender-to-glb.py.
+  {
+    id: "rollup-banner",
+    category: "Signage",
+    name: "Roll-up Banner",
+    url: "/media/lab/mockup/models/signage/rollup-banner/model.glb",
+    screenMesh: /^banner_screen_/,
+    bodyMaterials: /^stand$/,
+    colors: [
+      { name: "Original", hex: null },
+      { name: "Black", hex: "#1c1c1e" },
+      { name: "White", hex: "#f1f1f1" },
+      { name: "Red", hex: "#b91c1c" },
+      { name: "Blue", hex: "#1e40af" },
+    ],
+    screenPixels: [800, 2000],
+    screenAspect: 800 / 2001,
+  },
+  {
+    id: "y-banner",
+    category: "Signage",
+    name: "Y Banner",
+    url: "/media/lab/mockup/models/signage/y-banner/model.glb",
+    screenMesh: "banner_screen",
+    bodyMaterials: /^frame$/,
+    colors: [
+      { name: "Original", hex: null },
+      { name: "Black", hex: "#1c1c1e" },
+      { name: "White", hex: "#f1f1f1" },
+      { name: "Red", hex: "#b91c1c" },
+      { name: "Blue", hex: "#1e40af" },
+    ],
+    screenPixels: [600, 1600],
+    screenAspect: 0.586 / 1.546,
+  },
+  {
+    id: "flag-banner",
+    category: "Signage",
+    name: "Flag Banner",
+    url: "/media/lab/mockup/models/signage/flag-banner/model.glb",
+    screenMesh: "flag_screen",
+    bodyMaterials: /^pole$/,
+    colors: [
+      { name: "Original", hex: null },
+      { name: "Black", hex: "#1c1c1e" },
+      { name: "White", hex: "#f1f1f1" },
+      { name: "Red", hex: "#b91c1c" },
+      { name: "Blue", hex: "#1e40af" },
+    ],
+    screenPixels: [1500, 4000],
+    screenAspect: 250.9 / 669,
+  },
+  {
+    id: "id-card",
+    category: "Wearables",
+    name: "ID Card",
+    url: "/media/lab/mockup/models/print/id-card/model.glb",
+    screenMesh: "card_screen",
+    // The colour picker changes the lanyard; the holder stays clear plastic.
+    bodyMaterials: /^lanyard$/,
+    colors: [
+      { name: "Black", hex: null },
+      { name: "White", hex: "#f1f1f1" },
+      { name: "Red", hex: "#b91c1c" },
+      { name: "Blue", hex: "#1e40af" },
+      { name: "Green", hex: "#15803d" },
+    ],
+    screenPixels: [1200, 2000],
+    screenAspect: 2.885 / 4.805,
+  },
 ];
 
 export const DEFAULT_DEVICE_ID = DEVICES[0].id;

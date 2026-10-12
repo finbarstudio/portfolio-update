@@ -29,6 +29,7 @@ function applyPreset(preset: AnimationPreset) {
     deviceExtents,
     deviceScreen,
     composition,
+    background,
     setShots,
     setPlayhead,
     setPlaying,
@@ -39,7 +40,12 @@ function applyPreset(preset: AnimationPreset) {
     screen: deviceScreen,
     aspect: composition.width / composition.height,
     // A laptop is always seen from above its deck, never from underneath.
-    minPitch: getDevice(deviceId).lid ? LAPTOP_MIN_PITCH : undefined,
+    // With a floor on, the view also stays above the ground rather than dipping under it.
+    minPitch: getDevice(deviceId).lid
+      ? LAPTOP_MIN_PITCH
+      : background.floor !== "none"
+        ? FLOOR_MIN_PITCH
+        : undefined,
   };
 
   const built = (): Shot[] =>
@@ -100,6 +106,9 @@ function applyPreset(preset: AnimationPreset) {
   }
   setPlaying(true);
 }
+
+/** Degrees above the ground every take stays at or over while a floor is on. */
+const FLOOR_MIN_PITCH = 3;
 
 /** Degrees above the deck every laptop take stays at or over. */
 const LAPTOP_MIN_PITCH = 6;

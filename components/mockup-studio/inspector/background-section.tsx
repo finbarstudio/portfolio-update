@@ -11,7 +11,12 @@ import { Section } from "@/components/mockup-studio/ui/section";
 import { Segmented, type SegmentedOption } from "@/components/mockup-studio/ui/segmented";
 import { Slider } from "@/components/mockup-studio/ui/slider";
 import { Switch } from "@/components/mockup-studio/ui/switch";
-import { HDRIS, hdriFormat } from "@/lib/mockup-studio/scene/hdris";
+import {
+  HDRI_GROUPS,
+  HDRIS,
+  type HdriUse,
+  hdriFormat,
+} from "@/lib/mockup-studio/scene/hdris";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { FloorKind } from "@/lib/mockup-studio/scene/types";
 
@@ -24,6 +29,12 @@ const FLOORS: SegmentedOption<FloorKind>[] = [
 ];
 
 import type { BackgroundLayer } from "@/lib/mockup-studio/scene/types";
+
+const HDRI_USES: SegmentedOption<HdriUse>[] = [
+  { value: "both", label: "Backdrop and light" },
+  { value: "backdrop", label: "Backdrop" },
+  { value: "lighting", label: "Light only" },
+];
 
 const LAYER_FITS: SegmentedOption<BackgroundLayer["fit"]>[] = [
   { value: "cover", label: "Cover" },
@@ -127,9 +138,9 @@ export function BackgroundSection() {
         options={FLOORS}
         onChange={(floor) => setBackground({ floor })}
       />
-      <div className="flex min-h-7 items-center justify-between gap-2">
+      <div className="flex min-h-7 flex-wrap items-center justify-between gap-2">
         <span className="text-ms-ink-muted">Environment</span>
-        <div className="flex min-w-0 items-center gap-1">
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-1">
           {HDRIS.length > 0 && !background.hdriFile ? (
             <select
               aria-label="Built-in environment"
@@ -140,10 +151,14 @@ export function BackgroundSection() {
               className="h-7 max-w-32 rounded-ms-control border border-ms-line bg-ms-raised px-1.5 text-ms-ink"
             >
               <option value="">None</option>
-              {HDRIS.map((hdri) => (
-                <option key={hdri.id} value={hdri.id}>
-                  {hdri.name}
-                </option>
+              {HDRI_GROUPS.map((group) => (
+                <optgroup key={group} label={group}>
+                  {HDRIS.filter((hdri) => hdri.group === group).map((hdri) => (
+                    <option key={hdri.id} value={hdri.id}>
+                      {hdri.name}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           ) : null}
@@ -181,25 +196,35 @@ export function BackgroundSection() {
       ) : null}
       {background.hdri || background.hdriFile ? (
         <>
-          <Slider
-            label="Blur"
-            value={background.hdriBlur}
-            min={0}
-            max={100}
-            step={1}
-            defaultValue={25}
-            onChange={(hdriBlur) => setBackground({ hdriBlur })}
+          <Segmented
+            label="Use as"
+            value={background.hdriUse}
+            options={HDRI_USES}
+            onChange={(hdriUse) => setBackground({ hdriUse })}
           />
-          <Slider
-            label="Brightness"
-            value={background.hdriBrightness}
-            min={0}
-            max={200}
-            step={1}
-            unit="%"
-            defaultValue={100}
-            onChange={(hdriBrightness) => setBackground({ hdriBrightness })}
-          />
+          {background.hdriUse !== "lighting" ? (
+            <>
+              <Slider
+                label="Blur"
+                value={background.hdriBlur}
+                min={0}
+                max={100}
+                step={1}
+                defaultValue={25}
+                onChange={(hdriBlur) => setBackground({ hdriBlur })}
+              />
+              <Slider
+                label="Brightness"
+                value={background.hdriBrightness}
+                min={0}
+                max={200}
+                step={1}
+                unit="%"
+                defaultValue={100}
+                onChange={(hdriBrightness) => setBackground({ hdriBrightness })}
+              />
+            </>
+          ) : null}
           <Slider
             label="Turn"
             value={background.hdriRotation}
@@ -210,13 +235,10 @@ export function BackgroundSection() {
             defaultValue={0}
             onChange={(hdriRotation) => setBackground({ hdriRotation })}
           />
-          <Switch
-            label="Light the device with it"
-            checked={background.hdriLighting}
-            onChange={(hdriLighting) => setBackground({ hdriLighting })}
-          />
-          {background.transparent ? (
-            <p className="text-ms-ink-faint">Hidden while Transparent is on.</p>
+          {background.transparent && background.hdriUse !== "lighting" ? (
+            <p className="text-ms-ink-faint">
+              Hidden while Transparent is on. Light only still works.
+            </p>
           ) : null}
         </>
       ) : null}

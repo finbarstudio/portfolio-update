@@ -1,4 +1,4 @@
-import { type Group, type Object3D, Vector3 } from "three";
+import { type Group, type Object3D, Quaternion, Vector3 } from "three";
 import { defaultValues } from "@/lib/mockup-studio/scene/store";
 import type { Values } from "@/lib/mockup-studio/scene/types";
 import { type BounceUniforms, createBounceUniforms } from "./screen-bounce";
@@ -31,6 +31,11 @@ export interface ViewportRuntime {
   refreshScreen: (() => void) | null;
   /** The media is being shown in a window over a backdrop, composed to exactly the screen's shape. */
   framed: boolean;
+  /**
+   * How the ground is turned. With a floor on, the floor and the surroundings ride with the device, so a move reads
+   * as the camera travelling round a thing that stands still. Identity without a floor.
+   */
+  ground: Quaternion;
   /** Monotonic seconds passed to R3F's `advance` while exporting. */
   tick: number;
 }
@@ -47,6 +52,7 @@ export function createRuntime(): ViewportRuntime {
     video: null,
     refreshScreen: null,
     framed: false,
+    ground: new Quaternion(),
     tick: 0,
   };
 }
