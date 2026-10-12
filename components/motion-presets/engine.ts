@@ -1251,59 +1251,88 @@ export interface Look {
   videoPlay: VideoPlay;
   /** seconds a card is in focus before its video starts */
   videoDelay: number;
-  /** once its card has left focus, a video finishes and stays on its last picture, or goes back to its first */
-  videoAfter: VideoAfter;
+  /** how fast a video runs backwards to its first picture once its card has left focus, 1 = normal speed */
+  videoReverse: number;
 }
 
 export type VideoPlay = "loop" | "focus";
-export type VideoAfter = "hold" | "rewind";
 
-/** What "play once on focus" has seen so far in this run of the loop. Start a run with `newFocusPlayback()`. */
+/**
+ * "Play once on focus", as one playhead per upload that only ever moves
+ * smoothly: forwards at normal speed while its card is in focus, backwards at
+ * the reverse speed once it is not. Nothing jumps while a card can be seen;
+ * a card that is not drawn at all goes straight back to its first picture.
+ * Start a run with `newFocusPlayback()`.
+ */
 export interface FocusPlayback {
   last: number;
   lead: number | null;
-  /** per upload: the loop time its card last came into focus, or null while it waits on its first picture */
-  started: (number | null)[];
+  /** the loop time the card in focus came into focus */
+  since: number;
+  /** per upload, seconds into its video */
+  at: number[];
 }
-export const newFocusPlayback = (): FocusPlayback => ({ last: Infinity, lead: null, started: [] });
+export const newFocusPlayback = (): FocusPlayback => ({ last: Infinity, lead: null, since: 0, at: [] });
+
+/** One frame of the loop, as far as video playback cares. */
+interface FocusFrame {
+  focus: number | null;
+  /** which uploads have a card drawn */
+  shown: Set<number>;
+}
+function focusFrame(settings: Settings, seconds: number, aspect: number, cardShape: number, uploads: number): FocusFrame {
+  const frame = layoutFrame(settings, seconds, aspect, cardShape);
+  return { focus: frame.focus === null ? null : frame.focus % uploads, shown: new Set(frame.items.map((item) => item.i % uploads)) };
+}
+
+function advance(state: FocusPlayback, seconds: number, step: number, frame: FocusFrame, lengths: number[], look: Look, duration: number) {
+  if (frame.focus !== state.lead) {
+    state.lead = frame.focus;
+    state.since = seconds;
+  }
+  const playing = seconds - state.since >= look.videoDelay;
+  for (let u = 0; u < lengths.length; u++) {
+    if (!frame.shown.has(u)) state.at[u] = 0;
+    else if (frame.focus === null) {
+      // No single card in focus: every video plays once from the start of the loop, then runs back in time to be on its first picture as the loop ends.
+      if (duration - seconds <= state.at[u] / look.videoReverse) state.at[u] = Math.max(0, state.at[u] - step * look.videoReverse);
+      else if (playing) state.at[u] = Math.min(lengths[u], state.at[u] + step);
+    } else if (u === frame.focus) {
+      if (playing) state.at[u] = Math.min(lengths[u], state.at[u] + step);
+    } else state.at[u] = Math.max(0, state.at[u] - step * look.videoReverse);
+  }
+}
 
 /**
- * How far into its video each upload should be at `seconds` of the loop, for
- * "play once on focus". Fed every frame in order; it starts over by itself
- * when the loop does. `focus` is the card in focus, and with no single card in
- * focus every video plays once from the start of the loop. `leadIn` says how
- * long before the loop point the card in focus there came into focus, so its
- * video carries on across the loop point instead of starting a second time.
+ * How far into its video each upload should be at `seconds` of the loop.
+ * `lengths` holds each upload's video length (0 for a picture). Fed every
+ * frame in order. When the loop starts over it first runs the whole loop
+ * through quietly, so the videos begin exactly as the end of the loop leaves
+ * them and the loop point is as smooth as the rest.
  */
-export function focusTimes(state: FocusPlayback, seconds: number, focus: number | null, uploads: number, look: Look, leadIn: () => number): number[] {
-  if (seconds < state.last || state.started.length !== uploads) {
-    state.started = new Array<number | null>(uploads).fill(focus === null ? seconds : null);
-    state.lead = focus === null ? null : focus % uploads;
-    if (state.lead !== null) state.started[state.lead] = seconds - leadIn();
+export function focusTimes(state: FocusPlayback, seconds: number, settings: Settings, aspect: number, cardShape: number, lengths: number[], look: Look): number[] {
+  const uploads = lengths.length;
+  if (seconds < state.last || state.at.length !== uploads) {
+    const { duration } = settings.motion;
+    const step = 1 / 60;
+    const frames: FocusFrame[] = [];
+    for (let t = 0; t < duration; t += step) frames.push(focusFrame(settings, t, aspect, cardShape, uploads));
+    state.at = new Array<number>(uploads).fill(0);
+    state.lead = null;
+    state.since = 0;
+    // With no single card in focus every video plays once from the start of the loop, so there is nothing to carry over.
+    if (frames[0]?.focus !== null) {
+      // Twice round, so even a slow reverse has settled into what every later loop repeats.
+      for (let pass = 0; pass < 2; pass++) {
+        frames.forEach((frame, k) => advance(state, k * step, step, frame, lengths, look, duration));
+        state.since -= duration;
+      }
+    }
+    state.last = 0;
   }
+  advance(state, seconds, Math.max(0, seconds - state.last), focusFrame(settings, seconds, aspect, cardShape, uploads), lengths, look, settings.motion.duration);
   state.last = seconds;
-  const now = focus === null ? null : focus % uploads;
-  if (now !== state.lead) {
-    if (state.lead !== null && look.videoAfter === "rewind") state.started[state.lead] = null;
-    if (now !== null) state.started[now] = seconds;
-    state.lead = now;
-  }
-  return state.started.map((start) => (start === null ? 0 : Math.max(0, seconds - start - look.videoDelay)));
-}
-
-/**
- * How many seconds before the loop point the card in focus at the loop point
- * came into focus. 0 when no single card is in focus there, or one always is.
- */
-export function focusLeadIn(settings: Settings, aspect: number, cardShape: number): number {
-  const { duration } = settings.motion;
-  const first = layoutFrame(settings, 0, aspect, cardShape).focus;
-  if (first === null) return 0;
-  const step = 1 / 60;
-  for (let back = step; back < duration; back += step) {
-    if (layoutFrame(settings, duration - back, aspect, cardShape).focus !== first) return back - step;
-  }
-  return 0;
+  return state.at;
 }
 
 export type Counter = "off" | "number" | "fraction";
@@ -1360,7 +1389,7 @@ export const BASE_LOOK: Look = {
   counterStyle: "outline",
   videoPlay: "loop",
   videoDelay: 0.3,
-  videoAfter: "rewind",
+  videoReverse: 0.5,
 };
 
 /** A saved setup: which preset, how it was tuned, and how it looks. No media. */
@@ -1441,7 +1470,8 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   const counterScale = finite(savedLook.counterScale);
   if (counterScale !== undefined) look.counterScale = clamp(counterScale, 0.1, 20);
   look.videoPlay = oneOf(savedLook.videoPlay, ["loop", "focus"] as const) ?? look.videoPlay;
-  look.videoAfter = oneOf(savedLook.videoAfter, ["hold", "rewind"] as const) ?? look.videoAfter;
+  const videoReverse = finite(savedLook.videoReverse);
+  if (videoReverse !== undefined) look.videoReverse = clamp(videoReverse, 0.05, 60);
   const videoDelay = finite(savedLook.videoDelay);
   if (videoDelay !== undefined) look.videoDelay = clamp(videoDelay, 0, 60);
 

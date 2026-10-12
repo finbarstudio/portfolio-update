@@ -23,9 +23,7 @@ import {
   bezier,
   canvasSide,
   cardAspect,
-  focusLeadIn,
   focusTimes,
-  layoutFrame,
   newFocusPlayback,
   hasCounter,
   clamp,
@@ -48,7 +46,6 @@ import {
   type Preset,
   type SavedSetup,
   type TiltMode,
-  type VideoAfter,
   type VideoPlay,
 } from "./engine";
 import { ArrayBufferTarget, Muxer } from "mp4-muxer";
@@ -590,10 +587,6 @@ const VIDEO_PLAYS: { value: VideoPlay; label: string }[] = [
   { value: "loop", label: "Loop" },
   { value: "focus", label: "Once on focus" },
 ];
-const VIDEO_AFTERS: { value: VideoAfter; label: string }[] = [
-  { value: "rewind", label: "Rewind" },
-  { value: "hold", label: "Hold end" },
-];
 const CARD_FACINGS = [
   { value: false, label: "Upright" },
   { value: true, label: "Sunray" },
@@ -654,6 +647,9 @@ export default function MotionTool() {
   const fullSizeRef = useRef(false);
   /** True while an export draws its own frames one by one: the live loop stands aside. */
   const offlineRef = useRef(false);
+  // A number in the corner of each card while editing, to tell uploads apart. Never part of an export.
+  const [cardTags, setCardTags] = useState(false);
+  const tagsRef = useRef(false);
   const draggedRef = useRef<number | null>(null);
   const stageRef = useRef<HTMLElement>(null);
   /** Which wireframe sits over the preview, if any. */
@@ -682,6 +678,7 @@ export default function MotionTool() {
   // The draw loop reads the latest settings without restarting.
   useEffect(() => {
     sceneRef.current = { preset, motion, options, easing, path, look };
+    tagsRef.current = cardTags;
     flowRef.current = { adjustments, chosen, easing };
   });
 
@@ -756,7 +753,7 @@ export default function MotionTool() {
       const resolution = fullSizeRef.current ? 1 : Math.min(1, longest / Math.max(width, height));
       const seconds = ((now - loopStartRef.current) / 1000) % duration;
       steerVideos(seconds);
-      renderer.draw(seconds, { ...sceneRef.current, media: mediaRef.current, resolution, fullQuality: fullSizeRef.current, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
+      renderer.draw(seconds, { ...sceneRef.current, media: mediaRef.current, resolution, tags: tagsRef.current && !fullSizeRef.current && !placeholdersRef.current, fullQuality: fullSizeRef.current, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
       frame = requestAnimationFrame(tick);
     });
     return () => {
@@ -780,8 +777,8 @@ export default function MotionTool() {
   /** How far into its video each upload should be, when videos play once on focus. */
   const videoTimes = (state: FocusPlayback, seconds: number) => {
     const scene = sceneRef.current;
-    const { focus } = layoutFrame(scene, seconds, scene.look.width / scene.look.height, cardAspect(scene.look));
-    return focusTimes(state, seconds, focus, mediaRef.current.length, scene.look, () => focusLeadIn(scene, scene.look.width / scene.look.height, cardAspect(scene.look)));
+    const lengths = mediaRef.current.map((item) => (item.video ? lastMoment(item.video) : 0));
+    return focusTimes(state, seconds, scene, scene.look.width / scene.look.height, cardAspect(scene.look), lengths, scene.look);
   };
 
   /**
@@ -789,6 +786,7 @@ export default function MotionTool() {
    * is started once as its card comes into focus and left to play through.
    */
   const playbackRef = useRef(newFocusPlayback());
+  const wantedRef = useRef<number[]>([]);
   const steerVideos = (seconds: number) => {
     const media = mediaRef.current;
     if (!media.some((item) => item.video)) return;
@@ -801,21 +799,23 @@ export default function MotionTool() {
       return;
     }
     const times = videoTimes(playbackRef.current, seconds);
+    const before = wantedRef.current;
     media.forEach(({ video }, index) => {
       if (!video) return;
       video.loop = false;
       const want = times[index];
-      if (want <= 0) {
-        if (!video.paused) video.pause();
-        if (video.currentTime > 0.02) video.currentTime = 0;
-      } else if (want < lastMoment(video)) {
-        // Started once and left to run; only pulled back into line if it has drifted well off.
+      if (want > (before[index] ?? 0) && want < lastMoment(video)) {
+        // Running forwards: left to play by itself, and only pulled back into line if it has drifted well off.
         if (video.paused || Math.abs(video.currentTime - want) > 0.35) video.currentTime = want;
         if (video.paused) void video.play();
-      } else if (video.paused && video.currentTime < lastMoment(video) - 0.05) {
-        video.currentTime = lastMoment(video);
+      } else {
+        // Holding still or running backwards: a video cannot play in reverse, so it is stepped there picture by picture.
+        if (!video.paused) video.pause();
+        const to = Math.min(want, lastMoment(video));
+        if (!video.seeking && Math.abs(video.currentTime - to) > 0.02) video.currentTime = to;
       }
     });
+    wantedRef.current = [...times];
   };
 
   const restart = () => {
@@ -1281,7 +1281,7 @@ export default function MotionTool() {
           <p>or drop files anywhere</p>
         </div>
         {thumbs.length > 0 && (
-          <ul className="mp-media">
+          <ul className="mp-media" style={{ "--card": cardAspect(look) } as React.CSSProperties}>
             {thumbs.map((thumb, index) => (
               <li
                 key={thumb.id}
@@ -1308,12 +1308,10 @@ export default function MotionTool() {
                 }}
               >
                 <img src={thumb.url} alt={`${thumb.isVideo ? "Video" : "Media"} ${index + 1}`} draggable={false} />
-                {thumb.isVideo && (
-                  <span className="mp-media-video" aria-hidden="true">
-                    ▶
-                  </span>
-                )}
-                <span className="mp-media-slot">{index + 1}</span>
+                <span className="mp-media-slot">
+                  {index + 1}
+                  {thumb.isVideo && <span aria-hidden="true"> ▶</span>}
+                </span>
                 <button type="button" className="mp-media-remove" aria-label={`Remove media ${index + 1}`} onClick={() => removeMedia(thumb.id)}>
                   ×
                 </button>
@@ -1330,13 +1328,14 @@ export default function MotionTool() {
           </ul>
         )}
 
+        {thumbs.length > 0 && <Choice label="Card numbers" value={cardTags} options={ON_OFF} onChange={setCardTags} />}
         {thumbs.some((thumb) => thumb.isVideo) && (
           <>
             <Choice label="Videos" value={look.videoPlay} options={VIDEO_PLAYS} onChange={(videoPlay) => patchLook({ videoPlay })} />
             {look.videoPlay === "focus" && (
               <>
                 <Slider label="Start delay" min={0} max={3} step={0.05} typedMin={0} typedMax={60} value={look.videoDelay} onChange={(videoDelay) => patchLook({ videoDelay })} onReset={() => patchLook({ videoDelay: BASE_LOOK.videoDelay })} />
-                <Choice label="After focus" value={look.videoAfter} options={VIDEO_AFTERS} onChange={(videoAfter) => patchLook({ videoAfter })} />
+                <Slider label="Reverse speed" min={0.1} max={4} step={0.05} typedMin={0.05} typedMax={60} value={look.videoReverse} onChange={(videoReverse) => patchLook({ videoReverse })} onReset={() => patchLook({ videoReverse: BASE_LOOK.videoReverse })} />
               </>
             )}
           </>

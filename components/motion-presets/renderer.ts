@@ -29,6 +29,8 @@ export interface Scene extends Settings {
   fullQuality?: boolean;
   /** How many pictures and videos are uploaded. The number overlay counts these; without any it counts cards. */
   uploads?: number;
+  /** A small number in the corner of every card, saying which upload it shows. An editing aid: never set for an export. */
+  tags?: boolean;
 }
 
 type Matrix = number[];
@@ -91,6 +93,28 @@ const UNIFORMS = ["uMatrix", "uSize", "uCrop", "uRadius", "uAlpha", "uShade", "u
 const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 const SERIF = 'Georgia, "Times New Roman", serif';
+
+/** A small dark pill with an upload's number, for the corner of its card. */
+function tagPicture(text: string): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  const height = 48;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+  const font = `600 ${height * 0.62}px ${MONO}`;
+  ctx.font = font;
+  canvas.width = Math.max(height, Math.ceil(ctx.measureText(text).width + height * 0.7));
+  canvas.height = height;
+  ctx.font = font;
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgb(0 0 0 / 0.55)";
+  ctx.beginPath();
+  ctx.roundRect(0, 0, canvas.width, height, height / 2);
+  ctx.fill();
+  ctx.fillStyle = "rgb(255 255 255 / 0.92)";
+  ctx.fillText(text, canvas.width / 2, height / 2 + 2);
+  return canvas;
+}
 
 /** Draws the number in one of the overlay styles. Returns a canvas cut close around it. */
 function counterPicture(text: string, style: CounterStyle, px: number): HTMLCanvasElement {
@@ -215,6 +239,26 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   let frames = 0;
   // The number overlay's picture, redrawn only when what it shows changes.
   const counter: { key: string; texture: WebGLTexture | null; width: number; height: number } = { key: "", texture: null, width: 0, height: 0 };
+  // Card tags, made once per number and kept.
+  const tags = new Map<number, { texture: WebGLTexture | null; aspect: number }>();
+  const tagFor = (upload: number) => {
+    let tag = tags.get(upload);
+    if (!tag) {
+      const picture = tagPicture(String(upload + 1));
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, picture);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      tag = { texture, aspect: picture.width / picture.height };
+      tags.set(upload, tag);
+    }
+    return tag;
+  };
 
   return {
     texture(source, mipmaps) {
@@ -306,6 +350,19 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
         gl.uniform1f(uniform.uAlpha, item.alpha);
         gl.uniform1f(uniform.uShade, clamp(1 + (item.depth + distance) * 0.1, 0.4, 1)); // dimmer further away
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        if (scene.tags) {
+          // The tag rides on its card, in the top left corner, a tenth of the card's short side tall.
+          const tag = tagFor(item.i % media.length);
+          const tall = (0.1 * Math.min(w, h)) / h;
+          const wide = (tall * h * tag.aspect) / w;
+          const marginX = (0.04 * Math.min(w, h)) / w;
+          const marginY = (0.04 * Math.min(w, h)) / h;
+          gl.bindTexture(gl.TEXTURE_2D, tag.texture);
+          gl.uniform1f(uniform.uOverlay, 1);
+          gl.uniformMatrix4fv(uniform.uMatrix, false, multiply(item.matrix, multiply(translate(-0.5 + marginX + wide / 2, 0.5 - marginY - tall / 2, 0), scale(wide, tall))));
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          gl.uniform1f(uniform.uOverlay, 0);
+        }
       }
 
       if (look.counter === "off" || lead === null) return;
