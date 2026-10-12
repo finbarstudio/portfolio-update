@@ -45,7 +45,7 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  */
 
 /** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
-const VERSION = "2.7";
+const VERSION = "2.8";
 
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 
@@ -78,7 +78,7 @@ const VISIONS: { value: Vision; label: string; filter: string; about: string }[]
 ];
 
 const DARK_TIPS: Record<DarkMode, string> = {
-  off: "The email as designed",
+  off: "The email as a reader in light mode gets it. The email's own dark styles are switched off, whatever this computer is set to",
   scheme: "Turns on the email's own prefers-color-scheme rules, as Apple Mail does",
   invert: "Flips every colour, as classic Outlook on Windows and the Gmail app on iOS do",
 };
@@ -167,6 +167,12 @@ function previewSource(src: string, imagesOff: boolean, stylesOff: boolean, dark
       .replace(/(<img\b[^>]*?\s)src\s*=/gi, "$1data-src=")
       .replace(/url\(\s*(['"]?)[^)'"]*\1\s*\)/gi, "none")
       .replace(/(<(?:table|td|body)\b[^>]*?\s)background\s*=/gi, "$1data-background=");
+  }
+  if (dark === "off") {
+    // Light means light: on a computer set to dark mode the browser would otherwise switch the
+    // email's own dark styles on by itself, and "Light" would show the dark version.
+    out = out.replace(/@media[^{]*prefers-color-scheme\s*:\s*dark[^{]*\{/gi, "@media not all {");
+    out = out.replace(/<\/head>/i, "<style>:root{color-scheme:light}</style></head>");
   }
   if (dark === "scheme") {
     // Turn the email's own dark-mode media queries on, as a client that honours them would.
