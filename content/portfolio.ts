@@ -28,8 +28,8 @@
  * the standard inset. That is Finbar's default for a full-size 2:1 (Oct 2026),
  * not full bleed.
  * Lows is done to this standard; the other chapters still use older media
- * until he supplies theirs. Chapter order (his, 6 Oct 2026): Lola Audio, Lows, Rennen Plus, Salesmasters;
- * the rest is ours to order.
+ * until he supplies theirs. Chapter order (his, 12 Oct 2026): Lola Audio, Salesmasters, Lows, Rennen Plus,
+ * Packer, The Moment You Realise, TasWater, London Home Show, Plated with Issy, Other.
  *
  * Facts come from Job:CV/London 2026/FINBAR-CONTEXT.md. Media paths resolve
  * through mediaDeep (Cloudflare R2 in production). Copy: no em dashes,
@@ -153,27 +153,6 @@ const RAW: Slide[] = [
   { kind: "cv" },
   { kind: "index" },
 
-  /* ── Lows Design and Build ──────────────────────────────────── */
-  { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
-  {
-    kind: "text",
-    name: "Lows Design + Build",
-    category: "Brand and Website",
-    body:
-      "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
-    meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, study("lows-design-build")],
-  },
-  one("portfolio/lows/logo-zoom.mp4", "The brand", { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
-  linked("portfolio/lows/macbook.webm", "The website", { label: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }),
-  linked("portfolio/lows/iphone-instagram.webm", "The Instagram profile", { label: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }),
-  one("portfolio/lows/signage-wheel.webm", "The identity on signs, a billboard and a site flag. These are mockups", { frame: false }),
-  {
-    kind: "quote",
-    name: "Lows Design + Build",
-    quote: "He has completely transformed our online presence and taken it to the next level.",
-    by: "Samuel Low",
-  },
-
   /* ── Lola Audio ─────────────────────────────────────────────── */
   { kind: "title", id: "lola", name: "Lola Audio", category: "Logo and Website", year: "2026" },
   {
@@ -186,20 +165,6 @@ const RAW: Slide[] = [
   },
   one("portfolio/lola-audio/brand.webm", "The brand: her mark, the site and the stills it sits on", { frame: false }),
   linked("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { label: "lola-audio.com", href: "https://www.lola-audio.com" }, { sound: true }),
-
-  /* ── Rennen Plus ────────────────────────────────────────────── */
-  { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
-  {
-    kind: "text",
-    name: "Rennen Plus",
-    category: "Website",
-    body:
-      "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
-  },
-  linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
-  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
-  linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
 
   /* ── Salesmasters ──────────────────────────────────────────── */
   { kind: "title", id: "salesmasters", name: "Salesmasters", category: "Editorial", year: "2024–2025" },
@@ -228,6 +193,41 @@ const RAW: Slide[] = [
     caption: "Nine editions, every page. Click or drag a page to turn it",
   },
 
+  /* ── Lows Design and Build ──────────────────────────────────── */
+  { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
+  {
+    kind: "text",
+    name: "Lows Design + Build",
+    category: "Brand and Website",
+    body:
+      "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
+    meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, study("lows-design-build")],
+  },
+  one("portfolio/lows/logo-zoom.mp4", "The brand", { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
+  linked("portfolio/lows/macbook.webm", "The website", { label: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }),
+  linked("portfolio/lows/iphone-instagram.webm", "The Instagram profile", { label: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }),
+  one("portfolio/lows/signage-wheel.webm", "The identity on signs, a billboard and a site flag. These are mockups", { frame: false }),
+  {
+    kind: "quote",
+    name: "Lows Design + Build",
+    quote: "He has completely transformed our online presence and taken it to the next level.",
+    by: "Samuel Low",
+  },
+
+  /* ── Rennen Plus ────────────────────────────────────────────── */
+  { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
+  {
+    kind: "text",
+    name: "Rennen Plus",
+    category: "Website",
+    body:
+      "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
+    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
+  },
+  linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
+  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
+  linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
+
   /* ── Packer and Associates ─────────────────────────────────── */
   { kind: "title", id: "packer", name: "Packer and Associates", category: "Capability Statement", year: "2024–2025" },
   {
@@ -252,6 +252,19 @@ const RAW: Slide[] = [
   },
   row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
   row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
+
+  /* ── TasWater ──────────────────────────────────────────────── */
+  { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
+  {
+    kind: "text",
+    name: "TasWater",
+    category: "Information Design",
+    body:
+      "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
+    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
+  },
+  one("taswater/map.webp"),
+  one("taswater/hero.webp"),
 
   /* ── The London Home Show ──────────────────────────────────── */
   { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
@@ -280,19 +293,6 @@ const RAW: Slide[] = [
   { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
   one("plated-with-issy/site-scroll-3d.mp4"),
   row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
-
-  /* ── TasWater ──────────────────────────────────────────────── */
-  { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
-  {
-    kind: "text",
-    name: "TasWater",
-    category: "Information Design",
-    body:
-      "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
-    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
-  },
-  one("taswater/map.webp"),
-  one("taswater/hero.webp"),
 
   /* ── Other ─────────────────────────────────────────────────── */
   { kind: "section", title: "Other", subtitle: "Covers and side projects", year: "2022–2026" },
