@@ -240,6 +240,19 @@ const RAW: Slide[] = [
   },
   one("portfolio/packer/capability-statement.webm", "The capability statement, page by page", { frame: false }),
 
+  /* ── TasWater ──────────────────────────────────────────────── */
+  { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
+  {
+    kind: "text",
+    name: "TasWater",
+    category: "Information Design",
+    body:
+      "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
+    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
+  },
+  one("portfolio/taswater/map-mockup.webp"),
+  one("portfolio/taswater/snake-mockup.webp"),
+
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
   { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
   {
@@ -252,19 +265,6 @@ const RAW: Slide[] = [
   },
   row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
   row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
-
-  /* ── TasWater ──────────────────────────────────────────────── */
-  { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
-  {
-    kind: "text",
-    name: "TasWater",
-    category: "Information Design",
-    body:
-      "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
-    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
-  },
-  one("taswater/map.webp"),
-  one("taswater/hero.webp"),
 
   /* ── The London Home Show ──────────────────────────────────── */
   { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
