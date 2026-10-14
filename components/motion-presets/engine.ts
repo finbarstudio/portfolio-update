@@ -115,6 +115,10 @@ export interface Variant {
   dock?: boolean;
   /** grid: cards scattered on a table, each picked up in turn and shown large in the middle */
   scatter?: boolean;
+  /** slide: a strip of small frames along the foot, with the current frame shown large above in a cross-fading viewer */
+  film?: boolean;
+  /** fan: a hand of cards held low in the frame, each drawn out in turn and shown large above */
+  hand?: boolean;
   /** feature: composed for a tall frame, group at the bottom and the card above */
   tall?: boolean;
   horizontal?: boolean;
@@ -244,6 +248,8 @@ interface Raw extends Partial<Transform> {
   scaled?: boolean;
   /** how far this card is from being "the one showing", for layouts with no row to measure along; lowest wins */
   lead?: number;
+  /** a second picture of another card: the card whose upload it shows */
+  card?: number;
 }
 
 interface Context {
@@ -405,6 +411,26 @@ function cellCentre(cell: number, cols: number, rows: number, c: Context): [numb
 const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
   slide(i, c) {
     const p = centred(i - c.T * c.n, c.n);
+    if (c.v.film) {
+      // The strip: every frame, small and edge to edge, running along the foot
+      // of the frame (or down the left side when moving up or down). The frame
+      // at the middle is lit, the rest dimmed. Above it, the viewer shows that
+      // frame large; as the strip moves on, the viewer cross-fades to the next.
+      const frames = c.n / 2;
+      const j = i % frames;
+      const q = centred(j - c.T * frames, frames);
+      const near = smooth(1 - Math.abs(q));
+      const upright = c.o.direction === "up" || c.o.direction === "down";
+      const span = upright ? c.A : 1;
+      const thick = upright ? c.w : c.h;
+      const row = -span + thick / 2 + 0.1;
+      if (i < frames) return { u: q * (c.pitch + c.g), v: row, z: 0.01 * near, p: q, a: edgeFade(q, frames) * (0.4 + 0.6 * near), lead: 99 };
+      // As large as fits in the space above the strip, square to the camera.
+      const room = row + thick / 2 + 0.08;
+      const largest = Math.min(c.m.scale, ((span * 0.94 - room) * 2) / thick, (1.84 * (upright ? 1 : c.A)) / (upright ? c.h : c.w));
+      const centre = (room + span * 0.94) / 2;
+      return { u: 0, v: centre, z: 0.2 + 0.001 * near, s: largest, scaled: true, a: clamp(1 - Math.abs(q)), p: q, lead: Math.abs(q), card: j };
+    }
     if (c.v.dock) {
       // A row of small cards runs along one edge of the frame. The card in the
       // middle rises out of it and is shown large in the space beside, then
@@ -736,6 +762,22 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     return { z, a, x: Math.cos(angle) * 0.95 * Math.min(1.4, c.A) * c.m.shape, y: Math.sin(angle) * 0.95 * c.m.shape, lead: Math.abs(depth - 0.8) };
   },
   fan(i, c) {
+    if (c.v.hand) {
+      // A hand of cards held low in the frame, fanned about a point below it.
+      // In turn each card is drawn up out of the hand, straightened and shown
+      // large above, then slid back into its place.
+      const p = centred(i - c.T * c.n, c.n);
+      const out = smooth(1 - Math.abs(p));
+      const slot = i - (c.n - 1) / 2;
+      const spread = Math.min(0.16, 1.1 / c.n) * Math.max(0.2, c.m.shape);
+      const angle = slot * spread;
+      const pivot = -1 - c.h * 1.15;
+      const reach = c.h * 2.1;
+      const home = { x: Math.sin(angle) * reach, y: pivot + Math.cos(angle) * reach, rz: -angle };
+      const largest = Math.min(c.m.scale, (1.8 * c.A) / c.w, 1.1 / c.h);
+      const shownY = 0.8 - (c.h * largest) / 2;
+      return { x: lerp(home.x, 0, out), y: lerp(home.y, shownY, out), z: i * 0.002 + 0.3 * out, rz: lerpAngle(home.rz, 0, out), s: lerp(1, largest, out), scaled: true, p, lead: Math.abs(p) };
+    }
     const breathing = c.v.open ? 0.55 + 0.45 * Math.sin(TAU * c.T - Math.PI / 2) : 1;
     const p = i - (c.n - 1) / 2;
     const R = 2.2;
@@ -786,6 +828,8 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
 
 /** Layouts that fill whole rows draw a few more items than asked for. */
 export function itemTotal(layout: LayoutName, n: number, v: Variant): number {
+  // Every frame is drawn twice: once in the strip, once in the viewer.
+  if (v.film) return n * 2;
   if (layout === "grid" || layout === "tour" || (layout === "proximity" && v.field)) return gridCols(n) * Math.ceil(n / gridCols(n));
   if (layout === "marquee") return (v.rows ?? 2) * Math.ceil(n / (v.rows ?? 2));
   return n;
@@ -795,7 +839,7 @@ export function itemTotal(layout: LayoutName, n: number, v: Variant): number {
 /** Layouts whose pull-out group is one solid shape, so its cards never stagger. */
 const SOLID_GROUPS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "orbit", "globe", "grid"]);
 /** Whether the Stagger slider does anything for this preset. */
-export const canStagger = (preset: Preset) => !((preset.variant.feature && SOLID_GROUPS.has(preset.layout)) || preset.variant.scatter);
+export const canStagger = (preset: Preset) => !((preset.variant.feature && SOLID_GROUPS.has(preset.layout)) || preset.variant.scatter || preset.variant.film || preset.variant.hand);
 /** Layouts that need enough cards to make their shape: with fewer uploads, the uploads repeat. */
 export const FILLS_UP: ReadonlySet<LayoutName> = new Set<LayoutName>(["globe"]);
 const SHARED_CLOCK: ReadonlySet<LayoutName> = new Set<LayoutName>(["flip", "pulse", "proximity", "tour", "zoom"]);
@@ -803,7 +847,8 @@ const SHARED_CLOCK: ReadonlySet<LayoutName> = new Set<LayoutName>(["flip", "puls
 /** Motion is a chain of steps, one per item unless a layout says otherwise. */
 function stepsPerLoop(layout: LayoutName, c: Context): number {
   // One step per card: each step brings the next card into focus.
-  if (c.v.feature || c.v.scatter) return c.n;
+  if (c.v.film) return c.n / 2;
+  if (c.v.feature || c.v.scatter || c.v.hand) return c.n;
   if (layout === "marquee") return Math.ceil(c.n / (c.v.rows ?? 2));
   if (layout === "grid") return gridCols(c.n);
   if (layout === "globe") return 6;
@@ -843,7 +888,7 @@ function itemTime(layout: LayoutName, i: number, c: Context, T: number, reversed
   // Cards do not all set off on the beat: a slight, fixed unevenness per card.
   const unevenness = (hash(i, 11) - 0.5) * 0.12;
   // A group that is one solid shape (a ring, a globe, a grid, a table of cards) moves as one: staggering it would pull it out of shape.
-  const solid = (c.v.feature && SOLID_GROUPS.has(layout)) || c.v.scatter;
+  const solid = (c.v.feature && SOLID_GROUPS.has(layout)) || c.v.scatter || c.v.film || c.v.hand;
   const wait = solid ? 0 : clamp((reversed ? 1 - spot : spot) + unevenness) * c.m.stagger * c.m.hold;
   return lerp(v, k + c.ease(clamp((v - k - wait) / (1 - c.m.hold))), c.m.rhythm) / steps;
 }
@@ -884,7 +929,7 @@ const COUNTS_DOWN: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "wheel
 /** Layouts with no single card that is "the one showing", so the number overlay has nothing to count. */
 export const NO_COUNTER: ReadonlySet<LayoutName> = new Set<LayoutName>(["grid", "globe", "float", "marquee", "fan"]);
 /** Whether a preset has one card at a time that the number overlay can count. Two rings turning against each other do not. */
-export const hasCounter = (preset: Preset) => (!NO_COUNTER.has(preset.layout) || Boolean(preset.variant.feature) || Boolean(preset.variant.scatter)) && !preset.variant.two;
+export const hasCounter = (preset: Preset) => (!NO_COUNTER.has(preset.layout) || Boolean(preset.variant.feature || preset.variant.scatter || preset.variant.hand)) && !preset.variant.two;
 /** How far the card in focus comes forward: enough to win the overlap, too little to see as movement. */
 const FOCUS_LIFT = 0.03;
 /** How long the fade out and the fade in each take, as a share of the loop. */
@@ -985,11 +1030,11 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     const score = raw.lead ?? (raw.p !== undefined ? Math.abs(raw.p - f) : Infinity);
     if (a > 0.2 && score < leadScore) {
       leadScore = score;
-      lead = i;
+      lead = raw.card ?? i;
     }
     a *= curtain;
     if (a <= 0.003) continue;
-    items.push({ i, x, y, z, rx, ry, rz, s, a });
+    items.push({ i: raw.card ?? i, x, y, z, rx, ry, rz, s, a });
   }
 
   const camera = { x: 0, y: 0, back: 0 };
@@ -1221,7 +1266,8 @@ function naturalDuration(preset: Preset): number {
   const stops = preset.path?.length ?? 1;
   const seconds = (() => {
     // A pull-out or a table of cards shows every card in turn, so it needs time for each.
-    if (preset.variant.feature || preset.variant.scatter) return n * 2.6;
+    if (preset.variant.film) return (n / 2) * 2.6;
+    if (preset.variant.feature || preset.variant.scatter || preset.variant.hand) return n * 2.6;
     switch (preset.layout) {
       case "marquee":
         return Math.ceil(n / (preset.variant.rows ?? 2)) * 3.2;
@@ -1290,6 +1336,7 @@ export const PRESETS: Preset[] = [
   preset("Slide 03", "slide", {}, { count: 7, size: 0.8, gap: 0.1, rhythm: 1, stagger: 1 }, { options: { direction: "up" } }),
   preset("Slide 04", "slide", {}, { count: 9, size: 0.7, gap: 0.14, rhythm: 1, stagger: 1, hold: 0.5, fade: 0.3 }),
   preset("Slide 05", "slide", {}, { count: 8, size: 0.75, gap: 0.14, rhythm: 1, stagger: 1, hold: 0.55 }, { options: { direction: "right" } }),
+  preset("Filmstrip 01", "slide", { film: true }, { count: 9, size: 0.22, gap: 0.03, rhythm: 1, hold: 0.6, scale: 4 }, { format: "wide" }),
   preset("Dock 01", "slide", { dock: true }, { count: 11, size: 0.3, gap: 0.1, rhythm: 1, hold: 0.55, scale: 3.4 }, { format: "wide" }),
   preset("Focus 01", "slide", {}, { count: 9, size: 0.5, gap: 0.16, rhythm: 1, scale: 2 }, { options: { focus: "centre" } }),
   preset("Focus 02", "slide", {}, { count: 9, size: 0.4, gap: 0.16, rhythm: 1, scale: 2, stagger: 1 }, { options: { focus: "centre", direction: "up" } }),
@@ -1342,11 +1389,11 @@ export const PRESETS: Preset[] = [
   preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.1, tilt: 48 }),
   preset("Grid 03", "grid", { pan: "alt" }, { count: 24, size: 0.6, gap: 0.1 }),
   preset("Grid 04", "grid", { pan: "pulse" }, { count: 24, size: 0.55, gap: 0.24 }),
-  preset("Scatter 01", "grid", { scatter: true }, { count: 12, size: 0.34, gap: 0.1, rhythm: 1, hold: 0.55, scale: 3 }),
   preset("Grid 08", "grid", { feature: true }, { count: 9, size: 0.26, gap: 0.08, rhythm: 1, hold: 0.55, scale: 3.6, groupTilt: 10, groupTurn: -14 }, { options: { faceCamera: false }, format: "wide" }),
   preset("Grid 05", "tour", {}, { count: 9, size: 1.1, gap: 0.12, rhythm: 1, hold: 0.45 }, { path: [0, 4, 8, 6, 2] }),
   preset("Grid 06", "tour", {}, { count: 16, size: 0.9, gap: 0.1, rhythm: 1, hold: 0.4, tilt: 24 }, { path: [0, 5, 10, 15, 12, 9, 6, 3] }),
   preset("Grid 07", "tour", {}, { count: 12, size: 0.8, gap: 0.1, rhythm: 1, hold: 0.3, distance: 1.5 }, { path: [0, 3, 11, 8] }),
+  preset("Scatter 01", "grid", { scatter: true }, { count: 12, size: 0.34, gap: 0.1, rhythm: 1, hold: 0.55, scale: 3 }),
   preset("Marquee 01", "marquee", { rows: 2 }, { count: 16, size: 0.85, gap: 0.1 }),
   preset("Marquee 02", "marquee", { rows: 3 }, { count: 24, size: 0.6, gap: 0.1 }),
   preset("Marquee 03", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.1, yaw: 26 }),
@@ -1367,6 +1414,7 @@ export const PRESETS: Preset[] = [
   preset("Tunnel 03", "tunnel", { sides: true }, { count: 12, size: 1 }),
   preset("Fan 01", "fan", { sway: true }, { count: 7, size: 0.9, gap: 0.2 }),
   preset("Fan 02", "fan", { open: true }, { count: 7, size: 0.9, gap: 0.2 }),
+  preset("Hand 01", "fan", { hand: true }, { count: 7, size: 0.42, gap: 0.2, rhythm: 1, hold: 0.55, scale: 2.4 }),
   preset("Wave 01", "wave", {}, { count: 12, size: 0.6, gap: 0.14 }),
   preset("Wave 02", "wave", { ribbon: true }, { count: 12, size: 0.7, gap: 0.1 }),
   preset("Stairs 01", "stairs", {}, { count: 9, size: 0.6, gap: 0.3, rhythm: 1 }),
