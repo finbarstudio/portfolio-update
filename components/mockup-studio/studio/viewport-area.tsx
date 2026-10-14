@@ -12,7 +12,6 @@ import {
   HandIcon,
   SelectIcon,
 } from "@/components/mockup-studio/ui/icons";
-import { PintLink } from "@/components/mockup-studio/ui/pint-link";
 import { PARAMS } from "@/lib/mockup-studio/scene/params";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { PickMode } from "@/lib/mockup-studio/scene/types";
@@ -200,10 +199,6 @@ export function ViewportArea() {
       {fullscreen ? (
         <FullscreenBar onExit={() => toggleFullscreen(sectionRef.current)} />
       ) : null}
-
-      <div className="absolute right-4 bottom-4 z-10 [:fullscreen_&]:hidden">
-        <PintLink floating />
-      </div>
 
       {pick ? (
         <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-ms-panel bg-ms-panel py-1 pl-3 pr-1">

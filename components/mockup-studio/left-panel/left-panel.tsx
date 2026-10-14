@@ -1,6 +1,5 @@
 "use client";
 
-import { PintLink } from "@/components/mockup-studio/ui/pint-link";
 import { VERSION } from "@/lib/mockup-studio/version";
 import { AppHeader } from "./app-header";
 import { MockupSection } from "./mockup-section";
@@ -15,7 +14,6 @@ export function LeftPanel() {
       <ScreenMediaSection />
       <PresetsSection />
       <footer className="mt-auto flex flex-col gap-2 border-ms-line border-t p-4">
-        <PintLink />
         <a
           href="https://lab.finbar.studio"
           target="_blank"
