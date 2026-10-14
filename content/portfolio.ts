@@ -226,7 +226,12 @@ const RAW: Slide[] = [
   },
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
   one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
-  linked("portfolio/rennen-plus/phones.webm", "The same website on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
+  {
+    kind: "media",
+    items: ["portfolio/rennen-plus/phone-car.webm", "portfolio/rennen-plus/phone-search.webm", "portfolio/rennen-plus/phone-concierge.webm"].map((p) => m(p, { frame: false })),
+    caption: "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge",
+    link: { label: "rennenplus.com.au", href: "https://rennenplus.com.au" },
+  },
 
   /* ── Packer and Associates ─────────────────────────────────── */
   { kind: "title", id: "packer", name: "Packer and Associates", category: "Capability Statement", year: "2024–2025" },
