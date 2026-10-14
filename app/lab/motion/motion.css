@@ -217,35 +217,9 @@
   aspect-ratio: 4 / 5;
   border-radius: 6px;
 }
-/* A quiet amber tint marks the pint link out from the controls. */
-.mp-pint {
-  --amber: 232 180 82;
-  display: block;
-  margin-top: 24px;
-  padding: 11px 12px;
-  text-align: center;
-  color: rgb(var(--amber) / 0.9);
-  text-decoration: none;
-  background: rgb(var(--amber) / 0.07);
-  border: 1px solid rgb(var(--amber) / 0.3);
-  border-radius: 9px;
-  transition:
-    color 0.15s,
-    background 0.15s,
-    border-color 0.15s;
-}
-.mp-pint:hover {
-  color: rgb(var(--amber));
-  background: rgb(var(--amber) / 0.14);
-  border-color: rgb(var(--amber) / 0.55);
-}
-.mp-pint:focus-visible {
-  outline: 2px solid #6aa8ff;
-  outline-offset: 1px;
-}
 .mp-home {
   display: block;
-  margin-top: 14px;
+  margin-top: 24px;
   text-align: center;
   font-size: 11px;
   color: var(--mp-dim);
@@ -262,20 +236,9 @@
   color: #5c5c64;
   font-variant-numeric: tabular-nums;
 }
-/* The same link, floating in the bottom right corner of the preview area, clear of the canvas. It is not part of the canvas, so it never appears in an export. */
+/* The stage buttons are placed against the preview area. */
 .mp-stage {
   position: relative;
-}
-.mp-pint.mp-pint-float {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  margin: 0;
-  padding: 8px 16px;
-  white-space: nowrap;
-  background: rgb(32 28 20 / 0.85);
-  backdrop-filter: blur(10px);
-  border-radius: 999px;
 }
 .mp-choices {
   display: flex;
@@ -311,7 +274,7 @@
   place-items: center;
   min-width: 0;
   min-height: 0;
-  /* The strip along the bottom is kept clear for the pint link. */
+  /* The strip along the bottom is kept clear for the stage buttons. */
   padding: 24px 24px 64px;
 }
 /* The canvas and anything laid over it. It shrinks to the canvas, so percentages inside mean "of the canvas". */
@@ -451,7 +414,7 @@
   inset: 5%;
 }
 
-/* Restart and full screen sit in the strip under the canvas, opposite the pint link. */
+/* Restart, full screen and guides sit in the strip under the canvas. */
 .mp-stage-buttons {
   position: absolute;
   bottom: 16px;
@@ -482,9 +445,6 @@
   max-height: 100dvh;
   border-radius: 0;
   box-shadow: none;
-}
-.mp-stage:fullscreen .mp-pint-float {
-  display: none;
 }
 .mp-stage:fullscreen .mp-stage-buttons {
   opacity: 0;
@@ -1022,9 +982,6 @@
     padding: 12px;
     background: #0c0c0d;
     box-shadow: 0 1px 0 var(--mp-line);
-  }
-  .mp-pint.mp-pint-float {
-    display: none;
   }
   .mp-stage-buttons {
     position: static;

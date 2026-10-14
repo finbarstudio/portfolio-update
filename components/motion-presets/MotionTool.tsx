@@ -95,9 +95,6 @@ const greyCards = (renderer: Renderer) => GREYS.map((_, index) => greyCard(rende
 /** Shown at the foot of the preset list. Bump it when the tool changes in a way worth naming. */
 const VERSION = "v2.6";
 
-/** Finbar's Stripe payment page. Change the link here. */
-const PINT_URL = "https://donate.stripe.com/cNi6oH8vP2f6eHlaoQ8N200";
-
 /** Frames per second in an exported file. */
 const EXPORT_FPS = 60;
 const EXPORT_BITRATE = 24_000_000;
@@ -1221,9 +1218,6 @@ export default function MotionTool() {
             </div>
           </details>
         ))}
-        <a className="mp-pint" href={PINT_URL} target="_blank" rel="noopener noreferrer">
-          Buy me a pint
-        </a>
         <a className="mp-home" href="/" target="_blank" rel="noopener">
           lab.finbar.studio
         </a>
@@ -1260,9 +1254,6 @@ export default function MotionTool() {
             {shownGuide ? `Guides: ${GUIDE_NAMES[shownGuide]}` : "Guides"}
           </button>
         </div>
-        <a className="mp-pint mp-pint-float" href={PINT_URL} target="_blank" rel="noopener noreferrer">
-          Buy me a pint
-        </a>
       </main>
 
       <aside className="mp-panel mp-panel-right" aria-label="Settings">
