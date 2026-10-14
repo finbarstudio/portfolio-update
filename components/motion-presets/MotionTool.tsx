@@ -92,7 +92,7 @@ function greyCard(renderer: Renderer, index: number): MediaItem {
 const greyCards = (renderer: Renderer) => GREYS.map((_, index) => greyCard(renderer, index));
 
 /** Shown at the foot of the preset list. Bump it when the tool changes in a way worth naming. */
-const VERSION = "v2.3";
+const VERSION = "v2.4";
 
 /** Finbar's Stripe payment page. Change the link here. */
 const PINT_URL = "https://donate.stripe.com/cNi6oH8vP2f6eHlaoQ8N200";
