@@ -11,6 +11,7 @@ import {
   COUNTER_POSITIONS,
   COUNTER_STYLES,
   EASINGS,
+  FILLS_UP,
   FOUR_WAY,
   HARD_LIMITS,
   HAS_FOCUS,
@@ -21,6 +22,7 @@ import {
   adjustmentFor,
   applyAdjustments,
   bezier,
+  canStagger,
   canvasSide,
   cardAspect,
   focusTimes,
@@ -638,7 +640,9 @@ export default function MotionTool() {
   // One card per upload, unless Count has been set by hand. Kept inside what this preset can show.
   if (mediaCount !== null && adjustments.count === undefined) {
     // At least what the preset needs to work, and no more than the outer limit.
-    motion.count = clamp(mediaCount, rangeFor(preset, "count").min, HARD_LIMITS.count.max);
+    // A shape that needs many cards (a globe) repeats the uploads rather than thinning out.
+    const fill = FILLS_UP.has(preset.layout) ? (preset.defaults.count ?? 0) : 0;
+    motion.count = clamp(Math.max(mediaCount, fill), rangeFor(preset, "count").min, HARD_LIMITS.count.max);
   }
   const options = presetOptions(preset, chosen);
 
@@ -1383,7 +1387,7 @@ export default function MotionTool() {
         {!ALWAYS_STEPPED.has(layout) && <Choice label="Motion" value={stepped} options={PACES} onChange={(value) => setMotion("rhythm", value ? 1 : 0)} />}
         {slider("duration")}
         {slider("speed")}
-        {stepped && layout !== "proximity" && layout !== "tour" && !ALWAYS_STEPPED.has(layout) && slider("stagger")}
+        {stepped && layout !== "proximity" && layout !== "tour" && !ALWAYS_STEPPED.has(layout) && canStagger(preset) && slider("stagger")}
         {stepped && slider("hold")}
         {HAS_LOOP_GAP.has(layout) && slider("loopGap")}
         <Choice label="Loop fade" value={options.loopFade} options={ON_OFF} onChange={(value) => setOption("loopFade", value)} />

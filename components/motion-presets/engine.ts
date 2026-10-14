@@ -113,6 +113,8 @@ export interface Variant {
   mirror?: boolean;
   /** slide: a row along the foot of the frame, the card in the middle rising out of it and shown large above */
   dock?: boolean;
+  /** grid: cards scattered on a table, each picked up in turn and shown large in the middle */
+  scatter?: boolean;
   /** feature: composed for a tall frame, group at the bottom and the card above */
   tall?: boolean;
   horizontal?: boolean;
@@ -308,7 +310,27 @@ function featurePlace(c: Context, main: number, cross: number): { x: number; y: 
  * flat to the viewer. `shown` runs from 0, in the group, to 1, pulled out:
  * the turn and tilt belong to the group and fall away as a card leaves it.
  */
-function featureCard(c: Context, main: number, cross: number, depth: number, groupMain: number, shownMain: number, shown: number) {
+type Turns = { rx: number; ry: number; rz: number };
+type Rows = number[][];
+const times = (a: Rows, b: Rows): Rows => a.map((row) => [0, 1, 2].map((col) => row[0] * b[0][col] + row[1] * b[1][col] + row[2] * b[2][col]));
+const aboutX = (t: number): Rows => [[1, 0, 0], [0, Math.cos(t), -Math.sin(t)], [0, Math.sin(t), Math.cos(t)]];
+const aboutY = (t: number): Rows => [[Math.cos(t), 0, Math.sin(t)], [0, 1, 0], [-Math.sin(t), 0, Math.cos(t)]];
+const aboutZ = (t: number): Rows => [[Math.cos(t), -Math.sin(t), 0], [Math.sin(t), Math.cos(t), 0], [0, 0, 1]];
+/**
+ * A card's own turn, then the whole group's turn about the upright and tilt
+ * about the level, as the three angles the renderer applies (y, then x, then
+ * z). Adding the angles instead would twist cards that are already turned.
+ */
+function compose(local: Turns, turn: number, tilt: number): Turns {
+  const m = times(aboutX(tilt), times(aboutY(turn), times(aboutY(local.ry), times(aboutX(local.rx), aboutZ(local.rz)))));
+  const rx = Math.asin(clamp(-m[1][2], -1, 1));
+  if (Math.abs(m[1][2]) > 0.99999) return { rx, ry: Math.atan2(-m[2][0], m[0][0]), rz: 0 };
+  return { rx, ry: Math.atan2(m[0][2], m[2][2]), rz: Math.atan2(m[1][0], m[1][1]) };
+}
+/** From one angle to another the short way round. */
+const lerpAngle = (a: number, b: number, t: number) => a + (mod(b - a + Math.PI, TAU) - Math.PI) * t;
+
+function featureCard(c: Context, main: number, cross: number, depth: number, groupMain: number, shownMain: number, shown: number, local: Turns = { rx: 0, ry: 0, rz: 0 }) {
   const at = featurePlace(c, main, cross);
   const middle = featurePlace(c, groupMain, 0);
   // Turning towards the shown card reads the same on either side.
@@ -322,13 +344,15 @@ function featureCard(c: Context, main: number, cross: number, depth: number, gro
   const y2 = dy * Math.cos(tilt) - z1 * Math.sin(tilt);
   const z2 = dy * Math.sin(tilt) + z1 * Math.cos(tilt);
   const out = featurePlace(c, shownMain, 0);
+  const home = compose(local, turn, tilt);
   return {
     x: lerp(middle.x + x1, out.x, shown),
     y: lerp(middle.y + y2, out.y, shown),
     z: lerp(z2, 0.3, shown),
     // The card being shown ends up square to the camera, however the camera is turned.
-    ry: lerp(turn, -c.m.yaw * DEG, shown),
-    rx: lerp(tilt, -c.m.tilt * DEG, shown),
+    ry: lerpAngle(home.ry, -c.m.yaw * DEG, shown),
+    rx: lerpAngle(home.rx, -c.m.tilt * DEG, shown),
+    rz: lerpAngle(home.rz, 0, shown),
   };
 }
 /** Half the frame's length along the split, and a card's length along it. */
@@ -348,8 +372,8 @@ function featureRing(c: Context, angle: number, p: number, outwards: boolean): R
   const R = clamp(((c.w + c.g) * c.n) / TAU, half * 0.26, half * 0.4) * c.m.radius;
   const centre = Math.min(-half + R + card / 2 + 0.12, -half * 0.42);
   const out = smooth(1 - Math.abs(p));
-  const placed = featureCard(c, centre + Math.sin(angle) * R, 0, Math.cos(angle) * R, centre, half * 0.42 * c.m.shape, out);
-  return { ...placed, ry: placed.ry + (outwards ? angle : 0) * (1 - out), s: lerp(1, c.m.scale, out), scaled: true, p };
+  const placed2 = featureCard(c, centre + Math.sin(angle) * R, 0, Math.cos(angle) * R, centre, half * 0.42 * c.m.shape, out, { rx: 0, ry: outwards ? angle : 0, rz: 0 });
+  return { ...placed2, s: lerp(1, c.m.scale, out), scaled: true, p };
 }
 
 /** An upright wheel's cards and radius: sized so the whole wheel sits inside the frame. */
@@ -382,14 +406,19 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
   slide(i, c) {
     const p = centred(i - c.T * c.n, c.n);
     if (c.v.dock) {
-      // A row of small cards runs along the foot of the frame. The card in the
-      // middle rises out of it and is shown large in the space above, then
-      // drops back into its place as the row moves on.
+      // A row of small cards runs along one edge of the frame. The card in the
+      // middle rises out of it and is shown large in the space beside, then
+      // drops back into its place as the row moves on. Sideways the row sits
+      // along the foot; up or down it runs along the left edge, like a sidebar.
       const out = smooth(1 - Math.abs(p));
-      const row = -1 + c.h / 2 + 0.12;
-      const top = 0.94 - (c.h * c.m.scale) / 2;
-      const raised = Math.max(row + c.h / 2 + 0.06 + (c.h * c.m.scale) / 2, (row + c.h / 2 + 0.94) / 2);
-      return { u: lerp(along(p, c), 0, out), v: lerp(row, Math.min(top, raised), out) * c.m.shape + row * (1 - c.m.shape) * (1 - out), z: 0.3 * out, s: lerp(1, c.m.scale, out), scaled: true, p, a: edgeFade(p, c.n) };
+      const upright = c.o.direction === "up" || c.o.direction === "down";
+      const span = upright ? c.A : 1; // half the frame, across the row
+      const thick = upright ? c.w : c.h; // the row's thickness
+      const row = -span + thick / 2 + 0.12;
+      const room = row + thick / 2 + 0.06; // where the free space starts
+      const shownHalf = (thick * c.m.scale) / 2;
+      const target = Math.min(span * 0.94 - shownHalf, Math.max(room + shownHalf, (room + span * 0.94) / 2));
+      return { u: lerp(along(p, c), 0, out), v: lerp(row, lerp(row, target, c.m.shape), out), z: 0.3 * out, s: lerp(1, c.m.scale, out), scaled: true, p, a: edgeFade(p, c.n) };
     }
     return { u: along(p, c), p, a: edgeFade(p, c.n) };
   },
@@ -504,11 +533,10 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       const centre = Math.min(-half + tight + card / 2 + 0.12, -half * 0.35);
       const out = smooth(1 - Math.abs(p)); // 1 in focus, 0 from one place away
       const blade = lean(Math.cos(angle), Math.sin(angle));
-      const placed = featureCard(c, centre + Math.cos(angle) * tight, Math.sin(angle) * tight, c.o.faceCamera ? -Math.abs(p) * 0.004 : 0, centre, half * (c.v.tall ? 0.52 : 0.4) * c.m.shape, out);
       const spoke = featurePlace(c, Math.cos(angle), Math.sin(angle));
       // The card stands upright as it is pulled out of the wheel.
-      if (c.o.faceCamera) return { ...placed, rx: 0, ry: 0, rz: ray(spoke.x, spoke.y) * (1 - out), p };
-      return { ...placed, rx: placed.rx + blade.rx * (1 - out), ry: placed.ry + blade.ry * (1 - out), rz: ray(spoke.x, spoke.y) * (1 - out), p };
+      const placed = featureCard(c, centre + Math.cos(angle) * tight, Math.sin(angle) * tight, c.o.faceCamera ? -Math.abs(p) * 0.004 : 0, centre, half * (c.v.tall ? 0.52 : 0.4) * c.m.shape, out, { rx: blade.rx, ry: blade.ry, rz: ray(spoke.x, spoke.y) });
+      return { ...placed, p };
     }
     if (c.v.side) return { x: Math.cos(angle) * R - R, y: Math.sin(angle) * R, ...lean(Math.cos(angle), Math.sin(angle)), rz: ray(Math.cos(angle), Math.sin(angle)), p };
     return { x: Math.sin(angle) * R, y: Math.cos(angle) * R - R, ...lean(Math.sin(angle), Math.cos(angle)), rz: ray(Math.sin(angle), Math.cos(angle)), p };
@@ -518,6 +546,24 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const rows = Math.ceil(c.n / cols);
     const col = i % cols;
     const row = Math.floor(i / cols);
+    if (c.v.scatter) {
+      // Prints dropped loosely on a table, filling the frame. One at a time is
+      // picked up, straightened and held up large in the middle, then put back.
+      const across = Math.max(1, Math.round(Math.sqrt(c.n * c.A)));
+      const down = Math.ceil(c.n / across);
+      const cellW = (2 * c.A * 0.78) / across;
+      const cellH = (2 * 0.74) / down;
+      const home = {
+        x: (-across / 2 + (i % across) + 0.5) * cellW + (hash(i, 3) - 0.5) * cellW * 0.4,
+        y: (down / 2 - Math.floor(i / across) - 0.5) * cellH + (hash(i, 5) - 0.5) * cellH * 0.4,
+        rz: (hash(i, 7) - 0.5) * 0.5,
+      };
+      const p = centred(i - c.T * c.n, c.n);
+      const out = smooth(1 - Math.abs(p));
+      // Held up as large as asked, but never larger than the frame.
+      const largest = Math.min(c.m.scale, (1.8 * c.A) / c.w, 1.8 / c.h);
+      return { x: lerp(home.x, 0, out), y: lerp(home.y, 0, out), z: hash(i, 9) * 0.02 + 0.3 * out, rz: lerpAngle(home.rz, 0, out), s: lerp(1, largest, out), scaled: true, p, lead: Math.abs(p) };
+    }
     if (c.v.feature) {
       // A contact sheet at one end of the frame. Card by card, each lifts out of
       // its cell and is shown large at the other end, then goes back.
@@ -644,12 +690,11 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       const centre = -half * 0.5;
       const p = centred(i - c.T * c.n, c.n);
       const out = smooth(1 - Math.abs(p));
-      const placed = featureCard(c, centre + x * R, y * R, z * R, centre, half * 0.42 * c.m.shape, out);
+      // Each card faces straight out from the middle of the globe.
       const facing = featurePlace(c, x, y);
+      const placed = featureCard(c, centre + x * R, y * R, z * R, centre, half * 0.42 * c.m.shape, out, { rx: -Math.asin(clamp(facing.y, -1, 1)), ry: Math.atan2(facing.x, z), rz: 0 });
       return {
         ...placed,
-        ry: placed.ry + Math.atan2(facing.x, z) * (1 - out),
-        rx: placed.rx - Math.asin(facing.y) * (1 - out),
         s: lerp(1, c.m.scale, out),
         scaled: true,
         p,
@@ -747,10 +792,18 @@ export function itemTotal(layout: LayoutName, n: number, v: Variant): number {
 }
 
 /** These pace themselves from the shared clock: one card at a time, or still cards. */
+/** Layouts whose pull-out group is one solid shape, so its cards never stagger. */
+const SOLID_GROUPS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "orbit", "globe", "grid"]);
+/** Whether the Stagger slider does anything for this preset. */
+export const canStagger = (preset: Preset) => !((preset.variant.feature && SOLID_GROUPS.has(preset.layout)) || preset.variant.scatter);
+/** Layouts that need enough cards to make their shape: with fewer uploads, the uploads repeat. */
+export const FILLS_UP: ReadonlySet<LayoutName> = new Set<LayoutName>(["globe"]);
 const SHARED_CLOCK: ReadonlySet<LayoutName> = new Set<LayoutName>(["flip", "pulse", "proximity", "tour", "zoom"]);
 
 /** Motion is a chain of steps, one per item unless a layout says otherwise. */
 function stepsPerLoop(layout: LayoutName, c: Context): number {
+  // One step per card: each step brings the next card into focus.
+  if (c.v.feature || c.v.scatter) return c.n;
   if (layout === "marquee") return Math.ceil(c.n / (c.v.rows ?? 2));
   if (layout === "grid") return gridCols(c.n);
   if (layout === "globe") return 6;
@@ -789,7 +842,9 @@ function itemTime(layout: LayoutName, i: number, c: Context, T: number, reversed
   const spot = queuePlace(layout, i, c, k);
   // Cards do not all set off on the beat: a slight, fixed unevenness per card.
   const unevenness = (hash(i, 11) - 0.5) * 0.12;
-  const wait = clamp((reversed ? 1 - spot : spot) + unevenness) * c.m.stagger * c.m.hold;
+  // A group that is one solid shape (a ring, a globe, a grid, a table of cards) moves as one: staggering it would pull it out of shape.
+  const solid = (c.v.feature && SOLID_GROUPS.has(layout)) || c.v.scatter;
+  const wait = solid ? 0 : clamp((reversed ? 1 - spot : spot) + unevenness) * c.m.stagger * c.m.hold;
   return lerp(v, k + c.ease(clamp((v - k - wait) / (1 - c.m.hold))), c.m.rhythm) / steps;
 }
 
@@ -829,7 +884,7 @@ const COUNTS_DOWN: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "wheel
 /** Layouts with no single card that is "the one showing", so the number overlay has nothing to count. */
 export const NO_COUNTER: ReadonlySet<LayoutName> = new Set<LayoutName>(["grid", "globe", "float", "marquee", "fan"]);
 /** Whether a preset has one card at a time that the number overlay can count. Two rings turning against each other do not. */
-export const hasCounter = (preset: Preset) => (!NO_COUNTER.has(preset.layout) || Boolean(preset.variant.feature)) && !preset.variant.two;
+export const hasCounter = (preset: Preset) => (!NO_COUNTER.has(preset.layout) || Boolean(preset.variant.feature) || Boolean(preset.variant.scatter)) && !preset.variant.two;
 /** How far the card in focus comes forward: enough to win the overlap, too little to see as movement. */
 const FOCUS_LIFT = 0.03;
 /** How long the fade out and the fade in each take, as a share of the loop. */
@@ -1165,6 +1220,8 @@ function naturalDuration(preset: Preset): number {
   const n = itemTotal(preset.layout, preset.defaults.count ?? BASE_MOTION.count, preset.variant);
   const stops = preset.path?.length ?? 1;
   const seconds = (() => {
+    // A pull-out or a table of cards shows every card in turn, so it needs time for each.
+    if (preset.variant.feature || preset.variant.scatter) return n * 2.6;
     switch (preset.layout) {
       case "marquee":
         return Math.ceil(n / (preset.variant.rows ?? 2)) * 3.2;
@@ -1260,7 +1317,7 @@ export const PRESETS: Preset[] = [
   preset("Ring 03", "ring", { inside: true }, { count: 12, size: 1.1, gap: 0.1 }),
   preset("Ring 04", "ring", { vertical: true }, { count: 10, size: 0.7, gap: 0.16, rhythm: 1 }),
   preset("Ring 05", "ring", {}, { count: 14, size: 0.6, gap: 0.34, tilt: 14, scale: 1.25, perspective: 55, rhythm: 1 }, { options: { focus: "centre" } }),
-  preset("Ring 06", "ring", { feature: true }, { count: 10, size: 0.26, gap: 0.2, rhythm: 1, hold: 0.55, stagger: 0.3, scale: 3.6, groupTilt: 22 }, { options: { faceCamera: false }, format: "wide" }),
+  preset("Ring 06", "ring", { feature: true }, { count: 10, size: 0.26, gap: 0.2, rhythm: 1, hold: 0.55, scale: 3.6, groupTilt: 22 }, { options: { faceCamera: false }, format: "wide" }),
   preset("Orbit 01", "orbit", {}, { count: 7, size: 0.9, tilt: 28 }, { options: { centre: false } }),
   preset("Orbit 02", "orbit", {}, { count: 8, size: 0.9, tilt: 28 }),
   preset("Orbit 03", "orbit", { two: true }, { count: 12, size: 0.7, tilt: 34, perspective: 40, radius: 0.88 }, { options: { centre: false } }),
@@ -1269,7 +1326,7 @@ export const PRESETS: Preset[] = [
   preset("Orbit 06", "orbit", {}, { count: 9, size: 0.7, tilt: 36, radius: 1.25, perspective: 50 }, { options: { centre: false } }),
   preset("Orbit 07", "orbit", { wheel: true }, { count: 10, size: 0.8, gap: 0.3, yaw: 40, tilt: 6, perspective: 45 }, { options: { centre: false } }),
   preset("Orbit 08", "orbit", { wheel: true }, { count: 8, size: 0.8, gap: 0.4, yaw: 28, tilt: 12, perspective: 40, scale: 1.35, rhythm: 1 }, { options: { centre: false, focus: "centre" } }),
-  preset("Orbit 09", "orbit", { feature: true }, { count: 9, size: 0.26, gap: 0.25, rhythm: 1, hold: 0.55, stagger: 0.3, scale: 3.6, groupTilt: 30 }, { options: { centre: false }, format: "wide" }),
+  preset("Orbit 09", "orbit", { feature: true }, { count: 9, size: 0.26, gap: 0.25, rhythm: 1, hold: 0.55, scale: 3.6, groupTilt: 30 }, { options: { centre: false }, format: "wide" }),
   preset("Deck 01", "deck", { fly: "up" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 02", "deck", { fly: "right" }, { count: 6, size: 1.05, gap: 0.3, rhythm: 1 }),
   preset("Deck 03", "deck", { fly: "spin" }, { count: 6, size: 1, gap: 0.4, rhythm: 1 }),
@@ -1285,6 +1342,7 @@ export const PRESETS: Preset[] = [
   preset("Grid 02", "grid", { pan: "diag" }, { count: 36, size: 0.6, gap: 0.1, tilt: 48 }),
   preset("Grid 03", "grid", { pan: "alt" }, { count: 24, size: 0.6, gap: 0.1 }),
   preset("Grid 04", "grid", { pan: "pulse" }, { count: 24, size: 0.55, gap: 0.24 }),
+  preset("Scatter 01", "grid", { scatter: true }, { count: 12, size: 0.34, gap: 0.1, rhythm: 1, hold: 0.55, scale: 3 }),
   preset("Grid 08", "grid", { feature: true }, { count: 9, size: 0.26, gap: 0.08, rhythm: 1, hold: 0.55, scale: 3.6, groupTilt: 10, groupTurn: -14 }, { options: { faceCamera: false }, format: "wide" }),
   preset("Grid 05", "tour", {}, { count: 9, size: 1.1, gap: 0.12, rhythm: 1, hold: 0.45 }, { path: [0, 4, 8, 6, 2] }),
   preset("Grid 06", "tour", {}, { count: 16, size: 0.9, gap: 0.1, rhythm: 1, hold: 0.4, tilt: 24 }, { path: [0, 5, 10, 15, 12, 9, 6, 3] }),
