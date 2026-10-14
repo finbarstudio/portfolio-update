@@ -2680,6 +2680,221 @@ export const PRESETS: AnimationPreset[] = [
     ],
   },
   {
+    id: "sway",
+    name: "Sway",
+    description: "",
+    shots: [
+      {
+        name: "Sway",
+        seconds: 6,
+        build: journey(
+          [
+            [0, { rotZ: -3 }],
+            [0.5, { rotZ: 3 }],
+            [1, { rotZ: -3 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "float",
+    name: "Float",
+    description: "",
+    shots: [
+      {
+        name: "Float",
+        seconds: 6,
+        build: journey(
+          [
+            [0, { y: 2, rotX: 2 }],
+            [0.5, { y: -2, rotX: -2 }],
+            [1, { y: 2, rotX: 2 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "figure-eight",
+    name: "Figure Eight",
+    description: "",
+    shots: [
+      {
+        name: "Figure Eight",
+        seconds: 8,
+        build: journey(
+          [
+            [0, { rotY: 0, rotX: 0 }],
+            [0.25, { rotY: 12, rotX: 6 }],
+            [0.5, { rotY: 0, rotX: 0 }],
+            [0.75, { rotY: -12, rotX: 6 }],
+            [1, { rotY: 0, rotX: 0 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "look-around",
+    name: "Look Around",
+    description: "",
+    shots: [
+      {
+        name: "Look Around",
+        seconds: 8,
+        build: journey(
+          [
+            [0, { rotY: 0, rotX: 0 }],
+            [0.25, { rotY: 18, rotX: 4 }],
+            [0.5, { rotY: 0, rotX: 10 }],
+            [0.75, { rotY: -18, rotX: 4 }],
+            [1, { rotY: 0, rotX: 0 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "tilt-back",
+    name: "Tilt Back",
+    description: "",
+    shots: [
+      {
+        name: "Tilt Back",
+        seconds: 6,
+        build: journey(
+          [
+            [0, { tilt: 0 }],
+            [0.5, { tilt: 10, fill: 0.84 }],
+            [1, { tilt: 0 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "full-spin",
+    name: "Full Spin",
+    description: "",
+    // A whole turn shows every side, so it is kept for the slim, handheld things it suits.
+    categories: ["Phones and tablets"],
+    shots: [
+      {
+        name: "Full Spin",
+        seconds: 10,
+        build: journey(
+          [
+            [0, { rotY: 0, fill: 0.72 }],
+            [1, { rotY: 360, fill: 0.72 }],
+          ],
+          "linear",
+        ),
+      },
+    ],
+  },
+  {
+    id: "swing-wide",
+    name: "Swing Wide",
+    description: "",
+    shots: [
+      {
+        name: "Swing Wide",
+        seconds: 8,
+        build: journey(
+          [
+            [0, { rotY: -28, x: 3, fill: 0.94 }],
+            [0.5, { rotY: 28, x: -3, fill: 0.94 }],
+            [1, { rotY: -28, x: 3, fill: 0.94 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "breathe-close",
+    name: "Breathe Close",
+    description: "",
+    shots: [
+      {
+        name: "Breathe Close",
+        seconds: 6,
+        crop: true,
+        build: journey(
+          [
+            [0, { fill: 1.1 }],
+            [0.5, { fill: 1.25, dof: 40 }],
+            [1, { fill: 1.1 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "glow-pulse",
+    name: "Glow Pulse",
+    description: "",
+    shots: [
+      {
+        name: "Glow Pulse",
+        seconds: 4,
+        build: journey(
+          [
+            [0, { glow: 0 }],
+            [0.5, { glow: 60 }],
+            [1, { glow: 0 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "focus-breathe",
+    name: "Focus Breathe",
+    description: "",
+    shots: [
+      {
+        name: "Focus Breathe",
+        seconds: 6,
+        build: journey(
+          [
+            [0, { dof: 10 }],
+            [0.5, { dof: 70 }],
+            [1, { dof: 10 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
+    id: "dolly-turn",
+    name: "Dolly Turn",
+    description: "",
+    shots: [
+      {
+        name: "Dolly Turn",
+        seconds: 7,
+        build: journey(
+          [
+            [0, { rotY: -10, fill: 0.8 }],
+            [0.5, { rotY: 10, fill: 0.95 }],
+            [1, { rotY: -10, fill: 0.8 }],
+          ],
+          "easeInOut",
+        ),
+      },
+    ],
+  },
+  {
     id: "lamps-pass",
     name: "Lamps Pass",
     description: "",
