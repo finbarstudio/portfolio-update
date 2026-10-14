@@ -12,6 +12,8 @@ export interface MediaItem {
   url?: string;
   /** a small canvas each video frame is drawn down to for the preview */
   frame?: HTMLCanvasElement;
+  /** a video's first picture, which a crossfade fades to */
+  first?: WebGLTexture | null;
   /** the object URL a video plays from, released when the video is removed */
   videoUrl?: string;
   /** the uploaded picture file, re-read at full quality for an export; no decoded pixels are held */
@@ -29,6 +31,8 @@ export interface Scene extends Settings {
   fullQuality?: boolean;
   /** How many pictures and videos are uploaded. The number overlay counts these; without any it counts cards. */
   uploads?: number;
+  /** Per upload, how far its video has faded to its first picture, 0 to 1. */
+  fades?: number[];
   /** A small number in the corner of every card, saying which upload it shows. An editing aid: never set for an export. */
   tags?: boolean;
 }
@@ -386,8 +390,16 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
         gl.uniform2f(uniform.uSize, w * item.s, h * item.s);
         gl.uniform4fv(uniform.uCrop, crop);
         gl.uniform1f(uniform.uRadius, look.radius * Math.min(w, h) * item.s);
-        gl.uniform1f(uniform.uAlpha, item.alpha);
         gl.uniform1f(uniform.uShade, clamp(1 + (item.depth + distance) * 0.1, 0.4, 1)); // dimmer further away
+        // A crossfade: the first picture underneath, the video over it fading out.
+        const fade = source.first ? (scene.fades?.[item.i % media.length] ?? 0) : 0;
+        if (fade > 0) {
+          gl.bindTexture(gl.TEXTURE_2D, source.first ?? null);
+          gl.uniform1f(uniform.uAlpha, item.alpha);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          gl.bindTexture(gl.TEXTURE_2D, source.texture);
+        }
+        gl.uniform1f(uniform.uAlpha, item.alpha * (1 - fade));
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         if (scene.tags) {
           // The tag rides on its card, in the top left corner, a tenth of the card's short side tall.

@@ -1440,13 +1440,20 @@ export interface Look {
   counterPosition: CounterPosition;
   counterScale: number;
   counterStyle: CounterStyle;
-  /** videos run round and round, or each plays through once when its card comes into focus */
+  /** videos run round and round, run forwards then backwards, or each plays through once when its card comes into focus */
   videoPlay: VideoPlay;
-  /** seconds a card is in focus before its video starts */
-  videoDelay: number;
+  /** play once on focus: how long a card is in focus before its video starts, in steps (the time from one card to the next) */
+  videoStart: number;
+  /** play once on focus: after its card leaves focus, a video holds its last picture, plays backwards, or crossfades to its first */
+  videoAfter: VideoAfter;
+  /** play once on focus: how long after leaving focus it starts going back, in steps */
+  videoReturnAfter: number;
+  /** play once on focus: how long going back takes, in steps */
+  videoReturnLength: number;
 }
 
-export type VideoPlay = "loop" | "focus";
+export type VideoPlay = "loop" | "bounce" | "focus";
+export type VideoAfter = "hold" | "bounce" | "fade";
 
 /** One frame of the loop, as far as video playback cares. */
 export interface FocusFrame {
@@ -1465,55 +1472,114 @@ export interface FocusPlayback {
   lead: number | null;
   /** the loop time the card in focus came into focus */
   since: number;
+  /** seconds from one card coming into focus to the next */
+  step: number;
   /** per upload, seconds into its video (play once on focus) */
   at: number[];
+  /** per upload, how far it has faded to its first picture, 0 to 1 */
+  mix: number[];
+  /** per upload, the loop time its card left focus, and where its video was then */
+  left: (number | null)[];
+  atLeft: number[];
   /** per upload, the loop times its card comes into focus, in order; the first may be before the loop starts */
   starts: number[][];
 }
-export const newFocusPlayback = (): FocusPlayback => ({ last: Infinity, lead: null, since: 0, at: [], starts: [] });
+export const newFocusPlayback = (): FocusPlayback => ({ last: Infinity, lead: null, since: 0, step: 1, at: [], mix: [], left: [], atLeft: [], starts: [] });
+
+/** What every upload's video should show at one moment. */
+export interface VideoMoment {
+  /** seconds into the video */
+  times: number[];
+  /** 0 shows the video; towards 1 it fades to the video's first picture */
+  fades: number[];
+}
+
+/** How long a crossfade holds on the first picture after the video has gone back to it, so the change is hidden. */
+const FADE_SETTLE = 0.2;
 
 /**
  * Play once on focus: a video starts from its first picture when its card
- * comes into focus, plays through and stays on its last picture. It goes back
- * to the first picture only while its card cannot be seen, so the change is
- * never on show. A card that never leaves the canvas has no such moment, and
- * goes back as it comes into focus again.
+ * comes into focus, plays through and stays on its last picture. Then, as the
+ * card moves away, it goes back to the start in one of three ways: it holds
+ * until the card is off screen, it plays backwards, or it crossfades to its
+ * first picture. Whichever, it goes straight back while its card cannot be
+ * seen at all. Timings are in steps, the time from one card to the next.
  */
 function advance(state: FocusPlayback, seconds: number, step: number, frame: FocusFrame, lengths: number[], look: Look) {
   if (frame.focus !== state.lead) {
+    if (state.lead !== null) {
+      state.left[state.lead] = seconds;
+      state.atLeft[state.lead] = state.at[state.lead];
+    }
     state.lead = frame.focus;
     state.since = seconds;
-    if (frame.focus !== null) state.at[frame.focus] = 0;
+    if (frame.focus !== null) {
+      state.left[frame.focus] = null;
+      // Holding, it starts again from the top; going back, it carries on from wherever going back had reached.
+      if (look.videoAfter === "hold" || state.mix[frame.focus] > 0) {
+        state.at[frame.focus] = 0;
+        state.mix[frame.focus] = 0;
+      }
+    }
   }
-  const playing = seconds - state.since >= look.videoDelay;
+  const playing = seconds - state.since >= look.videoStart * state.step;
   for (let u = 0; u < lengths.length; u++) {
     if (frame.focus === null || u === frame.focus) {
       if (playing) state.at[u] = Math.min(lengths[u], state.at[u] + step);
-    } else if (!frame.shown.has(u)) state.at[u] = 0;
+      continue;
+    }
+    if (!frame.shown.has(u)) {
+      state.at[u] = 0;
+      state.mix[u] = 0;
+      continue;
+    }
+    const left = state.left[u];
+    if (left === null || left === undefined || look.videoAfter === "hold") continue;
+    const into = seconds - left - look.videoReturnAfter * state.step;
+    if (into <= 0) continue;
+    const over = Math.max(0.05, look.videoReturnLength * state.step);
+    if (look.videoAfter === "bounce") state.at[u] = state.atLeft[u] * Math.max(0, 1 - into / over);
+    else if (into < over) state.mix[u] = into / over;
+    else if (into < over + FADE_SETTLE) {
+      state.at[u] = 0;
+      state.mix[u] = 1;
+    } else {
+      state.mix[u] = 0;
+      state.left[u] = null;
+    }
   }
 }
 
 /**
- * How far into its video each upload should be at `seconds` of the loop.
- * `lengths` holds each upload's video length (0 for a picture) and `frameAt`
- * describes any moment of the loop. Fed every frame in order. When the loop
- * starts over it first runs the whole loop through quietly, so that the first
- * frame carries on exactly from the last and it knows when each card will
- * come into focus.
+ * What each upload's video should show at `seconds` of the loop. `lengths`
+ * holds each upload's video length (0 for a picture) and `frameAt` describes
+ * any moment of the loop. Fed every frame in order. When the loop starts over
+ * it first runs the whole loop through quietly, so that the first frame
+ * carries on exactly from the last and it knows when each card will come into
+ * focus.
  *
- * Looping videos are lined up with focus too: each runs round and round, timed
- * so that it is on its first picture at the moment its card comes into focus.
+ * Looping and bouncing videos are lined up with focus too: each is timed so
+ * that it is on its first picture at the moment its card comes into focus.
  */
-export function focusTimes(state: FocusPlayback, seconds: number, duration: number, lengths: number[], look: Look, frameAt: (seconds: number) => FocusFrame): number[] {
+export function focusTimes(state: FocusPlayback, seconds: number, duration: number, lengths: number[], look: Look, frameAt: (seconds: number) => FocusFrame): VideoMoment {
   const uploads = lengths.length;
   if (seconds < state.last || state.at.length !== uploads) {
     const step = 1 / 60;
     const frames: FocusFrame[] = [];
     for (let t = 0; t < duration; t += step) frames.push(frameAt(t));
-    state.at = new Array<number>(uploads).fill(0);
+    const reset = () => {
+      state.at = new Array<number>(uploads).fill(0);
+      state.mix = new Array<number>(uploads).fill(0);
+      state.left = new Array<number | null>(uploads).fill(null);
+      state.atLeft = new Array<number>(uploads).fill(0);
+      state.lead = null;
+      state.since = 0;
+    };
+    reset();
     state.starts = lengths.map(() => []);
-    state.lead = null;
-    state.since = 0;
+    let changes = 0;
+    for (let k = 1; k < frames.length; k++) if (frames[k].focus !== frames[k - 1].focus && frames[k].focus !== null) changes++;
+    state.step = duration / Math.max(1, changes);
     // With no single card in focus every video plays from the start of the loop, so there is nothing to carry over.
     if (frames.length && frames[0].focus !== null) {
       // Twice round, so the start of the loop is what every later loop repeats.
@@ -1524,6 +1590,7 @@ export function focusTimes(state: FocusPlayback, seconds: number, duration: numb
           if (pass === 1 && state.lead !== before && state.lead !== null) state.starts[state.lead].push(k * step);
         });
         state.since -= duration;
+        for (let u = 0; u < uploads; u++) if (state.left[u] !== null) state.left[u] = (state.left[u] ?? 0) - duration;
       }
       // The card in focus at the loop point came into focus before it.
       if (state.lead !== null && state.starts[state.lead][0] !== state.since) state.starts[state.lead].unshift(state.since);
@@ -1532,8 +1599,8 @@ export function focusTimes(state: FocusPlayback, seconds: number, duration: numb
   }
   advance(state, seconds, Math.max(0, seconds - state.last), frameAt(seconds), lengths, look);
   state.last = seconds;
-  if (look.videoPlay === "focus") return state.at;
-  return lengths.map((length, u) => {
+  if (look.videoPlay === "focus") return { times: state.at, fades: state.mix };
+  const times = lengths.map((length, u) => {
     if (!length) return 0;
     const starts = state.starts[u];
     // Timed from whichever moment of coming into focus is nearest, behind or ahead, so the video is already in step
@@ -1548,8 +1615,15 @@ export function focusTimes(state: FocusPlayback, seconds: number, duration: numb
         }
       }
     }
-    return (((seconds - start) % length) + length) % length;
+    const into = seconds - start;
+    if (look.videoPlay === "bounce") {
+      // Forwards to the end, then backwards to the start: never a jump, however the clip begins and ends.
+      const phase = ((into % (2 * length)) + 2 * length) % (2 * length);
+      return phase < length ? phase : 2 * length - phase;
+    }
+    return ((into % length) + length) % length;
   });
+  return { times, fades: new Array<number>(uploads).fill(0) };
 }
 
 export type Counter = "off" | "number" | "fraction";
@@ -1605,7 +1679,10 @@ export const BASE_LOOK: Look = {
   counterScale: 1,
   counterStyle: "outline",
   videoPlay: "loop",
-  videoDelay: 0.3,
+  videoStart: 0.1,
+  videoAfter: "bounce",
+  videoReturnAfter: 0.1,
+  videoReturnLength: 0.6,
 };
 
 /** A saved setup: which preset, how it was tuned, and how it looks. No media. */
@@ -1686,9 +1763,12 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   look.counterStyle = oneOf(savedLook.counterStyle, COUNTER_STYLES.map((style) => style.id)) ?? look.counterStyle;
   const counterScale = finite(savedLook.counterScale);
   if (counterScale !== undefined) look.counterScale = clamp(counterScale, 0.1, 20);
-  look.videoPlay = oneOf(savedLook.videoPlay, ["loop", "focus"] as const) ?? look.videoPlay;
-  const videoDelay = finite(savedLook.videoDelay);
-  if (videoDelay !== undefined) look.videoDelay = clamp(videoDelay, 0, 60);
+  look.videoPlay = oneOf(savedLook.videoPlay, ["loop", "bounce", "focus"] as const) ?? look.videoPlay;
+  look.videoAfter = oneOf(savedLook.videoAfter, ["hold", "bounce", "fade"] as const) ?? look.videoAfter;
+  for (const key of ["videoStart", "videoReturnAfter", "videoReturnLength"] as const) {
+    const value = finite(savedLook[key]);
+    if (value !== undefined) look[key] = clamp(value, 0, 20);
+  }
 
   return { preset: found, motion, options, easing, path, look };
 }

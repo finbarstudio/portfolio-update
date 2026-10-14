@@ -49,6 +49,7 @@ import {
   type Preset,
   type SavedSetup,
   type TiltMode,
+  type VideoAfter,
   type VideoPlay,
 } from "./engine";
 import { ArrayBufferTarget, Muxer } from "mp4-muxer";
@@ -202,11 +203,13 @@ function loadVideo(renderer: Renderer, file: File, id: number): Promise<MediaIte
     video.onloadeddata = async () => {
       video.onloadeddata = null;
       const frame = drawnDown(video, PREVIEW_VIDEO);
+      const first = drawnDown(video, EXPORT_PICTURE);
       const thumb = await toBlob(drawnDown(video, THUMB_PICTURE));
       void video.play();
       resolve({
         id,
         texture: renderer.texture(frame, false),
+        first: renderer.texture(first, true),
         aspect: video.videoWidth / video.videoHeight,
         video,
         frame,
@@ -227,6 +230,7 @@ const loadFile = (renderer: Renderer, file: File, id: number) => (file.type.star
 function discard(renderer: Renderer, items: MediaItem[]) {
   for (const item of items) {
     renderer.deleteTexture(item.texture);
+    if (item.first) renderer.deleteTexture(item.first);
     item.video?.pause();
     item.video?.removeAttribute("src");
     if (item.url) URL.revokeObjectURL(item.url);
@@ -591,8 +595,14 @@ const SIDES = [
   { value: false, label: "Shown right" },
   { value: true, label: "Shown left" },
 ];
+const VIDEO_AFTERS: { value: VideoAfter; label: string }[] = [
+  { value: "hold", label: "Hold" },
+  { value: "bounce", label: "Bounce back" },
+  { value: "fade", label: "Crossfade" },
+];
 const VIDEO_PLAYS: { value: VideoPlay; label: string }[] = [
   { value: "loop", label: "Loop" },
+  { value: "bounce", label: "Bounce" },
   { value: "focus", label: "Once on focus" },
 ];
 const CARD_FACINGS = [
@@ -762,8 +772,8 @@ export default function MotionTool() {
       const longest = fullScreenRef.current ? FULL_SCREEN_CANVAS : PREVIEW_CANVAS;
       const resolution = fullSizeRef.current ? 1 : Math.min(1, longest / Math.max(width, height));
       const seconds = ((now - loopStartRef.current) / 1000) % duration;
-      steerVideos(seconds);
-      renderer.draw(seconds, { ...sceneRef.current, media: mediaRef.current, resolution, tags: tagsRef.current && !fullSizeRef.current && !placeholdersRef.current, fullQuality: fullSizeRef.current, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
+      const fades = steerVideos(seconds);
+      renderer.draw(seconds, { ...sceneRef.current, media: mediaRef.current, fades, resolution, tags: tagsRef.current && !fullSizeRef.current && !placeholdersRef.current, fullQuality: fullSizeRef.current, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
       frame = requestAnimationFrame(tick);
     });
     return () => {
@@ -804,11 +814,11 @@ export default function MotionTool() {
    */
   const playbackRef = useRef(newFocusPlayback());
   const wantedRef = useRef<number[]>([]);
-  const steerVideos = (seconds: number) => {
+  const steerVideos = (seconds: number): number[] | undefined => {
     const media = mediaRef.current;
-    if (!media.some((item) => item.video)) return;
+    if (!media.some((item) => item.video)) return undefined;
     const looping = sceneRef.current.look.videoPlay === "loop";
-    const times = videoTimes(playbackRef.current, seconds);
+    const { times, fades } = videoTimes(playbackRef.current, seconds);
     const before = wantedRef.current;
     media.forEach(({ video }, index) => {
       if (!video) return;
@@ -819,7 +829,7 @@ export default function MotionTool() {
       const off = looping ? Math.min(apart, length - apart) : apart;
       if (looping || (want > (before[index] ?? 0) && want < lastMoment(video))) {
         if (!video.seeking && (video.paused || off > 0.35)) video.currentTime = want;
-        if (video.paused) void video.play();
+        if (video.paused) video.play().catch(() => undefined); // a pause straight after is expected, not a fault
       } else {
         if (!video.paused) video.pause();
         const to = Math.min(want, lastMoment(video));
@@ -827,6 +837,7 @@ export default function MotionTool() {
       }
     });
     wantedRef.current = [...times];
+    return [...fades];
   };
 
   const restart = () => {
@@ -1040,11 +1051,13 @@ export default function MotionTool() {
       setStatus("Rendering…");
       for (let k = 0; k < total && !failure; k++) {
         const seconds = k / EXPORT_FPS;
+        let fades: number[] | undefined;
         if (videos.length) {
-          const times = videoTimes(playback, seconds);
-          await Promise.all(mediaRef.current.map((item, index) => (item.video ? seekTo(item.video, times[index], scene.look.videoPlay === "focus") : undefined)));
+          const moment = videoTimes(playback, seconds);
+          fades = [...moment.fades];
+          await Promise.all(mediaRef.current.map((item, index) => (item.video ? seekTo(item.video, moment.times[index], scene.look.videoPlay !== "loop") : undefined)));
         }
-        renderer.draw(seconds, { ...scene, media: mediaRef.current, resolution: 1, fullQuality: true, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
+        renderer.draw(seconds, { ...scene, media: mediaRef.current, fades, resolution: 1, fullQuality: true, uploads: placeholdersRef.current ? undefined : mediaRef.current.length });
         const picture = new VideoFrame(canvas, { timestamp: Math.round((k * 1_000_000) / EXPORT_FPS), duration: Math.round(1_000_000 / EXPORT_FPS) });
         encoder.encode(picture, { keyFrame: k % (EXPORT_FPS * 2) === 0 });
         picture.close();
@@ -1345,7 +1358,15 @@ export default function MotionTool() {
             <Choice label="Videos" value={look.videoPlay} options={VIDEO_PLAYS} onChange={(videoPlay) => patchLook({ videoPlay })} />
             {look.videoPlay === "focus" && (
               <>
-                <Slider label="Start delay" min={0} max={3} step={0.05} typedMin={0} typedMax={60} value={look.videoDelay} onChange={(videoDelay) => patchLook({ videoDelay })} onReset={() => patchLook({ videoDelay: BASE_LOOK.videoDelay })} />
+                <Slider label="Start delay" min={0} max={1} step={0.05} typedMin={0} typedMax={20} value={look.videoStart} onChange={(videoStart) => patchLook({ videoStart })} onReset={() => patchLook({ videoStart: BASE_LOOK.videoStart })} />
+                <Choice label="After focus" value={look.videoAfter} options={VIDEO_AFTERS} onChange={(videoAfter) => patchLook({ videoAfter })} />
+                {look.videoAfter !== "hold" && (
+                  <>
+                    <Slider label="Return after" min={0} max={2} step={0.05} typedMin={0} typedMax={20} value={look.videoReturnAfter} onChange={(videoReturnAfter) => patchLook({ videoReturnAfter })} onReset={() => patchLook({ videoReturnAfter: BASE_LOOK.videoReturnAfter })} />
+                    <Slider label="Return length" min={0.05} max={2} step={0.05} typedMin={0.05} typedMax={20} value={look.videoReturnLength} onChange={(videoReturnLength) => patchLook({ videoReturnLength })} onReset={() => patchLook({ videoReturnLength: BASE_LOOK.videoReturnLength })} />
+                  </>
+                )}
+                <p className="mp-note">Timed in steps, so it keeps pace with the loop: 1 is the time from one card to the next.</p>
               </>
             )}
           </>
