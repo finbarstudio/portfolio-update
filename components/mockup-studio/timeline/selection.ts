@@ -19,7 +19,7 @@ export const useSelection = create<SelectionState>()((set) => ({
 }));
 
 interface ShotSelectionState {
-  /** Shots highlighted in the timeline, in timeline order. A preset applied with two or more replaces them all. */
+  /** Shots highlighted in the timeline, in timeline order. A preset replaces them; with none highlighted it replaces the whole timeline. */
   ids: string[];
   /** The shot a shift-click extends from. */
   anchor: string | null;

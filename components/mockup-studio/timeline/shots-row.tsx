@@ -60,6 +60,11 @@ function highlight(
     );
     return;
   }
+  // Clicking the one highlighted shot again lets it go, so presets go back to replacing the whole timeline.
+  if (ids.length === 1 && ids[0] === id) {
+    select([], null);
+    return;
+  }
   select([id], id);
 }
 

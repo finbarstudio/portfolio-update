@@ -17,14 +17,12 @@ import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { Shot } from "@/lib/mockup-studio/scene/types";
 
 /**
- * A one-shot preset animates the shot under the playhead. A multi-shot preset
- * replaces the whole timeline with its own shots and lengths. Either way the
- * preset sets its own pose, so nothing left over from manual edits leaks in.
+ * A preset replaces the whole timeline with its own shots and lengths, or, when shots are highlighted in the
+ * timeline, just those. Either way the preset sets its own pose, so nothing left over from manual edits leaks in.
  */
 function applyPreset(preset: AnimationPreset) {
   const {
     shots,
-    playhead,
     deviceId,
     deviceExtents,
     deviceScreen,
@@ -60,50 +58,25 @@ function applyPreset(preset: AnimationPreset) {
       };
     });
 
-  // Two or more highlighted shots: the preset takes their place, however many shots it has.
+  // Shots highlighted in the timeline: the preset takes their place, however many shots it has. Nothing highlighted:
+  // it takes over the whole timeline.
   const picked = useShotSelection.getState().ids;
   const indices = shots
     .map((shot, index) => (picked.includes(shot.id) ? index : -1))
     .filter((index) => index >= 0);
-  if (indices.length >= 2) {
+  const fresh = built();
+  if (indices.length > 0) {
     const first = Math.min(...indices);
     const last = Math.max(...indices);
-    const fresh = built();
     setShots([...shots.slice(0, first), ...fresh, ...shots.slice(last + 1)]);
-    useShotSelection.getState().select(
-      fresh.map((shot) => shot.id),
-      fresh[0]?.id ?? null,
-    );
     setPlayhead(
       shots.slice(0, first).reduce((sum, shot) => sum + shot.duration, 0),
     );
-    setPlaying(true);
-    return;
-  }
-
-  if (preset.shots.length === 1) {
-    // The take is paced for its own length: a slow twelve second study squeezed into a three second shot is a
-    // different animation, so the shot takes the preset's length along with its moves.
-    const { shot, startMs } = locateShot(shots, playhead);
-    const [part] = preset.shots;
-    const duration = Math.round(part.seconds * 1000);
-    setShots(
-      shots.map((each) =>
-        each.id === shot.id
-          ? {
-              ...each,
-              duration,
-              tracks: part.build(duration, framing),
-              preset: preset.id,
-            }
-          : each,
-      ),
-    );
-    setPlayhead(startMs);
   } else {
-    setShots(built());
-    useShotSelection.getState().clear();
+    setShots(fresh);
   }
+  // The next preset goes back to replacing everything until shots are picked again.
+  useShotSelection.getState().clear();
   setPlaying(true);
 }
 
@@ -167,6 +140,7 @@ export function PresetsSection() {
     (s) => locateShot(s.shots, s.playhead).shot.preset ?? null,
   );
   const active = PRESETS.find((preset) => preset.id === activeId);
+  const picked = useShotSelection((s) => s.ids.length);
   const groups = GROUPS.map((title) => ({
     title,
     presets: presets.filter((preset) => groupOf(preset) === title),
@@ -182,6 +156,11 @@ export function PresetsSection() {
         ) : (
           "This shot uses no preset"
         )}
+      </p>
+      <p className="mb-2 text-ms-ink-faint">
+        {picked > 0
+          ? `A preset replaces the ${picked === 1 ? "highlighted shot" : `${picked} highlighted shots`}.`
+          : "A preset replaces the whole timeline. Click shots in the timeline to replace only those."}
       </p>
       <div>
         {groups.map((group, index) => (

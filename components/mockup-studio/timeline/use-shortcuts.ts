@@ -2,7 +2,7 @@
 
 import { type RefObject, useEffect } from "react";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
-import { useSelection } from "./selection";
+import { useSelection, useShotSelection } from "./selection";
 
 function isTextEntry(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -47,6 +47,12 @@ export function useTimelineShortcuts(
       } else if (event.key === "k" || event.key === "K") {
         event.preventDefault();
         if (!event.repeat) addKeyframes();
+      } else if (event.key === "Escape") {
+        // Let go of highlighted shots, so the next preset replaces the whole timeline.
+        if (useShotSelection.getState().ids.length) {
+          event.preventDefault();
+          useShotSelection.getState().clear();
+        }
       } else if (event.key === "Delete" || event.key === "Backspace") {
         const { selected, select } = useSelection.getState();
         if (!selected) return;
