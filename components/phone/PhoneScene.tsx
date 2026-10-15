@@ -48,7 +48,7 @@ import {
   type FitMode,
   type PhoneMediaItem,
 } from "./phone-config";
-import { usePhoneTextures, type PhoneTextureDescriptor } from "./usePhoneTextures";
+import { usePhoneTextures, PLAY_REFUSED, type PhoneTextureDescriptor } from "./usePhoneTextures";
 
 /* ── Imperative controller (the export hook drives this) ─────────── */
 
@@ -98,6 +98,12 @@ export type PhoneSceneProps = {
   prominence?: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady?: () => void;
+  /** Move the camera in: 1 is the standard framing, 1.2 is a fifth closer. */
+  zoom?: number;
+  /** When the browser will not start the clips on its own (iOS Low Power
+   *  Mode), show a Play button with this class; a tap starts them. Off by
+   *  default, so the studio site's TMYR hero is unchanged. */
+  tapToPlayClass?: string;
 };
 
 /* ── Single phone instance — materials + mesh handling (verbatim) ── */
@@ -220,6 +226,8 @@ type CarouselProps = {
   prominence: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady: () => void;
+  /** filled with a function that starts every clip, for a Play button's tap */
+  kickRef?: React.RefObject<(() => void) | null>;
 };
 
 function Carousel({
@@ -236,6 +244,7 @@ function Carousel({
   prominence,
   controllerRef,
   onReady,
+  kickRef,
 }: CarouselProps) {
   const reportedReady = useRef(false);
   const gltf = useGLTF(model) as unknown as { scene: THREE.Group };
@@ -246,6 +255,13 @@ function Carousel({
   const mediaCount = Math.max(1, items.length);
   const count = fillCount(mediaCount);
   const descriptors = usePhoneTextures(items, fit, bgColor);
+  useEffect(() => {
+    if (!kickRef) return;
+    kickRef.current = () => descriptors.forEach((d) => d.kick());
+    return () => {
+      kickRef.current = null;
+    };
+  }, [kickRef, descriptors]);
 
   // Off screen: the render loop is stopped — pause every video to halt decode.
   useEffect(() => {
@@ -448,7 +464,22 @@ export default function PhoneScene({
   prominence = 0,
   controllerRef,
   onReady,
+  zoom = 1,
+  tapToPlayClass,
 }: PhoneSceneProps) {
+  const [refused, setRefused] = useState(false);
+  const kickRef = useRef<(() => void) | null>(null);
+  // tap-to-play: hear about a refused start of one of this scene's clips
+  const mediaSrcs = media.map((m) => m.src).join("|");
+  useEffect(() => {
+    if (!tapToPlayClass) return;
+    const mine = new Set(mediaSrcs.split("|"));
+    const heard = (e: Event) => {
+      if (mine.has((e as CustomEvent<string>).detail)) setRefused(true);
+    };
+    document.addEventListener(PLAY_REFUSED, heard);
+    return () => document.removeEventListener(PLAY_REFUSED, heard);
+  }, [tapToPlayClass, mediaSrcs]);
   const { ref: hoverRef, hovered } = useGroupHover<HTMLDivElement>(hoverable);
   const [ready, setReady] = useState(false);
   // The sandbox mounts a single, always-relevant canvas — treat it as in-view
@@ -500,7 +531,7 @@ export default function PhoneScene({
       {canMount && (
         <Canvas
           frameloop="demand"
-          camera={{ position: [0, 0, CAMERA_DISTANCE], fov: CAMERA_FOV, near: 0.1, far: 50 }}
+          camera={{ position: [0, 0, CAMERA_DISTANCE / zoom], fov: CAMERA_FOV, near: 0.1, far: 50 }}
           dpr={[1, 1.5]}
           gl={glConfig}
           style={{
@@ -533,10 +564,23 @@ export default function PhoneScene({
               prominence={prominence}
               controllerRef={controllerRef}
               onReady={handleReady}
+              kickRef={kickRef}
             />
           </Suspense>
         </Canvas>
       )}
+      {tapToPlayClass && refused ? (
+        <button
+          type="button"
+          className={tapToPlayClass}
+          onClick={() => {
+            kickRef.current?.();
+            setRefused(false);
+          }}
+        >
+          Play
+        </button>
+      ) : null}
     </div>
   );
 }

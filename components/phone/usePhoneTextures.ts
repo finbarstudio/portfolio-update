@@ -40,6 +40,10 @@ export type PhoneTextureDescriptor = {
   sync: (onScreen: boolean, onStage: boolean, paused: boolean) => void;
   /** Pause the underlying video (no-op for images). */
   pauseVideo: () => void;
+  /** Start the video now, from a tap: attaches its file if needed and plays.
+   *  Run inside the tap's handler, the browser counts it as the reader's own
+   *  play, which iOS allows even when it refuses to start clips by itself. */
+  kick: () => void;
   /** Re-paint the image at the current fit/background (no-op for videos). */
   recompose: (fit: FitMode, bgColor: string | null) => void;
   dispose: () => void;
@@ -57,6 +61,10 @@ function applyMirror(tex: THREE.Texture, crop = { repeat: [1, 1], offset: [0, 0]
   tex.repeat.set(-rx, ry);
   tex.offset.set(rx + ox, oy);
 }
+
+/** Sent on document (detail: the clip's src) when the browser refuses to start
+ *  a clip on its own; a scene that offers a Play button listens for it. */
+export const PLAY_REFUSED = "phone-play-refused";
 
 function makeVideoDescriptor(src: string): PhoneTextureDescriptor {
   const el = document.createElement("video");
@@ -93,7 +101,12 @@ function makeVideoDescriptor(src: string): PhoneTextureDescriptor {
           el.load();
         }
         if (onStage && !paused) {
-          if (el.paused) el.play().catch(() => {});
+          // iOS (Low Power Mode) can refuse to start even a muted clip; the
+          // scene can then offer a Play button (PLAY_REFUSED, see PhoneScene)
+          if (el.paused)
+            el.play().catch((e: unknown) => {
+              if (e instanceof DOMException && e.name === "NotAllowedError") document.dispatchEvent(new CustomEvent(PLAY_REFUSED, { detail: src }));
+            });
         } else if (!el.paused) {
           el.pause();
         }
@@ -107,6 +120,13 @@ function makeVideoDescriptor(src: string): PhoneTextureDescriptor {
     },
     pauseVideo: () => {
       if (!el.paused) el.pause();
+    },
+    kick: () => {
+      if (el.getAttribute("src") !== src) {
+        el.src = src;
+        el.load();
+      }
+      el.play().catch(() => {});
     },
     recompose: () => {},
     dispose: () => {
@@ -172,6 +192,7 @@ function makeImageDescriptor(src: string): PhoneTextureDescriptor {
     tick: () => {},
     sync: () => {},
     pauseVideo: () => {},
+    kick: () => {},
     recompose: (fit, bgColor) => {
       lastFit = fit;
       lastBg = bgColor;
@@ -230,6 +251,7 @@ function makeGeneratedDescriptor(src: string): PhoneTextureDescriptor {
       if (paused && on) render(performance.now()); // settle a frame for export
     },
     pauseVideo: () => {},
+    kick: () => {},
     recompose: () => {},
     dispose: () => {
       tex.dispose();

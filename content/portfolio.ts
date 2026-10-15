@@ -208,8 +208,7 @@ const RAW: Slide[] = [
       "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
     meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }, study("tmyr")],
   },
-  one("tmyr/hero-poster.webp", "The reels on Instagram", { frame: false, phones: true }),
-  row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
+  one("tmyr/hero-poster.webp", "The reels on Instagram", { frame: false, phones: true, mobile: { src: "/media/images/tmyr/hero-poster.webp", w: 4, h: 5 } }),
   row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
 
   /* ── TasWater ──────────────────────────────────────────────── */
