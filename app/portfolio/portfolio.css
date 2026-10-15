@@ -540,6 +540,11 @@ html[data-pf-theme="light"] .pf-chrome {
 .pf-caption-link { margin-left: 1.2em; text-transform: none; letter-spacing: var(--tr-copy); color: var(--soft); }
 .pf-caption-link:hover { color: var(--ink); }
 
+/* the Plated with Issy globe (components/portfolio/PfGlobe.tsx): the live 3D
+   globe fills its page on Issy's green (#3e3c2a); grab it to spin it */
+.pf-globe { position: absolute; inset: 0; background: #3e3c2a; cursor: grab; touch-action: pan-y; user-select: none; }
+.pf-globe[data-grabbing="1"] { cursor: grabbing; }
+.pf-globe canvas { display: block; }
 /* The Moment You Realise phones (components/portfolio/PfPhones.tsx): the live 3D carousel fills its page */
 .pf-phones { position: absolute; inset: 0; }
 /* on a desktop its frame runs to the page's left and right edges at the usual

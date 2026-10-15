@@ -1,5 +1,6 @@
 import PfMedia from "@/components/portfolio/PfMedia";
 import PfPhones from "@/components/portfolio/PfPhones";
+import PfGlobe from "@/components/portfolio/PfGlobe";
 import PfCars from "@/components/portfolio/PfCars";
 import PfDeck from "@/components/portfolio/PfDeck";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
@@ -39,7 +40,7 @@ function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; grou
       className={`pf-item${m.frame === false ? "" : " is-framed"}${m.mobile ? " has-phone" : ""}`}
       style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.mobile ? { "--r-phone": (m.mobile.w / m.mobile.h).toFixed(4) } : null), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
     >
-      {m.cars ? <PfCars /> : m.phones ? <PfPhones /> : <PfMedia src={m.src} light={m.light} mobile={m.mobile?.src} video={m.video} sound={m.sound} alt={m.alt} w={m.w} h={m.h} group={group} />}
+      {m.cars ? <PfCars /> : m.phones ? <PfPhones /> : m.globe ? <PfGlobe /> : <PfMedia src={m.src} light={m.light} mobile={m.mobile?.src} video={m.video} sound={m.sound} alt={m.alt} w={m.w} h={m.h} group={group} />}
       {m.overlay ? (
         // the file's own frame, drawn the way the picture is (cover, centred), so the overlay lands on the same spot of the picture
         <div className="pf-overlay" aria-hidden={m.overlay.alt ? undefined : true}>
