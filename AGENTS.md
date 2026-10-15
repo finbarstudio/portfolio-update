@@ -88,6 +88,17 @@ usage (CPU/build minutes). Finbar is managing that budget. So:
 - Commit locally and leave the work unpushed unless Finbar has said to push
   (see "Never push without instruction" above).
 
+# Lab tools edited outside this repo
+
+Two lab tools are copies. Their source lives in the parent's `Lab/` folder, and
+a sync script there overwrites the copy here on every release. Never edit these
+copies in this repo; edit the source and sync.
+
+| Copy in this repo | Source |
+|---|---|
+| `components/mockup-studio/`, `lib/mockup-studio/`, `public/media/lab/mockup/` | `../Lab/mockup-studio` (`scripts/sync-to-lab.sh`) |
+| `components/motion-presets/`, `app/lab/motion/` | `../Lab/motion-tool` (`bun run sync`) |
+
 # Repository & folder layout
 
 **This `Website/` folder IS the git repo and the whole deploy.** The git root is
