@@ -4,7 +4,8 @@ import PfGlobe from "@/components/portfolio/PfGlobe";
 import PfCars from "@/components/portfolio/PfCars";
 import PfDeck from "@/components/portfolio/PfDeck";
 import PfIndex from "@/components/portfolio/PfIndex";
-import { MdArrowOutward } from "@/components/MaterialIcon";
+import { MdArrowOutward, MdArrowUpward } from "@/components/MaterialIcon";
+import { FlaskIcon, SOCIALS } from "@/components/social-icons";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 import { PORTFOLIO, CV, UPDATED, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
 import "./portfolio.css";
@@ -22,9 +23,10 @@ import "./portfolio.css";
 type Chapter = { no: string; name: string; sub: string; id: string };
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
+/** The logomark, with the studio's centre-out pulse (.mark-pulse in globals.css). */
 function Mark() {
   return (
-    <span className="pf-mark" aria-hidden="true">
+    <span className="pf-end-mark mark-pulse" aria-hidden="true">
       <svg viewBox={MARK_VIEWBOX}>
         {MARK_SHAPES.map((s, i) => {
           if (s.tag === "polygon") return <polygon key={i} points={s.points} fill={s.fill} />;
@@ -115,7 +117,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
   switch (s.kind) {
     case "cover":
       return (
-        <section className="pf-slide pf-cover is-text">
+        <section className="pf-slide pf-cover is-text" id="cover">
           <div className="pf-pad">
             <div className="pf-head pf-mono">
               <span>Portfolio</span>
@@ -365,11 +367,29 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               ))}
               <span className="pf-soft">{page}</span>
             </div>
-            <h2 className="pf-poster">
-              Thank
-              <br />
-              you<Mark />
+            {/* as the cover: one line, centred on the page, "Thank" on the left
+                margin and "You" on the right, the logomark pulsing in the middle */}
+            <h2 className="pf-poster" aria-label="Thank you">
+              <span className="pf-name-l"><Kerned text="Thank" /></span>
+              <Mark />
+              <span className="pf-name-r"><Kerned text="You" /></span>
             </h2>
+            {/* the foot: back to the cover, and the socials and the lab, small */}
+            <div className="pf-end-foot pf-mono">
+              <a className="pf-to-top" href="#cover">
+                Back to top<MdArrowUpward className="pf-arrow" />
+              </a>
+              <span className="pf-end-icons">
+                {SOCIALS.map((s) => (
+                  <a key={s.href} className="pf-end-icon" href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+                    {s.icon}
+                  </a>
+                ))}
+                <a className="pf-end-icon" href="https://lab.finbar.studio/" target="_blank" rel="noopener noreferrer" aria-label="Lab, experiments">
+                  <FlaskIcon />
+                </a>
+              </span>
+            </div>
           </div>
         </section>
       );

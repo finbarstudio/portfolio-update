@@ -19,7 +19,8 @@ const FROM = {
   lola: "portfolio/print/lola-audio-brand.webp",
   "rennen-plus": "portfolio/print/rennen-plus-website.webp",
   plated: { src: "portfolio/print/globe-black.webp", whole: "black" },
-  lows: { src: "portfolio/print/lows-logo-zoom.webp", whole: "black", h: 230 },
+  // lifted, so the overlaid title has its own space under the lockup
+  lows: { src: "portfolio/print/lows-logo-zoom.webp", whole: "black", h: 190, lift: 40 },
   "share-to-buy": "portfolio/print/phones-black.webp",
   taswater: "portfolio/taswater/map-mockup.webp",
   "london-home-show": "portfolio/print/london-home-show-event-deck.webp",
@@ -28,11 +29,13 @@ const FROM = {
 
 mkdirSync(OUT, { recursive: true });
 for (const [id, from] of Object.entries(FROM)) {
-  const { src, whole, h = 440 } = typeof from === "string" ? { src: from } : from;
+  const { src, whole, h = 440, lift = 0 } = typeof from === "string" ? { src: from } : from;
   const png = `${OUT}/${id}.png`;
   // fill 1200 by 480, cropping the middle (or trim it and fit it whole, on a colour)
   const size = whole ? ["-fuzz", "4%", "-trim", "+repage", "-resize", `1200x${h}`, "-background", whole] : ["-resize", "1200x480^"];
-  execFileSync(MAGICK, [`${IMG}/${src}`, ...size, "-gravity", "center", "-extent", "1200x480", png]);
+  // `lift` moves the picture up that many px: centre it in a shorter box, then pad the foot
+  const box = lift ? ["-gravity", "center", "-extent", `1200x${480 - 2 * lift}`, "-gravity", "north", "-extent", "1200x480"] : ["-gravity", "center", "-extent", "1200x480"];
+  execFileSync(MAGICK, [`${IMG}/${src}`, ...size, ...box, png]);
   execFileSync(CWEBP, ["-quiet", "-q", "82", "-m", "6", "-sharp_yuv", png, "-o", `${OUT}/${id}.webp`]);
   rmSync(png);
   console.log(`${id}  <- ${src}`);

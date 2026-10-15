@@ -142,13 +142,11 @@ body:has(.pf) { background: #1a1a1a; }
   font-weight: 700;
   text-transform: uppercase;
 }
-.pf-mark { display: inline-block; width: 0.5em; height: 0.5em; margin-left: 0.06em; vertical-align: 0.26em; }
-.pf-mark svg { width: 100%; height: 100%; display: block; }
 
 .pf-cover .pf-pad { z-index: 1; }
 /* the name: one line, centred top to bottom on the page, the first name on
    the left margin and the second on the right */
-.pf-cover .pf-poster {
+.pf-cover .pf-poster, .pf-end .pf-poster {
   font-size: calc(var(--u) * 7.92);
   position: absolute;
   left: calc(var(--u) * 2.6); right: calc(var(--u) * 2.6);
@@ -160,6 +158,26 @@ body:has(.pf) { background: #1a1a1a; }
 }
 /* the F carries side space of its own: hang it out so its stem meets the margin */
 .pf-name-l { margin-left: -0.045em; }
+/* the logomark on the closing page: in the middle of the page, about a cap
+   height tall, pulsing; the PDF prints it whole */
+/* a T has no side space of its own, so it hangs less than the F */
+.pf-end .pf-name-l { margin-left: -0.02em; }
+.pf-end-mark { position: absolute; left: 50%; top: 50%; width: 0.72em; height: 0.72em; transform: translate(-50%, -50%); }
+.pf-end-mark svg { width: 100%; height: 100%; display: block; }
+/* the closing page's foot: back to top on the left, the socials and the lab,
+   small, on the right */
+.pf-end-foot {
+  position: absolute;
+  left: calc(var(--u) * 2.6); right: calc(var(--u) * 2.6); bottom: calc(var(--u) * 2.2);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.pf-to-top { display: inline-flex; align-items: center; }
+.pf-end-icons { display: flex; align-items: center; gap: calc(var(--u) * 1.2); }
+/* a small glyph inside a bigger tap area */
+.pf-end-foot .pf-end-icon { display: block; box-sizing: content-box; width: max(calc(var(--u) * 0.9), 14px); height: max(calc(var(--u) * 0.9), 14px); padding: 8px; margin: -8px; color: var(--soft); }
+.pf-end-foot .pf-end-icon:hover { color: var(--ink); }
+.pf-end-icon svg { display: block; width: 100%; height: 100%; }
+@media print { .pf-end-mark svg > * { animation: none !important; transform: none !important; opacity: 1 !important; } }
 
 /* ── the list of projects ───────────────────────────────────────── */
 .pf-list {
@@ -194,21 +212,29 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-index-switch button:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
 .pf-thumbs {
   list-style: none;
-  margin: auto 0 0;
+  margin: auto 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: calc(var(--u) * 1.6);
-  row-gap: calc(var(--u) * 1.3);
+  column-gap: calc(var(--u) * 2.4);
+  row-gap: calc(var(--u) * 2.4);
 }
 .pf-thumbs a { display: block; }
 .pf-thumbs a:hover { text-decoration: none; }
 .pf-thumb-media { position: relative; display: block; aspect-ratio: 5 / 2; overflow: hidden; border-radius: calc(var(--u) * 0.4); background: var(--well, #161412); }
 .pf-thumb-media > :is(img, video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.pf-thumb-cap { display: flex; align-items: baseline; gap: calc(var(--u) * 0.8); margin-top: calc(var(--u) * 0.55); }
-.pf-thumb-cap .n { font-size: max(calc(var(--u) * 1.05), 13px); line-height: 1.2; letter-spacing: var(--tr-copy); }
-.pf-thumb-cap > :last-child { margin-left: auto; text-align: right; }
-.pf-thumbs a:hover .n { color: var(--pink); }
+/* the black gradient at the foot of each picture, and the title on it */
+.pf-thumb-media::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.78)); pointer-events: none; }
+.pf-thumb-title {
+  position: absolute;
+  left: calc(var(--u) * 1.1); right: calc(var(--u) * 1.1); bottom: calc(var(--u) * 0.85);
+  z-index: 1;
+  color: #f3f1ee;
+  font-size: max(calc(var(--u) * 1.55), 15px);
+  line-height: 1.1;
+  letter-spacing: var(--tr-body);
+}
+.pf-thumbs a:hover .pf-thumb-title { color: var(--pink); }
 
 /* ── about (CV) ─────────────────────────────────────────────────── */
 .pf-cv .pf-pad { justify-content: space-between; }
@@ -523,7 +549,11 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-index[data-view] .pf-list { display: block; }
   .pf-index[data-view] .pf-thumbs, .pf-index-switch { display: none; }
   .pf-list { margin-top: 28px; }
-  .pf-cover .pf-poster { font-size: 12.24vw; left: 18px; right: 18px; }
+  .pf-cover .pf-poster, .pf-end .pf-poster { font-size: 12.24vw; left: 18px; right: 18px; }
+  .pf-end-foot { left: 18px; right: 18px; bottom: 26px; }
+  /* on a phone THANK is too wide for a page-centred mark: it sits evenly between the words */
+  .pf-end .pf-poster { align-items: center; }
+  .pf-end-mark { position: static; transform: none; flex: none; }
   .pf-cv-foot .pf-phone-note { flex-basis: 100%; margin: 26px 0 0; text-align: left; }
   .pf-meta { display: flex; }
   .pf-cv-bio { grid-column: 1 / -1; grid-row: auto; font-size: 16px; }

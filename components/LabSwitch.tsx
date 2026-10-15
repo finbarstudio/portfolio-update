@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { FlaskIcon } from "@/components/social-icons";
 
 /**
  * The lab switch, first in the nav (top left): a small digital toggle with the
@@ -16,14 +17,6 @@ import { createPortal } from "react-dom";
  * On localhost it goes to lab.localhost on the same port (the proxy maps it).
  */
 
-function FlaskIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M9.4 3h5.2M10.3 3v5.4L5.5 17.5A2.35 2.35 0 0 0 7.7 20.7h8.6a2.35 2.35 0 0 0 2.2-3.2L13.7 8.4V3" />
-      <path d="M7.6 14.5h8.8" />
-    </svg>
-  );
-}
 
 const isLocal = (h: string) => h === "localhost" || h.endsWith(".localhost") || h === "127.0.0.1";
 

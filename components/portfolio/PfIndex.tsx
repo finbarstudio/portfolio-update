@@ -96,13 +96,10 @@ export default function PfIndex({ chapters, page }: { chapters: IndexChapter[]; 
           {chapters.map((c) => (
             <li key={c.id}>
               <a href={`#${c.id}`}>
+                {/* the title sits on the picture, over a black gradient at its foot */}
                 <span className="pf-thumb-media">
                   <Thumb id={c.id} name={c.name} />
-                </span>
-                <span className="pf-thumb-cap">
-                  <span className="pf-mono pf-soft">{c.no}</span>
-                  <span className="n">{c.name}</span>
-                  <span className="pf-mono pf-soft">{c.sub}</span>
+                  <span className="pf-thumb-title">{c.name}</span>
                 </span>
               </a>
             </li>
