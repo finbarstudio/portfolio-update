@@ -25,6 +25,28 @@ export const C = {
   blue50: "#D6F0F9",
 } as const;
 
+/** What each colour is called in the guidelines, for the colour codes and the pack's README. */
+const NAMES: Record<string, string> = {
+  [C.pink]: "Pink",
+  [C.midnight]: "Midnight Blue",
+  [C.maroon]: "Dark Maroon",
+  [C.rose]: "Rose White",
+  [C.violet]: "Pale Violet",
+  [C.violetTint]: "Pale Violet Tint",
+  [C.yellow]: "Pastel Yellow",
+  [C.yellowTint]: "Pastel Yellow Tint",
+  [C.powder]: "Powder Pink",
+  [C.powderTint]: "Powder Pink Tint",
+  [C.mint]: "Mint Green",
+  [C.blue]: "Cool Blue",
+  [C.yellow50]: "Pastel Yellow 50%",
+  [C.violet50]: "Pale Violet 50%",
+  [C.powder50]: "Powder Pink 50%",
+  [C.mint50]: "Mint Green 50%",
+  [C.blue50]: "Cool Blue 50%",
+};
+export const colourName = (hex: string) => NAMES[hex] ?? hex;
+
 /** The Live gradient: the five category colours at 100%, no 50% tints. */
 export const GRADIENT = [C.mint, C.blue, C.violet, C.powder, C.yellow];
 

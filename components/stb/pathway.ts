@@ -40,6 +40,8 @@ export interface Pathway {
   crossings: number;
   /** Where the line passes over itself: the point index on the upper (later) stretch. */
   over: number[];
+  /** The matching point index on the lower (earlier) stretch, one per entry in `over`. */
+  under: number[];
   /** False when no walk passed every check and the closest one was used. */
   clean: boolean;
 }
@@ -189,7 +191,10 @@ function score(pts: number[], W: number, H: number, p: PathParams) {
       if (!cross.some(([ci, cj]) => Math.abs(i - ci) <= win && Math.abs(j - cj) <= win)) tight++;
     }
   }
-  if (tight > 0) bad += 1 + Math.floor(tight / 20);
+  // Two stretches merging reads as one fat band with two rows of text in it,
+  // which looks worse than any extra crossing, so when no walk is clean the
+  // closest one picked should never be one of these.
+  if (tight > 0) bad += 8 + Math.floor(tight / 10);
 
   // Composition: enough line on show, and spread across the frame.
   let seen = 0;
@@ -213,11 +218,11 @@ function score(pts: number[], W: number, H: number, p: PathParams) {
     for (const count of inPanel) if (count * sp < 0.7) bad += 2;
   }
 
-  return { bad, crossings: cross.length, over: cross.map(([, j]) => j * every) };
+  return { bad, crossings: cross.length, over: cross.map(([, j]) => j * every), under: cross.map(([i]) => i * every) };
 }
 
 export function generatePathway(seed: number, W: number, H: number, p: PathParams): Pathway {
-  let best: { pts: number[]; bad: number; crossings: number; over: number[] } | null = null;
+  let best: { pts: number[]; bad: number; crossings: number; over: number[]; under: number[] } | null = null;
   for (let a = 0; a < ATTEMPTS; a++) {
     const rng = mulberry32((Math.imul(seed | 0, 2654435761) + Math.imul(a, 40503)) | 0);
     const pts = walk(rng, W, H, p);
@@ -231,5 +236,5 @@ export function generatePathway(seed: number, W: number, H: number, p: PathParam
   for (let i = 2; i < pts.length; i += 2) {
     cum.push(cum[cum.length - 1] + Math.hypot(pts[i] - pts[i - 2], pts[i + 1] - pts[i - 1]));
   }
-  return { pts, cum, crossings: best?.crossings ?? 0, over: best?.over ?? [], clean: best?.bad === 0 };
+  return { pts, cum, crossings: best?.crossings ?? 0, over: best?.over ?? [], under: best?.under ?? [], clean: best?.bad === 0 };
 }

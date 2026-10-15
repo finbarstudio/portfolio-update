@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { generatePathway, type Pathway } from "./pathway";
-import { BRANDS, GRADIENT, textPresets, type BrandKey } from "./palette";
+import { BRANDS, GRADIENT, colourName, textPresets, type BrandKey } from "./palette";
 import { media, corsMedia } from "@/lib/media";
 
 /**
@@ -12,29 +12,28 @@ import { media, corsMedia } from "@/lib/media";
  * FORMATS. Three only, the ones social posts use: 1:1, 3:4 and the 9:16 reel,
  * each exported with its long side at 2048.
  *
- * CAROUSEL. One line drawn across three panels side by side, exported as three
- * files that join edge to edge when swiped. The line is generated once for the
- * whole strip (three panels wide) and each panel is a window onto it, so the
+ * CAROUSEL. One line drawn across 2 to 10 panels side by side, exported as one
+ * file per panel that join edge to edge when swiped. The line is generated once
+ * for the whole strip and each panel is a window onto it, so the
  * line, the gradient and the scrolling text all carry straight across the
  * joins. Every panel shares the same loop length, so each video loops cleanly
- * on its own and the three stay in step.
+ * on its own and they all stay in step.
  *
  * The canvas on screen is a preview (the strip is drawn at half size, to keep
  * it quick). Every download is drawn fresh at full size, off screen.
  */
 
 const LONG = 2048;
+/** `stroke` is the line thickness, fixed per format (decided Oct 2026, no choice in the tool):
+ *  px on a 1080 short side, and the same share of the short side at any size. */
 const SIZES = [
-  { label: "1:1", w: LONG, h: LONG },
-  { label: "3:4", w: 1536, h: LONG },
-  { label: "Reel 9:16", w: 1152, h: LONG },
+  { label: "1:1", w: LONG, h: LONG, stroke: 150 },
+  { label: "3:4", w: 1536, h: LONG, stroke: 150 },
+  { label: "Reel 9:16", w: 1152, h: LONG, stroke: 200 },
 ];
-/** Panels in a carousel. */
-const PANELS = 3;
-
-/** Line thickness: three steps only, named by their width in px on a
- *  1080 x 1920 reel. Other formats take the same share of their short side. */
-const THICKNESSES = [100, 150, 200];
+/** Panels in a carousel: 2 to 10, 3 to start with. */
+const PANELS_MIN = 2;
+const PANELS_MAX = 10;
 
 /** The gradient always runs ALONG the line, like water in a pipe. This is how
  *  much line one full run of the colours covers (short side = 1). */
@@ -59,7 +58,7 @@ interface Look {
   textColours: string[];
   /** Line thickness, as a share of the short side. */
   stroke: number;
-  /** Text reads the other way along the line (and so sits the other way up). */
+  /** Turns every stretch of text the other way up (for when the automatic choice reads wrong). */
   flip: boolean;
 }
 
@@ -144,6 +143,73 @@ function strokeLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, fro
 }
 
 /**
+ * How far either side of a crossing (in line units) the upper stretch has to be
+ * laid down again to cover the lower one completely. Two bands of width w that
+ * cross at an angle a overlap for (w / 2)(1 / sin a + 1 / tan a) either side of
+ * the crossing along the upper one, so a shallow crossing needs a much longer
+ * patch than a square one. A little extra covers the curve of the line.
+ */
+function overWindow(path: Pathway, k: number, stroke: number) {
+  const { pts } = path;
+  const last = pts.length / 2 - 1;
+  const heading = (i: number) => {
+    const a = Math.max(0, i - 3), b = Math.min(last, i + 3);
+    return Math.atan2(pts[b * 2 + 1] - pts[a * 2 + 1], pts[b * 2] - pts[a * 2]);
+  };
+  const sin = Math.max(Math.abs(Math.sin(heading(path.over[k]) - heading(path.under[k]))), 0.42);
+  return (stroke / 2) * (1 / sin + Math.sqrt(1 - sin * sin) / sin) + stroke * 0.35;
+}
+
+interface Stretch {
+  /** px along the line */
+  a: number;
+  b: number;
+  /** true: text reads from a towards b. false: it reads from b back towards a. */
+  fwd: boolean;
+}
+
+/**
+ * The line cut into stretches by which way it heads, so every letter sits the
+ * right way up: where the line runs right to left, that stretch's text is laid
+ * out from its far end and turned round. It only switches once the line is
+ * clearly heading the other way, so a near-vertical wobble does not flip it back
+ * and forth, and a stretch shorter than two line-widths takes its neighbour's
+ * way. `flip` turns every stretch round.
+ */
+function stretches(path: Pathway, S: number, strokePx: number, flip: boolean): Stretch[] {
+  const { pts, cum } = path;
+  const last = pts.length / 2 - 1;
+  const across = (i: number) => {
+    const a = Math.max(0, i - 3), b = Math.min(last, i + 3);
+    return (pts[b * 2] - pts[a * 2]) / (Math.hypot(pts[b * 2] - pts[a * 2], pts[b * 2 + 1] - pts[a * 2 + 1]) || 1);
+  };
+  let fwd = across(0) >= 0;
+  let list: Stretch[] = [{ a: 0, b: cum[last] * S, fwd }];
+  for (let i = 1; i < last; i++) {
+    const c = across(i);
+    if ((fwd && c < -0.3) || (!fwd && c > 0.3)) {
+      fwd = !fwd;
+      list[list.length - 1].b = cum[i] * S;
+      list.push({ a: cum[i] * S, b: cum[last] * S, fwd });
+    }
+  }
+  const fuse = (l: Stretch[]) =>
+    l.reduce<Stretch[]>((out, st) => {
+      const prev = out[out.length - 1];
+      if (prev && prev.fwd === st.fwd) prev.b = st.b;
+      else out.push({ ...st });
+      return out;
+    }, []);
+  for (let guard = 0; guard < 50; guard++) {
+    const k = list.findIndex((st) => st.b - st.a < strokePx * 2);
+    if (k < 0 || list.length < 2) break;
+    list[k].fwd = (list[k - 1] ?? list[k + 1]).fwd;
+    list = fuse(list);
+  }
+  return flip ? list.map((st) => ({ ...st, fwd: !st.fwd })) : list;
+}
+
+/**
  * The ticker: the text repeated along the line, each repeat in the next colour.
  * tPhase 0 to 1 slides it forward by one full set of colours, so a loop joins up.
  * `range` (px along the line) limits it to the letters around one stretch.
@@ -168,32 +234,47 @@ interface Glyph {
   colour: string;
 }
 
-/** Where every letter of the ticker goes. Shared by the canvas and the SVG export. */
+/**
+ * Where every letter of the ticker goes. Shared by the canvas and the SVG export.
+ * Each stretch reads the right way up (see stretches()); a forwards stretch uses
+ * the layout measured from the start of the line, a turned one the layout
+ * measured from the end, so both scroll and loop exactly as before. Letters keep
+ * a small gap either side of a change of way.
+ */
 function layoutText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
   const { size, chars, widths, tracking, period } = ticker(ctx, look.text, strokePx);
   const { pts, cum } = path;
   const total = cum[cum.length - 1] * S;
   const n = look.textColours.length;
   const shift = tPhase * n * period;
+  const pad = size * 0.35;
   const glyphs: Glyph[] = [];
-  for (let k = -Math.ceil(shift / period) - 1; k * period + shift < total; k++) {
-    const colour = look.textColours[((k % n) + n) % n];
-    let s = k * period + shift;
-    for (let c = 0; c < chars.length; c++) {
-      // Flipped, the same layout is measured from the far end of the line.
-      const at = look.flip ? total - (s + widths[c] / 2) : s + widths[c] / 2;
-      s += widths[c] + tracking;
-      if (at < 0 || at >= total || (range && (at < range[0] || at > range[1]))) continue;
-      const i = locate(cum, at / S);
-      const t = (at / S - cum[i]) / (cum[i + 1] - cum[i] || 1);
-      const x0 = pts[i * 2], y0 = pts[i * 2 + 1], x1 = pts[i * 2 + 2], y1 = pts[i * 2 + 3];
-      glyphs.push({
-        ch: chars[c],
-        x: (x0 + (x1 - x0) * t) * S,
-        y: (y0 + (y1 - y0) * t) * S,
-        angle: Math.atan2(y1 - y0, x1 - x0) + (look.flip ? Math.PI : 0),
-        colour,
-      });
+  for (const st of stretches(path, S, strokePx, look.flip)) {
+    const lo = st.a > 0 ? st.a + pad : -Infinity;
+    const hi = st.b < total ? st.b - pad : Infinity;
+    // the repeats that can land in this stretch, measured from whichever end it reads from
+    const from = st.fwd ? st.a : total - st.b;
+    const to = st.fwd ? st.b : total - st.a;
+    for (let k = Math.floor((from - shift) / period) - 1; k * period + shift < to; k++) {
+      const colour = look.textColours[((k % n) + n) % n];
+      let s = k * period + shift;
+      for (let c = 0; c < chars.length; c++) {
+        const half = widths[c] / 2;
+        const at = st.fwd ? s + half : total - (s + half);
+        s += widths[c] + tracking;
+        if (at - half < lo || at + half > hi) continue;
+        if (at < 0 || at >= total || (range && (at < range[0] || at > range[1]))) continue;
+        const i = locate(cum, at / S);
+        const t = (at / S - cum[i]) / (cum[i + 1] - cum[i] || 1);
+        const x0 = pts[i * 2], y0 = pts[i * 2 + 1], x1 = pts[i * 2 + 2], y1 = pts[i * 2 + 3];
+        glyphs.push({
+          ch: chars[c],
+          x: (x0 + (x1 - x0) * t) * S,
+          y: (y0 + (y1 - y0) * t) * S,
+          angle: Math.atan2(y1 - y0, x1 - x0) + (st.fwd ? 0 : Math.PI),
+          colour,
+        });
+      }
     }
   }
   return { size, glyphs };
@@ -238,10 +319,10 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, 
   if (look.text) {
     drawText(ctx, path, S, look, STROKE * S, tPhase);
     // Where the line passes over itself, two runs of text would collide. Lay the
-    // upper stretch down again over the crossing, then its own letters on top,
-    // so the text underneath slides out of sight beneath it.
-    const win = STROKE * 0.75;
-    for (const j of path.over) {
+    // upper stretch down again over the whole overlap, then its own letters on
+    // top, so the text underneath slides out of sight beneath it.
+    for (const [k, j] of path.over.entries()) {
+      const win = overWindow(path, k, STROKE);
       const at = path.cum[j];
       strokeLine(ctx, path, S, locate(path.cum, at - win), Math.min(last, locate(path.cum, at + win) + 1), look, gPhase);
       drawText(ctx, path, S, look, STROKE * S, tPhase, [(at - win - STROKE) * S, (at + win + STROKE) * S]);
@@ -311,13 +392,15 @@ function buildSvg(ctx: CanvasRenderingContext2D, w: number, h: number, S: number
   };
 
   // The stretches that pass over another, and so hide its text.
-  const win = look.stroke * 0.75;
   const overs = look.text
-    ? path.over.map((j) => ({
-        from: locate(cum, cum[j] - win),
-        to: Math.min(last, locate(cum, cum[j] + win) + 1),
-        range: [(cum[j] - win - look.stroke) * S, (cum[j] + win + look.stroke) * S] as [number, number],
-      }))
+    ? path.over.map((j, k) => {
+        const win = overWindow(path, k, look.stroke);
+        return {
+          from: locate(cum, cum[j] - win),
+          to: Math.min(last, locate(cum, cum[j] + win) + 1),
+          range: [(cum[j] - win - look.stroke) * S, (cum[j] + win + look.stroke) * S] as [number, number],
+        };
+      })
     : [];
 
   const body: string[] = [];
@@ -356,6 +439,127 @@ function save(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
+const CRC = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+
+function crc32(d: Uint8Array) {
+  let c = 0xffffffff;
+  for (let i = 0; i < d.length; i++) c = CRC[(c ^ d[i]) & 255] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+/** A zip with every file stored as it is (PNGs are compressed already, so there is nothing to gain). */
+function zip(files: { name: string; data: Uint8Array<ArrayBuffer> }[]) {
+  const now = new Date();
+  const time = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+  const date = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+  const out: Uint8Array<ArrayBuffer>[] = [];
+  const central: Uint8Array<ArrayBuffer>[] = [];
+  let offset = 0;
+  for (const f of files) {
+    const name = new TextEncoder().encode(f.name);
+    const crc = crc32(f.data);
+    const local = new Uint8Array(30 + name.length);
+    const l = new DataView(local.buffer);
+    l.setUint32(0, 0x04034b50, true);
+    l.setUint16(4, 20, true);
+    l.setUint16(6, 0x0800, true); // names are UTF-8
+    l.setUint16(10, time, true);
+    l.setUint16(12, date, true);
+    l.setUint32(14, crc, true);
+    l.setUint32(18, f.data.length, true);
+    l.setUint32(22, f.data.length, true);
+    l.setUint16(26, name.length, true);
+    local.set(name, 30);
+    const entry = new Uint8Array(46 + name.length);
+    const e = new DataView(entry.buffer);
+    e.setUint32(0, 0x02014b50, true);
+    e.setUint16(4, 20, true);
+    e.setUint16(6, 20, true);
+    e.setUint16(8, 0x0800, true);
+    e.setUint16(12, time, true);
+    e.setUint16(14, date, true);
+    e.setUint32(16, crc, true);
+    e.setUint32(20, f.data.length, true);
+    e.setUint32(24, f.data.length, true);
+    e.setUint16(28, name.length, true);
+    e.setUint32(42, offset, true);
+    entry.set(name, 46);
+    out.push(local, f.data);
+    central.push(entry);
+    offset += local.length + f.data.length;
+  }
+  const size = central.reduce((a, c) => a + c.length, 0);
+  const end = new Uint8Array(22);
+  const d = new DataView(end.buffer);
+  d.setUint32(0, 0x06054b50, true);
+  d.setUint16(8, files.length, true);
+  d.setUint16(10, files.length, true);
+  d.setUint32(12, size, true);
+  d.setUint32(16, offset, true);
+  return new Blob([...out, ...central, end], { type: "application/zip" });
+}
+
+/** The colour codes, to copy. A gradient is one row that opens to show its colours. */
+function Colours({ bg, line, text }: { bg: string; line: string; text: string[] }) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState("");
+  // open from the start on a wide screen; on a phone it would cover the picture
+  useEffect(() => setOpen(window.innerWidth > 760), []);
+  const copy = (hex: string) => {
+    navigator.clipboard?.writeText(hex).then(() => {
+      setCopied(hex);
+      setTimeout(() => setCopied((c) => (c === hex ? "" : c)), 1200);
+    });
+  };
+  const row = (label: string, hex: string, key = label + hex) => (
+    <div className="stb-crow" key={key}>
+      <i style={{ background: hex }} />
+      <span>
+        {label}
+        <small>{colourName(hex)}</small>
+      </span>
+      <button type="button" onClick={() => copy(hex)} title="Copy">
+        {copied === hex ? "Copied" : hex}
+      </button>
+    </div>
+  );
+  return (
+    <div className="stb-colours" data-open={open ? "1" : "0"}>
+      <button type="button" className="stb-colours-head" aria-expanded={open} onClick={() => setOpen(!open)}>
+        Colours
+      </button>
+      {open && (
+        <div className="stb-colours-body">
+          {row("Background", bg)}
+          {line === "gradient" ? (
+            <details>
+              <summary>
+                <i style={{ background: `linear-gradient(90deg, ${GRADIENT.join(",")})` }} />
+                <span>
+                  Line
+                  <small>Live gradient</small>
+                </span>
+              </summary>
+              {GRADIENT.map((hex) => row("", hex))}
+            </details>
+          ) : (
+            row("Line", line)
+          )}
+          {text.map((hex) => row("Text", hex, `t${hex}`))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Slider({ label, value, min, max, step, onChange, show }: {
   label: string; value: number; min: number; max: number; step: number;
   onChange: (v: number) => void; show?: string;
@@ -374,6 +578,8 @@ export default function PathwayTool() {
   const [combo, setCombo] = useState(0);
   const [size, setSize] = useState(0);
   const [carousel, setCarousel] = useState(false);
+  /** The panel count as typed, so the box can be cleared while typing. */
+  const [panelsText, setPanelsText] = useState("3");
   /** Show the canvas inside a mock social post, one panel at a time. */
   const [social, setSocial] = useState(false);
   const [slide, setSlide] = useState(0);
@@ -382,7 +588,6 @@ export default function PathwayTool() {
   const [text, setText] = useState("");
   const [textPreset, setTextPreset] = useState(0);
   const [flipText, setFlipText] = useState(false);
-  const [thickness, setThickness] = useState(150);
   /** How fast the text travels: % of the short side per second. */
   const [textSpeed, setTextSpeed] = useState(5);
   const [alpha, setAlpha] = useState<Alpha>("none");
@@ -395,6 +600,7 @@ export default function PathwayTool() {
   const [loopSecs, setLoopSecs] = useState(8);
   /** null, or how far through an export we are (0 to 1). */
   const [progress, setProgress] = useState<number | null>(null);
+  const [packing, setPacking] = useState(false);
   const recording = progress !== null;
   const [fontReady, setFontReady] = useState(false);
 
@@ -415,11 +621,12 @@ export default function PathwayTool() {
 
   const { w, h } = SIZES[size];
   const short = Math.min(w, h);
-  const n = carousel ? PANELS : 1;
-  /** The whole strip: one panel, or three side by side. */
+  const panels = Math.min(PANELS_MAX, Math.max(PANELS_MIN, Math.round(Number(panelsText)) || 3));
+  const n = carousel ? panels : 1;
+  /** The whole strip: one panel, or n side by side. */
   const stripW = w * n;
-  /** The canvas on screen: full size for one image, half size for a strip. */
-  const view = carousel ? 0.5 : 1;
+  /** The canvas on screen: full size for one image, smaller for a strip. */
+  const view = carousel ? Math.min(0.5, 1.5 / n) : 1;
   const colours = BRANDS[brand].combos[combo];
   const live = brand === "live";
   const isGradient = colours.line === "gradient";
@@ -427,10 +634,10 @@ export default function PathwayTool() {
   const gradientMoves = animateGradient && isGradient;
   const textMoves = scrollText && shownText !== "";
   const moving = gradientMoves || textMoves;
-  const stroke = thickness / 1080;
+  const stroke = SIZES[size].stroke / 1080;
   const presets = textPresets(colours.line);
-  // A strip is three panels of ground to cover, so the line is that much longer.
-  const path = generatePathway(seed, stripW / short, h / short, { ...p, length: p.length * (carousel ? 2.4 : 1), stroke, panels: n });
+  // A strip is n panels of ground to cover, so the line is that much longer.
+  const path = generatePathway(seed, stripW / short, h / short, { ...p, length: p.length * (carousel ? 0.8 * n : 1), stroke, panels: n });
   const at = Math.min(slide, n - 1);
 
   const look: Look = {
@@ -515,6 +722,59 @@ export default function PathwayTool() {
     for (let i = 0; i < n; i++) {
       save(new Blob([buildSvg(ctx, w, h, short, i * w, path, look)], { type: "image/svg+xml" }), fileName(i, "svg"));
       await pause(350);
+    }
+  };
+
+  /**
+   * Everything in one zip: per panel the artwork, the line on its own and the
+   * background with the line cut out; one plain background (the same for every
+   * panel); and a README with the colours. Stills, at the first frame.
+   */
+  const downloadPack = async () => {
+    setPacking(true);
+    try {
+      const { el, ctx } = sheet();
+      const png = async () => {
+        const blob = await new Promise<Blob | null>((r) => el.toBlob(r, "image/png"));
+        return new Uint8Array(await blob!.arrayBuffer());
+      };
+      const tag = (i: number) => (n > 1 ? `-${i + 1}of${n}` : "");
+      const files: { name: string; data: Uint8Array<ArrayBuffer> }[] = [];
+      const kinds: [Alpha, string][] = [["none", "artwork"], ["bg", "line"], ["line", "cut-out"]];
+      for (const [alpha, kind] of kinds) {
+        for (let i = 0; i < n; i++) {
+          render(ctx, w, h, short, i * w, path, { ...look, alpha }, 0, 0);
+          files.push({ name: `${base}-${kind}${tag(i)}.png`, data: await png() });
+          await pause();
+        }
+      }
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = look.bg;
+      ctx.fillRect(0, 0, w, h);
+      files.push({ name: `${base}-background.png`, data: await png() });
+      const lineColours = look.line === "gradient" ? `Live gradient: ${GRADIENT.map((c) => `${colourName(c)} ${c}`).join(", ")}` : `${colourName(look.line)} ${look.line}`;
+      const readme = [
+        `Share to Buy pathway, seed ${seed}`,
+        `${SIZES[size].label}, ${w} x ${h} px${n > 1 ? `, carousel of ${n} (1of${n} is the first slide)` : ""}`,
+        "",
+        "FILES",
+        `${base}-artwork*.png     the finished artwork`,
+        `${base}-line*.png        the line on its own, on a transparent background`,
+        `${base}-cut-out*.png     the background with the line cut out of it`,
+        `${base}-background.png   the plain background colour${n > 1 ? ", the same for every slide" : ""}`,
+        "",
+        "COLOURS",
+        `Background  ${colourName(look.bg)} ${look.bg}`,
+        `Line        ${lineColours}`,
+        ...(look.text ? [`Text        ${look.textColours.map((c) => `${colourName(c)} ${c}`).join(", ")}`] : []),
+        "",
+        "These are a colour pairing from the brand guidelines. Keep them together as they are.",
+        "",
+      ].join("\r\n");
+      files.push({ name: "README.txt", data: new TextEncoder().encode(readme) });
+      save(zip(files), `${base}-pack.zip`);
+    } finally {
+      setPacking(false);
     }
   };
 
@@ -616,7 +876,21 @@ export default function PathwayTool() {
           </div>
           <div className="stb-seg stb-seg-gap">
             <button type="button" aria-pressed={!carousel} onClick={() => { setCarousel(false); setSlide(0); }}>Single</button>
-            <button type="button" aria-pressed={carousel} onClick={() => setCarousel(true)}>Carousel of {PANELS}</button>
+            <button type="button" aria-pressed={carousel} onClick={() => setCarousel(true)}>Carousel</button>
+            {carousel && (
+              <label className="stb-panels">
+                <input
+                  type="number"
+                  min={PANELS_MIN}
+                  max={PANELS_MAX}
+                  value={panelsText}
+                  aria-label={`Slides, ${PANELS_MIN} to ${PANELS_MAX}`}
+                  onChange={(e) => { setPanelsText(e.target.value); setSlide(0); }}
+                  onBlur={() => setPanelsText(String(panels))}
+                />
+                <span>slides</span>
+              </label>
+            )}
           </div>
         </section>
 
@@ -630,17 +904,6 @@ export default function PathwayTool() {
               <span>Seed</span>
               <input type="number" value={seed} onChange={(e) => setSeed(Number(e.target.value) || 0)} />
             </label>
-          </div>
-          <div className="stb-slider">
-            <span>Thickness</span>
-            <div className="stb-seg">
-              {THICKNESSES.map((t) => (
-                <button key={t} type="button" aria-pressed={thickness === t} onClick={() => setThickness(t)}>
-                  {t}
-                </button>
-              ))}
-            </div>
-            <output>px</output>
           </div>
           <Slider label="Tightest bend" value={p.rMin} min={0.15} max={0.5} step={0.01} onChange={(v) => set({ rMin: v, rMax: Math.max(p.rMax, v) })} />
           <Slider label="Widest bend" value={p.rMax} min={0.2} max={1.5} step={0.01} onChange={(v) => set({ rMax: v, rMin: Math.min(p.rMin, v) })} />
@@ -711,6 +974,9 @@ export default function PathwayTool() {
               Download SVG
             </button>
           </div>
+          <button type="button" className="stb-primary stb-pack" onClick={downloadPack} disabled={recording || packing}>
+            {packing ? "Making the pack" : "Download pack (zip)"}
+          </button>
           {moving && (
             <button type="button" className="stb-primary" onClick={exportVideo} disabled={recording}>
               {recording ? `Making the video ${Math.round((progress ?? 0) * 100)}%` : `Download MP4 · ${loopSecs.toFixed(1)}s loop`}
@@ -725,6 +991,7 @@ export default function PathwayTool() {
       </aside>
 
       <main className="stb-stage">
+        <Colours bg={colours.bg} line={colours.line} text={look.text ? look.textColours : []} />
         <button type="button" className="stb-toggle" aria-pressed={social} onClick={() => { setSocial(!social); setSlide(0); }}>
           {social ? "Show the artwork" : "Preview as a post"}
         </button>

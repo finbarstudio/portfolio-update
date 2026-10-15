@@ -482,3 +482,132 @@ div.stb-slider {
     padding: 8px 0;
   }
 }
+
+/* Carousel slide count, typed */
+.stb-panels {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+.stb-tool .stb-panels input[type="number"] {
+  width: 56px;
+  padding: 5px 6px;
+}
+.stb-pack {
+  background: var(--midnight);
+}
+
+/* THE COLOUR CODES: a small box floating at the top right of the stage. Click a
+   code to copy it; a gradient opens to show its five colours. */
+.stb-stage {
+  position: relative;
+}
+.stb-colours {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  width: 230px;
+  border: 1px solid rgb(10 10 51 / 0.2);
+  border-radius: 8px;
+  background: var(--rose);
+  box-shadow: 0 2px 16px rgb(10 10 51 / 0.12);
+  font-size: 12px;
+}
+.stb-colours[data-open="0"] {
+  width: auto;
+}
+.stb-colours-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  background: none;
+  font-size: 10px !important;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.stb-colours-head::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+}
+.stb-colours[data-open="1"] .stb-colours-head::after {
+  transform: rotate(-135deg) translateY(-2px);
+}
+.stb-colours-body {
+  display: grid;
+  gap: 2px;
+  padding: 0 8px 8px;
+}
+.stb-crow,
+.stb-colours summary {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+.stb-colours summary {
+  cursor: pointer;
+  list-style: none;
+}
+.stb-colours summary::-webkit-details-marker {
+  display: none;
+}
+.stb-colours summary::after {
+  content: "+";
+  opacity: 0.6;
+}
+.stb-colours details[open] summary::after {
+  content: "–";
+}
+.stb-colours details .stb-crow {
+  padding-left: 14px;
+}
+.stb-crow i,
+.stb-colours summary i {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgb(10 10 51 / 0.2);
+}
+.stb-crow span,
+.stb-colours summary span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.stb-crow small,
+.stb-colours summary small {
+  font-size: 11px;
+  opacity: 0.65;
+}
+.stb-crow button {
+  padding: 3px 6px;
+  border: 1px solid rgb(10 10 51 / 0.25);
+  border-radius: 4px;
+  background: #fff;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px !important;
+  min-width: 64px;
+}
+.stb-crow button:hover {
+  border-color: var(--midnight);
+}
+@media (max-width: 760px) {
+  .stb-colours {
+    top: auto;
+    bottom: 0;
+  }
+  .stb-crow button {
+    min-height: 32px;
+  }
+}
