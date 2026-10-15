@@ -694,9 +694,9 @@ html[data-pf-theme="light"] .pf-chrome {
   --line: #dbd6cf;
   --pink-deep: #510415;
 }
-/* the logo's hover label (NavLogo `tip`): the nav's tooltip, centred under
-   the wordmark, set as the domain is written */
-.pf-chrome .nav-logo-tip { left: 50%; transform: translate(-50%, -4px); font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif; font-weight: 500; letter-spacing: 0.06em; text-transform: none; }
+/* the logo's hover label (NavLogo `tip`): the nav's tooltip at the same size
+   and height as the CV one, centred under the wordmark, in lowercase */
+.pf-chrome .nav-logo-tip { top: calc(100% - 13px); left: 50%; transform: translate(-50%, -4px); font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: none; }
 .pf-chrome .nav-logo:hover .nav-logo-tip,
 .pf-chrome .nav-logo:focus-visible .nav-logo-tip { opacity: 1; transform: translate(-50%, 0); }
 /* the theme switch's knob glyph */
