@@ -99,6 +99,8 @@ export default function PfMedia({ src: dark, light, mobile, video, sound, alt, w
   }, [mobile]);
   const src = mobile && isPhone ? mobile : light && isLight ? light : dark;
   const known = isPhone !== null;
+  // the phone file can be a still where the desktop one is a clip
+  const moving = src === mobile ? /\.(mp4|webm)(\?|$)/.test(src) : video;
   /** 0 to 99 while downloading; null when the size is unknown. */
   const [pct, setPct] = useState<number | null>(0);
   const [url, setUrl] = useState<string | null>(null);
@@ -108,7 +110,7 @@ export default function PfMedia({ src: dark, light, mobile, video, sound, alt, w
 
   useEffect(() => {
     if (!known) return;
-    if (video && window.matchMedia("(max-width: 760px)").matches) {
+    if (moving && window.matchMedia("(max-width: 760px)").matches) {
       setPct(null);
       setUrl(src);
       return;
@@ -140,12 +142,31 @@ export default function PfMedia({ src: dark, light, mobile, video, sound, alt, w
       stop.abort();
       if (made) URL.revokeObjectURL(made);
     };
-  }, [src, video, known]);
+  }, [src, moving, known]);
 
   // Clips play only while on screen. The first time a clip plays it holds on
   // its opening frame for a moment: if the reader watched it load to 100%, it
   // fades in and settles before it moves, not jumping straight into motion.
+  //
+  // iOS Safari can refuse to start a clip on its own (Low Power Mode does
+  // this even to muted clips), which used to leave a still frame with no way
+  // to play it. When a start is refused, a Play button shows instead; a tap
+  // is a gesture, so the browser lets it play.
   const begun = useRef(false);
+  const [refused, setRefused] = useState(false);
+  const loudRef = useRef(loud);
+  useEffect(() => {
+    loudRef.current = loud;
+  }, [loud]);
+  const start = (v: HTMLVideoElement) => {
+    if (!loudRef.current) v.muted = true; // set on the element itself: Safari reads it at play()
+    v.play().then(
+      () => setRefused(false),
+      (e: unknown) => {
+        if (e instanceof DOMException && e.name === "NotAllowedError") setRefused(true);
+      },
+    );
+  };
   useEffect(() => {
     const v = clip.current;
     if (!v || !url) return;
@@ -155,11 +176,11 @@ export default function PfMedia({ src: dark, light, mobile, video, sound, alt, w
       ([entry]) => {
         clearTimeout(wait);
         if (entry.isIntersecting) {
-          if (begun.current) v.play().catch(() => {});
+          if (begun.current) start(v);
           else
             wait = setTimeout(() => {
               begun.current = true;
-              v.play().catch(() => {});
+              start(v);
             }, START_HOLD);
         } else {
           v.pause();
@@ -177,9 +198,14 @@ export default function PfMedia({ src: dark, light, mobile, video, sound, alt, w
 
   return (
     <>
-      {url && video ? (
+      {url && moving ? (
         <>
-          <video ref={clip} src={url} muted={!loud} loop playsInline preload="auto" data-in={shown ? "1" : "0"} onLoadedData={() => setShown(true)} />
+          <video ref={clip} src={url} muted={!loud} autoPlay={false} loop playsInline preload="auto" data-in={shown ? "1" : "0"} onLoadedData={() => setShown(true)} onPlaying={() => setRefused(false)} />
+          {refused && shown ? (
+            <button type="button" className="pf-play pf-mono" onClick={() => clip.current && start(clip.current)}>
+              Play
+            </button>
+          ) : null}
           {sound && shown ? (
             <button type="button" className="pf-sound pf-mono" aria-pressed={loud} onClick={() => setLoud(!loud)}>
               {loud ? "Sound on" : "Sound off"}

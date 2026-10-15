@@ -275,6 +275,22 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-sound[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .pf-sound:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+/* shown only when the browser would not start a clip on its own (iOS Low
+   Power Mode): a tap on it plays the clip */
+.pf-play {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 88px; min-height: 44px;
+  padding: 0 calc(var(--u) * 1.4);
+  border: 1px solid var(--soft);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  z-index: 2;
+}
+.pf-play:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
 
 /* the car grid: 12 by 19 cells that fill the frame exactly. The car under the
    pointer grows to a 5 by 5 block and the rest step aside by whole cells, so

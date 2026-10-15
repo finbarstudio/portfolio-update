@@ -161,7 +161,7 @@ const RAW: Slide[] = [
   },
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
   one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
-  linked("portfolio/rennen-plus/phones.webm", "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
+  linked("portfolio/rennen-plus/phones.webm", "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }, { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
 
   /* ── Lows Design and Build ──────────────────────────────────── */
   { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
