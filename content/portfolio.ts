@@ -196,8 +196,8 @@ const RAW: Slide[] = [
     meta: [ME, { label: "Year", value: "2026" }, study("plated-with-issy")],
   },
   // cream type on the olive; the wordmark sits centred, about a third of the way up, just under the main photograph and catching its edge
-  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 19, alt: "Plated with Issy" } }, "#FAE3B1"),
-  bleed("portfolio/plated-with-issy/website-display.webm", undefined, {}, "#3D3E2A"),
+  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 20.9, alt: "Plated with Issy" } }, "#FAE3B1"),
+  bleed("portfolio/plated-with-issy/website-phone.webm", undefined, { mobile: phone("portfolio/plated-with-issy/website-phone-mobile.webm") }, "#3e3c2a"),
   // the globe of polaroids, live: 16:9 on a desktop, square on a phone
   bleed("portfolio/plated-with-issy/polaroids/the-venue.webp", "Every polaroid from the supper club. Drag to spin it", { globe: true, w: 16, h: 9, mobile: { ...phone("portfolio/plated-with-issy/polaroids/the-venue.webp")!, w: 1, h: 1 } }, "#FAE3B1"),
 
