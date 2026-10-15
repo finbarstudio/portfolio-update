@@ -74,7 +74,7 @@ async function download(url: string, onProgress: (pct: number | null) => void, s
   return URL.createObjectURL(new Blob(chunks, { type: res.headers.get("content-type") ?? "" }));
 }
 
-export default function PfMedia({ src: dark, light, video, sound, alt, w, h, group }: { src: string; light?: string; video?: boolean; /** the clip has a soundtrack: it starts muted, with a button to turn the sound on */ sound?: boolean; alt?: string; w: number; h: number; group?: string }) {
+export default function PfMedia({ src: dark, light, mobile, video, sound, alt, w, h, group }: { src: string; light?: string; /** a separate file for phones, 760px and under */ mobile?: string; video?: boolean; /** the clip has a soundtrack: it starts muted, with a button to turn the sound on */ sound?: boolean; alt?: string; w: number; h: number; group?: string }) {
   // A piece can have a second file for the page's light theme. It is swapped
   // the moment the theme switch is flipped (it sets data-pf-theme on <html>).
   const [isLight, setIsLight] = useState(false);
@@ -86,7 +86,19 @@ export default function PfMedia({ src: dark, light, video, sound, alt, w, h, gro
     watch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-pf-theme"] });
     return () => watch.disconnect();
   }, [light]);
-  const src = light && isLight ? light : dark;
+  // A piece can also have its own file for phones. Until the width is known
+  // nothing loads, so a phone never starts on the desktop file.
+  const [isPhone, setIsPhone] = useState<boolean | null>(mobile ? null : false);
+  useEffect(() => {
+    if (!mobile) return;
+    const mq = window.matchMedia("(max-width: 760px)");
+    const read = () => setIsPhone(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, [mobile]);
+  const src = mobile && isPhone ? mobile : light && isLight ? light : dark;
+  const known = isPhone !== null;
   /** 0 to 99 while downloading; null when the size is unknown. */
   const [pct, setPct] = useState<number | null>(0);
   const [url, setUrl] = useState<string | null>(null);
@@ -95,6 +107,7 @@ export default function PfMedia({ src: dark, light, video, sound, alt, w, h, gro
   const [loud, setLoud] = useState(false);
 
   useEffect(() => {
+    if (!known) return;
     if (video && window.matchMedia("(max-width: 760px)").matches) {
       setPct(null);
       setUrl(src);
@@ -127,7 +140,7 @@ export default function PfMedia({ src: dark, light, video, sound, alt, w, h, gro
       stop.abort();
       if (made) URL.revokeObjectURL(made);
     };
-  }, [src, video]);
+  }, [src, video, known]);
 
   // Clips play only while on screen. The first time a clip plays it holds on
   // its opening frame for a moment: if the reader watched it load to 100%, it

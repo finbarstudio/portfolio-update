@@ -414,6 +414,8 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-media .pf-run { position: static; padding: 14px 14px 0; }
   .pf-media .pf-row { position: static; flex-direction: column; padding: 12px 14px 14px; gap: 8px; }
   .pf-media .pf-item { width: 100%; height: auto; }
+  /* a piece with its own phone file takes that file's shape */
+  .pf-media .pf-item.has-phone { aspect-ratio: var(--r-phone) !important; }
   .pf-row-line { flex-direction: column; gap: 8px; }
   /* the document: the page at full width, the strip wrapping to two rows of six */
   .pf-deck { position: static; padding: 12px 14px 14px; gap: 10px; }

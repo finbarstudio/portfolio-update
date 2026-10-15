@@ -37,7 +37,7 @@
 import { mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number; /** a separate file for phones (760px and under), with its own shape: the page swaps to it and takes its proportions */ mobile?: { src: string; w: number; h: number } };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -99,6 +99,11 @@ export const CV = {
 
 const D = DIMS as unknown as Record<string, [number, number]>;
 /** One image or clip, measured. `frame: false` for artwork on transparency. */
+/** The phone version of a piece (see Media.mobile), measured like any other. */
+const phone = (path: string): Media["mobile"] => {
+  const [w, h] = D[path] ?? [4, 5];
+  return { src: `/media/images/${path}`, w, h };
+};
 function m(path: string, o: Partial<Media> = {}): Media {
   const [w, h] = D[path] ?? [16, 9];
   return { src: `/media/images/${path}`, w, h, video: /\.(mp4|webm)$/.test(path), frame: true, ...o };
@@ -230,7 +235,7 @@ const RAW: Slide[] = [
       "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
     meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }, study("london-home-show")],
   },
-  one("portfolio/london-home-show/event-orbit.webm", "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", { frame: false }),
+  one("portfolio/london-home-show/event-deck.webm", "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", { frame: false, mobile: phone("portfolio/london-home-show/event-deck-mobile.webm") }),
 
   /* ── Other ─────────────────────────────────────────────────── */
   /* One page each. The full story is on each case study. */
