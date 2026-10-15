@@ -50,7 +50,7 @@ export type Slide =
   | { kind: "title"; id: string; name: string; category: string; year: string }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
-  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number }
+  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9); "desktop": only on a desktop (and in the PDF), a phone keeps the usual stacked page */ bleed?: boolean | "desktop"; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
   | { kind: "deck"; /** a landscape document to page through: every page in order, and the same pages small */ name: string; pages: string[]; thumbs: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
@@ -135,10 +135,10 @@ function forPhones(item: Media): Media {
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
 /** One image filling the whole page, edge to edge (cropped to 16:9). */
 const bleed = (path: string, caption?: string, o: Partial<Media> = {}, ink?: string): Slide => ({ kind: "media", items: [m(path, o)], bleed: true, caption, ink });
-/** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption. */
-const device = (path: string, caption: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption });
+/** A device video on its own page: a 2:1 file on black, filling the page top to bottom (only black is lost at the sides), the running line over it. */
+const device = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, bleed: "desktop" });
 /** The same with a link out after the caption: only in Other, where a page stands in for a whole project (each project's own links are on its opening page). */
-const linked = (path: string, caption: string, link: { label: string; href: string }, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link });
+const linked = (path: string, caption: string, link: { label: string; href: string }, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link, bleed: "desktop" });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
 
 /** Several rows of images on one page, `per` to a row, none cropped. */
@@ -171,10 +171,10 @@ const RAW: Slide[] = [
       "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
     meta: [{ label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
   },
-  one("portfolio/lola-audio/brand.webm", "The brand: her mark, the site and the stills it sits on", { frame: false }),
-  device("portfolio/lola-audio/pages.webm", "The site page by page: the opening sheet, a showreel in the full-screen player, her bio and the work"),
+  device("portfolio/lola-audio/brand.webm"),
+  device("portfolio/lola-audio/pages.webm"),
   // phones get an H.264 and AAC copy: an iPhone will not reliably play the Opus sound in the WebM
-  device("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { sound: true, mobile: phone("portfolio/lola-audio/website-mobile.mp4") }),
+  device("portfolio/lola-audio/website.webm", undefined, { sound: true, mobile: phone("portfolio/lola-audio/website-mobile.mp4") }),
 
   /* ── Rennen Plus ────────────────────────────────────────────── */
   { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
@@ -186,9 +186,9 @@ const RAW: Slide[] = [
       "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
     meta: [{ label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
   },
-  device("portfolio/rennen-plus/website.webm", "The homepage"),
-  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
-  device("portfolio/rennen-plus/phones.webm", "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge", { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
+  device("portfolio/rennen-plus/website.webm"),
+  one("portfolio/rennen-plus/cars.webp", "228 cars, each cut out and set on one baseline", { frame: false, cars: true }),
+  device("portfolio/rennen-plus/phones.webm", "Designed mobile first, as most visitors browse on a phone", { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
 
   /* ── Plated with Issy ──────────────────────────────────────── */
   { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
@@ -205,7 +205,7 @@ const RAW: Slide[] = [
   bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 20.9, alt: "Plated with Issy" }, phoneBox: { w: 1, h: 1, fill: "#3f3c2a" } }, "#FAE3B1"),
   bleed("portfolio/plated-with-issy/website-phone.webm", undefined, { phoneBox: { w: 1, h: 1, fill: "#f3e3b0" } }, "#3e3c2a"),
   // the globe of polaroids, live: 16:9 on a desktop, square on a phone
-  bleed("portfolio/plated-with-issy/polaroids/the-venue.webp", "Every polaroid from the supper club. Drag to spin it", { globe: true, w: 16, h: 9, mobile: { ...phone("portfolio/plated-with-issy/polaroids/the-venue.webp")!, w: 1, h: 1 } }, "#FAE3B1"),
+  bleed("portfolio/plated-with-issy/polaroids/the-venue.webp", undefined, { globe: true, w: 16, h: 9, mobile: { ...phone("portfolio/plated-with-issy/polaroids/the-venue.webp")!, w: 1, h: 1 } }, "#FAE3B1"),
 
   /* ── Lows Design and Build ──────────────────────────────────── */
   { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
@@ -217,10 +217,10 @@ const RAW: Slide[] = [
       "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
     meta: [{ label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, { label: "Instagram", value: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }, study("lows-design-build")],
   },
-  one("portfolio/lows/logo-zoom.mp4", "The brand", { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
-  device("portfolio/lows/macbook.webm", "The website"),
-  device("portfolio/lows/iphone-instagram.webm", "The Instagram profile"),
-  one("portfolio/lows/signage-wheel.webm", "The identity on signs, a billboard and a site flag. These are mockups", { frame: false }),
+  one("portfolio/lows/logo-zoom.mp4", undefined, { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
+  device("portfolio/lows/macbook.webm"),
+  device("portfolio/lows/iphone-instagram.webm"),
+  device("portfolio/lows/signage-wheel.webm"),
   {
     kind: "quote",
     name: "Lows Design + Build",
@@ -238,12 +238,12 @@ const RAW: Slide[] = [
       "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
     meta: [study("tmyr")],
   },
-  { kind: "media", items: [m("tmyr/hero-poster.webp", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 9, h: 10 } })], caption: "The reels on Instagram", ground: "#ae125f", ink: "#ffffff" },
+  { kind: "media", items: [m("tmyr/hero-poster.webp", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 9, h: 10 } })], ground: "#ae125f", ink: "#ffffff" },
   // These two clips carry their page colour in the file (padded to the page's shape with the clip's own
   // corner pixels), so the pink round them is the same video colour on every screen. Phones get square
   // versions; the ring's is H.264 at 30fps, as the VP9 one was too heavy for an iPhone to start.
-  { kind: "media", items: [m("portfolio/tmyr/posts-ring-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/posts-ring-mobile.mp4") })], caption: "The feed posts, one for each moment in the campaign", bleed: true, ground: "#ae125f", ink: "#ffffff" },
-  { kind: "media", items: [m("portfolio/tmyr/guy-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/guy-mobile.mp4") })], caption: "A feed post and its end card", bleed: true, ground: "#e71988", ink: "#ffffff" },
+  { kind: "media", items: [m("portfolio/tmyr/posts-ring-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/posts-ring-mobile.mp4") })], bleed: true, ground: "#ae125f", ink: "#ffffff" },
+  { kind: "media", items: [m("portfolio/tmyr/guy-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/guy-mobile.mp4") })], bleed: true, ground: "#e71988", ink: "#ffffff" },
 
   /* ── TasWater ──────────────────────────────────────────────── */
   { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
@@ -255,8 +255,8 @@ const RAW: Slide[] = [
       "TasWater runs water and sewerage for the whole of Tasmania. I designed two large graphics for them in a month, made to sit inside their interactive eLearning software: one of the whole water network, one of a new starter’s first year. Both are strictly on brand and were signed off by their leadership.",
     meta: [{ label: "Studio", value: "Packer and Associates" }, study("taswater")],
   },
-  bleed("portfolio/taswater/map-mockup.webp", "The network graphic for the eLearning: water from intake and treatment to the tap, then back through sewage and wastewater", { mobile: phone("portfolio/taswater/map-mockup-mobile.webp") }),
-  bleed("portfolio/taswater/snake-mockup.webp", "The onboarding graphic for the eLearning: a new starter’s first twelve months, from day one to month twelve", { mobile: phone("portfolio/taswater/snake-mockup-mobile.webp") }),
+  bleed("portfolio/taswater/map-mockup.webp", undefined, { mobile: phone("portfolio/taswater/map-mockup-mobile.webp") }),
+  bleed("portfolio/taswater/snake-mockup.webp", undefined, { mobile: phone("portfolio/taswater/snake-mockup-mobile.webp") }),
 
   /* ── The London Home Show ──────────────────────────────────── */
   { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
@@ -268,14 +268,15 @@ const RAW: Slide[] = [
       "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
     meta: [study("london-home-show")],
   },
-  { kind: "media", items: [m("portfolio/london-home-show/event-deck.webm", { frame: false, mobile: phone("portfolio/london-home-show/event-deck-mobile.webm") })], caption: "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", phoneBleed: true },
+  // edge to edge on a phone too
+  { kind: "media", items: [m("portfolio/london-home-show/event-deck.webm", { frame: false, mobile: phone("portfolio/london-home-show/event-deck-mobile.webm") })], bleed: true },
 
   /* ── Other ─────────────────────────────────────────────────── */
   /* One page each. The full story is on each case study. */
   { kind: "section", title: "Other", subtitle: "Playbooks, print and covers", year: "2022–2026" },
-  linked("portfolio/salesmasters/covers-wheel.webm", "Salesmasters. Sales playbooks for nine clients, each in the client’s own brand", { label: "Case study", href: "https://www.finbar.studio/case-studies/salesmasters" }),
-  linked("portfolio/packer/capability-statement.webm", "Packer and Associates. The capability statement, page by page", { label: "Case study", href: "https://www.finbar.studio/case-studies/packer-associates" }),
-  { kind: "media", items: [m("joe-devine/hero.webp")], bleed: true, caption: "Joe Devine. Single covers, art direction and photography", link: { label: "Case study", href: "https://www.finbar.studio/case-studies/joe-devine" } },
+  linked("portfolio/salesmasters/covers-wheel.webm", "Salesmasters. Sales playbooks for nine clients", { label: "Case study", href: "https://www.finbar.studio/case-studies/salesmasters" }),
+  linked("portfolio/packer/capability-statement.webm", "Packer and Associates. Capability statement", { label: "Case study", href: "https://www.finbar.studio/case-studies/packer-associates" }),
+  { kind: "media", items: [m("joe-devine/hero.webp")], bleed: true, caption: "Joe Devine. Single covers and art direction", link: { label: "Case study", href: "https://www.finbar.studio/case-studies/joe-devine" } },
 
   { kind: "end" },
 ];

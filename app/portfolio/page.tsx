@@ -286,7 +286,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
       const h = `min(calc((var(--H) - ${down - 1} * var(--G)) / ${down}), calc((var(--W) - ${n - 1} * var(--G)) / ${ratio.toFixed(4)}))`;
       return (
         <section
-          className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}${s.phoneBleed ? " is-pbleed" : ""}${s.ink ? " has-ink" : ""}`}
+          className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed === true ? " is-bleed" : s.bleed === "desktop" ? " is-dbleed" : ""}${s.phoneBleed ? " is-pbleed" : ""}${s.ink ? " has-ink" : ""}`}
           style={s.ink || s.ground ? ({ ...(s.ink ? { "--bleed-ink": s.ink } : null), ...(s.ground ? { "--ground": s.ground } : null) } as React.CSSProperties) : undefined}
         >
           <Run chap={chap} page={page} />

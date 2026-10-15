@@ -91,7 +91,7 @@ function Card({ i, texture }: { i: number; texture: THREE.Texture | null }) {
   );
 }
 
-function Globe({ drag }: { drag: React.MutableRefObject<{ vx: number; down: boolean }> }) {
+function Globe({ drag, pace = 1 }: { drag: React.MutableRefObject<{ vx: number; down: boolean }>; /** times the usual turning speed */ pace?: number }) {
   const spin = useRef<THREE.Group>(null);
   const yaw = useRef(0);
   // the globe's own speed: follows the hand while it is held, then eases back to the slow turn
@@ -127,7 +127,7 @@ function Globe({ drag }: { drag: React.MutableRefObject<{ vx: number; down: bool
     const d = Math.min(dt, 0.05);
     const g = drag.current;
     // held, it moves with the hand; let go, a flick carries on and settles back to the slow turn
-    vel.current = g.down ? g.vx : THREE.MathUtils.damp(vel.current, still.current ? 0 : SPIN, 1.6, d);
+    vel.current = g.down ? g.vx : THREE.MathUtils.damp(vel.current, still.current ? 0 : SPIN * pace, 1.6, d);
     yaw.current += vel.current * d;
     if (spin.current) spin.current.rotation.y = yaw.current;
   });
@@ -141,7 +141,8 @@ function Globe({ drag }: { drag: React.MutableRefObject<{ vx: number; down: bool
   );
 }
 
-export default function PfGlobe() {
+/** `thumb`: the contents page's thumbnail: on black, turning a little faster on its own, nothing to grab, no icon. */
+export default function PfGlobe({ thumb = false }: { thumb?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false); // close enough to build
   const [seen, setSeen] = useState(false); // on screen: keep drawing
@@ -201,14 +202,14 @@ export default function PfGlobe() {
   return (
     <div
       ref={box}
-      className="pf-globe"
+      className={`pf-globe${thumb ? " is-thumb" : ""}`}
       data-grabbing={grabbing ? "1" : "0"}
-      onPointerDown={onDown}
-      onPointerMove={onMove}
-      onPointerUp={onUp}
-      onPointerCancel={onUp}
+      onPointerDown={thumb ? undefined : onDown}
+      onPointerMove={thumb ? undefined : onMove}
+      onPointerUp={thumb ? undefined : onUp}
+      onPointerCancel={thumb ? undefined : onUp}
       role="img"
-      aria-label="A turning globe of polaroids from Plated with Issy's supper club. Drag to spin it."
+      aria-label={thumb ? "A turning globe of polaroids from Plated with Issy's supper club" : "A turning globe of polaroids from Plated with Issy's supper club. Drag to spin it."}
     >
       {near ? (
         <Canvas
@@ -218,12 +219,14 @@ export default function PfGlobe() {
           camera={{ fov: FOV, position: [0, 0, CAM_Z], near: 0.1, far: 50 }}
           gl={{ antialias: true, alpha: true }}
         >
-          <Globe drag={drag} />
+          <Globe drag={drag} pace={thumb ? 3 : 1} />
         </Canvas>
       ) : null}
-      <span className="pf-globe-hint" data-gone={spun ? "1" : "0"} aria-hidden="true">
-        <MdSwipe size={20} />
-      </span>
+      {thumb ? null : (
+        <span className="pf-hint" data-gone={spun ? "1" : "0"} aria-hidden="true">
+          <MdSwipe size={20} />
+        </span>
+      )}
     </div>
   );
 }

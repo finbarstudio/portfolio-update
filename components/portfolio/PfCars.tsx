@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { media } from "@/lib/media";
 import sheet from "@/content/portfolio-cars.json";
 import { PRINT_POSTER, usePrintJpeg, usePrintView } from "@/components/portfolio/print";
+import { MdAdsClick } from "@/components/MaterialIcon";
 
 /**
  * The Rennen Plus car grid on the portfolio: every thumbnail on the site, 12
@@ -60,6 +61,7 @@ function place(i: number, open: Open | null, { cols, grow: GROW }: Grid): [numbe
 export default function PfCars() {
   const [open, setOpen] = useState<Open | null>(null);
   const [phone, setPhone] = useState(false);
+  const [used, setUsed] = useState(false); // a car has been opened: the hint goes
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -91,6 +93,7 @@ export default function PfCars() {
     const r = clamp(Math.floor(((e.clientY - b.top) / b.height) * ROWS), 0, ROWS - 1);
     const i = r * COLS + c;
     if (open?.i === i) return;
+    setUsed(true);
     // the block is centred on the car, or sits against the edge the car is on
     setOpen({ i, c, r, c0: clamp(c - (GROW - 1) / 2, 0, COLS - GROW), r0: clamp(r - (GROW - 1) / 2, 0, ROWS - GROW) });
   };
@@ -106,43 +109,51 @@ export default function PfCars() {
     );
 
   return (
-    <div
-      className="pf-cars"
-      ref={box}
-      style={{ "--cols": COLS, "--rows": ROWS, "--shape": ((COLS * CELL) / ROWS).toFixed(4) } as React.CSSProperties}
-      onPointerMove={point}
-      onPointerDown={point}
-      onPointerLeave={() => setOpen(null)}
-    >
-      {shown.map((n, i) => {
-        const car = CARS[n];
-        const big = open?.i === i;
-        const [x, y] = place(i, open, grid);
-        return (
-          <div
-            key={car.slug}
-            className="pf-car"
-            data-big={big ? "1" : "0"}
-            style={{ transform: `translate(${x * 100}%, ${y * 100}%) scale(${big ? GROW : 1})` }}
-          >
+    <>
+      <div
+        className="pf-cars"
+        ref={box}
+        style={{ "--cols": COLS, "--rows": ROWS, "--shape": ((COLS * CELL) / ROWS).toFixed(4) } as React.CSSProperties}
+        onPointerMove={point}
+        onPointerDown={point}
+        onPointerLeave={() => setOpen(null)}
+      >
+        {shown.map((n, i) => {
+          const car = CARS[n];
+          const big = open?.i === i;
+          const [x, y] = place(i, open, grid);
+          return (
             <div
-              className="pf-car-art"
-              role="img"
-              aria-label={car.name}
-              style={{
-                backgroundImage: sprite,
-                backgroundSize: `${sheet.spriteCols * 100}% ${sheet.spriteRows * 100}%`,
-                backgroundPosition: `${((n % sheet.spriteCols) / (sheet.spriteCols - 1)) * 100}% ${(Math.floor(n / sheet.spriteCols) / (sheet.spriteRows - 1)) * 100}%`,
-              }}
+              key={car.slug}
+              className="pf-car"
+              data-big={big ? "1" : "0"}
+              style={{ transform: `translate(${x * 100}%, ${y * 100}%) scale(${big ? GROW : 1})` }}
             >
-              {big ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={media(`/media/images/portfolio/rennen-plus/cars/${car.slug}.webp`)} alt="" width={1000} height={400} />
-              ) : null}
+              <div
+                className="pf-car-art"
+                role="img"
+                aria-label={car.name}
+                style={{
+                  backgroundImage: sprite,
+                  backgroundSize: `${sheet.spriteCols * 100}% ${sheet.spriteRows * 100}%`,
+                  backgroundPosition: `${((n % sheet.spriteCols) / (sheet.spriteCols - 1)) * 100}% ${(Math.floor(n / sheet.spriteCols) / (sheet.spriteRows - 1)) * 100}%`,
+                }}
+              >
+                {big ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={media(`/media/images/portfolio/rennen-plus/cars/${car.slug}.webp`)} alt="" width={1000} height={400} />
+                ) : null}
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+      {/* a car opens under the pointer: a small icon says so, until one has */}
+      {small ? null : (
+        <span className="pf-hint pf-cars-hint" data-gone={used ? "1" : "0"} aria-hidden="true">
+          <MdAdsClick size={20} />
+        </span>
+      )}
+    </>
   );
 }

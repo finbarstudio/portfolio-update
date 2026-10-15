@@ -8,11 +8,50 @@
  *
  * The thumbnails are 5:2 crops from each chapter's work, made by
  * scripts/portfolio-thumbs.mjs into public/media/images/portfolio/thumbs/.
+ * Most of them move: a short loop of the chapter's own clip (<id>.webm, its
+ * still as the poster), playing only while it is on screen; Plated with Issy
+ * is its live globe, turning on its own. The PDF prints the stills.
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { media } from "@/lib/media";
 import { usePrintJpeg, usePrintView } from "@/components/portfolio/print";
+
+// three.js only runs in the browser
+const PfGlobe = dynamic(() => import("@/components/portfolio/PfGlobe"), { ssr: false });
+
+/** the chapters whose thumbnail is a loop (thumbs/<id>.webm) */
+const CLIPS = new Set(["lola", "rennen-plus", "lows", "share-to-buy", "london-home-show"]);
+/** the chapter whose thumbnail is its live globe */
+const GLOBE = "plated";
+
+/** A thumbnail loop: muted, playing only while on screen (and again on coming back to the tab). */
+function Clip({ src, poster, name }: { src: string; poster: string; name: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    let seen = false;
+    const play = () => {
+      v.muted = true;
+      v.play().catch(() => {});
+    };
+    const io = new IntersectionObserver(([e]) => {
+      seen = e.isIntersecting;
+      if (seen) play();
+      else v.pause();
+    });
+    io.observe(v);
+    const back = () => document.visibilityState === "visible" && seen && play();
+    document.addEventListener("visibilitychange", back);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", back);
+    };
+  }, []);
+  return <video ref={ref} src={src} poster={poster} muted loop playsInline preload="none" aria-label={name} />;
+}
 
 export interface IndexChapter {
   no: string;
@@ -26,13 +65,13 @@ function Thumb({ id, name }: { id: string; name: string }) {
   // the PDF takes a JPEG copy (see usePrintJpeg)
   const print = usePrintView();
   const printed = usePrintJpeg(print ? src : null, 1200);
+  if (!print && id === GLOBE) return <PfGlobe thumb />;
+  if (!print && CLIPS.has(id)) return <Clip src={media(`/media/images/portfolio/thumbs/${id}.webm`)} poster={src} name={name} />;
   const shown = print ? printed : src;
   return shown ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={shown} alt={name} width={1200} height={480} loading="lazy" decoding="async" />
-  ) : (
-    <span className="pf-thumb-blank" />
-  );
+  ) : null;
 }
 
 export default function PfIndex({ chapters, page }: { chapters: IndexChapter[]; page: string }) {
@@ -57,7 +96,9 @@ export default function PfIndex({ chapters, page }: { chapters: IndexChapter[]; 
           {chapters.map((c) => (
             <li key={c.id}>
               <a href={`#${c.id}`}>
-                <Thumb id={c.id} name={c.name} />
+                <span className="pf-thumb-media">
+                  <Thumb id={c.id} name={c.name} />
+                </span>
                 <span className="pf-thumb-cap">
                   <span className="pf-mono pf-soft">{c.no}</span>
                   <span className="n">{c.name}</span>
