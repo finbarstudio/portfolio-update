@@ -147,6 +147,7 @@ const RAW: Slide[] = [
     meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
   },
   one("portfolio/lola-audio/brand.webm", "The brand: her mark, the site and the stills it sits on", { frame: false }),
+  linked("portfolio/lola-audio/pages.webm", "The site page by page: the opening sheet, a showreel in the full-screen player, her bio and the work", { label: "lola-audio.com", href: "https://www.lola-audio.com" }),
   linked("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { label: "lola-audio.com", href: "https://www.lola-audio.com" }, { sound: true }),
 
   /* ── Rennen Plus ────────────────────────────────────────────── */
