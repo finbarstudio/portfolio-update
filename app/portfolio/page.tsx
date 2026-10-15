@@ -38,8 +38,8 @@ function Mark() {
 function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; group?: string }) {
   return (
     <div
-      className={`pf-item${m.frame === false ? "" : " is-framed"}${m.mobile ? " has-phone" : ""}`}
-      style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.mobile ? { "--r-phone": (m.mobile.w / m.mobile.h).toFixed(4) } : null), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
+      className={`pf-item${m.frame === false ? "" : " is-framed"}${m.mobile ? " has-phone" : ""}${m.phoneBox ? " has-box" : ""}`}
+      style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.mobile ? { "--r-phone": (m.mobile.w / m.mobile.h).toFixed(4) } : null), ...(m.phoneBox ? { "--r-box": (m.phoneBox.w / m.phoneBox.h).toFixed(4), "--fill": m.phoneBox.fill } : null), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
     >
       {m.cars ? <PfCars /> : m.phones ? <PfPhones /> : m.globe ? <PfGlobe /> : <PfMedia src={m.src} light={m.light} mobile={m.mobile?.src} mobileLight={m.mobile?.light} video={m.video} sound={m.sound} alt={m.alt} w={m.w} h={m.h} group={group} />}
       {m.overlay ? (
@@ -306,7 +306,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
       const h = `min(calc((var(--H) - ${down - 1} * var(--G)) / ${down}), calc((var(--W) - ${n - 1} * var(--G)) / ${ratio.toFixed(4)}))`;
       return (
         <section
-          className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}${s.ink ? " has-ink" : ""}`}
+          className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}${s.phoneBleed ? " is-pbleed" : ""}${s.ink ? " has-ink" : ""}`}
           style={s.ink || s.ground ? ({ ...(s.ink ? { "--bleed-ink": s.ink } : null), ...(s.ground ? { "--ground": s.ground } : null) } as React.CSSProperties) : undefined}
         >
           <Run chap={chap} page={page} />

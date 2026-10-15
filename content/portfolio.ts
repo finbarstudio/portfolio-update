@@ -38,7 +38,7 @@ import { mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 import PHONE from "./portfolio-phone.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** Plated with Issy: this page is the live 3D globe of polaroids (PfGlobe), and the file is only a stand-in for its measurements */ globe?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number; /** a separate file for phones (760px and under), with its own shape: the page swaps to it and takes its proportions */ mobile?: { src: string; w: number; h: number; /** the phone file for the light theme */ light?: string }; /** an image laid over the piece, placed in the FILE's own frame (percent of its width and height, centre point), so it stays put however the page crops the file */ overlay?: { src: string; x: number; y: number; w: number; alt?: string }; };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** Plated with Issy: this page is the live 3D globe of polaroids (PfGlobe), and the file is only a stand-in for its measurements */ globe?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number; /** a separate file for phones (760px and under), with its own shape: the page swaps to it and takes its proportions */ mobile?: { src: string; w: number; h: number; /** the phone file for the light theme */ light?: string }; /** an image laid over the piece, placed in the FILE's own frame (percent of its width and height, centre point), so it stays put however the page crops the file */ overlay?: { src: string; x: number; y: number; w: number; alt?: string }; /** on a phone only: the piece sits whole inside a box of this shape, on this colour (its own background colour, so the box reads as one picture) */ phoneBox?: { w: number; h: number; fill: string }; };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -50,7 +50,7 @@ export type Slide =
   | { kind: "title"; id: string; name: string; category: string; year: string }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
-  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number }
+  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
   | { kind: "deck"; /** a landscape document to page through: every page in order, and the same pages small */ name: string; pages: string[]; thumbs: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
@@ -173,7 +173,8 @@ const RAW: Slide[] = [
   },
   one("portfolio/lola-audio/brand.webm", "The brand: her mark, the site and the stills it sits on", { frame: false }),
   device("portfolio/lola-audio/pages.webm", "The site page by page: the opening sheet, a showreel in the full-screen player, her bio and the work"),
-  device("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { sound: true }),
+  // phones get an H.264 and AAC copy: an iPhone will not reliably play the Opus sound in the WebM
+  device("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { sound: true, mobile: phone("portfolio/lola-audio/website-mobile.mp4") }),
 
   /* ── Rennen Plus ────────────────────────────────────────────── */
   { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
@@ -188,6 +189,23 @@ const RAW: Slide[] = [
   device("portfolio/rennen-plus/website.webm", "The homepage"),
   one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
   device("portfolio/rennen-plus/phones.webm", "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge", { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
+
+  /* ── Plated with Issy ──────────────────────────────────────── */
+  { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
+  {
+    kind: "text",
+    name: "Plated with Issy",
+    category: "Brand and Website",
+    body:
+      "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
+    meta: [study("plated-with-issy")],
+  },
+  // cream type on the olive; the wordmark sits centred, about a third of the way up, just under the main photograph and catching its edge
+  // on a phone these two are square like the globe after them, on their own background colours
+  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 20.9, alt: "Plated with Issy" }, phoneBox: { w: 1, h: 1, fill: "#3f3c2a" } }, "#FAE3B1"),
+  bleed("portfolio/plated-with-issy/website-phone.webm", undefined, { phoneBox: { w: 1, h: 1, fill: "#f3e3b0" } }, "#3e3c2a"),
+  // the globe of polaroids, live: 16:9 on a desktop, square on a phone
+  bleed("portfolio/plated-with-issy/polaroids/the-venue.webp", "Every polaroid from the supper club. Drag to spin it", { globe: true, w: 16, h: 9, mobile: { ...phone("portfolio/plated-with-issy/polaroids/the-venue.webp")!, w: 1, h: 1 } }, "#FAE3B1"),
 
   /* ── Lows Design and Build ──────────────────────────────────── */
   { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
@@ -210,22 +228,6 @@ const RAW: Slide[] = [
     by: "Samuel Low",
   },
 
-  /* ── Plated with Issy ──────────────────────────────────────── */
-  { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
-  {
-    kind: "text",
-    name: "Plated with Issy",
-    category: "Brand and Website",
-    body:
-      "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
-    meta: [study("plated-with-issy")],
-  },
-  // cream type on the olive; the wordmark sits centred, about a third of the way up, just under the main photograph and catching its edge
-  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 20.9, alt: "Plated with Issy" } }, "#FAE3B1"),
-  bleed("portfolio/plated-with-issy/website-phone.webm", undefined, {}, "#3e3c2a"),
-  // the globe of polaroids, live: 16:9 on a desktop, square on a phone
-  bleed("portfolio/plated-with-issy/polaroids/the-venue.webp", "Every polaroid from the supper club. Drag to spin it", { globe: true, w: 16, h: 9, mobile: { ...phone("portfolio/plated-with-issy/polaroids/the-venue.webp")!, w: 1, h: 1 } }, "#FAE3B1"),
-
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
   { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
   {
@@ -236,11 +238,12 @@ const RAW: Slide[] = [
       "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
     meta: [study("tmyr")],
   },
-  { kind: "media", items: [m("tmyr/hero-poster.webp", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 4, h: 5 } })], caption: "The reels on Instagram", ground: "#ae125f", ink: "#ffffff" },
+  { kind: "media", items: [m("tmyr/hero-poster.webp", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 9, h: 10 } })], caption: "The reels on Instagram", ground: "#ae125f", ink: "#ffffff" },
   // the ring of posts sits on its own deep pink; the page takes that pink (as the browser draws it) so it has no edge
-  { kind: "media", items: [m("portfolio/tmyr/posts-ring.webm", { frame: false })], caption: "The feed posts, one for each moment in the campaign", ground: "#ae125f", ink: "#ffffff" },
+  // phones get an H.264 copy at 30fps: the VP9 one is heavy enough that an iPhone would not start it
+  { kind: "media", items: [m("portfolio/tmyr/posts-ring.webm", { frame: false, mobile: phone("portfolio/tmyr/posts-ring-mobile.mp4") })], caption: "The feed posts, one for each moment in the campaign", ground: "#ae125f", ink: "#ffffff", phoneBleed: true },
   // Guy's post and its end card, on the post's own pink (as the browser draws it) so the square has no edge
-  { kind: "media", items: [m("portfolio/tmyr/guy.webm", { frame: false })], caption: "A feed post and its end card", ground: "#e71988", ink: "#ffffff" },
+  { kind: "media", items: [m("portfolio/tmyr/guy.webm", { frame: false })], caption: "A feed post and its end card", ground: "#e71988", ink: "#ffffff", phoneBleed: true },
 
   /* ── TasWater ──────────────────────────────────────────────── */
   { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
@@ -265,7 +268,7 @@ const RAW: Slide[] = [
       "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
     meta: [study("london-home-show")],
   },
-  one("portfolio/london-home-show/event-deck.webm", "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", { frame: false, mobile: phone("portfolio/london-home-show/event-deck-mobile.webm") }),
+  { kind: "media", items: [m("portfolio/london-home-show/event-deck.webm", { frame: false, mobile: phone("portfolio/london-home-show/event-deck-mobile.webm") })], caption: "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", phoneBleed: true },
 
   /* ── Other ─────────────────────────────────────────────────── */
   /* One page each. The full story is on each case study. */

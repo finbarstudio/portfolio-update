@@ -168,6 +168,18 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
       },
     );
   };
+  // iOS only lets a clip make sound if it is unmuted during the tap itself,
+  // so the element is unmuted (and played) here, not left to the re-render
+  const toggleSound = () => {
+    const v = clip.current;
+    const next = !loud;
+    if (v) {
+      v.muted = !next;
+      if (next) v.play().catch(() => {});
+    }
+    loudRef.current = next;
+    setLoud(next);
+  };
   useEffect(() => {
     const v = clip.current;
     if (!v || !url) return;
@@ -220,7 +232,7 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
             </button>
           ) : null}
           {sound && shown ? (
-            <button type="button" className="pf-sound pf-mono" aria-pressed={loud} aria-label={loud ? "Sound on" : "Sound off"} onClick={() => setLoud(!loud)}>
+            <button type="button" className="pf-sound pf-mono" aria-pressed={loud} aria-label={loud ? "Sound on" : "Sound off"} onClick={() => toggleSound()}>
               {/* the words on a desktop; on a phone only the icon shows */}
               <span className="pf-sound-icon">{loud ? <MdVolumeUp size={16} /> : <MdVolumeOff size={16} />}</span>
               <span className="pf-sound-word">{loud ? "Sound on" : "Sound off"}</span>
