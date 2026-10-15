@@ -37,7 +37,7 @@
 import { mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number; /** a separate file for phones (760px and under), with its own shape: the page swaps to it and takes its proportions */ mobile?: { src: string; w: number; h: number } };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number; /** a separate file for phones (760px and under), with its own shape: the page swaps to it and takes its proportions */ mobile?: { src: string; w: number; h: number }; /** an image laid over the piece, placed in the FILE's own frame (percent of its width and height, centre point), so it stays put however the page crops the file */ overlay?: { src: string; x: number; y: number; w: number; alt?: string } };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -195,7 +195,9 @@ const RAW: Slide[] = [
       "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
     meta: [ME, { label: "Year", value: "2026" }, study("plated-with-issy")],
   },
-  { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
+  // the wordmark sits centred in the open space to the left of the photographs (x 22 splits the
+  // difference between the cropped desktop page and the uncropped phone one)
+  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 22, y: 48, w: 19, alt: "Plated with Issy" } }),
   one("plated-with-issy/site-scroll-3d.mp4"),
   row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
 

@@ -369,6 +369,26 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-media.is-bleed::after { bottom: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent); }
 .pf-media.is-bleed .pf-item { width: 100%; height: 100%; aspect-ratio: auto !important; border-radius: 0; box-shadow: none; }
 .pf-media.is-bleed .pf-item :is(img, video) { object-fit: cover; }
+/* an image laid over a piece (Media.overlay): this box is the file's own frame,
+   as tall as the item and as wide as the file's shape makes it, centred, which
+   is exactly where a covering picture is drawn when the file is wider than the
+   box (or the same shape). The overlay is placed by its centre inside it. */
+.pf-overlay {
+  position: absolute;
+  left: 50%; top: 50%;
+  height: 100%;
+  aspect-ratio: var(--r);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+.pf-media .pf-item .pf-overlay img {
+  position: absolute;
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  object-fit: contain;
+}
 
 /* ── grid pages: tiles on a unit grid (4:3, 1:1 and 2:1 artwork) ── */
 .pf-grid {
