@@ -252,6 +252,14 @@ export interface Transform {
    * rounded like a card's, so a card sliding through a cell stays inside it.
    */
   clip?: [number, number, number, number];
+  /**
+   * A card being replaced by another drawn over it: `card` is the upload
+   * coming in, and `dx`, `dy` how far this card has moved from the place the
+   * new card will take, in card lengths. Where the new card will cover this one it
+   * stays solid; anywhere else (a taller or wider picture sticking out past
+   * the new one) fades out by `fade`, 0 to 1.
+   */
+  under?: { card: number; dx: number; dy: number; fade: number };
 }
 
 /**
@@ -918,6 +926,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const x = swapping ? clamp((at - k - wait) / (1 - c.m.hold)) : 1;
     if (leaving && (!swapping || x >= 1)) return null;
     const card = mod(p + (swapping && !leaving ? round + 1 : round) * stride, n);
+    const incoming = mod(p + (round + 1) * stride, n);
     const e = leaving ? c.easeOut(x) : c.ease(x);
 
     // As large as the frame allows at size 1, whatever the grid.
@@ -931,8 +940,8 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const shift = (ox: number, oy: number): Raw => ({ ...out, x: (cx + ox * c.w) * s, y: (cy + oy * c.h) * s, clip: [-ox, -oy, 1 - ox, 1 - oy] });
     switch (c.o.swap) {
       case "fade":
-        // The new picture fades in over the old, which stays put underneath.
-        return leaving ? out : { ...out, a: clamp(e) };
+        // The new picture fades in over the old, which stays put underneath where the new one will cover it.
+        return leaving ? { ...out, under: { card: incoming, dx: 0, dy: 0, fade: clamp(e) } } : { ...out, a: clamp(e) };
       case "flip": {
         // The cell turns over: the old picture on the front, the new one on the back.
         const angle = (leaving ? e : e - 1) * Math.PI;
@@ -946,10 +955,10 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
         return leaving ? shift(e * dx, e * dy) : shift(-(1 - e) * dx, -(1 - e) * dy);
       case "slide":
         // The new picture slides in over the old, which drifts a little the same way.
-        return leaving ? shift(e * dx * 0.3, e * dy * 0.3) : shift(-(1 - e) * dx, -(1 - e) * dy);
+        return leaving ? { ...shift(e * dx * 0.3, e * dy * 0.3), under: { card: incoming, dx: e * dx * 0.3, dy: e * dy * 0.3, fade: clamp(e) } } : shift(-(1 - e) * dx, -(1 - e) * dy);
       case "wipe": {
         // An edge crosses the cell, revealing the new picture where the old one was.
-        if (leaving) return out;
+        if (leaving) return { ...out, under: { card: incoming, dx: 0, dy: 0, fade: clamp(e) } };
         const clip: [number, number, number, number] = dx < 0 ? [1 - e, 0, 1, 1] : dx > 0 ? [0, 0, e, 1] : dy > 0 ? [0, 0, 1, e] : [0, 1 - e, 1, 1];
         return { ...out, clip };
       }
@@ -1212,7 +1221,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     }
     a *= curtain;
     if (a <= 0.003) continue;
-    items.push({ i: raw.card ?? i, x, y, z, rx, ry, rz, s, a, clip: raw.clip });
+    items.push({ i: raw.card ?? i, x, y, z, rx, ry, rz, s, a, clip: raw.clip, under: raw.under });
   }
 
   const camera = { x: 0, y: 0, back: 0 };

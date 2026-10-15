@@ -77,7 +77,7 @@ void main() { vUv = aPos + 0.5; gl_Position = uMatrix * vec4(aPos, 0.0, 1.0); }`
 const FRAGMENT = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 color;
-uniform sampler2D uTexture; uniform vec2 uSize; uniform vec4 uCrop, uQuad, uWindow; uniform float uRadius, uAlpha, uShade, uOverlay;
+uniform sampler2D uTexture; uniform vec2 uSize; uniform vec4 uCrop, uQuad, uWindow, uKeep; uniform float uRadius, uAlpha, uShade, uOverlay, uOutside;
 // A rounded rectangle centred on c with half size h, in the card's own units: 1 inside, 0 outside, soft at the edge.
 float rounded(vec2 p, vec2 c, vec2 h) {
   vec2 q = abs((p - c) * uSize) - h * uSize + uRadius;
@@ -90,6 +90,8 @@ void main() {
   // Where on the card this point is. Usually the whole card is drawn; a clipped card draws only part of itself.
   vec2 p = mix(uQuad.xy, uQuad.zw, vUv);
   float mask = rounded(p, vec2(0.5), vec2(0.5)) * rounded(p, (uWindow.xy + uWindow.zw) * 0.5, (uWindow.zw - uWindow.xy) * 0.5);
+  // A card being replaced keeps full strength where the new card will cover it, and fades by uOutside elsewhere.
+  mask *= mix(uOutside, 1.0, rounded(p, (uKeep.xy + uKeep.zw) * 0.5, (uKeep.zw - uKeep.xy) * 0.5));
   // Seen from behind, a card would show its picture mirrored.
   vec2 uv = gl_FrontFacing ? p : vec2(1.0 - p.x, p.y);
   // Nothing of this card here: leave the depth buffer alone so cards behind still show.
@@ -98,7 +100,7 @@ void main() {
   color = vec4(rgb, 1.0) * mask * uAlpha;
 }`;
 
-const UNIFORMS = ["uMatrix", "uSize", "uCrop", "uQuad", "uWindow", "uRadius", "uAlpha", "uShade", "uOverlay"] as const;
+const UNIFORMS = ["uMatrix", "uSize", "uCrop", "uQuad", "uWindow", "uKeep", "uRadius", "uAlpha", "uShade", "uOverlay", "uOutside"] as const;
 /** No window: far enough out that its rounded corners never touch the card. */
 const NO_WINDOW = [-2, -2, 3, 3];
 
@@ -374,7 +376,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       view = multiply(view, translate(-camera.x, -camera.y, 0));
       const projection = perspective(camera.fov, aspect, 0.1, 100);
 
-      const drawn: { i: number; depth: number; alpha: number; s: number; fx: number; fy: number; matrix: Matrix; quad: Matrix; part: number[]; window: number[] }[] = [];
+      const drawn: { i: number; depth: number; alpha: number; s: number; fx: number; fy: number; matrix: Matrix; quad: Matrix; part: number[]; window: number[]; keep: number[]; outside: number }[] = [];
       for (const t of items) {
         let model = translate(t.x, t.y, t.z);
         if (t.ry) model = multiply(model, rotateY(t.ry));
@@ -396,7 +398,15 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
         const slot = multiply(projection, modelView);
         const matrix = fx === 1 && fy === 1 ? slot : multiply(slot, scale(fx, fy));
         const quad = t.clip ? multiply(matrix, multiply(translate((x0 + x1) / 2 - 0.5, (y0 + y1) / 2 - 0.5, 0), scale(x1 - x0, y1 - y0))) : matrix;
-        drawn.push({ i: t.i, depth, alpha: t.a, s: t.s, fx, fy, matrix, quad, part: [x0, y0, x1, y1], window });
+        // Being replaced: the new card's footprint in this card's units, where this card stays solid.
+        let keep = NO_WINDOW;
+        if (t.under) {
+          const coming = media[t.under.card % media.length].aspect;
+          const [kx, ky] = look.native ? (coming > shape ? [1, shape / coming] : [coming / shape, 1]) : [1, 1];
+          const { dx, dy } = t.under;
+          keep = [toX((1 - kx) / 2 - dx), toY((1 - ky) / 2 - dy), toX((1 + kx) / 2 - dx), toY((1 + ky) / 2 - dy)];
+        }
+        drawn.push({ i: t.i, depth, alpha: t.a, s: t.s, fx, fy, matrix, quad, part: [x0, y0, x1, y1], window, keep, outside: t.under ? 1 - t.under.fade : 1 });
       }
       drawn.sort((a, b) => a.depth - b.depth); // far to near
 
@@ -413,6 +423,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
         gl.uniformMatrix4fv(uniform.uMatrix, false, item.quad);
         gl.uniform4fv(uniform.uQuad, item.part);
         gl.uniform4fv(uniform.uWindow, item.window);
+        gl.uniform4fv(uniform.uKeep, item.keep);
+        gl.uniform1f(uniform.uOutside, item.outside);
         gl.uniform2f(uniform.uSize, cw * item.s, ch * item.s);
         gl.uniform4fv(uniform.uCrop, crop);
         gl.uniform1f(uniform.uRadius, look.radius * Math.min(cw, ch) * item.s);

@@ -98,7 +98,7 @@ function greyCard(renderer: Renderer, index: number): MediaItem {
 const greyCards = (renderer: Renderer) => GREYS.map((_, index) => greyCard(renderer, index));
 
 /** Shown at the foot of the preset list. Bump it when the tool changes in a way worth naming. */
-const VERSION = "v2.7";
+const VERSION = "v2.8";
 
 /** Frames per second in an exported file. */
 const EXPORT_FPS = 60;
