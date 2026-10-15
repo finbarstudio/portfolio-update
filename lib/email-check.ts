@@ -216,6 +216,7 @@ const SRC = {
   msTypography: { label: "Microsoft: typography improvements in Word and Outlook for Windows", url: "https://techcommunity.microsoft.com/blog/microsoft365insiderblog/typography-improvements-in-word-and-outlook-for-windows/4222055", kind: "client docs" },
   knakTypography: { label: "Knak (Nicole Merlin): Microsoft introduces advanced typography, and the opt-out for senders", url: "https://knak.com/blog/microsoft-introduces-advanced-typography/", kind: "vendor research" },
   preheaderPad: { label: "Parcel: preheader spacing (which padding characters each client honours)", url: "https://parcel.io/blog/preheader-spacing", kind: "vendor research" },
+  gmailPromo: { label: "Google: Gmail Promotions tab annotations (senders choose the preview image)", url: "https://developers.google.com/workspace/gmail/promotab", kind: "client docs" },
   preheader: { label: "Litmus: the preview text hack", url: "https://www.litmus.com/blog/the-little-known-preview-text-hack-you-may-want-to-use-in-every-email", kind: "vendor research" },
   share: { label: "Litmus: email client market share", url: "https://www.litmus.com/email-client-market-share", kind: "vendor research" },
   textSize: { label: "MDN: text-size-adjust", url: "https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust", kind: "standard" },
@@ -255,6 +256,7 @@ export const SOURCES: Record<string, Source[]> = {
   "link-same-text": [wcag("WCAG21/Understanding/link-purpose-in-context.html", "WCAG 2.4.4, link purpose")],
   "preheader-unpadded": [SRC.preheader, SRC.preheaderPad],
   "preheader-old-pad": [SRC.preheaderPad],
+  "preheader-shy-first": [SRC.preheaderPad],
 
   "unsubscribe-empty": [SRC.gmailSenders, SRC.acUnsub],
   "bare-placeholder": [SRC.sesTemplates, SRC.sesHandlebars],
@@ -1177,7 +1179,8 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
   if (!tags.some((t) => t.name === "title")) {
     add("title", "info", "No title tag", "Some clients and screen readers show it; it is also the browser tab name in the web version.");
   }
-  const scripts = tags.filter((t) => t.name === "script");
+  // JSON-LD is how Gmail reads email markup and Promotions annotations, so it is not flagged.
+  const scripts = tags.filter((t) => t.name === "script" && !/application\/ld\+json/i.test(t.attrs.type ?? ""));
   if (scripts.length) {
     add("script", "fail", "Script tags", "Every email client removes scripts, and they raise the spam score.", { lines: scripts.map((t) => t.line) });
   }
@@ -1188,6 +1191,15 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
       "No hidden preheader",
       `The inbox preview line will show the first text in the email: "${stats.previewText}". Type a preview line in the source panel to add a hidden preheader.`,
       { a11y: false },
+    );
+  }
+  if (!options.transactional && tags.some((t) => !t.mso && t.inBody && t.name === "img") && !/PromotionCard|DiscountOffer/.test(src)) {
+    add(
+      "gmail-preview-images",
+      "info",
+      "The Gmail app may show images instead of the preview line",
+      "Email developers report that the Gmail apps sometimes show pictures from the email (a hero, or even footer icons) in the space under the subject, in place of the preheader, and not the same way every time. Google does not document when it does this, and nothing in the email reliably stops it. A preheader is still worth having for every other inbox. For marketing email, Gmail's own Promotions annotations let you choose the image it shows.",
+      { affects: ["gmail"], howTo: { text: "Optional: add a Promotions annotation in the head so Gmail uses the image you pick. See Google's guide at developers.google.com/workspace/gmail/promotab for the full markup and its rules." } },
     );
   }
   if (!options.transactional && !/unsubscribe|opt[\s-]?out|manage (your )?preferences|\{\{\s*unsub|%unsub|\*\|unsub/i.test(src)) {
@@ -2120,6 +2132,17 @@ export function checkEmail(src: string, options: CheckOptions = {}): Finding[] {
         { lines: [preheaderTag.line], fix: "preheader-pad" },
       );
     }
+    const shyAt = inner.search(PAD_SHY);
+    const figureAt = inner.search(PAD_FIGURE);
+    if (shyAt !== -1 && (figureAt === -1 || shyAt < figureAt)) {
+      add(
+        "preheader-shy-first",
+        "warn",
+        "Soft hyphens come first in the preheader padding",
+        "Classic Outlook on Windows shows a soft hyphen (&shy;) as a visible hyphen, so if they come straight after the preheader text the preview line can end in a row of dashes. They belong at the end of the padding, after the figure spaces, where they fall beyond what the preview shows.",
+        { lines: [preheaderTag.line], fix: "preheader-pad", affects: ["outlook"] },
+      );
+    }
   }
 
   // ── Markup slips ────────────────────────────────────────────────────
@@ -2634,7 +2657,10 @@ export const FIXES: Record<FixId, Fix> = {
       const close = src.indexOf(`</${pre.name}>`, pre.end);
       if (close === -1) return same(src);
       const inner = src.slice(pre.end, close);
-      if (!inner.trim() || inner.includes("<") || (PAD_FIGURE.test(inner) && PAD_SHY.test(inner))) return same(src);
+      // Already right: figure spaces first, soft hyphens after them.
+      const shyAt = inner.search(PAD_SHY);
+      const figureAt = inner.search(PAD_FIGURE);
+      if (!inner.trim() || inner.includes("<") || (figureAt !== -1 && shyAt > figureAt)) return same(src);
       // Old padding is taken off first, so the fix also upgrades padding that some clients now ignore.
       const text = inner.replace(PAD_CHARS_RUN, "");
       if (!text.trim()) return same(src);
