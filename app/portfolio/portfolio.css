@@ -348,10 +348,25 @@ body:has(.pf) { background: #1a1a1a; }
 @keyframes pf-breathe { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
 
 /* a full-bleed page: the one exception to "always inset". The image fills
-   the sheet edge to edge and is cropped to 16:9; the running line sits on it. */
+   the sheet edge to edge and is cropped to 16:9. The running line and the
+   caption stay, in light type over a soft shade at the top and bottom, in
+   either theme (the picture is the same in both). */
 .pf-media.is-bleed .pf-row { inset: 0; }
-/* no running line on these: it cannot be read over a photograph */
-.pf-media.is-bleed .pf-run { display: none; }
+.pf-media.is-bleed .pf-run,
+.pf-media.is-bleed .pf-caption { color: #f3f1ee; }
+.pf-media.is-bleed .pf-run .pf-soft,
+.pf-media.is-bleed .pf-caption-link { color: rgba(243, 241, 238, 0.72); }
+.pf-media.is-bleed::before,
+.pf-media.is-bleed::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: calc(var(--u) * 9);
+  z-index: 1;
+  pointer-events: none;
+}
+.pf-media.is-bleed::before { top: 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent); }
+.pf-media.is-bleed::after { bottom: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent); }
 .pf-media.is-bleed .pf-item { width: 100%; height: 100%; aspect-ratio: auto !important; border-radius: 0; box-shadow: none; }
 .pf-media.is-bleed .pf-item :is(img, video) { object-fit: cover; }
 
@@ -441,9 +456,16 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-deck-strip button { width: 100%; }
   .pf-deck-bar > button { font-size: 22px; min-width: 44px; min-height: 44px; }
   .pf-media .pf-caption { position: static; padding: 0 14px 16px; }
-  .pf-media.is-bleed .pf-run { display: none; }
+  /* full bleed on a phone: the picture runs edge to edge across the page,
+     between the running line above it and the caption below, in the page's
+     own colours (nothing sits over the picture here) */
   .pf-media.is-bleed .pf-row { padding: 0; }
   .pf-media.is-bleed .pf-item { aspect-ratio: var(--r) !important; }
+  .pf-media.is-bleed .pf-item.has-phone { aspect-ratio: var(--r-phone) !important; }
+  .pf-media.is-bleed::before, .pf-media.is-bleed::after { content: none; }
+  .pf-media.is-bleed .pf-run, .pf-media.is-bleed .pf-caption { color: var(--ink); }
+  .pf-media.is-bleed .pf-run .pf-soft, .pf-media.is-bleed .pf-caption-link { color: var(--soft); }
+  .pf-media.is-bleed .pf-caption { padding-top: 14px; }
   /* the covers sheet: three across, as many rows as it takes */
   .pf-covers { position: static; --g: 8px; padding: 12px 14px 14px; }
   .pf-media .pf-covers .pf-item { width: calc((100% - 16px) / 3); }

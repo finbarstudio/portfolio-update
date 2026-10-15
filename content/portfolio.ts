@@ -110,7 +110,7 @@ function m(path: string, o: Partial<Media> = {}): Media {
 }
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
 /** One image filling the whole page, edge to edge (cropped to 16:9). */
-const bleed = (path: string, caption?: string): Slide => ({ kind: "media", items: [m(path)], bleed: true, caption });
+const bleed = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], bleed: true, caption });
 /** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption and a link out. */
 const linked = (path: string, caption: string, link: { label: string; href: string }, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
@@ -208,7 +208,7 @@ const RAW: Slide[] = [
       "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
     meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }, study("tmyr")],
   },
-  one("tmyr/hero-poster.webp", "The reels on Instagram", { frame: false, phones: true, mobile: { src: "/media/images/tmyr/hero-poster.webp", w: 4, h: 5 } }),
+  one("tmyr/hero-poster.webp", "The reels on Instagram", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 4, h: 5 } }),
   row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
 
   /* ── TasWater ──────────────────────────────────────────────── */
@@ -221,8 +221,8 @@ const RAW: Slide[] = [
       "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
     meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
   },
-  one("portfolio/taswater/map-mockup.webp"),
-  one("portfolio/taswater/snake-mockup.webp"),
+  bleed("portfolio/taswater/map-mockup.webp", "The network: water from intake and treatment to the tap, then back through sewage and wastewater", { mobile: phone("portfolio/taswater/map-mockup-mobile.webp") }),
+  bleed("portfolio/taswater/snake-mockup.webp", "Onboarding: a new starter’s first twelve months, from day one to month twelve", { mobile: phone("portfolio/taswater/snake-mockup-mobile.webp") }),
 
   /* ── The London Home Show ──────────────────────────────────── */
   { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
