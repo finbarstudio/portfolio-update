@@ -5,8 +5,11 @@
  * case study opens with, reading its model and reels from the project content
  * so the two never drift apart.
  *
- * On a phone the page is 4:5 (see the piece's `mobile` shape in
- * content/portfolio.ts) and the camera sits a little closer. If iOS will not
+ * The phones always sit in the flat line the case study only shows on hover,
+ * and there is no hover. On a desktop the frame runs to the page's left and
+ * right edges at the usual height (portfolio.css), so the line has room; the
+ * phones stay the same size. On a phone the page is 4:5 (see the piece's
+ * `mobile` shape in content/portfolio.ts) and the camera sits a little closer. If iOS will not
  * start the reels on its own, a Play button shows and a tap starts them.
  */
 
@@ -46,6 +49,8 @@ export default function PfPhones() {
         background="transparent"
         poster={phones.poster}
         fill
+        hoverable={false}
+        presetOverride="flat"
         zoom={isPhone ? PHONE_ZOOM : 1}
         tapToPlayClass="pf-play pf-mono"
       />

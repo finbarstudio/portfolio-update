@@ -533,3 +533,9 @@ html[data-pf-theme="light"] .pf-chrome {
 
 /* The Moment You Realise phones (components/portfolio/PfPhones.tsx): the live 3D carousel fills its page */
 .pf-phones { position: absolute; inset: 0; }
+/* on a desktop its frame runs to the page's left and right edges at the usual
+   height: the row centres it, so it spills out evenly both sides and the
+   page clips it at the edges */
+@media (min-width: 761px) {
+  .pf-media .pf-item:has(> .pf-phones) { width: 100cqw; aspect-ratio: auto !important; }
+}
