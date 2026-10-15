@@ -89,7 +89,8 @@ export type LayoutName =
   | "wave"
   | "stairs"
   | "float"
-  | "pulse";
+  | "pulse"
+  | "swap";
 
 /** What makes one preset of a layout differ from the next. */
 export interface Variant {
@@ -177,6 +178,11 @@ export interface Motion {
   /** feature presets: the wheel or stack turned and tilted in space, in degrees. The card pulled out of it stays square. */
   groupTurn: number;
   groupTilt: number;
+  /** swap grid: cells across and down */
+  cols: number;
+  rows: number;
+  /** swap grid: seconds from one swap to the next; the loop is as long as it takes every cell to come round */
+  pace: number;
 }
 export type MotionKey = keyof Motion;
 
@@ -184,6 +190,10 @@ export type Direction = "left" | "right" | "up" | "down";
 export type Origin = "centre" | Direction;
 export type Focus = "off" | "start" | "centre" | "end";
 export type TiltMode = "off" | "fan" | "uniform" | "alternate";
+/** Swap grid: how a cell changes from one upload to the next. */
+export type SwapMethod = "fade" | "flip" | "push" | "slide" | "wipe" | "zoom";
+/** Swap grid: the order the cells take their turns in. */
+export type SwapOrder = "turn" | "shuffle" | "wave";
 
 /** The switches. */
 export interface Options {
@@ -205,6 +215,12 @@ export interface Options {
   sunray: boolean;
   /** feature: the group at the other end of the frame, the card shown at this end */
   flip: boolean;
+  /** swap grid: how a cell changes over */
+  swap: SwapMethod;
+  /** swap grid: the order cells change in */
+  swapOrder: SwapOrder;
+  /** swap grid: every cell changes on each step, instead of one cell at a time */
+  swapAll: boolean;
 }
 
 export interface Preset {
@@ -230,6 +246,12 @@ export interface Transform {
   s: number;
   /** opacity */
   a: number;
+  /**
+   * Only the part of the card inside this window shows: x0, y0, x1, y1 in the
+   * card's own units (0 to 1, from the bottom left). The window's corners are
+   * rounded like a card's, so a card sliding through a cell stays inside it.
+   */
+  clip?: [number, number, number, number];
 }
 
 /**
@@ -417,6 +439,46 @@ function cellCentre(cell: number, cols: number, rows: number, c: Context): [numb
   const col = cell % cols;
   const row = Math.floor(cell / cols);
   return [(col - (cols - 1) / 2) * (c.w + c.g), -(row - (rows - 1) / 2) * (c.h + c.g)];
+}
+
+const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
+
+/**
+ * Swap grid: a board of cells showing more uploads than it has room for. Each
+ * swap, one cell (or every cell) changes to an upload that is not on show.
+ * `stride` is how far a cell's next upload is from its last: a whole board on,
+ * or one further when the uploads tile the board exactly, which would
+ * otherwise bring back the same picture. `rounds` is how many times each cell
+ * changes before the board is back where it began.
+ */
+function swapPlan(m: Motion) {
+  const cols = Math.max(1, Math.round(m.cols));
+  const rows = Math.max(1, Math.round(m.rows));
+  const cells = cols * rows;
+  const n = Math.max(1, Math.round(m.count));
+  const stride = cells % n === 0 ? cells + 1 : cells;
+  return { cols, rows, cells, n, stride, rounds: n / gcd(n, stride) };
+}
+
+/** How many swaps make one whole loop, after which every cell shows what it began with. */
+export function swapSteps(m: Motion, all: boolean): number {
+  const plan = swapPlan(m);
+  return all ? plan.rounds : plan.cells * plan.rounds;
+}
+
+/** A swap grid's loop is as long as its swaps take; every other preset keeps its own. */
+export function withSwapLoop(preset: Preset, m: Motion, o: Options): Motion {
+  if (preset.layout !== "swap") return m;
+  return { ...m, speed: 1, duration: m.pace * swapSteps(m, o.swapAll) };
+}
+
+/** Swap grid: the cells in the order they take their turns. */
+function swapOrder(cols: number, rows: number, order: SwapOrder): number[] {
+  const cells = Array.from({ length: cols * rows }, (_, cell) => cell);
+  const diagonal = (cell: number) => (cell % cols) + Math.floor(cell / cols);
+  if (order === "wave") return cells.sort((a, b) => diagonal(a) - diagonal(b) || (a % cols) - (b % cols));
+  if (order === "shuffle") return cells.sort((a, b) => hash(a, 13) - hash(b, 13));
+  return cells;
 }
 
 const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
@@ -827,6 +889,75 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const y = centred((hash(i, 3) - 0.5) * span + c.T * speed * span, span);
     return { x: (hash(i, 2) - 0.5) * 2 * c.A * reach + sway, y, z, s: 0.75, a: edgeFade(y, span, 0.6) };
   },
+  // A board of cells, each changing in turn to an upload not on show. Items
+  // 0 to cells-1 are what each cell shows; the rest are what a changing cell
+  // is leaving behind, drawn only while it changes.
+  swap(i, c) {
+    const { cols, rows, cells, n, stride, rounds } = swapPlan(c.m);
+    const p = i % cells; // place in the order of turns
+    const cell = swapOrder(cols, rows, c.o.swapOrder)[p];
+    const leaving = i >= cells;
+    const all = c.o.swapAll;
+    const at = mod(Math.abs(c.Tg), 1) * (all ? rounds : cells * rounds);
+    const k = Math.floor(at);
+    let round: number;
+    let swapping: boolean;
+    let wait = 0;
+    let lead: number;
+    if (all) {
+      round = k;
+      swapping = true;
+      wait = (p / cells) * c.m.stagger * c.m.hold; // the stagger spreads the changes along the order
+      lead = p;
+    } else {
+      const turn = k % cells;
+      round = Math.floor(k / cells) + (p < turn ? 1 : 0);
+      swapping = p === turn;
+      lead = mod(turn - p, cells); // swaps since this cell last changed: the newest wins focus
+    }
+    const x = swapping ? clamp((at - k - wait) / (1 - c.m.hold)) : 1;
+    if (leaving && (!swapping || x >= 1)) return null;
+    const card = mod(p + (swapping && !leaving ? round + 1 : round) * stride, n);
+    const e = leaving ? c.easeOut(x) : c.ease(x);
+
+    // As large as the frame allows at size 1, whatever the grid.
+    const fill = Math.min((2 * c.A * 0.92) / (cols * c.w + (cols - 1) * c.g), (2 * 0.92) / (rows * c.h + (rows - 1) * c.g));
+    const s = fill * c.m.size;
+    const [cx, cy] = cellCentre(cell, cols, rows, c);
+    const dx = c.o.direction === "left" ? -1 : c.o.direction === "right" ? 1 : 0;
+    const dy = c.o.direction === "up" ? 1 : c.o.direction === "down" ? -1 : 0;
+    const out: Raw = { x: cx * s, y: cy * s, z: leaving ? 0 : 0.002, s, card, lead: leaving ? undefined : lead };
+    // Moved by (ox, oy) card lengths, seen only through the cell.
+    const shift = (ox: number, oy: number): Raw => ({ ...out, x: (cx + ox * c.w) * s, y: (cy + oy * c.h) * s, clip: [-ox, -oy, 1 - ox, 1 - oy] });
+    switch (c.o.swap) {
+      case "fade":
+        // The new picture fades in over the old, which stays put underneath.
+        return leaving ? out : { ...out, a: clamp(e) };
+      case "flip": {
+        // The cell turns over: the old picture on the front, the new one on the back.
+        const angle = (leaving ? e : e - 1) * Math.PI;
+        if (leaving ? e >= 0.5 : e <= 0.5) return null;
+        // Sideways it turns about the upright, up or down about the level.
+        const turn = dx ? { ry: -dx * angle } : { rx: dy * angle };
+        return { ...out, ...turn, z: Math.sin(Math.PI * clamp(e)) * 0.12 * s };
+      }
+      case "push":
+        // The new picture pushes the old one out of the cell.
+        return leaving ? shift(e * dx, e * dy) : shift(-(1 - e) * dx, -(1 - e) * dy);
+      case "slide":
+        // The new picture slides in over the old, which drifts a little the same way.
+        return leaving ? shift(e * dx * 0.3, e * dy * 0.3) : shift(-(1 - e) * dx, -(1 - e) * dy);
+      case "wipe": {
+        // An edge crosses the cell, revealing the new picture where the old one was.
+        if (leaving) return out;
+        const clip: [number, number, number, number] = dx < 0 ? [1 - e, 0, 1, 1] : dx > 0 ? [0, 0, e, 1] : dy > 0 ? [0, 0, 1, e] : [0, 1 - e, 1, 1];
+        return { ...out, clip };
+      }
+      case "zoom":
+        // The old picture sinks back and fades; the new one settles in from in front.
+        return leaving ? { ...out, s: s * (1 - 0.15 * e), a: clamp(1 - e) } : { ...out, s: s * (1 + 0.25 * (1 - e)), a: clamp(e * 1.6) };
+    }
+  },
   pulse(i, c) {
     const steps = c.T * c.n;
     const k = Math.floor(steps);
@@ -857,14 +988,14 @@ const SOLID_GROUPS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "orbi
 export const canStagger = (preset: Preset) => !((preset.variant.feature && SOLID_GROUPS.has(preset.layout)) || preset.variant.scatter || preset.variant.film || preset.variant.hand);
 /** Whether a preset has a card leaving focus, for the second easing curve to move. */
 export const hasExit = (preset: Preset) => {
-  if (preset.layout === "pulse") return true;
+  if (preset.layout === "pulse" || preset.layout === "swap") return true;
   if (SHARED_CLOCK.has(preset.layout) || preset.layout === "float") return false;
   if (preset.layout === "grid" || preset.layout === "globe") return Boolean(preset.variant.feature || preset.variant.scatter);
   return true;
 };
 /** Layouts that need enough cards to make their shape: with fewer uploads, the uploads repeat. */
 export const FILLS_UP: ReadonlySet<LayoutName> = new Set<LayoutName>(["globe"]);
-const SHARED_CLOCK: ReadonlySet<LayoutName> = new Set<LayoutName>(["flip", "pulse", "proximity", "tour", "zoom"]);
+const SHARED_CLOCK: ReadonlySet<LayoutName> = new Set<LayoutName>(["flip", "pulse", "proximity", "tour", "zoom", "swap"]);
 
 /** Motion is a chain of steps, one per item unless a layout says otherwise. */
 function stepsPerLoop(layout: LayoutName, c: Context): number {
@@ -960,7 +1091,7 @@ export interface Frame {
 }
 
 /** Layouts where up and down mean something. The rest only run forwards or backwards. */
-export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "proximity"]);
+export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "marquee", "wave", "stairs", "proximity", "swap"]);
 /**
  * Layouts that show their cards one after another, where the last meeting the
  * first is a visible join. These can leave empty places between the two.
@@ -968,7 +1099,7 @@ export const FOUR_WAY: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "
 export const HAS_LOOP_GAP: ReadonlySet<LayoutName> = new Set<LayoutName>(["slide", "cover", "ring", "wheel", "deck", "helix", "stairs", "wave", "tunnel", "flip", "pulse", "zoom"]);
 const COUNTS_DOWN: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "wheel", "orbit", "tunnel", "helix"]);
 /** Layouts with no single card that is "the one showing", so the number overlay has nothing to count. */
-export const NO_COUNTER: ReadonlySet<LayoutName> = new Set<LayoutName>(["grid", "globe", "float", "marquee", "fan"]);
+export const NO_COUNTER: ReadonlySet<LayoutName> = new Set<LayoutName>(["grid", "globe", "float", "marquee", "fan", "swap"]);
 /** Whether a preset has one card at a time that the number overlay can count. Two rings turning against each other do not. */
 export const hasCounter = (preset: Preset) => (!NO_COUNTER.has(preset.layout) || Boolean(preset.variant.feature || preset.variant.scatter || preset.variant.hand)) && !preset.variant.two;
 /** How far the card in focus comes forward: enough to win the overlap, too little to see as movement. */
@@ -992,7 +1123,8 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
   const sign = reversed ? -1 : 1;
   const h = m.size;
   const w = h * cardShape;
-  const cards = itemTotal(layout, Math.round(m.count), preset.variant);
+  // A swap grid draws each cell twice: what it shows, and what it is leaving while it changes.
+  const cards = layout === "swap" ? 2 * swapPlan(m).cells : itemTotal(layout, Math.round(m.count), preset.variant);
   // Empty places after the last card: they take a turn in the loop like any card, but nothing is drawn in them.
   const n = cards + (HAS_LOOP_GAP.has(layout) ? Math.round(m.loopGap) : 0);
   const T = (seconds / m.duration) * Math.round(m.speed);
@@ -1080,7 +1212,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     }
     a *= curtain;
     if (a <= 0.003) continue;
-    items.push({ i: raw.card ?? i, x, y, z, rx, ry, rz, s, a });
+    items.push({ i: raw.card ?? i, x, y, z, rx, ry, rz, s, a, clip: raw.clip });
   }
 
   const camera = { x: 0, y: 0, back: 0 };
@@ -1151,9 +1283,12 @@ export const BASE_MOTION: Motion = {
   loopGap: 0,
   groupTurn: 0,
   groupTilt: 0,
+  cols: 2,
+  rows: 2,
+  pace: 2,
 };
 
-export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre", loopFade: false, sunray: false, flip: false };
+export const BASE_OPTIONS: Options = { direction: "left", focus: "off", tiltMode: "off", solo: false, centre: true, faceCamera: true, origin: "centre", loopFade: false, sunray: false, flip: false, swap: "push", swapOrder: "turn", swapAll: false };
 
 export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max: number; step: number }> = {
   duration: { label: "Loop (sec)", min: 3, max: 120, step: 1 },
@@ -1182,6 +1317,9 @@ export const MOTION_RANGES: Record<MotionKey, { label: string; min: number; max:
   loopGap: { label: "Loop gap", min: 0, max: 6, step: 1 },
   groupTurn: { label: "Wheel turn", min: -90, max: 90, step: 1 },
   groupTilt: { label: "Wheel tilt", min: -90, max: 90, step: 1 },
+  cols: { label: "Columns", min: 1, max: 6, step: 1 },
+  rows: { label: "Rows", min: 1, max: 6, step: 1 },
+  pace: { label: "Swap time (sec)", min: 0.4, max: 8, step: 0.1 },
 };
 export const MOTION_KEYS = Object.keys(MOTION_RANGES) as MotionKey[];
 
@@ -1219,6 +1357,9 @@ export const HARD_LIMITS: Record<MotionKey, { min: number; max: number }> = {
   loopGap: { min: 0, max: 100 },
   groupTurn: { min: -360, max: 360 },
   groupTilt: { min: -360, max: 360 },
+  cols: { min: 1, max: 12 },
+  rows: { min: 1, max: 12 },
+  pace: { min: 0.1, max: 120 },
 };
 
 /** A value kept inside its outer limits, and whole where the setting is a count of something. */
@@ -1249,6 +1390,7 @@ const COUNT_MAX: Record<LayoutName, number> = {
   marquee: 64,
   grid: 64,
   globe: 120,
+  swap: 48,
 };
 
 /**
@@ -1440,6 +1582,7 @@ export const PRESETS: Preset[] = [
   preset("Grid 06", "tour", {}, { count: 16, size: 0.9, gap: 0.1, rhythm: 1, hold: 0.4, tilt: 24 }, { path: [0, 5, 10, 15, 12, 9, 6, 3] }),
   preset("Grid 07", "tour", {}, { count: 12, size: 0.8, gap: 0.1, rhythm: 1, hold: 0.3, distance: 1.5 }, { path: [0, 3, 11, 8] }),
   preset("Scatter 01", "grid", { scatter: true }, { count: 12, size: 0.34, gap: 0.1, rhythm: 1, hold: 0.55, scale: 3 }),
+  preset("Swap 01", "swap", {}, { count: 8, cols: 2, rows: 2, size: 1, gap: 0.04, hold: 0.5, pace: 2.2 }),
   preset("Marquee 01", "marquee", { rows: 2 }, { count: 16, size: 0.85, gap: 0.1 }),
   preset("Marquee 02", "marquee", { rows: 3 }, { count: 24, size: 0.6, gap: 0.1 }),
   preset("Marquee 03", "marquee", { rows: 4 }, { count: 32, size: 0.6, gap: 0.1, yaw: 26 }),
@@ -1480,6 +1623,8 @@ export interface Look {
   /** card shape as a ratio, e.g. 4 by 5 */
   cardW: number;
   cardH: number;
+  /** each card keeps its own picture's shape, as large as fits inside the card shape, instead of being cropped to it */
+  native: boolean;
   background: string;
   /** the number overlay: off, the card's number, or the number out of the total */
   counter: Counter;
@@ -1719,6 +1864,7 @@ export const BASE_LOOK: Look = {
   height: 1920,
   cardW: 4,
   cardH: 5,
+  native: false,
   background: "#000000",
   counter: "off",
   counterPosition: "bottom-left",
@@ -1780,6 +1926,9 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   if (typeof savedOptions.loopFade === "boolean") options.loopFade = savedOptions.loopFade;
   if (typeof savedOptions.sunray === "boolean") options.sunray = savedOptions.sunray;
   if (typeof savedOptions.flip === "boolean") options.flip = savedOptions.flip;
+  options.swap = oneOf(savedOptions.swap, ["fade", "flip", "push", "slide", "wipe", "zoom"] as const) ?? options.swap;
+  options.swapOrder = oneOf(savedOptions.swapOrder, ["turn", "shuffle", "wave"] as const) ?? options.swapOrder;
+  if (typeof savedOptions.swapAll === "boolean") options.swapAll = savedOptions.swapAll;
   options.origin = oneOf(savedOptions.origin, ["centre", "left", "right", "up", "down"] as const) ?? options.origin;
 
   const curve = (value: unknown): Bezier | undefined => {
@@ -1806,6 +1955,7 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   if (cardW !== undefined && cardW > 0) look.cardW = ratioPart(cardW);
   const cardH = finite(savedLook.cardH);
   if (cardH !== undefined && cardH > 0) look.cardH = ratioPart(cardH);
+  if (typeof savedLook.native === "boolean") look.native = savedLook.native;
   if (typeof savedLook.background === "string" && /^#[0-9a-f]{6}$/i.test(savedLook.background)) look.background = savedLook.background;
   look.counter = oneOf(savedLook.counter, ["off", "number", "fraction"] as const) ?? look.counter;
   look.counterPosition = oneOf(savedLook.counterPosition, COUNTER_POSITIONS) ?? look.counterPosition;

@@ -77,22 +77,30 @@ void main() { vUv = aPos + 0.5; gl_Position = uMatrix * vec4(aPos, 0.0, 1.0); }`
 const FRAGMENT = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 color;
-uniform sampler2D uTexture; uniform vec2 uSize; uniform vec4 uCrop; uniform float uRadius, uAlpha, uShade, uOverlay;
+uniform sampler2D uTexture; uniform vec2 uSize; uniform vec4 uCrop, uQuad, uWindow; uniform float uRadius, uAlpha, uShade, uOverlay;
+// A rounded rectangle centred on c with half size h, in the card's own units: 1 inside, 0 outside, soft at the edge.
+float rounded(vec2 p, vec2 c, vec2 h) {
+  vec2 q = abs((p - c) * uSize) - h * uSize + uRadius;
+  float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - uRadius;
+  return 1.0 - smoothstep(-fwidth(d), fwidth(d), d);
+}
 void main() {
   // The number overlay: a picture with its own transparency, drawn flat on the screen.
   if (uOverlay > 0.5) { color = texture(uTexture, vUv) * uAlpha; return; }
-  vec2 q = abs((vUv - 0.5) * uSize) - uSize * 0.5 + uRadius;
-  float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - uRadius;
-  float mask = 1.0 - smoothstep(-fwidth(d), fwidth(d), d);
+  // Where on the card this point is. Usually the whole card is drawn; a clipped card draws only part of itself.
+  vec2 p = mix(uQuad.xy, uQuad.zw, vUv);
+  float mask = rounded(p, vec2(0.5), vec2(0.5)) * rounded(p, (uWindow.xy + uWindow.zw) * 0.5, (uWindow.zw - uWindow.xy) * 0.5);
   // Seen from behind, a card would show its picture mirrored.
-  vec2 uv = gl_FrontFacing ? vUv : vec2(1.0 - vUv.x, vUv.y);
+  vec2 uv = gl_FrontFacing ? p : vec2(1.0 - p.x, p.y);
   // Nothing of this card here: leave the depth buffer alone so cards behind still show.
   if (mask * uAlpha < 0.004) discard;
   vec3 rgb = texture(uTexture, uCrop.xy + uv * uCrop.zw).rgb * uShade;
   color = vec4(rgb, 1.0) * mask * uAlpha;
 }`;
 
-const UNIFORMS = ["uMatrix", "uSize", "uCrop", "uRadius", "uAlpha", "uShade", "uOverlay"] as const;
+const UNIFORMS = ["uMatrix", "uSize", "uCrop", "uQuad", "uWindow", "uRadius", "uAlpha", "uShade", "uOverlay"] as const;
+/** No window: far enough out that its rounded corners never touch the card. */
+const NO_WINDOW = [-2, -2, 3, 3];
 
 const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
@@ -366,7 +374,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
       view = multiply(view, translate(-camera.x, -camera.y, 0));
       const projection = perspective(camera.fov, aspect, 0.1, 100);
 
-      const drawn: { i: number; depth: number; alpha: number; s: number; matrix: Matrix }[] = [];
+      const drawn: { i: number; depth: number; alpha: number; s: number; fx: number; fy: number; matrix: Matrix; quad: Matrix; part: number[]; window: number[] }[] = [];
       for (const t of items) {
         let model = translate(t.x, t.y, t.z);
         if (t.ry) model = multiply(model, rotateY(t.ry));
@@ -375,7 +383,20 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
         const modelView = multiply(view, multiply(model, scale(w * t.s, h * t.s)));
         const depth = modelView[14];
         if (depth > -0.2) continue; // at or behind the camera
-        drawn.push({ i: t.i, depth, alpha: t.a, s: t.s, matrix: multiply(projection, modelView) });
+        // Native shape: the card is its picture's own shape, as large as fits in the slot the layout gave it.
+        // fx and fy are its share of the slot across and down.
+        const picture = media[t.i % media.length].aspect;
+        const [fx, fy] = look.native ? (picture > shape ? [1, shape / picture] : [picture / shape, 1]) : [1, 1];
+        // A clipped card draws only the part of itself inside its window. The window is given in the slot's units.
+        const toX = (u: number) => (u - (1 - fx) / 2) / fx;
+        const toY = (v: number) => (v - (1 - fy) / 2) / fy;
+        const window = t.clip ? [toX(t.clip[0]), toY(t.clip[1]), toX(t.clip[2]), toY(t.clip[3])] : NO_WINDOW;
+        const [x0, y0, x1, y1] = [Math.max(0, window[0]), Math.max(0, window[1]), Math.min(1, window[2]), Math.min(1, window[3])];
+        if (x1 - x0 < 1e-4 || y1 - y0 < 1e-4) continue;
+        const slot = multiply(projection, modelView);
+        const matrix = fx === 1 && fy === 1 ? slot : multiply(slot, scale(fx, fy));
+        const quad = t.clip ? multiply(matrix, multiply(translate((x0 + x1) / 2 - 0.5, (y0 + y1) / 2 - 0.5, 0), scale(x1 - x0, y1 - y0))) : matrix;
+        drawn.push({ i: t.i, depth, alpha: t.a, s: t.s, fx, fy, matrix, quad, part: [x0, y0, x1, y1], window });
       }
       drawn.sort((a, b) => a.depth - b.depth); // far to near
 
@@ -383,13 +404,18 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
         // Cards on the same plane would flicker; the later, nearer one wins by a hair.
         gl.polygonOffset(0, -order);
         const source = media[item.i % media.length];
-        const cover = source.aspect / shape;
-        const crop = cover > 1 ? [(1 - 1 / cover) / 2, 0, 1 / cover, 1] : [0, (1 - cover) / 2, 1, cover];
+        // The card's own width and height. Cropped to the card shape unless the card already has the picture's shape.
+        const cw = w * item.fx;
+        const ch = h * item.fy;
+        const cover = source.aspect / (cw / ch);
+        const crop = look.native ? [0, 0, 1, 1] : cover > 1 ? [(1 - 1 / cover) / 2, 0, 1 / cover, 1] : [0, (1 - cover) / 2, 1, cover];
         gl.bindTexture(gl.TEXTURE_2D, source.texture);
-        gl.uniformMatrix4fv(uniform.uMatrix, false, item.matrix);
-        gl.uniform2f(uniform.uSize, w * item.s, h * item.s);
+        gl.uniformMatrix4fv(uniform.uMatrix, false, item.quad);
+        gl.uniform4fv(uniform.uQuad, item.part);
+        gl.uniform4fv(uniform.uWindow, item.window);
+        gl.uniform2f(uniform.uSize, cw * item.s, ch * item.s);
         gl.uniform4fv(uniform.uCrop, crop);
-        gl.uniform1f(uniform.uRadius, look.radius * Math.min(w, h) * item.s);
+        gl.uniform1f(uniform.uRadius, look.radius * Math.min(cw, ch) * item.s);
         gl.uniform1f(uniform.uShade, clamp(1 + (item.depth + distance) * 0.1, 0.4, 1)); // dimmer further away
         // A crossfade: the first picture underneath, the video over it fading out.
         const fade = source.first ? (scene.fades?.[item.i % media.length] ?? 0) : 0;
@@ -401,13 +427,14 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
         }
         gl.uniform1f(uniform.uAlpha, item.alpha * (1 - fade));
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        if (scene.tags) {
+        // A card only partly in its window leaves its tag off: the tag would show outside the window.
+        if (scene.tags && item.part.join() === "0,0,1,1") {
           // The tag rides on its card, in the top left corner, a tenth of the card's short side tall.
           const tag = tagFor(item.i % media.length);
-          const tall = (0.1 * Math.min(w, h)) / h;
-          const wide = (tall * h * tag.aspect) / w;
-          const marginX = (0.04 * Math.min(w, h)) / w;
-          const marginY = (0.04 * Math.min(w, h)) / h;
+          const tall = (0.1 * Math.min(cw, ch)) / ch;
+          const wide = (tall * ch * tag.aspect) / cw;
+          const marginX = (0.04 * Math.min(cw, ch)) / cw;
+          const marginY = (0.04 * Math.min(cw, ch)) / ch;
           gl.bindTexture(gl.TEXTURE_2D, tag.texture);
           gl.uniform1f(uniform.uOverlay, 1);
           gl.uniformMatrix4fv(uniform.uMatrix, false, multiply(item.matrix, multiply(translate(-0.5 + marginX + wide / 2, 0.5 - marginY - tall / 2, 0), scale(wide, tall))));

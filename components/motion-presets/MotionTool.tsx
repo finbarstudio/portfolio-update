@@ -36,6 +36,8 @@ import {
   presetOptions,
   rangeFor,
   shapeLabel,
+  swapSteps,
+  withSwapLoop,
   ratioPart,
   type Adjustments,
   type Bezier,
@@ -49,6 +51,8 @@ import {
   type Origin,
   type Preset,
   type SavedSetup,
+  type SwapMethod,
+  type SwapOrder,
   type TiltMode,
   type VideoAfter,
   type VideoPlay,
@@ -94,7 +98,7 @@ function greyCard(renderer: Renderer, index: number): MediaItem {
 const greyCards = (renderer: Renderer) => GREYS.map((_, index) => greyCard(renderer, index));
 
 /** Shown at the foot of the preset list. Bump it when the tool changes in a way worth naming. */
-const VERSION = "v2.6";
+const VERSION = "v2.7";
 
 /** Frames per second in an exported file. */
 const EXPORT_FPS = 60;
@@ -672,6 +676,30 @@ const TILTS: { value: TiltMode; label: string }[] = [
   { value: "alternate", label: "Alternate" },
 ];
 /** Which end of a feature frame the card is shown at. */
+const SWAP_METHODS: { value: SwapMethod; label: string }[] = [
+  { value: "fade", label: "Fade" },
+  { value: "flip", label: "Flip" },
+  { value: "push", label: "Push" },
+  { value: "slide", label: "Slide" },
+  { value: "wipe", label: "Wipe" },
+  { value: "zoom", label: "Zoom" },
+];
+/** Swap methods that travel one way across the cell, so Direction means something. */
+const SWAP_DIRECTED: ReadonlySet<SwapMethod> = new Set<SwapMethod>(["flip", "push", "slide", "wipe"]);
+const SWAP_ORDERS: { value: SwapOrder; label: string }[] = [
+  { value: "turn", label: "In turn" },
+  { value: "shuffle", label: "Shuffled" },
+  { value: "wave", label: "Wave" },
+];
+const SWAP_CELLS = [
+  { value: false, label: "One at a time" },
+  { value: true, label: "All together" },
+];
+/** Cards cropped to the card shape, or each in its own picture's shape. */
+const PICTURE_FITS = [
+  { value: false, label: "Crop to shape" },
+  { value: true, label: "Native" },
+];
 const SIDES = [
   { value: false, label: "Shown right" },
   { value: true, label: "Shown left" },
@@ -694,14 +722,14 @@ const ON_OFF = [
   { value: false, label: "Off" },
   { value: true, label: "On" },
 ];
-const SCENE_KEYS: MotionKey[] = ["scale", "reach", "cardTilt", "count", "size", "gap", "radius", "shape", "groupTurn", "groupTilt", "turn", "spin", "fade", "offsetX", "offsetY"];
-const TIMING_KEYS: MotionKey[] = ["duration", "speed", "rhythm", "stagger", "hold", "loopGap"];
+const SCENE_KEYS: MotionKey[] = ["scale", "reach", "cardTilt", "cols", "rows", "count", "size", "gap", "radius", "shape", "groupTurn", "groupTilt", "turn", "spin", "fade", "offsetX", "offsetY"];
+const TIMING_KEYS: MotionKey[] = ["duration", "pace", "speed", "rhythm", "stagger", "hold", "loopGap"];
 const PACES = [
   { value: false, label: "Continuous" },
   { value: true, label: "Stepped" },
 ];
 /** These show one card at a time, so they always move in steps. */
-const ALWAYS_STEPPED = new Set(["flip", "pulse", "zoom"]);
+const ALWAYS_STEPPED = new Set(["flip", "pulse", "zoom", "swap"]);
 const CAMERA_KEYS: MotionKey[] = ["tilt", "yaw", "roll", "perspective", "distance"];
 
 export default function MotionTool() {
@@ -738,6 +766,8 @@ export default function MotionTool() {
     motion.count = clamp(Math.max(mediaCount, fill), rangeFor(preset, "count").min, HARD_LIMITS.count.max);
   }
   const options = presetOptions(preset, chosen);
+  // A swap grid's loop is as long as its swaps take, so it follows the uploads, the grid and the swap time.
+  Object.assign(motion, withSwapLoop(preset, motion, options));
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<Renderer | null>(null);
@@ -811,11 +841,12 @@ export default function MotionTool() {
         const target = previewCanvases.current.get(item.name)?.getContext("2d");
         if (!target) continue;
         const flow = flowRef.current;
-        const itemMotion = applyAdjustments(item, flow.adjustments);
+        const itemOptions = presetOptions(item, flow.chosen);
+        const itemMotion = withSwapLoop(item, applyAdjustments(item, flow.adjustments), itemOptions);
         renderer.draw(still ? 1.7 : (now / 1000) % itemMotion.duration, {
           preset: item,
           motion: itemMotion,
-          options: presetOptions(item, flow.chosen),
+          options: itemOptions,
           easing: flow.easing,
           easingOut: flow.easingOut ?? undefined,
           path: item.path ?? [],
@@ -1217,7 +1248,8 @@ export default function MotionTool() {
     { value: "centre", label: "Centre" },
     { value: "end", label: upright ? "Bottom" : "Right" },
   ];
-  const sceneKeys: MotionKey[] = [
+  const swap = layout === "swap";
+  const sceneKeys: MotionKey[] = swap ? ["cols", "rows", "count", "size", "gap", "offsetX", "offsetY"] : [
     ...((focusable && options.focus !== "off") || layout === "proximity" ? (["scale", "reach"] as const) : preset.variant.feature ? (["scale"] as const) : []),
     ...(options.tiltMode !== "off" ? (["cardTilt"] as const) : []),
     "count",
@@ -1461,17 +1493,27 @@ export default function MotionTool() {
           }}
         />
         {layout === "zoom" && <Choice label="Grow from" value={options.origin} options={ORIGINS} onChange={(value) => setOption("origin", value)} />}
-        {layout !== "tour" && layout !== "zoom" && !(layout === "proximity" && preset.variant.field) && (
+        {swap && (
+          <>
+            <Choice label="Swap" value={options.swap} options={SWAP_METHODS} onChange={(value) => setOption("swap", value)} />
+            <Choice label="Order" value={options.swapOrder} options={SWAP_ORDERS} onChange={(value) => setOption("swapOrder", value)} />
+            <Choice label="Cells" value={options.swapAll} options={SWAP_CELLS} onChange={(value) => setOption("swapAll", value)} />
+          </>
+        )}
+        {layout !== "tour" && layout !== "zoom" && !(layout === "proximity" && preset.variant.field) && (!swap || SWAP_DIRECTED.has(options.swap)) && (
           <Choice label="Direction" value={fourWay || options.direction === "left" || options.direction === "right" ? options.direction : "left"} options={fourWay ? DIRECTIONS : WAYS} onChange={(value) => setOption("direction", value)} />
         )}
         {focusable && <Choice label="Scale focus" value={options.focus} options={focuses} onChange={(value) => setOption("focus", value)} />}
-        <Choice label="Tilt" value={options.tiltMode} options={TILTS} onChange={(value) => setOption("tiltMode", value)} />
+        {!swap && <Choice label="Tilt" value={options.tiltMode} options={TILTS} onChange={(value) => setOption("tiltMode", value)} />}
         {focusable && <Choice label="Solo" value={options.solo} options={ON_OFF} onChange={(value) => setOption("solo", value)} />}
         {layout === "orbit" && <Choice label="Centre card" value={options.centre} options={ON_OFF} onChange={(value) => setOption("centre", value)} />}
         {preset.variant.feature && !preset.variant.tall && <Choice label="Side" value={options.flip} options={SIDES} onChange={(value) => setOption("flip", value)} />}
         {((layout === "orbit" && !preset.variant.flat) || layout === "wheel" || preset.variant.feature) && <Choice label="Face viewer" value={options.faceCamera} options={ON_OFF} onChange={(value) => setOption("faceCamera", value)} />}
         {layout === "wheel" && <Choice label="Cards" value={options.sunray} options={CARD_FACINGS} onChange={(value) => setOption("sunray", value)} />}
         {sceneKeys.map(slider)}
+        {swap && Math.round(motion.count) <= Math.round(motion.cols) * Math.round(motion.rows) && (
+          <p className="mp-note">Add more pictures than there are cells, so every swap brings in one that is not already showing.</p>
+        )}
         {pins && (
           <>
             <Heading title={layout === "tour" ? "Camera path" : "Focus path"} changed={path.join() !== (preset.path ?? []).join()} onReset={() => setPath(preset.path ?? [])} />
@@ -1486,11 +1528,17 @@ export default function MotionTool() {
 
         <Heading title="Timing" changed={changedAny(TIMING_KEYS)} onReset={() => resetKeys(TIMING_KEYS)} />
         {!ALWAYS_STEPPED.has(layout) && <Choice label="Motion" value={stepped} options={PACES} onChange={(value) => setMotion("rhythm", value ? 1 : 0)} />}
-        {slider("duration")}
-        {slider("speed")}
+        {swap ? slider("pace") : slider("duration")}
+        {!swap && slider("speed")}
         {stepped && layout !== "proximity" && layout !== "tour" && !ALWAYS_STEPPED.has(layout) && canStagger(preset) && slider("stagger")}
+        {swap && options.swapAll && slider("stagger")}
         {stepped && slider("hold")}
         {HAS_LOOP_GAP.has(layout) && slider("loopGap")}
+        {swap && (
+          <p className="mp-note">
+            {swapSteps(motion, options.swapAll)} swaps make one loop of {Math.round(motion.duration * 10) / 10} seconds, then every cell is back where it began.
+          </p>
+        )}
         <Choice label="Loop fade" value={options.loopFade} options={ON_OFF} onChange={(value) => setOption("loopFade", value)} />
 
         {stepped && (
@@ -1535,7 +1583,12 @@ export default function MotionTool() {
         <Heading title="Camera" changed={changedAny(CAMERA_KEYS)} onReset={() => resetKeys(CAMERA_KEYS)} />
         {CAMERA_KEYS.map(slider)}
 
-        <Heading title="Card shape" changed={look.cardW !== BASE_LOOK.cardW || look.cardH !== BASE_LOOK.cardH} onReset={() => patchLook({ cardW: BASE_LOOK.cardW, cardH: BASE_LOOK.cardH })} />
+        <Heading
+          title="Card shape"
+          changed={look.cardW !== BASE_LOOK.cardW || look.cardH !== BASE_LOOK.cardH || look.native !== BASE_LOOK.native}
+          onReset={() => patchLook({ cardW: BASE_LOOK.cardW, cardH: BASE_LOOK.cardH, native: BASE_LOOK.native })}
+        />
+        <Choice label="Pictures" value={look.native} options={PICTURE_FITS} onChange={(native) => patchLook({ native })} />
         <div className="mp-choices">
           {CARD_SHAPES.map((shape) => (
             <button
@@ -1552,6 +1605,7 @@ export default function MotionTool() {
           <NumberField key={`cw${look.cardW}`} label="Ratio, width" value={look.cardW} onCommit={(value) => patchLook({ cardW: ratioPart(value) })} />
           <NumberField key={`ch${look.cardH}`} label="Ratio, height" value={look.cardH} onCommit={(value) => patchLook({ cardH: ratioPart(value) })} />
         </div>
+        {look.native && <p className="mp-note">Each picture keeps its own shape, as large as fits inside the card shape, so desktop and phone screenshots can sit side by side.</p>}
 
         <Heading title="Look" changed={look.radius !== BASE_LOOK.radius || look.background !== BASE_LOOK.background} onReset={() => patchLook({ radius: BASE_LOOK.radius, background: BASE_LOOK.background })} />
         <Slider label="Corners" min={0} max={0.5} step={0.01} value={look.radius} onChange={(radius) => patchLook({ radius })} onReset={() => patchLook({ radius: BASE_LOOK.radius })} />
