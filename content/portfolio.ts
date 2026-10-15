@@ -239,11 +239,11 @@ const RAW: Slide[] = [
     meta: [study("tmyr")],
   },
   { kind: "media", items: [m("tmyr/hero-poster.webp", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 9, h: 10 } })], caption: "The reels on Instagram", ground: "#ae125f", ink: "#ffffff" },
-  // the ring of posts sits on its own deep pink; the page takes that pink (as the browser draws it) so it has no edge
-  // phones get an H.264 copy at 30fps: the VP9 one is heavy enough that an iPhone would not start it
-  { kind: "media", items: [m("portfolio/tmyr/posts-ring.webm", { frame: false, mobile: phone("portfolio/tmyr/posts-ring-mobile.mp4") })], caption: "The feed posts, one for each moment in the campaign", ground: "#ae125f", ink: "#ffffff", phoneBleed: true },
-  // Guy's post and its end card, on the post's own pink (as the browser draws it) so the square has no edge
-  { kind: "media", items: [m("portfolio/tmyr/guy.webm", { frame: false })], caption: "A feed post and its end card", ground: "#e71988", ink: "#ffffff", phoneBleed: true },
+  // These two clips carry their page colour in the file (padded to the page's shape with the clip's own
+  // corner pixels), so the pink round them is the same video colour on every screen. Phones get square
+  // versions; the ring's is H.264 at 30fps, as the VP9 one was too heavy for an iPhone to start.
+  { kind: "media", items: [m("portfolio/tmyr/posts-ring-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/posts-ring-mobile.mp4") })], caption: "The feed posts, one for each moment in the campaign", bleed: true, ground: "#ae125f", ink: "#ffffff" },
+  { kind: "media", items: [m("portfolio/tmyr/guy-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/guy.webm") })], caption: "A feed post and its end card", bleed: true, ground: "#e71988", ink: "#ffffff" },
 
   /* ── TasWater ──────────────────────────────────────────────── */
   { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
