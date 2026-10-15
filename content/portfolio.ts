@@ -172,7 +172,8 @@ const RAW: Slide[] = [
     meta: [{ label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
   },
   device("portfolio/lola-audio/brand.webm"),
-  device("portfolio/lola-audio/pages.webm"),
+  // inset, not full bleed (his call)
+  one("portfolio/lola-audio/pages.webm", undefined, { frame: false }),
   // phones get an H.264 and AAC copy: an iPhone will not reliably play the Opus sound in the WebM
   device("portfolio/lola-audio/website.webm", undefined, { sound: true, mobile: phone("portfolio/lola-audio/website-mobile.mp4") }),
 

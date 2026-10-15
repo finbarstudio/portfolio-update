@@ -123,10 +123,10 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <span>Graphic and digital designer<br /><span className="pf-soft">London</span></span>
               <span><a href={`mailto:${CV.email}`}>{CV.email}</a><br /><span className="pf-soft">Updated {UPDATED.long}</span></span>
             </div>
+            {/* one line, centred on the page: the first name on the left margin, the second on the right */}
             <h1 className="pf-poster" aria-label="Finbar Skitini">
-              <Kerned text="Finbar" />
-              <br />
-              <Kerned text="Skitini" />
+              <span className="pf-name-l"><Kerned text="Finbar" /></span>
+              <span className="pf-name-r"><Kerned text="Skitini" /></span>
             </h1>
           </div>
         </section>
@@ -301,12 +301,15 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
           </div>
           {s.caption ? (
             <p className="pf-caption pf-mono">
-              <span>{s.caption}</span>
-              {s.link ? (
-                <a className="pf-caption-link" href={s.link.href} target="_blank" rel="noopener noreferrer">
-                  {s.link.label}<MdArrowOutward className="pf-arrow" />
-                </a>
-              ) : null}
+              {/* .pf-cc: over a full-bleed piece it reads like closed captions, on a black box */}
+              <span className="pf-cc">
+                <span>{s.caption}</span>
+                {s.link ? (
+                  <a className="pf-caption-link" href={s.link.href} target="_blank" rel="noopener noreferrer">
+                    {s.link.label}<MdArrowOutward className="pf-arrow" />
+                  </a>
+                ) : null}
+              </span>
             </p>
           ) : null}
         </section>
