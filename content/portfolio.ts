@@ -195,9 +195,8 @@ const RAW: Slide[] = [
       "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
     meta: [ME, { label: "Year", value: "2026" }, study("plated-with-issy")],
   },
-  // the wordmark sits centred in the open space to the left of the photographs (x 22 splits the
-  // difference between the cropped desktop page and the uncropped phone one)
-  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 22, y: 48, w: 19, alt: "Plated with Issy" } }),
+  // the wordmark sits centred, about a third of the way up, just under the main photograph and catching its edge
+  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 19, alt: "Plated with Issy" } }),
   one("plated-with-issy/site-scroll-3d.mp4"),
   row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
 
