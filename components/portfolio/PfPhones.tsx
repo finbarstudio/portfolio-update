@@ -5,8 +5,9 @@
  * case study opens with, reading its model and reels from the project content
  * so the two never drift apart.
  *
- * The phones always sit in the flat line the case study only shows on hover,
- * and there is no hover. On a desktop the frame runs to the page's left and
+ * The phones stand in one straight row, all the same size and close together,
+ * sliding along past the frame's edges (PhoneScene's `strip` mode), and
+ * there is no hover. On a desktop the frame runs to the page's left and
  * right edges at the usual height (portfolio.css), so the line has room; the
  * phones stay the same size. On a phone the page is 4:5 (see the piece's
  * `mobile` shape in content/portfolio.ts) and the camera sits a little closer. If iOS will not
@@ -25,7 +26,11 @@ const PhoneScene = dynamic(() => import("@/components/phone/PhoneScene"), {
 });
 
 const phones = projects.find((p) => p.slug === "tmyr")?.heroPhones;
-const PHONE_ZOOM = 1.15;
+// camera: pulled back on a desktop so the row runs across the whole frame,
+// a little closer on a phone's 4:5 page
+const ZOOM = { wide: 0.8, phone: 1.15 };
+// centre to centre, in world units (a phone is about 0.1 wide)
+const SPACING = 0.125;
 
 export default function PfPhones() {
   // the camera is set when the scene mounts, so wait until the width is known
@@ -50,8 +55,8 @@ export default function PfPhones() {
         poster={phones.poster}
         fill
         hoverable={false}
-        presetOverride="flat"
-        zoom={isPhone ? PHONE_ZOOM : 1}
+        strip={SPACING}
+        zoom={isPhone ? ZOOM.phone : ZOOM.wide}
         tapToPlayClass="pf-play pf-mono"
       />
     </div>

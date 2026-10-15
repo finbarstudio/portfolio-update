@@ -98,8 +98,14 @@ export type PhoneSceneProps = {
   prominence?: number;
   controllerRef?: React.RefObject<PhoneSceneController | null>;
   onReady?: () => void;
-  /** Move the camera in: 1 is the standard framing, 1.2 is a fifth closer. */
+  /** Move the camera in: 1 is the standard framing, 1.2 is a fifth closer,
+   *  0.8 pulls it back. */
   zoom?: number;
+  /** Straight-line mode: the phones stand in one flat row, all the same size,
+   *  this far apart (centre to centre, world units; a phone is about 0.1
+   *  wide), sliding along and wrapping round past the frame's edges. Replaces
+   *  the curved carousel and its hover. Off by default. */
+  strip?: number;
   /** When the browser will not start the clips on its own (iOS Low Power
    *  Mode), show a Play button with this class; a tap starts them. Off by
    *  default, so the studio site's TMYR hero is unchanged. */
@@ -228,6 +234,8 @@ type CarouselProps = {
   onReady: () => void;
   /** filled with a function that starts every clip, for a Play button's tap */
   kickRef?: React.RefObject<(() => void) | null>;
+  /** straight-line mode (see PhoneSceneProps.strip) */
+  strip?: number;
 };
 
 function Carousel({
@@ -245,6 +253,7 @@ function Carousel({
   controllerRef,
   onReady,
   kickRef,
+  strip,
 }: CarouselProps) {
   const reportedReady = useRef(false);
   const gltf = useGLTF(model) as unknown as { scene: THREE.Group };
@@ -253,7 +262,8 @@ function Carousel({
   const items = useMemo(() => media.slice(0, MAX_PHONES), [media]);
   // One descriptor per unique item; the ring repeats them so there are never gaps.
   const mediaCount = Math.max(1, items.length);
-  const count = fillCount(mediaCount);
+  // a straight line needs enough phones to run past both edges of a wide frame
+  const count = strip ? mediaCount * Math.max(1, Math.ceil(12 / mediaCount)) : fillCount(mediaCount);
   const descriptors = usePhoneTextures(items, fit, bgColor);
   useEffect(() => {
     if (!kickRef) return;
@@ -298,7 +308,7 @@ function Carousel({
     return () => { ref.current = null; };
   }, [controllerRef, gl, scene, camera, invalidate, count, speed]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     // Re-upload only the textures whose video is actually PLAYING.
     for (let i = 0; i < descriptors.length; i++) descriptors[i].tick();
 
@@ -329,10 +339,37 @@ function Carousel({
     const onScreenByDesc = new Array(descriptors.length).fill(false);
     const onStageByDesc = new Array(descriptors.length).fill(false);
 
+    // the frame's half width at the phones' depth, for the straight line
+    const halfW = state.viewport.width / 2;
+
     for (let i = 0; i < count; i++) {
       const phone = phoneGroups.current[i];
       if (!phone) continue;
       const di = i % mediaCount;
+
+      if (strip) {
+        // Straight line: every phone the same size, `strip` apart, sliding left
+        // and wrapping round off-screen. The line is wider than the frame, so
+        // phones enter and leave past the edges.
+        let pos = (i - offset) % count;
+        if (pos < -count / 2) pos += count;
+        if (pos >= count / 2) pos -= count;
+        const x = pos * strip;
+        phone.position.set(x, 0, 0);
+        phone.rotation.z = 0;
+        phone.scale.setScalar(1);
+        const inFrame = Math.abs(x) < halfW + strip;
+        const d = descriptors[di];
+        const hasFrame = !!d && d.hasFrame();
+        const visible = hasFrame && Math.abs(pos) < count / 2 - 0.5;
+        if (phone.visible !== visible) phone.visible = visible;
+        if (inFrame) {
+          onScreenByDesc[di] = true;
+          onStageByDesc[di] = true;
+          if (!hasFrame) pendingFrames++;
+        }
+        continue;
+      }
 
       const arc = arcPosFor(i, count, offset);
       const rest = slotAt(REST_SLOTS, arc);
@@ -466,6 +503,7 @@ export default function PhoneScene({
   onReady,
   zoom = 1,
   tapToPlayClass,
+  strip,
 }: PhoneSceneProps) {
   const [refused, setRefused] = useState(false);
   const kickRef = useRef<(() => void) | null>(null);
@@ -565,6 +603,7 @@ export default function PhoneScene({
               controllerRef={controllerRef}
               onReady={handleReady}
               kickRef={kickRef}
+              strip={strip}
             />
           </Suspense>
         </Canvas>
