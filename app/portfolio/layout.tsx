@@ -50,7 +50,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
         <TopNav variant="portfolio" />
         {/* not "sticky": on the main site the logo stays put when the bar hides;
             here the whole thing goes, logo included */}
-        <NavLogo href="https://www.finbar.studio/" />
+        <NavLogo href="https://www.finbar.studio/" tip="finbar.studio" />
       </div>
       <ContactPanel />
       {children}

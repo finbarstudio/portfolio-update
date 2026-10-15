@@ -19,7 +19,7 @@ import { scrollToHero } from "@/lib/scroll";
 
 export const GOTO_HERO_KEY = "finbar-goto-hero";
 
-export default function NavLogo({ onHome = false, sticky = false, href = "/" }: { onHome?: boolean; sticky?: boolean; /** where the logo goes; the portfolio subdomain points it at the main site */ href?: string }) {
+export default function NavLogo({ onHome = false, sticky = false, href = "/", tip }: { onHome?: boolean; sticky?: boolean; /** where the logo goes; the portfolio subdomain points it at the main site */ href?: string; /** a hover label under the logo, in the nav's tooltip style (the portfolio uses it) */ tip?: string }) {
   return (
     <Link
       href={href}
@@ -35,6 +35,11 @@ export default function NavLogo({ onHome = false, sticky = false, href = "/" }: 
       }}
     >
       <BrandWordmark />
+      {tip ? (
+        <span className="nav-tip nav-logo-tip" aria-hidden="true">
+          {tip}
+        </span>
+      ) : null}
     </Link>
   );
 }
