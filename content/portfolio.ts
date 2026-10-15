@@ -218,11 +218,11 @@ const RAW: Slide[] = [
     name: "TasWater",
     category: "Information Design",
     body:
-      "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
+      "TasWater runs water and sewerage for the whole of Tasmania. I designed two large graphics for them in a month, made to sit inside their interactive eLearning software: one of the whole water network, one of a new starter’s first year. Both are strictly on brand and were signed off by their leadership.",
     meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
   },
-  bleed("portfolio/taswater/map-mockup.webp", "The network: water from intake and treatment to the tap, then back through sewage and wastewater", { mobile: phone("portfolio/taswater/map-mockup-mobile.webp") }),
-  bleed("portfolio/taswater/snake-mockup.webp", "Onboarding: a new starter’s first twelve months, from day one to month twelve", { mobile: phone("portfolio/taswater/snake-mockup-mobile.webp") }),
+  bleed("portfolio/taswater/map-mockup.webp", "The network graphic for the eLearning: water from intake and treatment to the tap, then back through sewage and wastewater", { mobile: phone("portfolio/taswater/map-mockup-mobile.webp") }),
+  bleed("portfolio/taswater/snake-mockup.webp", "The onboarding graphic for the eLearning: a new starter’s first twelve months, from day one to month twelve", { mobile: phone("portfolio/taswater/snake-mockup-mobile.webp") }),
 
   /* ── The London Home Show ──────────────────────────────────── */
   { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
