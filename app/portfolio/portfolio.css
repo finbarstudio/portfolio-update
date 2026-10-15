@@ -146,8 +146,17 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-mark svg { width: 100%; height: 100%; display: block; }
 
 .pf-cover .pf-pad { z-index: 1; }
-/* the note on the cover about the lighter phone files: phones only */
-.pf-phone-note { display: none; }
+/* the note on the cover: best on a desktop on wifi, lighter files on a phone.
+   It sits under the header line; the name keeps its place at the foot. */
+.pf-cover .pf-poster { margin-top: auto; }
+.pf-phone-note {
+  margin-top: calc(var(--u) * 2.6);
+  max-width: 34em;
+  font-size: max(calc(var(--u) * 0.95), 12px);
+  line-height: 1.45;
+  color: var(--soft);
+  text-wrap: pretty;
+}
 .pf-cover .pf-poster { font-size: calc(var(--u) * 11); }
 
 /* ── the list of projects ───────────────────────────────────────── */
@@ -442,7 +451,7 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-list .n { font-size: 19px; }
   .pf-list { margin-top: 28px; }
   .pf-cover .pf-poster { font-size: 17vw; }
-  .pf-phone-note { display: block; margin-top: 22px; max-width: 30em; font-size: 14px; line-height: 1.45; color: var(--soft); text-wrap: pretty; }
+  .pf-phone-note { margin-top: 22px; max-width: 30em; font-size: 14px; }
   .pf-cv-bio { grid-column: 1 / -1; grid-row: auto; font-size: 16px; }
   /* about: even out the short broken lines, and give the résumé line room */
   .pf-cv-bio p { text-wrap: pretty; }

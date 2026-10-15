@@ -121,9 +121,9 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <span>Graphic and digital designer<br /><span className="pf-soft">London</span></span>
               <span><a href={`mailto:${CV.email}`}>{CV.email}</a><br /><span className="pf-soft">Updated {UPDATED.long}</span></span>
             </div>
-            {/* phones get lighter files (content/portfolio.ts: forPhones); say so, and where to see them at their best */}
+            {/* where it is best seen, and that phones get lighter files (content/portfolio.ts: forPhones) */}
             <p className="pf-phone-note">
-              On a phone, this portfolio loads lighter versions of the videos and images so it is kind to mobile data. For full quality, open it on a desktop on wifi.
+              Best seen on a desktop on wifi. On a phone, this portfolio loads lighter versions of the videos and images so it is kind to mobile data.
             </p>
             <h1 className="pf-poster" aria-label="Finbar Skitini">
               <Kerned text="Finbar" />
