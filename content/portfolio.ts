@@ -84,7 +84,7 @@ export const CV = {
     {
       group: "Freelance",
       items: [
-        { title: "Finbar Studio", lines: ["Designer", "2024–now"] },
+        { title: "Finbar Studio", lines: ["Designer", "2025–now"] },
         { title: "Share to Buy", lines: ["Designer", "2026"] },
       ],
     },

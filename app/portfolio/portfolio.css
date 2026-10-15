@@ -272,6 +272,8 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-cv-item .in { display: block; color: var(--soft); }
 .pf-part { display: inline-block; white-space: nowrap; margin-right: 0.28em; }
 .pf-cv-contact { display: grid; grid-template-columns: auto 1fr; column-gap: 0.8em; }
+/* the About page's short blocks (eligibility, roles) break into even lines */
+.pf-cv-item, .pf-cv-block .pf-copy { text-wrap: balance; }
 .pf-cv-foot { display: flex; align-items: baseline; gap: calc(var(--u) * 3); width: 100%; }
 /* the note at the foot of the About page, in the captions' type: best on a
    desktop on wifi, lighter files on a phone */
@@ -585,7 +587,6 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-cv-bio { grid-column: 1 / -1; grid-row: auto; font-size: 16px; }
   /* about: even out the short broken lines, and give the résumé line room */
   .pf-cv-bio p { text-wrap: pretty; }
-  .pf-cv-item, .pf-cv-block .pf-copy { text-wrap: balance; }
   .pf-cv-foot { margin-top: 40px; flex-wrap: wrap; row-gap: 8px; }
   .pf-mono { font-size: 10px; }
   .pf-copy, .pf-meta .v { font-size: 13px; }
