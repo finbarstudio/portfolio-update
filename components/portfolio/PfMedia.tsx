@@ -74,7 +74,7 @@ async function download(url: string, onProgress: (pct: number | null) => void, s
   return URL.createObjectURL(new Blob(chunks, { type: res.headers.get("content-type") ?? "" }));
 }
 
-export default function PfMedia({ src: dark, light, mobile, mobileLight, video, sound, alt, w, h, group }: { src: string; light?: string; /** a separate file for phones, 760px and under */ mobile?: string; /** the phone file for the light theme */ mobileLight?: string; video?: boolean; /** the clip has a soundtrack: it starts muted, with a button to turn the sound on */ sound?: boolean; alt?: string; w: number; h: number; group?: string }) {
+export default function PfMedia({ src: dark, light, mobile, mobileLight, video, sound, alt, w, h, group, grounds }: { /** the page's ground follows the clip's background: seconds in, colour from then on */ grounds?: { at: number; color: string }[]; src: string; light?: string; /** a separate file for phones, 760px and under */ mobile?: string; /** the phone file for the light theme */ mobileLight?: string; video?: boolean; /** the clip has a soundtrack: it starts muted, with a button to turn the sound on */ sound?: boolean; alt?: string; w: number; h: number; group?: string }) {
   // A piece can have a second file for the page's light theme. It is swapped
   // the moment the theme switch is flipped (it sets data-pf-theme on <html>).
   const [isLight, setIsLight] = useState(false);
@@ -152,6 +152,46 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
   // this even to muted clips), which used to leave a still frame with no way
   // to play it. When a start is refused, a Play button shows instead; a tap
   // is a gesture, so the browser lets it play.
+  // A clip whose background changes partway: keep the page's ground on the
+  // colour of the frame being shown, so the clip never shows an edge. Uses the
+  // video's own frame clock where the browser has it, else its time updates.
+  const groundKey = grounds?.map((g) => `${g.at}:${g.color}`).join("|") ?? "";
+  useEffect(() => {
+    const v = clip.current;
+    if (!v || !url || !groundKey) return;
+    const steps = groundKey.split("|").map((x) => {
+      const [at, color] = x.split(":");
+      return { at: Number(at), color };
+    });
+    const slide = v.closest<HTMLElement>(".pf-slide");
+    if (!slide) return;
+    let shown = "";
+    const paint = (t: number) => {
+      let color = steps[0].color;
+      for (const g of steps) if (t >= g.at) color = g.color;
+      if (color !== shown) {
+        slide.style.setProperty("--ground", color);
+        shown = color;
+      }
+    };
+    let handle = 0;
+    let live = true;
+    const frameClock = typeof (v as { requestVideoFrameCallback?: unknown }).requestVideoFrameCallback === "function";
+    const onFrame = (_: number, meta: { mediaTime: number }) => {
+      if (!live) return;
+      paint(meta.mediaTime);
+      handle = v.requestVideoFrameCallback(onFrame);
+    };
+    const onTime = () => paint(v.currentTime);
+    if (frameClock) handle = v.requestVideoFrameCallback(onFrame);
+    else v.addEventListener("timeupdate", onTime);
+    return () => {
+      live = false;
+      if (frameClock) v.cancelVideoFrameCallback(handle);
+      else v.removeEventListener("timeupdate", onTime);
+    };
+  }, [url, groundKey]);
+
   const begun = useRef(false);
   const [refused, setRefused] = useState(false);
   const loudRef = useRef(loud);

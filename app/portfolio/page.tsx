@@ -40,7 +40,7 @@ function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; grou
       className={`pf-item${m.frame === false ? "" : " is-framed"}${m.mobile ? " has-phone" : ""}`}
       style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.mobile ? { "--r-phone": (m.mobile.w / m.mobile.h).toFixed(4) } : null), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
     >
-      {m.cars ? <PfCars /> : m.phones ? <PfPhones /> : m.globe ? <PfGlobe /> : <PfMedia src={m.src} light={m.light} mobile={m.mobile?.src} mobileLight={m.mobile?.light} video={m.video} sound={m.sound} alt={m.alt} w={m.w} h={m.h} group={group} />}
+      {m.cars ? <PfCars /> : m.phones ? <PfPhones /> : m.globe ? <PfGlobe /> : <PfMedia src={m.src} light={m.light} mobile={m.mobile?.src} mobileLight={m.mobile?.light} grounds={m.grounds} video={m.video} sound={m.sound} alt={m.alt} w={m.w} h={m.h} group={group} />}
       {m.overlay ? (
         // the file's own frame, drawn the way the picture is (cover, centred), so the overlay lands on the same spot of the picture
         <div className="pf-overlay" aria-hidden={m.overlay.alt ? undefined : true}>
@@ -305,7 +305,10 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
       const down = lines.length;
       const h = `min(calc((var(--H) - ${down - 1} * var(--G)) / ${down}), calc((var(--W) - ${n - 1} * var(--G)) / ${ratio.toFixed(4)}))`;
       return (
-        <section className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}`} style={s.ink ? ({ "--bleed-ink": s.ink } as React.CSSProperties) : undefined}>
+        <section
+          className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}${s.ink ? " has-ink" : ""}`}
+          style={s.ink || s.ground ? ({ ...(s.ink ? { "--bleed-ink": s.ink } : null), ...(s.ground ? { "--ground": s.ground } : null) } as React.CSSProperties) : undefined}
+        >
           <Run chap={chap} page={page} />
           <div className={`pf-row${s.per ? " is-stack" : ""}`} style={{ "--h": h } as React.CSSProperties}>
             {s.per
