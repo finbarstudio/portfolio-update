@@ -9,7 +9,6 @@
  *   media    one to four images or clips in a row
  *   grid     tiles on a unit grid (see THE NEW IMAGE STANDARD below)
  *   covers   a sheet of A4 covers in rows
- *   booklet  a printed piece as a 3D magazine whose pages turn (PfBooklet)
  *   logo     a mark centred on a ground
  *
  * THE MEDIA RULE FOR THIS PAGE: inset, never full bleed, never cropped. Every
@@ -35,7 +34,7 @@
  * through mediaDeep (Cloudflare R2 in production). Copy: no em dashes,
  * humanizer pass, nothing that is not true.
  */
-import { media as mediaOne, mediaDeep } from "@/lib/media";
+import { mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
 
 export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number };
@@ -52,7 +51,6 @@ export type Slide =
   | { kind: "quote"; name: string; quote: string; by: string }
   | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean; /** stack the items in rows of this many, each at its true proportions */ per?: number }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
-  | { kind: "booklet"; /** the books on the stage, the first open by default: name, every page in reading order (front cover first), the same pages small, and page numbers to star in the spreads view */ books: { name: string; pages: string[]; thumbs: string[]; stars?: number[] }[]; caption?: string }
   | { kind: "deck"; /** a landscape document to page through: every page in order, and the same pages small */ name: string; pages: string[]; thumbs: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
   | { kind: "section"; title: string; subtitle: string; year: string }
@@ -64,7 +62,6 @@ export const UPDATED = { long: "October 2026", short: "05.10.2026" };
 export const PORTFOLIO_PDF = false;
 
 /** The opening page's portrait. It is on black, so it sits straight on the page. */
-export const HEADSHOT = mediaOne(`/media/images/${"portfolio/headshot.webp"}`);
 
 export const CV = {
   email: "finbar@finbar.studio",
@@ -108,32 +105,13 @@ function m(path: string, o: Partial<Media> = {}): Media {
 }
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
 /** One image filling the whole page, edge to edge (cropped to 16:9). */
-const bleed = (path: string): Slide => ({ kind: "media", items: [m(path)], bleed: true });
+const bleed = (path: string, caption?: string): Slide => ({ kind: "media", items: [m(path)], bleed: true, caption });
 /** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption and a link out. */
 const linked = (path: string, caption: string, link: { label: string; href: string }, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
 
 /** Several rows of images on one page, `per` to a row, none cropped. */
 const stack = (paths: string[], per: number, caption?: string): Slide => ({ kind: "media", items: paths.map((p) => m(p)), caption, per });
-
-/**
- * A whole playbook for the booklet stage: its pages are page-01.webp … under
- * public/media/images/portfolio/salesmasters/<slug>/, with small copies in
- * thumbs/. An odd page count means the back cover was exported facing the
- * last inside page; a blank leaf ("") goes in before it so the book still
- * closes on its back cover. Stars are page numbers in the FILES, from 1.
- */
-const book = (name: string, slug: string, count: number, stars?: number[]) => {
-  const file = (i: number) => `page-${String(i + 1).padStart(2, "0")}.webp`;
-  const order = Array.from({ length: count }, (_, i) => i);
-  if (count % 2) order.splice(count - 1, 0, -1);
-  return {
-    name,
-    pages: order.map((i) => (i < 0 ? "" : `/media/images/portfolio/salesmasters/${slug}/${file(i)}`)),
-    thumbs: order.map((i) => (i < 0 ? "" : `/media/images/portfolio/salesmasters/${slug}/thumbs/${file(i)}`)),
-    stars: stars?.map((n) => (n > count - 1 && count % 2 ? n + 1 : n)),
-  };
-};
 
 /** A grid page. Each tile is [path, column, row, columns spanned, rows spanned], 1-based. */
 const grid = (cols: number, rows: number, tiles: [string, number, number, number, number][], caption?: string): Slide => ({
@@ -166,32 +144,19 @@ const RAW: Slide[] = [
   one("portfolio/lola-audio/brand.webm", "The brand: her mark, the site and the stills it sits on", { frame: false }),
   linked("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { label: "lola-audio.com", href: "https://www.lola-audio.com" }, { sound: true }),
 
-  /* ── Salesmasters ──────────────────────────────────────────── */
-  { kind: "title", id: "salesmasters", name: "Salesmasters", category: "Editorial", year: "2024–2025" },
+  /* ── Rennen Plus ────────────────────────────────────────────── */
+  { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
   {
     kind: "text",
-    name: "Salesmasters",
-    category: "Editorial",
+    name: "Rennen Plus",
+    category: "Website",
     body:
-      "Salesmasters writes sales playbooks for businesses in healthcare, manufacturing, technology and storage. Over twelve months I researched, wrote and designed more than fifteen of them, each 30 to 50 pages, with the diagrams drawn for each client. Every book ran on the same InDesign system, and each one took about seventy hours of work, roughly two weeks from brief to print-ready files. Every client came back for the next one.",
-    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024–2025" }, study("salesmasters")],
+      "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
+    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
   },
-  one("portfolio/salesmasters/covers-wheel.webm", "The covers of nine of the playbooks, each in its client’s own brand", { frame: false }),
-  {
-    kind: "booklet",
-    books: [
-      book("Site Ware Direct", "site-ware-direct", 67, [1, 6, 8, 21, 23, 46, 67]),
-      book("Alpha Lifecare", "alpha-lifecare", 68, [1, 6, 9, 23, 42, 55, 68]),
-      book("Prescience", "prescience", 65, [1, 7, 8, 11, 21, 36, 56, 65]),
-      book("Connected Platforms", "connected-platforms", 55, [1, 2, 6, 19, 49, 55]),
-      book("Criterion", "criterion", 61, [1, 4, 6, 18, 30, 55, 61]),
-      book("Active Medical", "active-medical", 58, [1, 6, 8, 17, 18, 41, 58]),
-      book("Cutek", "cutek", 88, [1, 2, 6, 26, 37, 84, 88]),
-      book("Bus4x4", "bus4x4", 62, [1, 5, 6, 8, 32, 40, 62]),
-      book("All Storage Systems", "all-storage-systems", 77, [1, 2, 6, 13, 20, 53, 63, 77]),
-    ],
-    caption: "Nine editions, every page. Click or drag a page to turn it",
-  },
+  linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
+  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
+  linked("portfolio/rennen-plus/phones.webm", "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
 
   /* ── Lows Design and Build ──────────────────────────────────── */
   { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
@@ -214,44 +179,19 @@ const RAW: Slide[] = [
     by: "Samuel Low",
   },
 
-  /* ── Rennen Plus ────────────────────────────────────────────── */
-  { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
+  /* ── Plated with Issy ──────────────────────────────────────── */
+  { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
   {
     kind: "text",
-    name: "Rennen Plus",
-    category: "Website",
+    name: "Plated with Issy",
+    category: "Brand and Website",
     body:
-      "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
+      "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
+    meta: [ME, { label: "Year", value: "2026" }, study("plated-with-issy")],
   },
-  linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
-  one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
-  linked("portfolio/rennen-plus/phones.webm", "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
-
-  /* ── Packer and Associates ─────────────────────────────────── */
-  { kind: "title", id: "packer", name: "Packer and Associates", category: "Capability Statement", year: "2024–2025" },
-  {
-    kind: "text",
-    name: "Packer and Associates",
-    category: "Capability Statement",
-    body:
-      "Packer and Associates is a Brisbane workforce development company, running since 1997. This is the capability statement they send to prospective clients. In twelve pages it sets out who they are, what they do and who they work with, then walks through five client projects, from BHP and Rio Tinto to TAFE Queensland. I gathered the content, wrote it and designed it as a digital document that goes out in new business conversations and from the team’s email signatures.",
-    meta: [ME, { label: "Year", value: "2024–2025" }, { label: "Live", value: "packerandassociates.com.au", href: "https://www.packerandassociates.com.au" }, study("packer-associates")],
-  },
-  one("portfolio/packer/capability-statement.webm", "The capability statement, page by page", { frame: false }),
-
-  /* ── TasWater ──────────────────────────────────────────────── */
-  { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
-  {
-    kind: "text",
-    name: "TasWater",
-    category: "Information Design",
-    body:
-      "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
-    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
-  },
-  one("portfolio/taswater/map-mockup.webp"),
-  one("portfolio/taswater/snake-mockup.webp"),
+  { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
+  one("plated-with-issy/site-scroll-3d.mp4"),
+  row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
   { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
@@ -267,6 +207,19 @@ const RAW: Slide[] = [
   row(["tmyr/1080x1920-ig-reels/freya.webm", "tmyr/1080x1920-ig-reels/kiran.webm", "tmyr/1080x1920-ig-reels/lauren.webm", "tmyr/1080x1920-ig-reels/olu.webm"], "Reels"),
   row(["tmyr/1080x1080-ig-posts/kiran.webm", "tmyr/1080x1080-ig-posts/anthony.webm", "tmyr/1080x1080-ig-posts/molly.webm"], "Feed posts"),
 
+  /* ── TasWater ──────────────────────────────────────────────── */
+  { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
+  {
+    kind: "text",
+    name: "TasWater",
+    category: "Information Design",
+    body:
+      "TasWater runs water and sewerage for the whole of Tasmania. I designed two large infographics for them in a month, turning a statewide network into something a customer can read at a glance, strictly on brand and signed off by their leadership.",
+    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
+  },
+  one("portfolio/taswater/map-mockup.webp"),
+  one("portfolio/taswater/snake-mockup.webp"),
+
   /* ── The London Home Show ──────────────────────────────────── */
   { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
   {
@@ -279,24 +232,12 @@ const RAW: Slide[] = [
   },
   one("portfolio/london-home-show/event-orbit.webm", "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", { frame: false }),
 
-  /* ── Plated with Issy ──────────────────────────────────────── */
-  { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
-  {
-    kind: "text",
-    name: "Plated with Issy",
-    category: "Brand and Website",
-    body:
-      "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
-    meta: [ME, { label: "Year", value: "2026" }, study("plated-with-issy")],
-  },
-  { kind: "logo", src: `/media/images/plated-with-issy/wordmark.svg`, alt: "Plated with Issy wordmark", bg: "#3D3E2A", size: "54cqw", dark: true },
-  one("plated-with-issy/site-scroll-3d.mp4"),
-  row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
-
   /* ── Other ─────────────────────────────────────────────────── */
-  { kind: "section", title: "Other", subtitle: "Covers and side projects", year: "2022–2026" },
-  one("joe-devine/hero.webp", "Single covers for Joe Devine"),
-  row(["joe-devine/albums/giant-leap-md.webp", "joe-devine/albums/baby-steps-md.webp", "joe-devine/albums/one-foot-forward-md.webp", "joe-devine/albums/too-far-gone-md.webp"], "Art direction and photography, one colour per single"),
+  /* One page each. The full story is on each case study. */
+  { kind: "section", title: "Other", subtitle: "Playbooks, print and covers", year: "2022–2026" },
+  linked("portfolio/salesmasters/covers-wheel.webm", "Salesmasters. Sales playbooks for nine clients, each in the client’s own brand", { label: "Case study", href: "https://www.finbar.studio/case-studies/salesmasters" }),
+  linked("portfolio/packer/capability-statement.webm", "Packer and Associates. The capability statement, page by page", { label: "Case study", href: "https://www.finbar.studio/case-studies/packer-associates" }),
+  bleed("joe-devine/hero.webp", "Joe Devine. Single covers, art direction and photography"),
 
   { kind: "end" },
 ];

@@ -2,9 +2,8 @@ import PfMedia from "@/components/portfolio/PfMedia";
 import PfPhones from "@/components/portfolio/PfPhones";
 import PfCars from "@/components/portfolio/PfCars";
 import PfDeck from "@/components/portfolio/PfDeck";
-import PfBooklet from "@/components/portfolio/PfBooklet";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
-import { PORTFOLIO, CV, UPDATED, HEADSHOT, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
+import { PORTFOLIO, CV, UPDATED, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
 import "./portfolio.css";
 
 /**
@@ -115,8 +114,6 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <Kerned text="Skitini" />
             </h1>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="pf-headshot" src={HEADSHOT} alt="Finbar Skitini" width={1024} height={1024} decoding="async" />
         </section>
       );
     case "cv":
@@ -323,19 +320,6 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
           <div className="pf-covers" style={{ "--n": Math.ceil(s.items.length / 2) } as React.CSSProperties}>
             {s.items.map((m) => <Item key={m.src} m={m} group={chap?.id} />)}
           </div>
-          {s.caption ? (
-            <p className="pf-caption pf-mono">
-              <b>Above</b>
-              <span>{s.caption}</span>
-            </p>
-          ) : null}
-        </section>
-      );
-    case "booklet":
-      return (
-        <section className="pf-slide pf-media pf-bookslide">
-          <Run chap={chap} page={page} />
-          <PfBooklet books={s.books} />
           {s.caption ? (
             <p className="pf-caption pf-mono">
               <b>Above</b>

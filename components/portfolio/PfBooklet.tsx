@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Printed booklets on the portfolio that can be picked up and read. One or
+ * Printed booklets that can be picked up and read. One or
  * more books share the stage, listed down the left to switch between; the
  * first is open when the page loads.
  *
@@ -25,6 +25,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { corsMedia, media } from "@/lib/media";
 import Book, { PAGE_H, PAGE_W } from "@/components/booklet/Book";
 import SpreadWall, { toSpreads } from "@/components/booklet/SpreadWall";
+import "./booklet.css";
 
 export interface BookletBook {
   /** shown on the switch between books */
@@ -118,7 +119,7 @@ function PhonePreview({ books }: { books: BookletBook[] }) {
         ))}
       </div>
       <p className="pf-booklet-phone-note">
-        This is a small sample. Open this portfolio on a desktop to pick up and read {others > 0 ? `all ${books.length} playbooks` : "the whole playbook"}, every page.
+        This is a small sample. Open this page on a desktop to pick up and read {others > 0 ? `all ${books.length} playbooks` : "the whole playbook"}, every page.
       </p>
     </div>
   );

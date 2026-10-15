@@ -1,0 +1,126 @@
+/* The booklet (components/portfolio/PfBooklet.tsx): playbooks you can pick up
+   and read, on the Salesmasters case study. It sits on its own black 16:9
+   sheet, sized in container units (--u = 1cqw) like the portfolio pages it
+   was built for, with the same warm white type. */
+
+.sm-booklet {
+  --paper: #000000;
+  --ink: #f3f1ee;
+  --soft: #9a938b;
+  --line: #2a2724;
+  --u: 1cqw;
+  --tr-label: 0.1em;
+  --T: 5.4cqw; --B: 6.6cqw; --S: 6cqw;
+  position: relative;
+  /* as wide as the column, but never taller than most of the screen */
+  width: min(100%, calc(80svh * 16 / 9));
+  margin-inline: auto;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  container-type: inline-size;
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-host), "Host Grotesk", system-ui, sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}
+.sm-booklet p { margin: 0; }
+.sm-booklet .pf-mono {
+  font-weight: 500;
+  font-size: max(calc(var(--u) * 0.7), 10px);
+  line-height: 1.5;
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+}
+.sm-booklet .pf-soft { color: var(--soft); }
+
+/* the booklet: a 3D magazine in the media box (PfBooklet). The view switch
+   and the page arrows sit on the caption line, either side of the caption. */
+.pf-booklet {
+  position: absolute;
+  /* a gutter either side keeps the book clear of the view options on the right
+     (and the same on the left, so it stays centred on the page) */
+  top: var(--T); bottom: var(--B); left: calc(var(--S) + 8cqw); right: calc(var(--S) + 8cqw);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+.pf-booklet:active { cursor: grabbing; }
+.pf-booklet:focus-visible { outline: 1px solid var(--soft); outline-offset: calc(var(--u) * 0.4); }
+.pf-booklet[data-view="spreads"] { cursor: auto; }
+.pf-booklet-wait { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; pointer-events: none; }
+.pf-booklet-ui {
+  position: absolute;
+  left: var(--S); right: var(--S);
+  bottom: calc(var(--u) * 2.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 3;
+  pointer-events: none;
+}
+.pf-booklet-set { display: flex; align-items: center; gap: calc(var(--u) * 0.2); pointer-events: auto; }
+.pf-booklet-ui button, .pf-booklet-views button, .pf-booklet-books button {
+  /* small type, full-size target: the padding is the hit area */
+  min-width: 44px; min-height: 44px;
+  margin: -14px 0;
+  padding: 0 calc(var(--u) * 0.6);
+  border: 0;
+  background: none;
+  color: var(--soft);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+.pf-booklet-ui button:hover, .pf-booklet-ui button[aria-pressed="true"], .pf-booklet-views button:hover, .pf-booklet-views button[aria-pressed="true"], .pf-booklet-books button:hover, .pf-booklet-books button[aria-pressed="true"] { color: var(--ink); }
+.pf-booklet-ui button:disabled { opacity: 0.3; cursor: default; }
+.pf-booklet-ui button:focus-visible, .pf-booklet-views button:focus-visible, .pf-booklet-books button:focus-visible { outline: 1px solid var(--soft); outline-offset: -8px; }
+.pf-booklet-books {
+  position: absolute;
+  left: calc(var(--u) * 2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  z-index: 3;
+}
+.pf-booklet-books button { margin: 0; min-height: 32px; text-align: left; }
+.pf-booklet-views {
+  position: absolute;
+  right: calc(var(--u) * 2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 3;
+}
+.pf-booklet-views button { margin: 0; min-height: 36px; text-align: right; }
+.pf-booklet-views .pf-booklet-close { margin-top: calc(var(--u) * 0.8); color: var(--ink); }
+.pf-booklet-set:first-child { margin-left: calc(var(--u) * -0.6); }
+.pf-booklet-set:last-child { margin-right: calc(var(--u) * -0.6); }
+.pf-booklet-where { min-width: 11em; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* the phone's still preview (PfBooklet): four single pages of one book as a
+   2 by 2, and a note that the rest is on a desktop */
+.pf-booklet-phone { position: absolute; top: var(--T); bottom: var(--B); left: var(--S); right: var(--S); display: grid; gap: 14px; align-content: center; }
+.pf-booklet-phone-pages { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pf-booklet-phone img { display: block; width: 100%; height: auto; }
+.pf-booklet-phone p { margin: 0; }
+.pf-booklet-phone-note { text-align: center; text-wrap: balance; font-size: 13px; line-height: 1.4; }
+
+@media (max-width: 760px) {
+  .sm-booklet { width: 100%; aspect-ratio: auto; --u: 1.9vw; }
+  .pf-booklet { position: relative; inset: auto; margin: 12px 14px 0; aspect-ratio: 1.25; }
+  /* an exception to the tight phone pages: this one is let run tall, for a
+     2 by 2 of pages and room around the note under them */
+  .pf-booklet-phone { position: static; padding: 22px 18px 0; gap: 18px; }
+  .pf-booklet-phone-pages { gap: 12px; }
+  .pf-booklet-phone-note { font-size: 15px; line-height: 1.45; padding: 12px 6px 0; color: var(--ink); }
+  .pf-booklet-phone { padding-bottom: 34px; }
+  /* the case study's line about turning pages: the phone preview has its own */
+  .sm-booklet + .sm-excerpt-note { display: none; }
+}

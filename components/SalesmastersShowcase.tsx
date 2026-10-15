@@ -3,20 +3,20 @@
 /**
  * SalesmastersShowcase — bespoke case study for the Salesmasters sales playbooks.
  * Three sections: the clients / credibility (cover marquee + stats + site link),
- * the playbook itself (interactive page viewer of a full edition), and the
- * bespoke infographics and technique diagrams.
+ * the playbooks themselves (every page of nine editions, to pick up and read in
+ * 3D: components/portfolio/PfBooklet.tsx), and one client's diagrams.
  */
 
 import type { ReactNode } from "react";
-import BookViewer from "./BookViewer";
+import dynamic from "next/dynamic";
 import { MdOpenInNew } from "@/components/MaterialIcon";
 import { media } from "@/lib/media";
+import { SALESMASTERS_BOOKS } from "@/content/salesmasters-books";
 
 const SITE_URL = "https://salesmasters.com.au";
 
-const PLAYBOOK_PAGES = Array.from({ length: 20 }, (_, i) =>
-  media(`/media/images/salesmasters/playbook/page-${i + 1}.webp`)
-);
+// three.js and the page images: client only, and only fetched with this page
+const PfBooklet = dynamic(() => import("./portfolio/PfBooklet"), { ssr: false });
 
 const LOGOS = [
   "active-medical.svg",
@@ -31,13 +31,6 @@ const LOGOS = [
 ].map((n) => media(`/media/images/salesmasters/logos/${n}`));
 
 const G = "/media/images/salesmasters/graphics";
-
-const CUTEK_ICONS = ["architects", "consumers", "distributors", "government"].map(
-  (n) => media(`${G}/cutek/${n}.webp`)
-);
-const AM_ICONS = ["handshake", "target", "graph", "star", "bolt", "simple"].map(
-  (n) => media(`${G}/active-medical/icons/${n}.webp`)
-);
 
 const STATS = [
   { value: "15+", tag: "Playbooks", label: "Across five industries" },
@@ -65,9 +58,9 @@ function Company({ name, caption, children }: { name: string; caption?: string; 
   );
 }
 
-function Tile({ src, tall = false, wide = false, icon = false }: { src: string; tall?: boolean; wide?: boolean; icon?: boolean }) {
+function Tile({ src, tall = false }: { src: string; tall?: boolean }) {
   return (
-    <figure className={`sm-tile${tall ? " sm-tile-tall" : ""}${wide ? " sm-tile-wide" : ""}${icon ? " sm-tile-icon" : ""}`}>
+    <figure className={`sm-tile${tall ? " sm-tile-tall" : ""}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={media(src)} alt="" aria-hidden="true" loading="lazy" />
     </figure>
@@ -130,9 +123,12 @@ export default function SalesmastersShowcase() {
           an interactive, distributable PDF and a print edition, with the print
           pre-production managed through to delivery.
         </p>
-        {/* Highlight the pages 8–9 spread (cover=0, then 2-3,4-5,6-7,8-9 → index 4). */}
-        <BookViewer pages={PLAYBOOK_PAGES} markSpread={4} />
-        <p className="sm-excerpt-note">A 20-page excerpt of a full-length sales playbook.</p>
+        <div className="sm-booklet">
+          <PfBooklet books={SALESMASTERS_BOOKS} />
+        </div>
+        <p className="sm-excerpt-note">
+          Nine playbooks, every page. Pick one, then click or drag a page to turn it. Spreads lays the whole book out at once.
+        </p>
       </section>
 
       {/* 03 — Infographics & technique diagrams, grouped by client */}
@@ -143,7 +139,8 @@ export default function SalesmastersShowcase() {
           playbook together with custom graphics, all built to the client&apos;s
           brand: custom Sales Wheels that map their process, technique frameworks
           like BANT and STAR drawn as purpose-built diagrams, client-specific
-          process maps, and custom icon sets.
+          process maps, and custom icon sets. Here is one set, from the Site
+          Ware Direct playbook.
         </p>
 
         {/* Site Ware Direct — wheel, BANT, STAR side by side, all 2-row tall */}
@@ -155,28 +152,6 @@ export default function SalesmastersShowcase() {
             <Tile src={`${G}/site-ware-direct/wheel.webp`} tall />
             <Tile src={`${G}/site-ware-direct/bant.webp`} tall />
             <Tile src={`${G}/site-ware-direct/star.webp`} tall />
-          </div>
-        </Company>
-
-        {/* Cutek — Sales Wheel (tall) + 2×2 audience icons */}
-        <Company name="Cutek" caption="Sales Wheel and a custom audience icon set across their market segments.">
-          <Tile src={`${G}/cutek/wheel.webp`} tall />
-          <div className="sm-co-2x2">
-            {CUTEK_ICONS.map((src) => <Tile key={src} src={src} icon />)}
-          </div>
-        </Company>
-
-        {/* Bus4x4 — tyre wheel first, then six-point walkround, both tall */}
-        <Company name="Bus4x4" caption="The hand-drawn tyre-wheel illustration and the custom six-point walkround diagram.">
-          <Tile src={`${G}/bus4x4/wheel.webp`} tall />
-          <Tile src={`${G}/bus4x4/technical.webp`} tall wide />
-        </Company>
-
-        {/* Active Medical — Sales Wheel (tall) + 3×2 icon grid */}
-        <Company name="Active Medical" caption="Sales Wheel and a custom icon set.">
-          <Tile src={`${G}/active-medical/wheel.webp`} tall />
-          <div className="sm-co-3x2">
-            {AM_ICONS.map((src) => <Tile key={src} src={src} icon />)}
           </div>
         </Company>
       </section>

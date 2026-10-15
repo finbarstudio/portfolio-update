@@ -1466,7 +1466,7 @@ const RAW_PROJECTS: Project[] = [
     seo: {
       title: "Packer & Associates: Publication & Brand Design | Finbar Studio",
       description:
-        "An ongoing design and communications contract covering website management, the capability statement, and social and editorial content.",
+        "The capability statement Packer & Associates send to prospective clients, written and designed from scratch, and the website I looked after across the contract.",
     },
     date: "2024",
     categories: ["Publication Design", "Print Collateral"],
@@ -1477,11 +1477,11 @@ const RAW_PROJECTS: Project[] = [
       "Brand Applications",
     ],
     oneLiner:
-      "An ongoing design and communications contract across three workstreams: website management, the capability statement, and social/editorial content.",
-    role: "Designer and content lead across the contract, running the website, producing the capability statement, and creating ongoing social and editorial content.",
+      "A twelve-page capability statement for a Brisbane workforce development company, and the website I looked after across the contract.",
+    role: "Designer and writer. Gathered the content for the capability statement, wrote it and designed it, and ran the website across the contract.",
     problem:
-      "Packer & Associates needed a consistent design and communications presence maintained over time across three fronts: their website, their flagship capability statement, and their day-to-day social and editorial output.",
-    outcome: "Brand expression held consistent across every touchpoint, sustained over the full engagement.",
+      "Packer & Associates needed one document to send prospective clients that showed who they are, what they do and the work behind it, and a website kept current as the business grew.",
+    outcome: "A capability statement the team sends in new business conversations and from their email signatures, and a website kept up to date and on brand.",
     heroPdf: [
       "/media/images/packer-associates/pdf-pages/page-0-thumb.webp",
       "/media/images/packer-associates/pdf-pages/page-1-thumb.webp",
