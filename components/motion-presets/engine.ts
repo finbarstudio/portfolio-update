@@ -274,6 +274,8 @@ interface Context {
   focus: number;
   path: number[];
   ease: (x: number) => number;
+  /** the curve for the card leaving focus: the same as `ease` unless a second curve is set */
+  easeOut: (x: number) => number;
   /** the shared clock in steps, with the stop-and-go rhythm applied */
   glide: (steps: number) => number;
 }
@@ -282,6 +284,15 @@ interface Context {
 const bump = (u: number, reach: number) => {
   const a = Math.abs(u);
   return a < reach ? (1 - a / reach) ** 2 : 0;
+};
+/**
+ * How far a card is pulled out of its group: 1 in focus, 0 from one place away.
+ * Stepping, the easing curves alone shape the move, so the card leaving focus
+ * follows them as closely as the one arriving. Gliding, it starts and stops softly.
+ */
+const pulled = (p: number, c: Context) => {
+  const x = clamp(1 - Math.abs(p));
+  return lerp(smooth(x), x, c.m.rhythm);
 };
 /** The area under `bump` from 0 to u: how far a grown card pushes its neighbours. */
 const bumpArea = (u: number, reach: number) => (Math.sign(u) * reach * (1 - (1 - Math.min(Math.abs(u), reach) / reach) ** 3)) / 3;
@@ -377,7 +388,7 @@ function featureRing(c: Context, angle: number, p: number, outwards: boolean): R
   // Wide enough to read as a ring even with few cards, never so wide it reaches the shown card.
   const R = clamp(((c.w + c.g) * c.n) / TAU, half * 0.26, half * 0.4) * c.m.radius;
   const centre = Math.min(-half + R + card / 2 + 0.12, -half * 0.42);
-  const out = smooth(1 - Math.abs(p));
+  const out = pulled(p, c);
   const placed2 = featureCard(c, centre + Math.sin(angle) * R, 0, Math.cos(angle) * R, centre, half * 0.42 * c.m.shape, out, { rx: 0, ry: outwards ? angle : 0, rz: 0 });
   return { ...placed2, s: lerp(1, c.m.scale, out), scaled: true, p };
 }
@@ -436,7 +447,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       // middle rises out of it and is shown large in the space beside, then
       // drops back into its place as the row moves on. Sideways the row sits
       // along the foot; up or down it runs along the left edge, like a sidebar.
-      const out = smooth(1 - Math.abs(p));
+      const out = pulled(p, c);
       const upright = c.o.direction === "up" || c.o.direction === "down";
       const span = upright ? c.A : 1; // half the frame, across the row
       const thick = upright ? c.w : c.h; // the row's thickness
@@ -507,13 +518,13 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
     const q = mod(i - c.T * c.n, c.n);
     // The front card leaves, travels to the back, and rejoins the stack.
     const leaving = q > c.n - 1 ? c.n - q : 0;
-    const slot = leaving ? lerp(0, c.n - 1, easeInOut(leaving)) : q;
+    const slot = leaving ? lerp(0, c.n - 1, lerp(easeInOut(leaving), leaving, c.m.rhythm)) : q;
     const lift = Math.sin(Math.PI * leaving);
     if (c.v.feature) {
       // The stack waits at one end of the frame. Its front card comes out to
       // the other end and is shown large, then goes to the back of the stack.
       const { half } = featureSpan(c);
-      const shown = smooth(1 - slot); // 1 for the front card, 0 from the second card back
+      const shown = pulled(slot, c); // 1 for the front card, 0 from the second card back
       const placed = featureCard(c, -half * 0.55 + slot * c.g * 0.25, slot * c.g * 0.2, -slot * 0.12, -half * 0.55, half * 0.32 * c.m.shape, shown);
       return {
         ...placed,
@@ -557,7 +568,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       const { half, card } = featureSpan(c);
       const tight = (((c.w + c.g) * c.n) / TAU) * c.m.radius; // cards a gap apart, no minimum size
       const centre = Math.min(-half + tight + card / 2 + 0.12, -half * 0.35);
-      const out = smooth(1 - Math.abs(p)); // 1 in focus, 0 from one place away
+      const out = pulled(p, c); // 1 in focus, 0 from one place away
       const blade = lean(Math.cos(angle), Math.sin(angle));
       const spoke = featurePlace(c, Math.cos(angle), Math.sin(angle));
       // The card stands upright as it is pulled out of the wheel.
@@ -585,7 +596,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
         rz: (hash(i, 7) - 0.5) * 0.5,
       };
       const p = centred(i - c.T * c.n, c.n);
-      const out = smooth(1 - Math.abs(p));
+      const out = pulled(p, c);
       // Held up as large as asked, but never larger than the frame.
       const largest = Math.min(c.m.scale, (1.8 * c.A) / c.w, 1.8 / c.h);
       return { x: lerp(home.x, 0, out), y: lerp(home.y, 0, out), z: hash(i, 9) * 0.02 + 0.3 * out, rz: lerpAngle(home.rz, 0, out), s: lerp(1, largest, out), scaled: true, p, lead: Math.abs(p) };
@@ -596,7 +607,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       const { half } = featureSpan(c);
       const centre = -half * 0.5;
       const p = centred(i - c.T * c.n, c.n);
-      const out = smooth(1 - Math.abs(p));
+      const out = pulled(p, c);
       const placed = featureCard(c, centre + (col - (cols - 1) / 2) * (c.w + c.g), -(row - (rows - 1) / 2) * (c.h + c.g), 0, centre, half * 0.42 * c.m.shape, out);
       return { ...placed, s: lerp(1, c.m.scale, out), scaled: true, p, lead: Math.abs(p) };
     }
@@ -715,7 +726,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       const z = Math.sin(theta) * r;
       const centre = -half * 0.5;
       const p = centred(i - c.T * c.n, c.n);
-      const out = smooth(1 - Math.abs(p));
+      const out = pulled(p, c);
       // Each card faces straight out from the middle of the globe.
       const facing = featurePlace(c, x, y);
       const placed = featureCard(c, centre + x * R, y * R, z * R, centre, half * 0.42 * c.m.shape, out, { rx: -Math.asin(clamp(facing.y, -1, 1)), ry: Math.atan2(facing.x, z), rz: 0 });
@@ -767,7 +778,7 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
       // In turn each card is drawn up out of the hand, straightened and shown
       // large above, then slid back into its place.
       const p = centred(i - c.T * c.n, c.n);
-      const out = smooth(1 - Math.abs(p));
+      const out = pulled(p, c);
       const slot = i - (c.n - 1) / 2;
       const spread = Math.min(0.16, 1.1 / c.n) * Math.max(0.2, c.m.shape);
       const angle = slot * spread;
@@ -819,8 +830,12 @@ const layouts: Record<LayoutName, (i: number, c: Context) => Raw | null> = {
   pulse(i, c) {
     const steps = c.T * c.n;
     const k = Math.floor(steps);
-    const f = c.ease(clamp((steps - k) / (1 - c.m.hold)));
-    if (i === mod(k, c.n)) return { s: 1 + 0.5 * f, a: clamp(1 - f), z: 0.01, lead: f < 0.5 ? 0 : 1 };
+    const x = clamp((steps - k) / (1 - c.m.hold));
+    const f = c.ease(x);
+    if (i === mod(k, c.n)) {
+      const gone = c.easeOut(x);
+      return { s: 1 + 0.5 * gone, a: clamp(1 - gone), z: 0.01, lead: f < 0.5 ? 0 : 1 };
+    }
     if (i === mod(k + 1, c.n)) return { s: 0.7 + 0.3 * f, a: clamp(f), lead: f < 0.5 ? 1 : 0 };
     return null;
   },
@@ -840,6 +855,13 @@ export function itemTotal(layout: LayoutName, n: number, v: Variant): number {
 const SOLID_GROUPS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", "orbit", "globe", "grid"]);
 /** Whether the Stagger slider does anything for this preset. */
 export const canStagger = (preset: Preset) => !((preset.variant.feature && SOLID_GROUPS.has(preset.layout)) || preset.variant.scatter || preset.variant.film || preset.variant.hand);
+/** Whether a preset has a card leaving focus, for the second easing curve to move. */
+export const hasExit = (preset: Preset) => {
+  if (preset.layout === "pulse") return true;
+  if (SHARED_CLOCK.has(preset.layout) || preset.layout === "float") return false;
+  if (preset.layout === "grid" || preset.layout === "globe") return Boolean(preset.variant.feature || preset.variant.scatter);
+  return true;
+};
 /** Layouts that need enough cards to make their shape: with fewer uploads, the uploads repeat. */
 export const FILLS_UP: ReadonlySet<LayoutName> = new Set<LayoutName>(["globe"]);
 const SHARED_CLOCK: ReadonlySet<LayoutName> = new Set<LayoutName>(["flip", "pulse", "proximity", "tour", "zoom"]);
@@ -879,7 +901,7 @@ function queuePlace(layout: LayoutName, i: number, c: Context, k: number): numbe
  * steps (1); `hold` is the share of each step spent resting; `stagger` uses
  * that rest to delay items down the queue.
  */
-function itemTime(layout: LayoutName, i: number, c: Context, T: number, reversed: boolean): number {
+function itemTime(layout: LayoutName, i: number, c: Context, T: number, reversed: boolean, ease: (x: number) => number): number {
   if (SHARED_CLOCK.has(layout) || c.m.rhythm === 0) return T;
   const steps = stepsPerLoop(layout, c);
   const v = T * steps;
@@ -890,7 +912,24 @@ function itemTime(layout: LayoutName, i: number, c: Context, T: number, reversed
   // A group that is one solid shape (a ring, a globe, a grid, a table of cards) moves as one: staggering it would pull it out of shape.
   const solid = (c.v.feature && SOLID_GROUPS.has(layout)) || c.v.scatter || c.v.film || c.v.hand;
   const wait = solid ? 0 : clamp((reversed ? 1 - spot : spot) + unevenness) * c.m.stagger * c.m.hold;
-  return lerp(v, k + c.ease(clamp((v - k - wait) / (1 - c.m.hold))), c.m.rhythm) / steps;
+  return lerp(v, k + ease(clamp((v - k - wait) / (1 - c.m.hold))), c.m.rhythm) / steps;
+}
+
+/** How far a card is from focus, in places, by whichever measure its layout gives. */
+const fromFocusOf = (raw: Raw | null, c: Context) => (raw ? (raw.lead ?? (raw.p !== undefined ? Math.abs(raw.p - (raw.f ?? c.focus)) : Infinity)) : Infinity);
+
+/**
+ * Whether item i is the card leaving focus in the step under way: in focus as
+ * the step begins and further away as it ends. Leaves `c.T` changed.
+ */
+function leavesFocus(layout: LayoutName, i: number, c: Context, T: number, sign: number): boolean {
+  const steps = stepsPerLoop(layout, c);
+  const k = Math.floor(T * steps);
+  c.T = (sign * k) / steps;
+  const before = fromFocusOf(layouts[layout](i, c), c);
+  if (before >= 0.5) return false;
+  c.T = (sign * (k + 1)) / steps;
+  return fromFocusOf(layouts[layout](i, c), c) > before;
 }
 
 export interface Settings {
@@ -898,6 +937,8 @@ export interface Settings {
   motion: Motion;
   options: Options;
   easing: Bezier;
+  /** a second curve for the card leaving focus; without one it follows `easing` */
+  easingOut?: Bezier;
   /** tour: the cells the camera visits */
   path: number[];
 }
@@ -941,7 +982,7 @@ export const HAS_RADIUS: ReadonlySet<LayoutName> = new Set<LayoutName>(["ring", 
 
 /** Everything the renderer needs to draw one moment of a preset. */
 export function layoutFrame(settings: Settings, seconds: number, aspect: number, cardShape: number): Frame {
-  const { preset, motion: m, options: o, easing } = settings;
+  const { preset, motion: m, options: o, easing, easingOut } = settings;
   const { layout } = preset;
   const fourWay = FOUR_WAY.has(layout);
   const vertical = fourWay && (o.direction === "up" || o.direction === "down");
@@ -959,6 +1000,9 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
   const curtain = o.loopFade ? smooth(loopAt / LOOP_FADE) * smooth((1 - loopAt) / LOOP_FADE) : 1;
   const hold = clamp(m.hold, 0, 0.9);
   const ease = (x: number) => bezier(easing, x);
+  const easeOut = easingOut ? (x: number) => bezier(easingOut, x) : ease;
+  // Only worth finding the leaving card when it moves on a curve of its own.
+  const ownExit = Boolean(easingOut) && m.rhythm > 0 && !SHARED_CLOCK.has(layout);
   const camZ = 1 / Math.tan((m.perspective * DEG) / 2); // a card 2 units tall fills the frame at z = 0
   const reachable = Math.min(1.5, (n - 1) / 2);
   const c: Context = {
@@ -978,6 +1022,7 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
     focus: o.focus === "start" ? -reachable : o.focus === "end" ? reachable : 0,
     path: settings.path.filter((cell) => cell >= 0 && cell < (pathGrid(preset, Math.round(m.count))?.cells ?? 0)),
     ease,
+    easeOut,
     glide: (steps) => {
       const k = Math.floor(steps);
       return lerp(steps, k + ease(clamp((steps - k) / (1 - hold))), m.rhythm);
@@ -988,7 +1033,8 @@ export function layoutFrame(settings: Settings, seconds: number, aspect: number,
   let lead: number | null = null;
   let leadScore = Infinity;
   for (let i = 0; i < cards; i++) {
-    c.T = sign * itemTime(layout, i, c, T, reversed);
+    const exits = ownExit && leavesFocus(layout, i, c, T, sign);
+    c.T = sign * itemTime(layout, i, c, T, reversed, exits ? easeOut : ease);
     const raw = layouts[layout](i, c);
     if (!raw) continue;
     let { x = 0, y = 0, rx = 0, ry = 0, rz = 0, s = 1, a = 1 } = raw;
@@ -1693,6 +1739,7 @@ export interface SavedSetup {
   motion: Motion;
   options: Options;
   easing: Bezier;
+  easingOut?: Bezier;
   path: number[];
   look: Look;
 }
@@ -1735,11 +1782,13 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
   if (typeof savedOptions.flip === "boolean") options.flip = savedOptions.flip;
   options.origin = oneOf(savedOptions.origin, ["centre", "left", "right", "up", "down"] as const) ?? options.origin;
 
-  let easing = BASE_EASING;
-  if (Array.isArray(file.easing) && file.easing.length === 4 && file.easing.every((part) => finite(part) !== undefined)) {
-    const [x1, y1, x2, y2] = file.easing as number[];
-    easing = [clamp(x1), clamp(y1, -1, 2), clamp(x2), clamp(y2, -1, 2)];
-  }
+  const curve = (value: unknown): Bezier | undefined => {
+    if (!Array.isArray(value) || value.length !== 4 || !value.every((part) => finite(part) !== undefined)) return undefined;
+    const [x1, y1, x2, y2] = value as number[];
+    return [clamp(x1), clamp(y1, -1, 2), clamp(x2), clamp(y2, -1, 2)];
+  };
+  const easing = curve(file.easing) ?? BASE_EASING;
+  const easingOut = curve(file.easingOut);
 
   const path = Array.isArray(file.path)
     ? file.path.filter((cell): cell is number => Number.isInteger(cell) && cell >= 0 && cell < 64).slice(0, 64)
@@ -1770,5 +1819,5 @@ export function parseSetup(text: string): (Settings & { look: Look }) | string {
     if (value !== undefined) look[key] = clamp(value, 0, 20);
   }
 
-  return { preset: found, motion, options, easing, path, look };
+  return { preset: found, motion, options, easing, easingOut, path, look };
 }

@@ -791,53 +791,236 @@
   color: var(--mp-dim);
 }
 
+/* Easing: the curve across the full panel width, a dot running it, a bar moving the way a card will. */
 .mp-easing {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
   gap: 8px;
-  align-items: start;
+}
+.mp-curve-editor {
+  display: grid;
+  gap: 6px;
 }
 .mp-curve {
+  display: block;
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 100 / 80;
   background: #101012;
   border-radius: 8px;
   touch-action: none;
 }
+.mp-curve-grid {
+  stroke: #1c1c20;
+  stroke-width: 0.35;
+}
 .mp-curve-box {
   fill: none;
-  stroke: var(--mp-line);
-  stroke-width: 0.6;
+  stroke: #34343b;
+  stroke-width: 0.45;
+}
+.mp-curve-ghost {
+  fill: none;
+  stroke: #4a4a53;
+  stroke-width: 0.9;
+  stroke-dasharray: 2 1.6;
 }
 .mp-curve-arm {
-  stroke: #55555e;
-  stroke-width: 0.8;
+  stroke: #5c5c66;
+  stroke-width: 0.55;
 }
 .mp-curve-line {
   fill: none;
   stroke: var(--mp-accent);
-  stroke-width: 1.8;
+  stroke-width: 1.2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.mp-curve-handle {
-  fill: var(--mp-accent);
+/* A large invisible ring makes each handle easy to catch; the dot inside is what shows. */
+.mp-curve-hit {
+  fill: transparent;
   cursor: grab;
 }
-.mp-curve-handle:focus-visible {
+.mp-curve-hit:active {
+  cursor: grabbing;
+}
+/* Focus shows on the dot itself, from the keyboard only. */
+.mp-tool .mp-curve-hit:focus {
   outline: none;
+}
+.mp-curve-hit:focus-visible + .mp-curve-handle {
   stroke: #6aa8ff;
-  stroke-width: 2;
+  stroke-width: 1.4;
+}
+.mp-curve-handle {
+  fill: var(--mp-accent);
+  stroke: #101012;
+  stroke-width: 0.8;
+  pointer-events: none;
+}
+.mp-curve-hit:hover + .mp-curve-handle {
+  fill: #fff;
+}
+/* The dot runs left to right at an even pace while rising by the curve, so it traces it. */
+.mp-curve-run-x {
+  animation: mp-run-x 2.2s linear infinite;
+}
+.mp-curve-run-y {
+  fill: #6aa8ff;
+  animation: mp-run-y 2.2s var(--curve) infinite;
+}
+@keyframes mp-run-x {
+  0% {
+    transform: translateX(var(--x0));
+  }
+  70%,
+  100% {
+    transform: translateX(var(--x1));
+  }
+}
+@keyframes mp-run-y {
+  0% {
+    transform: translateY(var(--y0));
+  }
+  70%,
+  100% {
+    transform: translateY(var(--y1));
+  }
+}
+/* The middle half of the track is the move; the quarters either side leave room to overshoot. */
+.mp-curve-track {
+  height: 14px;
+  padding: 3px 0;
+  overflow: hidden;
+  background: #101012;
+  border-radius: 7px;
+}
+.mp-curve-track span {
+  display: block;
+  width: calc((100% - 20px) / 2);
+  margin-left: calc((100% - 20px) / 4);
+  animation: mp-track 2.2s var(--curve) infinite;
+}
+.mp-curve-track span::after {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 8px;
+  background: var(--mp-accent);
+  border-radius: 4px;
+}
+@keyframes mp-track {
+  0% {
+    transform: translateX(0);
+  }
+  70%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mp-curve-run-x,
+  .mp-curve-run-y,
+  .mp-curve-track span {
+    animation: none;
+  }
+  .mp-curve-run-y {
+    display: none;
+  }
+}
+.mp-curve-values {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--mp-text);
+  background: var(--mp-field);
+  border: 1px solid var(--mp-line);
+  border-radius: 6px;
 }
 .mp-easings {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 3px;
 }
 .mp-tool .mp-easings button {
-  min-height: 24px;
-  padding: 0 2px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 0 6px;
+  overflow: hidden;
   font-size: 11px;
+  white-space: nowrap;
+  text-align: left;
+}
+.mp-easings svg {
+  flex: none;
+  width: 18px;
+  height: 12px;
+  overflow: visible;
+}
+.mp-easings polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+/* Leaving focus: a second curve, folded away until wanted. */
+.mp-exit {
+  margin-top: 4px;
+  border-top: 1px solid var(--mp-line);
+}
+.mp-exit summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 2px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.mp-exit summary::-webkit-details-marker {
+  display: none;
+}
+.mp-exit summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin: 0 4px 0 2px;
+  border-right: 1.5px solid var(--mp-dim);
+  border-bottom: 1.5px solid var(--mp-dim);
+  rotate: -45deg;
+  transition: rotate 0.15s;
+}
+.mp-exit[open] summary::before {
+  rotate: 45deg;
+}
+.mp-tool .mp-exit h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text);
+}
+.mp-exit summary span {
+  font-size: 11px;
+  color: var(--mp-dim);
+}
+.mp-exit summary:focus-visible {
+  outline: 2px solid #6aa8ff;
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+.mp-exit > :not(summary) + :not(summary) {
+  margin-top: 8px;
+}
+.mp-exit .mp-note {
+  margin: 0 0 8px;
 }
 
 .mp-path {

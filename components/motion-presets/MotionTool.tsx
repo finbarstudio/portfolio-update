@@ -29,6 +29,7 @@ import {
   layoutFrame,
   newFocusPlayback,
   hasCounter,
+  hasExit,
   clamp,
   pathGrid,
   parseSetup,
@@ -385,82 +386,165 @@ function Choice<T extends string | boolean>({
   );
 }
 
-// The curve editor's drawing area: x runs 0 to 1, y runs -0.6 to 1.6 so an overshoot has room.
-const PLOT = { left: 8, right: 92, top: 6, bottom: 94, yMin: -0.6, yMax: 1.6 };
+// The curve editor's drawing area: x runs 0 to 1, y runs -0.5 to 1.5 so an overshoot has room.
+const PLOT = { left: 5, right: 95, top: 5, bottom: 75, yMin: -0.5, yMax: 1.5 };
 const plotX = (x: number) => PLOT.left + x * (PLOT.right - PLOT.left);
 const plotY = (y: number) => PLOT.bottom - ((y - PLOT.yMin) / (PLOT.yMax - PLOT.yMin)) * (PLOT.bottom - PLOT.top);
+const curvePoints = (curve: Bezier, toX: (x: number) => number, toY: (y: number) => number) =>
+  Array.from({ length: 49 }, (_, k) => `${toX(k / 48).toFixed(2)},${toY(bezier(curve, k / 48)).toFixed(2)}`).join(" ");
+const sameCurve = (a: Bezier, b: Bezier) => a.every((part, index) => part === b[index]);
+const curveText = (curve: Bezier) => curve.map((part) => part.toFixed(2)).join(", ");
+/** Four numbers from whatever was typed or pasted, "cubic-bezier(0.3, 1.3, 0.35, 1)" included. */
+function readCurve(text: string): Bezier | null {
+  const parts = text.match(/-?\d*\.?\d+/g)?.map(Number);
+  if (!parts || parts.length !== 4 || !parts.every(Number.isFinite)) return null;
+  return [clamp(parts[0]), clamp(parts[1], PLOT.yMin, PLOT.yMax), clamp(parts[2]), clamp(parts[3], PLOT.yMin, PLOT.yMax)];
+}
 
-/** Drag the two handles to shape how each move speeds up, slows down and settles. */
-function CurveEditor({ curve, onChange }: { curve: Bezier; onChange: (curve: Bezier) => void }) {
+/**
+ * Drag the two handles to shape how each move speeds up, slows down and
+ * settles. A dot runs the curve, and a bar under it moves the way a card will.
+ * `ghost` draws another curve faintly behind, to compare against.
+ */
+function CurveEditor({ curve, onChange, label, ghost }: { curve: Bezier; onChange: (curve: Bezier) => void; label: string; ghost?: Bezier }) {
   const dragging = useRef<0 | 1 | null>(null);
+  const [typed, setTyped] = useState<string | null>(null);
   const [x1, y1, x2, y2] = curve;
 
   const moveHandle = (handle: 0 | 1, x: number, y: number) => {
     const next: Bezier = [...curve];
-    next[handle * 2] = clamp(x);
-    next[handle * 2 + 1] = clamp(y, PLOT.yMin, PLOT.yMax);
+    next[handle * 2] = Math.round(clamp(x) * 100) / 100;
+    next[handle * 2 + 1] = Math.round(clamp(y, PLOT.yMin, PLOT.yMax) * 100) / 100;
     onChange(next);
   };
   const fromPointer = (event: React.PointerEvent<SVGSVGElement>) => {
     if (dragging.current === null) return;
     const box = event.currentTarget.getBoundingClientRect();
     const px = ((event.clientX - box.left) / box.width) * 100;
-    const py = ((event.clientY - box.top) / box.height) * 100;
+    const py = ((event.clientY - box.top) / box.height) * 80;
     moveHandle(
       dragging.current,
       (px - PLOT.left) / (PLOT.right - PLOT.left),
       PLOT.yMin + ((PLOT.bottom - py) / (PLOT.bottom - PLOT.top)) * (PLOT.yMax - PLOT.yMin),
     );
   };
-  const points = Array.from({ length: 41 }, (_, k) => `${plotX(k / 40).toFixed(2)},${plotY(bezier(curve, k / 40)).toFixed(2)}`).join(" ");
+  const commit = () => {
+    const read = typed === null ? null : readCurve(typed);
+    if (read) onChange(read);
+    setTyped(null);
+  };
   const handles: [0 | 1, number, number, number, number][] = [
     [0, x1, y1, 0, 0],
     [1, x2, y2, 1, 1],
   ];
+  const run = {
+    "--curve": `cubic-bezier(${x1}, ${y1}, ${x2}, ${y2})`,
+    "--x0": `${plotX(0)}px`,
+    "--x1": `${plotX(1)}px`,
+    "--y0": `${plotY(0)}px`,
+    "--y1": `${plotY(1)}px`,
+  } as React.CSSProperties;
 
   return (
-    <svg
-      className="mp-curve"
-      viewBox="0 0 100 100"
-      onPointerMove={fromPointer}
-      onPointerUp={() => {
-        dragging.current = null;
-      }}
-      onPointerLeave={() => {
-        dragging.current = null;
-      }}
-    >
-      <rect x={PLOT.left} y={plotY(1)} width={PLOT.right - PLOT.left} height={plotY(0) - plotY(1)} className="mp-curve-box" />
-      {handles.map(([handle, x, y, anchorX, anchorY]) => (
-        <line key={`arm${handle}`} x1={plotX(anchorX)} y1={plotY(anchorY)} x2={plotX(x)} y2={plotY(y)} className="mp-curve-arm" />
+    <div className="mp-curve-editor" style={run}>
+      <svg
+        className="mp-curve"
+        viewBox="0 0 100 80"
+        role="group"
+        aria-label={label}
+        onPointerMove={fromPointer}
+        onPointerUp={() => {
+          dragging.current = null;
+        }}
+        onPointerCancel={() => {
+          dragging.current = null;
+        }}
+      >
+        {[0.25, 0.5, 0.75].map((x) => (
+          <line key={`gx${x}`} x1={plotX(x)} y1={PLOT.top} x2={plotX(x)} y2={PLOT.bottom} className="mp-curve-grid" />
+        ))}
+        {[-0.25, 0.25, 0.5, 0.75, 1.25].map((y) => (
+          <line key={`gy${y}`} x1={PLOT.left} y1={plotY(y)} x2={PLOT.right} y2={plotY(y)} className="mp-curve-grid" />
+        ))}
+        <rect x={PLOT.left} y={plotY(1)} width={PLOT.right - PLOT.left} height={plotY(0) - plotY(1)} className="mp-curve-box" />
+        {ghost && <polyline points={curvePoints(ghost, plotX, plotY)} className="mp-curve-ghost" />}
+        {handles.map(([handle, x, y, anchorX, anchorY]) => (
+          <line key={`arm${handle}`} x1={plotX(anchorX)} y1={plotY(anchorY)} x2={plotX(x)} y2={plotY(y)} className="mp-curve-arm" />
+        ))}
+        <polyline points={curvePoints(curve, plotX, plotY)} className="mp-curve-line" />
+        <g className="mp-curve-run-x">
+          <circle r={1.6} className="mp-curve-run-y" />
+        </g>
+        {handles.map(([handle, x, y]) => (
+          <g key={handle}>
+            <circle
+              cx={plotX(x)}
+              cy={plotY(y)}
+              r={7}
+              tabIndex={0}
+              role="slider"
+              aria-label={handle === 0 ? "Curve start handle" : "Curve end handle"}
+              aria-valuetext={`${x.toFixed(2)}, ${y.toFixed(2)}`}
+              aria-valuenow={Number(y.toFixed(2))}
+              aria-valuemin={PLOT.yMin}
+              aria-valuemax={PLOT.yMax}
+              className="mp-curve-hit"
+              onPointerDown={(event) => {
+                dragging.current = handle;
+                event.currentTarget.ownerSVGElement?.setPointerCapture(event.pointerId);
+              }}
+              onKeyDown={(event) => {
+                const step = { ArrowLeft: [-0.05, 0], ArrowRight: [0.05, 0], ArrowUp: [0, 0.05], ArrowDown: [0, -0.05] }[event.key];
+                if (!step) return;
+                event.preventDefault();
+                moveHandle(handle, x + step[0], y + step[1]);
+              }}
+            />
+            <circle cx={plotX(x)} cy={plotY(y)} r={2.6} className="mp-curve-handle" />
+          </g>
+        ))}
+      </svg>
+      <div className="mp-curve-track" aria-hidden="true">
+        <span />
+      </div>
+      <input
+        className="mp-curve-values"
+        type="text"
+        spellCheck={false}
+        aria-label={`${label}, as four numbers`}
+        title="Type or paste four numbers, or a CSS cubic-bezier()"
+        value={typed ?? curveText(curve)}
+        onFocus={(event) => {
+          setTyped(curveText(curve));
+          event.target.select();
+        }}
+        onChange={(event) => setTyped(event.target.value)}
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") event.currentTarget.blur();
+          if (event.key === "Escape") {
+            setTyped(null);
+            event.currentTarget.blur();
+          }
+        }}
+      />
+    </div>
+  );
+}
+
+/** The named curves, each drawn small on its button. */
+function EasingList({ curve, onChange }: { curve: Bezier; onChange: (curve: Bezier) => void }) {
+  return (
+    <div className="mp-easings">
+      {EASINGS.map((item) => (
+        <button key={item.name} type="button" aria-pressed={sameCurve(item.curve, curve)} onClick={() => onChange(item.curve)}>
+          <svg viewBox="0 0 24 16" aria-hidden="true">
+            <polyline points={curvePoints(item.curve, (x) => 2 + x * 20, (y) => 12 - y * 8)} />
+          </svg>
+          {item.name}
+        </button>
       ))}
-      <polyline points={points} className="mp-curve-line" />
-      {handles.map(([handle, x, y]) => (
-        <circle
-          key={handle}
-          cx={plotX(x)}
-          cy={plotY(y)}
-          r={4.5}
-          tabIndex={0}
-          role="slider"
-          aria-label={handle === 0 ? "Curve start handle" : "Curve end handle"}
-          aria-valuenow={Number(y.toFixed(2))}
-          aria-valuemin={PLOT.yMin}
-          aria-valuemax={PLOT.yMax}
-          className="mp-curve-handle"
-          onPointerDown={(event) => {
-            dragging.current = handle;
-            event.currentTarget.ownerSVGElement?.setPointerCapture(event.pointerId);
-          }}
-          onKeyDown={(event) => {
-            const step = { ArrowLeft: [-0.05, 0], ArrowRight: [0.05, 0], ArrowUp: [0, 0.05], ArrowDown: [0, -0.05] }[event.key];
-            if (!step) return;
-            event.preventDefault();
-            moveHandle(handle, x + step[0], y + step[1]);
-          }}
-        />
-      ))}
-    </svg>
+    </div>
   );
 }
 
@@ -628,6 +712,8 @@ export default function MotionTool() {
   // Switches the user has set. They hold across presets until reset.
   const [chosen, setChosen] = useState<Partial<Options>>({});
   const [easing, setEasing] = useState<Bezier>(BASE_EASING);
+  // A second curve for the card leaving focus; null while it follows the first.
+  const [easingOut, setEasingOut] = useState<Bezier | null>(null);
   const [path, setPath] = useState<number[]>(PRESETS[0].path ?? []);
   // Groups start folded, apart from the one holding the chosen preset.
   const [openGroups, setOpenGroups] = useState<ReadonlySet<string>>(() => new Set([groupOf(PRESETS[0])]));
@@ -657,7 +743,7 @@ export default function MotionTool() {
   const rendererRef = useRef<Renderer | null>(null);
   const mediaRef = useRef<MediaItem[]>([]);
   const placeholdersRef = useRef(true);
-  const sceneRef = useRef<Omit<Scene, "media">>({ preset, motion, options, easing, path, look });
+  const sceneRef = useRef<Omit<Scene, "media">>({ preset, motion, options, easing, easingOut: easingOut ?? undefined, path, look });
   const loopStartRef = useRef(0);
   const nextIdRef = useRef(0);
   /** True while an export records: the loop then draws at full size. */
@@ -690,13 +776,13 @@ export default function MotionTool() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const setupInputRef = useRef<HTMLInputElement>(null);
   const previewCanvases = useRef(new Map<string, HTMLCanvasElement>());
-  const flowRef = useRef({ adjustments, chosen, easing });
+  const flowRef = useRef({ adjustments, chosen, easing, easingOut });
 
   // The draw loop reads the latest settings without restarting.
   useEffect(() => {
-    sceneRef.current = { preset, motion, options, easing, path, look };
+    sceneRef.current = { preset, motion, options, easing, easingOut: easingOut ?? undefined, path, look };
     tagsRef.current = cardTags;
-    flowRef.current = { adjustments, chosen, easing };
+    flowRef.current = { adjustments, chosen, easing, easingOut };
   });
 
   // One small hidden WebGL canvas draws every preview in turn and copies each
@@ -731,6 +817,7 @@ export default function MotionTool() {
           motion: itemMotion,
           options: presetOptions(item, flow.chosen),
           easing: flow.easing,
+          easingOut: flow.easingOut ?? undefined,
           path: item.path ?? [],
           look: PREVIEW_LOOK,
           media: greys,
@@ -844,7 +931,7 @@ export default function MotionTool() {
 
   // A changed setting starts the loop again, once the slider has stopped moving:
   // restarting on every step of a drag would hold the preview on its first frame.
-  const settings = JSON.stringify([motion, options, easing, path, look.width, look.height, look.cardW, look.cardH]);
+  const settings = JSON.stringify([motion, options, easing, easingOut, path, look.width, look.height, look.cardW, look.cardH]);
   const firstSettings = useRef(true);
   useEffect(() => {
     if (firstSettings.current) {
@@ -942,11 +1029,12 @@ export default function MotionTool() {
     setAdjustments({});
     setChosen({});
     setEasing(BASE_EASING);
+    setEasingOut(null);
     setPath(preset.path ?? []);
   }
 
   function saveSetup() {
-    const setup: SavedSetup = { app: "motion-presets", version: 2, preset: preset.name, motion, options, easing, path, look };
+    const setup: SavedSetup = { app: "motion-presets", version: 2, preset: preset.name, motion, options, easing, ...(easingOut ? { easingOut } : {}), path, look };
     download(new Blob([JSON.stringify(setup, null, 2)], { type: "application/json" }), `${preset.name.toLowerCase().replace(" ", "-")}-setup.json`);
     setStatus("Setup saved. It holds the settings, not the media.");
   }
@@ -961,6 +1049,7 @@ export default function MotionTool() {
     setAdjustments(loaded);
     setChosen(parsed.options);
     setEasing(parsed.easing);
+    setEasingOut(parsed.easingOut ?? null);
     setLook(parsed.look);
     choosePreset(parsed.preset);
     setPath(parsed.path);
@@ -1157,7 +1246,7 @@ export default function MotionTool() {
     );
   };
   const stepped = ALWAYS_STEPPED.has(layout) || motion.rhythm > 0;
-  const tuned = Object.keys(adjustments).length > 0 || Object.keys(chosen).length > 0 || easing !== BASE_EASING;
+  const tuned = Object.keys(adjustments).length > 0 || Object.keys(chosen).length > 0 || easing !== BASE_EASING || easingOut !== null;
 
   return (
     <div
@@ -1404,16 +1493,43 @@ export default function MotionTool() {
         {HAS_LOOP_GAP.has(layout) && slider("loopGap")}
         <Choice label="Loop fade" value={options.loopFade} options={ON_OFF} onChange={(value) => setOption("loopFade", value)} />
 
-        {stepped && <Heading title="Easing" changed={easing !== BASE_EASING} onReset={() => setEasing(BASE_EASING)} />}
+        {stepped && (
+          <Heading
+            title="Easing"
+            changed={easing !== BASE_EASING || easingOut !== null}
+            onReset={() => {
+              setEasing(BASE_EASING);
+              setEasingOut(null);
+            }}
+          />
+        )}
         <div className="mp-easing" hidden={!stepped}>
-          <CurveEditor curve={easing} onChange={setEasing} />
-          <div className="mp-easings">
-            {EASINGS.map((item) => (
-              <button key={item.name} type="button" aria-pressed={item.curve.every((part, index) => part === easing[index])} onClick={() => setEasing(item.curve)}>
-                {item.name}
-              </button>
-            ))}
-          </div>
+          <CurveEditor curve={easing} onChange={setEasing} label={easingOut ? "Easing, coming into focus" : "Easing"} />
+          <EasingList curve={easing} onChange={setEasing} />
+          {hasExit(preset) && (
+            <details className="mp-exit">
+              <summary>
+                <h3>Leaving focus</h3>
+                <span>{easingOut ? "Own curve" : "Same curve"}</span>
+              </summary>
+              <p className="mp-note">The card leaving focus moves on this curve. Every other card keeps the one above.</p>
+              <Choice
+                label="Curve"
+                value={easingOut !== null}
+                options={[
+                  { value: false, label: "Same" },
+                  { value: true, label: "Own" },
+                ]}
+                onChange={(own) => setEasingOut(own ? (easingOut ?? easing) : null)}
+              />
+              {easingOut && (
+                <>
+                  <CurveEditor curve={easingOut} onChange={setEasingOut} label="Easing, leaving focus" ghost={easing} />
+                  <EasingList curve={easingOut} onChange={setEasingOut} />
+                </>
+              )}
+            </details>
+          )}
         </div>
 
         <Heading title="Camera" changed={changedAny(CAMERA_KEYS)} onReset={() => resetKeys(CAMERA_KEYS)} />
