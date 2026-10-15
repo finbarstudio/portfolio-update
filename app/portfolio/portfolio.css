@@ -199,9 +199,35 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-list a > :last-child { text-align: right; }
 .pf-list a:hover { text-decoration: none; }
 .pf-list a:hover .n { color: var(--pink); }
+/* list view on a desktop: hovering a row opens it a little and brings up the
+   project's thumbnail on the right */
+.pf-list a { position: relative; }
+.pf-list-thumb { display: none; }
+@media (hover: hover) and (min-width: 761px) {
+  .pf-list a { transition: padding 0.3s cubic-bezier(0.25, 0.6, 0.2, 1); }
+  .pf-list a:hover { padding-block: calc(var(--u) * 2.1); }
+  .pf-list-thumb {
+    display: block;
+    position: absolute;
+    right: 0; top: 50%;
+    height: calc(100% - var(--u) * 0.9);
+    aspect-ratio: 9 / 4;
+    width: auto;
+    object-fit: cover;
+    border-radius: calc(var(--u) * 0.3);
+    opacity: 0;
+    transform: translateY(-50%) scale(0.96);
+    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.25, 0.6, 0.2, 1);
+    pointer-events: none;
+  }
+  .pf-list a:hover .pf-list-thumb { opacity: 1; transform: translateY(-50%) scale(1); }
+  /* the discipline sits clear of the thumbnail */
+  .pf-list a > .pf-soft:nth-child(3) { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { .pf-list a, .pf-list-thumb { transition: none; } }
 
 /* the thumbnail view (components/portfolio/PfIndex.tsx): three across, each a
-   5:2 picture over its number, name and discipline. A switch in the header
+   9:4 picture over its number, name and discipline. A switch in the header
    row flips between this and the list; on a phone it is always the list */
 .pf-index[data-view="thumbs"] .pf-list,
 .pf-index[data-view="list"] .pf-thumbs { display: none; }
@@ -221,7 +247,7 @@ body:has(.pf) { background: #1a1a1a; }
 }
 .pf-thumbs a { display: block; }
 .pf-thumbs a:hover { text-decoration: none; }
-.pf-thumb-media { position: relative; display: block; aspect-ratio: 5 / 2; overflow: hidden; border-radius: calc(var(--u) * 0.4); background: var(--well, #161412); }
+.pf-thumb-media { position: relative; display: block; aspect-ratio: 9 / 4; overflow: hidden; border-radius: calc(var(--u) * 0.4); background: var(--well, #161412); }
 .pf-thumb-media > :is(img, video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* the black gradient at the foot of each picture, and the title on it */
 .pf-thumb-media::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.78)); pointer-events: none; }

@@ -6,7 +6,7 @@
  * list and back. On a phone it is always the list. The PDF prints the
  * thumbnails. Each entry links to its chapter's opening page.
  *
- * The thumbnails are 5:2 crops from each chapter's work, made by
+ * The thumbnails are 9:4 crops from each chapter's work, made by
  * scripts/portfolio-thumbs.mjs into public/media/images/portfolio/thumbs/.
  * Most of them move: a short loop of the chapter's own clip (<id>.webm, its
  * still as the poster), playing only while it is on screen; Plated with Issy
@@ -70,7 +70,7 @@ function Thumb({ id, name }: { id: string; name: string }) {
   const shown = print ? printed : src;
   return shown ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={shown} alt={name} width={1200} height={480} loading="lazy" decoding="async" />
+    <img src={shown} alt={name} width={1200} height={534} loading="lazy" decoding="async" />
   ) : null;
 }
 
@@ -112,6 +112,9 @@ export default function PfIndex({ chapters, page }: { chapters: IndexChapter[]; 
                 <span className="pf-mono pf-soft">{c.no}</span>
                 <span className="n">{c.name}</span>
                 <span className="pf-mono pf-soft">{c.sub}</span>
+                {/* on hover the row opens a little and its thumbnail shows on the right */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="pf-list-thumb" src={media(`/media/images/portfolio/thumbs/${c.id}.webp`)} alt="" width={1200} height={534} loading="lazy" decoding="async" />
               </a>
             </li>
           ))}
