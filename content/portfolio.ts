@@ -236,6 +236,7 @@ const RAW: Slide[] = [
     meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }, study("tmyr")],
   },
   one("tmyr/hero-poster.webp", "The reels on Instagram", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 4, h: 5 } }),
+  one("portfolio/tmyr/posts-ring.webm", "The feed posts, one for each moment in the campaign", { frame: false }),
   // Guy's post and its end card, on the post's own pink (as the browser draws it) so the square has no edge
   { kind: "media", items: [m("portfolio/tmyr/guy.webm", { frame: false })], caption: "A feed post and its end card", ground: "#e71988", ink: "#ffffff" },
 
