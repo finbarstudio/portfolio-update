@@ -1,4 +1,5 @@
 import {
+  Color,
   type Matrix4,
   type Mesh,
   type MeshStandardMaterial,
@@ -39,6 +40,12 @@ export interface MediaUniforms {
   uOpacity: Uniform<number>;
   /** 1 when uMap is a video, whose frames the shader must decode from sRGB itself. */
   uVideo: Uniform<number>;
+  /** Share of the screen's height the band across the top takes. 0 is no band; the media then fills the screen. */
+  uBar: Uniform<number>;
+  /** The band's colour, linear. */
+  uBarColor: Uniform<Color>;
+  /** 1 to take the band's colour from the top edge of the media instead. */
+  uBarAuto: Uniform<number>;
 }
 
 /** The screen's place and the strength of its bounce. Shared by every surface that reflects it. */
@@ -69,6 +76,9 @@ export function createBounceUniforms(): BounceUniforms {
     uOffset: new Uniform(new Vector2()),
     uOpacity: new Uniform(1),
     uVideo: new Uniform(0),
+    uBar: new Uniform(0),
+    uBarColor: new Uniform(new Color(1, 1, 1)),
+    uBarAuto: new Uniform(1),
     uBounceOrigin: new Uniform(new Vector3()),
     uBounceAcross: new Uniform(new Vector3(1, 0, 0)),
     uBounceDown: new Uniform(new Vector3(0, -1, 0)),
@@ -93,6 +103,9 @@ uniform float uScale;
 uniform vec2 uOffset;
 uniform float uOpacity;
 uniform float uVideo;
+uniform float uBar;
+uniform vec3 uBarColor;
+uniform float uBarAuto;
 
 // Video frames arrive sRGB encoded: three uploads them without an sRGB internal format and leaves the decoding to the
 // shader, where its own materials do it. Without this a video reads as linear light and gets gamma applied twice,
@@ -104,8 +117,10 @@ vec3 mediaSrgbToLinear(vec3 c) {
 }
 
 // The same picture read from a coarser level of the texture's mipmaps: a cheap blur. 0 is the full picture.
+// s spans the area the media fills: the whole screen, or the part below the band when there is one.
 vec3 mediaColorLod(vec2 s, float lod) {
-  float screenOverMedia = uScreenAspect / uMediaAspect;
+  float areaAspect = uScreenAspect / max(1.0 - uBar, 0.01);
+  float screenOverMedia = areaAspect / uMediaAspect;
   vec2 span = vec2(1.0);
   if (uFit < 0.5) {
     span = vec2(min(1.0, screenOverMedia), min(1.0, 1.0 / screenOverMedia));
@@ -113,6 +128,11 @@ vec3 mediaColorLod(vec2 s, float lod) {
     span = vec2(max(1.0, screenOverMedia), max(1.0, 1.0 / screenOverMedia));
   }
   vec2 m = 0.5 + (s - 0.5 - vec2(uOffset.x, -uOffset.y)) * span / uScale;
+  // Under a status bar the media hangs from the top, the way a page does in a phone's browser: its top meets the bar
+  // and anything that does not fit runs off the bottom, instead of being cropped evenly at both ends.
+  if (uBar > 0.0) {
+    m.y += 0.5 * span.y / uScale - 0.5;
+  }
   vec4 texel = textureLod(uMap, clamp(m, 0.0, 1.0), lod);
   if (uVideo > 0.5) {
     texel.rgb = mediaSrgbToLinear(texel.rgb);
@@ -125,10 +145,23 @@ vec3 mediaColor(vec2 s) {
   return mediaColorLod(s, 0.0);
 }
 
+// The band's colour: the one chosen, or the media's top edge averaged across, the way a phone's browser picks it.
+vec3 barColor() {
+  if (uBarAuto < 0.5) return uBarColor;
+  vec3 sum = vec3(0.0);
+  for (int i = 0; i < 5; i++) {
+    sum += mediaColorLod(vec2((float(i) + 0.5) / 5.0, 0.004), 3.0);
+  }
+  return sum / 5.0;
+}
+
 vec3 contentAtLod(vec2 s, float lod) {
   float onScreen = step(0.0, s.x) * step(s.x, 1.0) * step(0.0, s.y) * step(s.y, 1.0);
   // With nothing on it the panel is off: true black, like an OLED.
-  vec3 content = uHasMap > 0.5 ? mediaColorLod(s, lod) : vec3(0.0);
+  if (uHasMap < 0.5) return vec3(0.0);
+  vec3 content = s.y < uBar
+    ? barColor()
+    : mediaColorLod(vec2(s.x, (s.y - uBar) / max(1.0 - uBar, 0.01)), lod);
   return content * onScreen;
 }
 

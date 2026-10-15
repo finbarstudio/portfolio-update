@@ -13,6 +13,7 @@ import type { MediaFrame } from "./frames";
 
 import type { Hdri, HdriUse } from "./hdris";
 import type { AnimPath } from "./params";
+import type { StatusBar } from "./status-bar";
 
 export type Values = Record<AnimPath, number>;
 
@@ -168,4 +169,6 @@ export interface SceneDocument {
   shotBlend?: number;
   /** The window and backdrop the screen media is presented in. Absent in older files: no framing. */
   frame?: MediaFrame;
+  /** The coloured band across the top of the screen. Absent in older files: off. */
+  statusBar?: StatusBar;
 }

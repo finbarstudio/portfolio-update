@@ -6,6 +6,11 @@ import {
   getWallpaper,
   type MediaFrame,
 } from "@/lib/mockup-studio/scene/frames";
+import {
+  DEFAULT_STATUS_BAR,
+  MAX_STATUS_BAR,
+  type StatusBar,
+} from "@/lib/mockup-studio/scene/status-bar";
 /**
  * Validation for scene files. A .json picked from disk is untrusted input, so
  * everything is narrowed field by field and rebuilt; nothing from the file is
@@ -93,6 +98,24 @@ function readRecord(value: unknown, where: string): Record<string, unknown> {
 function readArray(value: unknown, where: string): unknown[] {
   if (!Array.isArray(value)) fail(where, "must be a list");
   return value;
+}
+
+/** The status bar is optional too: anything missing or odd falls back to the default for that field. */
+function readStatusBar(value: unknown): StatusBar {
+  if (typeof value !== "object" || value === null) return DEFAULT_STATUS_BAR;
+  const raw = value as Record<string, unknown>;
+  return {
+    on: raw.on === true,
+    height:
+      typeof raw.height === "number" && Number.isFinite(raw.height)
+        ? Math.min(MAX_STATUS_BAR, Math.max(0, raw.height))
+        : DEFAULT_STATUS_BAR.height,
+    auto: typeof raw.auto === "boolean" ? raw.auto : DEFAULT_STATUS_BAR.auto,
+    color:
+      typeof raw.color === "string" && /^#[0-9a-f]{6}$/i.test(raw.color)
+        ? raw.color
+        : DEFAULT_STATUS_BAR.color,
+  };
 }
 
 const FRAME_STYLE_VALUES = new Set(FRAME_STYLES.map((style) => style.value));
@@ -423,5 +446,6 @@ export function parseSceneDocument(input: unknown): SceneDocument {
         ? Math.min(MAX_SHOT_BLEND, Math.max(0, raw.shotBlend))
         : 0,
     frame: readFrame(raw.frame),
+    statusBar: readStatusBar(raw.statusBar),
   };
 }

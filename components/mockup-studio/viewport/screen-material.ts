@@ -7,6 +7,7 @@ import {
   Vector3,
 } from "three";
 import { lampPosition } from "@/lib/mockup-studio/scene/lamps";
+import { type StatusBar, statusBarFraction } from "@/lib/mockup-studio/scene/status-bar";
 import type { Light, Media, MediaFit, Values } from "@/lib/mockup-studio/scene/types";
 import { MEDIA_GLSL, type MediaUniforms } from "./screen-bounce";
 import { TONE_GLSL } from "./tone";
@@ -187,6 +188,9 @@ export function createScreenSurface(media: MediaUniforms): ScreenSurface {
     uOffset: media.uOffset,
     uOpacity: media.uOpacity,
     uVideo: media.uVideo,
+    uBar: media.uBar,
+    uBarColor: media.uBarColor,
+    uBarAuto: media.uBarAuto,
     uCrt: new Uniform(0),
     uGhosting: new Uniform(0),
     uDepth: new Uniform(0),
@@ -258,8 +262,13 @@ export function updateScreenSurface(
   lights: readonly Light[],
   /** An environment photo is lighting the scene, so the glass should mirror it too. */
   environment: boolean,
+  statusBar: StatusBar,
 ) {
   const { uniforms } = surface;
+  uniforms.uBar.value = statusBarFraction(statusBar);
+  uniforms.uBarAuto.value = statusBar.auto ? 1 : 0;
+  // Set as sRGB, stored linear: the shader works in linear light.
+  uniforms.uBarColor.value.set(statusBar.color);
   uniforms.uScreenAspect.value = screenAspect;
   uniforms.uFit.value = media ? FIT_INDEX[media.fit] : 0;
   uniforms.uScale.value = media ? Math.max(0.01, media.scale) : 1;

@@ -10,6 +10,7 @@ import { DEFAULT_FRAME, type MediaFrame } from "./frames";
 import type { ScreenBox } from "./framing";
 import { clampTyped } from "./limits";
 import { ANIM_PATHS, type AnimPath, PARAMS } from "./params";
+import { DEFAULT_STATUS_BAR, type StatusBar } from "./status-bar";
 import type {
   AspectPreset,
   Background,
@@ -168,6 +169,8 @@ export interface StudioState {
   shotBlend: number;
   /** The window and backdrop the screen media is presented in. */
   frame: MediaFrame;
+  /** The coloured band across the top of the screen, under the status bar. */
+  statusBar: StatusBar;
 
   // Session
   selectedLightId: string | null;
@@ -245,6 +248,7 @@ export interface StudioState {
   setSeamlessLoop(seamlessLoop: boolean): void;
   setShotBlend(ms: number): void;
   setFrame(patch: Partial<MediaFrame>): void;
+  setStatusBar(patch: Partial<StatusBar>): void;
   setRecording(recording: boolean): void;
   setProMode(proMode: boolean): void;
   setGuides(guides: boolean): void;
@@ -310,6 +314,7 @@ export const useStudio = create<StudioState>()((set, get) => {
     seamlessLoop: false,
     shotBlend: 0,
     frame: DEFAULT_FRAME,
+    statusBar: DEFAULT_STATUS_BAR,
     loop: true,
     recording: false,
     proMode: false,
@@ -608,6 +613,8 @@ export const useStudio = create<StudioState>()((set, get) => {
     setShotBlend: (ms) =>
       set({ shotBlend: Math.min(MAX_SHOT_BLEND, Math.max(0, ms)) }),
     setFrame: (patch) => set({ frame: { ...get().frame, ...patch } }),
+    setStatusBar: (patch) =>
+      set({ statusBar: { ...get().statusBar, ...patch } }),
     setRecording: (recording) => set({ recording }),
     setProMode: (proMode) => set({ proMode }),
     setGuides: (guides) => set({ guides }),
@@ -731,6 +738,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         seamlessLoop,
         shotBlend,
         frame,
+        statusBar,
       } = get();
       return {
         version: 1,
@@ -746,6 +754,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         seamlessLoop,
         shotBlend,
         frame,
+        statusBar,
       };
     },
 
@@ -764,6 +773,7 @@ export const useStudio = create<StudioState>()((set, get) => {
         seamlessLoop: doc.seamlessLoop === true,
         shotBlend: doc.shotBlend ?? 0,
         frame: { ...DEFAULT_FRAME, ...doc.frame },
+        statusBar: { ...DEFAULT_STATUS_BAR, ...doc.statusBar },
         selectedLightId: doc.lights[0]?.id ?? null,
         playhead: 0,
         playing: false,

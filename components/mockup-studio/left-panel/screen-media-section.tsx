@@ -19,6 +19,7 @@ import {
   WALLPAPERS,
   wallpaperCss,
 } from "@/lib/mockup-studio/scene/frames";
+import { DEFAULT_STATUS_BAR, MAX_STATUS_BAR } from "@/lib/mockup-studio/scene/status-bar";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import type { MediaFit } from "@/lib/mockup-studio/scene/types";
 import { clearMedia, setMediaFromFile } from "./media";
@@ -135,6 +136,64 @@ function FrameControls() {
         defaultValue={DEFAULT_FRAME.shadow}
         onChange={(shadow) => setFrame({ shadow })}
       />
+    </>
+  );
+}
+
+const BAR_COLOUR_OPTIONS: SegmentedOption<"auto" | "custom">[] = [
+  { value: "auto", label: "From media" },
+  { value: "custom", label: "Custom" },
+];
+
+/**
+ * The band a phone's browser paints across the top of the screen, behind the status bar and the Dynamic Island. Its
+ * height is set in the screen's own pixels, so it can be matched to a real device.
+ */
+function StatusBarControls({ screenHeight }: { screenHeight: number }) {
+  const bar = useStudio((s) => s.statusBar);
+  const setStatusBar = useStudio((s) => s.setStatusBar);
+  const toPixels = (percent: number) =>
+    Math.round((percent / 100) * screenHeight);
+  return (
+    <>
+      <Switch
+        label="Status bar"
+        checked={bar.on}
+        onChange={(on) => setStatusBar({ on })}
+      />
+      {bar.on ? (
+        <>
+          <Slider
+            label="Bar height"
+            value={toPixels(bar.height)}
+            min={0}
+            max={toPixels(MAX_STATUS_BAR)}
+            step={1}
+            unit="px"
+            defaultValue={toPixels(DEFAULT_STATUS_BAR.height)}
+            onChange={(px) =>
+              setStatusBar({ height: (px / screenHeight) * 100 })
+            }
+          />
+          <Segmented
+            label="Bar colour"
+            value={bar.auto ? "auto" : "custom"}
+            options={BAR_COLOUR_OPTIONS}
+            onChange={(choice) => setStatusBar({ auto: choice === "auto" })}
+          />
+          {bar.auto ? null : (
+            <ColourPicker
+              label="Bar colour"
+              value={bar.color}
+              onChange={(color) => setStatusBar({ color })}
+            />
+          )}
+          <p className="text-[11px] text-ms-ink-faint text-pretty">
+            The media sits below the bar, the way a page does in a phone&apos;s
+            browser. From media takes the colour along its top edge.
+          </p>
+        </>
+      ) : null}
     </>
   );
 }
@@ -359,6 +418,7 @@ export function ScreenMediaSection() {
           ) : (
             <FrameControls />
           )}
+          <StatusBarControls screenHeight={size[1]} />
         </div>
       ) : null}
     </Section>

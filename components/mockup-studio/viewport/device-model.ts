@@ -2,7 +2,7 @@ import {
   Box3,
   BufferAttribute,
   BufferGeometry,
-  type Color,
+  Color,
   Group,
   type Material,
   MathUtils,
@@ -11,6 +11,7 @@ import {
   MeshStandardMaterial,
   Object3D,
   Raycaster,
+  type Texture,
   Vector3,
 } from "three";
 import type { DeviceDef, ScreenPlane } from "@/lib/mockup-studio/scene/devices";
@@ -163,6 +164,13 @@ export function setLid(rig: LidRig, open: number): void {
 interface BodyMaterial {
   material: MeshStandardMaterial;
   original: Color;
+  /** The part's own colour texture, put back when the model's own finish is chosen. */
+  originalMap: Texture | null;
+  /**
+   * A grey copy of that texture, used while a finish is applied. The texture carries the finish the model was built
+   * in (a burgundy back, say), and the tint multiplies it, so without this the old colour shows through.
+   */
+  neutralMap: Texture | null;
   /** Brightness relative to the brightest body part, so darker trim stays darker under a tint. */
   weight: number;
 }
@@ -202,16 +210,78 @@ function collectBody(
     }
     object.material = clone;
   });
-  const materials = [...clones.values()];
-  const brightest = Math.max(
-    ...materials.map((material) => luminance(material.color)),
-    0.0001,
-  );
-  return materials.map((material) => ({
+  const parts = [...clones.values()].map((material) => {
+    const read = material.map ? readMap(material.map) : null;
+    // The colour as the part really shows: its own colour times the average of its texture.
+    const shown = material.color.clone();
+    if (read) shown.multiply(read.average);
+    return { material, read, brightness: Math.max(shown.r, shown.g, shown.b) };
+  });
+  // Brightness is the strongest channel rather than luminance, which would rank a deep red far darker than a grey
+  // of the same depth and so break up a coloured finish under a tint.
+  const brightest = Math.max(...parts.map((part) => part.brightness), 0.0001);
+  return parts.map(({ material, read, brightness }) => ({
     material,
     original: material.color.clone(),
-    weight: Math.max(0.4, luminance(material.color) / brightest),
+    originalMap: material.map,
+    neutralMap: read?.neutral ?? null,
+    weight: Math.max(0.4, brightness / brightest),
   }));
+}
+
+type PixelSource = CanvasImageSource & { width: number; height: number };
+
+function srgbToLinear(c: number): number {
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
+/**
+ * A colour texture's average (linear) and its detail without its colour: each pixel's brightness, scaled so the
+ * brightest is white. Grain, gradients and printing survive; the hue the model was painted in does not. Null when
+ * the texture has no readable image.
+ */
+function readMap(map: Texture): { average: Color; neutral: Texture } | null {
+  const image = map.image as PixelSource | undefined;
+  if (!image?.width || !image.height) return null;
+  const canvas = document.createElement("canvas");
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return null;
+  // Drawn as decoded, so the copy keeps the original's orientation and the clone's flipY still applies.
+  ctx.drawImage(image, 0, 0);
+  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = pixels.data;
+  const count = data.length / 4;
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  let brightest = 1;
+  for (let i = 0; i < data.length; i += 4) {
+    r += srgbToLinear(data[i] / 255);
+    g += srgbToLinear(data[i + 1] / 255);
+    b += srgbToLinear(data[i + 2] / 255);
+    brightest = Math.max(
+      brightest,
+      0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2],
+    );
+  }
+  const scale = 255 / brightest;
+  for (let i = 0; i < data.length; i += 4) {
+    const grey =
+      (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) * scale;
+    data[i] = grey;
+    data[i + 1] = grey;
+    data[i + 2] = grey;
+  }
+  ctx.putImageData(pixels, 0, 0);
+  const neutral = map.clone();
+  neutral.image = canvas;
+  neutral.needsUpdate = true;
+  return {
+    average: new Color(r / count, g / count, b / count),
+    neutral,
+  };
 }
 
 /** Tint the body, or restore the model's own colours with `null`. */
@@ -220,8 +290,13 @@ export function applyBodyColor(
   color: string | null,
 ): void {
   for (const part of prepared.body) {
-    if (color) part.material.color.set(color).multiplyScalar(part.weight);
-    else part.material.color.copy(part.original);
+    if (color) {
+      part.material.map = part.neutralMap ?? part.originalMap;
+      part.material.color.set(color).multiplyScalar(part.weight);
+    } else {
+      part.material.map = part.originalMap;
+      part.material.color.copy(part.original);
+    }
   }
 }
 
@@ -596,6 +671,7 @@ export function prepareDevice(
 export function disposeDevice(prepared: PreparedDevice): void {
   for (const geometry of prepared.ownedGeometries) geometry.dispose();
   for (const material of prepared.ownedMaterials) material.dispose();
+  for (const part of prepared.body) part.neutralMap?.dispose();
   prepared.screen?.material.dispose();
   prepared.screen?.glass.dispose();
   for (const part of prepared.body) part.material.dispose();

@@ -16,6 +16,7 @@ const TRACKED = [
   "seamlessLoop",
   "shotBlend",
   "frame",
+  "statusBar",
 ] as const satisfies readonly (keyof StudioState)[];
 
 type Snapshot = Pick<StudioState, (typeof TRACKED)[number]>;

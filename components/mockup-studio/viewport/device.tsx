@@ -17,6 +17,7 @@ import { media } from "@/lib/media";
 import { type DeviceDef, getDevice } from "@/lib/mockup-studio/scene/devices";
 import { drawFramed } from "@/lib/mockup-studio/scene/frames";
 import { OPEN_SOUND, SILENCE, speakerShape } from "@/lib/mockup-studio/scene/sound";
+import { statusBarFraction } from "@/lib/mockup-studio/scene/status-bar";
 import { useStudio } from "@/lib/mockup-studio/scene/store";
 import {
   applyBodyColor,
@@ -79,9 +80,11 @@ interface ScreenSource {
 /** Longest side of the canvas a framed screen is composed on. */
 const FRAME_LONG_EDGE = 2048;
 
-/** Pixel size of the canvas for a framed screen: the screen's own shape, capped so video can be redrawn every frame. */
-function frameCanvasSize(def: DeviceDef): [number, number] {
-  const aspect = def.screenAspect;
+/**
+ * Pixel size of the canvas for a framed screen: the shape of the area the media fills (the screen, less the status
+ * bar), capped so video can be redrawn every frame.
+ */
+function frameCanvasSize(aspect: number): [number, number] {
   return aspect >= 1
     ? [FRAME_LONG_EDGE, Math.round(FRAME_LONG_EDGE / aspect)]
     : [Math.round(FRAME_LONG_EDGE * aspect), FRAME_LONG_EDGE];
@@ -99,6 +102,7 @@ function useScreenMedia(
   const mediaUrl = useStudio((s) => s.media?.url ?? null);
   const mediaKind = useStudio((s) => s.media?.kind ?? null);
   const frame = useStudio((s) => s.frame);
+  const bar = useStudio((s) => statusBarFraction(s.statusBar));
   const gl = useThree((s) => s.gl);
   const [source, setSource] = useState<ScreenSource | null>(null);
 
@@ -201,7 +205,8 @@ function useScreenMedia(
       return clear;
     }
 
-    const [width, height] = frameCanvasSize(def);
+    const areaAspect = def.screenAspect / (1 - bar);
+    const [width, height] = frameCanvasSize(areaAspect);
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
@@ -232,8 +237,8 @@ function useScreenMedia(
       texture.needsUpdate = true;
     };
     draw();
-    // The composed picture is exactly the screen's shape, so it goes on edge to edge.
-    uniforms.uMediaAspect.value = def.screenAspect;
+    // The composed picture is exactly the shape it fills, so it goes on edge to edge.
+    uniforms.uMediaAspect.value = areaAspect;
     uniforms.uMap.value = texture;
     uniforms.uHasMap.value = 1;
     uniforms.uVideo.value = 0;
@@ -243,7 +248,7 @@ function useScreenMedia(
       texture.dispose();
       clear();
     };
-  }, [screen, source, frame, def, gl, runtime]);
+  }, [screen, source, frame, bar, def, gl, runtime]);
 }
 
 /** How a picture already composed to the screen's shape is placed on it. */
@@ -324,7 +329,7 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
     runtime.bounce.uBounceWash.value = (v["screen.spill"] / 100) * SPILL_MAX;
 
     if (screen) {
-      const { media, lights, background } = useStudio.getState();
+      const { media, lights, background, statusBar } = useStudio.getState();
       updateScreenSurface(
         screen,
         runtime.values,
@@ -335,6 +340,7 @@ function DeviceModel({ def, runtime }: DeviceModelProps) {
         !background.transparent &&
           background.hdriUse !== "backdrop" &&
           (background.hdriFile !== null || background.hdri !== null),
+        statusBar,
       );
     }
   }, -5);
