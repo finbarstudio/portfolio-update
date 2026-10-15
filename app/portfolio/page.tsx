@@ -3,6 +3,7 @@ import PfPhones from "@/components/portfolio/PfPhones";
 import PfGlobe from "@/components/portfolio/PfGlobe";
 import PfCars from "@/components/portfolio/PfCars";
 import PfDeck from "@/components/portfolio/PfDeck";
+import { MdArrowOutward } from "@/components/MaterialIcon";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 import { PORTFOLIO, CV, UPDATED, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
 import "./portfolio.css";
@@ -17,7 +18,7 @@ import "./portfolio.css";
  * (components/portfolio/PfMedia.tsx).
  */
 
-type Chapter = { no: string; name: string; sub: string; year: string; id: string };
+type Chapter = { no: string; name: string; sub: string; id: string };
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
 function Mark() {
@@ -117,14 +118,10 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
           <div className="pf-pad">
             <div className="pf-head pf-mono">
               <span>Portfolio</span>
-              <span>Selected works<br /><span className="pf-soft">2022–2026</span></span>
+              <span>Selected works</span>
               <span>Graphic and digital designer<br /><span className="pf-soft">London</span></span>
               <span><a href={`mailto:${CV.email}`}>{CV.email}</a><br /><span className="pf-soft">Updated {UPDATED.long}</span></span>
             </div>
-            {/* where it is best seen, and that phones get lighter files (content/portfolio.ts: forPhones) */}
-            <p className="pf-phone-note">
-              Best seen on a desktop on wifi. On a phone, this portfolio loads lighter versions of the videos and images so it is kind to mobile data.
-            </p>
             <h1 className="pf-poster" aria-label="Finbar Skitini">
               <Kerned text="Finbar" />
               <br />
@@ -182,6 +179,10 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <a href="/cv">Résumé (PDF) ↓</a>
               {PORTFOLIO_PDF ? <a href="/portfolio.pdf">Portfolio (PDF) ↓</a> : null}
               <span className="pf-soft">Updated {UPDATED.short}</span>
+              {/* where it is best seen, and that phones get lighter files (content/portfolio.ts: forPhones) */}
+              <p className="pf-phone-note">
+                <span>Best seen on a desktop on wifi. On a phone, this portfolio loads lighter versions of the videos and images so it is kind to mobile data.</span>
+              </p>
             </div>
           </div>
         </section>
@@ -203,7 +204,6 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
                     <span className="pf-mono pf-soft">{c.no}</span>
                     <span className="n">{c.name}</span>
                     <span className="pf-mono pf-soft">{c.sub}</span>
-                    <span className="pf-mono pf-soft">{c.year}</span>
                   </a>
                 </li>
               ))}
@@ -240,7 +240,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <span>{chap?.no}</span>
               <span />
               <span />
-              <span>{s.year}</span>
+              <span />
             </div>
             <h2 className="pf-display" style={s.kind === "section" ? { maxWidth: "11em" } : undefined}>
               {name}
@@ -268,7 +268,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
                 <p key={m.label} className="pf-mono pf-soft">
                   {m.label}
                   {m.href ? (
-                    <a className="v" href={m.href} target="_blank" rel="noopener noreferrer">{m.value}</a>
+                    <a className="v" href={m.href} target="_blank" rel="noopener noreferrer">{m.value}<MdArrowOutward className="pf-arrow" /></a>
                   ) : (
                     <span className="v">{m.value}</span>
                   )}
@@ -325,7 +325,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <span>{s.caption}</span>
               {s.link ? (
                 <a className="pf-caption-link" href={s.link.href} target="_blank" rel="noopener noreferrer">
-                  {s.link.label} ↗
+                  {s.link.label}<MdArrowOutward className="pf-arrow" />
                 </a>
               ) : null}
             </p>
@@ -424,8 +424,8 @@ export default function PortfolioPage() {
   const total = PORTFOLIO.length;
   const chapters: Chapter[] = [];
   for (const s of PORTFOLIO) {
-    if (s.kind === "title") chapters.push({ no: pad2(chapters.length + 1), name: s.name, sub: s.category, year: s.year, id: s.id });
-    if (s.kind === "section") chapters.push({ no: pad2(chapters.length + 1), name: s.title, sub: s.subtitle, year: s.year, id: "other" });
+    if (s.kind === "title") chapters.push({ no: pad2(chapters.length + 1), name: s.name, sub: s.category, id: s.id });
+    if (s.kind === "section") chapters.push({ no: pad2(chapters.length + 1), name: s.title, sub: s.subtitle, id: "other" });
   }
   let n = -1;
   return (

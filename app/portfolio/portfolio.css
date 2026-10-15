@@ -146,17 +146,6 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-mark svg { width: 100%; height: 100%; display: block; }
 
 .pf-cover .pf-pad { z-index: 1; }
-/* the note on the cover: best on a desktop on wifi, lighter files on a phone.
-   It sits under the header line; the name keeps its place at the foot. */
-.pf-cover .pf-poster { margin-top: auto; }
-.pf-phone-note {
-  margin-top: calc(var(--u) * 2.6);
-  max-width: 34em;
-  font-size: max(calc(var(--u) * 0.95), 12px);
-  line-height: 1.45;
-  color: var(--soft);
-  text-wrap: pretty;
-}
 .pf-cover .pf-poster { font-size: calc(var(--u) * 11); }
 
 /* ── the list of projects ───────────────────────────────────────── */
@@ -190,12 +179,19 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-cv-item .in { display: block; color: var(--soft); }
 .pf-part { display: inline-block; white-space: nowrap; margin-right: 0.28em; }
 .pf-cv-contact { display: grid; grid-template-columns: auto 1fr; column-gap: 0.8em; }
-.pf-cv-foot { display: flex; gap: calc(var(--u) * 3); }
+.pf-cv-foot { display: flex; align-items: baseline; gap: calc(var(--u) * 3); width: 100%; }
+/* the note at the foot of the About page, in the captions' type: best on a
+   desktop on wifi, lighter files on a phone */
+.pf-cv-foot .pf-phone-note { margin-left: auto; max-width: 46em; line-height: 1.5; color: var(--soft); text-align: right; text-wrap: pretty; }
+.pf-phone-note span { text-transform: none; letter-spacing: var(--tr-copy); }
 
 /* ── chapter pages ──────────────────────────────────────────────── */
 .pf-title .pf-pad, .pf-text .pf-pad { justify-content: space-between; }
 .pf-text-body { margin-top: calc(var(--u) * 3.6); flex: 1; }
-.pf-meta { row-gap: calc(var(--u) * 0.4); }
+/* a project's links (live site, case study), together at the bottom right */
+.pf-meta { display: flex; justify-content: flex-end; flex-wrap: wrap; column-gap: calc(var(--u) * 3.2); row-gap: calc(var(--u) * 0.4); }
+/* the outward arrow on a link: an icon, as a text arrow turns into an emoji on an iPhone */
+.pf-arrow { display: inline-block; width: 0.9em; height: 0.9em; margin-left: 0.25em; vertical-align: -0.08em; }
 .pf-meta .v { display: block; color: var(--ink); text-transform: none; letter-spacing: var(--tr-copy); font-family: var(--font-host), "Host Grotesk", sans-serif; font-weight: 500; font-size: max(calc(var(--u) * 0.95), 12px); margin-top: 0.3em; }
 .pf-quote .pf-body { font-size: calc(var(--u) * 3); max-width: 22em; letter-spacing: var(--tr-quote); }
 .pf-quote .q { color: var(--pink); }
@@ -284,6 +280,8 @@ body:has(.pf) { background: #1a1a1a; }
   cursor: pointer;
   z-index: 2;
 }
+.pf-sound { display: inline-flex; align-items: center; gap: 0.5em; }
+.pf-sound-icon { display: inline-flex; }
 .pf-sound[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .pf-sound:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
 /* shown only when the browser would not start a clip on its own (iOS Low
@@ -451,7 +449,8 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-list .n { font-size: 19px; }
   .pf-list { margin-top: 28px; }
   .pf-cover .pf-poster { font-size: 17vw; }
-  .pf-phone-note { margin-top: 22px; max-width: 30em; font-size: 14px; }
+  .pf-cv-foot .pf-phone-note { flex-basis: 100%; margin: 26px 0 0; text-align: left; }
+  .pf-meta { display: flex; }
   .pf-cv-bio { grid-column: 1 / -1; grid-row: auto; font-size: 16px; }
   /* about: even out the short broken lines, and give the résumé line room */
   .pf-cv-bio p { text-wrap: pretty; }
@@ -477,16 +476,26 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-deck-strip { order: 3; width: 100%; display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
   .pf-deck-strip button { width: 100%; }
   .pf-deck-bar > button { font-size: 22px; min-width: 44px; min-height: 44px; }
-  .pf-media .pf-caption { position: static; padding: 0 14px 16px; }
-  /* full bleed on a phone: the picture runs edge to edge across the page,
-     between the running line above it and the caption below, in the page's
-     own colours (nothing sits over the picture here) */
+  /* no captions on a phone, only a caption's link, if it has one */
+  .pf-media .pf-caption { position: static; padding: 0 14px 16px; text-align: right; }
+  .pf-caption > :not(.pf-caption-link), .pf-caption:not(:has(.pf-caption-link)) { display: none; }
+  .pf-caption-link { margin-left: 0; }
+  /* full bleed on a phone: the picture fills the page edge to edge, top to
+     bottom, at its own proportions, and the running line sits over it in the
+     page's own colour (--bleed-ink), as on a desktop */
+  .pf-media.is-bleed .pf-run { position: absolute; top: 0; left: 0; right: 0; padding: 14px 14px 0; }
+  .pf-media.is-bleed .pf-run .pf-soft { color: var(--bleed-ink, #f3f1ee); }
   .pf-media.is-bleed .pf-row { padding: 0; }
+  /* a page on its own colour (TMYR) runs its piece to the page's sides too */
+  .pf-media.has-ink .pf-row { padding-left: 0; padding-right: 0; }
   .pf-media.is-bleed .pf-item { aspect-ratio: var(--r) !important; }
   .pf-media.is-bleed .pf-item.has-phone { aspect-ratio: var(--r-phone) !important; }
-  .pf-media.is-bleed .pf-run, .pf-media.is-bleed .pf-caption { color: var(--ink); }
-  .pf-media.is-bleed .pf-run .pf-soft, .pf-media.is-bleed .pf-caption-link { color: var(--soft); }
-  .pf-media.is-bleed .pf-caption { padding-top: 14px; }
+  /* the sound switch: just the icon, small */
+  .pf-sound { right: 4px; bottom: 4px; width: 44px; height: 44px; min-height: 0; padding: 0; justify-content: center; border: 0; background: none; color: var(--ink); }
+  .pf-sound-word { display: none; }
+  .pf-sound-icon { width: 30px; height: 30px; place-items: center; justify-content: center; align-items: center; border-radius: 999px; background: var(--paper); box-shadow: 0 0 0 1px var(--soft); }
+  .pf-sound[aria-pressed="true"] { background: none; color: var(--paper); }
+  .pf-sound[aria-pressed="true"] .pf-sound-icon { background: var(--ink); box-shadow: none; }
   /* the covers sheet: three across, as many rows as it takes */
   .pf-covers { position: static; --g: 8px; padding: 12px 14px 14px; }
   .pf-media .pf-covers .pf-item { width: calc((100% - 16px) / 3); }
@@ -557,6 +566,12 @@ html[data-pf-theme="light"] .pf-chrome {
 .pf-globe { position: absolute; inset: 0; background: #3e3c2a; cursor: grab; touch-action: pan-y; user-select: none; }
 .pf-globe[data-grabbing="1"] { cursor: grabbing; }
 .pf-globe canvas { display: block; }
+/* on a phone, a small swipe icon says it can be spun (gone once it has been) */
+.pf-globe-hint { display: none; }
+@media (max-width: 760px) {
+  .pf-globe-hint { display: flex; position: absolute; right: 12px; bottom: 12px; width: 34px; height: 34px; align-items: center; justify-content: center; border-radius: 999px; color: #fae3b1; box-shadow: 0 0 0 1px rgba(250, 227, 177, 0.5); pointer-events: none; transition: opacity 0.4s ease; }
+  .pf-globe-hint[data-gone="1"] { opacity: 0; }
+}
 /* The Moment You Realise phones (components/portfolio/PfPhones.tsx): the live 3D carousel fills its page */
 .pf-phones { position: absolute; inset: 0; }
 /* on a desktop its frame runs to the page's left and right edges at the usual

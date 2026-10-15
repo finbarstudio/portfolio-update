@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { corsMedia } from "@/lib/media";
+import { MdVolumeOff, MdVolumeUp } from "@/components/MaterialIcon";
 
 /**
  * One image or clip on /portfolio, loaded in full as soon as the page opens,
@@ -171,10 +172,12 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
     const v = clip.current;
     if (!v || !url) return;
     begun.current = false;
+    let seen = false;
     let wait: ReturnType<typeof setTimeout> | undefined;
     const io = new IntersectionObserver(
       ([entry]) => {
         clearTimeout(wait);
+        seen = entry.isIntersecting;
         if (entry.isIntersecting) {
           if (begun.current) start(v);
           else
@@ -190,9 +193,19 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
       { threshold: 0.2 },
     );
     io.observe(v);
+    // Leaving the browser (switching apps on a phone) pauses every clip, and
+    // coming back does not count as scrolling, so the observer above never
+    // hears of it: start the clip again if it is still on screen.
+    const back = () => {
+      if (document.visibilityState === "visible" && seen && begun.current) start(v);
+    };
+    document.addEventListener("visibilitychange", back);
+    window.addEventListener("pageshow", back);
     return () => {
       clearTimeout(wait);
       io.disconnect();
+      document.removeEventListener("visibilitychange", back);
+      window.removeEventListener("pageshow", back);
     };
   }, [url]);
 
@@ -207,8 +220,10 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
             </button>
           ) : null}
           {sound && shown ? (
-            <button type="button" className="pf-sound pf-mono" aria-pressed={loud} onClick={() => setLoud(!loud)}>
-              {loud ? "Sound on" : "Sound off"}
+            <button type="button" className="pf-sound pf-mono" aria-pressed={loud} aria-label={loud ? "Sound on" : "Sound off"} onClick={() => setLoud(!loud)}>
+              {/* the words on a desktop; on a phone only the icon shows */}
+              <span className="pf-sound-icon">{loud ? <MdVolumeUp size={16} /> : <MdVolumeOff size={16} />}</span>
+              <span className="pf-sound-word">{loud ? "Sound on" : "Sound off"}</span>
             </button>
           ) : null}
         </>

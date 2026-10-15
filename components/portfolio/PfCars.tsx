@@ -31,6 +31,10 @@ const WIDE: Grid = { cols: 12, rows: 19, grow: 5 };
 const PHONE: Grid = { cols: 4, rows: 12, grow: 1 };
 const CELL = 2.9; // a cell's width over its height, the same on both (the frame in portfolio.css is cut to it)
 const CARS = sheet.cars;
+// the phone's sample leaves out the SUVs (and the raised Taycan wagon): a short
+// grid reads better as a wall of low cars
+const SUV = /cayenne|macan|bentayga|urus|purosangue|stelvio|levante|rsq8|sq7|sq8|x5m|x6m|range-rover|rrs|velar|evoque|g-class|f-pace|touareg|model-y|cross-turismo/;
+const LOW = CARS.flatMap((car, n) => (SUV.test(car.slug) ? [] : [n]));
 const SPRITE = "/media/images/portfolio/rennen-plus/cars-sprite.webp";
 
 /** The open car, its own cell, and the top left cell of the block it fills. */
@@ -72,7 +76,7 @@ export default function PfCars() {
   const { cols: COLS, rows: ROWS, grow: GROW } = grid;
   // which cars are shown: all of them, or an even sample on a phone
   const count = COLS * ROWS;
-  const shown = Array.from({ length: count }, (_, k) => Math.floor((k * CARS.length) / count));
+  const shown = phone ? Array.from({ length: count }, (_, k) => LOW[Math.floor((k * LOW.length) / count)]) : Array.from({ length: count }, (_, k) => k);
 
   const point = (e: React.PointerEvent<HTMLDivElement>) => {
     const b = box.current?.getBoundingClientRect();

@@ -3,7 +3,7 @@
  *
  * Page kinds (drawn by app/portfolio/page.tsx):
  *   title    chapter opener: name, discipline, year
- *   text     the project paragraph + team / year
+ *   text     the project paragraph + its links (live site, case study)
  *   quote    a verbatim client line (shorten with … only, never reword)
  *   index    the list of projects, after the about page
  *   media    one to four images or clips in a row
@@ -151,9 +151,8 @@ const grid = (cols: number, rows: number, tiles: [string, number, number, number
   caption,
 });
 
-const ME = { label: "Team members", value: "Finbar Skitini" };
 /** The small link on a project's intro card to its full case study on the studio site. */
-const study = (slug: string): Meta => ({ label: "Case study", value: "Read it ↗", href: `https://www.finbar.studio/case-studies/${slug}` });
+const study = (slug: string): Meta => ({ label: "Case study", value: "Read it", href: `https://www.finbar.studio/case-studies/${slug}` });
 
 const RAW: Slide[] = [
   { kind: "cover" },
@@ -168,7 +167,7 @@ const RAW: Slide[] = [
     category: "Logo and Website",
     body:
       "Lola Stoodley is a composer and sound designer, so her site plays like her work. Faders mix the music as you move them, scrolling back rewinds the track, and her name draws itself in pen. Each showreel opens in a full-screen player you can scrub frame by frame.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
+    meta: [{ label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
   },
   one("portfolio/lola-audio/brand.webm", "The brand: her mark, the site and the stills it sits on", { frame: false }),
   linked("portfolio/lola-audio/pages.webm", "The site page by page: the opening sheet, a showreel in the full-screen player, her bio and the work", { label: "lola-audio.com", href: "https://www.lola-audio.com" }),
@@ -182,7 +181,7 @@ const RAW: Slide[] = [
     category: "Website",
     body:
       "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
-    meta: [ME, { label: "Year", value: "2026" }, { label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
+    meta: [{ label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
   },
   linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
   one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
@@ -196,7 +195,7 @@ const RAW: Slide[] = [
     category: "Brand and Website",
     body:
       "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
-    meta: [ME, { label: "Year", value: "2023–2026" }, { label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, study("lows-design-build")],
+    meta: [{ label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, study("lows-design-build")],
   },
   one("portfolio/lows/logo-zoom.mp4", "The brand", { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
   linked("portfolio/lows/macbook.webm", "The website", { label: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }),
@@ -217,11 +216,11 @@ const RAW: Slide[] = [
     category: "Brand and Website",
     body:
       "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
-    meta: [ME, { label: "Year", value: "2026" }, study("plated-with-issy")],
+    meta: [study("plated-with-issy")],
   },
   // cream type on the olive; the wordmark sits centred, about a third of the way up, just under the main photograph and catching its edge
   bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 20.9, alt: "Plated with Issy" } }, "#FAE3B1"),
-  bleed("portfolio/plated-with-issy/website-phone.webm", undefined, { mobile: phone("portfolio/plated-with-issy/website-phone-mobile.webm") }, "#3e3c2a"),
+  bleed("portfolio/plated-with-issy/website-phone.webm", undefined, {}, "#3e3c2a"),
   // the globe of polaroids, live: 16:9 on a desktop, square on a phone
   bleed("portfolio/plated-with-issy/polaroids/the-venue.webp", "Every polaroid from the supper club. Drag to spin it", { globe: true, w: 16, h: 9, mobile: { ...phone("portfolio/plated-with-issy/polaroids/the-venue.webp")!, w: 1, h: 1 } }, "#FAE3B1"),
 
@@ -233,9 +232,9 @@ const RAW: Slide[] = [
     category: "Social Campaign for Share to Buy",
     body:
       "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
-    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2022–2023" }, study("tmyr")],
+    meta: [study("tmyr")],
   },
-  { kind: "media", items: [m("tmyr/hero-poster.webp", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 4, h: 5 } })], caption: "The reels on Instagram", ground: "#e71988", ink: "#ffffff" },
+  { kind: "media", items: [m("tmyr/hero-poster.webp", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 4, h: 5 } })], caption: "The reels on Instagram", ground: "#ae125f", ink: "#ffffff" },
   // the ring of posts sits on its own deep pink; the page takes that pink (as the browser draws it) so it has no edge
   { kind: "media", items: [m("portfolio/tmyr/posts-ring.webm", { frame: false })], caption: "The feed posts, one for each moment in the campaign", ground: "#ae125f", ink: "#ffffff" },
   // Guy's post and its end card, on the post's own pink (as the browser draws it) so the square has no edge
@@ -249,7 +248,7 @@ const RAW: Slide[] = [
     category: "Information Design",
     body:
       "TasWater runs water and sewerage for the whole of Tasmania. I designed two large graphics for them in a month, made to sit inside their interactive eLearning software: one of the whole water network, one of a new starter’s first year. Both are strictly on brand and were signed off by their leadership.",
-    meta: [ME, { label: "Studio", value: "Packer and Associates" }, { label: "Year", value: "2024" }, study("taswater")],
+    meta: [{ label: "Studio", value: "Packer and Associates" }, study("taswater")],
   },
   bleed("portfolio/taswater/map-mockup.webp", "The network graphic for the eLearning: water from intake and treatment to the tap, then back through sewage and wastewater", { mobile: phone("portfolio/taswater/map-mockup-mobile.webp") }),
   bleed("portfolio/taswater/snake-mockup.webp", "The onboarding graphic for the eLearning: a new starter’s first twelve months, from day one to month twelve", { mobile: phone("portfolio/taswater/snake-mockup-mobile.webp") }),
@@ -262,7 +261,7 @@ const RAW: Slide[] = [
     category: "Event",
     body:
       "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
-    meta: [{ label: "Team members", value: "Share to Buy marketing team" }, { label: "Year", value: "2023" }, study("london-home-show")],
+    meta: [study("london-home-show")],
   },
   one("portfolio/london-home-show/event-deck.webm", "The London Home Show on the day: flags, wayfinding, ticketing and the brochure", { frame: false, mobile: phone("portfolio/london-home-show/event-deck-mobile.webm") }),
 

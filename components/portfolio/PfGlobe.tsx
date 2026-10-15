@@ -23,6 +23,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { corsMedia, media } from "@/lib/media";
+import { MdSwipe } from "@/components/MaterialIcon";
 
 const DIR = "/media/images/portfolio/plated-with-issy/polaroids";
 const NAMES = [
@@ -146,6 +147,7 @@ export default function PfGlobe() {
   const drag = useRef({ vx: SPIN, down: false });
   const last = useRef({ x: 0, t: 0 });
   const [grabbing, setGrabbing] = useState(false);
+  const [spun, setSpun] = useState(false); // once it has been grabbed, the swipe hint goes
 
   useEffect(() => {
     const el = box.current;
@@ -168,6 +170,7 @@ export default function PfGlobe() {
       e.currentTarget.setPointerCapture(e.pointerId); // keep the drag when the pointer leaves the frame
     } catch {}
     setGrabbing(true);
+    setSpun(true);
   };
   const onMove = (e: React.PointerEvent) => {
     const g = drag.current;
@@ -207,6 +210,9 @@ export default function PfGlobe() {
           <Globe drag={drag} />
         </Canvas>
       ) : null}
+      <span className="pf-globe-hint" data-gone={spun ? "1" : "0"} aria-hidden="true">
+        <MdSwipe size={20} />
+      </span>
     </div>
   );
 }
