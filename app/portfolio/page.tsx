@@ -300,7 +300,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
       const down = lines.length;
       const h = `min(calc((var(--H) - ${down - 1} * var(--G)) / ${down}), calc((var(--W) - ${n - 1} * var(--G)) / ${ratio.toFixed(4)}))`;
       return (
-        <section className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}`}>
+        <section className={`pf-slide pf-media${n === 4 ? " is-4" : ""}${s.bleed ? " is-bleed" : ""}`} style={s.ink ? ({ "--bleed-ink": s.ink } as React.CSSProperties) : undefined}>
           <Run chap={chap} page={page} />
           <div className={`pf-row${s.per ? " is-stack" : ""}`} style={{ "--h": h } as React.CSSProperties}>
             {s.per

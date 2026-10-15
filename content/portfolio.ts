@@ -49,7 +49,7 @@ export type Slide =
   | { kind: "title"; id: string; name: string; category: string; year: string }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
   | { kind: "quote"; name: string; quote: string; by: string }
-  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean; /** stack the items in rows of this many, each at its true proportions */ per?: number }
+  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9) */ bleed?: boolean; /** on a full-bleed page, the colour of the running line and caption laid over the picture */ ink?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
   | { kind: "deck"; /** a landscape document to page through: every page in order, and the same pages small */ name: string; pages: string[]; thumbs: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
@@ -110,7 +110,7 @@ function m(path: string, o: Partial<Media> = {}): Media {
 }
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
 /** One image filling the whole page, edge to edge (cropped to 16:9). */
-const bleed = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], bleed: true, caption });
+const bleed = (path: string, caption?: string, o: Partial<Media> = {}, ink?: string): Slide => ({ kind: "media", items: [m(path, o)], bleed: true, caption, ink });
 /** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption and a link out. */
 const linked = (path: string, caption: string, link: { label: string; href: string }, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
@@ -195,10 +195,9 @@ const RAW: Slide[] = [
       "Plated with Issy is a candlelit supper club run by Issy Park. The identity sets a flowing script against a sharp serif on deep olive, so it feels like the table itself. The site carries her photography, a polaroid gallery she orders herself and her Instagram, and it went live in under a week.",
     meta: [ME, { label: "Year", value: "2026" }, study("plated-with-issy")],
   },
-  // the wordmark sits centred, about a third of the way up, just under the main photograph and catching its edge
-  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 19, alt: "Plated with Issy" } }),
-  one("plated-with-issy/site-scroll-3d.mp4"),
-  row(["plated-with-issy/supper-issy.webp", "plated-with-issy/supper-table.webp", "plated-with-issy/supper-course.webp"], "Photography from the supper club, used across the site"),
+  // cream type on the olive; the wordmark sits centred, about a third of the way up, just under the main photograph and catching its edge
+  bleed("portfolio/plated-with-issy/filmstrip.webm", undefined, { overlay: { src: "/media/images/plated-with-issy/wordmark.svg", x: 50, y: 73, w: 19, alt: "Plated with Issy" } }, "#FAE3B1"),
+  bleed("portfolio/plated-with-issy/website-display.webm", undefined, {}, "#3D3E2A"),
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
   { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
