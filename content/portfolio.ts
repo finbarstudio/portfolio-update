@@ -59,8 +59,8 @@ export type Slide =
 
 export const UPDATED = { long: "October 2026", short: "05.10.2026" };
 
-/** The portfolio PDF link on the About page. Off until the file exists (see TopNav). */
-export const PORTFOLIO_PDF = false;
+/** The portfolio PDF link on the About page (the same flag is in TopNav). The PDF is made by scripts/portfolio-pdf.mjs. */
+export const PORTFOLIO_PDF = true;
 
 /** The opening page's portrait. It is on black, so it sits straight on the page. */
 
@@ -243,7 +243,7 @@ const RAW: Slide[] = [
   // corner pixels), so the pink round them is the same video colour on every screen. Phones get square
   // versions; the ring's is H.264 at 30fps, as the VP9 one was too heavy for an iPhone to start.
   { kind: "media", items: [m("portfolio/tmyr/posts-ring-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/posts-ring-mobile.mp4") })], caption: "The feed posts, one for each moment in the campaign", bleed: true, ground: "#ae125f", ink: "#ffffff" },
-  { kind: "media", items: [m("portfolio/tmyr/guy-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/guy.webm") })], caption: "A feed post and its end card", bleed: true, ground: "#e71988", ink: "#ffffff" },
+  { kind: "media", items: [m("portfolio/tmyr/guy-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/guy-mobile.mp4") })], caption: "A feed post and its end card", bleed: true, ground: "#e71988", ink: "#ffffff" },
 
   /* ── TasWater ──────────────────────────────────────────────── */
   { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },

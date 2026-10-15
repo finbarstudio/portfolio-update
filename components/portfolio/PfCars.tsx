@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { media } from "@/lib/media";
 import sheet from "@/content/portfolio-cars.json";
+import { PRINT_POSTER, usePrintJpeg, usePrintView } from "@/components/portfolio/print";
 
 /**
  * The Rennen Plus car grid on the portfolio: every thumbnail on the site, 12
@@ -72,11 +73,15 @@ export default function PfCars() {
     return () => mq.removeEventListener("change", set);
   }, []);
 
-  const grid = phone ? PHONE : WIDE;
+  // the PDF shows a still of the desktop grid (one image, not a sprite drawn 228 times)
+  const print = usePrintView();
+  const poster = usePrintJpeg(print ? PRINT_POSTER.cars : null);
+  const small = phone && !print;
+  const grid = small ? PHONE : WIDE;
   const { cols: COLS, rows: ROWS, grow: GROW } = grid;
   // which cars are shown: all of them, or an even sample on a phone
   const count = COLS * ROWS;
-  const shown = phone ? Array.from({ length: count }, (_, k) => LOW[Math.floor((k * LOW.length) / count)]) : Array.from({ length: count }, (_, k) => k);
+  const shown = small ? Array.from({ length: count }, (_, k) => LOW[Math.floor((k * LOW.length) / count)]) : Array.from({ length: count }, (_, k) => k);
 
   const point = (e: React.PointerEvent<HTMLDivElement>) => {
     const b = box.current?.getBoundingClientRect();
@@ -91,6 +96,14 @@ export default function PfCars() {
   };
 
   const sprite = `url(${media(SPRITE)})`;
+
+  if (print)
+    return (
+      <div className="pf-print-fill">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="pf-print-poster" src={poster ?? undefined} alt="Every car on the Rennen Plus site" data-in="1" />
+      </div>
+    );
 
   return (
     <div

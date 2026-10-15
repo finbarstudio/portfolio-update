@@ -24,6 +24,7 @@ import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { corsMedia, media } from "@/lib/media";
 import { MdSwipe } from "@/components/MaterialIcon";
+import { PRINT_POSTER, usePrintJpeg, usePrintView } from "@/components/portfolio/print";
 
 const DIR = "/media/images/portfolio/plated-with-issy/polaroids";
 const NAMES = [
@@ -148,6 +149,8 @@ export default function PfGlobe() {
   const last = useRef({ x: 0, t: 0 });
   const [grabbing, setGrabbing] = useState(false);
   const [spun, setSpun] = useState(false); // once it has been grabbed, the swipe hint goes
+  const print = usePrintView(); // the PDF: a still of the globe
+  const poster = usePrintJpeg(print ? PRINT_POSTER.globe : null);
 
   useEffect(() => {
     const el = box.current;
@@ -186,6 +189,14 @@ export default function PfGlobe() {
     drag.current = { ...drag.current, down: false };
     setGrabbing(false);
   };
+
+  if (print)
+    return (
+      <div className="pf-globe">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="pf-print-poster" src={poster ?? undefined} alt="A globe of polaroids from Plated with Issy's supper club" data-in="1" />
+      </div>
+    );
 
   return (
     <div

@@ -54,10 +54,9 @@ function GlobeIcon() {
   );
 }
 
-/** The portfolio PDF download. Off until the file exists at
- *  public/downloads/Finbar-Skitini-Portfolio.pdf; then set this to true (and the
- *  same flag in content/portfolio.ts) and the buttons appear. */
-const PORTFOLIO_PDF = false;
+/** The portfolio PDF download (public/downloads/Finbar-Skitini-Portfolio.pdf,
+ *  made by scripts/portfolio-pdf.mjs). The same flag is in content/portfolio.ts. */
+const PORTFOLIO_PDF = true;
 
 /** `portfolio`: the /portfolio page wears this nav too, inverted on black (see
  *  app/portfolio/layout.tsx) and carrying the CV download, which the main site

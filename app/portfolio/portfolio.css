@@ -169,6 +169,33 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-list a:hover { text-decoration: none; }
 .pf-list a:hover .n { color: var(--pink); }
 
+/* the thumbnail view (components/portfolio/PfIndex.tsx): three across, each a
+   5:2 picture over its number, name and discipline. A switch in the header
+   row flips between this and the list; on a phone it is always the list */
+.pf-index[data-view="thumbs"] .pf-list,
+.pf-index[data-view="list"] .pf-thumbs { display: none; }
+.pf-index-switch { display: flex; gap: calc(var(--u) * 1.2); }
+.pf-index-switch button { padding: 0; border: 0; background: none; color: var(--soft); font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.pf-index-switch button[aria-pressed="true"] { color: var(--ink); }
+.pf-index-switch button:hover { color: var(--ink); }
+.pf-index-switch button:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+.pf-thumbs {
+  list-style: none;
+  margin: auto 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: calc(var(--u) * 1.6);
+  row-gap: calc(var(--u) * 1.3);
+}
+.pf-thumbs a { display: block; }
+.pf-thumbs a:hover { text-decoration: none; }
+.pf-thumbs img, .pf-thumb-blank { display: block; width: 100%; aspect-ratio: 5 / 2; object-fit: cover; border-radius: calc(var(--u) * 0.4); background: var(--well, #161412); }
+.pf-thumb-cap { display: flex; align-items: baseline; gap: calc(var(--u) * 0.8); margin-top: calc(var(--u) * 0.55); }
+.pf-thumb-cap .n { font-size: max(calc(var(--u) * 1.05), 13px); line-height: 1.2; letter-spacing: var(--tr-copy); }
+.pf-thumb-cap > :last-child { margin-left: auto; text-align: right; }
+.pf-thumbs a:hover .n { color: var(--pink); }
+
 /* ── about (CV) ─────────────────────────────────────────────────── */
 .pf-cv .pf-pad { justify-content: space-between; }
 .pf-cv-grid { margin-top: calc(var(--u) * 2.6); flex: 1; row-gap: calc(var(--u) * 3.4); align-content: start; }
@@ -419,7 +446,6 @@ body:has(.pf) { background: #1a1a1a; }
   text-align: center;
   z-index: 2;
 }
-.pf-caption b { font-weight: 700; margin-right: 0.8em; }
 .pf-caption span { text-transform: none; letter-spacing: var(--tr-copy); }
 
 .pf-logo { position: absolute; inset: 0; display: grid; place-items: center; }
@@ -429,7 +455,7 @@ body:has(.pf) { background: #1a1a1a; }
 
 
 /* ── phones ─────────────────────────────────────────────────────── */
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
   .pf-slide.is-text { aspect-ratio: auto; --u: 1.9vw; }
   .pf-slide.is-text .pf-pad { position: static; padding: 22px 18px 26px; min-height: 64svh; }
   .pf-slide.is-text .pf-display { font-size: 11vw; }
@@ -447,6 +473,8 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-list a { grid-template-columns: 2.2em 1fr; row-gap: 2px; column-gap: 0; padding: 12px 0; }
   .pf-list a > :nth-child(n + 3) { grid-column: 2; text-align: left; }
   .pf-list .n { font-size: 19px; }
+  .pf-index[data-view] .pf-list { display: block; }
+  .pf-index[data-view] .pf-thumbs, .pf-index-switch { display: none; }
   .pf-list { margin-top: 28px; }
   .pf-cover .pf-poster { font-size: 17vw; }
   .pf-cv-foot .pf-phone-note { flex-basis: 100%; margin: 26px 0 0; text-align: left; }
@@ -479,7 +507,7 @@ body:has(.pf) { background: #1a1a1a; }
   /* no captions on a phone, except on the Other pages, whose caption says
      what the piece is and links out (they are the only captions with a link) */
   .pf-media .pf-caption { position: static; padding: 0 14px 16px; text-align: left; }
-  .pf-caption b, .pf-caption:not(:has(.pf-caption-link)) { display: none; }
+  .pf-caption:not(:has(.pf-caption-link)) { display: none; }
   .pf-media.is-bleed .pf-caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 14px 14px; }
   .pf-media.is-bleed .pf-caption-link { color: var(--bleed-ink, #f3f1ee); }
   /* full bleed on a phone: the picture fills the page edge to edge, top to
@@ -577,7 +605,7 @@ html[data-pf-theme="light"] .pf-chrome {
 .pf-globe canvas { display: block; }
 /* on a phone, a small swipe icon says it can be spun (gone once it has been) */
 .pf-globe-hint { display: none; }
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
   .pf-globe-hint { display: flex; position: absolute; right: 12px; bottom: 12px; width: 34px; height: 34px; align-items: center; justify-content: center; border-radius: 999px; color: #fae3b1; box-shadow: 0 0 0 1px rgba(250, 227, 177, 0.5); pointer-events: none; transition: opacity 0.4s ease; }
   .pf-globe-hint[data-gone="1"] { opacity: 0; }
 }
@@ -588,4 +616,21 @@ html[data-pf-theme="light"] .pf-chrome {
    page clips it at the edges */
 @media (min-width: 761px) {
   .pf-media .pf-item:has(> .pf-phones) { width: 100cqw; aspect-ratio: auto !important; }
+}
+
+/* ── the PDF (the print view, ?print: scripts/portfolio-pdf.mjs) ─────
+   One page per sheet at desktop size, 1600 by 900, edge to edge, in the page's
+   own colours. Clips and the 3D pieces show stills (components/portfolio/print.ts). */
+.pf-print-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pf-print-fill { position: absolute; inset: 0; }
+@media print {
+  @page { size: 1200pt 675pt; margin: 0; }
+  html:has(.pf), body:has(.pf) { background: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pf, .pf * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pf-chrome, nextjs-portal, .pf-sound, .pf-play, .pf-globe-hint, .pf-load, .pf-print-hide { display: none !important; }
+  /* a plain column: Chrome ignores page breaks between the items of a flex column */
+  body:has(.pf) { margin: 0; }
+  .pf { display: block; padding: 0; }
+  .pf-slide { width: 100vw; height: 56.25vw; max-width: none; aspect-ratio: auto; break-after: page; break-inside: avoid; }
+  .pf-slide:last-child { break-after: auto; }
 }

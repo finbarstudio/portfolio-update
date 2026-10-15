@@ -3,6 +3,7 @@ import PfPhones from "@/components/portfolio/PfPhones";
 import PfGlobe from "@/components/portfolio/PfGlobe";
 import PfCars from "@/components/portfolio/PfCars";
 import PfDeck from "@/components/portfolio/PfDeck";
+import PfIndex from "@/components/portfolio/PfIndex";
 import { MdArrowOutward } from "@/components/MaterialIcon";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
 import { PORTFOLIO, CV, UPDATED, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
@@ -176,11 +177,12 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               </div>
             </div>
             <div className="pf-cv-foot pf-mono">
-              <a href="/cv">Résumé (PDF) ↓</a>
-              {PORTFOLIO_PDF ? <a href="/portfolio.pdf">Portfolio (PDF) ↓</a> : null}
+              {/* absolute, so the link still works inside the printed PDF */}
+              <a href="https://www.finbar.studio/cv">Résumé (PDF) ↓</a>
+              {PORTFOLIO_PDF ? <a className="pf-print-hide" href="/portfolio.pdf" download>Portfolio (PDF) ↓</a> : null}
               <span className="pf-soft">Updated {UPDATED.short}</span>
               {/* where it is best seen, and that phones get lighter files (content/portfolio.ts: forPhones) */}
-              <p className="pf-phone-note">
+              <p className="pf-phone-note pf-print-hide">
                 <span>Best seen on a desktop on wifi. On a phone, this portfolio loads lighter versions of the videos and images so it is kind to mobile data.</span>
               </p>
             </div>
@@ -188,29 +190,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
         </section>
       );
     case "index":
-      return (
-        <section className="pf-slide pf-index is-text" aria-label="Projects">
-          <div className="pf-pad">
-            <div className="pf-head pf-mono">
-              <span>Projects</span>
-              <span />
-              <span />
-              <span className="pf-soft">{page}</span>
-            </div>
-            <ol className="pf-list">
-              {chapters.map((c) => (
-                <li key={c.id}>
-                  <a className="pf-cols" href={`#${c.id}`}>
-                    <span className="pf-mono pf-soft">{c.no}</span>
-                    <span className="n">{c.name}</span>
-                    <span className="pf-mono pf-soft">{c.sub}</span>
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-      );
+      return <PfIndex chapters={chapters} page={page} />;
     case "grid":
       return (
         <section className="pf-slide pf-media pf-gridslide">
@@ -321,7 +301,6 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
           </div>
           {s.caption ? (
             <p className="pf-caption pf-mono">
-              <b>Above</b>
               <span>{s.caption}</span>
               {s.link ? (
                 <a className="pf-caption-link" href={s.link.href} target="_blank" rel="noopener noreferrer">
@@ -342,7 +321,6 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
           </div>
           {s.caption ? (
             <p className="pf-caption pf-mono">
-              <b>Above</b>
               <span>{s.caption}</span>
             </p>
           ) : null}
@@ -355,7 +333,6 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
           <PfDeck name={s.name} pages={s.pages} thumbs={s.thumbs} />
           {s.caption ? (
             <p className="pf-caption pf-mono">
-              <b>Above</b>
               <span>{s.caption}</span>
             </p>
           ) : null}

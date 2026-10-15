@@ -9,7 +9,7 @@
  * sliding along past the frame's edges (PhoneScene's `strip` mode), and
  * there is no hover. On a desktop the frame runs to the page's left and
  * right edges at the usual height (portfolio.css), so the line has room; the
- * phones stay the same size. On a phone the page is 4:5 (see the piece's
+ * phones stay the same size. On a phone the page is 9:10 (see the piece's
  * `mobile` shape in content/portfolio.ts) and the camera sits a little closer. If iOS will not
  * start the reels on its own, a Play button shows and a tap starts them.
  * Phones play H.264 copies of the reels (see `reel`).
@@ -20,6 +20,7 @@ import dynamic from "next/dynamic";
 import Loader from "@/components/Loader";
 import { projects } from "@/content/projects";
 import { corsMedia, media } from "@/lib/media";
+import { PRINT_POSTER, usePrintJpeg, usePrintView } from "@/components/portfolio/print";
 
 // r3f and WebGL only run in the browser
 const PhoneScene = dynamic(() => import("@/components/phone/PhoneScene"), {
@@ -29,7 +30,7 @@ const PhoneScene = dynamic(() => import("@/components/phone/PhoneScene"), {
 
 const phones = projects.find((p) => p.slug === "tmyr")?.heroPhones;
 // camera: pulled back on a desktop so the row runs across the whole frame,
-// a little closer on a phone's 4:5 page
+// a little closer on a phone's page
 const ZOOM = { wide: 0.8, phone: 1.15 };
 // centre to centre, in world units (a phone is about 0.1 wide)
 const SPACING = 0.125;
@@ -60,6 +61,15 @@ export default function PfPhones() {
     return () => mq.removeEventListener("change", read);
   }, []);
 
+  const print = usePrintView(); // the PDF: a still of the phones
+  const poster = usePrintJpeg(print ? PRINT_POSTER.phones : null);
+  if (print)
+    return (
+      <div className="pf-phones">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="pf-print-poster" src={poster ?? undefined} alt="The campaign's reels playing on a row of iPhones" data-in="1" />
+      </div>
+    );
   if (!phones || isPhone === null) return null;
   return (
     <div className="pf-phones">

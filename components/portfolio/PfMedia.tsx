@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { corsMedia } from "@/lib/media";
 import { MdVolumeOff, MdVolumeUp } from "@/components/MaterialIcon";
+import { printStill, usePrintJpeg, usePrintView } from "@/components/portfolio/print";
 
 /**
  * One image or clip on /portfolio, loaded in full as soon as the page opens,
@@ -108,9 +109,12 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
   const [shown, setShown] = useState(false);
   const clip = useRef<HTMLVideoElement>(null);
   const [loud, setLoud] = useState(false);
+  // the print view (the PDF) shows a still of a clip, and downloads nothing
+  const print = usePrintView();
+  const printed = usePrintJpeg(print ? (video ? printStill(dark) : dark) : null);
 
   useEffect(() => {
-    if (!known) return;
+    if (!known || print) return;
     if (moving && window.matchMedia("(max-width: 760px)").matches) {
       setPct(null);
       setUrl(src);
@@ -143,7 +147,7 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
       stop.abort();
       if (made) URL.revokeObjectURL(made);
     };
-  }, [src, moving, known]);
+  }, [src, moving, known, print]);
 
   // Clips play only while on screen. The first time a clip plays it holds on
   // its opening frame for a moment: if the reader watched it load to 100%, it
@@ -220,6 +224,11 @@ export default function PfMedia({ src: dark, light, mobile, mobileLight, video, 
       window.removeEventListener("pageshow", back);
     };
   }, [url]);
+
+  if (print) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return printed ? <img src={printed} alt={alt ?? ""} width={w} height={h} data-in="1" /> : null;
+  }
 
   return (
     <>
