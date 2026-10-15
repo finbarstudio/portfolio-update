@@ -2,7 +2,8 @@
  *
  *  To add a piece: give it a route under app/lab/<slug>/page.tsx, put its media
  *  under public/media/lab/<slug>/ (lowercase kebab-case, WebP for stills), then
- *  add an entry here with the next id. Newest first is automatic (id, descending).
+ *  add an entry here with the next id. The lab shows them in THIS order (Finbar,
+ *  15 Oct 2026): Dino, Lindon and GemFest first, then Mockup and Motion, the rest after.
  */
 import { media } from "@/lib/media";
 
@@ -26,28 +27,36 @@ export interface LabItem {
 
 const RAW_ITEMS: LabItem[] = [
   {
+    id: 2,
+    name: "Dino",
+    line: "A restoration workshop, demo build",
+    href: "https://www.finbar.studio/mt",
+    live: "dino",
+    added: "2026-09-30",
+  },
+  {
+    id: 3,
+    name: "Lindon",
+    line: "A builder's site, demo build",
+    href: "https://www.finbar.studio/lindon",
+    image: "/media/lab/lindon/tile.webp",
+    added: "2026-09-30",
+  },
+  {
+    id: 1,
+    name: "GemFest",
+    line: "Scroll the constellation",
+    href: "/gemfest",
+    image: "/media/lab/gemfest/tile.webp",
+    added: "2026-09-30",
+  },
+  {
     id: 8,
     name: "Mockup",
     line: "3D device mockups, animated and exported",
     href: "/mockup",
     image: "/media/lab/mockup/tile.webp",
     added: "2026-10-09",
-  },
-  {
-    id: 7,
-    name: "Invoice",
-    line: "Invoices, quotes and receipts",
-    href: "/invoice",
-    image: "/media/lab/invoice/tile.webp",
-    added: "2026-10-08",
-  },
-  {
-    id: 6,
-    name: "Email",
-    line: "What breaks in which inbox",
-    href: "/email",
-    image: "/media/lab/email/tile.webp",
-    added: "2026-10-07",
   },
   {
     id: 5,
@@ -66,28 +75,12 @@ const RAW_ITEMS: LabItem[] = [
     added: "2026-10-01",
   },
   {
-    id: 3,
-    name: "Lindon",
-    line: "A builder's site, demo build",
-    href: "https://www.finbar.studio/lindon",
-    image: "/media/lab/lindon/tile.webp",
-    added: "2026-09-30",
-  },
-  {
-    id: 2,
-    name: "Dino",
-    line: "A restoration workshop, demo build",
-    href: "https://www.finbar.studio/mt",
-    live: "dino",
-    added: "2026-09-30",
-  },
-  {
-    id: 1,
-    name: "GemFest",
-    line: "Scroll the constellation",
-    href: "/gemfest",
-    image: "/media/lab/gemfest/tile.webp",
-    added: "2026-09-30",
+    id: 6,
+    name: "Email",
+    line: "What breaks in which inbox",
+    href: "/email",
+    image: "/media/lab/email/tile.webp",
+    added: "2026-10-07",
   },
 ];
 

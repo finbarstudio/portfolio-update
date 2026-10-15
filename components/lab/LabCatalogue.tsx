@@ -14,7 +14,7 @@ import { heroMark } from "@/content/moto-technique";
  * the one live one: the demo's metal badge itself, tilting to the pointer.
  */
 export default function LabCatalogue() {
-  const items = [...LAB_ITEMS].sort((a, b) => b.id - a.id);
+  const items = LAB_ITEMS; // shown in the order set in content/lab-items.ts
 
   return (
     <>
