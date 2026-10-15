@@ -36,8 +36,9 @@
  */
 import { mediaDeep } from "@/lib/media";
 import DIMS from "./portfolio-dims.json";
+import PHONE from "./portfolio-phone.json";
 
-export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** Plated with Issy: this page is the live 3D globe of polaroids (PfGlobe), and the file is only a stand-in for its measurements */ globe?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number; /** a separate file for phones (760px and under), with its own shape: the page swaps to it and takes its proportions */ mobile?: { src: string; w: number; h: number }; /** an image laid over the piece, placed in the FILE's own frame (percent of its width and height, centre point), so it stays put however the page crops the file */ overlay?: { src: string; x: number; y: number; w: number; alt?: string } };
+export type Media = { src: string; w: number; h: number; video?: boolean; frame?: boolean; alt?: string; /** the file to show instead when the page is in its light theme */ light?: string; /** the Rennen Plus car grid: this page is drawn live by PfCars, and the file is only its measurements */ cars?: boolean; /** The Moment You Realise phones: this page is the live 3D iPhone carousel from the case study (PhoneCarousel), and the file is its poster and measurements */ phones?: boolean; /** Plated with Issy: this page is the live 3D globe of polaroids (PfGlobe), and the file is only a stand-in for its measurements */ globe?: boolean; /** a clip with a soundtrack: muted until the reader turns it on */ sound?: boolean; /** shown this much bigger than the standard inset, e.g. 1.1 */ scale?: number; /** a separate file for phones (760px and under), with its own shape: the page swaps to it and takes its proportions */ mobile?: { src: string; w: number; h: number; /** the phone file for the light theme */ light?: string }; /** an image laid over the piece, placed in the FILE's own frame (percent of its width and height, centre point), so it stays put however the page crops the file */ overlay?: { src: string; x: number; y: number; w: number; alt?: string } };
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
@@ -106,7 +107,30 @@ const phone = (path: string): Media["mobile"] => {
 };
 function m(path: string, o: Partial<Media> = {}): Media {
   const [w, h] = D[path] ?? [16, 9];
-  return { src: `/media/images/${path}`, w, h, video: /\.(mp4|webm)$/.test(path), frame: true, ...o };
+  return forPhones({ src: `/media/images/${path}`, w, h, video: /\.(mp4|webm)$/.test(path), frame: true, ...o });
+}
+
+/**
+ * Phones on mobile data get lighter copies (scripts/portfolio-phone.mjs makes
+ * them as <name>.sm.<ext> and lists them in content/portfolio-phone.json). A
+ * piece with its own phone file uses that file's copy; any other piece uses its
+ * own copy at the same shape. Pages drawn live (cars, phones, globe) are left alone.
+ */
+const SM = new Set(PHONE as string[]);
+const PRE = "/media/images/";
+const lighter = (src: string) => {
+  const rel = src.startsWith(PRE) ? src.slice(PRE.length) : src;
+  return SM.has(rel) ? PRE + rel.replace(/\.(\w+)$/, ".sm.$1") : undefined;
+};
+function forPhones(item: Media): Media {
+  if (item.cars || item.phones || item.globe) return item;
+  const light = item.light ? lighter(item.light) : undefined;
+  if (item.mobile) {
+    const src = lighter(item.mobile.src);
+    return src ? { ...item, mobile: { ...item.mobile, src } } : item;
+  }
+  const src = lighter(item.src);
+  return src ? { ...item, mobile: { src, w: item.w, h: item.h, ...(light ? { light } : null) } } : item;
 }
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
 /** One image filling the whole page, edge to edge (cropped to 16:9). */

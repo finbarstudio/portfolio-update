@@ -40,7 +40,7 @@ function Item({ m, style, group }: { m: Media; style?: React.CSSProperties; grou
       className={`pf-item${m.frame === false ? "" : " is-framed"}${m.mobile ? " has-phone" : ""}`}
       style={{ aspectRatio: `${m.w} / ${m.h}`, "--r": (m.w / m.h).toFixed(4), ...(m.mobile ? { "--r-phone": (m.mobile.w / m.mobile.h).toFixed(4) } : null), ...(m.scale ? { "--k": m.scale } : null), ...style } as React.CSSProperties}
     >
-      {m.cars ? <PfCars /> : m.phones ? <PfPhones /> : m.globe ? <PfGlobe /> : <PfMedia src={m.src} light={m.light} mobile={m.mobile?.src} video={m.video} sound={m.sound} alt={m.alt} w={m.w} h={m.h} group={group} />}
+      {m.cars ? <PfCars /> : m.phones ? <PfPhones /> : m.globe ? <PfGlobe /> : <PfMedia src={m.src} light={m.light} mobile={m.mobile?.src} mobileLight={m.mobile?.light} video={m.video} sound={m.sound} alt={m.alt} w={m.w} h={m.h} group={group} />}
       {m.overlay ? (
         // the file's own frame, drawn the way the picture is (cover, centred), so the overlay lands on the same spot of the picture
         <div className="pf-overlay" aria-hidden={m.overlay.alt ? undefined : true}>
@@ -121,6 +121,10 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <span>Graphic and digital designer<br /><span className="pf-soft">London</span></span>
               <span><a href={`mailto:${CV.email}`}>{CV.email}</a><br /><span className="pf-soft">Updated {UPDATED.long}</span></span>
             </div>
+            {/* phones get lighter files (content/portfolio.ts: forPhones); say so, and where to see them at their best */}
+            <p className="pf-phone-note">
+              On a phone, this portfolio loads lighter versions of the videos and images so it is kind to mobile data. For full quality, open it on a desktop on wifi.
+            </p>
             <h1 className="pf-poster" aria-label="Finbar Skitini">
               <Kerned text="Finbar" />
               <br />

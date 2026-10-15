@@ -74,7 +74,7 @@ async function download(url: string, onProgress: (pct: number | null) => void, s
   return URL.createObjectURL(new Blob(chunks, { type: res.headers.get("content-type") ?? "" }));
 }
 
-export default function PfMedia({ src: dark, light, mobile, video, sound, alt, w, h, group }: { src: string; light?: string; /** a separate file for phones, 760px and under */ mobile?: string; video?: boolean; /** the clip has a soundtrack: it starts muted, with a button to turn the sound on */ sound?: boolean; alt?: string; w: number; h: number; group?: string }) {
+export default function PfMedia({ src: dark, light, mobile, mobileLight, video, sound, alt, w, h, group }: { src: string; light?: string; /** a separate file for phones, 760px and under */ mobile?: string; /** the phone file for the light theme */ mobileLight?: string; video?: boolean; /** the clip has a soundtrack: it starts muted, with a button to turn the sound on */ sound?: boolean; alt?: string; w: number; h: number; group?: string }) {
   // A piece can have a second file for the page's light theme. It is swapped
   // the moment the theme switch is flipped (it sets data-pf-theme on <html>).
   const [isLight, setIsLight] = useState(false);
@@ -97,10 +97,10 @@ export default function PfMedia({ src: dark, light, mobile, video, sound, alt, w
     mq.addEventListener("change", read);
     return () => mq.removeEventListener("change", read);
   }, [mobile]);
-  const src = mobile && isPhone ? mobile : light && isLight ? light : dark;
+  const src = mobile && isPhone ? (mobileLight && isLight ? mobileLight : mobile) : light && isLight ? light : dark;
   const known = isPhone !== null;
   // the phone file can be a still where the desktop one is a clip
-  const moving = src === mobile ? /\.(mp4|webm)(\?|$)/.test(src) : video;
+  const moving = src === mobile || src === mobileLight ? /\.(mp4|webm)(\?|$)/.test(src) : video;
   /** 0 to 99 while downloading; null when the size is unknown. */
   const [pct, setPct] = useState<number | null>(0);
   const [url, setUrl] = useState<string | null>(null);
