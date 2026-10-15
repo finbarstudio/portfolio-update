@@ -11,23 +11,28 @@ const CWEBP = "/opt/homebrew/bin/cwebp";
 const IMG = "public/media/images";
 const OUT = `${IMG}/portfolio/thumbs`;
 
-// chapter id (content/portfolio.ts) -> the picture it is cut from
+// chapter id (content/portfolio.ts) -> the picture it is cut from. The 3D
+// pieces are screenshots on black (globe-black, phones-black), taken by hand
+// with the page colour set to black; the globe is trimmed of its black margin
+// and shown whole, nearly the full height, on black.
 const FROM = {
   lola: "portfolio/print/lola-audio-brand.webp",
   "rennen-plus": "portfolio/print/rennen-plus-website.webp",
-  plated: "portfolio/print/globe.webp",
-  lows: "portfolio/print/lows-macbook.webp",
-  "share-to-buy": "portfolio/print/phones.webp",
+  plated: { src: "portfolio/print/globe-black.webp", whole: "black" },
+  lows: { src: "portfolio/print/lows-logo-zoom.webp", whole: "black", h: 230 },
+  "share-to-buy": "portfolio/print/phones-black.webp",
   taswater: "portfolio/taswater/map-mockup.webp",
   "london-home-show": "portfolio/print/london-home-show-event-deck.webp",
   other: "joe-devine/hero.webp",
 };
 
 mkdirSync(OUT, { recursive: true });
-for (const [id, src] of Object.entries(FROM)) {
+for (const [id, from] of Object.entries(FROM)) {
+  const { src, whole, h = 440 } = typeof from === "string" ? { src: from } : from;
   const png = `${OUT}/${id}.png`;
-  // fill 1200 by 480, cropping the middle
-  execFileSync(MAGICK, [`${IMG}/${src}`, "-resize", "1200x480^", "-gravity", "center", "-extent", "1200x480", png]);
+  // fill 1200 by 480, cropping the middle (or trim it and fit it whole, on a colour)
+  const size = whole ? ["-fuzz", "4%", "-trim", "+repage", "-resize", `1200x${h}`, "-background", whole] : ["-resize", "1200x480^"];
+  execFileSync(MAGICK, [`${IMG}/${src}`, ...size, "-gravity", "center", "-extent", "1200x480", png]);
   execFileSync(CWEBP, ["-quiet", "-q", "82", "-m", "6", "-sharp_yuv", png, "-o", `${OUT}/${id}.webp`]);
   rmSync(png);
   console.log(`${id}  <- ${src}`);
