@@ -135,7 +135,9 @@ function forPhones(item: Media): Media {
 const one = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, o)], caption });
 /** One image filling the whole page, edge to edge (cropped to 16:9). */
 const bleed = (path: string, caption?: string, o: Partial<Media> = {}, ink?: string): Slide => ({ kind: "media", items: [m(path, o)], bleed: true, caption, ink });
-/** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption and a link out. */
+/** A device video on its own page: a 2:1 file (padded with black at the sides) at the standard margin, no outline, with a caption. */
+const device = (path: string, caption: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption });
+/** The same with a link out after the caption: only in Other, where a page stands in for a whole project (each project's own links are on its opening page). */
 const linked = (path: string, caption: string, link: { label: string; href: string }, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
 
@@ -170,8 +172,8 @@ const RAW: Slide[] = [
     meta: [{ label: "Live", value: "lola-audio.com", href: "https://www.lola-audio.com" }, study("lola-audio")],
   },
   one("portfolio/lola-audio/brand.webm", "The brand: her mark, the site and the stills it sits on", { frame: false }),
-  linked("portfolio/lola-audio/pages.webm", "The site page by page: the opening sheet, a showreel in the full-screen player, her bio and the work", { label: "lola-audio.com", href: "https://www.lola-audio.com" }),
-  linked("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { label: "lola-audio.com", href: "https://www.lola-audio.com" }, { sound: true }),
+  device("portfolio/lola-audio/pages.webm", "The site page by page: the opening sheet, a showreel in the full-screen player, her bio and the work"),
+  device("portfolio/lola-audio/website.webm", "The website. It has sound, which is off until you turn it on", { sound: true }),
 
   /* ── Rennen Plus ────────────────────────────────────────────── */
   { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
@@ -183,9 +185,9 @@ const RAW: Slide[] = [
       "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
     meta: [{ label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
   },
-  linked("portfolio/rennen-plus/website.webm", "The homepage", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }),
+  device("portfolio/rennen-plus/website.webm", "The homepage"),
   one("portfolio/rennen-plus/cars.webp", "Every car on the site, each one cut out, faced the same way and sat on one baseline", { frame: false, cars: true }),
-  linked("portfolio/rennen-plus/phones.webm", "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge", { label: "rennenplus.com.au", href: "https://rennenplus.com.au" }, { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
+  device("portfolio/rennen-plus/phones.webm", "Designed mobile first, because the visitor stats showed most people browse on a phone: a car page, search and the AI concierge", { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
 
   /* ── Lows Design and Build ──────────────────────────────────── */
   { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
@@ -195,11 +197,11 @@ const RAW: Slide[] = [
     category: "Brand and Website",
     body:
       "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
-    meta: [{ label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, study("lows-design-build")],
+    meta: [{ label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, { label: "Instagram", value: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }, study("lows-design-build")],
   },
   one("portfolio/lows/logo-zoom.mp4", "The brand", { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
-  linked("portfolio/lows/macbook.webm", "The website", { label: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }),
-  linked("portfolio/lows/iphone-instagram.webm", "The Instagram profile", { label: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }),
+  device("portfolio/lows/macbook.webm", "The website"),
+  device("portfolio/lows/iphone-instagram.webm", "The Instagram profile"),
   one("portfolio/lows/signage-wheel.webm", "The identity on signs, a billboard and a site flag. These are mockups", { frame: false }),
   {
     kind: "quote",
@@ -270,7 +272,7 @@ const RAW: Slide[] = [
   { kind: "section", title: "Other", subtitle: "Playbooks, print and covers", year: "2022–2026" },
   linked("portfolio/salesmasters/covers-wheel.webm", "Salesmasters. Sales playbooks for nine clients, each in the client’s own brand", { label: "Case study", href: "https://www.finbar.studio/case-studies/salesmasters" }),
   linked("portfolio/packer/capability-statement.webm", "Packer and Associates. The capability statement, page by page", { label: "Case study", href: "https://www.finbar.studio/case-studies/packer-associates" }),
-  bleed("joe-devine/hero.webp", "Joe Devine. Single covers, art direction and photography"),
+  { kind: "media", items: [m("joe-devine/hero.webp")], bleed: true, caption: "Joe Devine. Single covers, art direction and photography", link: { label: "Case study", href: "https://www.finbar.studio/case-studies/joe-devine" } },
 
   { kind: "end" },
 ];

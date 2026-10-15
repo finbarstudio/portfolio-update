@@ -476,10 +476,12 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-deck-strip { order: 3; width: 100%; display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
   .pf-deck-strip button { width: 100%; }
   .pf-deck-bar > button { font-size: 22px; min-width: 44px; min-height: 44px; }
-  /* no captions on a phone, only a caption's link, if it has one */
-  .pf-media .pf-caption { position: static; padding: 0 14px 16px; text-align: right; }
-  .pf-caption > :not(.pf-caption-link), .pf-caption:not(:has(.pf-caption-link)) { display: none; }
-  .pf-caption-link { margin-left: 0; }
+  /* no captions on a phone, except on the Other pages, whose caption says
+     what the piece is and links out (they are the only captions with a link) */
+  .pf-media .pf-caption { position: static; padding: 0 14px 16px; text-align: left; }
+  .pf-caption b, .pf-caption:not(:has(.pf-caption-link)) { display: none; }
+  .pf-media.is-bleed .pf-caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 14px 14px; }
+  .pf-media.is-bleed .pf-caption-link { color: var(--bleed-ink, #f3f1ee); }
   /* full bleed on a phone: the picture fills the page edge to edge, top to
      bottom, at its own proportions, and the running line sits over it in the
      page's own colour (--bleed-ink), as on a desktop */
@@ -558,7 +560,7 @@ html[data-pf-theme="light"] .pf-chrome {
 /* the theme switch's knob glyph */
 .pf-chrome .lab-switch-knob svg { width: 8px; height: 8px; }
 
-.pf-caption-link { margin-left: 1.2em; text-transform: none; letter-spacing: var(--tr-copy); color: var(--soft); }
+.pf-caption-link { white-space: nowrap; margin-left: 1.2em; text-transform: none; letter-spacing: var(--tr-copy); color: var(--soft); }
 .pf-caption-link:hover { color: var(--ink); }
 
 /* the Plated with Issy globe (components/portfolio/PfGlobe.tsx): the live 3D
