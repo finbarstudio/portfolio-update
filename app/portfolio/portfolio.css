@@ -630,6 +630,7 @@ body:has(.pf) { background: #1a1a1a; }
      what the piece is and links out (they are the only captions with a link) */
   .pf-media .pf-caption { position: static; padding: 0 14px 16px; text-align: left; }
   .pf-caption:not(:has(.pf-caption-link)) { display: none; }
+  .pf-media.has-pcap .pf-caption { display: block; }
   .pf-media.is-bleed .pf-caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 14px 14px; }
   .pf-media.is-bleed .pf-caption-link { color: var(--bleed-ink, #f3f1ee); }
   /* full bleed on a phone: the picture fills the page edge to edge, top to
