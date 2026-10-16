@@ -194,6 +194,8 @@ const RAW: Slide[] = [
   },
   device("portfolio/rennen-plus/website.webm"),
   one("portfolio/rennen-plus/cars.webp", "228 cars, each cut out and set on one baseline", { frame: false, cars: true }),
+  // 2:1 and inset, on the page's own black (the clip is on black)
+  one("portfolio/rennen-plus/materials.webm", "Pick an option on the site, like an exhaust tip finish, to preview it as an interactive 3D material", { frame: false, mobile: phone("portfolio/rennen-plus/materials-mobile.mp4") }),
   device("portfolio/rennen-plus/phones.webm", "Designed mobile first, as most visitors browse on a phone", { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
 
   /* ── Plated with Issy ──────────────────────────────────────── */
