@@ -292,9 +292,12 @@ body:has(.pf) { background: #1a1a1a; }
 .pf-title.has-bg { --ink: #f3f1ee; color: var(--ink); }
 .pf-title-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 .pf-title-bg .pf-item { width: 100%; height: 100%; aspect-ratio: auto !important; border-radius: 0; box-shadow: none; }
-.pf-title-bg .pf-item :is(img, video) { object-fit: cover; }
+.pf-title-bg .pf-item :is(img, video) { object-fit: cover; object-position: var(--focus, 50% 50%); }
 .pf-title-bg::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0) 58%), linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0) 22%); }
 .pf-title.has-bg .pf-pad { z-index: 1; }
+/* an image's Midjourney prompt, laid over a full-bleed page at the bottom left (Palms Motel); under the picture on a phone */
+.pf-prompt { position: absolute; left: calc(var(--u) * 2.6); bottom: calc(var(--u) * 2.2); font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; z-index: 2; max-width: min(44em, 56%); margin: 0; padding: 0.9em 1.1em; background: rgba(0, 0, 0, 0.74); color: #f3f1ee; border-radius: 3px; font-family: var(--font-mono); font-size: max(calc(var(--u) * 0.82), 11px); line-height: 1.5; letter-spacing: 0.01em; text-wrap: pretty; }
+.pf-prompt-label { display: block; margin-bottom: 0.5em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(243, 241, 238, 0.6); }
 /* a project's skill tags, in the nav tooltip's style (Download CV's hover, .nav-tip in globals.css), a size up */
 .pf-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5em; margin: 0; padding: 0; }
 .pf-tags > span { background: #000; color: var(--ink); border: 1px solid var(--ink); border-radius: 3px; padding: 0.4em 0.5em; font-family: var(--font-mono); font-weight: 400; font-size: max(calc(var(--u) * 0.85), 12px); letter-spacing: 0.06em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
@@ -604,6 +607,7 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-end-mark { position: static; transform: none; flex: none; }
   .pf-cv-foot .pf-phone-note { flex-basis: 100%; margin: 26px 0 0; text-align: left; }
   .pf-meta { display: flex; }
+  .pf-media .pf-prompt { position: static; max-width: none; margin: 0 14px 22px; background: none; padding: 0; font-size: 12px; }
   .pf-title.has-bg .pf-pad { position: relative; }
   .pf-head .pf-tags { flex: 1; margin-block: 0; }
   .pf-media .pf-caption .pf-tags { display: flex; justify-content: flex-start; margin: 8px 0 0; }

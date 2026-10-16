@@ -51,10 +51,10 @@ export type Slide =
   | { kind: "cv" }
   | { kind: "index" }
   | { kind: "grid"; cols: number; rows: number; cells: Cell[]; caption?: string }
-  | { kind: "title"; id: string; name: string; category: string; year: string; /** skills an employer would look for, as tags on the opening page (from the short list in TAGS) */ tags?: Tag[]; /** a picture filling the whole title page behind the name */ bg?: Media }
+  | { kind: "title"; id: string; name: string; category: string; year: string; /** skills an employer would look for, as tags on the opening page (from the short list in TAGS) */ tags?: Tag[]; /** a picture filling the whole title page behind the name */ bg?: Media; /** which part of that picture stays in view when the page crops it (CSS object-position) */ bgFocus?: string }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[]; /** the project's key numbers, along the foot of the page (kept out of the body copy) */ stats?: Stat[] }
   | { kind: "quote"; name: string; quote: string; by: string }
-  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9); "desktop": only on a desktop (and in the PDF), a phone keeps the usual stacked page */ bleed?: boolean | "desktop"; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number; /** skill tags, for the one-page projects in Other */ tags?: Tag[]; /** keep the caption on a phone (phones drop captions otherwise) */ phoneCaption?: boolean }
+  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9); "desktop": only on a desktop (and in the PDF), a phone keeps the usual stacked page */ bleed?: boolean | "desktop"; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number; /** skill tags, for the one-page projects in Other */ tags?: Tag[]; /** keep the caption on a phone (phones drop captions otherwise) */ phoneCaption?: boolean; /** the image's Midjourney prompt, laid over the picture (under it on a phone) */ prompt?: string }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
   | { kind: "deck"; /** a landscape document to page through: every page in order, and the same pages small */ name: string; pages: string[]; thumbs: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
@@ -264,7 +264,9 @@ const RAW: Slide[] = [
     category: "AI Art Direction",
     year: "2024",
     tags: ["Art Direction", "Generative AI", "Social Media"],
-    bg: m("palmsmotel/scene-2.webp", { frame: false, alt: "Palms Motel at dusk: a lit kidney pool, palms and a 1970s motel block" }),
+    // the sign (his pick); it is upright, so the page keeps its top part, the sign, in view
+    bg: m("palmsmotel/sign.webp", { frame: false, alt: "The Palms Motel roadside sign" }),
+    bgFocus: "50% 22%",
   },
   {
     kind: "text",
@@ -275,8 +277,22 @@ const RAW: Slide[] = [
     meta: [{ label: "TikTok", value: "@palmsmotel", href: "https://www.tiktok.com/@palmsmotel" }, study("palmsmotel")],
     stats: [{ value: "770k", label: "Views, top post" }, { value: "109k", label: "Likes" }, { value: "288", label: "Images, one prompt system" }],
   },
-  bleed("palmsmotel/scene-1.webp", undefined, { alt: "A white 1970s house by a kidney pool, palms and pink flowers" }),
-  { kind: "media", items: [m("palmsmotel/scene-3.webp", { frame: false, alt: "A turquoise pool path past striped loungers and cacti" }), m("palmsmotel/sign.webp", { frame: false, alt: "The Palms Motel roadside sign" })] },
+  // Two full-bleed pages, each with its Midjourney prompt laid over it. The prompts follow his documented
+  // recipe (fixed: 1977 Palm Springs, Hasselblad 28mm, sage and coral, Slim Aarons / Architectural Digest;
+  // variable: the scene). RECONSTRUCTED, not his originals: swap in the real prompts from his Midjourney archive.
+  {
+    kind: "media",
+    items: [m("palmsmotel/scene-1.webp", { frame: false, alt: "A white 1970s house by a kidney pool, palms and pink flowers" })],
+    bleed: "desktop",
+    prompt: "Palm Springs, 1977. A white curved modernist house beside a kidney-shaped pool, pink bougainvillea, cacti and fan palms, mountains behind, clear afternoon light. Shot on a Hasselblad, 28mm, sage and coral colour temperature, Slim Aarons, Architectural Digest --ar 4:3",
+  },
+  {
+    kind: "media",
+    items: [m("palmsmotel/scene-2.webp", { frame: false, alt: "Palms Motel at dusk: a lit kidney pool, palms and a 1970s motel block" })],
+    bleed: "desktop",
+    prompt: "Palm Springs, 1977. A motel bar at dusk beside a lit kidney-shaped pool, turquoise roofline, striped loungers, warm lamps inside, palms against the mountains. Shot on a Hasselblad, 28mm, sage and coral colour temperature, Slim Aarons, Architectural Digest --ar 4:3",
+  },
+  // the poster prints, until his poster video replaces this page as the chapter's last
   { kind: "media", items: ["palmsmotel/poster-1.webp", "palmsmotel/poster-2.webp", "palmsmotel/poster-3.webp", "palmsmotel/poster-4.webp"].map((p) => m(p, { frame: false, alt: "A Palms Motel poster print" })), caption: "Sold as poster prints" },
 
   /* ── TasWater ──────────────────────────────────────────────── */

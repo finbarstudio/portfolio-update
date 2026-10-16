@@ -231,7 +231,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
         <section className={`pf-slide pf-title is-text${s.kind === "title" && s.bg ? " has-bg" : ""}`} id={s.kind === "title" ? s.id : "other"}>
           {s.kind === "title" && s.bg ? (
             // the picture fills the page behind the name, darkened at the foot so the name reads
-            <div className="pf-title-bg">
+            <div className="pf-title-bg" style={s.bgFocus ? ({ "--focus": s.bgFocus } as React.CSSProperties) : undefined}>
               <Item m={s.bg} group={chap?.id} />
             </div>
           ) : null}
@@ -342,6 +342,12 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
                 ) : null}
                 {s.tags ? <Tags tags={s.tags} /> : null}
               </span>
+            </p>
+          ) : null}
+          {s.prompt ? (
+            <p className="pf-prompt">
+              <span className="pf-prompt-label">Midjourney prompt</span>
+              {s.prompt}
             </p>
           ) : null}
         </section>

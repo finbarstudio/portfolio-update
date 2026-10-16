@@ -24,7 +24,7 @@ const FROM = {
   // lifted, so the overlaid title has its own space under the lockup
   lows: { src: "portfolio/print/lows-logo-zoom.webp", whole: "black", h: 190, lift: 40 },
   "share-to-buy": "portfolio/print/phones-black.webp",
-  "palms-motel": "palmsmotel/scene-2.webp",
+  "palms-motel": "palmsmotel/scene-2.webp", // the dusk pool: the sign is upright and crops badly to 9:4
   taswater: "portfolio/taswater/map-mockup.webp",
   "london-home-show": "portfolio/print/london-home-show-event-deck.webp",
   other: "joe-devine/hero.webp",
