@@ -51,7 +51,7 @@ export type Slide =
   | { kind: "cv" }
   | { kind: "index" }
   | { kind: "grid"; cols: number; rows: number; cells: Cell[]; caption?: string }
-  | { kind: "title"; id: string; name: string; category: string; year: string; /** skills an employer would look for, as tags on the opening page (from the short list in TAGS) */ tags?: Tag[] }
+  | { kind: "title"; id: string; name: string; category: string; year: string; /** skills an employer would look for, as tags on the opening page (from the short list in TAGS) */ tags?: Tag[]; /** a picture filling the whole title page behind the name */ bg?: Media }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[]; /** the project's key numbers, along the foot of the page (kept out of the body copy) */ stats?: Stat[] }
   | { kind: "quote"; name: string; quote: string; by: string }
   | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9); "desktop": only on a desktop (and in the PDF), a phone keeps the usual stacked page */ bleed?: boolean | "desktop"; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number; /** skill tags, for the one-page projects in Other */ tags?: Tag[]; /** keep the caption on a phone (phones drop captions otherwise) */ phoneCaption?: boolean }
@@ -253,6 +253,31 @@ const RAW: Slide[] = [
   // versions; the ring's is H.264 at 30fps, as the VP9 one was too heavy for an iPhone to start.
   { kind: "media", items: [m("portfolio/tmyr/posts-ring-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/posts-ring-mobile.mp4") })], bleed: true, ground: "#ae125f", ink: "#ffffff" },
   { kind: "media", items: [m("portfolio/tmyr/guy-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/guy-mobile.mp4") })], bleed: true, ground: "#e71988", ink: "#ffffff" },
+
+  /* ── Palms Motel ───────────────────────────────────────────── */
+  // A personal project, kept as the one AI image set in the deck. The images are the 2024 exports off the old
+  // Framer site (public/media/images/palmsmotel); the posters are small (424 by 600), so they sit four across.
+  {
+    kind: "title",
+    id: "palms-motel",
+    name: "Palms Motel",
+    category: "AI Art Direction",
+    year: "2024",
+    tags: ["Art Direction", "Generative AI", "Social Media"],
+    bg: m("palmsmotel/scene-2.webp", { frame: false, alt: "Palms Motel at dusk: a lit kidney pool, palms and a 1970s motel block" }),
+  },
+  {
+    kind: "text",
+    name: "Palms Motel",
+    category: "AI Art Direction",
+    body:
+      "A personal project: a 1970s Palm Springs motel that never existed, told as a TikTok slideshow series. I wrote one Midjourney prompt system with fixed parts (the era, the camera, the light, the colours) and one variable, the scene, so hundreds of images read like one afternoon shot by one photographer. Each was graded and cleaned up in Photoshop.",
+    meta: [{ label: "TikTok", value: "@palmsmotel", href: "https://www.tiktok.com/@palmsmotel" }, study("palmsmotel")],
+    stats: [{ value: "770k", label: "Views, top post" }, { value: "109k", label: "Likes" }, { value: "288", label: "Images, one prompt system" }],
+  },
+  bleed("palmsmotel/scene-1.webp", undefined, { alt: "A white 1970s house by a kidney pool, palms and pink flowers" }),
+  { kind: "media", items: [m("palmsmotel/scene-3.webp", { frame: false, alt: "A turquoise pool path past striped loungers and cacti" }), m("palmsmotel/sign.webp", { frame: false, alt: "The Palms Motel roadside sign" })] },
+  { kind: "media", items: ["palmsmotel/poster-1.webp", "palmsmotel/poster-2.webp", "palmsmotel/poster-3.webp", "palmsmotel/poster-4.webp"].map((p) => m(p, { frame: false, alt: "A Palms Motel poster print" })), caption: "Sold as poster prints" },
 
   /* ── TasWater ──────────────────────────────────────────────── */
   { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024", tags: ["Infographics"] },

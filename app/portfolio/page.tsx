@@ -228,7 +228,13 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
       const name = s.kind === "title" ? s.name : s.title;
       const sub = s.kind === "title" ? s.category : s.subtitle;
       return (
-        <section className="pf-slide pf-title is-text" id={s.kind === "title" ? s.id : "other"}>
+        <section className={`pf-slide pf-title is-text${s.kind === "title" && s.bg ? " has-bg" : ""}`} id={s.kind === "title" ? s.id : "other"}>
+          {s.kind === "title" && s.bg ? (
+            // the picture fills the page behind the name, darkened at the foot so the name reads
+            <div className="pf-title-bg">
+              <Item m={s.bg} group={chap?.id} />
+            </div>
+          ) : null}
           <div className="pf-pad">
             <div className="pf-head pf-mono">
               <span>{chap?.no}</span>
