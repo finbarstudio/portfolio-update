@@ -292,6 +292,8 @@ const RAW: Slide[] = [
     bleed: "desktop",
     prompt: "Palm Springs, 1977. A motel bar at dusk beside a lit kidney-shaped pool, turquoise roofline, striped loungers, warm lamps inside, palms against the mountains. Shot on a Hasselblad, 28mm, sage and coral colour temperature, Slim Aarons, Architectural Digest --ar 4:3",
   },
+  // a poster print framed by the pool, edge to edge, with its own upright cut for phones
+  { kind: "media", items: [m("palmsmotel/poster-frame.webm", { frame: false, alt: "A framed Palms Motel poster by the pool", mobile: phone("palmsmotel/poster-frame-mobile.mp4") })], bleed: true },
   // the poster prints in motion, the chapter's last page: edge to edge, with its own upright cut for phones
   { kind: "media", items: [m("palmsmotel/posters.webm", { frame: false, alt: "The Palms Motel poster prints", mobile: phone("palmsmotel/posters-mobile.mp4") })], bleed: true },
 
