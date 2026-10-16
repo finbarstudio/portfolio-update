@@ -269,8 +269,9 @@ const RAW: Slide[] = [
     name: "The London Home Show",
     category: "Event",
     body:
-      "The London Home Show is the UK’s first affordable homes exhibition, with more than 4,000 visitors. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that drove record ticket sales.",
+      "The London Home Show is the UK’s first affordable homes exhibition. I designed the show’s print and digital: flags and wayfinding, stage graphics, brochures, booklets and tickets, Metro newspaper ads, and the email campaign that sold the tickets.",
     meta: [study("london-home-show")],
+    stats: [{ value: "4,000+", label: "Visitors" }, { value: "Record", label: "Ticket sales" }],
   },
   // edge to edge on a phone too
   { kind: "media", items: [m("portfolio/london-home-show/event-deck.webm", { frame: false, mobile: phone("portfolio/london-home-show/event-deck-mobile.webm") })], bleed: true },
