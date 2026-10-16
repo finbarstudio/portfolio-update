@@ -110,7 +110,7 @@ const nextConfig: NextConfig = {
       // the browser rather than downloaded (see the header rule above).
       // The ?v= is there for Cloudflare, which caches /downloads for a day by
       // URL: bump it whenever the PDF is replaced, or /cv serves the old CV.
-      { source: "/cv", destination: "/downloads/Finbar-Skitini-CV.pdf?v=2026-10-16d", permanent: false },
+      { source: "/cv", destination: "/downloads/Finbar-Skitini-CV.pdf?v=2026-10-16e", permanent: false },
       // finbar.studio/portfolio.pdf = the portfolio as a PDF (the button on /portfolio).
       // The file is made by scripts/portfolio-pdf.mjs; bump the ?v= when it is remade.
       { source: "/portfolio.pdf", destination: "/downloads/Finbar-Skitini-Portfolio.pdf?v=2026-10-16", permanent: false },
