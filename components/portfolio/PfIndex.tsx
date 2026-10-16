@@ -3,8 +3,8 @@
 /**
  * The portfolio's contents page (Projects). On a desktop it opens as the
  * list, with a switch in the header row to flip to thumbnails, three across,
- * and back. On a phone it is always the list. The PDF prints the
- * thumbnails. Each entry links to its chapter's opening page.
+ * and back. On a phone it is always the list, and the PDF prints the
+ * list too. Each entry links to its chapter's opening page.
  *
  * The thumbnails are 9:4 crops from each chapter's work, made by
  * scripts/portfolio-thumbs.mjs into public/media/images/portfolio/thumbs/.
@@ -75,9 +75,8 @@ function Thumb({ id, name }: { id: string; name: string }) {
 }
 
 export default function PfIndex({ chapters, page }: { chapters: IndexChapter[]; page: string }) {
-  // the site opens on the list (his call); the PDF always prints the thumbnails
-  const [picked, setView] = useState<"thumbs" | "list">("list");
-  const view = usePrintView() ? "thumbs" : picked;
+  // opens on the list, the PDF included (his call); the switch flips to the thumbnails
+  const [view, setView] = useState<"thumbs" | "list">("list");
   return (
     <section className="pf-slide pf-index is-text" aria-label="Projects" data-view={view}>
       <div className="pf-pad">

@@ -61,7 +61,7 @@ export type Slide =
   | { kind: "section"; title: string; subtitle: string; year: string }
   | { kind: "end" };
 
-export const UPDATED = { long: "October 2026", short: "05.10.2026" };
+export const UPDATED = { long: "October 2026", short: "16.10.2026" };
 
 /** The portfolio PDF link on the About page (the same flag is in TopNav). The PDF is made by scripts/portfolio-pdf.mjs. */
 export const PORTFOLIO_PDF = true;

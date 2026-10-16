@@ -53,7 +53,7 @@ export function usePrintJpeg(src: string | null, max = 1700) {
         g.drawImage(img, 0, 0, c.width, c.height);
         const corners = [[0, 0], [c.width - 1, 0], [0, c.height - 1], [c.width - 1, c.height - 1]];
         const clear = corners.some(([x, y]) => g.getImageData(x, y, 1, 1).data[3] < 255);
-        if (!clear) out = c.toDataURL("image/jpeg", 0.77);
+        if (!clear) out = c.toDataURL("image/jpeg", 0.84);
       }
       if (live) setJpeg({ src, out });
     };

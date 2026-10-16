@@ -765,6 +765,8 @@ html[data-pf-theme="light"] .pf-chrome {
   html:has(.pf), body:has(.pf) { background: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pf, .pf * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pf-chrome, nextjs-portal, .pf-sound, .pf-play, .pf-hint, .pf-load, .pf-print-hide { display: none !important; }
+  /* the contents switch keeps its cell in the header row, so the page number stays at the right edge */
+  .pf-index-switch.pf-print-hide { display: block !important; visibility: hidden; }
   /* a plain column: Chrome ignores page breaks between the items of a flex column */
   body:has(.pf) { margin: 0; }
   .pf { display: block; padding: 0; }
