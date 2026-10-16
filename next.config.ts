@@ -113,7 +113,7 @@ const nextConfig: NextConfig = {
       { source: "/cv", destination: "/downloads/Finbar-Skitini-CV.pdf?v=2026-10-16e", permanent: false },
       // finbar.studio/portfolio.pdf = the portfolio as a PDF (the button on /portfolio).
       // The file is made by scripts/portfolio-pdf.mjs; bump the ?v= when it is remade.
-      { source: "/portfolio.pdf", destination: "/downloads/Finbar-Skitini-Portfolio.pdf?v=2026-10-16c", permanent: false },
+      { source: "/portfolio.pdf", destination: "/downloads/Finbar-Skitini-Portfolio.pdf?v=2026-10-16d", permanent: false },
       // Safety net: public/media is not deployed once R2 serves it, so any
       // "/media/..." path that slipped past media() is bounced to the bucket
       // rather than 404ing. It costs a round trip; fix the reference instead.

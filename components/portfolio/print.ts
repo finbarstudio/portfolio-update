@@ -35,7 +35,7 @@ export function stillName(path: string) {
  * corners (a logo) is left as it is, since a JPEG cannot hold transparency.
  * Null until it is ready; pass null to skip.
  */
-export function usePrintJpeg(src: string | null, max = 2000) {
+export function usePrintJpeg(src: string | null, max = 1700) {
   const [jpeg, setJpeg] = useState<{ src: string; out: string } | null>(null);
   useEffect(() => {
     if (!src) return;
@@ -53,7 +53,7 @@ export function usePrintJpeg(src: string | null, max = 2000) {
         g.drawImage(img, 0, 0, c.width, c.height);
         const corners = [[0, 0], [c.width - 1, 0], [0, c.height - 1], [c.width - 1, c.height - 1]];
         const clear = corners.some(([x, y]) => g.getImageData(x, y, 1, 1).data[3] < 255);
-        if (!clear) out = c.toDataURL("image/jpeg", 0.84);
+        if (!clear) out = c.toDataURL("image/jpeg", 0.77);
       }
       if (live) setJpeg({ src, out });
     };
