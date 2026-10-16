@@ -288,13 +288,12 @@ body:has(.pf) { background: #1a1a1a; }
 /* the outward arrow on a link: an icon, as a text arrow turns into an emoji on an iPhone */
 .pf-arrow { display: inline-block; width: 0.9em; height: 0.9em; margin-left: 0.25em; vertical-align: -0.08em; }
 .pf-meta .v { display: block; color: var(--ink); text-transform: none; letter-spacing: var(--tr-copy); font-family: var(--font-host), "Host Grotesk", sans-serif; font-weight: 500; font-size: max(calc(var(--u) * 0.95), 12px); margin-top: 0.3em; }
-/* a project's skill tags: small outlined pills, on the opening page's running row (and after the caption in Other) */
-.pf-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5em; margin: 0; padding: 0; list-style: none; }
-
-.pf-tags > span { border: 1px solid currentColor; border-radius: 999px; padding: 0.2em 0.75em 0.15em; line-height: 1.2; white-space: nowrap; }
-.pf-head .pf-tags { grid-column: 2 / -1; margin-block: -0.35em; margin-right: 0; }
+/* a project's skill tags, in the nav tooltip's style (Download CV's hover, .nav-tip in globals.css), a size up */
+.pf-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5em; margin: 0; padding: 0; }
+.pf-tags > span { background: #000; color: var(--ink); border: 1px solid var(--ink); border-radius: 3px; padding: 0.4em 0.5em; font-family: var(--font-mono); font-weight: 400; font-size: max(calc(var(--u) * 0.85), 12px); letter-spacing: 0.06em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+.pf-head .pf-tags { grid-column: 2 / -1; margin-block: -0.45em; margin-right: 0; }
 .pf-caption .pf-tags { display: inline-flex; vertical-align: middle; margin-left: 1.2em; }
-.pf-caption .pf-tags > span { text-transform: uppercase; letter-spacing: var(--tr-label); line-height: 1.2; }
+.pf-caption .pf-tags > span { letter-spacing: 0.06em; text-transform: uppercase; }
 /* the foot of a project's opening page: its key numbers left, its links right */
 .pf-text-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: calc(var(--u) * 3.2); }
 .pf-text-foot .pf-meta { margin-left: auto; }
