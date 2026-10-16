@@ -194,8 +194,8 @@ const RAW: Slide[] = [
   },
   device("portfolio/rennen-plus/website.webm"),
   one("portfolio/rennen-plus/cars.webp", "228 cars, each cut out and set on one baseline", { frame: false, cars: true }),
-  // full bleed on a desktop (his call), the caption on its closed-caption box; a phone keeps it stacked with the caption under it
-  { ...one("portfolio/rennen-plus/materials.webm", "Pick an option on the site, like an exhaust tip finish, to preview it as an interactive 3D material", { frame: false, mobile: phone("portfolio/rennen-plus/materials-mobile.mp4") }), bleed: "desktop", phoneCaption: true } as Slide,
+  // inset at 2:1 on the page's black (the clip is on black), caption under it, kept on phones too
+  { ...one("portfolio/rennen-plus/materials.webm", "Pick an option on the site, like an exhaust tip finish, to preview it as an interactive 3D material", { frame: false, mobile: phone("portfolio/rennen-plus/materials-mobile.mp4") }), phoneCaption: true } as Slide,
   device("portfolio/rennen-plus/phones.webm", "Designed mobile first, as most visitors browse on a phone", { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
 
   /* ── Plated with Issy ──────────────────────────────────────── */
