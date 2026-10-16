@@ -256,7 +256,7 @@ const RAW: Slide[] = [
 
   /* ── Palms Motel ───────────────────────────────────────────── */
   // A personal project, kept as the one AI image set in the deck. The images are the 2024 exports off the old
-  // Framer site (public/media/images/palmsmotel); the posters are small (424 by 600), so they sit four across.
+  // Framer site (public/media/images/palmsmotel); the posters are his own carousel video (Portfolio/Palms Motel/Finals).
   {
     kind: "title",
     id: "palms-motel",
@@ -292,8 +292,8 @@ const RAW: Slide[] = [
     bleed: "desktop",
     prompt: "Palm Springs, 1977. A motel bar at dusk beside a lit kidney-shaped pool, turquoise roofline, striped loungers, warm lamps inside, palms against the mountains. Shot on a Hasselblad, 28mm, sage and coral colour temperature, Slim Aarons, Architectural Digest --ar 4:3",
   },
-  // the poster prints, until his poster video replaces this page as the chapter's last
-  { kind: "media", items: ["palmsmotel/poster-1.webp", "palmsmotel/poster-2.webp", "palmsmotel/poster-3.webp", "palmsmotel/poster-4.webp"].map((p) => m(p, { frame: false, alt: "A Palms Motel poster print" })), caption: "Sold as poster prints" },
+  // the poster prints in motion, the chapter's last page: edge to edge, with its own upright cut for phones
+  { kind: "media", items: [m("palmsmotel/posters.webm", { frame: false, alt: "The Palms Motel poster prints", mobile: phone("palmsmotel/posters-mobile.mp4") })], bleed: true },
 
   /* ── TasWater ──────────────────────────────────────────────── */
   { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024", tags: ["Infographics"] },
