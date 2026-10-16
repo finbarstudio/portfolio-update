@@ -288,6 +288,13 @@ body:has(.pf) { background: #1a1a1a; }
 /* the outward arrow on a link: an icon, as a text arrow turns into an emoji on an iPhone */
 .pf-arrow { display: inline-block; width: 0.9em; height: 0.9em; margin-left: 0.25em; vertical-align: -0.08em; }
 .pf-meta .v { display: block; color: var(--ink); text-transform: none; letter-spacing: var(--tr-copy); font-family: var(--font-host), "Host Grotesk", sans-serif; font-weight: 500; font-size: max(calc(var(--u) * 0.95), 12px); margin-top: 0.3em; }
+/* a project's skill tags: small outlined pills, on the opening page's running row (and after the caption in Other) */
+.pf-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5em; margin: 0; padding: 0; list-style: none; }
+
+.pf-tags > span { border: 1px solid currentColor; border-radius: 999px; padding: 0.2em 0.75em 0.15em; line-height: 1.2; white-space: nowrap; }
+.pf-head .pf-tags { grid-column: 2 / -1; margin-block: -0.35em; margin-right: 0; }
+.pf-caption .pf-tags { display: inline-flex; vertical-align: middle; margin-left: 1.2em; }
+.pf-caption .pf-tags > span { text-transform: uppercase; letter-spacing: var(--tr-label); line-height: 1.2; }
 /* the foot of a project's opening page: its key numbers left, its links right */
 .pf-text-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: calc(var(--u) * 3.2); }
 .pf-text-foot .pf-meta { margin-left: auto; }
@@ -591,6 +598,8 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-end-mark { position: static; transform: none; flex: none; }
   .pf-cv-foot .pf-phone-note { flex-basis: 100%; margin: 26px 0 0; text-align: left; }
   .pf-meta { display: flex; }
+  .pf-head .pf-tags { flex: 1; margin-block: 0; }
+  .pf-media .pf-caption .pf-tags { display: flex; justify-content: flex-start; margin: 8px 0 0; }
   .pf-text-foot { flex-direction: column; align-items: stretch; gap: 30px; }
   .pf-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .pf-stat dd { font-size: 28px; }

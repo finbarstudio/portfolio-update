@@ -7,7 +7,7 @@ import PfIndex from "@/components/portfolio/PfIndex";
 import { MdArrowOutward, MdArrowUpward } from "@/components/MaterialIcon";
 import { FlaskIcon, SOCIALS } from "@/components/social-icons";
 import { MARK_SHAPES, MARK_VIEWBOX } from "@/components/brand-mark";
-import { PORTFOLIO, CV, UPDATED, PORTFOLIO_PDF, type Media, type Slide } from "@/content/portfolio";
+import { PORTFOLIO, CV, UPDATED, PORTFOLIO_PDF, type Media, type Slide, type Tag } from "@/content/portfolio";
 import "./portfolio.css";
 
 /**
@@ -104,6 +104,18 @@ function Kerned({ text }: { text: string }) {
 }
 
 /** The running line on a media page: chapter left, page number right. */
+/** A project's skill tags, in the words job ads use. */
+function Tags({ tags }: { tags: Tag[] }) {
+  return (
+    // spans with list roles, as in Other it sits inside the caption's <p>
+    <span className="pf-tags" role="list" aria-label="Skills">
+      {tags.map((t) => (
+        <span key={t} role="listitem">{t}</span>
+      ))}
+    </span>
+  );
+}
+
 function Run({ chap, page }: { chap?: Chapter; page: string }) {
   return (
     <div className="pf-run pf-mono">
@@ -220,9 +232,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
           <div className="pf-pad">
             <div className="pf-head pf-mono">
               <span>{chap?.no}</span>
-              <span />
-              <span />
-              <span />
+              {s.kind === "title" && s.tags ? <Tags tags={s.tags} /> : <span />}
             </div>
             <h2 className="pf-display" style={s.kind === "section" ? { maxWidth: "11em" } : undefined}>
               {name}
@@ -324,6 +334,7 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
                     {s.link.label}<MdArrowOutward className="pf-arrow" />
                   </a>
                 ) : null}
+                {s.tags ? <Tags tags={s.tags} /> : null}
               </span>
             </p>
           ) : null}

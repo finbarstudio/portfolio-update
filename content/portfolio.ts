@@ -43,15 +43,18 @@ export type Media = { src: string; w: number; h: number; video?: boolean; frame?
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
 export type Stat = { value: string; label: string };
+/** The skill tags on each project's opening page: a short list, in the words job ads use, so an employer scanning the deck can match it to their brief. Keep it short; add a tag here before using it. */
+export const TAGS = ["Brand Identity", "Web Design", "UX/UI", "Art Direction", "Motion Design", "Social Media", "Print", "Editorial", "Infographics", "Wayfinding", "Email", "Generative AI", "3D", "Photography"] as const;
+export type Tag = (typeof TAGS)[number];
 export type Slide =
   | { kind: "cover" }
   | { kind: "cv" }
   | { kind: "index" }
   | { kind: "grid"; cols: number; rows: number; cells: Cell[]; caption?: string }
-  | { kind: "title"; id: string; name: string; category: string; year: string }
+  | { kind: "title"; id: string; name: string; category: string; year: string; /** skills an employer would look for, as tags on the opening page (from the short list in TAGS) */ tags?: Tag[] }
   | { kind: "text"; name: string; category: string; body: string; meta: Meta[]; /** the project's key numbers, along the foot of the page (kept out of the body copy) */ stats?: Stat[] }
   | { kind: "quote"; name: string; quote: string; by: string }
-  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9); "desktop": only on a desktop (and in the PDF), a phone keeps the usual stacked page */ bleed?: boolean | "desktop"; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number }
+  | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9); "desktop": only on a desktop (and in the PDF), a phone keeps the usual stacked page */ bleed?: boolean | "desktop"; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number; /** skill tags, for the one-page projects in Other */ tags?: Tag[] }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
   | { kind: "deck"; /** a landscape document to page through: every page in order, and the same pages small */ name: string; pages: string[]; thumbs: string[]; caption?: string }
   | { kind: "logo"; src: string; alt?: string; bg?: string; size?: string; dark?: boolean }
@@ -139,7 +142,7 @@ const bleed = (path: string, caption?: string, o: Partial<Media> = {}, ink?: str
 /** A device video on its own page: a 2:1 file on black, filling the page top to bottom (only black is lost at the sides), the running line over it. */
 const device = (path: string, caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, bleed: "desktop" });
 /** The same with a link out after the caption: only in Other, where a page stands in for a whole project (each project's own links are on its opening page). */
-const linked = (path: string, caption: string, link: { label: string; href: string }, o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link, bleed: "desktop" });
+const linked = (path: string, caption: string, link: { label: string; href: string }, tags?: Tag[], o: Partial<Media> = {}): Slide => ({ kind: "media", items: [m(path, { frame: false, ...o })], caption, link, bleed: "desktop", tags });
 const row = (paths: string[], caption?: string, o: Partial<Media> = {}): Slide => ({ kind: "media", items: paths.map((p) => m(p, o)), caption });
 
 /** Several rows of images on one page, `per` to a row, none cropped. */
@@ -163,7 +166,7 @@ const RAW: Slide[] = [
   { kind: "index" },
 
   /* ── Lola Audio ─────────────────────────────────────────────── */
-  { kind: "title", id: "lola", name: "Lola Audio", category: "Logo and Website", year: "2026" },
+  { kind: "title", id: "lola", name: "Lola Audio", category: "Logo and Website", year: "2026", tags: ["Brand Identity", "Web Design", "UX/UI"] },
   {
     kind: "text",
     name: "Lola Audio",
@@ -179,7 +182,7 @@ const RAW: Slide[] = [
   device("portfolio/lola-audio/website.webm", undefined, { sound: true, mobile: phone("portfolio/lola-audio/website-mobile.mp4") }),
 
   /* ── Rennen Plus ────────────────────────────────────────────── */
-  { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026" },
+  { kind: "title", id: "rennen-plus", name: "Rennen Plus", category: "Website", year: "2026", tags: ["Web Design", "UX/UI"] },
   {
     kind: "text",
     name: "Rennen Plus",
@@ -194,7 +197,7 @@ const RAW: Slide[] = [
   device("portfolio/rennen-plus/phones.webm", "Designed mobile first, as most visitors browse on a phone", { mobile: phone("portfolio/rennen-plus/phones-mobile.webp") }),
 
   /* ── Plated with Issy ──────────────────────────────────────── */
-  { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026" },
+  { kind: "title", id: "plated", name: "Plated with Issy", category: "Brand and Website", year: "2026", tags: ["Brand Identity", "Art Direction", "Web Design"] },
   {
     kind: "text",
     name: "Plated with Issy",
@@ -211,7 +214,7 @@ const RAW: Slide[] = [
   bleed("portfolio/plated-with-issy/polaroids/the-venue.webp", undefined, { globe: true, w: 16, h: 9, mobile: { ...phone("portfolio/plated-with-issy/polaroids/the-venue.webp")!, w: 1, h: 1 } }, "#FAE3B1"),
 
   /* ── Lows Design and Build ──────────────────────────────────── */
-  { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026" },
+  { kind: "title", id: "lows", name: "Lows Design + Build", category: "Brand and Website", year: "2026", tags: ["Brand Identity", "Web Design", "Social Media"] },
   {
     kind: "text",
     name: "Lows Design + Build",
@@ -232,7 +235,7 @@ const RAW: Slide[] = [
   },
 
   /* ── The Moment You Realise (Share to Buy) ─────────────────── */
-  { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023" },
+  { kind: "title", id: "share-to-buy", name: "The Moment You Realise", category: "Social Campaign for Share to Buy", year: "2022–2023", tags: ["Motion Design", "Social Media"] },
   {
     kind: "text",
     name: "The Moment You Realise",
@@ -250,7 +253,7 @@ const RAW: Slide[] = [
   { kind: "media", items: [m("portfolio/tmyr/guy-wide.webm", { frame: false, mobile: phone("portfolio/tmyr/guy-mobile.mp4") })], bleed: true, ground: "#e71988", ink: "#ffffff" },
 
   /* ── TasWater ──────────────────────────────────────────────── */
-  { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024" },
+  { kind: "title", id: "taswater", name: "TasWater", category: "Information Design", year: "2024", tags: ["Infographics"] },
   {
     kind: "text",
     name: "TasWater",
@@ -263,7 +266,7 @@ const RAW: Slide[] = [
   bleed("portfolio/taswater/snake-mockup.webp", undefined, { mobile: phone("portfolio/taswater/snake-mockup-mobile.webp") }),
 
   /* ── The London Home Show ──────────────────────────────────── */
-  { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023" },
+  { kind: "title", id: "london-home-show", name: "The London Home Show", category: "Event", year: "2023", tags: ["Print", "Wayfinding", "Email"] },
   {
     kind: "text",
     name: "The London Home Show",
@@ -279,9 +282,9 @@ const RAW: Slide[] = [
   /* ── Other ─────────────────────────────────────────────────── */
   /* One page each. The full story is on each case study. */
   { kind: "section", title: "Other", subtitle: "Playbooks, print and covers", year: "2022–2026" },
-  linked("portfolio/salesmasters/covers-wheel.webm", "Salesmasters. Sales playbooks for nine clients", { label: "Case study", href: "https://www.finbar.studio/case-studies/salesmasters" }),
-  linked("portfolio/packer/capability-statement.webm", "Packer and Associates. Capability statement", { label: "Case study", href: "https://www.finbar.studio/case-studies/packer-associates" }),
-  { kind: "media", items: [m("joe-devine/hero.webp")], bleed: true, caption: "Joe Devine. Single covers and art direction", link: { label: "Case study", href: "https://www.finbar.studio/case-studies/joe-devine" } },
+  linked("portfolio/salesmasters/covers-wheel.webm", "Salesmasters. Sales playbooks for nine clients", { label: "Case study", href: "https://www.finbar.studio/case-studies/salesmasters" }, ["Editorial", "Print", "Infographics", "Generative AI"]),
+  linked("portfolio/packer/capability-statement.webm", "Packer and Associates. Capability statement", { label: "Case study", href: "https://www.finbar.studio/case-studies/packer-associates" }, ["Editorial", "Print", "3D"]),
+  { kind: "media", items: [m("joe-devine/hero.webp")], bleed: true, caption: "Joe Devine. Single covers and art direction", link: { label: "Case study", href: "https://www.finbar.studio/case-studies/joe-devine" }, tags: ["Art Direction", "Photography"] },
 
   { kind: "end" },
 ];
