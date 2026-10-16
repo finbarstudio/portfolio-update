@@ -105,23 +105,19 @@ copies in this repo; edit the source and sync.
 here, not the parent. Anything that should go to GitHub or ship on the site
 lives inside `Website/`. Nothing above this folder is in git.
 
-The parent `finbar.studio/` is Finbar's design workspace, deliberately OUTSIDE
-the repo. It holds source/working assets, not site code:
-
-- `Brand/`, `Headshots/`, `Journal/` — design source files (logos, photo edits,
-  writing drafts). The site consumes finished exports copied into
-  `Website/public/`, never these originals.
-- `journal-studio/` — Sanity Studio source for the retired /journal blog.
-  The journal was removed from the site (Aug 2026); this and the Sanity project
-  still hold the written posts, but nothing here consumes them.
-- `Social Media/` — **DO NOT TOUCH.** Another agent owns this folder. It's
-  outside the repo so git never sees it; leave it entirely alone.
+Everything else (originals, exports, captures, lab tool sources, brand masters,
+outreach, admin) lives in the parent workspace `finbar.studio/`, and client work
+in `../../Design Work/<Client>/`. **Where each kind of file goes, and how to name
+and store it, is in `../AGENTS.md`. Read it before saving anything outside this
+repo.**
 
 Rules of thumb:
-- New asset for the site → optimise it and put the export in `Website/public/`.
-- Working file, research, or non-site design → keep it in the parent, out of git.
-- `archive/` and `research/` are on disk but **gitignored** (not live). To put an
-  archived demo back on the site, `git add` its folder again.
+- New asset for the site → optimise it and put the export in `public/media/`
+  (the media rule above); keep the original in the parent workspace.
+- Working file, research, or non-site design → the parent workspace, out of git.
+- `Social Media/` in the parent is **DO NOT TOUCH** (another agent owns it).
+- `archive/` and `research/` here are on disk but **gitignored** (not live). To put
+  an archived demo back on the site, `git add` its folder again.
 
 # The palette is four colours
 
