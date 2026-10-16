@@ -288,6 +288,13 @@ body:has(.pf) { background: #1a1a1a; }
 /* the outward arrow on a link: an icon, as a text arrow turns into an emoji on an iPhone */
 .pf-arrow { display: inline-block; width: 0.9em; height: 0.9em; margin-left: 0.25em; vertical-align: -0.08em; }
 .pf-meta .v { display: block; color: var(--ink); text-transform: none; letter-spacing: var(--tr-copy); font-family: var(--font-host), "Host Grotesk", sans-serif; font-weight: 500; font-size: max(calc(var(--u) * 0.95), 12px); margin-top: 0.3em; }
+/* the foot of a project's opening page: its key numbers left, its links right */
+.pf-text-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: calc(var(--u) * 3.2); }
+.pf-text-foot .pf-meta { margin-left: auto; }
+.pf-stats { display: flex; align-items: flex-start; gap: calc(var(--u) * 4); margin: 0; }
+.pf-stat { display: flex; flex-direction: column; margin: 0; }
+.pf-stat dd { order: -1; }
+.pf-stat dd { margin: 0 0 0.12em; font-size: calc(var(--u) * 3.4); line-height: 1; font-weight: 600; letter-spacing: var(--tr-display); }
 .pf-quote .pf-body { font-size: calc(var(--u) * 3); max-width: 22em; letter-spacing: var(--tr-quote); }
 .pf-quote .q { color: var(--pink); }
 
@@ -584,6 +591,9 @@ body:has(.pf) { background: #1a1a1a; }
   .pf-end-mark { position: static; transform: none; flex: none; }
   .pf-cv-foot .pf-phone-note { flex-basis: 100%; margin: 26px 0 0; text-align: left; }
   .pf-meta { display: flex; }
+  .pf-text-foot { flex-direction: column; align-items: stretch; gap: 30px; }
+  .pf-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .pf-stat dd { font-size: 28px; }
   .pf-cv-bio { grid-column: 1 / -1; grid-row: auto; font-size: 16px; }
   /* about: even out the short broken lines, and give the résumé line room */
   .pf-cv-bio p { text-wrap: pretty; }

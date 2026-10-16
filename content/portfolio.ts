@@ -42,13 +42,14 @@ export type Media = { src: string; w: number; h: number; video?: boolean; frame?
 /** One tile of a grid page: where it sits on the unit grid and how many units it spans. */
 export type Cell = Media & { c: number; r: number; cs: number; rs: number };
 export type Meta = { label: string; value: string; href?: string };
+export type Stat = { value: string; label: string };
 export type Slide =
   | { kind: "cover" }
   | { kind: "cv" }
   | { kind: "index" }
   | { kind: "grid"; cols: number; rows: number; cells: Cell[]; caption?: string }
   | { kind: "title"; id: string; name: string; category: string; year: string }
-  | { kind: "text"; name: string; category: string; body: string; meta: Meta[] }
+  | { kind: "text"; name: string; category: string; body: string; meta: Meta[]; /** the project's key numbers, along the foot of the page (kept out of the body copy) */ stats?: Stat[] }
   | { kind: "quote"; name: string; quote: string; by: string }
   | { kind: "media"; items: Media[]; caption?: string; /** a link shown after the caption */ link?: { label: string; href: string }; /** fill the whole page, edge to edge (crops to 16:9); "desktop": only on a desktop (and in the PDF), a phone keeps the usual stacked page */ bleed?: boolean | "desktop"; /** the colour of the running line and caption (on a full-bleed page they sit over the picture) */ ink?: string; /** on a phone only: the piece fills the page edge to edge, top to bottom, with the running line over it (no page colour shows round it) */ phoneBleed?: boolean; /** the page's own ground colour, to match a piece's background so it sits on the page with no edge */ ground?: string; /** stack the items in rows of this many, each at its true proportions */ per?: number }
   | { kind: "covers"; /** A4 covers, shown small in rows */ items: Media[]; caption?: string }
@@ -184,7 +185,8 @@ const RAW: Slide[] = [
     name: "Rennen Plus",
     category: "Website",
     body:
-      "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. 228 cars and about 2,500 parts, live in five and a half weeks for the Porsche Club of Queensland Concours.",
+      "Rennen Plus sells performance parts from five brands, and its range was spread across supplier sites, an old Shopify store and a quoting spreadsheet. I designed one catalogue where the car comes first: pick your car, see only the parts that fit it, and get a landed Australian price that changes as you choose options. It went live for the Porsche Club of Queensland Concours, and the customers who call now are noticeably better informed.",
+    stats: [{ value: "228", label: "Cars" }, { value: "2,500", label: "Parts, priced live" }, { value: "5½ weeks", label: "Brief to live" }],
     meta: [{ label: "Live", value: "rennenplus.com.au", href: "https://rennenplus.com.au" }, study("rennen-plus")],
   },
   device("portfolio/rennen-plus/website.webm"),
@@ -215,7 +217,7 @@ const RAW: Slide[] = [
     name: "Lows Design + Build",
     category: "Brand and Website",
     body:
-      "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages, an estimate tool that turns a visitor into a named lead, and a CMS the team updates themselves. The launch came with a pack of posts for Instagram, LinkedIn and X.",
+      "Lows is a family-run building company in South London. I refined their mark from the client’s own sketches, then designed a website led by the work: big photography, project pages and a CMS the team updates themselves. Rather than buy in an extension cost estimator, I built theirs from scratch. It saved them money, they can configure it however they like, and it asks for an email before it gives an estimate, so every use is a lead. The launch came with a pack of posts for Instagram, LinkedIn and X.",
     meta: [{ label: "Live", value: "lowsdesignandbuild.com", href: "https://lowsdesignandbuild.com" }, { label: "Instagram", value: "@lowsdesignandbuild", href: "https://www.instagram.com/lowsdesignandbuild" }, study("lows-design-build")],
   },
   one("portfolio/lows/logo-zoom.mp4", undefined, { frame: false, light: `/media/images/${"portfolio/lows/logo-zoom-light.mp4"}` }),
@@ -236,7 +238,8 @@ const RAW: Slide[] = [
     name: "The Moment You Realise",
     category: "Social Campaign for Share to Buy",
     body:
-      "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made more than thirty motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn. New registrants were up 19.7 percent on the year before.",
+      "The Moment You Realise was a campaign for Share to Buy, the UK’s largest affordable homeownership platform. I made motion and still assets in two styles and cut every one for feed, Stories, Reels and LinkedIn.",
+    stats: [{ value: "30+", label: "Motion and still assets" }, { value: "+19.7%", label: "New registrants, year on year" }, { value: "+3.4%", label: "Property enquiries" }],
     meta: [study("tmyr")],
   },
   { kind: "media", items: [m("tmyr/hero-poster.webp", { frame: false, phones: true, mobile: { ...phone("tmyr/hero-poster.webp")!, w: 9, h: 10 } })], ground: "#ae125f", ink: "#ffffff" },

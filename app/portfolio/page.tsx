@@ -245,17 +245,30 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
             <div className="pf-text-body">
               <p className="pf-body">{s.body}</p>
             </div>
-            <div className="pf-cols pf-meta">
-              {s.meta.map((m) => (
-                <p key={m.label} className="pf-mono pf-soft">
-                  {m.label}
-                  {m.href ? (
-                    <a className="v" href={m.href} target="_blank" rel="noopener noreferrer">{m.value}<MdArrowOutward className="pf-arrow" /></a>
-                  ) : (
-                    <span className="v">{m.value}</span>
-                  )}
-                </p>
-              ))}
+            {/* the key numbers on the left, the links on the right, along the foot of the page */}
+            <div className="pf-text-foot">
+              {s.stats ? (
+                <dl className="pf-stats">
+                  {s.stats.map((st) => (
+                    <div key={st.label} className="pf-stat">
+                      <dt className="pf-mono pf-soft">{st.label}</dt>
+                      <dd>{st.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+              <div className="pf-cols pf-meta">
+                {s.meta.map((m) => (
+                  <p key={m.label} className="pf-mono pf-soft">
+                    {m.label}
+                    {m.href ? (
+                      <a className="v" href={m.href} target="_blank" rel="noopener noreferrer">{m.value}<MdArrowOutward className="pf-arrow" /></a>
+                    ) : (
+                      <span className="v">{m.value}</span>
+                    )}
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
         </section>
