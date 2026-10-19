@@ -1052,15 +1052,6 @@ export default function PathwayTool() {
               </button>
             )}
           </div>
-          <p className="stb-note">
-            {photo && !cutoutPng
-              ? "Now the cut-out: the same photo as a PNG with the background removed."
-              : cutoutPng && !photo
-                ? "Now the background: the full photo the cut-out came from."
-                : photo && cutoutPng
-                  ? `${photo.name} with ${cutoutPng.name}`
-                  : "The full photo, plus the same photo as a PNG with its background removed (in Paint: Remove background, then save as PNG). You can drop both on the artwork."}
-          </p>
           {subject && (
             <>
               <div className="stb-seg stb-seg-gap">
