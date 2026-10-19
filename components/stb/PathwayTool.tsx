@@ -34,12 +34,13 @@ const VERSION = "1.5";
 /** `stroke` is the line thickness, fixed per format (decided Oct 2026, no choice in the tool):
  *  px on a 1080 short side, and the same share of the short side at any size. */
 const SIZES = [
-  { label: "1:1", w: LONG, h: LONG, stroke: 150 },
-  { label: "3:4", w: 1536, h: LONG, stroke: 150 },
-  { label: "Reel 9:16", w: 1152, h: LONG, stroke: 200 },
+  // the button shows the ratio; `note` says what it is for, on hover
+  { label: "1:1", note: "Square post", w: LONG, h: LONG, stroke: 150 },
+  { label: "3:4", note: "Portrait post", w: 1536, h: LONG, stroke: 150 },
+  { label: "9:16", note: "Reel or story", w: 1152, h: LONG, stroke: 200 },
   // LinkedIn landscape, 4:5 turned on its side
-  { label: "LinkedIn 5:4", w: LONG, h: 1638, stroke: 150 },
-  { label: "16:9", w: LONG, h: 1152, stroke: 150 },
+  { label: "5:4", note: "LinkedIn landscape", w: LONG, h: 1638, stroke: 150 },
+  { label: "16:9", note: "Widescreen", w: LONG, h: 1152, stroke: 150 },
 ];
 /** "Original" (a photo's own size) is kept to 1:3 to 3:1, and 4096 px on the long side at most. */
 const RATIO_MAX = 3;
@@ -795,7 +796,7 @@ export default function PathwayTool() {
         return { w: pw, h: ph };
       })()
     : null;
-  const format = size < SIZES.length || !photoSize ? SIZES[size < SIZES.length ? size : 0] : { label: "Original", ...photoSize, stroke: 150 };
+  const format = size < SIZES.length || !photoSize ? SIZES[size < SIZES.length ? size : 0] : { label: "Original", note: "The photo's own size", ...photoSize, stroke: 150 };
   const { w, h } = format;
   const short = Math.min(w, h);
   const panels = Math.min(PANELS_MAX, Math.max(PANELS_MIN, Math.round(Number(panelsText)) || 3));
@@ -1052,7 +1053,7 @@ export default function PathwayTool() {
       const lineColours = look.line === "gradient" ? `Live gradient: ${GRADIENT.map((c) => `${colourName(c)} ${c}`).join(", ")}` : `${colourName(look.line)} ${look.line}`;
       const readme = [
         `Share to Buy pathway, seed ${seed}`,
-        `${format.label}, ${w} x ${h} px${n > 1 ? `, carousel of ${n} (1of${n} is the first slide)` : ""}`,
+        `${format.label} (${format.note}), ${w} x ${h} px${n > 1 ? `, carousel of ${n} (1of${n} is the first slide)` : ""}`,
         "",
         "FILES",
         `${base}-artwork*.png     the finished artwork`,
@@ -1202,18 +1203,20 @@ export default function PathwayTool() {
 
         <section>
           <h2>Format</h2>
-          <div className="stb-seg stb-seg-wrap">
+          <div className="stb-seg stb-formats">
             {SIZES.map((s, i) => (
-              <button key={s.label} type="button" aria-pressed={size === i} onClick={() => setSize(i)}>
+              <button key={s.label} type="button" className="stb-has-note" data-note={s.note} aria-label={`${s.label}, ${s.note}`} aria-pressed={size === i} onClick={() => setSize(i)}>
                 {s.label}
               </button>
             ))}
-            {photoSize && (
-              <button type="button" aria-pressed={size === SIZES.length} onClick={() => setSize(SIZES.length)}>
+          </div>
+          {photoSize && (
+            <div className="stb-seg stb-seg-gap">
+              <button type="button" className="stb-has-note" data-note={`${photoSize.w} × ${photoSize.h}`} aria-pressed={size === SIZES.length} onClick={() => setSize(SIZES.length)}>
                 Original
               </button>
-            )}
-          </div>
+            </div>
+          )}
           <div className="stb-seg stb-seg-gap">
             <button type="button" aria-pressed={!carousel} onClick={() => { setCarousel(false); setSlide(0); }}>Single</button>
             <button type="button" aria-pressed={carousel} onClick={() => setCarousel(true)}>Carousel</button>

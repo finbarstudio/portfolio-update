@@ -529,6 +529,30 @@ div.stb-slider {
   width: 56px;
   padding: 5px 6px;
 }
+/* the five ratios always share one row */
+.stb-formats { flex-wrap: nowrap; }
+.stb-formats button { flex: 1 1 0; min-width: 0; padding-left: 4px; padding-right: 4px; }
+/* a format button's use, shown on hover */
+.stb-has-note { position: relative; }
+.stb-has-note::after {
+  content: attr(data-note);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  z-index: 3;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--midnight);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 2px);
+  transition: opacity 0.12s, transform 0.12s;
+}
+.stb-has-note:hover::after,
+.stb-has-note:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
 .stb-note[data-warn="1"] { color: #b3261e; opacity: 1; }
 .stb-pack {
   background: var(--midnight);
