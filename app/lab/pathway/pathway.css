@@ -494,6 +494,18 @@ div.stb-slider {
   width: 56px;
   padding: 5px 6px;
 }
+.stb-custom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.stb-tool .stb-custom .stb-text {
+  width: 120px;
+  flex: none;
+  text-transform: none;
+}
+.stb-note[data-warn="1"] { color: #b3261e; opacity: 1; }
 .stb-pack {
   background: var(--midnight);
 }

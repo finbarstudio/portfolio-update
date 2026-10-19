@@ -39,6 +39,27 @@ const SIZES = [
   // LinkedIn landscape, 4:5 turned on its side
   { label: "LinkedIn 5:4", w: LONG, h: 1638, stroke: 150 },
 ];
+/**
+ * A custom format, typed in: a ratio ("4:3", "1.91:1") drawn with the long side
+ * at LONG, or exact pixels ("1200x628"). Kept between 1:3 and 3:1, and 512 to
+ * 4096 px on the long side. The line is the standard 150 thickness.
+ */
+const CUSTOM_RATIO_MAX = 3;
+const CUSTOM_PX = [512, 4096];
+function parseCustom(text: string): { w: number; h: number } | string {
+  const m = text.trim().match(/^(\d+(?:\.\d+)?)\s*([:x×*])\s*(\d+(?:\.\d+)?)$/i);
+  if (!m) return "A ratio like 4:3, or pixels like 1200x628";
+  const a = Number(m[1]);
+  const b = Number(m[3]);
+  if (!a || !b) return "Both sides need a number";
+  const r = a / b;
+  if (r > CUSTOM_RATIO_MAX || r < 1 / CUSTOM_RATIO_MAX) return "Keep it between 1:3 and 3:1";
+  if (m[2] === ":") return r >= 1 ? { w: LONG, h: Math.round(LONG / r) } : { w: Math.round(LONG * r), h: LONG };
+  const long = Math.max(a, b);
+  if (long < CUSTOM_PX[0] || long > CUSTOM_PX[1]) return `${CUSTOM_PX[0]} to ${CUSTOM_PX[1]} px on the long side`;
+  return { w: Math.round(a), h: Math.round(b) };
+}
+
 /** Panels in a carousel: 2 to 10, 3 to start with. */
 const PANELS_MIN = 2;
 const PANELS_MAX = 10;
@@ -672,7 +693,10 @@ function Slider({ label, value, min, max, step, onChange, show }: {
 export default function PathwayTool() {
   const [brand, setBrand] = useState<BrandKey>("stb");
   const [combo, setCombo] = useState(0);
+  /** an index into SIZES, or SIZES.length for the custom format */
   const [size, setSize] = useState(0);
+  const [customText, setCustomText] = useState("4:3");
+  const [custom, setCustom] = useState({ w: LONG, h: 1536 });
   const [carousel, setCarousel] = useState(false);
   /** The panel count as typed, so the box can be cleared while typing. */
   const [panelsText, setPanelsText] = useState("3");
@@ -754,7 +778,12 @@ export default function PathwayTool() {
   const clock = useRef(0); // when the loop last started
   const drag = useRef<number | null>(null);
 
-  const { w, h } = SIZES[size];
+  const customError = (() => {
+    const c = parseCustom(customText);
+    return typeof c === "string" ? c : null;
+  })();
+  const format = size < SIZES.length ? SIZES[size] : { label: `Custom ${customText.trim()}`, ...custom, stroke: 150 };
+  const { w, h } = format;
   const short = Math.min(w, h);
   const panels = Math.min(PANELS_MAX, Math.max(PANELS_MIN, Math.round(Number(panelsText)) || 3));
   const n = carousel ? panels : 1;
@@ -769,7 +798,7 @@ export default function PathwayTool() {
   const gradientMoves = animateGradient && isGradient;
   const textMoves = scrollText && shownText !== "";
   const moving = gradientMoves || textMoves;
-  const stroke = SIZES[size].stroke / 1080;
+  const stroke = format.stroke / 1080;
   const presets = textPresets(colours.line);
   // A strip is n panels of ground to cover, so the line is that much longer.
   const path = generatePathway(seed, stripW / short, h / short, { ...p, length: p.length * (carousel ? 0.8 * n : 1), stroke, panels: n });
@@ -921,7 +950,7 @@ export default function PathwayTool() {
       const lineColours = look.line === "gradient" ? `Live gradient: ${GRADIENT.map((c) => `${colourName(c)} ${c}`).join(", ")}` : `${colourName(look.line)} ${look.line}`;
       const readme = [
         `Share to Buy pathway, seed ${seed}`,
-        `${SIZES[size].label}, ${w} x ${h} px${n > 1 ? `, carousel of ${n} (1of${n} is the first slide)` : ""}`,
+        `${format.label}, ${w} x ${h} px${n > 1 ? `, carousel of ${n} (1of${n} is the first slide)` : ""}`,
         "",
         "FILES",
         `${base}-artwork*.png     the finished artwork`,
@@ -1077,13 +1106,34 @@ export default function PathwayTool() {
 
         <section>
           <h2>Format</h2>
-          <div className="stb-seg">
+          <div className="stb-seg stb-seg-wrap">
             {SIZES.map((s, i) => (
               <button key={s.label} type="button" aria-pressed={size === i} onClick={() => setSize(i)}>
                 {s.label}
               </button>
             ))}
+            <button type="button" aria-pressed={size === SIZES.length} onClick={() => setSize(SIZES.length)}>
+              Custom
+            </button>
           </div>
+          {size === SIZES.length && (
+            <label className="stb-custom">
+              <input
+                type="text"
+                className="stb-text"
+                value={customText}
+                aria-label="Ratio or size, for example 4:3 or 1200x628"
+                placeholder="4:3 or 1200x628"
+                spellCheck={false}
+                onChange={(e) => {
+                  setCustomText(e.target.value);
+                  const c = parseCustom(e.target.value);
+                  if (typeof c !== "string") setCustom(c);
+                }}
+              />
+              <span className="stb-note" data-warn={customError ? "1" : undefined}>{customError ?? `${custom.w} × ${custom.h}`}</span>
+            </label>
+          )}
           <div className="stb-seg stb-seg-gap">
             <button type="button" aria-pressed={!carousel} onClick={() => { setCarousel(false); setSlide(0); }}>Single</button>
             <button type="button" aria-pressed={carousel} onClick={() => setCarousel(true)}>Carousel</button>
