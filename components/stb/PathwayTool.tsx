@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { generatePathway, type Pathway } from "./pathway";
 import { BRANDS, GRADIENT, colourName, textPresets, type BrandKey } from "./palette";
 import { media, corsMedia } from "@/lib/media";
+import { hasTransparency, makeSubject, type Mask, type Subject } from "./cutout";
 
 /**
  * Share to Buy pathway maker. One screen, no scroll: controls on the left, the
@@ -67,6 +68,68 @@ interface Look {
   stroke: number;
   /** Turns every stretch of text the other way up (for when the automatic choice reads wrong). */
   flip: boolean;
+  /** A photo in place of the background colour, and the subject cut out of it. */
+  photo?: PhotoLook;
+}
+
+type Place = "behind" | "wrap" | "front";
+
+interface PhotoLook {
+  img: CanvasImageSource;
+  /** the photo's size, px */
+  pw: number;
+  ph: number;
+  /** the whole strip, in line units (short side of one panel = 1) */
+  uw: number;
+  uh: number;
+  /** the cut-out, at the photo's size, or null until one is added */
+  subject: HTMLCanvasElement | null;
+  place: Place;
+  /** stretches (point indices) drawn over the subject when the line wraps round it */
+  front: [number, number][];
+  /** draw only the cut-out, on grey, to judge a model */
+  showMask: boolean;
+}
+
+/** Where the photo sits, covering the whole strip, in px at short side S. */
+function photoRect(ph: PhotoLook, S: number) {
+  const k = Math.max(ph.uw / ph.pw, ph.uh / ph.ph);
+  const dw = ph.pw * k;
+  const dh = ph.ph * k;
+  return { x: ((ph.uw - dw) / 2) * S, y: ((ph.uh - dh) / 2) * S, w: dw * S, h: dh * S, k };
+}
+
+/**
+ * Wrapping the line round the subject: every pass of the line across the subject
+ * goes in front for its first half and behind for its second (or the other way
+ * round), so it reads as passing round the person rather than over or under.
+ */
+function wrapRanges(path: Pathway, ph: PhotoLook, mask: Mask, stroke: number, swap: boolean): [number, number][] {
+  const r = photoRect(ph, 1);
+  const pts = path.pts;
+  const last = pts.length / 2 - 1;
+  const inside = (i: number) => {
+    const px = Math.floor((pts[i * 2] - r.x) / r.k * (mask.width / ph.pw));
+    const py = Math.floor((pts[i * 2 + 1] - r.y) / r.k * (mask.height / ph.ph));
+    if (px < 0 || py < 0 || px >= mask.width || py >= mask.height) return false;
+    return mask.data[py * mask.width + px] > 127;
+  };
+  const out: [number, number][] = [];
+  let start = -1;
+  for (let i = 0; i <= last + 1; i++) {
+    const on = i <= last && inside(i);
+    if (on && start < 0) start = i;
+    if (!on && start >= 0) {
+      const a = start, b = i - 1;
+      // a pass shorter than the line is wide is just clipping an edge: leave it behind
+      if (path.cum[b] - path.cum[a] > stroke) {
+        const mid = Math.round((a + b) / 2);
+        out.push(swap ? [mid, b] : [a, mid]);
+      }
+      start = -1;
+    }
+  }
+  return out;
 }
 
 const RGB = GRADIENT.map((hex) => {
@@ -310,14 +373,26 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
  */
 function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, ox: number, path: Pathway, look: Look, gPhase: number, tPhase: number) {
   const last = path.pts.length / 2 - 1;
+  const ph = look.photo;
+  const pr = ph && photoRect(ph, S);
   ctx.globalCompositeOperation = "source-over";
   ctx.clearRect(0, 0, w, h);
-  if (look.alpha !== "bg") {
-    ctx.fillStyle = look.bg;
-    ctx.fillRect(0, 0, w, h);
-  }
   ctx.save();
   ctx.translate(-ox, 0);
+  if (ph && pr && ph.showMask) {
+    ctx.fillStyle = "#8a8a8a";
+    ctx.fillRect(ox, 0, w, h);
+    if (ph.subject) ctx.drawImage(ph.subject, pr.x, pr.y, pr.w, pr.h);
+    ctx.restore();
+    return;
+  }
+  if (look.alpha !== "bg") {
+    if (ph && pr) ctx.drawImage(ph.img, pr.x, pr.y, pr.w, pr.h);
+    else {
+      ctx.fillStyle = look.bg;
+      ctx.fillRect(ox, 0, w, h);
+    }
+  }
   const STROKE = look.stroke;
   ctx.lineWidth = STROKE * S;
   ctx.lineJoin = "round";
@@ -333,6 +408,20 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, 
       const at = path.cum[j];
       strokeLine(ctx, path, S, locate(path.cum, at - win), Math.min(last, locate(path.cum, at + win) + 1), look, gPhase);
       drawText(ctx, path, S, look, STROKE * S, tPhase, [(at - win - STROKE) * S, (at + win + STROKE) * S]);
+    }
+  }
+  // The subject laid back over the line, so the line passes behind them. On a
+  // transparent export it punches the line out instead. Wrapping then lays the
+  // in-front halves down again on top.
+  if (ph && pr && ph.subject && ph.place !== "front" && look.alpha !== "line") {
+    if (look.alpha === "bg") ctx.globalCompositeOperation = "destination-out";
+    ctx.drawImage(ph.subject, pr.x, pr.y, pr.w, pr.h);
+    ctx.globalCompositeOperation = "source-over";
+    if (ph.place === "wrap") {
+      for (const [a, b] of ph.front) {
+        strokeLine(ctx, path, S, a, Math.min(last, b + 1), look, gPhase);
+        if (look.text) drawText(ctx, path, S, look, STROKE * S, tPhase, [path.cum[a] * S, path.cum[b] * S]);
+      }
     }
   }
   ctx.restore();
@@ -608,6 +697,12 @@ export default function PathwayTool() {
   /** null, or how far through an export we are (0 to 1). */
   const [progress, setProgress] = useState<number | null>(null);
   const [packing, setPacking] = useState(false);
+  // A photo behind the line, and the subject cut out of it (made elsewhere, brought in as a PNG)
+  const [photo, setPhoto] = useState<{ bmp: ImageBitmap; name: string } | null>(null);
+  const [cutoutPng, setCutoutPng] = useState<{ bmp: ImageBitmap; name: string } | null>(null);
+  const [place, setPlace] = useState<Place>("behind");
+  const [swapWrap, setSwapWrap] = useState(false);
+  const [showMask, setShowMask] = useState(false);
   const recording = progress !== null;
   const [fontReady, setFontReady] = useState(false);
 
@@ -621,6 +716,39 @@ export default function PathwayTool() {
       })
       .catch(() => setFontReady(true)); // draw in the fallback face rather than not at all
   }, []);
+
+  // The cut-out is laid over the background at the background's size.
+  const [subject, setSubject] = useState<Subject | null>(null);
+  useEffect(() => {
+    setSubject(photo && cutoutPng ? makeSubject(cutoutPng.bmp, photo.bmp.width, photo.bmp.height) : null);
+  }, [photo, cutoutPng]);
+
+  const loadImage = async (file: File) => {
+    const raw = await createImageBitmap(file, { imageOrientation: "from-image" });
+    // 2560 on the long side is plenty for a 2048 export
+    const k = Math.min(1, 2560 / Math.max(raw.width, raw.height));
+    return k < 1 ? createImageBitmap(raw, { resizeWidth: Math.round(raw.width * k), resizeHeight: Math.round(raw.height * k), resizeQuality: "high" }) : raw;
+  };
+
+  const addPhoto = async (file: File | undefined) => {
+    if (!file?.type.startsWith("image/")) return;
+    setPhoto({ bmp: await loadImage(file), name: file.name });
+  };
+
+  const addCutout = async (file: File | undefined) => {
+    if (!file?.type.startsWith("image/")) return;
+    setCutoutPng({ bmp: await loadImage(file), name: file.name });
+  };
+
+  /** Files dropped on the stage: one with a transparent background is the cut-out, any other the photo. */
+  const addDropped = async (files: FileList | undefined) => {
+    for (const file of Array.from(files ?? [])) {
+      if (!file.type.startsWith("image/")) continue;
+      const bmp = await loadImage(file);
+      if (hasTransparency(bmp)) setCutoutPng({ bmp, name: file.name });
+      else setPhoto({ bmp, name: file.name });
+    }
+  };
 
   const canvas = useRef<HTMLCanvasElement>(null);
   const clock = useRef(0); // when the loop last started
@@ -647,6 +775,21 @@ export default function PathwayTool() {
   const path = generatePathway(seed, stripW / short, h / short, { ...p, length: p.length * (carousel ? 0.8 * n : 1), stroke, panels: n });
   const at = Math.min(slide, n - 1);
 
+  const photoLook: PhotoLook | undefined = photo
+    ? {
+        img: photo.bmp,
+        pw: photo.bmp.width,
+        ph: photo.bmp.height,
+        uw: stripW / short,
+        uh: h / short,
+        subject: subject?.layer ?? null,
+        place,
+        front: [],
+        showMask: showMask && !!subject,
+      }
+    : undefined;
+  if (photoLook && subject && place === "wrap") photoLook.front = wrapRanges(path, photoLook, subject.mask, stroke, swapWrap);
+
   const look: Look = {
     bg: colours.bg,
     line: colours.line,
@@ -656,6 +799,7 @@ export default function PathwayTool() {
     textColours: (presets[textPreset] ?? presets[0]).colours,
     flip: flipText,
     stroke,
+    photo: photoLook,
   };
 
   /**
@@ -756,9 +900,24 @@ export default function PathwayTool() {
         }
       }
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = look.bg;
-      ctx.fillRect(0, 0, w, h);
-      files.push({ name: `${base}-background.png`, data: await png() });
+      if (look.photo) {
+        // a photo differs slide to slide, so each gets its own background, and the subject on its own
+        const pr = photoRect(look.photo, short);
+        for (let i = 0; i < n; i++) {
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(look.photo.img, pr.x - i * w, pr.y, pr.w, pr.h);
+          files.push({ name: `${base}-background${tag(i)}.png`, data: await png() });
+          if (look.photo.subject) {
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(look.photo.subject, pr.x - i * w, pr.y, pr.w, pr.h);
+            files.push({ name: `${base}-subject${tag(i)}.png`, data: await png() });
+          }
+        }
+      } else {
+        ctx.fillStyle = look.bg;
+        ctx.fillRect(0, 0, w, h);
+        files.push({ name: `${base}-background.png`, data: await png() });
+      }
       const lineColours = look.line === "gradient" ? `Live gradient: ${GRADIENT.map((c) => `${colourName(c)} ${c}`).join(", ")}` : `${colourName(look.line)} ${look.line}`;
       const readme = [
         `Share to Buy pathway, seed ${seed}`,
@@ -768,7 +927,9 @@ export default function PathwayTool() {
         `${base}-artwork*.png     the finished artwork`,
         `${base}-line*.png        the line on its own, on a transparent background`,
         `${base}-cut-out*.png     the background with the line cut out of it`,
-        `${base}-background.png   the plain background colour${n > 1 ? ", the same for every slide" : ""}`,
+        ...(look.photo
+          ? [`${base}-background*.png  the photo on its own`, `${base}-subject*.png     the cut-out on its own, on a transparent background`]
+          : [`${base}-background.png   the plain background colour${n > 1 ? ", the same for every slide" : ""}`]),
         "",
         "COLOURS",
         `Background  ${colourName(look.bg)} ${look.bg}`,
@@ -872,6 +1033,55 @@ export default function PathwayTool() {
             ))}
           </div>
           <p className="stb-note">{colours.name}</p>
+        </section>
+
+        <section>
+          <h2>Photo</h2>
+          <div className="stb-photo-row">
+            <label className="stb-file">
+              <input type="file" accept="image/*" onChange={(e) => { addPhoto(e.target.files?.[0]); e.target.value = ""; }} />
+              {photo ? "Change background" : "Add background"}
+            </label>
+            <label className="stb-file">
+              <input type="file" accept="image/png,image/webp" onChange={(e) => { addCutout(e.target.files?.[0]); e.target.value = ""; }} />
+              {cutoutPng ? "Change cut-out" : "Add cut-out"}
+            </label>
+            {(photo || cutoutPng) && (
+              <button type="button" className="stb-link" onClick={() => { setPhoto(null); setCutoutPng(null); setShowMask(false); }}>
+                Remove
+              </button>
+            )}
+          </div>
+          <p className="stb-note">
+            {photo && !cutoutPng
+              ? "Now the cut-out: the same photo as a PNG with the background removed."
+              : cutoutPng && !photo
+                ? "Now the background: the full photo the cut-out came from."
+                : photo && cutoutPng
+                  ? `${photo.name} with ${cutoutPng.name}`
+                  : "The full photo, plus the same photo as a PNG with its background removed (in Paint: Remove background, then save as PNG). You can drop both on the artwork."}
+          </p>
+          {subject && (
+            <>
+              <div className="stb-seg stb-seg-gap">
+                {(["behind", "wrap", "front"] as Place[]).map((pl) => (
+                  <button key={pl} type="button" aria-pressed={place === pl} onClick={() => setPlace(pl)}>
+                    {pl === "behind" ? "Behind" : pl === "wrap" ? "Round" : "In front"}
+                  </button>
+                ))}
+              </div>
+              {place === "wrap" && (
+                <label className="stb-check">
+                  <input type="checkbox" checked={swapWrap} onChange={(e) => setSwapWrap(e.target.checked)} />
+                  Swap which half goes in front
+                </label>
+              )}
+              <label className="stb-check">
+                <input type="checkbox" checked={showMask} onChange={(e) => setShowMask(e.target.checked)} />
+                Show the cut-out
+              </label>
+            </>
+          )}
         </section>
 
         <section>
@@ -979,7 +1189,7 @@ export default function PathwayTool() {
             <button type="button" className="stb-primary" onClick={downloadPng} disabled={recording}>
               Download PNG
             </button>
-            <button type="button" className="stb-primary" onClick={downloadSvg} disabled={recording}>
+            <button type="button" className="stb-primary" onClick={downloadSvg} disabled={recording || !!photo} title={photo ? "Not with a photo: use the PNG or the pack" : undefined}>
               Download SVG
             </button>
           </div>
@@ -999,7 +1209,11 @@ export default function PathwayTool() {
         </section>
       </aside>
 
-      <main className="stb-stage">
+      <main
+        className="stb-stage"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => { e.preventDefault(); addDropped(e.dataTransfer.files); }}
+      >
         <Colours bg={colours.bg} line={colours.line} text={look.text ? look.textColours : []} />
         <button type="button" className="stb-toggle" aria-pressed={social} onClick={() => { setSocial(!social); setSlide(0); }}>
           {social ? "Show the artwork" : "Preview as a post"}
