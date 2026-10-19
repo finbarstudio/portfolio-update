@@ -228,6 +228,18 @@
   box-shadow: 0 2px 24px rgb(10 10 51 / 0.14);
 }
 .stb-view canvas { display: block; width: 100%; height: 100%; }
+/* the over/under brush: a ring the size of the brush follows the pointer */
+.stb-frame .stb-view[data-brush] { cursor: none; touch-action: none; }
+.stb-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px rgb(10 10 51 / 0.6);
+  pointer-events: none;
+  opacity: 0;
+}
 /* where a carousel is cut into panels */
 .stb-cut {
   position: absolute;

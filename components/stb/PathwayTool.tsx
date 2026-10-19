@@ -108,6 +108,9 @@ interface PhotoLook {
   place: Place;
   /** stretches (point indices) drawn over the subject when the line wraps round it */
   front: [number, number][];
+  /** painted by hand, at the photo's proportions: where the line goes in front of the subject, and where behind */
+  paintOver: HTMLCanvasElement | null;
+  paintUnder: HTMLCanvasElement | null;
   /** draw only the cut-out, on grey, to judge a model */
   showMask: boolean;
 }
@@ -386,6 +389,43 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   }
 }
 
+/** The line and its text, crossings tidied. */
+function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, gPhase: number, tPhase: number) {
+  const last = path.pts.length / 2 - 1;
+  const STROKE = look.stroke;
+  ctx.lineWidth = STROKE * S;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "butt";
+  strokeLine(ctx, path, S, 0, last, look, gPhase);
+  if (look.text) {
+    drawText(ctx, path, S, look, STROKE * S, tPhase);
+    // Where the line passes over itself, two runs of text would collide. Lay the
+    // upper stretch down again over the whole overlap, then its own letters on
+    // top, so the text underneath slides out of sight beneath it.
+    for (const [k, j] of path.over.entries()) {
+      const win = overWindow(path, k, STROKE);
+      const at = path.cum[j];
+      strokeLine(ctx, path, S, locate(path.cum, at - win), Math.min(last, locate(path.cum, at + win) + 1), look, gPhase);
+      drawText(ctx, path, S, look, STROKE * S, tPhase, [(at - win - STROKE) * S, (at + win + STROKE) * S]);
+    }
+  }
+}
+
+/** Two off-screen canvases, reused frame to frame, cleared and reset on every call. */
+const scratches: HTMLCanvasElement[] = [];
+function scratch(i: number, w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
+  const c = (scratches[i] ??= document.createElement("canvas"));
+  if (c.width !== w || c.height !== h) {
+    c.width = w;
+    c.height = h;
+  }
+  const ctx = c.getContext("2d")!;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.clearRect(0, 0, w, h);
+  return [c, ctx];
+}
+
 /**
  * Draw one picture: a window w by h onto the line, starting `ox` px along it
  * from the left. S is the px size of the short side of ONE panel, which is the
@@ -414,36 +454,38 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, 
       ctx.fillRect(ox, 0, w, h);
     }
   }
-  const STROKE = look.stroke;
-  ctx.lineWidth = STROKE * S;
-  ctx.lineJoin = "round";
-  ctx.lineCap = "butt";
-  strokeLine(ctx, path, S, 0, last, look, gPhase);
-  if (look.text) {
-    drawText(ctx, path, S, look, STROKE * S, tPhase);
-    // Where the line passes over itself, two runs of text would collide. Lay the
-    // upper stretch down again over the whole overlap, then its own letters on
-    // top, so the text underneath slides out of sight beneath it.
-    for (const [k, j] of path.over.entries()) {
-      const win = overWindow(path, k, STROKE);
-      const at = path.cum[j];
-      strokeLine(ctx, path, S, locate(path.cum, at - win), Math.min(last, locate(path.cum, at + win) + 1), look, gPhase);
-      drawText(ctx, path, S, look, STROKE * S, tPhase, [(at - win - STROKE) * S, (at + win + STROKE) * S]);
-    }
-  }
+  drawLine(ctx, path, S, look, gPhase, tPhase);
   // The subject laid back over the line, so the line passes behind them. On a
-  // transparent export it punches the line out instead. Wrapping then lays the
-  // in-front halves down again on top.
-  if (ph && pr && ph.subject && ph.place !== "front" && look.alpha !== "line") {
+  // transparent export it punches the line out instead. Then the line goes down
+  // again on top wherever it should pass in front: everywhere ("In front"), the
+  // first half of each pass ("Round"), nowhere ("Behind"), plus whatever has
+  // been painted in front and minus whatever has been painted behind.
+  if (ph && pr && ph.subject && look.alpha !== "line") {
     if (look.alpha === "bg") ctx.globalCompositeOperation = "destination-out";
     ctx.drawImage(ph.subject, pr.x, pr.y, pr.w, pr.h);
     ctx.globalCompositeOperation = "source-over";
+    const [line, lctx] = scratch(0, w, h);
+    const [mask, mctx] = scratch(1, w, h);
+    mctx.translate(-ox, 0);
+    if (ph.place === "front") mctx.fillRect(ox, 0, w, h);
     if (ph.place === "wrap") {
-      for (const [a, b] of ph.front) {
-        strokeLine(ctx, path, S, a, Math.min(last, b + 1), look, gPhase);
-        if (look.text) drawText(ctx, path, S, look, STROKE * S, tPhase, [path.cum[a] * S, path.cum[b] * S]);
-      }
+      mctx.lineWidth = look.stroke * S;
+      mctx.lineJoin = "round";
+      mctx.lineCap = "butt";
+      for (const [a, b] of ph.front) strokeLine(mctx, path, S, a, Math.min(last, b + 1), { ...look, line: "#000", alpha: "none" }, 0);
     }
+    if (ph.paintUnder) {
+      mctx.globalCompositeOperation = "destination-out";
+      mctx.drawImage(ph.paintUnder, pr.x, pr.y, pr.w, pr.h);
+      mctx.globalCompositeOperation = "source-over";
+    }
+    if (ph.paintOver) mctx.drawImage(ph.paintOver, pr.x, pr.y, pr.w, pr.h);
+    lctx.translate(-ox, 0);
+    drawLine(lctx, path, S, look, gPhase, tPhase);
+    lctx.setTransform(1, 0, 0, 1, 0, 0);
+    lctx.globalCompositeOperation = "destination-in";
+    lctx.drawImage(mask, 0, 0);
+    ctx.drawImage(line, ox, 0);
   }
   ctx.restore();
 }
@@ -727,6 +769,16 @@ export default function PathwayTool() {
   const [place, setPlace] = useState<Place>("behind");
   const [swapWrap, setSwapWrap] = useState(false);
   const [showMask, setShowMask] = useState(false);
+  /** The over/under brush: paints where the line passes in front of the subject, or behind. */
+  const [brush, setBrush] = useState<"over" | "under" | null>(null);
+  const [brushSize, setBrushSize] = useState(0.08);
+  const [paint, setPaint] = useState<{ over: HTMLCanvasElement; under: HTMLCanvasElement; k: number } | null>(null);
+  const undo = useRef<[ImageData, ImageData][]>([]);
+  const [undoCount, setUndoCount] = useState(0);
+  /** the brush's smoothed position while a stroke is down, in paint px */
+  const brushAt = useRef<{ x: number; y: number } | null>(null);
+  const ring = useRef<HTMLSpanElement>(null);
+  const redraw = useRef<() => void>(() => {});
   const recording = progress !== null;
   const [fontReady, setFontReady] = useState(false);
 
@@ -746,6 +798,25 @@ export default function PathwayTool() {
   useEffect(() => {
     setSubject(photo && cutoutPng ? makeSubject(cutoutPng.bmp, photo.bmp.width, photo.bmp.height) : null);
   }, [photo, cutoutPng]);
+
+  // Painting starts fresh with every photo, at the photo's proportions (2048 on the long side at most).
+  useEffect(() => {
+    undo.current = [];
+    setUndoCount(0);
+    if (!photo) {
+      setPaint(null);
+      setBrush(null);
+      return;
+    }
+    const k = Math.min(1, 2048 / Math.max(photo.bmp.width, photo.bmp.height));
+    const make = () => {
+      const c = document.createElement("canvas");
+      c.width = Math.round(photo.bmp.width * k);
+      c.height = Math.round(photo.bmp.height * k);
+      return c;
+    };
+    setPaint({ over: make(), under: make(), k });
+  }, [photo]);
 
   const loadImage = async (file: File) => {
     const raw = await createImageBitmap(file, { imageOrientation: "from-image" });
@@ -838,9 +909,12 @@ export default function PathwayTool() {
         subject: subject?.layer ?? null,
         place,
         front: [],
+        paintOver: paint?.over ?? null,
+        paintUnder: paint?.under ?? null,
         showMask: showMask && !!subject,
       }
     : undefined;
+  const painting = !!brush && !!subject && !!paint && !showMask;
   if (photoLook && subject && place === "wrap") photoLook.front = wrapRanges(path, photoLook, subject.mask, stroke, swapWrap);
 
   const look: Look = {
@@ -887,14 +961,104 @@ export default function PathwayTool() {
     if (Math.abs(secs - loopSecs) > 0.01) setLoopSecs(secs);
     let raf = 0;
     const draw = () => {
+      cancelAnimationFrame(raf);
       const t = moving ? ((performance.now() - clock.current) / 1000 / secs) % 1 : 0;
       render(ctx, stripW * view, h * view, S, 0, path, look, flowAt(t, cycles), textMoves ? t : 0);
       if (moving && !recording) raf = requestAnimationFrame(draw); // an export takes the processor; the preview holds
     };
     draw();
+    redraw.current = () => {
+      if (!moving) draw();
+    };
     return () => cancelAnimationFrame(raf);
     // Runs after every render: any control changing, or the font arriving, redraws.
   });
+
+  /** The pointer on the artwork, in paint px, and the brush radius there. */
+  const brushPoint = (e: React.PointerEvent) => {
+    const el = canvas.current;
+    if (!el || !photoLook || !paint) return null;
+    const rect = el.getBoundingClientRect();
+    const r = photoRect(photoLook, 1);
+    const ux = ((e.clientX - rect.left) / rect.width) * (stripW / short);
+    const uy = ((e.clientY - rect.top) / rect.height) * (h / short);
+    const toPx = paint.k * (photoLook.pw / (r.w)) ;
+    return { x: (ux - r.x) * toPx, y: (uy - r.y) * toPx, rad: (brushSize / 2) * toPx };
+  };
+  /** One hard-edged stretch of brush: added to one layer, taken out of the other. */
+  const dab = (from: { x: number; y: number }, to: { x: number; y: number }, rad: number) => {
+    if (!paint || !brush) return;
+    const [add, remove] = brush === "over" ? [paint.over, paint.under] : [paint.under, paint.over];
+    for (const [c, op] of [[add, "source-over"], [remove, "destination-out"]] as const) {
+      const g = c.getContext("2d")!;
+      g.globalCompositeOperation = op;
+      g.strokeStyle = "#000";
+      g.lineWidth = rad * 2;
+      g.lineCap = "round";
+      g.lineJoin = "round";
+      g.beginPath();
+      g.moveTo(from.x, from.y);
+      g.lineTo(to.x, to.y);
+      g.stroke();
+      g.globalCompositeOperation = "source-over";
+    }
+    redraw.current();
+  };
+  const moveRing = (e: React.PointerEvent) => {
+    const el = ring.current;
+    const cv = canvas.current;
+    if (!el || !cv) return;
+    const rect = cv.getBoundingClientRect();
+    const view = cv.parentElement!.getBoundingClientRect();
+    const d = brushSize * (rect.width / (stripW / short));
+    el.style.width = el.style.height = `${d}px`;
+    el.style.transform = `translate(${e.clientX - view.left - d / 2}px, ${e.clientY - view.top - d / 2}px)`;
+    el.style.opacity = "1";
+  };
+  const brushDown = (e: React.PointerEvent) => {
+    const pt = brushPoint(e);
+    if (!pt || !paint) return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId); // keep painting when the pointer slips off the edge
+    } catch {}
+    const snap = (c: HTMLCanvasElement) => c.getContext("2d")!.getImageData(0, 0, c.width, c.height);
+    undo.current = [...undo.current.slice(-9), [snap(paint.over), snap(paint.under)]];
+    setUndoCount(undo.current.length);
+    brushAt.current = { x: pt.x, y: pt.y };
+    dab(pt, pt, pt.rad);
+  };
+  const brushMove = (e: React.PointerEvent) => {
+    moveRing(e);
+    const at = brushAt.current;
+    const pt = brushPoint(e);
+    if (!at || !pt) return;
+    // smoothing: the brush trails the pointer a little, which irons out the wobble of a hand
+    const next = { x: at.x + (pt.x - at.x) * 0.3, y: at.y + (pt.y - at.y) * 0.3 };
+    dab(at, next, pt.rad);
+    brushAt.current = next;
+  };
+  const brushUp = (e: React.PointerEvent) => {
+    const at = brushAt.current;
+    const pt = brushPoint(e);
+    if (at && pt) dab(at, pt, pt.rad); // finish where the pointer let go
+    brushAt.current = null;
+  };
+  const undoPaint = () => {
+    const last = undo.current.pop();
+    if (!last || !paint) return;
+    paint.over.getContext("2d")!.putImageData(last[0], 0, 0);
+    paint.under.getContext("2d")!.putImageData(last[1], 0, 0);
+    setUndoCount(undo.current.length);
+    redraw.current();
+  };
+  const clearPaint = () => {
+    if (!paint) return;
+    const snap = (c: HTMLCanvasElement) => c.getContext("2d")!.getImageData(0, 0, c.width, c.height);
+    undo.current = [...undo.current.slice(-9), [snap(paint.over), snap(paint.under)]];
+    setUndoCount(undo.current.length);
+    for (const c of [paint.over, paint.under]) c.getContext("2d")!.clearRect(0, 0, c.width, c.height);
+    redraw.current();
+  };
 
   const set = (patch: Partial<typeof p>) => setP({ ...p, ...patch });
   const restart = () => { clock.current = performance.now(); };
@@ -1120,6 +1284,21 @@ export default function PathwayTool() {
                   Swap which half goes in front
                 </label>
               )}
+              <div className="stb-seg stb-seg-gap">
+                <button type="button" aria-pressed={brush === "over"} onClick={() => setBrush(brush === "over" ? null : "over")}>
+                  Paint line in front
+                </button>
+                <button type="button" aria-pressed={brush === "under"} onClick={() => setBrush(brush === "under" ? null : "under")}>
+                  Paint line behind
+                </button>
+              </div>
+              {brush && <Slider label="Brush size" value={brushSize} min={0.02} max={0.4} step={0.01} onChange={setBrushSize} />}
+              {undoCount > 0 && (
+                <div className="stb-photo-row">
+                  <button type="button" className="stb-link" onClick={undoPaint}>Undo</button>
+                  <button type="button" className="stb-link" onClick={clearPaint}>Clear painting</button>
+                </div>
+              )}
               <label className="stb-check">
                 <input type="checkbox" checked={showMask} onChange={(e) => setShowMask(e.target.checked)} />
                 Show the cut-out
@@ -1296,14 +1475,22 @@ export default function PathwayTool() {
           )}
           <div
             className="stb-view"
-            onPointerDown={(e) => { drag.current = e.clientX; }}
+            data-brush={painting ? brush : undefined}
+            onPointerDown={(e) => {
+              if (painting) return brushDown(e);
+              drag.current = e.clientX;
+            }}
+            onPointerMove={(e) => { if (painting) brushMove(e); }}
             onPointerUp={(e) => {
+              if (painting) return brushUp(e);
               // a swipe moves one panel, as it does on a phone
               if (social && drag.current !== null && Math.abs(e.clientX - drag.current) > 30) go(at + (e.clientX < drag.current ? 1 : -1));
               drag.current = null;
             }}
+            onPointerLeave={() => { if (ring.current) ring.current.style.opacity = "0"; }}
           >
             <canvas ref={canvas} width={Math.round(stripW * view)} height={Math.round(h * view)} />
+            {painting && <span ref={ring} className="stb-ring" aria-hidden="true" />}
             {/* where one panel ends and the next begins */}
             {!social && Array.from({ length: n - 1 }, (_, i) => <span key={i} className="stb-cut" style={{ left: `${((i + 1) / n) * 100}%` }} aria-hidden="true" />)}
             {social && n > 1 && at > 0 && <button type="button" className="stb-nav is-prev" aria-label="Previous" onClick={() => go(at - 1)}>‹</button>}
