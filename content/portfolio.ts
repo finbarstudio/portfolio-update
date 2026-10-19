@@ -81,7 +81,7 @@ export const CV = {
     { label: "Web", long: "Website", value: "www.finbar.studio", href: "https://www.finbar.studio" },
   ],
   education: [
-    { title: "BA (Hons) Graphic Design", lines: ["University of Brighton", "2:1", "2018–2021"] },
+    { title: "BA (Hons) Graphic Design", lines: ["University of Brighton", "First", "2018–2021"] },
     { title: "UAL Foundation Diploma", lines: ["Ravensbourne", "Merit", "2017–2018"] },
   ],
   experience: [
