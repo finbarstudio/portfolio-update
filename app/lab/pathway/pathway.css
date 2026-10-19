@@ -611,3 +611,15 @@ div.stb-slider {
     min-height: 32px;
   }
 }
+
+.stb-version {
+  margin-left: 4px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--midnight);
+  opacity: 0.5;
+}
+/* four formats wrap to two rows rather than squeezing */
+.stb-panel section:has(> .stb-seg-gap) > .stb-seg:first-of-type {
+  flex-wrap: wrap;
+}

@@ -24,12 +24,19 @@ import { media, corsMedia } from "@/lib/media";
  */
 
 const LONG = 2048;
+/** Shown under the title. Bump it with every release Finbar asks to push:
+ *  1.0 first release (1 Oct 2026), 1.1 carousels and post preview (5 Oct),
+ *  1.2 fixed thickness, upright text, pack, colour codes (15 Oct),
+ *  1.3 LinkedIn 5:4 landscape (19 Oct). */
+const VERSION = "1.3";
 /** `stroke` is the line thickness, fixed per format (decided Oct 2026, no choice in the tool):
  *  px on a 1080 short side, and the same share of the short side at any size. */
 const SIZES = [
   { label: "1:1", w: LONG, h: LONG, stroke: 150 },
   { label: "3:4", w: 1536, h: LONG, stroke: 150 },
   { label: "Reel 9:16", w: 1152, h: LONG, stroke: 200 },
+  // LinkedIn landscape, 4:5 turned on its side
+  { label: "LinkedIn 5:4", w: LONG, h: 1638, stroke: 150 },
 ];
 /** Panels in a carousel: 2 to 10, 3 to start with. */
 const PANELS_MIN = 2;
@@ -831,7 +838,9 @@ export default function PathwayTool() {
   return (
     <div className="stb-tool" data-font={fontReady ? "in" : "wait"}>
       <aside className="stb-panel">
-        <h1>Pathway maker</h1>
+        <h1>
+          Pathway maker <span className="stb-version">v{VERSION}</span>
+        </h1>
 
         <section>
           <h2>Brand</h2>
