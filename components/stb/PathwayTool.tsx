@@ -28,8 +28,9 @@ const LONG = 2048;
 /** Shown under the title. Bump it with every release Finbar asks to push:
  *  1.0 first release (1 Oct 2026), 1.1 carousels and post preview (5 Oct),
  *  1.2 fixed thickness, upright text, pack, colour codes (15 Oct),
- *  1.3 LinkedIn 5:4 landscape (19 Oct), 1.4 photo with a cut-out, custom format (19 Oct). */
-const VERSION = "1.4";
+ *  1.3 LinkedIn 5:4 landscape (19 Oct), 1.4 photo with a cut-out, custom format (19 Oct),
+ *  1.5 Brush (paint the line in front of or behind the subject), Original size, 16:9 (19 Oct). */
+const VERSION = "1.5";
 /** `stroke` is the line thickness, fixed per format (decided Oct 2026, no choice in the tool):
  *  px on a 1080 short side, and the same share of the short side at any size. */
 const SIZES = [
