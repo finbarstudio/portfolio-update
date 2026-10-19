@@ -749,14 +749,21 @@ export default function PathwayTool() {
 
   const loadImage = async (file: File) => {
     const raw = await createImageBitmap(file, { imageOrientation: "from-image" });
-    // 2560 on the long side is plenty for a 2048 export
-    const k = Math.min(1, 2560 / Math.max(raw.width, raw.height));
+    // kept at its own size up to the custom format's largest, so the artwork can match it
+    const k = Math.min(1, CUSTOM_PX[1] / Math.max(raw.width, raw.height));
     return k < 1 ? createImageBitmap(raw, { resizeWidth: Math.round(raw.width * k), resizeHeight: Math.round(raw.height * k), resizeQuality: "high" }) : raw;
+  };
+
+  /** A new photo sets the artwork to its own size: the custom format, left blank so the photo's size shows as the hint. */
+  const takePhoto = (p: { bmp: ImageBitmap; name: string }) => {
+    setPhoto(p);
+    setSize(SIZES.length);
+    setCustomText("");
   };
 
   const addPhoto = async (file: File | undefined) => {
     if (!file?.type.startsWith("image/")) return;
-    setPhoto({ bmp: await loadImage(file), name: file.name });
+    takePhoto({ bmp: await loadImage(file), name: file.name });
   };
 
   const addCutout = async (file: File | undefined) => {
@@ -770,7 +777,7 @@ export default function PathwayTool() {
       if (!file.type.startsWith("image/")) continue;
       const bmp = await loadImage(file);
       if (hasTransparency(bmp)) setCutoutPng({ bmp, name: file.name });
-      else setPhoto({ bmp, name: file.name });
+      else takePhoto({ bmp, name: file.name });
     }
   };
 
@@ -778,11 +785,28 @@ export default function PathwayTool() {
   const clock = useRef(0); // when the loop last started
   const drag = useRef<number | null>(null);
 
+  /** The photo's own size, squared up to the custom format's 1:3 to 3:1 limit. */
+  const photoSize = photo
+    ? (() => {
+        const pw = photo.bmp.width;
+        const ph = photo.bmp.height;
+        if (pw / ph > CUSTOM_RATIO_MAX) return { w: pw, h: Math.round(pw / CUSTOM_RATIO_MAX) };
+        if (ph / pw > CUSTOM_RATIO_MAX) return { w: Math.round(ph / CUSTOM_RATIO_MAX), h: ph };
+        return { w: pw, h: ph };
+      })()
+    : null;
+  /** Nothing typed with a photo in: the photo's size. */
+  const fromPhoto = customText.trim() === "" && photoSize !== null;
   const customError = (() => {
+    if (fromPhoto) return null;
     const c = parseCustom(customText);
     return typeof c === "string" ? c : null;
   })();
-  const format = size < SIZES.length ? SIZES[size] : { label: `Custom ${customText.trim()}`, ...custom, stroke: 150 };
+  const customSize = fromPhoto ? photoSize : custom;
+  const format =
+    size < SIZES.length
+      ? SIZES[size]
+      : { label: `Custom ${fromPhoto ? `${customSize.w}x${customSize.h} (the photo's size)` : customText.trim()}`, ...customSize, stroke: 150 };
   const { w, h } = format;
   const short = Math.min(w, h);
   const panels = Math.min(PANELS_MAX, Math.max(PANELS_MIN, Math.round(Number(panelsText)) || 3));
@@ -1076,7 +1100,7 @@ export default function PathwayTool() {
               {cutoutPng ? "Change cut-out" : "Add cut-out"}
             </label>
             {(photo || cutoutPng) && (
-              <button type="button" className="stb-link" onClick={() => { setPhoto(null); setCutoutPng(null); setShowMask(false); }}>
+              <button type="button" className="stb-link" onClick={() => { setPhoto(null); setCutoutPng(null); setShowMask(false); if (!customText.trim()) setCustomText("4:3"); }}>
                 Remove
               </button>
             )}
@@ -1123,7 +1147,7 @@ export default function PathwayTool() {
                 className="stb-text"
                 value={customText}
                 aria-label="Ratio or size, for example 4:3 or 1200x628"
-                placeholder="4:3 or 1200x628"
+                placeholder={photoSize ? `${photoSize.w}x${photoSize.h}` : "4:3 or 1200x628"}
                 spellCheck={false}
                 onChange={(e) => {
                   setCustomText(e.target.value);
@@ -1131,7 +1155,7 @@ export default function PathwayTool() {
                   if (typeof c !== "string") setCustom(c);
                 }}
               />
-              <span className="stb-note" data-warn={customError ? "1" : undefined}>{customError ?? `${custom.w} × ${custom.h}`}</span>
+              <span className="stb-note" data-warn={customError ? "1" : undefined}>{customError ?? `${customSize.w} × ${customSize.h}`}</span>
             </label>
           )}
           <div className="stb-seg stb-seg-gap">
