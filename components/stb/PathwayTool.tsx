@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { generatePathway, type Pathway } from "./pathway";
 import { BRANDS, GRADIENT, colourName, textPresets, type BrandKey } from "./palette";
 import { media, corsMedia } from "@/lib/media";
-import { hasTransparency, makeSubject, type Mask, type Subject } from "./cutout";
+import { hasTransparency, makeSubject } from "./cutout";
 
 /**
  * Share to Buy pathway maker. One screen, no scroll: controls on the left, the
@@ -38,27 +38,11 @@ const SIZES = [
   { label: "Reel 9:16", w: 1152, h: LONG, stroke: 200 },
   // LinkedIn landscape, 4:5 turned on its side
   { label: "LinkedIn 5:4", w: LONG, h: 1638, stroke: 150 },
+  { label: "16:9", w: LONG, h: 1152, stroke: 150 },
 ];
-/**
- * A custom format, typed in: a ratio ("4:3", "1.91:1") drawn with the long side
- * at LONG, or exact pixels ("1200x628"). Kept between 1:3 and 3:1, and 512 to
- * 4096 px on the long side. The line is the standard 150 thickness.
- */
-const CUSTOM_RATIO_MAX = 3;
-const CUSTOM_PX = [512, 4096];
-function parseCustom(text: string): { w: number; h: number } | string {
-  const m = text.trim().match(/^(\d+(?:\.\d+)?)\s*([:x×*])\s*(\d+(?:\.\d+)?)$/i);
-  if (!m) return "A ratio like 4:3, or pixels like 1200x628";
-  const a = Number(m[1]);
-  const b = Number(m[3]);
-  if (!a || !b) return "Both sides need a number";
-  const r = a / b;
-  if (r > CUSTOM_RATIO_MAX || r < 1 / CUSTOM_RATIO_MAX) return "Keep it between 1:3 and 3:1";
-  if (m[2] === ":") return r >= 1 ? { w: LONG, h: Math.round(LONG / r) } : { w: Math.round(LONG * r), h: LONG };
-  const long = Math.max(a, b);
-  if (long < CUSTOM_PX[0] || long > CUSTOM_PX[1]) return `${CUSTOM_PX[0]} to ${CUSTOM_PX[1]} px on the long side`;
-  return { w: Math.round(a), h: Math.round(b) };
-}
+/** "Original" (a photo's own size) is kept to 1:3 to 3:1, and 4096 px on the long side at most. */
+const RATIO_MAX = 3;
+const PHOTO_MAX = 4096;
 
 /** Panels in a carousel: 2 to 10, 3 to start with. */
 const PANELS_MIN = 2;
@@ -93,7 +77,7 @@ interface Look {
   photo?: PhotoLook;
 }
 
-type Place = "behind" | "wrap" | "front";
+type Place = "behind" | "brush" | "front";
 
 interface PhotoLook {
   img: CanvasImageSource;
@@ -106,11 +90,8 @@ interface PhotoLook {
   /** the cut-out, at the photo's size, or null until one is added */
   subject: HTMLCanvasElement | null;
   place: Place;
-  /** stretches (point indices) drawn over the subject when the line wraps round it */
-  front: [number, number][];
-  /** painted by hand, at the photo's proportions: where the line goes in front of the subject, and where behind */
-  paintOver: HTMLCanvasElement | null;
-  paintUnder: HTMLCanvasElement | null;
+  /** "Brush": painted by hand, at the photo's proportions, where the line goes in front of the subject */
+  paint: HTMLCanvasElement | null;
   /** draw only the cut-out, on grey, to judge a model */
   showMask: boolean;
 }
@@ -121,39 +102,6 @@ function photoRect(ph: PhotoLook, S: number) {
   const dw = ph.pw * k;
   const dh = ph.ph * k;
   return { x: ((ph.uw - dw) / 2) * S, y: ((ph.uh - dh) / 2) * S, w: dw * S, h: dh * S, k };
-}
-
-/**
- * Wrapping the line round the subject: every pass of the line across the subject
- * goes in front for its first half and behind for its second (or the other way
- * round), so it reads as passing round the person rather than over or under.
- */
-function wrapRanges(path: Pathway, ph: PhotoLook, mask: Mask, stroke: number, swap: boolean): [number, number][] {
-  const r = photoRect(ph, 1);
-  const pts = path.pts;
-  const last = pts.length / 2 - 1;
-  const inside = (i: number) => {
-    const px = Math.floor((pts[i * 2] - r.x) / r.k * (mask.width / ph.pw));
-    const py = Math.floor((pts[i * 2 + 1] - r.y) / r.k * (mask.height / ph.ph));
-    if (px < 0 || py < 0 || px >= mask.width || py >= mask.height) return false;
-    return mask.data[py * mask.width + px] > 127;
-  };
-  const out: [number, number][] = [];
-  let start = -1;
-  for (let i = 0; i <= last + 1; i++) {
-    const on = i <= last && inside(i);
-    if (on && start < 0) start = i;
-    if (!on && start >= 0) {
-      const a = start, b = i - 1;
-      // a pass shorter than the line is wide is just clipping an edge: leave it behind
-      if (path.cum[b] - path.cum[a] > stroke) {
-        const mid = Math.round((a + b) / 2);
-        out.push(swap ? [mid, b] : [a, mid]);
-      }
-      start = -1;
-    }
-  }
-  return out;
 }
 
 const RGB = GRADIENT.map((hex) => {
@@ -457,9 +405,8 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, 
   drawLine(ctx, path, S, look, gPhase, tPhase);
   // The subject laid back over the line, so the line passes behind them. On a
   // transparent export it punches the line out instead. Then the line goes down
-  // again on top wherever it should pass in front: everywhere ("In front"), the
-  // first half of each pass ("Round"), nowhere ("Behind"), plus whatever has
-  // been painted in front and minus whatever has been painted behind.
+  // again on top wherever it should pass in front: everywhere ("In front"),
+  // nowhere ("Behind"), or wherever it has been painted in ("Brush").
   if (ph && pr && ph.subject && look.alpha !== "line") {
     if (look.alpha === "bg") ctx.globalCompositeOperation = "destination-out";
     ctx.drawImage(ph.subject, pr.x, pr.y, pr.w, pr.h);
@@ -468,18 +415,7 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, 
     const [mask, mctx] = scratch(1, w, h);
     mctx.translate(-ox, 0);
     if (ph.place === "front") mctx.fillRect(ox, 0, w, h);
-    if (ph.place === "wrap") {
-      mctx.lineWidth = look.stroke * S;
-      mctx.lineJoin = "round";
-      mctx.lineCap = "butt";
-      for (const [a, b] of ph.front) strokeLine(mctx, path, S, a, Math.min(last, b + 1), { ...look, line: "#000", alpha: "none" }, 0);
-    }
-    if (ph.paintUnder) {
-      mctx.globalCompositeOperation = "destination-out";
-      mctx.drawImage(ph.paintUnder, pr.x, pr.y, pr.w, pr.h);
-      mctx.globalCompositeOperation = "source-over";
-    }
-    if (ph.paintOver) mctx.drawImage(ph.paintOver, pr.x, pr.y, pr.w, pr.h);
+    if (ph.place === "brush" && ph.paint) mctx.drawImage(ph.paint, pr.x, pr.y, pr.w, pr.h);
     lctx.translate(-ox, 0);
     drawLine(lctx, path, S, look, gPhase, tPhase);
     lctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -735,10 +671,8 @@ function Slider({ label, value, min, max, step, onChange, show }: {
 export default function PathwayTool() {
   const [brand, setBrand] = useState<BrandKey>("stb");
   const [combo, setCombo] = useState(0);
-  /** an index into SIZES, or SIZES.length for the custom format */
+  /** an index into SIZES, or SIZES.length for "Original", the photo's own size */
   const [size, setSize] = useState(0);
-  const [customText, setCustomText] = useState("4:3");
-  const [custom, setCustom] = useState({ w: LONG, h: 1536 });
   const [carousel, setCarousel] = useState(false);
   /** The panel count as typed, so the box can be cleared while typing. */
   const [panelsText, setPanelsText] = useState("3");
@@ -767,13 +701,12 @@ export default function PathwayTool() {
   const [photo, setPhoto] = useState<{ bmp: ImageBitmap; name: string } | null>(null);
   const [cutoutPng, setCutoutPng] = useState<{ bmp: ImageBitmap; name: string } | null>(null);
   const [place, setPlace] = useState<Place>("behind");
-  const [swapWrap, setSwapWrap] = useState(false);
   const [showMask, setShowMask] = useState(false);
-  /** The over/under brush: paints where the line passes in front of the subject, or behind. */
-  const [brush, setBrush] = useState<"over" | "under" | null>(null);
+  /** "Brush": paint the line in front of the subject, or back behind it. */
+  const [brush, setBrush] = useState<"over" | "under">("over");
   const [brushSize, setBrushSize] = useState(0.08);
-  const [paint, setPaint] = useState<{ over: HTMLCanvasElement; under: HTMLCanvasElement; k: number } | null>(null);
-  const undo = useRef<[ImageData, ImageData][]>([]);
+  const [paint, setPaint] = useState<{ canvas: HTMLCanvasElement; k: number } | null>(null);
+  const undo = useRef<ImageData[]>([]);
   const [undoCount, setUndoCount] = useState(0);
   /** the brush's smoothed position while a stroke is down, in paint px */
   const brushAt = useRef<{ x: number; y: number } | null>(null);
@@ -794,7 +727,7 @@ export default function PathwayTool() {
   }, []);
 
   // The cut-out is laid over the background at the background's size.
-  const [subject, setSubject] = useState<Subject | null>(null);
+  const [subject, setSubject] = useState<HTMLCanvasElement | null>(null);
   useEffect(() => {
     setSubject(photo && cutoutPng ? makeSubject(cutoutPng.bmp, photo.bmp.width, photo.bmp.height) : null);
   }, [photo, cutoutPng]);
@@ -805,31 +738,26 @@ export default function PathwayTool() {
     setUndoCount(0);
     if (!photo) {
       setPaint(null);
-      setBrush(null);
       return;
     }
     const k = Math.min(1, 2048 / Math.max(photo.bmp.width, photo.bmp.height));
-    const make = () => {
-      const c = document.createElement("canvas");
-      c.width = Math.round(photo.bmp.width * k);
-      c.height = Math.round(photo.bmp.height * k);
-      return c;
-    };
-    setPaint({ over: make(), under: make(), k });
+    const c = document.createElement("canvas");
+    c.width = Math.round(photo.bmp.width * k);
+    c.height = Math.round(photo.bmp.height * k);
+    setPaint({ canvas: c, k });
   }, [photo]);
 
   const loadImage = async (file: File) => {
     const raw = await createImageBitmap(file, { imageOrientation: "from-image" });
-    // kept at its own size up to the custom format's largest, so the artwork can match it
-    const k = Math.min(1, CUSTOM_PX[1] / Math.max(raw.width, raw.height));
+    // kept at its own size (up to PHOTO_MAX), so "Original" can match it
+    const k = Math.min(1, PHOTO_MAX / Math.max(raw.width, raw.height));
     return k < 1 ? createImageBitmap(raw, { resizeWidth: Math.round(raw.width * k), resizeHeight: Math.round(raw.height * k), resizeQuality: "high" }) : raw;
   };
 
-  /** A new photo sets the artwork to its own size: the custom format, left blank so the photo's size shows as the hint. */
+  /** A new photo sets the artwork to its own size ("Original"). */
   const takePhoto = (p: { bmp: ImageBitmap; name: string }) => {
     setPhoto(p);
     setSize(SIZES.length);
-    setCustomText("");
   };
 
   const addPhoto = async (file: File | undefined) => {
@@ -856,28 +784,17 @@ export default function PathwayTool() {
   const clock = useRef(0); // when the loop last started
   const drag = useRef<number | null>(null);
 
-  /** The photo's own size, squared up to the custom format's 1:3 to 3:1 limit. */
+  /** The photo's own size, squared up to the 1:3 to 3:1 limit. */
   const photoSize = photo
     ? (() => {
         const pw = photo.bmp.width;
         const ph = photo.bmp.height;
-        if (pw / ph > CUSTOM_RATIO_MAX) return { w: pw, h: Math.round(pw / CUSTOM_RATIO_MAX) };
-        if (ph / pw > CUSTOM_RATIO_MAX) return { w: Math.round(ph / CUSTOM_RATIO_MAX), h: ph };
+        if (pw / ph > RATIO_MAX) return { w: pw, h: Math.round(pw / RATIO_MAX) };
+        if (ph / pw > RATIO_MAX) return { w: Math.round(ph / RATIO_MAX), h: ph };
         return { w: pw, h: ph };
       })()
     : null;
-  /** Nothing typed with a photo in: the photo's size. */
-  const fromPhoto = customText.trim() === "" && photoSize !== null;
-  const customError = (() => {
-    if (fromPhoto) return null;
-    const c = parseCustom(customText);
-    return typeof c === "string" ? c : null;
-  })();
-  const customSize = fromPhoto ? photoSize : custom;
-  const format =
-    size < SIZES.length
-      ? SIZES[size]
-      : { label: `Custom ${fromPhoto ? `${customSize.w}x${customSize.h} (the photo's size)` : customText.trim()}`, ...customSize, stroke: 150 };
+  const format = size < SIZES.length || !photoSize ? SIZES[size < SIZES.length ? size : 0] : { label: "Original", ...photoSize, stroke: 150 };
   const { w, h } = format;
   const short = Math.min(w, h);
   const panels = Math.min(PANELS_MAX, Math.max(PANELS_MIN, Math.round(Number(panelsText)) || 3));
@@ -906,16 +823,13 @@ export default function PathwayTool() {
         ph: photo.bmp.height,
         uw: stripW / short,
         uh: h / short,
-        subject: subject?.layer ?? null,
+        subject,
         place,
-        front: [],
-        paintOver: paint?.over ?? null,
-        paintUnder: paint?.under ?? null,
+        paint: paint?.canvas ?? null,
         showMask: showMask && !!subject,
       }
     : undefined;
-  const painting = !!brush && !!subject && !!paint && !showMask;
-  if (photoLook && subject && place === "wrap") photoLook.front = wrapRanges(path, photoLook, subject.mask, stroke, swapWrap);
+  const painting = place === "brush" && !!subject && !!paint && !showMask;
 
   const look: Look = {
     bg: colours.bg,
@@ -985,23 +899,20 @@ export default function PathwayTool() {
     const toPx = paint.k * (photoLook.pw / (r.w)) ;
     return { x: (ux - r.x) * toPx, y: (uy - r.y) * toPx, rad: (brushSize / 2) * toPx };
   };
-  /** One hard-edged stretch of brush: added to one layer, taken out of the other. */
+  /** One hard-edged stretch of brush: paints the line in front, or rubs it back out. */
   const dab = (from: { x: number; y: number }, to: { x: number; y: number }, rad: number) => {
-    if (!paint || !brush) return;
-    const [add, remove] = brush === "over" ? [paint.over, paint.under] : [paint.under, paint.over];
-    for (const [c, op] of [[add, "source-over"], [remove, "destination-out"]] as const) {
-      const g = c.getContext("2d")!;
-      g.globalCompositeOperation = op;
-      g.strokeStyle = "#000";
-      g.lineWidth = rad * 2;
-      g.lineCap = "round";
-      g.lineJoin = "round";
-      g.beginPath();
-      g.moveTo(from.x, from.y);
-      g.lineTo(to.x, to.y);
-      g.stroke();
-      g.globalCompositeOperation = "source-over";
-    }
+    if (!paint) return;
+    const g = paint.canvas.getContext("2d")!;
+    g.globalCompositeOperation = brush === "over" ? "source-over" : "destination-out";
+    g.strokeStyle = "#000";
+    g.lineWidth = rad * 2;
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.beginPath();
+    g.moveTo(from.x, from.y);
+    g.lineTo(to.x, to.y);
+    g.stroke();
+    g.globalCompositeOperation = "source-over";
     redraw.current();
   };
   const moveRing = (e: React.PointerEvent) => {
@@ -1021,9 +932,7 @@ export default function PathwayTool() {
     try {
       e.currentTarget.setPointerCapture(e.pointerId); // keep painting when the pointer slips off the edge
     } catch {}
-    const snap = (c: HTMLCanvasElement) => c.getContext("2d")!.getImageData(0, 0, c.width, c.height);
-    undo.current = [...undo.current.slice(-9), [snap(paint.over), snap(paint.under)]];
-    setUndoCount(undo.current.length);
+    snapshot();
     brushAt.current = { x: pt.x, y: pt.y };
     dab(pt, pt, pt.rad);
   };
@@ -1046,18 +955,22 @@ export default function PathwayTool() {
   const undoPaint = () => {
     const last = undo.current.pop();
     if (!last || !paint) return;
-    paint.over.getContext("2d")!.putImageData(last[0], 0, 0);
-    paint.under.getContext("2d")!.putImageData(last[1], 0, 0);
+    paint.canvas.getContext("2d")!.putImageData(last, 0, 0);
     setUndoCount(undo.current.length);
     redraw.current();
   };
   const clearPaint = () => {
     if (!paint) return;
-    const snap = (c: HTMLCanvasElement) => c.getContext("2d")!.getImageData(0, 0, c.width, c.height);
-    undo.current = [...undo.current.slice(-9), [snap(paint.over), snap(paint.under)]];
-    setUndoCount(undo.current.length);
-    for (const c of [paint.over, paint.under]) c.getContext("2d")!.clearRect(0, 0, c.width, c.height);
+    snapshot();
+    paint.canvas.getContext("2d")!.clearRect(0, 0, paint.canvas.width, paint.canvas.height);
     redraw.current();
+  };
+  /** Keep the painting as it is now, for Undo (the last 10 strokes). */
+  const snapshot = () => {
+    if (!paint) return;
+    const c = paint.canvas;
+    undo.current = [...undo.current.slice(-9), c.getContext("2d")!.getImageData(0, 0, c.width, c.height)];
+    setUndoCount(undo.current.length);
   };
 
   const set = (patch: Partial<typeof p>) => setP({ ...p, ...patch });
@@ -1264,7 +1177,7 @@ export default function PathwayTool() {
               {cutoutPng ? "Change cut-out" : "Add cut-out"}
             </label>
             {(photo || cutoutPng) && (
-              <button type="button" className="stb-link" onClick={() => { setPhoto(null); setCutoutPng(null); setShowMask(false); if (!customText.trim()) setCustomText("4:3"); }}>
+              <button type="button" className="stb-link" onClick={() => { setPhoto(null); setCutoutPng(null); setShowMask(false); if (size === SIZES.length) setSize(0); }}>
                 Remove
               </button>
             )}
@@ -1272,33 +1185,12 @@ export default function PathwayTool() {
           {subject && (
             <>
               <div className="stb-seg stb-seg-gap">
-                {(["behind", "wrap", "front"] as Place[]).map((pl) => (
+                {(["behind", "brush", "front"] as Place[]).map((pl) => (
                   <button key={pl} type="button" aria-pressed={place === pl} onClick={() => setPlace(pl)}>
-                    {pl === "behind" ? "Behind" : pl === "wrap" ? "Round" : "In front"}
+                    {pl === "behind" ? "Behind" : pl === "brush" ? "Brush" : "In front"}
                   </button>
                 ))}
               </div>
-              {place === "wrap" && (
-                <label className="stb-check">
-                  <input type="checkbox" checked={swapWrap} onChange={(e) => setSwapWrap(e.target.checked)} />
-                  Swap which half goes in front
-                </label>
-              )}
-              <div className="stb-seg stb-seg-gap">
-                <button type="button" aria-pressed={brush === "over"} onClick={() => setBrush(brush === "over" ? null : "over")}>
-                  Paint line in front
-                </button>
-                <button type="button" aria-pressed={brush === "under"} onClick={() => setBrush(brush === "under" ? null : "under")}>
-                  Paint line behind
-                </button>
-              </div>
-              {brush && <Slider label="Brush size" value={brushSize} min={0.02} max={0.4} step={0.01} onChange={setBrushSize} />}
-              {undoCount > 0 && (
-                <div className="stb-photo-row">
-                  <button type="button" className="stb-link" onClick={undoPaint}>Undo</button>
-                  <button type="button" className="stb-link" onClick={clearPaint}>Clear painting</button>
-                </div>
-              )}
               <label className="stb-check">
                 <input type="checkbox" checked={showMask} onChange={(e) => setShowMask(e.target.checked)} />
                 Show the cut-out
@@ -1315,28 +1207,12 @@ export default function PathwayTool() {
                 {s.label}
               </button>
             ))}
-            <button type="button" aria-pressed={size === SIZES.length} onClick={() => setSize(SIZES.length)}>
-              Custom
-            </button>
+            {photoSize && (
+              <button type="button" aria-pressed={size === SIZES.length} onClick={() => setSize(SIZES.length)}>
+                Original
+              </button>
+            )}
           </div>
-          {size === SIZES.length && (
-            <label className="stb-custom">
-              <input
-                type="text"
-                className="stb-text"
-                value={customText}
-                aria-label="Ratio or size, for example 4:3 or 1200x628"
-                placeholder={photoSize ? `${photoSize.w}x${photoSize.h}` : "4:3 or 1200x628"}
-                spellCheck={false}
-                onChange={(e) => {
-                  setCustomText(e.target.value);
-                  const c = parseCustom(e.target.value);
-                  if (typeof c !== "string") setCustom(c);
-                }}
-              />
-              <span className="stb-note" data-warn={customError ? "1" : undefined}>{customError ?? `${customSize.w} × ${customSize.h}`}</span>
-            </label>
-          )}
           <div className="stb-seg stb-seg-gap">
             <button type="button" aria-pressed={!carousel} onClick={() => { setCarousel(false); setSlide(0); }}>Single</button>
             <button type="button" aria-pressed={carousel} onClick={() => setCarousel(true)}>Carousel</button>
@@ -1459,6 +1335,17 @@ export default function PathwayTool() {
         onDrop={(e) => { e.preventDefault(); addDropped(e.dataTransfer.files); }}
       >
         <Colours bg={colours.bg} line={colours.line} text={look.text ? look.textColours : []} />
+        {painting && (
+          <div className="stb-brushbar" role="toolbar" aria-label="Brush">
+            <div className="stb-seg">
+              <button type="button" aria-pressed={brush === "over"} onClick={() => setBrush("over")}>Line in front</button>
+              <button type="button" aria-pressed={brush === "under"} onClick={() => setBrush("under")}>Line behind</button>
+            </div>
+            <Slider label="Size" value={brushSize} min={0.02} max={0.4} step={0.01} onChange={setBrushSize} show="" />
+            <button type="button" className="stb-link" onClick={undoPaint} disabled={undoCount === 0}>Undo</button>
+            <button type="button" className="stb-link" onClick={clearPaint} disabled={undoCount === 0}>Clear</button>
+          </div>
+        )}
         <button type="button" className="stb-toggle" aria-pressed={social} onClick={() => { setSocial(!social); setSlide(0); }}>
           {social ? "Show the artwork" : "Preview as a post"}
         </button>
