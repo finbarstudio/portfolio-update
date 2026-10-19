@@ -21,7 +21,7 @@
 .stb-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   padding: 14px 18px 12px;
   background: var(--rose);
   overflow-y: auto; /* only if the window is very short */
@@ -173,15 +173,80 @@
   border-radius: 50%;
 }
 
-.stb-check {
+/* PANEL SECTIONS: each folds away by its title; Export is always open */
+.stb-group,
+.stb-export {
+  padding-top: 14px;
+  border-top: 1px solid rgb(10 10 51 / 0.12);
+}
+.stb-group > summary {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 24px;
+  justify-content: space-between;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
 }
-.stb-check input {
-  accent-color: var(--pink);
+.stb-group > summary::-webkit-details-marker { display: none; }
+.stb-group > summary::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-right: 3px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  opacity: 0.55;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s;
 }
+.stb-group:not([open]) > summary::after { transform: rotate(-45deg); }
+.stb-group > summary h2 { margin: 0; }
+.stb-group:hover > summary::after { opacity: 1; }
+.stb-group-body { padding-top: 10px; }
+/* a fold inside a section (the pathway's shape) */
+.stb-sub { margin-top: 10px; padding-top: 0; border-top: 0; }
+.stb-sub > summary { font-size: 12px; opacity: 0.8; }
+.stb-sub > .stb-group-body { padding-top: 8px; }
+/* a small caption over a row of buttons */
+.stb-label { margin: 10px 0 5px; font-size: 11px; opacity: 0.65; }
+
+/* On/off settings: the label, then a switch */
+.stb-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 30px;
+  cursor: pointer;
+}
+.stb-switch input {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 20px;
+  margin: 0;
+  border-radius: 999px;
+  background: rgb(10 10 51 / 0.2);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.stb-switch input::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(10 10 51 / 0.3);
+  transition: transform 0.15s;
+}
+.stb-switch input:checked { background: var(--pink); }
+.stb-switch input:checked::before { transform: translateX(14px); }
+.stb-switch input:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+.stb-switch input:disabled { opacity: 0.4; }
 
 .stb-export {
   display: flex;
@@ -493,13 +558,12 @@ div.stb-slider {
     padding: 10px 12px;
   }
 
-  .stb-check {
-    height: 44px;
-    gap: 12px;
+  .stb-switch {
+    min-height: 44px;
   }
-  .stb-check input {
-    width: 22px;
-    height: 22px;
+  .stb-group,
+  .stb-export {
+    padding-top: 16px;
   }
   .stb-presets button {
     padding: 10px 12px;
@@ -680,7 +744,7 @@ div.stb-slider {
   opacity: 0.5;
 }
 /* four formats wrap to two rows rather than squeezing */
-.stb-panel section:has(> .stb-seg-gap) > .stb-seg:first-of-type {
+.stb-group-body:has(> .stb-seg-gap) > .stb-seg:first-of-type:not(.stb-formats) {
   flex-wrap: wrap;
 }
 

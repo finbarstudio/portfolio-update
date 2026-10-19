@@ -670,6 +670,30 @@ function Slider({ label, value, min, max, step, onChange, show }: {
   );
 }
 
+/** An on/off setting: the label, then a switch. */
+function Switch({ label, checked, onChange, disabled }: { label: string; checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+  return (
+    <label className="stb-switch">
+      <span>{label}</span>
+      <input type="checkbox" role="switch" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
+    </label>
+  );
+}
+
+/** A section of the panel that folds away. `openWhen` unfolds it when it turns true. */
+function Group({ title, defaultOpen = true, openWhen, sub, children }: { title: string; defaultOpen?: boolean; openWhen?: boolean; sub?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+  useEffect(() => {
+    if (openWhen) setOpen(true);
+  }, [openWhen]);
+  return (
+    <details className={sub ? "stb-group stb-sub" : "stb-group"} open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
+      <summary>{sub ? title : <h2>{title}</h2>}</summary>
+      <div className="stb-group-body">{children}</div>
+    </details>
+  );
+}
+
 export default function PathwayTool() {
   const [brand, setBrand] = useState<BrandKey>("stb");
   const [combo, setCombo] = useState(0);
@@ -1135,8 +1159,7 @@ export default function PathwayTool() {
           Pathway maker <span className="stb-version">v{VERSION}</span>
         </h1>
 
-        <section>
-          <h2>Brand</h2>
+        <Group title="Brand">
           <div className="stb-seg">
             {(Object.keys(BRANDS) as BrandKey[]).map((b) => (
               <button key={b} type="button" aria-pressed={brand === b} onClick={() => { setBrand(b); setCombo(0); }}>
@@ -1144,10 +1167,9 @@ export default function PathwayTool() {
               </button>
             ))}
           </div>
-        </section>
+        </Group>
 
-        <section>
-          <h2>Colours</h2>
+        <Group title="Colours">
           <div className="stb-swatches">
             {BRANDS[brand].combos.map((c, i) => (
               <button
@@ -1165,10 +1187,9 @@ export default function PathwayTool() {
             ))}
           </div>
           <p className="stb-note">{colours.name}</p>
-        </section>
+        </Group>
 
-        <section>
-          <h2>Photo</h2>
+        <Group title="Photo" defaultOpen={false} openWhen={!!(photo || cutoutPng)}>
           <div className="stb-photo-row">
             <label className="stb-file">
               <input type="file" accept="image/*" onChange={(e) => { addPhoto(e.target.files?.[0]); e.target.value = ""; }} />
@@ -1186,23 +1207,20 @@ export default function PathwayTool() {
           </div>
           {subject && (
             <>
-              <div className="stb-seg stb-seg-gap">
+              <p className="stb-label">Line</p>
+              <div className="stb-seg">
                 {(["behind", "brush", "front"] as Place[]).map((pl) => (
                   <button key={pl} type="button" aria-pressed={place === pl} onClick={() => setPlace(pl)}>
                     {pl === "behind" ? "Behind" : pl === "brush" ? "Brush" : "In front"}
                   </button>
                 ))}
               </div>
-              <label className="stb-check">
-                <input type="checkbox" checked={showMask} onChange={(e) => setShowMask(e.target.checked)} />
-                Show the cut-out
-              </label>
+              <Switch label="Preview cut-out" checked={showMask} onChange={setShowMask} />
             </>
           )}
-        </section>
+        </Group>
 
-        <section>
-          <h2>Format</h2>
+        <Group title="Format">
           <div className="stb-seg stb-formats">
             {SIZES.map((s, i) => (
               <button key={s.label} type="button" className="stb-has-note" data-note={s.note} aria-label={`${s.label}, ${s.note}`} aria-pressed={size === i} onClick={() => setSize(i)}>
@@ -1235,10 +1253,9 @@ export default function PathwayTool() {
               </label>
             )}
           </div>
-        </section>
+        </Group>
 
-        <section>
-          <h2>Pathway</h2>
+        <Group title="Pathway">
           <div className="stb-seed">
             <button type="button" className="stb-primary" onClick={() => setSeed(Math.floor(Math.random() * 1_000_000))}>
               New pathway
@@ -1248,16 +1265,17 @@ export default function PathwayTool() {
               <input type="number" value={seed} onChange={(e) => setSeed(Number(e.target.value) || 0)} />
             </label>
           </div>
-          <Slider label="Tightest bend" value={p.rMin} min={0.15} max={0.5} step={0.01} onChange={(v) => set({ rMin: v, rMax: Math.max(p.rMax, v) })} />
-          <Slider label="Widest bend" value={p.rMax} min={0.2} max={1.5} step={0.01} onChange={(v) => set({ rMax: v, rMin: Math.min(p.rMin, v) })} />
-          <Slider label="Length" value={p.length} min={2} max={10} step={0.25} onChange={(v) => set({ length: v })} />
-          <Slider label="Loops" value={p.loop} min={0} max={1} step={0.05} onChange={(v) => set({ loop: v })} />
-          <Slider label="Overlaps" value={p.maxCross} min={0} max={2} step={1} onChange={(v) => set({ maxCross: v })} show={`up to ${p.maxCross}`} />
-        </section>
+          <Group title="Shape" sub defaultOpen={false}>
+            <Slider label="Tightest bend" value={p.rMin} min={0.15} max={0.5} step={0.01} onChange={(v) => set({ rMin: v, rMax: Math.max(p.rMax, v) })} />
+            <Slider label="Widest bend" value={p.rMax} min={0.2} max={1.5} step={0.01} onChange={(v) => set({ rMax: v, rMin: Math.min(p.rMin, v) })} />
+            <Slider label="Length" value={p.length} min={2} max={10} step={0.25} onChange={(v) => set({ length: v })} />
+            <Slider label="Loops" value={p.loop} min={0} max={1} step={0.05} onChange={(v) => set({ loop: v })} />
+            <Slider label="Overlaps" value={p.maxCross} min={0} max={2} step={1} onChange={(v) => set({ maxCross: v })} show={`up to ${p.maxCross}`} />
+          </Group>
+        </Group>
 
         {live && (
-          <section>
-            <h2>Ticker text</h2>
+          <Group title="Ticker text">
             <input className="stb-text" type="text" placeholder="FREE EVENT" value={text} onChange={(e) => setText(e.target.value)} />
             <div className="stb-presets">
               {presets.map((t, i) => (
@@ -1269,35 +1287,20 @@ export default function PathwayTool() {
               ))}
               <span className="stb-note">{(presets[textPreset] ?? presets[0]).name}</span>
             </div>
-            <label className="stb-check">
-              <input type="checkbox" checked={flipText} onChange={(e) => setFlipText(e.target.checked)} />
-              Flip the text
-            </label>
-            <label className="stb-check">
-              <input type="checkbox" checked={scrollText} onChange={(e) => { restart(); setScrollText(e.target.checked); }} />
-              Scroll the text
-            </label>
+            <Switch label="Flip text" checked={flipText} onChange={setFlipText} />
+            <Switch label="Animate" checked={scrollText} onChange={(v) => { restart(); setScrollText(v); }} />
             {scrollText && <Slider label="Speed" value={textSpeed} min={1} max={25} step={1} onChange={setTextSpeed} />}
-          </section>
+          </Group>
         )}
 
         {isGradient && (
-          <section>
-            <h2>Gradient</h2>
-            <label className="stb-check">
-              <input type="checkbox" checked={animateGradient} onChange={(e) => { restart(); setAnimateGradient(e.target.checked); }} />
-              Flow along the path
-            </label>
+          <Group title="Gradient">
+            <Switch label="Animate" checked={animateGradient} onChange={(v) => { restart(); setAnimateGradient(v); }} />
+            {animateGradient && <Switch label="Reverse" checked={reverseFlow} onChange={setReverseFlow} />}
             {animateGradient && (
-              <label className="stb-check">
-                <input type="checkbox" checked={reverseFlow} onChange={(e) => setReverseFlow(e.target.checked)} />
-                Reverse the flow
-              </label>
+              <Slider label="Loop" value={gradientSecs} min={2} max={20} step={1} onChange={setGradientSecs} show={textMoves ? `~${gradientSecs}s` : `${gradientSecs}s`} />
             )}
-            {animateGradient && (
-              <Slider label="One run" value={gradientSecs} min={2} max={20} step={1} onChange={setGradientSecs} show={textMoves ? `~${gradientSecs}s` : `${gradientSecs}s`} />
-            )}
-          </section>
+          </Group>
         )}
 
         <section className="stb-export">
@@ -1305,7 +1308,7 @@ export default function PathwayTool() {
           <div className="stb-seg">
             {(["none", "bg", "line"] as Alpha[]).map((a) => (
               <button key={a} type="button" aria-pressed={look.alpha === a} disabled={moving} onClick={() => setAlpha(a)}>
-                {a === "none" ? "Solid" : a === "bg" ? "No background" : "No line"}
+                {a === "none" ? "Full" : a === "bg" ? "Line only" : "Line cut out"}
               </button>
             ))}
           </div>
