@@ -1,5 +1,5 @@
 /**
- * Drawing the line in and out: eight presets, each saying which stretches of
+ * Drawing the line in and out: seven presets, each saying which stretches of
  * the line are showing and how thick it is, as it draws in and as it draws out
  * (Snake only runs through). Some change the thickness as they go, and the
  * letters grow and shrink with it. The loop plays in and out, just in, or just out. Stretches are fractions of the part of the line that is on the
@@ -15,8 +15,6 @@ export interface DrawFrame {
   width: number;
   /** where along the line (0 to 1) the letters stay put as the thickness changes; the middle when left out */
   anchor?: number;
-  /** a slanted band across the artwork (0 left edge, 1 right edge) outside which nothing shows */
-  wipe?: Span;
   /** faint copies of the line drawn first, behind it: a trail */
   ghosts?: Ghost[];
 }
@@ -70,9 +68,9 @@ export const DRAW_PRESETS: DrawPreset[] = [
     id: "grow",
     label: "Grow",
     in: (p) => ({ ...one(0, inOut(p), 0.15 + 0.85 * easeOut(p)), anchor: 0 }),
-    out: (q) => ({ ...one(inOut(q), 1, 1 - 0.85 * easeIn(q)), anchor: 1 }),
+    // out: it rewinds, back the way it came, thinning as it goes
+    out: (q) => ({ ...one(0, 1 - inOut(q), 1 - 0.85 * easeIn(q)), anchor: 0 }),
   },
-  { id: "rewind", label: "Rewind", in: (p) => one(0, inOut(p)), out: (q) => one(0, 1 - inOut(q)) },
   {
     id: "snake",
     label: "Snake",
@@ -101,7 +99,6 @@ export const DRAW_PRESETS: DrawPreset[] = [
   },
   { id: "pop", label: "Pop", in: (p) => one(0, 1, Math.max(0, back(p))), out: (q) => one(0, 1, Math.max(0, 1 - backIn(q))) },
   { id: "trail", label: "Trail", in: trailIn, out: trailOut },
-  { id: "wipe", label: "Wipe", in: (p) => ({ ...one(0, 1), wipe: [0, inOut(p)] }), out: (q) => ({ ...one(0, 1), wipe: [inOut(q), 1] }) },
 
 ];
 
@@ -121,7 +118,6 @@ export function drawFrame(preset: DrawPreset, t: number, mode: DrawMode, reverse
   return {
     ...f,
     anchor: f.anchor === undefined ? undefined : 1 - f.anchor,
-    wipe: f.wipe && ([1 - f.wipe[1], 1 - f.wipe[0]] as Span),
     spans: turn(f.spans),
     ghosts: f.ghosts?.map((g) => ({ ...g, spans: turn(g.spans), caps: [g.caps[1], g.caps[0]] })),
   };

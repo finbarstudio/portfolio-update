@@ -81,7 +81,7 @@ interface Look {
   photo?: PhotoLook;
   /** Drawing in or out: the stretches showing (distances along the line), the
    *  thickness, and any faint copies drawn behind it for a trail. */
-  draw?: { spans: Span[]; width: number; ghosts?: Ghost[]; caps?: [boolean, boolean]; anchor?: number; wipe?: Span };
+  draw?: { spans: Span[]; width: number; ghosts?: Ghost[]; caps?: [boolean, boolean]; anchor?: number };
   /** The whole strip, in line units (short side of one panel = 1). */
   bounds: [number, number];
 }
@@ -375,25 +375,6 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   const d = look.draw;
   const base = look.stroke * (d?.width ?? 1);
   if (base <= 0) return;
-  // Wipe: everything clipped to a slanted band across the artwork
-  if (d?.wipe) {
-    const [W, H] = [look.bounds[0] * S, look.bounds[1] * S];
-    const sh = H * 0.18;
-    const X = (f: number) => -sh + f * (W + 2 * sh);
-    const [a, b] = d.wipe;
-    if (b - a < 1e-4) return;
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(X(a) + sh, 0);
-    ctx.lineTo(X(b) + sh, 0);
-    ctx.lineTo(X(b) - sh, H);
-    ctx.lineTo(X(a) - sh, H);
-    ctx.closePath();
-    ctx.clip();
-    drawLine(ctx, path, S, { ...look, draw: { ...d, wipe: undefined } }, gPhase, tPhase);
-    ctx.restore();
-    return;
-  }
   // A trail: each faint copy is drawn whole on its own layer, then laid down at
   // its opacity, so where it overlaps itself it does not darken. It has no
   // rounded end where it meets the solid line, so it never tints the solid
@@ -998,7 +979,6 @@ export default function PathwayTool() {
         spans: place(f.spans),
         ghosts: f.ghosts?.map((g) => ({ ...g, spans: place(g.spans) })),
         anchor: span[0] + (f.anchor ?? 0.5) * len,
-        wipe: f.wipe,
       },
     };
   };
