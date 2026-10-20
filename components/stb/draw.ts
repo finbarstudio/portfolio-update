@@ -13,6 +13,17 @@ export interface DrawFrame {
   spans: Span[];
   /** thickness, 1 = the format's line */
   width: number;
+  /** faint copies of the line drawn first, behind it: a trail */
+  ghosts?: Ghost[];
+}
+/** A faint copy of part of the line. `over`: it is a later part of the line than
+ *  the solid one, so it lies on top where they cross; otherwise underneath. */
+export interface Ghost {
+  spans: Span[];
+  alpha: number;
+  over: boolean;
+  /** rounded ends at the start and end of its stretch: none where it meets the solid line */
+  caps: [boolean, boolean];
 }
 export type DrawMode = "both" | "in" | "out";
 export interface DrawPreset {
@@ -33,15 +44,30 @@ const inOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 
 const easeIn = (x: number) => x * x * x;
 const easeOut = (x: number) => 1 - (1 - x) ** 3;
 const back = (x: number) => 1 + 2.7 * (x - 1) ** 3 + 1.7 * (x - 1) ** 2;
-const C4 = (2 * Math.PI) / 3;
-/** a springy settle: past the target and back a few times */
-const elastic = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : 2 ** (-10 * x) * Math.sin((x * 10 - 0.75) * C4) + 1);
-const elasticIn = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : -(2 ** (10 * x - 10)) * Math.sin((x * 10 - 10.75) * C4));
+/** Trail: faint copies run ahead of the solid line (drawing in) or linger behind it (drawing out) */
+const TRAIL = 16;
+const LAG = 0.022;
+const GHOST = 0.08;
+const trailIn = (p: number): DrawFrame => {
+  const at = (k: number) => inOut(clamp(p * (1 + TRAIL * LAG) - k * LAG));
+  const solid = at(TRAIL);
+  return { ...one(0, solid), ghosts: Array.from({ length: TRAIL }, (_, k) => ({ spans: [[solid, at(k)]] as Span[], alpha: GHOST, over: true, caps: [false, true] as [boolean, boolean] })) };
+};
+const trailOut = (q: number): DrawFrame => {
+  const at = (k: number) => inOut(clamp(q * (1 + TRAIL * LAG) - (TRAIL - k) * LAG));
+  const solid = at(TRAIL);
+  return { ...one(solid, 1), ghosts: Array.from({ length: TRAIL }, (_, k) => ({ spans: [[at(k), solid]] as Span[], alpha: GHOST, over: false, caps: [true, false] as [boolean, boolean] })) };
+};
 const backIn = (x: number) => 2.7 * x * x * x - 1.7 * x * x;
 const one = (a: number, b: number, width = 1): DrawFrame => ({ spans: [[a, b]], width });
 
 export const DRAW_PRESETS: DrawPreset[] = [
-  { id: "through", label: "Draw through", in: (p) => one(0, inOut(p)), out: (q) => one(inOut(q), 1) },
+  {
+    id: "grow",
+    label: "Grow",
+    in: (p) => one(0, inOut(p), 0.15 + 0.85 * easeOut(p)),
+    out: (q) => one(inOut(q), 1, 1 - 0.85 * easeIn(q)),
+  },
   { id: "rewind", label: "Rewind", in: (p) => one(0, inOut(p)), out: (q) => one(0, 1 - inOut(q)) },
   {
     id: "snake",
@@ -63,20 +89,15 @@ export const DRAW_PRESETS: DrawPreset[] = [
     in: (p) => ({ spans: [[0, easeOut(p) / 2], [1 - easeOut(p) / 2, 1]], width: 1 }),
     out: (q) => ({ spans: [[0, (1 - easeIn(q)) / 2], [(1 + easeIn(q)) / 2, 1]], width: 1 }),
   },
-  { id: "pop", label: "Pop", in: (p) => one(0, 1, Math.max(0, back(p))), out: (q) => one(0, 1, Math.max(0, 1 - backIn(q))) },
-  {
-    id: "grow",
-    label: "Grow",
-    in: (p) => one(0, inOut(p), 0.15 + 0.85 * easeOut(p)),
-    out: (q) => one(inOut(q), 1, 1 - 0.85 * easeIn(q)),
-  },
-  { id: "spring", label: "Spring", in: (p) => one(0, 1, Math.max(0, elastic(p))), out: (q) => one(0, 1, Math.max(0, 1 - elasticIn(q))) },
   {
     id: "burst",
     label: "Burst",
     in: (p) => one(0.5 - easeOut(p) / 2, 0.5 + easeOut(p) / 2, Math.max(0, back(p))),
     out: (q) => one(easeIn(q) / 2, 1 - easeIn(q) / 2, Math.max(0, 1 - backIn(q))),
   },
+  { id: "pop", label: "Pop", in: (p) => one(0, 1, Math.max(0, back(p))), out: (q) => one(0, 1, Math.max(0, 1 - backIn(q))) },
+  { id: "trail", label: "Trail", in: trailIn, out: trailOut },
+
 ];
 
 /**
@@ -90,7 +111,9 @@ export function drawFrame(preset: DrawPreset, t: number, mode: DrawMode, reverse
   else if (mode === "in") f = preset.in!(seg(t, 0, 0.6));
   else if (mode === "out") f = preset.out!(seg(t, 0.4, 1));
   else f = t < 0.5 ? preset.in!(seg(t, 0, 0.4)) : preset.out!(seg(t, 0.6, 1));
-  return reverse ? { ...f, spans: f.spans.map(([a, b]) => [1 - b, 1 - a]) } : f;
+  if (!reverse) return f;
+  const turn = (spans: Span[]) => spans.map(([a, b]) => [1 - b, 1 - a] as Span);
+  return { ...f, spans: turn(f.spans), ghosts: f.ghosts?.map((g) => ({ ...g, spans: turn(g.spans), caps: [g.caps[1], g.caps[0]] })) };
 }
 
 /**

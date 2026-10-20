@@ -5,7 +5,7 @@ import { generatePathway, type Pathway } from "./pathway";
 import { BRANDS, GRADIENT, colourName, textPresets, type BrandKey } from "./palette";
 import { media, corsMedia } from "@/lib/media";
 import { hasTransparency, makeSubject } from "./cutout";
-import { DRAW_PRESETS, drawFrame, onFrame, type DrawMode, type Span } from "./draw";
+import { DRAW_PRESETS, drawFrame, onFrame, type DrawMode, type Ghost, type Span } from "./draw";
 
 /**
  * Share to Buy pathway maker. One screen, no scroll: controls on the left, the
@@ -79,8 +79,9 @@ interface Look {
   flip: boolean;
   /** A photo in place of the background colour, and the subject cut out of it. */
   photo?: PhotoLook;
-  /** Drawing in or out: the stretches showing (distances along the line) and the thickness. */
-  draw?: { spans: Span[]; width: number };
+  /** Drawing in or out: the stretches showing (distances along the line), the
+   *  thickness, and any faint copies drawn behind it for a trail. */
+  draw?: { spans: Span[]; width: number; ghosts?: Ghost[]; caps?: [boolean, boolean] };
   /** The whole strip, in line units (short side of one panel = 1). */
   bounds: [number, number];
 }
@@ -352,7 +353,35 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   const d = look.draw;
   const base = look.stroke * (d?.width ?? 1);
   if (base <= 0) return;
-  const spans: Span[] = d ? d.spans.filter(([a, b]) => b - a > 1e-4) : [[0, cum[last]]];
+  // A trail: each faint copy is drawn whole on its own layer, then laid down at
+  // its opacity, so where it overlaps itself it does not darken. It has no
+  // rounded end where it meets the solid line, so it never tints the solid
+  // line's letters. Copies of earlier parts of the line go underneath the solid
+  // line, later parts on top (they are later, so they are the upper line).
+  const ghost = (g: Ghost) => {
+    const [layer, lctx] = scratch(2, ctx.canvas.width, ctx.canvas.height);
+    lctx.setTransform(ctx.getTransform());
+    drawLine(lctx, path, S, { ...look, text: "", draw: { spans: g.spans, width: d!.width, caps: g.caps } }, gPhase, tPhase);
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = g.alpha;
+    ctx.drawImage(layer, 0, 0);
+    ctx.restore();
+  };
+  for (const g of d?.ghosts ?? []) if (!g.over) ghost(g);
+  // Stretches that meet (closer than the line is wide) join into one, so their
+  // rounded ends never lie over each other's letters.
+  const spans: Span[] = d
+    ? d.spans
+        .filter(([a, b]) => b - a > 1e-4)
+        .sort((x, y) => x[0] - y[0])
+        .reduce<Span[]>((out, [a, b]) => {
+          const prev = out[out.length - 1];
+          if (prev && a - prev[1] < base) prev[1] = Math.max(prev[1], b);
+          else out.push([a, b]);
+          return out;
+        }, [])
+    : [[0, cum[last]]];
   const flowing = look.line === "gradient" && look.alpha !== "line";
   const colourAt = (i: number) => (flowing ? flowColour(cum[i] / FLOW_PERIOD - gPhase) : look.line === "gradient" ? "#000" : look.line);
   ctx.lineWidth = base * S;
@@ -369,16 +398,17 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
     ctx.fill();
     ctx.globalCompositeOperation = "source-over";
   };
+  // every stretch of line and its ends first, then all the letters on top
   for (const [a, b] of spans) {
     const i = locate(cum, a);
     const j = Math.min(last, locate(cum, b) + 1);
     strokeLine(ctx, path, S, i, j, look, gPhase);
     if (d) {
-      cap(i, -1);
-      cap(j, 1);
+      if (d.caps?.[0] ?? true) cap(i, -1);
+      if (d.caps?.[1] ?? true) cap(j, 1);
     }
-    if (look.text) drawText(ctx, path, S, look, base * S, tPhase, [a * S, b * S]);
   }
+  if (look.text) for (const [a, b] of spans) drawText(ctx, path, S, look, base * S, tPhase, [a * S, b * S]);
   if (look.text) {
     // Where the line passes over itself, two runs of text would collide. Lay the
     // upper stretch down again over the whole overlap, then its own letters on
@@ -395,6 +425,7 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
       }
     }
   }
+  for (const g of d?.ghosts ?? []) if (g.over) ghost(g);
 }
 
 /** Two off-screen canvases, reused frame to frame, cleared and reset on every call. */
@@ -918,7 +949,8 @@ export default function PathwayTool() {
     if (!drawPreset || !span) return look;
     const f = drawFrame(drawPreset, t, drawMode, drawReverse);
     const len = span[1] - span[0];
-    return { ...look, draw: { width: f.width, spans: f.spans.map(([a, b]) => [span[0] + a * len, span[0] + b * len]) } };
+    const place = (spans: Span[]) => spans.map(([a, b]) => [span[0] + a * len, span[0] + b * len] as Span);
+    return { ...look, draw: { width: f.width, spans: place(f.spans), ghosts: f.ghosts?.map((g) => ({ ...g, spans: place(g.spans) })) } };
   };
 
   /**
@@ -955,7 +987,9 @@ export default function PathwayTool() {
     let raf = 0;
     const draw = () => {
       cancelAnimationFrame(raf);
-      const t = moving ? ((performance.now() - clock.current) / 1000 / secs) % 1 : 0;
+      // ?t=0.4 holds the preview at that point in the loop, for checking a frame
+      const held = Number(new URLSearchParams(window.location.search).get("t"));
+      const t = !moving ? 0 : held > 0 ? held % 1 : ((performance.now() - clock.current) / 1000 / secs) % 1;
       render(ctx, stripW * view, h * view, S, 0, path, lookAt(t), flowAt(t, cycles), textMoves ? t : 0);
       if (moving && !recording) raf = requestAnimationFrame(draw); // an export takes the processor; the preview holds
     };
