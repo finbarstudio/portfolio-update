@@ -67,54 +67,142 @@
 .items .sep b { font-weight: inherit; }
 .items.laid { white-space: nowrap; }
 
-/* ---------- app shell (screen only) ---------- */
+/* ---------- app shell (screen only) ----------
+   Same look as the other Share to Buy lab tools (the pathway maker): a rose
+   panel with folding sections, outlined toggles, pink switches and buttons. */
 
 .app, .app * { box-sizing: border-box; }
 html, body { margin: 0; }
 .app {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 320px minmax(0, 1fr);
   height: 100vh;
-  font: 13px/1.4 system-ui, -apple-system, sans-serif;
-  color: #1d1d1f;
-  background: #e9e8ee;
+  height: 100dvh;
+  overflow: hidden;
+  font: 400 13px/1.3 var(--font);
+  color: var(--midnight);
+  background: #ece6ea;
 }
+.app button { font: inherit; color: inherit; cursor: pointer; }
+.app button:disabled { opacity: 0.4; cursor: default; }
+
 .panel {
-  overflow: auto;
-  padding: 16px;
-  background: #fff;
-  border-right: 1px solid #d8d6df;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 18px 14px;
+  background: var(--rose);
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 /* headings set in full, so a host site's own heading styles (lab.finbar.studio) do not leak in */
-.panel h1, .panel h2 { font-family: inherit; font-weight: 700; letter-spacing: normal; text-transform: none; line-height: 1.3; }
-.panel h1 { font-size: 15px; margin: 0 0 2px; }
-.panel .sub { color: #6b6879; margin: 0 0 14px; }
-.panel h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #6b6879; margin: 18px 0 6px; }
-.panel label { display: block; margin: 6px 0 2px; }
-.panel select, .panel input[type=number], .panel input[type=text], .panel textarea {
-  width: 100%; font: inherit; padding: 5px 7px; border: 1px solid #cfcdd8; border-radius: 6px; background: #fff;
-}
-.panel textarea { height: 110px; font: 11px/1.35 ui-monospace, Menlo, monospace; resize: vertical; }
-.panel .row { display: flex; gap: 6px; align-items: center; }
-.panel .row > * { flex: 1; }
-.panel button {
-  font: inherit; padding: 6px 10px; border-radius: 6px; border: 1px solid #cfcdd8; background: #f6f5f9; cursor: pointer;
-}
-.panel button.primary { background: var(--midnight); color: #fff; border-color: var(--midnight); }
-.panel .check { display: flex; gap: 6px; align-items: center; margin: 6px 0; }
-.panel .check input { margin: 0; }
-.messages { margin-top: 10px; }
-.msg { padding: 6px 8px; border-radius: 6px; margin: 4px 0; font-size: 12px; }
-.msg.warn { background: #fff4d6; color: #6b4e00; }
-.msg.error { background: #fde3e3; color: #8a1010; }
-.msg.info { background: #e8f1ff; color: #123d7a; }
-.hint { color: #6b6879; font-size: 12px; }
+.panel h1, .panel h2 { margin: 0; font-family: inherit; letter-spacing: normal; text-transform: none; line-height: 1.2; }
+.panel h1 { font-size: 20px; font-weight: 700; color: var(--pink); }
+.panel h1 .version { margin-left: 4px; font-size: 11px; font-weight: 400; color: var(--midnight); opacity: 0.5; }
+.panel h2 { font-size: 10px; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; }
+.panel p { margin: 0; }
+.panel .note { margin-top: 6px; font-size: 11px; opacity: 0.65; }
+.panel h1 + .note { margin-top: -8px; }
+.panel .label { margin: 12px 0 5px; font-size: 11px; opacity: 0.65; }
+.panel .group-body > .label:first-child { margin-top: 0; }
 
-.stage { overflow: auto; padding: 24px; }
+/* folding sections */
+.group { padding-top: 14px; border-top: 1px solid rgb(24 23 49 / 0.12); }
+.group > summary, .sub > summary {
+  display: flex; align-items: center; justify-content: space-between;
+  list-style: none; cursor: pointer; user-select: none;
+}
+.group > summary::-webkit-details-marker, .sub > summary::-webkit-details-marker { display: none; }
+.group > summary::after, .sub > summary::after {
+  content: ""; width: 7px; height: 7px; margin-right: 3px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  opacity: 0.55; transform: translateY(-2px) rotate(45deg); transition: transform 0.15s;
+}
+.group:not([open]) > summary::after, .sub:not([open]) > summary::after { transform: rotate(-45deg); }
+.group:hover > summary::after, .sub:hover > summary::after { opacity: 1; }
+.group-body { padding-top: 10px; }
+.sub { margin-top: 10px; }
+.sub > summary { font-size: 12px; opacity: 0.8; }
+
+/* toggles: a row of choices, the chosen one filled */
+.seg { display: flex; gap: 4px; }
+.seg-wrap { flex-wrap: wrap; }
+.seg button {
+  flex: 1 1 0; min-width: 0; padding: 6px 8px;
+  border: 1px solid var(--midnight); border-radius: 6px; background: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.seg-wrap button { flex: 1 1 auto; }
+.seg button[aria-pressed="true"] { background: var(--midnight); color: var(--rose); }
+.seg:empty::before { content: "None yet"; font-size: 11px; opacity: 0.5; }
+
+/* on/off settings: the label, then a switch */
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 30px; margin-top: 8px; cursor: pointer; }
+.switch input {
+  appearance: none; position: relative; flex: none; width: 34px; height: 20px; margin: 0;
+  border-radius: 999px; background: rgb(24 23 49 / 0.2); cursor: pointer; transition: background 0.15s;
+}
+.switch input::before {
+  content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 2px rgb(24 23 49 / 0.3); transition: transform 0.15s;
+}
+.switch input:checked { background: var(--pink); }
+.switch input:checked::before { transform: translateX(14px); }
+.switch input:focus-visible, .seg button:focus-visible, .app .primary:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+
+/* buttons and fields */
+.app .primary {
+  width: 100%; padding: 9px 12px; border: 0; border-radius: 6px;
+  background: var(--pink); color: var(--rose); font-weight: 700;
+}
+.app .primary.dark { background: var(--midnight); }
+.app .outline { width: 100%; margin-top: 6px; padding: 7px 12px; border: 1px solid var(--midnight); border-radius: 6px; background: none; }
+.app .link { padding: 4px 0; border: 0; background: none; text-decoration: underline; opacity: 0.7; }
+.app .link:hover { opacity: 1; }
+.file-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.file {
+  position: relative; display: inline-flex; align-items: center; padding: 7px 12px;
+  border: 1px solid var(--midnight); border-radius: 6px; cursor: pointer;
+}
+.file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.file:focus-within { outline: 2px solid var(--pink); outline-offset: 2px; }
+.panel textarea {
+  display: block; width: 100%; height: 84px; margin-top: 8px; padding: 7px 8px; resize: vertical;
+  border: 1px solid rgb(24 23 49 / 0.35); border-radius: 6px; background: #fff; color: inherit;
+  font: 11px/1.35 ui-monospace, Menlo, monospace;
+}
+.panel textarea::placeholder { font-family: var(--font); font-size: 12px; color: rgb(24 23 49 / 0.5); }
+
+/* what the data check found */
+.messages:empty { display: none; }
+.messages { display: flex; flex-direction: column; gap: 4px; }
+.msg { padding: 7px 9px; border-radius: 6px; font-size: 12px; line-height: 1.35; }
+.msg.warn { background: #ffeda6; }
+.msg.error { background: #f0a9cb; }
+.msg.info { background: #fff; border: 1px solid rgb(24 23 49 / 0.12); }
+
+.export { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 14px; border-top: 1px solid rgb(24 23 49 / 0.12); }
+.export .note { margin: 0 0 6px; }
+.export .label { margin: 4px 0 0; }
+.export .link { align-self: flex-start; font-size: 12px; }
+
+.stage { overflow: auto; padding: 28px; }
 .sheet { transform-origin: top left; }
-.spread { display: flex; margin: 0 auto 24px; width: max-content; }
-.spread .page { box-shadow: 0 2px 10px rgba(0, 0, 0, .25); }
+.spread { display: flex; margin: 0 auto 28px; width: max-content; }
+.spread .page { box-shadow: 0 2px 24px rgb(24 23 49 / 0.18); }
 .spread .page.single { margin-left: auto; }
+
+/* phone: the preview on top, the controls below */
+@media screen and (max-width: 760px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: 42dvh minmax(0, 1fr); font-size: 15px; }
+  .stage { order: -1; padding: 12px; }
+  .panel { padding: 16px 16px calc(20px + env(safe-area-inset-bottom)); border-top: 1px solid rgb(24 23 49 / 0.15); }
+  .seg button, .app .primary { min-height: 44px; }
+  .switch { min-height: 44px; }
+  .panel textarea { font-size: 16px; }
+  .export { margin-top: 0; }
+}
+
 /* trimmed view on screen: hide the bleed */
 .hide-bleed .page { clip-path: inset(var(--bleed)); }
 .hide-bleed .spread .page.left:not(:last-child) { margin-right: calc(-2 * var(--bleed)); }

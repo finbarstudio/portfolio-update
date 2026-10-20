@@ -49,6 +49,7 @@
 
   EGG.register('locations', {
     label: 'Location information',
+    short: 'Locations',
     section: 'locationInfo',
 
     csvHelp:

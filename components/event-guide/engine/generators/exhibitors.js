@@ -12,7 +12,8 @@
 
   const L = {
     titleX: 12.8, titleY: 7.5,
-    headY: 36.7,          // column headings when the title is on the page
+    headY: 36.7,          // column headings under a one-line title (2026 guides)
+    titleLine: 17.6,      // one 47.9pt title line in mm; a longer title pushes the headings down
     headYTop: 13,         // column headings on a page with no title and no key
     headH: 7.4,
     keyY: 13.6, keyH: 16.4, keyX: 14.3, keyW: 182.6,
@@ -97,6 +98,7 @@
 
   EGG.register('exhibitors', {
     label: 'Exhibitor information',
+    short: 'Exhibitors',
     section: 'exhibitorInfo',
 
     csvHelp:
@@ -129,7 +131,12 @@
 
       // usable height per page: page 1 carries the title, the last page the key.
       // The key page is only known after splitting, so assume the worst (key on every page after 1).
-      const top1 = L.headY + L.headH + L.afterHead;
+      // title space: the 2026 position for one line, moved down for each extra line
+      const title = opts.title || 'Exhibitor information';
+      const fit = EGG.fitTitle(title, 210 - 2 * L.titleX);
+      const titleLines = String(Array.isArray(title) ? title.join('\n') : title).split('\n').length;
+      const headY1 = L.headY + (titleLines - 1) * fit.lineMm - (L.titleLine - fit.lineMm);
+      const top1 = headY1 + L.headH + L.afterHead;
       const topKey = L.keyY + L.keyH + 2 + L.headH + L.afterHead;
       const capacities = [];
       const bottom = L.rowsBottom;
@@ -150,12 +157,11 @@
         const page = EGG.makePage({ number, side: EGG.sideOf(number, first, firstSide), className: 'ex' });
         let headY = L.headYTop;
         if (p === 0) {
-          const title = opts.title || 'Exhibitor information';
-          page.trim.appendChild(EGG.place(EGG.furniture(EGG.titleEl(title, EGG.fitTitle(title, 210 - 2 * L.titleX).pt), 'Title'), L.titleX, L.titleY));
-          headY = L.headY;
+          page.trim.appendChild(EGG.place(EGG.furniture(EGG.titleEl(title, fit.pt), 'Title'), L.titleX, L.titleY));
+          headY = headY1;
           if (showKey && groups.length === 1) {
-            key(page, L.headY - 3, cats, used); // single page: key under the title
-            headY = L.headY - 3 + L.keyH + 2;
+            key(page, headY1 - 3, cats, used); // single page: key under the title
+            headY = headY1 - 3 + L.keyH + 2;
           }
         } else if (showKey && p === groups.length - 1) {
           key(page, L.keyY, cats, used);

@@ -325,6 +325,8 @@
       EGG.state.event = ev;
     }
     EGG.state.source = source || 'pasted';
+    EGG.ui.example = null;
+    EGG.ui.pages = EGG.ui.side = null;
     EGG.render().then(() => {
       if (notes) {
         EGG.info(`Notes that came with the data: ${notes}`);
@@ -374,10 +376,7 @@
     });
     EGG.layoutItems(sheet);
     EGG.pages = pages;
-    const only = document.getElementById('opt-pdf');
-    const keep = only.value;
-    only.innerHTML = '<option value="">All pages</option>' + pages.map((p, i) => `<option value="${i}">Page ${i + 1} only (${p.classList.contains('left') ? 'left' : 'right'})</option>`).join('');
-    if (keep && keep < pages.length) only.value = keep;
+    if (EGG.ui.pdf !== '' && Number(EGG.ui.pdf) >= pages.length) EGG.ui.pdf = '';
     document.title = `${ev.event?.short || ev.event?.name || 'Event'} - ${gen.label}`;
     EGG.fit();
     EGG.showMessages();
@@ -386,17 +385,17 @@
   /** Values typed into the side panel override the file's settings. */
   EGG.overrides = function () {
     const o = {};
-    const pages = document.getElementById('opt-pages').value;
-    if (pages !== 'file') o.pages = pages === 'auto' ? 'auto' : Number(pages);
-    const side = document.getElementById('opt-side').value;
-    if (side !== 'file') o.firstPageSide = side;
+    if (EGG.ui.pages != null) o.pages = EGG.ui.pages === 'auto' ? 'auto' : Number(EGG.ui.pages);
+    if (EGG.ui.side) o.firstPageSide = EGG.ui.side;
     return o;
   };
 
   EGG.showMessages = function () {
+    EGG.refreshPanel();
     const box = document.getElementById('messages');
     box.innerHTML = EGG.messages.map((m) => `<div class="msg ${m.kind}">${EGG.esc(m.text)}</div>`).join('');
-    document.getElementById('source').textContent = EGG.state.source ? `Data: ${EGG.state.source}` : '';
+    const ev = EGG.state.event;
+    document.getElementById('source').textContent = ev ? `Showing ${ev.event?.name || 'your data'}${/^example/.test(EGG.state.source) ? '' : ` (from ${EGG.state.source})`}.` : '';
   };
 
   EGG.fit = function () {
@@ -416,14 +415,14 @@
    * carry a background either way: the pages are dropped onto the guide artwork.
    */
   EGG.applyView = function () {
-    const tables = document.getElementById('opt-content').value === 'tables';
+    const tables = !document.getElementById('opt-full').checked;
     EGG.root().classList.toggle('tables-only', tables);
     EGG.root().classList.toggle('no-bg', tables);
   };
 
   /** Print all pages, or just the page picked under Export. */
   EGG.print = function () {
-    const only = document.getElementById('opt-pdf').value;
+    const only = EGG.ui.pdf;
     (EGG.pages || []).forEach((p, i) => p.classList.toggle('no-print', only !== '' && String(i) !== only));
     window.print();
   };
@@ -437,42 +436,82 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
 
+  /* ---------------- side panel ---------------- */
+
+  EGG.VERSION = '1.1';
+  /** Panel choices. null means "as the data file says". */
+  EGG.ui = { example: null, pages: null, side: null, pdf: '' };
+
+  /** Fill a row of toggle buttons. items: [{ value, label, title }]. */
+  function seg(id, items, pressed, onPick) {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.innerHTML = '';
+    items.forEach((it) => {
+      const b = EGG.el('button', '', EGG.esc(it.label));
+      b.type = 'button';
+      if (it.title) b.title = it.title;
+      b.setAttribute('aria-pressed', String(String(it.value) === String(pressed)));
+      b.onclick = () => onPick(it.value);
+      box.appendChild(b);
+    });
+  }
+
+  /** Redraw the toggles from the current state (after every render). */
+  EGG.refreshPanel = function () {
+    const gen = EGG.generators[EGG.state.generator];
+    const section = (EGG.state.event && EGG.state.event[gen.section]) || {};
+    seg('seg-generator', Object.values(EGG.generators).map((g) => ({ value: g.id, label: g.short || g.label, title: g.label })), EGG.state.generator, (id) => {
+      EGG.state.generator = id;
+      EGG.render();
+    });
+    seg('seg-example', EGG.examples.map((x, i) => ({ value: i, label: x.data.event?.short || x.file, title: x.data.event?.name })), EGG.ui.example ?? '', EGG.useExample);
+    const filePages = section.pages == null || section.pages === 'auto' ? 'auto' : String(section.pages);
+    seg('seg-pages', [{ value: 'auto', label: 'Fewest', title: 'The fewest pages that fit' }, { value: '1', label: '1' }, { value: '2', label: '2' }, { value: '3', label: '3' }], EGG.ui.pages ?? filePages, (v) => {
+      EGG.ui.pages = v;
+      EGG.render();
+    });
+    seg('seg-side', [{ value: 'left', label: 'Left' }, { value: 'right', label: 'Right' }], EGG.ui.side ?? (section.firstPageSide === 'right' ? 'right' : 'left'), (v) => {
+      EGG.ui.side = v;
+      EGG.render();
+    });
+    const pages = EGG.pages || [];
+    seg('seg-pdf', [{ value: '', label: 'All pages' }].concat(pages.map((p, i) => ({ value: String(i), label: `Page ${i + 1}`, title: `Only page ${i + 1} (${p.classList.contains('left') ? 'left' : 'right'})` }))), EGG.ui.pdf, (v) => {
+      EGG.ui.pdf = v;
+      EGG.refreshPanel();
+    });
+    const help = document.getElementById('csv-help');
+    if (help) help.innerHTML = gen.csvHelp || '';
+  };
+
+  /** Load one of the bundled example shows. */
+  EGG.useExample = function (i) {
+    const x = EGG.examples[i];
+    if (!x) return;
+    EGG.state.event = JSON.parse(JSON.stringify(x.data));
+    EGG.state.source = `example ${x.file}`;
+    EGG.ui.example = i;
+    EGG.ui.pages = EGG.ui.side = null;
+    EGG.render();
+  };
+
   function initUi() {
-    const genSel = document.getElementById('opt-generator');
-    Object.values(EGG.generators).forEach((g) => genSel.add(new Option(g.label, g.id)));
-    genSel.value = EGG.state.generator;
-    genSel.onchange = () => {
-      EGG.state.generator = genSel.value;
-      document.getElementById('csv-help').innerHTML = EGG.generators[genSel.value].csvHelp || '';
-      EGG.render();
-    };
-    document.getElementById('csv-help').innerHTML = EGG.generators[EGG.state.generator].csvHelp || '';
-
-    const exSel = document.getElementById('opt-example');
-    EGG.examples.forEach((x, i) => exSel.add(new Option(x.data.event?.name || x.file, i)));
-    exSel.onchange = () => {
-      if (exSel.value === '') return;
-      const x = EGG.examples[exSel.value];
-      EGG.state.event = JSON.parse(JSON.stringify(x.data));
-      EGG.state.source = `example ${x.file}`;
-      EGG.render();
-    };
-
+    const v = document.getElementById('egg-version');
+    if (v) v.textContent = `v${EGG.VERSION}`;
     document.getElementById('opt-file').onchange = (e) => {
       const f = e.target.files[0];
       if (!f) return;
       f.text().then((t) => EGG.load(t, f.name));
+      e.target.value = '';
     };
     document.getElementById('btn-paste').onclick = () => EGG.load(document.getElementById('paste').value, 'pasted');
-    document.getElementById('opt-pages').onchange = EGG.render;
-    document.getElementById('opt-side').onchange = EGG.render;
-    document.getElementById('opt-content').onchange = EGG.applyView;
-    document.getElementById('btn-idml').onclick = () => EGG.exportIdml();
-    document.getElementById('btn-package').onclick = () => EGG.exportPackage();
+    document.getElementById('opt-full').onchange = EGG.applyView;
     document.getElementById('opt-bleed').onchange = (e) => {
       EGG.state.showBleed = e.target.checked;
       EGG.fit();
     };
+    document.getElementById('btn-idml').onclick = () => EGG.exportIdml();
+    document.getElementById('btn-package').onclick = () => EGG.exportPackage();
     document.getElementById('btn-print').onclick = EGG.print;
     document.getElementById('btn-save').onclick = () => {
       if (!EGG.state.event) return;
@@ -487,6 +526,7 @@
       const f = e.dataTransfer.files[0];
       if (f) f.text().then((t) => EGG.load(t, f.name));
     });
+    EGG.refreshPanel();
   }
 
   /**
@@ -498,9 +538,8 @@
     const q = new URLSearchParams(location.search);
     if (q.get('gen') && EGG.generators[q.get('gen')]) {
       EGG.state.generator = q.get('gen');
-      document.getElementById('opt-generator').value = q.get('gen');
     }
-    if (q.get('content')) document.getElementById('opt-content').value = q.get('content') === 'full' ? 'full' : 'tables';
+    if (q.get('content') === 'full') document.getElementById('opt-full').checked = true;
     EGG.applyView();
     if (q.get('bleed') === '1') {
       EGG.state.showBleed = true;
@@ -511,7 +550,7 @@
       if (x) {
         EGG.state.event = JSON.parse(JSON.stringify(x.data));
         EGG.state.source = `example ${x.file}`;
-        document.getElementById('opt-example').value = String(EGG.examples.indexOf(x));
+        EGG.ui.example = EGG.examples.indexOf(x);
       }
     } else if (q.get('data')) {
       try {
