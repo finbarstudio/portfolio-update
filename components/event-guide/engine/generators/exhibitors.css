@@ -1,0 +1,107 @@
+/* Exhibitor information. Sizes from the InDesign source (pt for type, mm for boxes). */
+
+.ex-row {
+  display: flex;
+  gap: 1.9mm;
+  min-height: 9.7mm;
+}
+.ex-row > div {
+  display: flex;
+  align-items: center;
+  border-radius: 1.5mm;
+}
+.ex-stand {
+  flex: 0 0 13mm;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 19pt;
+  line-height: 1;
+  color: var(--midnight);
+}
+.ex-name {
+  flex: 0 0 47mm;
+  justify-content: center;
+  text-align: center;
+  padding: 0.6mm 1.5mm;
+  background: var(--rose);
+  color: var(--midnight);
+  font-weight: 700;
+  font-size: 11pt;
+  line-height: 12pt;
+  text-wrap: balance;
+}
+.ex-talk {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.6mm 2mm 0.6mm 4mm;
+  background: var(--rose);
+  color: var(--onyx);
+  font-size: 11pt;
+  line-height: 12pt;
+}
+
+.ex-head span {
+  position: absolute;
+  bottom: 0;
+  font-weight: 700;
+  font-size: 13pt;
+  line-height: 1;
+  color: var(--rose);
+}
+
+.ex-key {
+  border: 0.5pt solid var(--rose);
+  border-radius: 3mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 6mm;
+}
+.ex-key-label {
+  position: absolute;
+  top: -2.6mm;
+  left: 5mm;
+  padding: 0 2mm;
+  background: var(--midnight);
+  font-weight: 700;
+  font-size: 13pt;
+  line-height: 1;
+}
+.ex-key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.6mm;
+  font-size: 10.5pt;
+}
+.ex-key-item i {
+  width: 6.4mm;
+  height: 6.4mm;
+  border-radius: 1mm;
+}
+
+/* room: script label centred on its rows with a rounded rule above and below */
+.ex-room {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4mm;
+}
+.ex-room i {             /* real elements, not ::before/::after, so the InDesign export sees them */
+  flex: 1 1 0;
+  width: 1.3mm;
+  border-radius: 1mm;
+  background: var(--rose);
+}
+.ex-room span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--script);
+  font-weight: 700;
+  font-size: 19pt;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--rose);
+}
+
+.ex-talk .items { flex: 1 1 auto; }

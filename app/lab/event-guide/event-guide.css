@@ -1,0 +1,31 @@
+/* Event guide generator (lab.finbar.studio/event-guide). The tool's own styles
+   come from components/event-guide/engine (a copy, never edited here). This file
+   only fits it into the lab. */
+
+.egg-lab {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #e9e8ee;
+}
+.egg-lab .app {
+  height: 100%;
+}
+
+/* No font package from the site: the brand fonts are not handed out to clients. */
+.egg-lab .pkg {
+  display: none;
+}
+
+/* Printing (Save as PDF): only the guide pages, on a see-through page. */
+@media print {
+  html,
+  body,
+  .lb-root {
+    background: none !important;
+  }
+  .egg-lab {
+    position: static;
+    background: none;
+  }
+}

@@ -90,14 +90,16 @@ usage (CPU/build minutes). Finbar is managing that budget. So:
 
 # Lab tools edited outside this repo
 
-Two lab tools are copies. Their source lives in the parent's `Lab/` folder, and
-a sync script there overwrites the copy here on every release. Never edit these
+Three lab tools are copies. Their source lives outside this repo (the parent's
+`Lab/` folder, or the Share to Buy folder for the event guide generator), and a
+sync script there overwrites the copy here on every release. Never edit these
 copies in this repo; edit the source and sync.
 
 | Copy in this repo | Source |
 |---|---|
 | `components/mockup-studio/`, `lib/mockup-studio/`, `public/media/lab/mockup/` | `../Lab/mockup-studio` (`scripts/sync-to-lab.sh`) |
 | `components/motion-presets/`, `app/lab/motion/` | `../Lab/motion-tool` (`bun run sync`) |
+| `components/event-guide/engine/` | `~/Documents/Me/Share to Buy/Projects/Event Guide Generator` (`tools/sync-to-lab.sh`). Hidden tool for clients: `app/lab/event-guide` stays out of `content/lab-items.ts`, the sitemap and every link. |
 
 # Repository & folder layout
 

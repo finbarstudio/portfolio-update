@@ -1,0 +1,163 @@
+/* Shared tokens, page geometry and the app shell.
+   All page measurements are millimetres on an A4 page (210 x 297) with 3mm bleed.
+   Generator-specific styles live in app/generators/<id>.css.
+   Everything hangs off the app's root element (#egg, class "app"), not the page,
+   so the tool can also sit inside another site (lab.finbar.studio/event-guide). */
+
+.app {
+  /* Brand colours, sampled from the exported 2026 guide PDFs */
+  --midnight: #181731;
+  --rose: #fef5f5;      /* Rose White: row boxes and white type */
+  --onyx: #231f20;      /* body type inside boxes */
+  --pink: #e71f68;      /* Share to Buy pink */
+  --yellow: #ffeda6;    /* Pastel Yellow: highlights, Homes for sale */
+  --powder: #f0a9cb;    /* Powder Pink: Financial advice */
+  --violet: #b3add6;    /* Pale Violet: Legal advice */
+  --mint: #a9d7cc;      /* Other advice */
+
+  --font: 'Share to Buy', system-ui, sans-serif;
+  --script: 'Caveat', cursive;
+
+  --page-w: 210mm;
+  --page-h: 297mm;
+  --bleed: 3mm;
+}
+
+/* ---------- page ---------- */
+
+.page {
+  position: relative;
+  width: calc(var(--page-w) + 2 * var(--bleed));
+  height: calc(var(--page-h) + 2 * var(--bleed));
+  overflow: hidden;
+  background: var(--midnight);
+  color: var(--rose);
+  font-family: var(--font);
+  font-kerning: normal;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.page .bg {            /* full-bleed background layer */
+  position: absolute;
+  inset: 0;
+}
+.page .trim {          /* trimmed page: content is positioned in mm from its top-left */
+  position: absolute;
+  left: var(--bleed);
+  top: var(--bleed);
+  width: var(--page-w);
+  height: var(--page-h);
+}
+.abs { position: absolute; }
+
+.title {
+  font-weight: 700;
+  font-size: 47.9pt;
+  line-height: 1.04;
+  letter-spacing: -0.005em;
+  color: var(--rose);
+  white-space: nowrap;
+}
+.title .hl { color: var(--yellow); }
+
+/* text that may only wrap at the " | " separators */
+.items { overflow-wrap: normal; min-width: 0; }
+.items .it { white-space: nowrap; }
+.items .sep { white-space: pre; word-spacing: 0.35mm; }
+.items .sep b { font-weight: inherit; }
+.items.laid { white-space: nowrap; }
+
+/* ---------- app shell (screen only) ---------- */
+
+.app, .app * { box-sizing: border-box; }
+html, body { margin: 0; }
+.app {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  height: 100vh;
+  font: 13px/1.4 system-ui, -apple-system, sans-serif;
+  color: #1d1d1f;
+  background: #e9e8ee;
+}
+.panel {
+  overflow: auto;
+  padding: 16px;
+  background: #fff;
+  border-right: 1px solid #d8d6df;
+}
+/* headings set in full, so a host site's own heading styles (lab.finbar.studio) do not leak in */
+.panel h1, .panel h2 { font-family: inherit; font-weight: 700; letter-spacing: normal; text-transform: none; line-height: 1.3; }
+.panel h1 { font-size: 15px; margin: 0 0 2px; }
+.panel .sub { color: #6b6879; margin: 0 0 14px; }
+.panel h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #6b6879; margin: 18px 0 6px; }
+.panel label { display: block; margin: 6px 0 2px; }
+.panel select, .panel input[type=number], .panel input[type=text], .panel textarea {
+  width: 100%; font: inherit; padding: 5px 7px; border: 1px solid #cfcdd8; border-radius: 6px; background: #fff;
+}
+.panel textarea { height: 110px; font: 11px/1.35 ui-monospace, Menlo, monospace; resize: vertical; }
+.panel .row { display: flex; gap: 6px; align-items: center; }
+.panel .row > * { flex: 1; }
+.panel button {
+  font: inherit; padding: 6px 10px; border-radius: 6px; border: 1px solid #cfcdd8; background: #f6f5f9; cursor: pointer;
+}
+.panel button.primary { background: var(--midnight); color: #fff; border-color: var(--midnight); }
+.panel .check { display: flex; gap: 6px; align-items: center; margin: 6px 0; }
+.panel .check input { margin: 0; }
+.messages { margin-top: 10px; }
+.msg { padding: 6px 8px; border-radius: 6px; margin: 4px 0; font-size: 12px; }
+.msg.warn { background: #fff4d6; color: #6b4e00; }
+.msg.error { background: #fde3e3; color: #8a1010; }
+.msg.info { background: #e8f1ff; color: #123d7a; }
+.hint { color: #6b6879; font-size: 12px; }
+
+.stage { overflow: auto; padding: 24px; }
+.sheet { transform-origin: top left; }
+.spread { display: flex; margin: 0 auto 24px; width: max-content; }
+.spread .page { box-shadow: 0 2px 10px rgba(0, 0, 0, .25); }
+.spread .page.single { margin-left: auto; }
+/* trimmed view on screen: hide the bleed */
+.hide-bleed .page { clip-path: inset(var(--bleed)); }
+.hide-bleed .spread .page.left:not(:last-child) { margin-right: calc(-2 * var(--bleed)); }
+.hide-bleed .spread { margin-top: calc(-1 * var(--bleed)); margin-bottom: calc(24px - var(--bleed)); }
+.hide-bleed .spread .page { box-shadow: none; }
+
+/* background off: transparent pages for placing over artwork in Illustrator or InDesign */
+.no-bg .page { background: none; }
+.no-bg .page .bg { display: none; }
+@media screen {
+  /* see-through page: a dark checker (so the light type still reads), a solid line
+     at the trim and a dashed line at the bleed */
+  .no-bg .page { background: repeating-conic-gradient(#2b2a44 0 25%, #222137 0 50%) 0 0 / 4mm 4mm; outline: 1px dashed #8d8aa3; outline-offset: -1px; }
+  .no-bg .page .trim { outline: 1px solid rgb(254 245 245 / .45); }
+}
+
+/* tables only: page furniture (title, headings, key, rules) shows as labelled outlines
+   on screen and is left out of the PDF and InDesign exports */
+@media screen {
+  .tables-only .furniture { color: transparent !important; background: none !important; border-color: transparent !important; outline: 1px dashed #b9b6cc; outline-offset: 0.6mm; }
+  .tables-only .furniture * { visibility: hidden; }
+  .tables-only .furniture::after {
+    content: attr(data-label); position: absolute; left: 0; top: 0; padding: 0.4mm 1.4mm;
+    font: 600 8pt/1.3 system-ui, sans-serif; color: #2c2a3a; background: rgb(255 255 255 / .75); visibility: visible; white-space: nowrap;
+  }
+}
+@media print { .tables-only .furniture { display: none !important; } }
+
+/* off-screen measuring area */
+#measure { position: absolute; left: -10000px; top: 0; visibility: hidden; }
+
+/* ---------- print: one PDF page per guide page, bleed included ---------- */
+
+@page { size: 216mm 303mm; margin: 0; }
+@media print {
+  .app { display: block; height: auto; background: none; }
+  .panel, #measure { display: none !important; }
+  .stage { padding: 0; overflow: visible; }
+  .sheet { transform: none !important; }
+  .spread { display: block; margin: 0 !important; width: auto; } /* beats the screen-only hide-bleed margins */
+  .page { break-after: page; box-shadow: none !important; clip-path: none !important; margin: 0 !important; }
+  .page:last-child { break-after: auto; }
+  .page.no-print { display: none !important; }
+  .page { background: none !important; }   /* exports never carry the page colour */
+  .page .bg { display: none !important; }
+}

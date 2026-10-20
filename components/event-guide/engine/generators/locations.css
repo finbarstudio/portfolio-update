@@ -1,0 +1,27 @@
+/* Location information. Sizes from the InDesign source (pt for type, mm for boxes). */
+
+.loc-rule {
+  border-radius: 1mm;
+  background: var(--rose);
+}
+
+.loc-row {
+  display: flex;
+  min-height: 7.7mm;
+  border-radius: 1mm;
+  background: var(--rose);
+  color: var(--onyx);
+  font-size: 11pt;
+  line-height: 13pt;
+}
+.loc-area {
+  flex: 0 0 55.6mm;
+  padding: 1.5mm 2mm 1.5mm 3mm;
+  border-right: 0.6mm solid var(--midnight);
+}
+.loc-devs {
+  min-width: 0;
+  flex: 1 1 auto;
+  padding: 1.5mm 2mm 1.5mm 4mm;
+}
+.loc-devs .pink { color: var(--pink); }
