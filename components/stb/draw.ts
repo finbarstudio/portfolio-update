@@ -130,16 +130,17 @@ export function drawFrame(preset: DrawPreset, t: number, mode: DrawMode, reverse
  * artwork count, so a preset spends its time where it can be seen, and "the
  * middle" is the middle of what shows, even when the line leaves the artwork
  * and comes back. A piece counts from where the line comes within a line's
- * width of the frame.
+ * width of the frame, which runs from x0 to x1 across and 0 to uh down (one
+ * panel of a carousel, or the whole artwork).
  */
-export function onFrame(path: Pathway, uw: number, uh: number, stroke: number): (u: number) => number {
+export function onFrame(path: Pathway, x0: number, x1: number, uh: number, stroke: number): (u: number) => number {
   const { pts, cum } = path;
   const m = stroke;
   const runs: Span[] = [];
   let open = -1;
   const n = pts.length / 2;
   for (let i = 0; i <= n; i++) {
-    const on = i < n && pts[i * 2] > -m && pts[i * 2] < uw + m && pts[i * 2 + 1] > -m && pts[i * 2 + 1] < uh + m;
+    const on = i < n && pts[i * 2] > x0 - m && pts[i * 2] < x1 + m && pts[i * 2 + 1] > -m && pts[i * 2 + 1] < uh + m;
     if (on && open < 0) open = i;
     if (!on && open >= 0) {
       runs.push([cum[open], cum[i - 1]]);

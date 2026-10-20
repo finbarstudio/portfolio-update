@@ -926,6 +926,8 @@ export default function PathwayTool() {
   };
 
   const canvas = useRef<HTMLCanvasElement>(null);
+  /** one panel at a time, for a carousel preview that draws in panel by panel */
+  const panelCanvas = useRef<HTMLCanvasElement | null>(null);
   const clock = useRef(0); // when the loop last started
   const drag = useRef<number | null>(null);
 
@@ -980,8 +982,8 @@ export default function PathwayTool() {
   const look: Look = {
     bg: colours.bg,
     line: colours.line,
-    // Video has no transparency, so anything that moves is always solid.
-    alpha: moving ? "none" : alpha,
+    // (an MP4 has no transparency, so it is always made solid; a GIF keeps it)
+    alpha,
     text: shownText,
     textColours: (presets[textPreset] ?? presets[0]).colours,
     flip: flipText,
@@ -991,8 +993,12 @@ export default function PathwayTool() {
   };
 
   /** The look at t through the loop: the line drawn in or out by the chosen preset. */
-  const along = drawPreset ? onFrame(path, stripW / short, h / short, stroke) : null;
-  const lookAt = (t: number): Look => {
+  // In a carousel each panel draws in its own piece of the line over the whole
+  // loop, so every slide starts as the line enters it and the clips run alike.
+  const alongs = drawPreset ? Array.from({ length: n }, (_, i) => onFrame(path, (i * w) / short, ((i + 1) * w) / short, h / short, stroke)) : null;
+  /** The look at t through the loop, for panel `panel`. */
+  const lookAt = (t: number, panel = 0): Look => {
+    const along = alongs?.[panel];
     if (!drawPreset || !along) return look;
     const f = drawFrame(drawPreset, t, drawMode, drawReverse);
     const place = (spans: Span[]) => spans.map(([a, b]) => [along(a), along(b)] as Span);
@@ -1037,7 +1043,8 @@ export default function PathwayTool() {
     return reverseFlow ? (1 - at) % 1 : at;
   };
   /** Draw panel `i` at full size, at t (0 to 1) through the loop. */
-  const drawPanel = (ctx: CanvasRenderingContext2D, i: number, t: number) => render(ctx, w, h, short, i * w, path, lookAt(t), flowAt(t, loop.cycles), textAt(t));
+  const drawPanel = (ctx: CanvasRenderingContext2D, i: number, t: number) =>
+    render(ctx, w, h, short, i * w, path, { ...lookAt(t, i), alpha: "none" }, flowAt(t, loop.cycles), textAt(t));
 
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");
@@ -1051,7 +1058,21 @@ export default function PathwayTool() {
       // ?t=0.4 holds the preview at that point in the loop, for checking a frame
       const held = Number(new URLSearchParams(window.location.search).get("t"));
       const t = !moving ? 0 : held > 0 ? held % 1 : ((performance.now() - clock.current) / 1000 / secs) % 1;
-      render(ctx, stripW * view, h * view, S, 0, path, lookAt(t), flowAt(t, cycles), textAt(t));
+      if (drawPreset && n > 1) {
+        // each panel at its own point in its own draw-in, laid side by side
+        const pw = w * view;
+        const pc = (panelCanvas.current ??= document.createElement("canvas"));
+        if (pc.width !== Math.round(pw) || pc.height !== Math.round(h * view)) {
+          pc.width = Math.round(pw);
+          pc.height = Math.round(h * view);
+        }
+        const pctx = pc.getContext("2d")!;
+        ctx.clearRect(0, 0, stripW * view, h * view);
+        for (let i = 0; i < n; i++) {
+          render(pctx, pw, h * view, S, i * pw, path, lookAt(t, i), flowAt(t, cycles), textAt(t));
+          ctx.drawImage(pc, i * pw, 0);
+        }
+      } else render(ctx, stripW * view, h * view, S, 0, path, lookAt(t), flowAt(t, cycles), textAt(t));
       if (moving && !recording) raf = requestAnimationFrame(draw); // an export takes the processor; the preview holds
     };
     draw();
@@ -1298,6 +1319,88 @@ export default function PathwayTool() {
     }
   };
 
+  /**
+   * An animated GIF, one per panel, see-through as the Export choice says
+   * (Line only: just the line; Line cut out: the background with the line cut
+   * out; Full: solid). It is Canva's way in for see-through animation. GIF has
+   * no partial transparency, so every pixel is either see-through or solid: the
+   * soft edges of the line, its letters and any trail are blended with the
+   * background colour of the colourway, so they look right laid on that colour.
+   * 25 frames a second (a GIF counts time in hundredths), 1080px on the long
+   * side at most, one palette for the whole loop so colours do not shimmer.
+   */
+  const exportGif = async () => {
+    if (recording) return;
+    setProgress(0);
+    try {
+      const { GIFEncoder, quantize, applyPalette } = await import("gifenc");
+      const { el, ctx } = sheet();
+      const k = Math.min(1, 1080 / Math.max(w, h));
+      const gw = Math.round(w * k);
+      const gh = Math.round(h * k);
+      const small = document.createElement("canvas");
+      small.width = gw;
+      small.height = gh;
+      const sctx = small.getContext("2d", { willReadFrequently: true })!;
+      const matte = (() => {
+        const v = parseInt(colours.bg.replace("#", ""), 16);
+        return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+      })();
+      const fps = 25;
+      const total = Math.max(1, Math.round(loop.secs * fps));
+      /** frame i of a panel: the line on its own, edges blended into the matte, each pixel see-through or solid */
+      const frame = (panel: number, i: number) => {
+        const t = i / total;
+        render(ctx, w, h, short, panel * w, path, lookAt(t, panel), flowAt(t, loop.cycles), textAt(t));
+        sctx.clearRect(0, 0, gw, gh);
+        sctx.drawImage(el, 0, 0, gw, gh);
+        const px = sctx.getImageData(0, 0, gw, gh).data;
+        for (let p = 0; p < px.length; p += 4) {
+          const a = px[p + 3] / 255;
+          if (a < 0.03) {
+            px[p] = px[p + 1] = px[p + 2] = px[p + 3] = 0;
+            continue;
+          }
+          px[p] = px[p] * a + matte[0] * (1 - a);
+          px[p + 1] = px[p + 1] * a + matte[1] * (1 - a);
+          px[p + 2] = px[p + 2] * a + matte[2] * (1 - a);
+          px[p + 3] = 255;
+        }
+        return px;
+      };
+      for (let panel = 0; panel < n; panel++) {
+        // one palette from frames spread through the loop
+        const samples = 6;
+        const pool = new Uint8ClampedArray(gw * gh * 4 * samples);
+        for (let s = 0; s < samples; s++) pool.set(frame(panel, Math.floor((s / samples) * total)), s * gw * gh * 4);
+        const palette = quantize(pool, 256, { format: "rgba4444", oneBitAlpha: true });
+        const clear = palette.findIndex((c) => c[3] === 0);
+        const gif = GIFEncoder();
+        for (let i = 0; i < total; i++) {
+          const index = applyPalette(frame(panel, i), palette, "rgba4444");
+          gif.writeFrame(index, gw, gh, {
+            palette: i === 0 ? palette : undefined,
+            delay: 1000 / fps,
+            repeat: 0,
+            transparent: clear >= 0,
+            transparentIndex: Math.max(0, clear),
+            dispose: 2,
+          });
+          if (i % 3 === 0) {
+            setProgress((panel + i / total) / n);
+            await pause();
+          }
+        }
+        gif.finish();
+        save(new Blob([gif.bytes()], { type: "image/gif" }), fileName(panel, "gif"));
+        await pause(350);
+      }
+    } finally {
+      restart();
+      setProgress(null);
+    }
+  };
+
   const go = (to: number) => setSlide(Math.max(0, Math.min(n - 1, to)));
 
   return (
@@ -1489,7 +1592,7 @@ export default function PathwayTool() {
           <h2>Export</h2>
           <div className="stb-seg">
             {(["none", "bg", "line"] as Alpha[]).map((a) => (
-              <button key={a} type="button" aria-pressed={look.alpha === a} disabled={moving} onClick={() => setAlpha(a)}>
+              <button key={a} type="button" aria-pressed={look.alpha === a} onClick={() => setAlpha(a)}>
                 {a === "none" ? "Full" : a === "bg" ? "Line only" : "Line cut out"}
               </button>
             ))}
@@ -1507,7 +1610,18 @@ export default function PathwayTool() {
           </button>
           {moving && (
             <button type="button" className="stb-primary" onClick={exportVideo} disabled={recording}>
-              {recording ? `Making the video ${Math.round((progress ?? 0) * 100)}%` : `Download MP4 · ${loopSecs.toFixed(1)}s loop`}
+              {recording ? `Making the file ${Math.round((progress ?? 0) * 100)}%` : `Download MP4 · ${loopSecs.toFixed(1)}s loop`}
+            </button>
+          )}
+          {moving && (
+            <button
+              type="button"
+              className="stb-primary stb-has-note"
+              data-note={alpha === "none" ? "Solid. Choose Line only or Line cut out for see-through, for Canva" : "See-through, for Canva"}
+              onClick={exportGif}
+              disabled={recording}
+            >
+              {alpha === "none" ? "Download GIF" : "Download GIF · see-through"}
             </button>
           )}
           <p className="stb-note">
