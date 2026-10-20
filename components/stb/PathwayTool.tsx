@@ -5,6 +5,7 @@ import { generatePathway, type Pathway } from "./pathway";
 import { BRANDS, GRADIENT, colourName, textPresets, type BrandKey } from "./palette";
 import { media, corsMedia } from "@/lib/media";
 import { hasTransparency, makeSubject } from "./cutout";
+import { DRAW_PRESETS, drawFrame, onFrame, type Span } from "./draw";
 
 /**
  * Share to Buy pathway maker. One screen, no scroll: controls on the left, the
@@ -78,6 +79,8 @@ interface Look {
   flip: boolean;
   /** A photo in place of the background colour, and the subject cut out of it. */
   photo?: PhotoLook;
+  /** Drawing in or out: the stretches showing (distances along the line) and the thickness. */
+  draw?: { spans: Span[]; width: number };
 }
 
 type Place = "behind" | "brush" | "front";
@@ -340,24 +343,39 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   }
 }
 
-/** The line and its text, crossings tidied. */
+/**
+ * The line and its text, crossings tidied. While it is drawing in or out only
+ * the stretches in look.draw show, with rounded ends, at look.draw.width.
+ */
 function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, gPhase: number, tPhase: number) {
+  const { cum } = path;
   const last = path.pts.length / 2 - 1;
-  const STROKE = look.stroke;
+  const STROKE = look.stroke * (look.draw?.width ?? 1);
+  if (STROKE <= 0) return;
+  const spans: Span[] = look.draw ? look.draw.spans.filter(([a, b]) => b - a > 1e-4) : [[0, cum[last]]];
   ctx.lineWidth = STROKE * S;
   ctx.lineJoin = "round";
-  ctx.lineCap = "butt";
-  strokeLine(ctx, path, S, 0, last, look, gPhase);
+  ctx.lineCap = look.draw ? "round" : "butt";
+  /** stroke from a to b (distances along the line), with its letters */
+  const lay = (a: number, b: number, text: boolean) => {
+    strokeLine(ctx, path, S, locate(cum, a), Math.min(last, locate(cum, b) + 1), look, gPhase);
+    if (text) drawText(ctx, path, S, look, STROKE * S, tPhase, [a * S, b * S]);
+  };
+  for (const [a, b] of spans) lay(a, b, !!look.text);
   if (look.text) {
-    drawText(ctx, path, S, look, STROKE * S, tPhase);
     // Where the line passes over itself, two runs of text would collide. Lay the
     // upper stretch down again over the whole overlap, then its own letters on
     // top, so the text underneath slides out of sight beneath it.
     for (const [k, j] of path.over.entries()) {
       const win = overWindow(path, k, STROKE);
-      const at = path.cum[j];
-      strokeLine(ctx, path, S, locate(path.cum, at - win), Math.min(last, locate(path.cum, at + win) + 1), look, gPhase);
-      drawText(ctx, path, S, look, STROKE * S, tPhase, [(at - win - STROKE) * S, (at + win + STROKE) * S]);
+      const at = cum[j];
+      for (const [a, b] of spans) {
+        const lo = Math.max(a, at - win);
+        const hi = Math.min(b, at + win);
+        if (hi <= lo) continue;
+        strokeLine(ctx, path, S, locate(cum, lo), Math.min(last, locate(cum, hi) + 1), look, gPhase);
+        drawText(ctx, path, S, look, STROKE * S, tPhase, [Math.max(a, at - win - STROKE) * S, Math.min(b, at + win + STROKE) * S]);
+      }
     }
   }
 }
@@ -715,6 +733,10 @@ export default function PathwayTool() {
   const [textSpeed, setTextSpeed] = useState(5);
   const [alpha, setAlpha] = useState<Alpha>("none");
   const [animateGradient, setAnimateGradient] = useState(false);
+  /** Drawing the line in and out: a preset from draw.ts, or none */
+  const [drawId, setDrawId] = useState<string | null>(null);
+  const [drawReverse, setDrawReverse] = useState(false);
+  const [drawSecs, setDrawSecs] = useState(4);
   /** The gradient flows back towards the start of the line instead of away from it. */
   const [reverseFlow, setReverseFlow] = useState(false);
   const [scrollText, setScrollText] = useState(false);
@@ -836,7 +858,8 @@ export default function PathwayTool() {
   const shownText = live ? text.trim() : "";
   const gradientMoves = animateGradient && isGradient;
   const textMoves = scrollText && shownText !== "";
-  const moving = gradientMoves || textMoves;
+  const drawPreset = DRAW_PRESETS.find((d) => d.id === drawId) ?? null;
+  const moving = gradientMoves || textMoves || !!drawPreset;
   const stroke = format.stroke / 1080;
   const presets = textPresets(colours.line);
   // A strip is n panels of ground to cover, so the line is that much longer.
@@ -870,16 +893,26 @@ export default function PathwayTool() {
     photo: photoLook,
   };
 
+  /** The look at t through the loop: the line drawn in or out by the chosen preset. */
+  const span = drawPreset ? onFrame(path, stripW / short, h / short, stroke) : null;
+  const lookAt = (t: number): Look => {
+    if (!drawPreset || !span) return look;
+    const f = drawFrame(drawPreset, t, drawReverse);
+    const len = span[1] - span[0];
+    return { ...look, draw: { width: f.width, spans: f.spans.map(([a, b]) => [span[0] + a * len, span[0] + b * len]) } };
+  };
+
   /**
    * One loop, so that a video always joins up with itself. Scrolling text sets
    * the length: the time it takes to travel one full set of its colours at the
    * chosen speed, after which every letter and colour is back where it began.
    * The gradient then fits a whole number of runs into that time. With no
-   * scrolling text the loop is simply the gradient's own length. It is the
-   * same for every panel of a carousel. S is the short side being drawn at.
+   * scrolling text the loop is the draw-in preset's length if there is one,
+   * else the gradient's own. It is the same for every panel of a carousel. S is
+   * the short side being drawn at.
    */
   const timing = (ctx: CanvasRenderingContext2D, S: number) => {
-    if (!textMoves) return { secs: gradientSecs, cycles: 1 };
+    if (!textMoves) return drawPreset ? { secs: drawSecs, cycles: Math.max(1, Math.round(drawSecs / gradientSecs)) } : { secs: gradientSecs, cycles: 1 };
     const set = ticker(ctx, look.text, stroke * S).period * look.textColours.length;
     const secs = set / ((textSpeed / 100) * S);
     return { secs, cycles: Math.max(1, Math.round(secs / gradientSecs)) };
@@ -892,7 +925,7 @@ export default function PathwayTool() {
   };
   /** Draw panel `i` at full size, at t (0 to 1) through the loop. */
   const drawPanel = (ctx: CanvasRenderingContext2D, i: number, t: number, cycles: number) =>
-    render(ctx, w, h, short, i * w, path, look, flowAt(t, cycles), textMoves ? t : 0);
+    render(ctx, w, h, short, i * w, path, lookAt(t), flowAt(t, cycles), textMoves ? t : 0);
 
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");
@@ -904,7 +937,7 @@ export default function PathwayTool() {
     const draw = () => {
       cancelAnimationFrame(raf);
       const t = moving ? ((performance.now() - clock.current) / 1000 / secs) % 1 : 0;
-      render(ctx, stripW * view, h * view, S, 0, path, look, flowAt(t, cycles), textMoves ? t : 0);
+      render(ctx, stripW * view, h * view, S, 0, path, lookAt(t), flowAt(t, cycles), textMoves ? t : 0);
       if (moving && !recording) raf = requestAnimationFrame(draw); // an export takes the processor; the preview holds
     };
     draw();
@@ -1014,12 +1047,13 @@ export default function PathwayTool() {
     return { el, ctx: el.getContext("2d")! };
   };
 
-  // Stills: a moving gradient or text exports as its first frame. A carousel
-  // saves one file per panel, a moment apart so the browser lets them all through.
+  // Stills: a moving gradient or text exports as its first frame, a line that
+  // draws in as the whole line. A carousel saves one file per panel, a moment
+  // apart so the browser lets them all through.
   const downloadPng = async () => {
     const { el, ctx } = sheet();
     for (let i = 0; i < n; i++) {
-      drawPanel(ctx, i, 0, 1);
+      render(ctx, w, h, short, i * w, path, look, 0, 0);
       const blob = await new Promise<Blob | null>((r) => el.toBlob(r, "image/png"));
       if (blob) save(blob, fileName(i, "png"));
       await pause(350);
@@ -1273,6 +1307,23 @@ export default function PathwayTool() {
             <Slider label="Loops" value={p.loop} min={0} max={1} step={0.05} onChange={(v) => set({ loop: v })} />
             <Slider label="Overlaps" value={p.maxCross} min={0} max={2} step={1} onChange={(v) => set({ maxCross: v })} show={`up to ${p.maxCross}`} />
           </Group>
+        </Group>
+
+        <Group title="Draw in" defaultOpen={false}>
+          <div className="stb-seg stb-draw-grid">
+            <button type="button" aria-pressed={!drawPreset} onClick={() => setDrawId(null)}>None</button>
+            {DRAW_PRESETS.map((d) => (
+              <button key={d.id} type="button" aria-pressed={drawId === d.id} onClick={() => { restart(); setDrawId(d.id); }}>
+                {d.label}
+              </button>
+            ))}
+          </div>
+          {drawPreset && (
+            <>
+              <Switch label="Reverse" checked={drawReverse} onChange={(v) => { restart(); setDrawReverse(v); }} />
+              <Slider label="Loop" value={drawSecs} min={2} max={12} step={0.5} onChange={(v) => { restart(); setDrawSecs(v); }} show={textMoves ? `~${drawSecs}s` : `${drawSecs}s`} />
+            </>
+          )}
         </Group>
 
         {live && (

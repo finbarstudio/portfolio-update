@@ -593,6 +593,8 @@ div.stb-slider {
   width: 56px;
   padding: 5px 6px;
 }
+/* draw-in presets: two to a row */
+.stb-draw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 6px; }
 /* the five ratios always share one row */
 .stb-formats { flex-wrap: nowrap; }
 .stb-formats button { flex: 1 1 0; min-width: 0; padding-left: 4px; padding-right: 4px; }
