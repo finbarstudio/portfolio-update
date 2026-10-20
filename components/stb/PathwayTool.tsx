@@ -500,7 +500,6 @@ function scratch(i: number, w: number, h: number): [HTMLCanvasElement, CanvasRen
  * a carousel is ox = one panel's width, and so on.
  */
 function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, ox: number, path: Pathway, look: Look, gPhase: number, tPhase: number) {
-  const last = path.pts.length / 2 - 1;
   const ph = look.photo;
   const pr = ph && photoRect(ph, S);
   ctx.globalCompositeOperation = "source-over";
