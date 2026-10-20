@@ -31,8 +31,10 @@ const LONG = 2048;
  *  1.2 fixed thickness, upright text, pack, colour codes (15 Oct),
  *  1.3 LinkedIn 5:4 landscape (19 Oct), 1.4 photo with a cut-out, custom format (19 Oct),
  *  1.5 Brush (paint the line in front of or behind the subject), Original size, 16:9 (19 Oct),
- *  1.6 tidier panel: folding sections, switches, plain ratio buttons with hover notes (19 Oct). */
-const VERSION = "1.6";
+ *  1.6 tidier panel: folding sections, switches, plain ratio buttons with hover notes (19 Oct),
+ *  1.7 draw-in presets (Grow, Snake, Burst, Pop, Trail), separate line/text/gradient speeds that
+ *      loop together, one text direction per visible piece of line, see-through GIF; brush removed (20 Oct). */
+const VERSION = "1.7";
 /** `stroke` is the line thickness, fixed per format (decided Oct 2026, no choice in the tool):
  *  px on a 1080 short side, and the same share of the short side at any size. */
 const SIZES = [
@@ -86,7 +88,7 @@ interface Look {
   bounds: [number, number];
 }
 
-type Place = "behind" | "brush" | "front";
+type Place = "behind" | "front";
 
 interface PhotoLook {
   img: CanvasImageSource;
@@ -99,8 +101,6 @@ interface PhotoLook {
   /** the cut-out, at the photo's size, or null until one is added */
   subject: HTMLCanvasElement | null;
   place: Place;
-  /** "Brush": painted by hand, at the photo's proportions, where the line goes in front of the subject */
-  paint: HTMLCanvasElement | null;
   /** draw only the cut-out, on grey, to judge a model */
   showMask: boolean;
 }
@@ -524,8 +524,8 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, 
   drawLine(ctx, path, S, look, gPhase, tPhase);
   // The subject laid back over the line, so the line passes behind them. On a
   // transparent export it punches the line out instead. Then the line goes down
-  // again on top wherever it should pass in front: everywhere ("In front"),
-  // nowhere ("Behind"), or wherever it has been painted in ("Brush").
+  // again on top where it should pass in front: everywhere ("In front") or
+  // nowhere ("Behind").
   if (ph && pr && ph.subject && look.alpha !== "line") {
     if (look.alpha === "bg") ctx.globalCompositeOperation = "destination-out";
     ctx.drawImage(ph.subject, pr.x, pr.y, pr.w, pr.h);
@@ -534,7 +534,6 @@ function render(ctx: CanvasRenderingContext2D, w: number, h: number, S: number, 
     const [mask, mctx] = scratch(1, w, h);
     mctx.translate(-ox, 0);
     if (ph.place === "front") mctx.fillRect(ox, 0, w, h);
-    if (ph.place === "brush" && ph.paint) mctx.drawImage(ph.paint, pr.x, pr.y, pr.w, pr.h);
     lctx.translate(-ox, 0);
     drawLine(lctx, path, S, look, gPhase, tPhase);
     lctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -850,16 +849,6 @@ export default function PathwayTool() {
   const [cutoutPng, setCutoutPng] = useState<{ bmp: ImageBitmap; name: string } | null>(null);
   const [place, setPlace] = useState<Place>("behind");
   const [showMask, setShowMask] = useState(false);
-  /** "Brush": paint the line in front of the subject, or back behind it. */
-  const [brush, setBrush] = useState<"over" | "under">("over");
-  const [brushSize, setBrushSize] = useState(0.08);
-  const [paint, setPaint] = useState<{ canvas: HTMLCanvasElement; k: number } | null>(null);
-  const undo = useRef<ImageData[]>([]);
-  const [undoCount, setUndoCount] = useState(0);
-  /** the brush's smoothed position while a stroke is down, in paint px */
-  const brushAt = useRef<{ x: number; y: number } | null>(null);
-  const ring = useRef<HTMLSpanElement>(null);
-  const redraw = useRef<() => void>(() => {});
   const recording = progress !== null;
   const [fontReady, setFontReady] = useState(false);
 
@@ -879,21 +868,6 @@ export default function PathwayTool() {
   useEffect(() => {
     setSubject(photo && cutoutPng ? makeSubject(cutoutPng.bmp, photo.bmp.width, photo.bmp.height) : null);
   }, [photo, cutoutPng]);
-
-  // Painting starts fresh with every photo, at the photo's proportions (2048 on the long side at most).
-  useEffect(() => {
-    undo.current = [];
-    setUndoCount(0);
-    if (!photo) {
-      setPaint(null);
-      return;
-    }
-    const k = Math.min(1, 2048 / Math.max(photo.bmp.width, photo.bmp.height));
-    const c = document.createElement("canvas");
-    c.width = Math.round(photo.bmp.width * k);
-    c.height = Math.round(photo.bmp.height * k);
-    setPaint({ canvas: c, k });
-  }, [photo]);
 
   const loadImage = async (file: File) => {
     const raw = await createImageBitmap(file, { imageOrientation: "from-image" });
@@ -976,11 +950,9 @@ export default function PathwayTool() {
         uh: h / short,
         subject,
         place,
-        paint: paint?.canvas ?? null,
         showMask: showMask && !!subject,
       }
     : undefined;
-  const painting = place === "brush" && !!subject && !!paint && !showMask;
 
   const look: Look = {
     bg: colours.bg,
@@ -1079,97 +1051,9 @@ export default function PathwayTool() {
       if (moving && !recording) raf = requestAnimationFrame(draw); // an export takes the processor; the preview holds
     };
     draw();
-    redraw.current = () => {
-      if (!moving) draw();
-    };
     return () => cancelAnimationFrame(raf);
     // Runs after every render: any control changing, or the font arriving, redraws.
   });
-
-  /** The pointer on the artwork, in paint px, and the brush radius there. */
-  const brushPoint = (e: React.PointerEvent) => {
-    const el = canvas.current;
-    if (!el || !photoLook || !paint) return null;
-    const rect = el.getBoundingClientRect();
-    const r = photoRect(photoLook, 1);
-    const ux = ((e.clientX - rect.left) / rect.width) * (stripW / short);
-    const uy = ((e.clientY - rect.top) / rect.height) * (h / short);
-    const toPx = paint.k * (photoLook.pw / (r.w)) ;
-    return { x: (ux - r.x) * toPx, y: (uy - r.y) * toPx, rad: (brushSize / 2) * toPx };
-  };
-  /** One hard-edged stretch of brush: paints the line in front, or rubs it back out. */
-  const dab = (from: { x: number; y: number }, to: { x: number; y: number }, rad: number) => {
-    if (!paint) return;
-    const g = paint.canvas.getContext("2d")!;
-    g.globalCompositeOperation = brush === "over" ? "source-over" : "destination-out";
-    g.strokeStyle = "#000";
-    g.lineWidth = rad * 2;
-    g.lineCap = "round";
-    g.lineJoin = "round";
-    g.beginPath();
-    g.moveTo(from.x, from.y);
-    g.lineTo(to.x, to.y);
-    g.stroke();
-    g.globalCompositeOperation = "source-over";
-    redraw.current();
-  };
-  const moveRing = (e: React.PointerEvent) => {
-    const el = ring.current;
-    const cv = canvas.current;
-    if (!el || !cv) return;
-    const rect = cv.getBoundingClientRect();
-    const view = cv.parentElement!.getBoundingClientRect();
-    const d = brushSize * (rect.width / (stripW / short));
-    el.style.width = el.style.height = `${d}px`;
-    el.style.transform = `translate(${e.clientX - view.left - d / 2}px, ${e.clientY - view.top - d / 2}px)`;
-    el.style.opacity = "1";
-  };
-  const brushDown = (e: React.PointerEvent) => {
-    const pt = brushPoint(e);
-    if (!pt || !paint) return;
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId); // keep painting when the pointer slips off the edge
-    } catch {}
-    snapshot();
-    brushAt.current = { x: pt.x, y: pt.y };
-    dab(pt, pt, pt.rad);
-  };
-  const brushMove = (e: React.PointerEvent) => {
-    moveRing(e);
-    const at = brushAt.current;
-    const pt = brushPoint(e);
-    if (!at || !pt) return;
-    // smoothing: the brush trails the pointer a little, which irons out the wobble of a hand
-    const next = { x: at.x + (pt.x - at.x) * 0.3, y: at.y + (pt.y - at.y) * 0.3 };
-    dab(at, next, pt.rad);
-    brushAt.current = next;
-  };
-  const brushUp = (e: React.PointerEvent) => {
-    const at = brushAt.current;
-    const pt = brushPoint(e);
-    if (at && pt) dab(at, pt, pt.rad); // finish where the pointer let go
-    brushAt.current = null;
-  };
-  const undoPaint = () => {
-    const last = undo.current.pop();
-    if (!last || !paint) return;
-    paint.canvas.getContext("2d")!.putImageData(last, 0, 0);
-    setUndoCount(undo.current.length);
-    redraw.current();
-  };
-  const clearPaint = () => {
-    if (!paint) return;
-    snapshot();
-    paint.canvas.getContext("2d")!.clearRect(0, 0, paint.canvas.width, paint.canvas.height);
-    redraw.current();
-  };
-  /** Keep the painting as it is now, for Undo (the last 10 strokes). */
-  const snapshot = () => {
-    if (!paint) return;
-    const c = paint.canvas;
-    undo.current = [...undo.current.slice(-9), c.getContext("2d")!.getImageData(0, 0, c.width, c.height)];
-    setUndoCount(undo.current.length);
-  };
 
   const set = (patch: Partial<typeof p>) => setP({ ...p, ...patch });
   const restart = () => { clock.current = performance.now(); };
@@ -1326,12 +1210,14 @@ export default function PathwayTool() {
    * An animated GIF, one per panel, see-through as the Export choice says
    * (Line only: just the line; Line cut out: the background with the line cut
    * out). Offered only for those two; a solid animation is an MP4. It is Canva's way in for see-through animation. GIF has
-   * no partial transparency, so every pixel is either see-through or solid. A
-   * half-see-through pixel (a soft edge, a trail) keeps its own colour and is
-   * shown or not by a fixed fine pattern, in proportion to how solid it is, so
-   * there is no halo of another colour on any background.
-   * 25 frames a second (a GIF counts time in hundredths), 1080px on the long
-   * side at most. Colour: one palette of 255 for the whole loop, built from the
+   * no partial transparency, so every pixel is either see-through or solid, and
+   * keeps its own colour so there is no halo of another colour on any
+   * background. On the edge of the line a pixel shows if it is at least half
+   * solid, which gives the cleanest edge a GIF can have; a soft area away from
+   * the line's edge (a trail) is shown by a fixed fine pattern in proportion to
+   * how solid it is. It is made at 1600px on the long side, so once Canva shrinks
+   * it to fit a design, its own smoothing softens what stepping is left.
+   * 25 frames a second (a GIF counts time in hundredths). Colour: one palette of 255 for the whole loop, built from the
    * solid pixels only at full colour depth (5-6-5 bits) so a gradient keeps its
    * steps small, plus a fixed fine dither that hides the steps left and holds
    * still from frame to frame; the 256th entry is the see-through one.
@@ -1342,7 +1228,7 @@ export default function PathwayTool() {
     try {
       const { GIFEncoder, quantize, applyPalette } = await import("gifenc");
       const { el, ctx } = sheet();
-      const k = Math.min(1, 1080 / Math.max(w, h));
+      const k = Math.min(1, 1600 / Math.max(w, h));
       const gw = Math.round(w * k);
       const gh = Math.round(h * k);
       const small = document.createElement("canvas");
@@ -1363,10 +1249,19 @@ export default function PathwayTool() {
         sctx.clearRect(0, 0, gw, gh);
         sctx.drawImage(el, 0, 0, gw, gh);
         const px = sctx.getImageData(0, 0, gw, gh).data;
+        const alpha = new Uint8Array(gw * gh);
+        for (let q = 0; q < alpha.length; q++) alpha[q] = px[q * 4 + 3];
+        /** next to a solid pixel: the edge of the line, not the inside of a trail */
+        const edge = (q: number) => {
+          const x = q % gw;
+          return (x > 0 && alpha[q - 1] > 250) || (x < gw - 1 && alpha[q + 1] > 250) || alpha[q - gw] > 250 || alpha[q + gw] > 250;
+        };
         for (let p = 0; p < px.length; p += 4) {
           const q = p >> 2;
+          const a = alpha[q];
           const cell = BAYER[((Math.floor(q / gw) & 3) << 2) | (q % gw & 3)];
-          if (px[p + 3] / 255 <= (cell + 0.5) / 16) {
+          const show = a > 250 || (a > 0 && (edge(q) ? a >= 128 : a / 255 > (cell + 0.5) / 16));
+          if (!show) {
             px[p] = px[p + 1] = px[p + 2] = px[p + 3] = 0;
             continue;
           }
@@ -1485,9 +1380,9 @@ export default function PathwayTool() {
             <>
               <p className="stb-label">Line</p>
               <div className="stb-seg">
-                {(["behind", "brush", "front"] as Place[]).map((pl) => (
+                {(["behind", "front"] as Place[]).map((pl) => (
                   <button key={pl} type="button" aria-pressed={place === pl} onClick={() => setPlace(pl)}>
-                    {pl === "behind" ? "Behind" : pl === "brush" ? "Brush" : "In front"}
+                    {pl === "behind" ? "Behind" : "In front"}
                   </button>
                 ))}
               </div>
@@ -1659,17 +1554,6 @@ export default function PathwayTool() {
         onDrop={(e) => { e.preventDefault(); addDropped(e.dataTransfer.files); }}
       >
         <Colours bg={colours.bg} line={colours.line} text={look.text ? look.textColours : []} />
-        {painting && (
-          <div className="stb-brushbar" role="toolbar" aria-label="Brush">
-            <div className="stb-seg">
-              <button type="button" aria-pressed={brush === "over"} onClick={() => setBrush("over")}>Line in front</button>
-              <button type="button" aria-pressed={brush === "under"} onClick={() => setBrush("under")}>Line behind</button>
-            </div>
-            <Slider label="Size" value={brushSize} min={0.02} max={0.4} step={0.01} onChange={setBrushSize} show="" />
-            <button type="button" className="stb-link" onClick={undoPaint} disabled={undoCount === 0}>Undo</button>
-            <button type="button" className="stb-link" onClick={clearPaint} disabled={undoCount === 0}>Clear</button>
-          </div>
-        )}
         <button type="button" className="stb-toggle" aria-pressed={social} onClick={() => { setSocial(!social); setSlide(0); }}>
           {social ? "Show the artwork" : "Preview as a post"}
         </button>
@@ -1686,22 +1570,14 @@ export default function PathwayTool() {
           )}
           <div
             className="stb-view"
-            data-brush={painting ? brush : undefined}
-            onPointerDown={(e) => {
-              if (painting) return brushDown(e);
-              drag.current = e.clientX;
-            }}
-            onPointerMove={(e) => { if (painting) brushMove(e); }}
+            onPointerDown={(e) => { drag.current = e.clientX; }}
             onPointerUp={(e) => {
-              if (painting) return brushUp(e);
               // a swipe moves one panel, as it does on a phone
               if (social && drag.current !== null && Math.abs(e.clientX - drag.current) > 30) go(at + (e.clientX < drag.current ? 1 : -1));
               drag.current = null;
             }}
-            onPointerLeave={() => { if (ring.current) ring.current.style.opacity = "0"; }}
           >
             <canvas ref={canvas} width={Math.round(stripW * view)} height={Math.round(h * view)} />
-            {painting && <span ref={ring} className="stb-ring" aria-hidden="true" />}
             {/* where one panel ends and the next begins */}
             {!social && Array.from({ length: n - 1 }, (_, i) => <span key={i} className="stb-cut" style={{ left: `${((i + 1) / n) * 100}%` }} aria-hidden="true" />)}
             {social && n > 1 && at > 0 && <button type="button" className="stb-nav is-prev" aria-label="Previous" onClick={() => go(at - 1)}>‹</button>}

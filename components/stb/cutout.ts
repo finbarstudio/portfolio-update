@@ -1,7 +1,7 @@
 /**
  * The subject of a photo, cut out elsewhere (Paint's "Remove background",
  * Photoshop, the cut-out bank) and brought in as a PNG with a transparent
- * background. The line passes behind it, in front of it, or is brushed over it.
+ * background. The line passes behind it or in front of it.
  *
  * In-browser cut-out models were tried and dropped (19 Oct 2026): MODNet and
  * MediaPipe were too rough, BiRefNet and BEN2 too big or refused by the GPU,
