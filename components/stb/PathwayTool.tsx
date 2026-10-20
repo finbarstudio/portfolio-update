@@ -81,7 +81,7 @@ interface Look {
   photo?: PhotoLook;
   /** Drawing in or out: the stretches showing (distances along the line), the
    *  thickness, and any faint copies drawn behind it for a trail. */
-  draw?: { spans: Span[]; width: number; ghosts?: Ghost[]; caps?: [boolean, boolean]; anchor?: number };
+  draw?: { spans: Span[]; width: number; ghosts?: Ghost[]; caps?: [boolean, boolean]; anchors?: number[] };
   /** The whole strip, in line units (short side of one panel = 1). */
   bounds: [number, number];
 }
@@ -353,13 +353,22 @@ function layoutText(
   return { size, glyphs };
 }
 
-function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
+function drawText(
+  ctx: CanvasRenderingContext2D,
+  path: Pathway,
+  S: number,
+  look: Look,
+  strokePx: number,
+  tPhase: number,
+  range?: [number, number],
+  anchor?: number,
+) {
   // A line drawing in at a thickness other than its own: lay the letters out at
-  // full size and scale the lot about the preset's anchor.
+  // full size and scale the lot about the stretch's anchor (`anchor`, distance along the line).
   const d = look.draw;
   const k = d && d.width !== 1 ? d.width : 1;
   if (k < 0.08) return;
-  const zoom: [number, number] | undefined = k !== 1 ? [k, (d?.anchor ?? 0) * S] : undefined;
+  const zoom: [number, number] | undefined = k !== 1 ? [k, (anchor ?? 0) * S] : undefined;
   const { size, glyphs } = layoutText(ctx, path, S, look, zoom ? look.stroke * S : strokePx, tPhase, range, zoom);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -405,18 +414,21 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   };
   for (const g of d?.ghosts ?? []) if (!g.over) ghost(g);
   // Stretches that meet (closer than the line is wide) join into one, so their
-  // rounded ends never lie over each other's letters.
-  const spans: Span[] = d
+  // rounded ends never lie over each other's letters. Each keeps the point its
+  // letters scale about.
+  type Piece = { a: number; b: number; anchor: number };
+  const pieces: Piece[] = d
     ? d.spans
-        .filter(([a, b]) => b - a > 1e-4)
-        .sort((x, y) => x[0] - y[0])
-        .reduce<Span[]>((out, [a, b]) => {
+        .map(([a, b], n) => ({ a, b, anchor: d.anchors?.[n] ?? (a + b) / 2 }))
+        .filter((p) => p.b - p.a > 1e-4)
+        .sort((x, y) => x.a - y.a)
+        .reduce<Piece[]>((out, p) => {
           const prev = out[out.length - 1];
-          if (prev && a - prev[1] < base) prev[1] = Math.max(prev[1], b);
-          else out.push([a, b]);
+          if (prev && p.a - prev.b < base) prev.b = Math.max(prev.b, p.b);
+          else out.push({ ...p });
           return out;
         }, [])
-    : [[0, cum[last]]];
+    : [{ a: 0, b: cum[last], anchor: 0 }];
   const flowing = look.line === "gradient" && look.alpha !== "line";
   const colourAt = (i: number) => (flowing ? flowColour(cum[i] / FLOW_PERIOD - gPhase) : look.line === "gradient" ? "#000" : look.line);
   ctx.lineWidth = base * S;
@@ -434,7 +446,7 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
     ctx.globalCompositeOperation = "source-over";
   };
   // every stretch of line and its ends first, then all the letters on top
-  for (const [a, b] of spans) {
+  for (const { a, b } of pieces) {
     const i = locate(cum, a);
     const j = Math.min(last, locate(cum, b) + 1);
     strokeLine(ctx, path, S, i, j, look, gPhase);
@@ -443,7 +455,7 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
       if (d.caps?.[1] ?? true) cap(j, 1);
     }
   }
-  if (look.text) for (const [a, b] of spans) drawText(ctx, path, S, look, base * S, tPhase, [a * S, b * S]);
+  if (look.text) for (const { a, b, anchor } of pieces) drawText(ctx, path, S, look, base * S, tPhase, [a * S, b * S], anchor);
   if (look.text) {
     // Where the line passes over itself, two runs of text would collide. Lay the
     // upper stretch down again over the whole overlap, then its own letters on
@@ -451,12 +463,12 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
     for (const [k, j] of path.over.entries()) {
       const win = overWindow(path, k, base);
       const at = cum[j];
-      for (const [a, b] of spans) {
+      for (const { a, b, anchor } of pieces) {
         const lo = Math.max(a, at - win);
         const hi = Math.min(b, at + win);
         if (hi <= lo) continue;
         strokeLine(ctx, path, S, locate(cum, lo), Math.min(last, locate(cum, hi) + 1), look, gPhase);
-        drawText(ctx, path, S, look, base * S, tPhase, [Math.max(a, at - win - base) * S, Math.min(b, at + win + base) * S]);
+        drawText(ctx, path, S, look, base * S, tPhase, [Math.max(a, at - win - base) * S, Math.min(b, at + win + base) * S], anchor);
       }
     }
   }
@@ -979,19 +991,18 @@ export default function PathwayTool() {
   };
 
   /** The look at t through the loop: the line drawn in or out by the chosen preset. */
-  const span = drawPreset ? onFrame(path, stripW / short, h / short, stroke) : null;
+  const along = drawPreset ? onFrame(path, stripW / short, h / short, stroke) : null;
   const lookAt = (t: number): Look => {
-    if (!drawPreset || !span) return look;
+    if (!drawPreset || !along) return look;
     const f = drawFrame(drawPreset, t, drawMode, drawReverse);
-    const len = span[1] - span[0];
-    const place = (spans: Span[]) => spans.map(([a, b]) => [span[0] + a * len, span[0] + b * len] as Span);
+    const place = (spans: Span[]) => spans.map(([a, b]) => [along(a), along(b)] as Span);
     return {
       ...look,
       draw: {
         width: f.width,
         spans: place(f.spans),
         ghosts: f.ghosts?.map((g) => ({ ...g, spans: place(g.spans) })),
-        anchor: span[0] + (f.anchor ?? 0.5) * len,
+        anchors: f.anchors?.map(along),
       },
     };
   };

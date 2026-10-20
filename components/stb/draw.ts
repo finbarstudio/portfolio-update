@@ -1,5 +1,5 @@
 /**
- * Drawing the line in and out: six presets, each saying which stretches of
+ * Drawing the line in and out: five presets, each saying which stretches of
  * the line are showing and how thick it is, as it draws in and as it draws out
  * (Snake only runs through). Some change the thickness as they go, and the
  * letters grow and shrink with it. The loop plays in and out, just in, or just out. Stretches are fractions of the part of the line that is on the
@@ -13,8 +13,9 @@ export interface DrawFrame {
   spans: Span[];
   /** thickness, 1 = the format's line */
   width: number;
-  /** where along the line (0 to 1) the letters stay put as the thickness changes; the middle when left out */
-  anchor?: number;
+  /** per stretch, where along the line (0 to 1) its letters stay put as the
+   *  thickness changes; the middle of the stretch when left out */
+  anchors?: number[];
   /** faint copies of the line drawn first, behind it: a trail */
   ghosts?: Ghost[];
 }
@@ -37,6 +38,8 @@ export interface DrawPreset {
   out?: (q: number) => DrawFrame;
   /** a preset that only runs through, with no separate in and out */
   loop?: (t: number) => DrawFrame;
+  /** what Reverse plays, for a preset that is the same both ways round (otherwise it runs from the other end) */
+  reversed?: { in: (p: number) => DrawFrame; out: (q: number) => DrawFrame };
 }
 
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
@@ -67,9 +70,9 @@ export const DRAW_PRESETS: DrawPreset[] = [
   {
     id: "grow",
     label: "Grow",
-    in: (p) => ({ ...one(0, inOut(p), 0.15 + 0.85 * easeOut(p)), anchor: 0 }),
+    in: (p) => ({ ...one(0, inOut(p), 0.15 + 0.85 * easeOut(p)), anchors: [0] }),
     // out: it rewinds, back the way it came, thinning as it goes
-    out: (q) => ({ ...one(0, 1 - inOut(q), 1 - 0.85 * easeIn(q)), anchor: 0 }),
+    out: (q) => ({ ...one(0, 1 - inOut(q), 1 - 0.85 * easeIn(q)), anchors: [0] }),
   },
   {
     id: "snake",
@@ -80,17 +83,17 @@ export const DRAW_PRESETS: DrawPreset[] = [
     },
   },
 
-  {
-    id: "ends",
-    label: "From both ends",
-    in: (p) => ({ spans: [[0, easeOut(p) / 2], [1 - easeOut(p) / 2, 1]], width: 1 }),
-    out: (q) => ({ spans: [[0, (1 - easeIn(q)) / 2], [(1 + easeIn(q)) / 2, 1]], width: 1 }),
-  },
+
   {
     id: "burst",
     label: "Burst",
     in: (p) => one(0.5 - easeOut(p) / 2, 0.5 + easeOut(p) / 2, Math.max(0, back(p))),
     out: (q) => one(easeIn(q) / 2, 1 - easeIn(q) / 2, Math.max(0, 1 - backIn(q))),
+    // reversed it bursts in from both ends to meet in the middle, and draws back out to them
+    reversed: {
+      in: (p) => ({ spans: [[0, easeOut(p) / 2], [1 - easeOut(p) / 2, 1]], width: Math.max(0, back(p)), anchors: [0, 1] }),
+      out: (q) => ({ spans: [[0, (1 - easeIn(q)) / 2], [(1 + easeIn(q)) / 2, 1]], width: Math.max(0, 1 - backIn(q)), anchors: [0, 1] }),
+    },
   },
   { id: "pop", label: "Pop", in: (p) => one(0, 1, Math.max(0, back(p))), out: (q) => one(0, 1, Math.max(0, 1 - backIn(q))) },
   { id: "trail", label: "Trail", in: trailIn, out: trailOut },
@@ -103,38 +106,54 @@ export const DRAW_PRESETS: DrawPreset[] = [
  * the last 60%. Reversed, a stretch from a to b becomes 1 - b to 1 - a.
  */
 export function drawFrame(preset: DrawPreset, t: number, mode: DrawMode, reverse: boolean): DrawFrame {
+  const own = reverse && preset.reversed;
+  const into = own ? preset.reversed!.in : preset.in!;
+  const outof = own ? preset.reversed!.out : preset.out!;
   let f: DrawFrame;
   if (preset.loop) f = preset.loop(t);
-  else if (mode === "in") f = preset.in!(seg(t, 0, 0.6));
-  else if (mode === "out") f = preset.out!(seg(t, 0.4, 1));
-  else f = t < 0.5 ? preset.in!(seg(t, 0, 0.4)) : preset.out!(seg(t, 0.6, 1));
-  if (!reverse) return f;
+  else if (mode === "in") f = into(seg(t, 0, 0.6));
+  else if (mode === "out") f = outof(seg(t, 0.4, 1));
+  else f = t < 0.5 ? into(seg(t, 0, 0.4)) : outof(seg(t, 0.6, 1));
+  if (!reverse || own) return f;
   const turn = (spans: Span[]) => spans.map(([a, b]) => [1 - b, 1 - a] as Span);
   return {
     ...f,
-    anchor: f.anchor === undefined ? undefined : 1 - f.anchor,
+    anchors: f.anchors?.map((u) => 1 - u),
     spans: turn(f.spans),
     ghosts: f.ghosts?.map((g) => ({ ...g, spans: turn(g.spans), caps: [g.caps[1], g.caps[0]] })),
   };
 }
 
 /**
- * Where the line is on the artwork, as distances along it: from the point it
- * first comes within a line's width of the frame to the point it last leaves.
- * The line runs on beyond the frame at both ends, and the presets should spend
- * their time where it can be seen.
+ * Where the line is on the artwork, as a way to turn a fraction (0 to 1) of
+ * the line you can see into a distance along it. Only the pieces on the
+ * artwork count, so a preset spends its time where it can be seen, and "the
+ * middle" is the middle of what shows, even when the line leaves the artwork
+ * and comes back. A piece counts from where the line comes within a line's
+ * width of the frame.
  */
-export function onFrame(path: Pathway, uw: number, uh: number, stroke: number): Span {
+export function onFrame(path: Pathway, uw: number, uh: number, stroke: number): (u: number) => number {
   const { pts, cum } = path;
   const m = stroke;
-  let first = -1;
-  let last = -1;
-  for (let i = 0; i < pts.length / 2; i++) {
-    const x = pts[i * 2], y = pts[i * 2 + 1];
-    if (x > -m && x < uw + m && y > -m && y < uh + m) {
-      if (first < 0) first = i;
-      last = i;
+  const runs: Span[] = [];
+  let open = -1;
+  const n = pts.length / 2;
+  for (let i = 0; i <= n; i++) {
+    const on = i < n && pts[i * 2] > -m && pts[i * 2] < uw + m && pts[i * 2 + 1] > -m && pts[i * 2 + 1] < uh + m;
+    if (on && open < 0) open = i;
+    if (!on && open >= 0) {
+      runs.push([cum[open], cum[i - 1]]);
+      open = -1;
     }
   }
-  return first < 0 ? [0, cum[cum.length - 1]] : [cum[first], cum[last]];
+  if (!runs.length) runs.push([0, cum[n - 1]]);
+  const seen = runs.reduce((sum, [a, b]) => sum + b - a, 0);
+  return (u: number) => {
+    let left = Math.max(0, Math.min(1, u)) * seen;
+    for (const [a, b] of runs) {
+      if (left <= b - a) return a + left;
+      left -= b - a;
+    }
+    return runs[runs.length - 1][1];
+  };
 }
