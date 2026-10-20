@@ -42,7 +42,7 @@
 
 .ex-head span {
   position: absolute;
-  bottom: 0;
+  top: 0;
   font-weight: 700;
   font-size: 13pt;
   line-height: 1;
@@ -71,11 +71,11 @@
   display: inline-flex;
   align-items: center;
   gap: 2.6mm;
-  font-size: 10.5pt;
+  font-size: 10pt;
 }
 .ex-key-item i {
-  width: 6.4mm;
-  height: 6.4mm;
+  width: 5.4mm;
+  height: 5.4mm;
   border-radius: 1mm;
 }
 

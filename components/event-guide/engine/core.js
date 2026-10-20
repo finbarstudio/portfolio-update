@@ -59,9 +59,33 @@
   };
 
   /**
-   * Title size that fits the width: 47.9pt as in the 2026 guides, smaller when a
-   * line would be wider than maxWidthMm (the MHS title sits on one line at ~37pt).
-   * Returns { pt, lineMm } where lineMm is the height of one title line.
+   * Spacing rules shared by every page type (mm). Blocks are measured by their
+   * visible type: from a title's last baseline, or a box's bottom edge, to the cap
+   * top of the next block. Use these rather than one-off numbers.
+   */
+  EGG.SPACE = {
+    margin: 12.8, // top, bottom and outer edge
+    inner: 16.8,  // spine side, on pages that mirror
+    gap: 12,      // between blocks: title, key, column headings, table
+    afterHead: 3, // column headings baseline to the first row
+  };
+
+  /** Where type sits in its line box, in mm from the top of the line: cap top and baseline. */
+  EGG.textMetrics = function (family, weight, pt, lineHeightPt) {
+    const c = (EGG.textMetrics.c = EGG.textMetrics.c || document.createElement('canvas').getContext('2d'));
+    const px = (pt * 96) / 72;
+    c.font = `${weight} ${px}px "${family}"`;
+    const m = c.measureText('H');
+    const half = ((lineHeightPt * 96) / 72 - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2;
+    const k = 25.4 / 96;
+    return { capTop: (half + m.fontBoundingBoxAscent - m.actualBoundingBoxAscent) * k, baseline: (half + m.fontBoundingBoxAscent) * k };
+  };
+
+  /**
+   * Title size and position. 47.9pt as in the 2026 guides, smaller when a line
+   * would be wider than maxWidthMm (the MHS title sits on one line at ~37pt).
+   * Placed with its capitals on the top margin. Returns { pt, lineMm, lines, y,
+   * bottom } where y is the title's top and bottom its last baseline.
    */
   EGG.fitTitle = function (text, maxWidthMm, maxPt) {
     maxPt = maxPt || 47.9;
@@ -74,7 +98,18 @@
     const w = t.getBoundingClientRect().width / EGG.pxPerMm();
     page.remove();
     const pt = w > maxWidthMm ? Math.floor((maxPt * maxWidthMm) / w * 10) / 10 : maxPt;
-    return { pt, lineMm: pt * 1.04 * (25.4 / 72) };
+    const lineMm = pt * 1.04 * (25.4 / 72);
+    const lines = String(Array.isArray(text) ? text.join('\n') : text || '').split('\n').length;
+    const m = EGG.textMetrics('Share to Buy', 700, pt, pt * 1.04);
+    const y = EGG.SPACE.margin - m.capTop;
+    return { pt, lineMm, lines, y, bottom: y + m.baseline + (lines - 1) * lineMm };
+  };
+
+  /** A title element at the fitted size. */
+  EGG.titleEl = function (text, pt) {
+    const t = EGG.el('div', 'title', EGG.titleHtml(text));
+    t.style.fontSize = pt + 'pt';
+    return t;
   };
 
   /**
@@ -86,13 +121,6 @@
     el.classList.add('furniture');
     el.dataset.label = label;
     return el;
-  };
-
-  /** A title element at the fitted size. */
-  EGG.titleEl = function (text, pt) {
-    const t = EGG.el('div', 'title', EGG.titleHtml(text));
-    t.style.fontSize = pt + 'pt';
-    return t;
   };
 
   /** A list that may only wrap at its " | " separators. classFor(i) lets a generator colour items. */

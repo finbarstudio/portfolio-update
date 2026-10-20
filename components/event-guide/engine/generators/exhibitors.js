@@ -10,21 +10,18 @@
 (function () {
   'use strict';
 
+  // Vertical spacing comes from EGG.SPACE (margins and the gap between blocks).
+  // These are the columns and the key, from the 2026 InDesign files.
   const L = {
-    titleX: 12.8, titleY: 7.5,
-    headY: 36.7,          // column headings under a one-line title (2026 guides)
-    titleLine: 17.6,      // one 47.9pt title line in mm; a longer title pushes the headings down
-    headYTop: 13,         // column headings on a page with no title and no key
-    headH: 7.4,
-    keyY: 13.6, keyH: 16.4, keyX: 14.3, keyW: 182.6,
-    afterHead: 1.9,       // heading baseline area to first row
-    rowsBottom: 282.6,    // rows end above this (same bottom margin as the location pages)
+    headPt: 13,           // column headings
+    keyMinH: 9,           // the key box; otherwise as tall as the title band, so a spread lines up
+    keyLabelUp: 2.6,      // the "Key" label sits this far up over the box's top edge
     gap: 2.0,             // space between rows
     roomGap: 5.0,         // space between rooms: a clear break between sections
     standX: 22.3, standW: 13.0,
     nameX: 37.2, nameW: 47.0,
     talkX: 86.2, talkW: 110.7,
-    roomX: 11.1, roomW: 6.5,
+    roomX: 12.8, roomW: 6.5,   // room labels sit on the left margin
     maxPages: 4,
   };
 
@@ -52,10 +49,10 @@
       `<span style="left:${L.nameX + 13.1}mm">Exhibitor</span>` +
       `<span style="left:${L.talkX}mm">Talk to them about…</span>`;
     EGG.furniture(h, 'Column headings');
-    page.trim.appendChild(EGG.place(h, 0, y, 210, L.headH));
+    page.trim.appendChild(EGG.place(h, 0, y, 210, (L.headPt * 25.4) / 72));
   }
 
-  function key(page, y, cats, used) {
+  function key(page, y, h, cats, used) {
     const k = EGG.el('div', 'ex-key');
     k.innerHTML =
       '<span class="ex-key-label">Key</span>' +
@@ -64,7 +61,7 @@
         .map(([, c]) => `<span class="ex-key-item"><i style="background:${c.color}"></i>${EGG.esc(c.label)}</span>`)
         .join('');
     EGG.furniture(k, 'Key');
-    page.trim.appendChild(EGG.place(k, L.keyX, y, L.keyW, L.keyH));
+    page.trim.appendChild(EGG.place(k, EGG.SPACE.margin, y, L.talkX + L.talkW - EGG.SPACE.margin, h));
   }
 
   /** Vertical room labels: one per run of consecutive rows in the same room. */
@@ -129,23 +126,36 @@
       const first = Number(opts.firstPageNumber) || 1;
       const firstSide = opts.firstPageSide || 'left';
 
-      // usable height per page: page 1 carries the title, the last page the key.
-      // The key page is only known after splitting, so assume the worst (key on every page after 1).
-      // title space: the 2026 position for one line, moved down for each extra line
+      // Vertical layout, all from EGG.SPACE. Page 1: title, gap, column headings, table.
+      // A later page with the key: key, gap, headings, table. The key band is as tall
+      // as the title band, and every page starts its headings at the same height, so
+      // the tables line up across a spread. One page with a key: title, key, headings.
+      const S = EGG.SPACE;
       const title = opts.title || 'Exhibitor information';
-      const fit = EGG.fitTitle(title, 210 - 2 * L.titleX);
-      const titleLines = String(Array.isArray(title) ? title.join('\n') : title).split('\n').length;
-      const headY1 = L.headY + (titleLines - 1) * fit.lineMm - (L.titleLine - fit.lineMm);
-      const top1 = headY1 + L.headH + L.afterHead;
-      const topKey = L.keyY + L.keyH + 2 + L.headH + L.afterHead;
-      const capacities = [];
-      const bottom = L.rowsBottom;
-      for (let p = 0; p < L.maxPages; p++) capacities.push(bottom - (p === 0 ? top1 : showKey ? topKey : L.headYTop + L.headH + L.afterHead));
-      if (showKey && Number(opts.pages) === 1) capacities[0] -= L.keyH - 1; // single page: key sits under the title
+      const fit = EGG.fitTitle(title, 210 - 2 * S.margin);
+      const hm = EGG.textMetrics('Share to Buy', 700, L.headPt, L.headPt);
+      const labelAbove = L.keyLabelUp - hm.capTop; // key label's cap top above the box
+      const keyH = Math.max(L.keyMinH, fit.bottom - S.margin - labelAbove);
+      const keyBand = labelAbove + keyH;
+      const rowsAfterCap = hm.baseline - hm.capTop + S.afterHead; // headings cap top to first row
+      const bottom = 297 - S.margin;
+      const spreadHead = Math.max(fit.bottom + S.gap, showKey ? S.margin + keyBand + S.gap : 0);
+      const singleHead = showKey ? fit.bottom + S.gap + keyBand + S.gap : fit.bottom + S.gap;
+      const capacities = (single) => {
+        const c = [];
+        for (let p = 0; p < L.maxPages; p++) c.push(bottom - ((single ? singleHead : spreadHead) + rowsAfterCap));
+        return c;
+      };
 
       const heights = EGG.measure(list.map((x) => rowEl(x, cats)), L.talkX + L.talkW - L.standX, 'ex');
       const gapAt = (i) => (i > 0 && (list[i].room || '') !== (list[i - 1].room || '') ? L.roomGap : L.gap);
-      const { groups, overflow } = EGG.splitRows(heights, capacities, gapAt, opts.pages || 'auto', opts.fillPages);
+      let split = EGG.splitRows(heights, capacities(false), gapAt, opts.pages || 'auto', opts.fillPages);
+      if (split.groups.length === 1 && showKey) {
+        // on its own page the key goes under the title, which takes more room
+        const one = EGG.splitRows(heights, capacities(true), gapAt, 1, opts.fillPages);
+        split = one.overflow && (opts.pages || 'auto') === 'auto' ? EGG.splitRows(heights, capacities(false), gapAt, 2, opts.fillPages) : one;
+      }
+      const { groups, overflow } = split;
       if (overflow) EGG.warn(`The exhibitors do not fit on ${groups.length} page(s). Allow more pages or shorten the longest rows.`);
       heights.forEach((h, i) => {
         if (h > 15) EGG.warn(`${list[i].name} runs to ${Math.round(h)}mm tall; consider fewer topics.`);
@@ -155,21 +165,16 @@
       return groups.map((g, p) => {
         const number = first + p;
         const page = EGG.makePage({ number, side: EGG.sideOf(number, first, firstSide), className: 'ex' });
-        let headY = L.headYTop;
+        let headCap = groups.length === 1 ? singleHead : spreadHead;
         if (p === 0) {
-          page.trim.appendChild(EGG.place(EGG.furniture(EGG.titleEl(title, fit.pt), 'Title'), L.titleX, L.titleY));
-          headY = headY1;
-          if (showKey && groups.length === 1) {
-            key(page, headY1 - 3, cats, used); // single page: key under the title
-            headY = headY1 - 3 + L.keyH + 2;
-          }
+          page.trim.appendChild(EGG.place(EGG.furniture(EGG.titleEl(title, fit.pt), 'Title'), S.margin, fit.y));
+          if (showKey && groups.length === 1) key(page, fit.bottom + S.gap + L.keyLabelUp - hm.capTop, keyH, cats, used);
         } else if (showKey && p === groups.length - 1) {
-          key(page, L.keyY, cats, used);
-          headY = L.keyY + L.keyH + 2;
+          key(page, S.margin + L.keyLabelUp - hm.capTop, keyH, cats, used);
         }
-        headings(page, headY);
+        headings(page, headCap - hm.capTop);
 
-        let y = headY + L.headH + L.afterHead;
+        let y = headCap + rowsAfterCap;
         const rows = list.slice(g.from, g.to);
         const tops = [];
         rows.forEach((x, i) => {

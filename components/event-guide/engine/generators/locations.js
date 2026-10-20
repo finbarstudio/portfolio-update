@@ -11,15 +11,11 @@
 (function () {
   'use strict';
 
+  // Vertical spacing and margins come from EGG.SPACE. Pages mirror: the outer
+  // margin on the outside edge, the inner margin at the spine.
   const L = {
-    titleX: 12.8, titleY: 7.5,
-    titleLine: 17.6,      // 47.9pt title line height in mm
-    ruleGap: 3.2, ruleH: 1.5, ruleX: 29.1, ruleW: 159.6,
-    afterTitle: 5.5,
-    contTop: 30.5,        // first row on pages without the title
-    rowsBottom: 282.6,
-    gap: 1.0,
-    outer: 12.8, inner: 16.8, // mirrored margins: outer edge vs spine
+    ruleGap: 6, ruleH: 1.5, ruleIn: 16.3, ruleW: 159.6, // rule under a two-line title: below its last baseline, in from the title
+    gap: 1.0,             // space between rows
     areaW: 55.6,
     maxPages: 4,
   };
@@ -75,15 +71,17 @@
       const first = Number(opts.firstPageNumber) || 1;
       const firstSide = opts.firstPageSide || 'left';
       const titleText = Array.isArray(opts.title) ? opts.title.join('\n') : String(opts.title || 'Homes across *the region*');
-      const titleLines = titleText.split('\n').length;
-      const fit = EGG.fitTitle(titleText, 210 - 2 * L.outer);
-      const hasRule = titleLines > 1;
-      const top1 =
-        L.titleY + titleLines * fit.lineMm + (hasRule ? L.ruleGap + L.ruleH : 0) + L.afterTitle * (fit.lineMm / L.titleLine);
-
+      // Page 1: title (capitals on the top margin), the rule if the title has two
+      // lines, gap, table. Later pages: the table from the top margin.
+      const S = EGG.SPACE;
+      const fit = EGG.fitTitle(titleText, 210 - S.margin - S.inner);
+      const hasRule = fit.lines > 1;
+      const ruleY = fit.bottom + L.ruleGap;
+      const top1 = (hasRule ? ruleY + L.ruleH : fit.bottom) + S.gap;
+      const bottom = 297 - S.margin;
       const capacities = [];
-      for (let p = 0; p < L.maxPages; p++) capacities.push(L.rowsBottom - (p === 0 ? top1 : L.contTop));
-      const width = 210 - L.outer - L.inner;
+      for (let p = 0; p < L.maxPages; p++) capacities.push(bottom - (p === 0 ? top1 : S.margin));
+      const width = 210 - S.margin - S.inner;
       const heights = EGG.measure(list.map((l, r) => rowEl(l, r)), width, 'loc');
       const { groups, overflow } = EGG.splitRows(heights, capacities, L.gap, opts.pages || 'auto', opts.fillPages);
       if (overflow) EGG.warn(`The locations do not fit on ${groups.length} page(s). Allow more pages.`);
@@ -93,16 +91,13 @@
         const side = EGG.sideOf(number, first, firstSide);
         const page = EGG.makePage({ number, side, className: 'loc' });
 
-        let y = L.contTop;
+        const x = side === 'left' ? S.margin : S.inner;
+        let y = S.margin;
         if (p === 0) {
-          page.trim.appendChild(EGG.place(EGG.furniture(EGG.titleEl(titleText, fit.pt), 'Title'), L.titleX, L.titleY));
-          if (hasRule) {
-            const yRule = L.titleY + titleLines * fit.lineMm + L.ruleGap;
-            page.trim.appendChild(EGG.place(EGG.furniture(EGG.el('div', 'loc-rule'), 'Title rule'), L.ruleX, yRule, L.ruleW, L.ruleH));
-          }
+          page.trim.appendChild(EGG.place(EGG.furniture(EGG.titleEl(titleText, fit.pt), 'Title'), x, fit.y));
+          if (hasRule) page.trim.appendChild(EGG.place(EGG.furniture(EGG.el('div', 'loc-rule'), 'Title rule'), x + L.ruleIn, ruleY, L.ruleW, L.ruleH));
           y = top1;
         }
-        const x = side === 'left' ? L.outer : L.inner;
         list.slice(g.from, g.to).forEach((l, i) => {
           const r = g.from + i;
           page.trim.appendChild(EGG.place(rowEl(l, r), x, y, width));
