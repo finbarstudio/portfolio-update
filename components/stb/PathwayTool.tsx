@@ -79,9 +79,8 @@ interface Look {
   flip: boolean;
   /** A photo in place of the background colour, and the subject cut out of it. */
   photo?: PhotoLook;
-  /** Drawing in or out: the stretches showing (distances along the line), the
-   *  thickness, and the thickness at each distance along the line for presets that vary it. */
-  draw?: { spans: Span[]; width: number; widthAt?: (d: number) => number };
+  /** Drawing in or out: the stretches showing (distances along the line) and the thickness. */
+  draw?: { spans: Span[]; width: number };
   /** The whole strip, in line units (short side of one panel = 1). */
   bounds: [number, number];
 }
@@ -277,8 +276,6 @@ interface Glyph {
   /** radians */
   angle: number;
   colour: string;
-  /** px along the line */
-  at: number;
 }
 
 /**
@@ -320,7 +317,6 @@ function layoutText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, loo
           y: (y0 + (y1 - y0) * t) * S,
           angle: Math.atan2(y1 - y0, x1 - x0) + (st.fwd ? 0 : Math.PI),
           colour,
-          at,
         });
       }
     }
@@ -330,18 +326,13 @@ function layoutText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, loo
 
 function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
   const { size, glyphs } = layoutText(ctx, path, S, look, strokePx, tPhase, range);
-  const widthAt = look.draw?.widthAt;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const g of glyphs) {
-    // where the line swells or shrinks, its letters do too
-    const k = widthAt ? Math.max(0, widthAt(g.at / S)) : 1;
-    if (k < 0.08) continue;
     ctx.fillStyle = g.colour;
     ctx.save();
     ctx.translate(g.x, g.y);
     ctx.rotate(g.angle);
-    if (k !== 1) ctx.scale(k, k);
     // The face sits a touch high on its middle line; nudge to centre the caps.
     ctx.fillText(g.ch, 0, size * 0.04);
     ctx.restore();
@@ -353,8 +344,7 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
  * the stretches in look.draw show, at look.draw.width, with rounded ends. The
  * ends are half discs laid on the outside of the line, not round line caps:
  * a gradient line is many short pieces, and caps on every piece would show as
- * seams. Where the thickness varies along the line it goes down in short
- * pieces, each at its own thickness.
+ * seams.
  */
 function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, gPhase: number, tPhase: number) {
   const { pts, cum } = path;
@@ -363,51 +353,26 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   const base = look.stroke * (d?.width ?? 1);
   if (base <= 0) return;
   const spans: Span[] = d ? d.spans.filter(([a, b]) => b - a > 1e-4) : [[0, cum[last]]];
-  const widthAt = (i: number) => base * (d?.widthAt ? Math.max(0, d.widthAt(cum[i])) : 1);
   const flowing = look.line === "gradient" && look.alpha !== "line";
   const colourAt = (i: number) => (flowing ? flowColour(cum[i] / FLOW_PERIOD - gPhase) : look.line === "gradient" ? "#000" : look.line);
+  ctx.lineWidth = base * S;
   ctx.lineJoin = "round";
   ctx.lineCap = "butt";
-  /** the line from point i to j */
-  const body = (i: number, j: number) => {
-    if (!d?.widthAt) {
-      ctx.lineWidth = base * S;
-      strokeLine(ctx, path, S, i, j, look, gPhase);
-      return;
-    }
-    if (look.alpha === "line") ctx.globalCompositeOperation = "destination-out";
-    // rounded pieces, so a tapering edge is smooth rather than stepped; neighbouring
-    // pieces are a hundredth of a unit apart, too close in colour to show a seam
-    ctx.lineCap = "round";
-    for (let k = i; k < j; k++) {
-      const w = widthAt(k);
-      if (w < 1e-4) continue;
-      ctx.lineWidth = w * S;
-      ctx.strokeStyle = colourAt(k);
-      ctx.beginPath();
-      trace(ctx, pts, S, k, Math.min(k + 2, j));
-      ctx.stroke();
-    }
-    ctx.lineCap = "butt";
-    ctx.globalCompositeOperation = "source-over";
-  };
   /** a rounded end at point i, on the side facing away from the line (dir +1 onwards, -1 back) */
   const cap = (i: number, dir: number) => {
-    const w = widthAt(i);
-    if (w < 1e-4) return;
     const a = Math.max(0, i - 1), b = Math.min(last, i + 1);
     const ang = Math.atan2(pts[b * 2 + 1] - pts[a * 2 + 1], pts[b * 2] - pts[a * 2]) + (dir > 0 ? 0 : Math.PI);
     if (look.alpha === "line") ctx.globalCompositeOperation = "destination-out";
     ctx.fillStyle = colourAt(i);
     ctx.beginPath();
-    ctx.arc(pts[i * 2] * S, pts[i * 2 + 1] * S, (w * S) / 2, ang - Math.PI / 2, ang + Math.PI / 2);
+    ctx.arc(pts[i * 2] * S, pts[i * 2 + 1] * S, (base * S) / 2, ang - Math.PI / 2, ang + Math.PI / 2);
     ctx.fill();
     ctx.globalCompositeOperation = "source-over";
   };
   for (const [a, b] of spans) {
     const i = locate(cum, a);
     const j = Math.min(last, locate(cum, b) + 1);
-    body(i, j);
+    strokeLine(ctx, path, S, i, j, look, gPhase);
     if (d) {
       cap(i, -1);
       cap(j, 1);
@@ -418,16 +383,15 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
     // Where the line passes over itself, two runs of text would collide. Lay the
     // upper stretch down again over the whole overlap, then its own letters on
     // top, so the text underneath slides out of sight beneath it.
-    const reach = base * (d?.widthAt ? 1.5 : 1);
     for (const [k, j] of path.over.entries()) {
-      const win = overWindow(path, k, reach);
+      const win = overWindow(path, k, base);
       const at = cum[j];
       for (const [a, b] of spans) {
         const lo = Math.max(a, at - win);
         const hi = Math.min(b, at + win);
         if (hi <= lo) continue;
-        body(locate(cum, lo), Math.min(last, locate(cum, hi) + 1));
-        drawText(ctx, path, S, look, base * S, tPhase, [Math.max(a, at - win - reach) * S, Math.min(b, at + win + reach) * S]);
+        strokeLine(ctx, path, S, locate(cum, lo), Math.min(last, locate(cum, hi) + 1), look, gPhase);
+        drawText(ctx, path, S, look, base * S, tPhase, [Math.max(a, at - win - base) * S, Math.min(b, at + win + base) * S]);
       }
     }
   }
@@ -954,15 +918,7 @@ export default function PathwayTool() {
     if (!drawPreset || !span) return look;
     const f = drawFrame(drawPreset, t, drawMode, drawReverse);
     const len = span[1] - span[0];
-    const w = f.widthAt;
-    return {
-      ...look,
-      draw: {
-        width: f.width,
-        spans: f.spans.map(([a, b]) => [span[0] + a * len, span[0] + b * len]),
-        widthAt: w && ((dist: number) => w((dist - span[0]) / len)),
-      },
-    };
+    return { ...look, draw: { width: f.width, spans: f.spans.map(([a, b]) => [span[0] + a * len, span[0] + b * len]) } };
   };
 
   /**

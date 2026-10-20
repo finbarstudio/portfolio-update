@@ -1,8 +1,8 @@
 /**
  * Drawing the line in and out: eight presets, each saying which stretches of
  * the line are showing and how thick it is, as it draws in and as it draws out
- * (Snake and Wave only run through). Some vary the thickness along the line,
- * and the letters grow and shrink with it. The loop plays in and out, just in, or just out. Stretches are fractions of the part of the line that is on the
+ * (Snake only runs through). Some change the thickness as they go, and the
+ * letters grow and shrink with it. The loop plays in and out, just in, or just out. Stretches are fractions of the part of the line that is on the
  * artwork, so every preset times the same on any format, carousel or seed.
  * Reversed, a preset runs from the other end of the line.
  */
@@ -13,8 +13,6 @@ export interface DrawFrame {
   spans: Span[];
   /** thickness, 1 = the format's line */
   width: number;
-  /** thickness along the line, u from 0 to 1 over the part on the artwork; the letters grow and shrink with it */
-  widthAt?: (u: number) => number;
 }
 export type DrawMode = "both" | "in" | "out";
 export interface DrawPreset {
@@ -35,12 +33,12 @@ const inOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 
 const easeIn = (x: number) => x * x * x;
 const easeOut = (x: number) => 1 - (1 - x) ** 3;
 const back = (x: number) => 1 + 2.7 * (x - 1) ** 3 + 1.7 * (x - 1) ** 2;
-/** a bigger overshoot than back(), for the swelling presets */
-const backBig = (x: number) => 1 + 3.5 * (x - 1) ** 3 + 2.5 * (x - 1) ** 2;
+const C4 = (2 * Math.PI) / 3;
+/** a springy settle: past the target and back a few times */
+const elastic = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : 2 ** (-10 * x) * Math.sin((x * 10 - 0.75) * C4) + 1);
+const elasticIn = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : -(2 ** (10 * x - 10)) * Math.sin((x * 10 - 10.75) * C4));
 const backIn = (x: number) => 2.7 * x * x * x - 1.7 * x * x;
 const one = (a: number, b: number, width = 1): DrawFrame => ({ spans: [[a, b]], width });
-/** a swell running along the line: 0 behind it, rising through an overshoot to 1 ahead */
-const wave = (front: number, u: number, soft: number) => clamp((front - u) / soft);
 
 export const DRAW_PRESETS: DrawPreset[] = [
   { id: "through", label: "Draw through", in: (p) => one(0, inOut(p)), out: (q) => one(inOut(q), 1) },
@@ -67,24 +65,17 @@ export const DRAW_PRESETS: DrawPreset[] = [
   },
   { id: "pop", label: "Pop", in: (p) => one(0, 1, Math.max(0, back(p))), out: (q) => one(0, 1, Math.max(0, 1 - backIn(q))) },
   {
-    id: "swell",
-    label: "Swell",
-    in: (p) => ({ ...one(0, 1), widthAt: (u) => Math.max(0, backBig(wave(p * 1.4, u, 0.4))) }),
-    out: (q) => ({ ...one(0, 1), widthAt: (u) => Math.max(0, 1 - backIn(wave(q * 1.4, u, 0.4))) }),
+    id: "grow",
+    label: "Grow",
+    in: (p) => one(0, inOut(p), 0.15 + 0.85 * easeOut(p)),
+    out: (q) => one(inOut(q), 1, 1 - 0.85 * easeIn(q)),
   },
+  { id: "spring", label: "Spring", in: (p) => one(0, 1, Math.max(0, elastic(p))), out: (q) => one(0, 1, Math.max(0, 1 - elasticIn(q))) },
   {
-    id: "bloom",
-    label: "Bloom",
-    in: (p) => ({ ...one(0, 1), widthAt: (u) => Math.max(0, backBig(wave(p * 1.5, Math.abs(u - 0.5) * 2, 0.5))) }),
-    out: (q) => ({ ...one(0, 1), widthAt: (u) => Math.max(0, 1 - backIn(wave(q * 1.5, 1 - Math.abs(u - 0.5) * 2, 0.5))) }),
-  },
-  {
-    id: "wave",
-    label: "Wave",
-    loop: (t) => {
-      const c = -0.15 + 1.3 * t;
-      return { ...one(0, 1), widthAt: (u) => 1 + 0.45 * Math.exp(-(((u - c) / 0.07) ** 2)) };
-    },
+    id: "burst",
+    label: "Burst",
+    in: (p) => one(0.5 - easeOut(p) / 2, 0.5 + easeOut(p) / 2, Math.max(0, back(p))),
+    out: (q) => one(easeIn(q) / 2, 1 - easeIn(q) / 2, Math.max(0, 1 - backIn(q))),
   },
 ];
 
@@ -99,9 +90,7 @@ export function drawFrame(preset: DrawPreset, t: number, mode: DrawMode, reverse
   else if (mode === "in") f = preset.in!(seg(t, 0, 0.6));
   else if (mode === "out") f = preset.out!(seg(t, 0.4, 1));
   else f = t < 0.5 ? preset.in!(seg(t, 0, 0.4)) : preset.out!(seg(t, 0.6, 1));
-  if (!reverse) return f;
-  const w = f.widthAt;
-  return { ...f, spans: f.spans.map(([a, b]) => [1 - b, 1 - a]), widthAt: w && ((u) => w(1 - u)) };
+  return reverse ? { ...f, spans: f.spans.map(([a, b]) => [1 - b, 1 - a]) } : f;
 }
 
 /**
