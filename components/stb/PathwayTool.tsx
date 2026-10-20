@@ -270,6 +270,19 @@ function ticker(ctx: CanvasRenderingContext2D, text: string, strokePx: number) {
   return { size, chars, widths, tracking, period };
 }
 
+/**
+ * Seconds for the scrolling text to travel one full run of its colours at
+ * `speed` (hundredths of the short side a second). It is the same at any size,
+ * so it is measured once at a fixed one.
+ */
+let measurer: CanvasRenderingContext2D | null = null;
+function textRunSecs(text: string, colours: number, stroke: number, speed: number) {
+  if (typeof document === "undefined") return 1; // (the server render; the browser measures)
+  measurer ??= document.createElement("canvas").getContext("2d");
+  const S = 1000;
+  return (ticker(measurer!, text, stroke * S).period * colours) / ((speed / 100) * S);
+}
+
 interface Glyph {
   ch: string;
   x: number;
@@ -984,20 +997,28 @@ export default function PathwayTool() {
   };
 
   /**
-   * One loop, so that a video always joins up with itself. Scrolling text sets
-   * the length: the time it takes to travel one full set of its colours at the
-   * chosen speed, after which every letter and colour is back where it began.
-   * The gradient then fits a whole number of runs into that time. With no
-   * scrolling text the loop is the draw-in preset's length if there is one,
-   * else the gradient's own. It is the same for every panel of a carousel. S is
-   * the short side being drawn at.
+   * One loop, so that a video always joins up with itself. The line, the text
+   * and the gradient each keep their own speed, and the loop is as long as the
+   * one in charge: the draw-in preset's length if there is one, else one full
+   * run of the scrolling text's colours, else one run of the gradient. The other
+   * two then fit a whole number of runs into it, at the nearest speed to the
+   * one chosen that does (never fewer than one run), so whatever loops or ends
+   * flush lands on the same frame it started on. Their sliders show the speed
+   * actually used. It is the same for every panel of a carousel.
    */
-  const timing = (ctx: CanvasRenderingContext2D, S: number) => {
-    if (!textMoves) return drawPreset ? { secs: drawSecs, cycles: Math.max(1, Math.round(drawSecs / gradientSecs)) } : { secs: gradientSecs, cycles: 1 };
-    const set = ticker(ctx, look.text, stroke * S).period * look.textColours.length;
-    const secs = set / ((textSpeed / 100) * S);
-    return { secs, cycles: Math.max(1, Math.round(secs / gradientSecs)) };
-  };
+  const textRun = textMoves ? textRunSecs(look.text, look.textColours.length, stroke, textSpeed) : 0;
+  const loop = (() => {
+    const secs = drawPreset ? drawSecs : textMoves ? textRun : gradientSecs;
+    return {
+      secs,
+      /** runs of the gradient per loop */
+      cycles: gradientMoves ? Math.max(1, Math.round(secs / gradientSecs)) : 1,
+      /** runs of the text's colours per loop */
+      textCycles: textMoves ? Math.max(1, Math.round(secs / textRun)) : 0,
+    };
+  })();
+  /** Where the text is, t (0 to 1) through the loop. */
+  const textAt = (t: number) => (textMoves ? (t * loop.textCycles) % 1 : 0);
   /** Where the gradient is, t (0 to 1) through the loop. Reversed, it runs the other way. */
   const flowAt = (t: number, cycles: number) => {
     if (!gradientMoves) return 0;
@@ -1005,14 +1026,13 @@ export default function PathwayTool() {
     return reverseFlow ? (1 - at) % 1 : at;
   };
   /** Draw panel `i` at full size, at t (0 to 1) through the loop. */
-  const drawPanel = (ctx: CanvasRenderingContext2D, i: number, t: number, cycles: number) =>
-    render(ctx, w, h, short, i * w, path, lookAt(t), flowAt(t, cycles), textMoves ? t : 0);
+  const drawPanel = (ctx: CanvasRenderingContext2D, i: number, t: number) => render(ctx, w, h, short, i * w, path, lookAt(t), flowAt(t, loop.cycles), textAt(t));
 
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");
     if (!ctx) return;
     const S = short * view;
-    const { secs, cycles } = timing(ctx, S);
+    const { secs, cycles } = loop;
     if (Math.abs(secs - loopSecs) > 0.01) setLoopSecs(secs);
     let raf = 0;
     const draw = () => {
@@ -1020,7 +1040,7 @@ export default function PathwayTool() {
       // ?t=0.4 holds the preview at that point in the loop, for checking a frame
       const held = Number(new URLSearchParams(window.location.search).get("t"));
       const t = !moving ? 0 : held > 0 ? held % 1 : ((performance.now() - clock.current) / 1000 / secs) % 1;
-      render(ctx, stripW * view, h * view, S, 0, path, lookAt(t), flowAt(t, cycles), textMoves ? t : 0);
+      render(ctx, stripW * view, h * view, S, 0, path, lookAt(t), flowAt(t, cycles), textAt(t));
       if (moving && !recording) raf = requestAnimationFrame(draw); // an export takes the processor; the preview holds
     };
     draw();
@@ -1237,8 +1257,7 @@ export default function PathwayTool() {
       const { Muxer, ArrayBufferTarget } = await import("mp4-muxer");
       const { el, ctx } = sheet();
       const fps = 30;
-      const { secs, cycles } = timing(ctx, short);
-      const total = Math.max(1, Math.round(secs * fps));
+      const total = Math.max(1, Math.round(loop.secs * fps));
       for (let panel = 0; panel < n; panel++) {
         const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: "avc", width: w, height: h }, fastStart: "in-memory" });
         const encoder = new VideoEncoder({
@@ -1247,7 +1266,7 @@ export default function PathwayTool() {
         });
         encoder.configure({ codec: "avc1.640033", width: w, height: h, bitrate: 16_000_000, framerate: fps });
         for (let i = 0; i < total; i++) {
-          drawPanel(ctx, panel, i / total, cycles);
+          drawPanel(ctx, panel, i / total);
           const picture = new VideoFrame(el, { timestamp: (i * 1e6) / fps, duration: 1e6 / fps });
           encoder.encode(picture, { keyFrame: i % 60 === 0 });
           picture.close();
@@ -1411,7 +1430,7 @@ export default function PathwayTool() {
                 ))}
               </div>
               <Switch label="Reverse" checked={drawReverse} onChange={(v) => { restart(); setDrawReverse(v); }} />
-              <Slider label="Loop" value={drawSecs} min={2} max={12} step={0.5} onChange={(v) => { restart(); setDrawSecs(v); }} show={textMoves ? `~${drawSecs}s` : `${drawSecs}s`} />
+              <Slider label="Loop" value={drawSecs} min={2} max={12} step={0.5} onChange={(v) => { restart(); setDrawSecs(v); }} show={`${drawSecs}s`} />
             </>
           )}
         </Group>
@@ -1431,7 +1450,17 @@ export default function PathwayTool() {
             </div>
             <Switch label="Flip text" checked={flipText} onChange={setFlipText} />
             <Switch label="Animate" checked={scrollText} onChange={(v) => { restart(); setScrollText(v); }} />
-            {scrollText && <Slider label="Speed" value={textSpeed} min={1} max={25} step={1} onChange={setTextSpeed} />}
+            {scrollText && (
+              <Slider
+                label="Speed"
+                value={textSpeed}
+                min={1}
+                max={25}
+                step={1}
+                onChange={(v) => { restart(); setTextSpeed(v); }}
+                show={textMoves && (drawPreset || loop.secs !== textRun) ? String(Math.round(((textSpeed * loop.textCycles * textRun) / loop.secs) * 10) / 10) : String(textSpeed)}
+              />
+            )}
           </Group>
         )}
 
@@ -1440,7 +1469,7 @@ export default function PathwayTool() {
             <Switch label="Animate" checked={animateGradient} onChange={(v) => { restart(); setAnimateGradient(v); }} />
             {animateGradient && <Switch label="Reverse" checked={reverseFlow} onChange={setReverseFlow} />}
             {animateGradient && (
-              <Slider label="Loop" value={gradientSecs} min={2} max={20} step={1} onChange={setGradientSecs} show={textMoves ? `~${gradientSecs}s` : `${gradientSecs}s`} />
+              <Slider label="Loop" value={gradientSecs} min={2} max={20} step={1} onChange={(v) => { restart(); setGradientSecs(v); }} show={`${Math.round((loop.secs / loop.cycles) * 10) / 10}s`} />
             )}
           </Group>
         )}

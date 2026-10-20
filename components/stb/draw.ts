@@ -1,5 +1,5 @@
 /**
- * Drawing the line in and out: seven presets, each saying which stretches of
+ * Drawing the line in and out: six presets, each saying which stretches of
  * the line are showing and how thick it is, as it draws in and as it draws out
  * (Snake only runs through). Some change the thickness as they go, and the
  * letters grow and shrink with it. The loop plays in and out, just in, or just out. Stretches are fractions of the part of the line that is on the
@@ -79,12 +79,7 @@ export const DRAW_PRESETS: DrawPreset[] = [
       return one(Math.max(0, head - 0.4), Math.min(1, head));
     },
   },
-  {
-    id: "middle",
-    label: "From the middle",
-    in: (p) => one(0.5 - easeOut(p) / 2, 0.5 + easeOut(p) / 2),
-    out: (q) => one(easeIn(q) / 2, 1 - easeIn(q) / 2),
-  },
+
   {
     id: "ends",
     label: "From both ends",
