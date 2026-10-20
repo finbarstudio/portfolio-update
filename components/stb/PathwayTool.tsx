@@ -5,7 +5,7 @@ import { generatePathway, type Pathway } from "./pathway";
 import { BRANDS, GRADIENT, colourName, textPresets, type BrandKey } from "./palette";
 import { media, corsMedia } from "@/lib/media";
 import { hasTransparency, makeSubject } from "./cutout";
-import { DRAW_PRESETS, drawFrame, onFrame, type Span } from "./draw";
+import { DRAW_PRESETS, drawFrame, onFrame, type DrawMode, type Span } from "./draw";
 
 /**
  * Share to Buy pathway maker. One screen, no scroll: controls on the left, the
@@ -736,6 +736,7 @@ export default function PathwayTool() {
   /** Drawing the line in and out: a preset from draw.ts, or none */
   const [drawId, setDrawId] = useState<string | null>(null);
   const [drawReverse, setDrawReverse] = useState(false);
+  const [drawMode, setDrawMode] = useState<DrawMode>("both");
   const [drawSecs, setDrawSecs] = useState(4);
   /** The gradient flows back towards the start of the line instead of away from it. */
   const [reverseFlow, setReverseFlow] = useState(false);
@@ -897,7 +898,7 @@ export default function PathwayTool() {
   const span = drawPreset ? onFrame(path, stripW / short, h / short, stroke) : null;
   const lookAt = (t: number): Look => {
     if (!drawPreset || !span) return look;
-    const f = drawFrame(drawPreset, t, drawReverse);
+    const f = drawFrame(drawPreset, t, drawMode, drawReverse);
     const len = span[1] - span[0];
     return { ...look, draw: { width: f.width, spans: f.spans.map(([a, b]) => [span[0] + a * len, span[0] + b * len]) } };
   };
@@ -1320,6 +1321,13 @@ export default function PathwayTool() {
           </div>
           {drawPreset && (
             <>
+              <div className="stb-seg">
+                {(["both", "in", "out"] as DrawMode[]).map((m) => (
+                  <button key={m} type="button" aria-pressed={!drawPreset.loop && drawMode === m} disabled={!!drawPreset.loop} onClick={() => { restart(); setDrawMode(m); }}>
+                    {m === "both" ? "In and out" : m === "in" ? "In" : "Out"}
+                  </button>
+                ))}
+              </div>
               <Switch label="Reverse" checked={drawReverse} onChange={(v) => { restart(); setDrawReverse(v); }} />
               <Slider label="Loop" value={drawSecs} min={2} max={12} step={0.5} onChange={(v) => { restart(); setDrawSecs(v); }} show={textMoves ? `~${drawSecs}s` : `${drawSecs}s`} />
             </>

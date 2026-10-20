@@ -1,7 +1,7 @@
 /**
- * Drawing the line in and out: eight presets, each a function of t (0 to 1
- * through the loop) that says which stretches of the line are showing and how
- * thick it is. Stretches are fractions of the part of the line that is on the
+ * Drawing the line in and out: eight presets, each saying which stretches of
+ * the line are showing and how thick it is, as it draws in and as it draws out
+ * (Snake only runs through). The loop plays in and out, just in, or just out. Stretches are fractions of the part of the line that is on the
  * artwork, so every preset times the same on any format, carousel or seed.
  * Reversed, a preset runs from the other end of the line.
  */
@@ -13,10 +13,16 @@ export interface DrawFrame {
   /** thickness, 1 = the format's line */
   width: number;
 }
+export type DrawMode = "both" | "in" | "out";
 export interface DrawPreset {
   id: string;
   label: string;
-  frame: (t: number) => DrawFrame;
+  /** drawing in, p from 0 (nothing) to 1 (the whole line) */
+  in?: (p: number) => DrawFrame;
+  /** drawing out, q from 0 (the whole line) to 1 (nothing) */
+  out?: (q: number) => DrawFrame;
+  /** a preset that only runs through, with no separate in and out */
+  loop?: (t: number) => DrawFrame;
 }
 
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
@@ -36,26 +42,15 @@ function bounce(x: number) {
 }
 
 const one = (a: number, b: number, width = 1): DrawFrame => ({ spans: [[a, b]], width });
-/** in over 0 to 0.4, hold, out over 0.6 to 1 */
-const IN: [number, number] = [0, 0.4];
-const OUT: [number, number] = [0.6, 1];
+const DASHES = 7;
 
 export const DRAW_PRESETS: DrawPreset[] = [
-  { id: "draw", label: "Draw in", frame: (t) => one(0, inOut(seg(t, 0, 0.5))) },
-  {
-    id: "through",
-    label: "Draw through",
-    frame: (t) => one(inOut(seg(t, ...OUT)), inOut(seg(t, ...IN))),
-  },
-  {
-    id: "rewind",
-    label: "Rewind",
-    frame: (t) => one(0, inOut(seg(t, ...IN)) * (1 - inOut(seg(t, ...OUT)))),
-  },
+  { id: "through", label: "Draw through", in: (p) => one(0, inOut(p)), out: (q) => one(inOut(q), 1) },
+  { id: "rewind", label: "Rewind", in: (p) => one(0, inOut(p)), out: (q) => one(0, 1 - inOut(q)) },
   {
     id: "snake",
     label: "Snake",
-    frame: (t) => {
+    loop: (t) => {
       const head = inOut(t) * 1.4;
       return one(Math.max(0, head - 0.4), Math.min(1, head));
     },
@@ -63,34 +58,36 @@ export const DRAW_PRESETS: DrawPreset[] = [
   {
     id: "middle",
     label: "From the middle",
-    frame: (t) => {
-      const r = (easeOut(seg(t, ...IN)) - easeIn(seg(t, ...OUT))) / 2;
-      return one(0.5 - r, 0.5 + r);
-    },
+    in: (p) => one(0.5 - easeOut(p) / 2, 0.5 + easeOut(p) / 2),
+    out: (q) => one(easeIn(q) / 2, 1 - easeIn(q) / 2),
   },
   {
     id: "ends",
     label: "From both ends",
-    frame: (t) => {
-      const r = (easeOut(seg(t, ...IN)) - easeIn(seg(t, ...OUT))) / 2;
-      return { spans: [[0, r], [1 - r, 1]], width: 1 };
-    },
+    in: (p) => ({ spans: [[0, easeOut(p) / 2], [1 - easeOut(p) / 2, 1]], width: 1 }),
+    out: (q) => ({ spans: [[0, (1 - easeIn(q)) / 2], [(1 + easeIn(q)) / 2, 1]], width: 1 }),
   },
+  { id: "bounce", label: "Bounce", in: (p) => one(0, bounce(p)), out: (q) => one(easeIn(q), 1) },
+  { id: "pop", label: "Pop", in: (p) => one(0, 1, Math.max(0, back(p))), out: (q) => one(0, 1, Math.max(0, 1 - backIn(q))) },
   {
-    id: "bounce",
-    label: "Bounce",
-    frame: (t) => one(easeIn(seg(t, 0.65, 1)), bounce(seg(t, 0, 0.5))),
-  },
-  {
-    id: "pop",
-    label: "Pop",
-    frame: (t) => one(0, 1, Math.max(0, back(seg(t, 0, 0.3)) - backIn(seg(t, 0.75, 1)))),
+    id: "dashes",
+    label: "Dashes",
+    in: (p) => ({ spans: Array.from({ length: DASHES }, (_, k) => [k / DASHES, (k + inOut(p)) / DASHES] as Span), width: 1 }),
+    out: (q) => ({ spans: Array.from({ length: DASHES }, (_, k) => [(k + inOut(q)) / DASHES, (k + 1) / DASHES] as Span), width: 1 }),
   },
 ];
 
-/** The preset at t, reversed if asked: a stretch from a to b becomes 1 - b to 1 - a. */
-export function drawFrame(preset: DrawPreset, t: number, reverse: boolean): DrawFrame {
-  const f = preset.frame(t);
+/**
+ * The preset at t through the loop. In and out: in over the first 40%, a hold,
+ * out over the last 40%. In: in over 60%, then hold. Out: hold, then out over
+ * the last 60%. Reversed, a stretch from a to b becomes 1 - b to 1 - a.
+ */
+export function drawFrame(preset: DrawPreset, t: number, mode: DrawMode, reverse: boolean): DrawFrame {
+  let f: DrawFrame;
+  if (preset.loop) f = preset.loop(t);
+  else if (mode === "in") f = preset.in!(seg(t, 0, 0.6));
+  else if (mode === "out") f = preset.out!(seg(t, 0.4, 1));
+  else f = t < 0.5 ? preset.in!(seg(t, 0, 0.4)) : preset.out!(seg(t, 0.6, 1));
   return reverse ? { ...f, spans: f.spans.map(([a, b]) => [1 - b, 1 - a]) } : f;
 }
 
