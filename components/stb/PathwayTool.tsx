@@ -81,7 +81,7 @@ interface Look {
   photo?: PhotoLook;
   /** Drawing in or out: the stretches showing (distances along the line), the
    *  thickness, and any faint copies drawn behind it for a trail. */
-  draw?: { spans: Span[]; width: number; ghosts?: Ghost[]; caps?: [boolean, boolean] };
+  draw?: { spans: Span[]; width: number; ghosts?: Ghost[]; caps?: [boolean, boolean]; anchor?: number; wipe?: Span };
   /** The whole strip, in line units (short side of one panel = 1). */
   bounds: [number, number];
 }
@@ -286,7 +286,16 @@ interface Glyph {
  * measured from the end, so both scroll and loop exactly as before. Letters keep
  * a small gap either side of a change of way.
  */
-function layoutText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
+function layoutText(
+  ctx: CanvasRenderingContext2D,
+  path: Pathway,
+  S: number,
+  look: Look,
+  strokePx: number,
+  tPhase: number,
+  range?: [number, number],
+  zoom?: [number, number],
+) {
   const { size, chars, widths, tracking, period } = ticker(ctx, look.text, strokePx);
   const { pts, cum } = path;
   const total = cum[cum.length - 1] * S;
@@ -297,15 +306,21 @@ function layoutText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, loo
   for (const st of stretches(path, S, strokePx, look.flip, look.bounds)) {
     const lo = st.a > 0 ? st.a + pad : -Infinity;
     const hi = st.b < total ? st.b - pad : Infinity;
+    // `zoom` [k, c]: the whole layout scaled by k about the point c px along the
+    // line, so a line that changes thickness grows and shrinks its letters in
+    // place instead of reflowing them along itself
+    const [zk, zc] = zoom ?? [1, 0];
+    const Z = (at: number) => zc + (at - zc) * zk;
+    const U = (z: number) => zc + (z - zc) / zk;
     // the repeats that can land in this stretch, measured from whichever end it reads from
-    const from = st.fwd ? st.a : total - st.b;
-    const to = st.fwd ? st.b : total - st.a;
+    const from = st.fwd ? U(st.a) : total - U(st.b);
+    const to = st.fwd ? U(st.b) : total - U(st.a);
     for (let k = Math.floor((from - shift) / period) - 1; k * period + shift < to; k++) {
       const colour = look.textColours[((k % n) + n) % n];
       let s = k * period + shift;
       for (let c = 0; c < chars.length; c++) {
-        const half = widths[c] / 2;
-        const at = st.fwd ? s + half : total - (s + half);
+        const half = (widths[c] / 2) * zk;
+        const at = Z(st.fwd ? s + widths[c] / 2 : total - (s + widths[c] / 2));
         s += widths[c] + tracking;
         if (at - half < lo || at + half > hi) continue;
         if (at < 0 || at >= total || (range && (at < range[0] || at > range[1]))) continue;
@@ -326,7 +341,13 @@ function layoutText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, loo
 }
 
 function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look: Look, strokePx: number, tPhase: number, range?: [number, number]) {
-  const { size, glyphs } = layoutText(ctx, path, S, look, strokePx, tPhase, range);
+  // A line drawing in at a thickness other than its own: lay the letters out at
+  // full size and scale the lot about the preset's anchor.
+  const d = look.draw;
+  const k = d && d.width !== 1 ? d.width : 1;
+  if (k < 0.08) return;
+  const zoom: [number, number] | undefined = k !== 1 ? [k, (d?.anchor ?? 0) * S] : undefined;
+  const { size, glyphs } = layoutText(ctx, path, S, look, zoom ? look.stroke * S : strokePx, tPhase, range, zoom);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const g of glyphs) {
@@ -334,6 +355,7 @@ function drawText(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
     ctx.save();
     ctx.translate(g.x, g.y);
     ctx.rotate(g.angle);
+    if (k !== 1) ctx.scale(k, k);
     // The face sits a touch high on its middle line; nudge to centre the caps.
     ctx.fillText(g.ch, 0, size * 0.04);
     ctx.restore();
@@ -353,6 +375,25 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   const d = look.draw;
   const base = look.stroke * (d?.width ?? 1);
   if (base <= 0) return;
+  // Wipe: everything clipped to a slanted band across the artwork
+  if (d?.wipe) {
+    const [W, H] = [look.bounds[0] * S, look.bounds[1] * S];
+    const sh = H * 0.18;
+    const X = (f: number) => -sh + f * (W + 2 * sh);
+    const [a, b] = d.wipe;
+    if (b - a < 1e-4) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(X(a) + sh, 0);
+    ctx.lineTo(X(b) + sh, 0);
+    ctx.lineTo(X(b) - sh, H);
+    ctx.lineTo(X(a) - sh, H);
+    ctx.closePath();
+    ctx.clip();
+    drawLine(ctx, path, S, { ...look, draw: { ...d, wipe: undefined } }, gPhase, tPhase);
+    ctx.restore();
+    return;
+  }
   // A trail: each faint copy is drawn whole on its own layer, then laid down at
   // its opacity, so where it overlaps itself it does not darken. It has no
   // rounded end where it meets the solid line, so it never tints the solid
@@ -950,7 +991,16 @@ export default function PathwayTool() {
     const f = drawFrame(drawPreset, t, drawMode, drawReverse);
     const len = span[1] - span[0];
     const place = (spans: Span[]) => spans.map(([a, b]) => [span[0] + a * len, span[0] + b * len] as Span);
-    return { ...look, draw: { width: f.width, spans: place(f.spans), ghosts: f.ghosts?.map((g) => ({ ...g, spans: place(g.spans) })) } };
+    return {
+      ...look,
+      draw: {
+        width: f.width,
+        spans: place(f.spans),
+        ghosts: f.ghosts?.map((g) => ({ ...g, spans: place(g.spans) })),
+        anchor: span[0] + (f.anchor ?? 0.5) * len,
+        wipe: f.wipe,
+      },
+    };
   };
 
   /**

@@ -13,6 +13,10 @@ export interface DrawFrame {
   spans: Span[];
   /** thickness, 1 = the format's line */
   width: number;
+  /** where along the line (0 to 1) the letters stay put as the thickness changes; the middle when left out */
+  anchor?: number;
+  /** a slanted band across the artwork (0 left edge, 1 right edge) outside which nothing shows */
+  wipe?: Span;
   /** faint copies of the line drawn first, behind it: a trail */
   ghosts?: Ghost[];
 }
@@ -65,8 +69,8 @@ export const DRAW_PRESETS: DrawPreset[] = [
   {
     id: "grow",
     label: "Grow",
-    in: (p) => one(0, inOut(p), 0.15 + 0.85 * easeOut(p)),
-    out: (q) => one(inOut(q), 1, 1 - 0.85 * easeIn(q)),
+    in: (p) => ({ ...one(0, inOut(p), 0.15 + 0.85 * easeOut(p)), anchor: 0 }),
+    out: (q) => ({ ...one(inOut(q), 1, 1 - 0.85 * easeIn(q)), anchor: 1 }),
   },
   { id: "rewind", label: "Rewind", in: (p) => one(0, inOut(p)), out: (q) => one(0, 1 - inOut(q)) },
   {
@@ -97,6 +101,7 @@ export const DRAW_PRESETS: DrawPreset[] = [
   },
   { id: "pop", label: "Pop", in: (p) => one(0, 1, Math.max(0, back(p))), out: (q) => one(0, 1, Math.max(0, 1 - backIn(q))) },
   { id: "trail", label: "Trail", in: trailIn, out: trailOut },
+  { id: "wipe", label: "Wipe", in: (p) => ({ ...one(0, 1), wipe: [0, inOut(p)] }), out: (q) => ({ ...one(0, 1), wipe: [inOut(q), 1] }) },
 
 ];
 
@@ -113,7 +118,13 @@ export function drawFrame(preset: DrawPreset, t: number, mode: DrawMode, reverse
   else f = t < 0.5 ? preset.in!(seg(t, 0, 0.4)) : preset.out!(seg(t, 0.6, 1));
   if (!reverse) return f;
   const turn = (spans: Span[]) => spans.map(([a, b]) => [1 - b, 1 - a] as Span);
-  return { ...f, spans: turn(f.spans), ghosts: f.ghosts?.map((g) => ({ ...g, spans: turn(g.spans), caps: [g.caps[1], g.caps[0]] })) };
+  return {
+    ...f,
+    anchor: f.anchor === undefined ? undefined : 1 - f.anchor,
+    wipe: f.wipe && ([1 - f.wipe[1], 1 - f.wipe[0]] as Span),
+    spans: turn(f.spans),
+    ghosts: f.ghosts?.map((g) => ({ ...g, spans: turn(g.spans), caps: [g.caps[1], g.caps[0]] })),
+  };
 }
 
 /**
