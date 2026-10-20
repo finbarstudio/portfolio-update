@@ -1325,10 +1325,11 @@ export default function PathwayTool() {
   /**
    * An animated GIF, one per panel, see-through as the Export choice says
    * (Line only: just the line; Line cut out: the background with the line cut
-   * out; Full: solid). It is Canva's way in for see-through animation. GIF has
-   * no partial transparency, so every pixel is either see-through or solid: the
-   * soft edges of the line, its letters and any trail are blended with the
-   * background colour of the colourway, so they look right laid on that colour.
+   * out). Offered only for those two; a solid animation is an MP4. It is Canva's way in for see-through animation. GIF has
+   * no partial transparency, so every pixel is either see-through or solid. A
+   * half-see-through pixel (a soft edge, a trail) keeps its own colour and is
+   * shown or not by a fixed fine pattern, in proportion to how solid it is, so
+   * there is no halo of another colour on any background.
    * 25 frames a second (a GIF counts time in hundredths), 1080px on the long
    * side at most. Colour: one palette of 255 for the whole loop, built from the
    * solid pixels only at full colour depth (5-6-5 bits) so a gradient keeps its
@@ -1348,13 +1349,14 @@ export default function PathwayTool() {
       small.width = gw;
       small.height = gh;
       const sctx = small.getContext("2d", { willReadFrequently: true })!;
-      const matte = (() => {
+      /** the background colour, to seed the palette of a loop with nothing solid in it */
+      const ground = (() => {
         const v = parseInt(colours.bg.replace("#", ""), 16);
         return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
       })();
       const fps = 25;
       const total = Math.max(1, Math.round(loop.secs * fps));
-      /** frame i of a panel: the line on its own, edges blended into the matte, each pixel see-through or solid */
+      /** frame i of a panel, each pixel see-through or solid */
       const frame = (panel: number, i: number) => {
         const t = i / total;
         render(ctx, w, h, short, panel * w, path, lookAt(t, panel), flowAt(t, loop.cycles), textAt(t));
@@ -1362,16 +1364,16 @@ export default function PathwayTool() {
         sctx.drawImage(el, 0, 0, gw, gh);
         const px = sctx.getImageData(0, 0, gw, gh).data;
         for (let p = 0; p < px.length; p += 4) {
-          const a = px[p + 3] / 255;
-          if (a < 0.03) {
+          const q = p >> 2;
+          const cell = BAYER[((Math.floor(q / gw) & 3) << 2) | (q % gw & 3)];
+          if (px[p + 3] / 255 <= (cell + 0.5) / 16) {
             px[p] = px[p + 1] = px[p + 2] = px[p + 3] = 0;
             continue;
           }
-          const q = p >> 2;
-          const dither = (BAYER[((Math.floor(q / gw) & 3) << 2) | (q % gw & 3)] / 16 - 0.47) * 7;
-          px[p] = px[p] * a + matte[0] * (1 - a) + dither;
-          px[p + 1] = px[p + 1] * a + matte[1] * (1 - a) + dither;
-          px[p + 2] = px[p + 2] * a + matte[2] * (1 - a) + dither;
+          const dither = (cell / 16 - 0.47) * 7;
+          px[p] += dither;
+          px[p + 1] += dither;
+          px[p + 2] += dither;
           px[p + 3] = 255;
         }
         return px;
@@ -1390,7 +1392,7 @@ export default function PathwayTool() {
           }
         }
         if (!used) {
-          solid.set([...matte, 255], 0);
+          solid.set([...ground, 255], 0);
           used = 4;
         }
         const colours255 = quantize(solid.subarray(0, used), 255, { format: "rgb565" });
@@ -1416,6 +1418,59 @@ export default function PathwayTool() {
         }
         gif.finish();
         save(new Blob([gif.bytes()], { type: "image/gif" }), fileName(panel, "gif"));
+        await pause(350);
+      }
+    } finally {
+      restart();
+      setProgress(null);
+    }
+  };
+
+  /**
+   * TRIAL (Oct 2026): a see-through WebM, to test whether Canva keeps its
+   * transparency. Chrome's own recorder films the loop as it plays, one pass per
+   * panel, 30 frames a second at 1080px on the long side; WebM (VP9) carries
+   * partial transparency, so soft edges and trails stay soft. It takes as long as
+   * the loop to make. Drop it if Canva turns the background black.
+   */
+  const exportWebm = async () => {
+    if (recording) return;
+    const type = ["video/webm;codecs=vp9", "video/webm;codecs=vp8"].find((t) => MediaRecorder.isTypeSupported(t));
+    if (!type) {
+      window.alert("This browser cannot record WebM. Use Chrome or Edge.");
+      return;
+    }
+    setProgress(0);
+    try {
+      const k = Math.min(1, 1080 / Math.max(w, h));
+      const vw = Math.round(w * k);
+      const vh = Math.round(h * k);
+      const el = document.createElement("canvas");
+      el.width = vw;
+      el.height = vh;
+      const ctx = el.getContext("2d")!;
+      const fps = 30;
+      const total = Math.max(1, Math.round(loop.secs * fps));
+      for (let panel = 0; panel < n; panel++) {
+        const stream = el.captureStream(0);
+        const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack;
+        const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 16_000_000 });
+        const chunks: Blob[] = [];
+        rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+        const done = new Promise((r) => (rec.onstop = r));
+        rec.start();
+        const start = performance.now();
+        for (let i = 0; i <= total; i++) {
+          const t = (i % total) / total;
+          render(ctx, vw, vh, short * k, panel * vw, path, lookAt(t, panel), flowAt(t, loop.cycles), textAt(t));
+          track.requestFrame();
+          setProgress((panel + i / total) / n);
+          const next = start + ((i + 1) * 1000) / fps;
+          while (performance.now() < next) await pause(Math.max(0, next - performance.now() - 2));
+        }
+        rec.stop();
+        await done;
+        save(new Blob(chunks, { type: "video/webm" }), fileName(panel, "webm"));
         await pause(350);
       }
     } finally {
@@ -1631,20 +1686,20 @@ export default function PathwayTool() {
           <button type="button" className="stb-primary stb-pack" onClick={downloadPack} disabled={recording || packing}>
             {packing ? "Making the pack" : "Download pack (zip)"}
           </button>
-          {moving && (
+          {/* a solid export is an MP4; a see-through one a GIF (and the WebM trial) */}
+          {moving && alpha === "none" && (
             <button type="button" className="stb-primary" onClick={exportVideo} disabled={recording}>
               {recording ? `Making the file ${Math.round((progress ?? 0) * 100)}%` : `Download MP4 · ${loopSecs.toFixed(1)}s loop`}
             </button>
           )}
-          {moving && (
-            <button
-              type="button"
-              className="stb-primary stb-has-note"
-              data-note={alpha === "none" ? "Solid. Choose Line only or Line cut out for see-through, for Canva" : "See-through, for Canva"}
-              onClick={exportGif}
-              disabled={recording}
-            >
-              {alpha === "none" ? "Download GIF" : "Download GIF · see-through"}
+          {moving && alpha !== "none" && (
+            <button type="button" className="stb-primary stb-has-note" data-note="See-through, for Canva" onClick={exportGif} disabled={recording}>
+              {recording ? `Making the file ${Math.round((progress ?? 0) * 100)}%` : "Download GIF · see-through"}
+            </button>
+          )}
+          {moving && alpha !== "none" && (
+            <button type="button" className="stb-primary stb-has-note" data-note="Trial: see-through video, to test in Canva" onClick={exportWebm} disabled={recording}>
+              Download WebM · see-through (trial)
             </button>
           )}
           <p className="stb-note">
