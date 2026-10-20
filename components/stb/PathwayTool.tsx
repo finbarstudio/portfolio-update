@@ -475,6 +475,9 @@ function drawLine(ctx: CanvasRenderingContext2D, path: Pathway, S: number, look:
   for (const g of d?.ghosts ?? []) if (g.over) ghost(g);
 }
 
+/** A 4 by 4 ordered dither: the same pattern every frame, so a GIF does not crawl. */
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
 /** Two off-screen canvases, reused frame to frame, cleared and reset on every call. */
 const scratches: HTMLCanvasElement[] = [];
 function scratch(i: number, w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
@@ -1327,7 +1330,10 @@ export default function PathwayTool() {
    * soft edges of the line, its letters and any trail are blended with the
    * background colour of the colourway, so they look right laid on that colour.
    * 25 frames a second (a GIF counts time in hundredths), 1080px on the long
-   * side at most, one palette for the whole loop so colours do not shimmer.
+   * side at most. Colour: one palette of 255 for the whole loop, built from the
+   * solid pixels only at full colour depth (5-6-5 bits) so a gradient keeps its
+   * steps small, plus a fixed fine dither that hides the steps left and holds
+   * still from frame to frame; the 256th entry is the see-through one.
    */
   const exportGif = async () => {
     if (recording) return;
@@ -1361,29 +1367,46 @@ export default function PathwayTool() {
             px[p] = px[p + 1] = px[p + 2] = px[p + 3] = 0;
             continue;
           }
-          px[p] = px[p] * a + matte[0] * (1 - a);
-          px[p + 1] = px[p + 1] * a + matte[1] * (1 - a);
-          px[p + 2] = px[p + 2] * a + matte[2] * (1 - a);
+          const q = p >> 2;
+          const dither = (BAYER[((Math.floor(q / gw) & 3) << 2) | (q % gw & 3)] / 16 - 0.47) * 7;
+          px[p] = px[p] * a + matte[0] * (1 - a) + dither;
+          px[p + 1] = px[p + 1] * a + matte[1] * (1 - a) + dither;
+          px[p + 2] = px[p + 2] * a + matte[2] * (1 - a) + dither;
           px[p + 3] = 255;
         }
         return px;
       };
       for (let panel = 0; panel < n; panel++) {
-        // one palette from frames spread through the loop
-        const samples = 6;
-        const pool = new Uint8ClampedArray(gw * gh * 4 * samples);
-        for (let s = 0; s < samples; s++) pool.set(frame(panel, Math.floor((s / samples) * total)), s * gw * gh * 4);
-        const palette = quantize(pool, 256, { format: "rgba4444", oneBitAlpha: true });
-        const clear = palette.findIndex((c) => c[3] === 0);
+        // one palette from the solid pixels of frames spread through the loop
+        const samples = 8;
+        const solid = new Uint8ClampedArray(Math.ceil((gw * gh) / 3) * 4 * samples + 4);
+        let used = 0;
+        for (let s = 0; s < samples; s++) {
+          const px = frame(panel, Math.floor((s / samples) * total));
+          for (let p = 0; p < px.length; p += 4 * 3) {
+            if (!px[p + 3]) continue;
+            solid.set([px[p], px[p + 1], px[p + 2], 255], used);
+            used += 4;
+          }
+        }
+        if (!used) {
+          solid.set([...matte, 255], 0);
+          used = 4;
+        }
+        const colours255 = quantize(solid.subarray(0, used), 255, { format: "rgb565" });
+        const clear = colours255.length;
+        const palette = [...colours255, [0, 0, 0]];
         const gif = GIFEncoder();
         for (let i = 0; i < total; i++) {
-          const index = applyPalette(frame(panel, i), palette, "rgba4444");
+          const px = frame(panel, i);
+          const index = applyPalette(px, colours255, "rgb565");
+          for (let p = 0; p < index.length; p++) if (!px[p * 4 + 3]) index[p] = clear;
           gif.writeFrame(index, gw, gh, {
             palette: i === 0 ? palette : undefined,
             delay: 1000 / fps,
             repeat: 0,
-            transparent: clear >= 0,
-            transparentIndex: Math.max(0, clear),
+            transparent: true,
+            transparentIndex: clear,
             dispose: 2,
           });
           if (i % 3 === 0) {
