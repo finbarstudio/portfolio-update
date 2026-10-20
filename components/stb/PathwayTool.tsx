@@ -1426,59 +1426,6 @@ export default function PathwayTool() {
     }
   };
 
-  /**
-   * TRIAL (Oct 2026): a see-through WebM, to test whether Canva keeps its
-   * transparency. Chrome's own recorder films the loop as it plays, one pass per
-   * panel, 30 frames a second at 1080px on the long side; WebM (VP9) carries
-   * partial transparency, so soft edges and trails stay soft. It takes as long as
-   * the loop to make. Drop it if Canva turns the background black.
-   */
-  const exportWebm = async () => {
-    if (recording) return;
-    const type = ["video/webm;codecs=vp9", "video/webm;codecs=vp8"].find((t) => MediaRecorder.isTypeSupported(t));
-    if (!type) {
-      window.alert("This browser cannot record WebM. Use Chrome or Edge.");
-      return;
-    }
-    setProgress(0);
-    try {
-      const k = Math.min(1, 1080 / Math.max(w, h));
-      const vw = Math.round(w * k);
-      const vh = Math.round(h * k);
-      const el = document.createElement("canvas");
-      el.width = vw;
-      el.height = vh;
-      const ctx = el.getContext("2d")!;
-      const fps = 30;
-      const total = Math.max(1, Math.round(loop.secs * fps));
-      for (let panel = 0; panel < n; panel++) {
-        const stream = el.captureStream(0);
-        const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack;
-        const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 16_000_000 });
-        const chunks: Blob[] = [];
-        rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
-        const done = new Promise((r) => (rec.onstop = r));
-        rec.start();
-        const start = performance.now();
-        for (let i = 0; i <= total; i++) {
-          const t = (i % total) / total;
-          render(ctx, vw, vh, short * k, panel * vw, path, lookAt(t, panel), flowAt(t, loop.cycles), textAt(t));
-          track.requestFrame();
-          setProgress((panel + i / total) / n);
-          const next = start + ((i + 1) * 1000) / fps;
-          while (performance.now() < next) await pause(Math.max(0, next - performance.now() - 2));
-        }
-        rec.stop();
-        await done;
-        save(new Blob(chunks, { type: "video/webm" }), fileName(panel, "webm"));
-        await pause(350);
-      }
-    } finally {
-      restart();
-      setProgress(null);
-    }
-  };
-
   const go = (to: number) => setSlide(Math.max(0, Math.min(n - 1, to)));
 
   return (
@@ -1686,7 +1633,8 @@ export default function PathwayTool() {
           <button type="button" className="stb-primary stb-pack" onClick={downloadPack} disabled={recording || packing}>
             {packing ? "Making the pack" : "Download pack (zip)"}
           </button>
-          {/* a solid export is an MP4; a see-through one a GIF (and the WebM trial) */}
+          {/* a solid animation is an MP4; a see-through one a GIF, since Canva turns
+              any uploaded video's transparency black (a WebM trial did, Oct 2026) */}
           {moving && alpha === "none" && (
             <button type="button" className="stb-primary" onClick={exportVideo} disabled={recording}>
               {recording ? `Making the file ${Math.round((progress ?? 0) * 100)}%` : `Download MP4 · ${loopSecs.toFixed(1)}s loop`}
@@ -1695,11 +1643,6 @@ export default function PathwayTool() {
           {moving && alpha !== "none" && (
             <button type="button" className="stb-primary stb-has-note" data-note="See-through, for Canva" onClick={exportGif} disabled={recording}>
               {recording ? `Making the file ${Math.round((progress ?? 0) * 100)}%` : "Download GIF · see-through"}
-            </button>
-          )}
-          {moving && alpha !== "none" && (
-            <button type="button" className="stb-primary stb-has-note" data-note="Trial: see-through video, to test in Canva" onClick={exportWebm} disabled={recording}>
-              Download WebM · see-through (trial)
             </button>
           )}
           <p className="stb-note">
