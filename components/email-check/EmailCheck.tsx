@@ -59,6 +59,9 @@ const WIDTHS = [
   { label: "Wide", value: 1000 },
   { label: "Fill", value: 0 },
 ];
+/** Dragging the preview's edge or the width slider stays between the narrowest and widest preset. */
+const MIN_WIDTH = 375;
+const MAX_WIDTH = 1000;
 
 type DarkMode = "off" | "scheme" | "invert";
 const DARK_MODES: { value: DarkMode; label: string }[] = [
@@ -632,6 +635,33 @@ export default function EmailCheck() {
     field.setSelectionRange(start, start + (lines[line - 1]?.length ?? 0));
     field.scrollTop = Math.max(0, ((line - 1) / lines.length) * field.scrollHeight - field.clientHeight / 2);
   };
+  // A new width reflows the email: measure again once it settles.
+  useEffect(() => {
+    const id = window.setTimeout(measure, 150);
+    return () => window.clearTimeout(id);
+    // measure reads the frame as it is; only the width matters here
+  }, [width]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** Drag the preview's right edge: the frame is centred, so it grows by twice the pointer's move. */
+  const resizeFrom = (e: React.PointerEvent<HTMLSpanElement>) => {
+    e.preventDefault();
+    const handle = e.currentTarget;
+    try {
+      handle.setPointerCapture(e.pointerId); // keeps the drag when the pointer runs off the thin handle
+    } catch {}
+    const startX = e.clientX;
+    const startW = frameRef.current?.getBoundingClientRect().width ?? (width || MAX_WIDTH);
+    const move = (ev: PointerEvent) => setWidth(Math.round(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startW + (ev.clientX - startX) * 2))));
+    const up = () => {
+      handle.removeEventListener("pointermove", move);
+      handle.removeEventListener("pointerup", up);
+      handle.removeEventListener("pointercancel", up);
+    };
+    handle.addEventListener("pointermove", move);
+    handle.addEventListener("pointerup", up);
+    handle.addEventListener("pointercancel", up);
+  };
+
   const onFrameLoad = () => {
     frameRef.current?.contentDocument?.addEventListener("click", onPreviewClick);
     measure();
@@ -1401,6 +1431,18 @@ export default function EmailCheck() {
                 </button>
               ))}
             </div>
+            <label className="ec-width" title={`Drag to any width from ${MIN_WIDTH} to ${MAX_WIDTH}px, or drag the preview's right edge`}>
+              <input
+                type="range"
+                min={MIN_WIDTH}
+                max={MAX_WIDTH}
+                step={1}
+                value={width || MAX_WIDTH}
+                aria-label="Preview width in pixels"
+                onChange={(e) => setWidth(Number(e.target.value))}
+              />
+              <output>{width ? `${width}px` : "fill"}</output>
+            </label>
             <div className="ec-chips" role="group" aria-label="Colour scheme">
               {DARK_MODES.map((m) => (
                 <button key={m.value} type="button" aria-pressed={dark === m.value} onClick={() => setDark(m.value)} title={DARK_TIPS[m.value]}>
@@ -1545,6 +1587,7 @@ export default function EmailCheck() {
         )}
         <div className="ec-stage">
           {hasSource && (
+            <div className="ec-frame" style={{ width: width ? undefined : "100%" }}>
             <iframe
               ref={frameRef}
               title="Email preview"
@@ -1555,6 +1598,8 @@ export default function EmailCheck() {
               className={inspect ? "ec-inspecting" : undefined}
               style={{ width: width ? `${width}px` : "100%", filter: VISIONS.find((v) => v.value === vision)?.filter || undefined }}
             />
+              <span className="ec-resize" onPointerDown={resizeFrom} title={`Drag to resize, ${MIN_WIDTH} to ${MAX_WIDTH}px`} aria-hidden="true" />
+            </div>
           )}
           <svg className="ec-filters" aria-hidden="true" focusable="false">
             <filter id="ec-protan" colorInterpolationFilters="sRGB">
