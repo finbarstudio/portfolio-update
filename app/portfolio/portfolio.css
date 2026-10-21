@@ -298,6 +298,10 @@ body:has(.pf) { background: #1a1a1a; }
 /* an image's Midjourney prompt, laid over a full-bleed page at the bottom left (Palms Motel); under the picture on a phone */
 .pf-prompt { position: absolute; left: calc(var(--u) * 2.6); bottom: calc(var(--u) * 2.2); font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; z-index: 2; max-width: min(44em, 56%); margin: 0; padding: 0.9em 1.1em; background: rgba(0, 0, 0, 0.74); color: #f3f1ee; border-radius: 3px; font-family: var(--font-mono); font-size: max(calc(var(--u) * 0.82), 11px); line-height: 1.5; letter-spacing: 0.01em; text-wrap: pretty; }
 .pf-prompt-label { display: block; margin-bottom: 0.5em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(243, 241, 238, 0.6); }
+/* the PDF's pointer to the live portfolio, at the foot of the cover (print only) */
+.pf-print-only { display: none; }
+.pf-online { position: absolute; left: calc(var(--u) * 2.6); right: calc(var(--u) * 2.6); bottom: calc(var(--u) * 2.4); margin: 0; justify-content: space-between; align-items: baseline; color: var(--soft); }
+.pf-online a { color: var(--ink); }
 /* a project's skill tags, in the nav tooltip's style (Download CV's hover, .nav-tip in globals.css), a size up */
 .pf-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 0.5em; margin: 0; padding: 0; }
 .pf-tags > span { background: #000; color: var(--ink); border: 1px solid var(--ink); border-radius: 3px; padding: 0.55em 0.55em; font-family: var(--font-mono); font-weight: 400; font-size: max(calc(var(--u) * 0.85), 12px); letter-spacing: 0.06em; text-transform: uppercase; line-height: 1; white-space: nowrap; text-box: trim-both cap alphabetic; }
@@ -767,6 +771,7 @@ html[data-pf-theme="light"] .pf-chrome {
   .pf-chrome, nextjs-portal, .pf-sound, .pf-play, .pf-hint, .pf-load, .pf-print-hide { display: none !important; }
   /* the contents switch keeps its cell in the header row, so the page number stays at the right edge */
   .pf-index-switch.pf-print-hide { display: block !important; visibility: hidden; }
+  .pf-print-only { display: flex; }
   /* a plain column: Chrome ignores page breaks between the items of a flex column */
   body:has(.pf) { margin: 0; }
   .pf { display: block; padding: 0; }

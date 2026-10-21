@@ -142,6 +142,11 @@ function SlideView({ s, chap, page, chapters }: { s: Slide; chap?: Chapter; page
               <span className="pf-name-l"><Kerned text="Finbar" /></span>
               <span className="pf-name-r"><Kerned text="Skitini" /></span>
             </h1>
+            {/* the PDF only: the live version, where the clips play and the 3D moves */}
+            <p className="pf-online pf-print-only pf-mono">
+              Best seen online, where the videos play and the 3D moves
+              <a href="https://portfolio.finbar.studio" target="_blank" rel="noopener noreferrer">View the portfolio<MdArrowOutward className="pf-arrow" /></a>
+            </p>
           </div>
         </section>
       );
