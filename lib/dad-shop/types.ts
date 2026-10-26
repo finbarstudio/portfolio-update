@@ -156,25 +156,28 @@ export interface FindFilters {
 
 export const PAGE_SIZE = 30;
 
-/** Store sections in the order you walk Sainsbury's. Unknown ones sort after. */
+/** Store sections (Sainsbury's own section names) in the order you walk the shop. Unknown ones sort after. */
 export const ZONE_ORDER = [
-  "Fruit & vegetables",
+  "Fruit and vegetables",
   "Bakery",
   "Meat & fish",
-  "Dairy eggs & chilled",
-  "Frozen",
+  "Chilled food",
+  "Dietary & world foods",
   "Food cupboard",
-  "Drinks",
+  "Snacks, sweets and treats",
+  "Hot drinks, soft drinks & water",
+  "Frozen",
+  "Beer, wine and spirits",
 ] as const;
 
-/** Where Find's section dropdown starts: the food sections we seed. */
+/** Where Find's section dropdown starts if the database can't list its sections. */
 export const FOOD_ZONES = [
-  "Meat & fish",
-  "Dairy eggs & chilled",
-  "Fruit & vegetables",
+  "Fruit and vegetables",
   "Bakery",
-  "Frozen",
+  "Meat & fish",
+  "Chilled food",
   "Food cupboard",
+  "Frozen",
 ] as const;
 
 export const BASE_PATH = "/dadshop";
