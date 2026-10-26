@@ -1,0 +1,942 @@
+/*
+ * Dad's shop (lab.finbar.studio/dads-shop-k7q2). Everything is scoped to
+ * .ds-app and every class starts with `ds-`. Light theme, big type, 48px
+ * touch targets, phone first. Covers the whole screen like the email tool,
+ * so the lab's black chrome never shows.
+ */
+
+/* lab.css paints html and body black while a .lb-root is on the page; this
+   page is light, so the rubber-band gap on a phone must be light too. The
+   doubled :has() outranks lab.css's rule whatever order the files load in. */
+html:has(.lb-root):has(.ds-app),
+body:has(.lb-root):has(.ds-app) {
+  background: #f7f6f2;
+}
+
+.ds-app {
+  --ds-bg: #f7f6f2;
+  --ds-card: #ffffff;
+  --ds-ink: #17181a;
+  --ds-soft: #555a61;
+  --ds-line: #d6d5cf;
+  --ds-green: #146c34;
+  --ds-green-bg: #e3f4e8;
+  --ds-amber: #6b4200;
+  --ds-amber-bg: #fdf0d0;
+  --ds-red: #a8201a;
+  --ds-red-bg: #fbe4e1;
+  --ds-grey-bg: #ececea;
+  --ds-link: var(--ds-ink);
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+  color-scheme: light;
+  font: 400 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+.ds-app *,
+.ds-app *::before,
+.ds-app *::after {
+  box-sizing: border-box;
+}
+
+/* lab.css pads every main in the lab and styles every link; undo both here.
+   Links take their colour from --ds-link so a class can set it without
+   fighting lab.css's `.lb-root a:hover` on specificity. */
+.lb-root .ds-app .ds-main {
+  padding-bottom: 0;
+}
+.lb-root .ds-app a,
+.lb-root .ds-app a:hover {
+  color: var(--ds-link, inherit);
+  text-decoration: none;
+}
+
+.ds-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ds-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+}
+
+.ds-app :focus-visible {
+  outline: 3px solid #1a5fd0;
+  outline-offset: 2px;
+}
+
+/* ── Type ───────────────────────────────────────────────────────────── */
+.ds-h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+.ds-h1--product {
+  font-size: 24px;
+  margin: 2px 0 6px;
+}
+.ds-h2 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+/* :where() keeps this at zero specificity so any ds- class can set its own margin */
+:where(.ds-app) p {
+  margin: 0 0 10px;
+}
+.ds-muted {
+  color: var(--ds-soft);
+}
+.ds-hint {
+  margin: 8px 0 0;
+  font-size: 16px;
+  min-height: 1.4em;
+}
+.ds-error {
+  color: var(--ds-red);
+  font-weight: 600;
+}
+.ds-note {
+  margin-top: 4px;
+}
+.ds-loading {
+  padding: 24px 0;
+}
+.ds-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* ── Buttons, fields ────────────────────────────────────────────────── */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--ds-card);
+  color: var(--ds-ink);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ds-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+.ds-btn--primary {
+  background: var(--ds-green);
+  color: #fff;
+  --ds-link: #fff;
+}
+.ds-btn--ghost {
+  border-color: var(--ds-line);
+  background: var(--ds-card);
+}
+.ds-btn--ghost.is-on {
+  border-color: var(--ds-red);
+  background: var(--ds-red-bg);
+  color: var(--ds-red);
+}
+.ds-btn--danger {
+  background: var(--ds-red);
+  color: #fff;
+}
+.ds-btn--done {
+  background: var(--ds-green-bg);
+  color: var(--ds-green);
+  border-color: var(--ds-green);
+  opacity: 1 !important;
+}
+.ds-btn--wide {
+  display: flex;
+  width: 100%;
+  margin-top: 10px;
+}
+.ds-btn--big {
+  min-height: 56px;
+  font-size: 19px;
+}
+
+.ds-label {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ds-soft);
+}
+.ds-input,
+.ds-select {
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 14px;
+  border: 2px solid var(--ds-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ds-ink);
+  font: inherit;
+  /* 16px+ stops iOS zooming the page when the field is tapped */
+  font-size: 17px;
+}
+.ds-input:focus,
+.ds-select:focus {
+  border-color: var(--ds-green);
+}
+
+.ds-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ds-field {
+  display: block;
+}
+
+/* ── Banners, empty states ──────────────────────────────────────────── */
+.ds-banner {
+  margin: 10px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border-left: 6px solid;
+}
+.ds-banner--amber {
+  background: var(--ds-amber-bg);
+  border-color: #b36b00;
+  color: var(--ds-amber);
+}
+.ds-banner > strong {
+  display: block;
+  margin-bottom: 2px;
+}
+.ds-warnings {
+  margin: 4px 0 0;
+  padding-left: 20px;
+}
+.ds-empty {
+  margin: 24px 0;
+  padding: 24px 18px;
+  border: 2px dashed var(--ds-line);
+  border-radius: 14px;
+  text-align: center;
+}
+.ds-empty-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ── Save status ────────────────────────────────────────────────────── */
+.ds-status {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: right;
+}
+.ds-status--saved {
+  color: var(--ds-green);
+}
+.ds-status--saving {
+  color: var(--ds-soft);
+}
+.ds-status--offline {
+  color: var(--ds-amber);
+  background: var(--ds-amber-bg);
+  padding: 4px 10px;
+  border-radius: 10px;
+  max-width: 60%;
+}
+
+/* ── Add item ───────────────────────────────────────────────────────── */
+.ds-add {
+  margin-bottom: 16px;
+}
+.ds-add-row {
+  display: flex;
+  gap: 8px;
+}
+.ds-add-row .ds-btn {
+  flex: none;
+}
+.ds-suggest {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  background: #fff;
+}
+.ds-suggest .ds-muted {
+  margin: 4px 6px 8px;
+}
+.ds-suggest-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ds-suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ds-suggest-item:hover {
+  background: var(--ds-bg);
+}
+.ds-suggest-name {
+  flex: 1;
+  min-width: 0;
+}
+.ds-suggest-price {
+  flex: none;
+  font-weight: 700;
+}
+
+/* ── Pictures ───────────────────────────────────────────────────────── */
+.ds-img {
+  flex: none;
+  display: block;
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+  background: var(--ds-grey-bg);
+  object-fit: contain;
+}
+.ds-img--sm {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+}
+.ds-img--hero {
+  width: 100%;
+  height: auto;
+  max-width: 320px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 16px;
+}
+.ds-img--empty {
+  display: grid;
+  place-items: center;
+  color: #8a8f96;
+}
+.ds-hero {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 14px;
+}
+
+/* ── List ───────────────────────────────────────────────────────────── */
+.ds-group {
+  margin-bottom: 18px;
+}
+.ds-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--ds-card);
+  border: 1px solid var(--ds-line);
+  border-radius: 14px;
+}
+.ds-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--ds-line);
+}
+.ds-row:last-child {
+  border-bottom: 0;
+}
+.ds-check {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #7b8088;
+  border-radius: 14px;
+  background: #fff;
+  color: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ds-check[aria-checked="true"] {
+  border-color: var(--ds-green);
+  background: var(--ds-green);
+  color: #fff;
+}
+.ds-row-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ds-row-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.ds-row-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--ds-soft);
+  font-size: 16px;
+}
+.ds-row.is-done .ds-row-name {
+  color: var(--ds-soft);
+  text-decoration: line-through;
+}
+.ds-step {
+  display: flex;
+  align-items: center;
+}
+.ds-step-btn {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ds-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ds-ink);
+  font: inherit;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+.ds-step-btn--bin {
+  color: var(--ds-red);
+}
+.ds-step-qty {
+  min-width: 32px;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 420px) {
+  /* narrow phones: the stepper drops under the name so the name stays readable */
+  .ds-step {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+}
+
+.ds-trolley {
+  margin-bottom: 16px;
+}
+.ds-trolley-sum {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 4px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ds-confirm {
+  margin-top: 10px;
+  padding: 12px;
+  border: 2px solid var(--ds-red);
+  border-radius: 12px;
+  background: var(--ds-red-bg);
+}
+.ds-confirm-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ds-total {
+  position: sticky;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--ds-ink);
+  color: #fff;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.2);
+}
+.ds-total-note {
+  opacity: 0.8;
+  font-size: 15px;
+}
+
+/* ── Badges ─────────────────────────────────────────────────────────── */
+.ds-fit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 2px 2px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ds-fit-num {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #fff;
+}
+.ds-fit--good {
+  background: var(--ds-green-bg);
+  color: #0f5a2b;
+}
+.ds-fit--good .ds-fit-num {
+  background: var(--ds-green);
+}
+.ds-fit--ok {
+  background: var(--ds-amber-bg);
+  color: var(--ds-amber);
+}
+.ds-fit--ok .ds-fit-num {
+  background: #8f5700;
+}
+.ds-fit--poor {
+  background: var(--ds-red-bg);
+  color: #8f1a14;
+}
+.ds-fit--poor .ds-fit-num {
+  background: var(--ds-red);
+}
+.ds-fit--none {
+  background: var(--ds-grey-bg);
+  color: #4a4f55;
+}
+.ds-fit--none .ds-fit-num {
+  background: #6b7078;
+}
+
+.ds-stars {
+  color: #b36b00;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.ds-stars-off {
+  color: #6b7078;
+}
+.ds-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ds-tag--red {
+  background: var(--ds-red-bg);
+  color: var(--ds-red);
+}
+.ds-tag--amber {
+  background: var(--ds-amber-bg);
+  color: var(--ds-amber);
+}
+.ds-tag--grey {
+  background: var(--ds-grey-bg);
+  color: #4a4f55;
+}
+
+/* ── Find ───────────────────────────────────────────────────────────── */
+.ds-search {
+  margin-bottom: 10px;
+}
+.ds-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ds-chip {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 2px solid var(--ds-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ds-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ds-chip.is-on {
+  border-color: var(--ds-green);
+  background: var(--ds-green-bg);
+  color: #0f5a2b;
+}
+.ds-chip.is-on::before {
+  content: "✓ ";
+}
+.ds-selects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ds-results {
+  transition: opacity 120ms ease;
+}
+.ds-results.is-pending {
+  opacity: 0.55;
+}
+.ds-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ds-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--ds-line);
+  border-radius: 14px;
+  background: var(--ds-card);
+}
+.ds-card.is-muted {
+  opacity: 0.75;
+}
+.ds-card-main {
+  display: flex;
+  flex: 1 1 240px;
+  gap: 12px;
+  min-width: 0;
+}
+.ds-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.ds-card-name {
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.ds-card-price strong {
+  font-size: 19px;
+}
+.ds-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 15px;
+}
+.ds-card-add {
+  flex: 1 1 100%;
+}
+@media (min-width: 520px) {
+  .ds-card-add {
+    flex: 0 0 auto;
+    min-width: 108px;
+  }
+}
+.ds-offer {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 1px 8px;
+  border-radius: 8px;
+  background: var(--ds-green-bg);
+  color: #0f5a2b;
+  font-size: 15px;
+  font-weight: 700;
+}
+.ds-offer--big {
+  padding: 4px 12px;
+  font-size: 17px;
+}
+.ds-reason {
+  color: var(--ds-soft);
+  font-size: 16px;
+}
+
+/* ── Product sheet ──────────────────────────────────────────────────── */
+.ds-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 12px 0 0;
+  border: 0;
+  background: none;
+  color: var(--ds-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ds-price {
+  margin: 0 0 6px;
+}
+.ds-price strong {
+  font-size: 26px;
+}
+.ds-block {
+  margin: 18px 0;
+}
+.ds-fit-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 8px;
+}
+.ds-fit-row .ds-fit {
+  font-size: 19px;
+}
+.ds-fit-row .ds-fit-num {
+  width: 36px;
+  height: 36px;
+}
+.ds-reasons {
+  margin: 0;
+  padding-left: 22px;
+}
+.ds-seedbox {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 14px 0;
+  padding: 12px 14px;
+  border-left: 6px solid;
+  border-radius: 12px;
+}
+.ds-seedbox--red {
+  background: var(--ds-red-bg);
+  border-color: var(--ds-red);
+  color: #7d1510;
+}
+.ds-seedbox--amber {
+  background: var(--ds-amber-bg);
+  border-color: #b36b00;
+  color: var(--ds-amber);
+}
+.ds-seedbox--green {
+  background: var(--ds-green-bg);
+  border-color: var(--ds-green);
+  color: #0f5a2b;
+}
+.ds-seedbox--grey {
+  background: var(--ds-grey-bg);
+  border-color: #7b8088;
+  color: #3f444a;
+}
+.ds-rate {
+  display: flex;
+  gap: 2px;
+}
+.ds-rate-star {
+  width: 52px;
+  height: 52px;
+  border: 0;
+  background: none;
+  color: #6b7078;
+  font-size: 38px;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ds-rate-star.is-on {
+  color: #b36b00;
+}
+.ds-actions {
+  margin: 18px 0;
+}
+.ds-actions .ds-link {
+  display: inline-block;
+  margin-top: 8px;
+}
+.ds-link,
+.ds-foot a {
+  --ds-link: var(--ds-green);
+  font-weight: 600;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+.ds-nutri {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ds-nutri th,
+.ds-nutri td {
+  padding: 10px 6px;
+  border-bottom: 1px solid var(--ds-line);
+  text-align: left;
+  font-weight: 400;
+}
+.ds-nutri td:nth-child(2) {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ds-nutri td:nth-child(3) {
+  width: 36%;
+}
+.ds-nutri .is-sub th {
+  padding-left: 20px;
+  color: var(--ds-soft);
+}
+.ds-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.ds-light-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6b7078;
+}
+.ds-light--green {
+  color: #0f5a2b;
+}
+.ds-light--green .ds-light-dot {
+  background: #1a8a44;
+}
+.ds-light--amber {
+  color: var(--ds-amber);
+}
+.ds-light--amber .ds-light-dot {
+  background: #e09a1a;
+}
+.ds-light--red {
+  color: var(--ds-red);
+}
+.ds-light--red .ds-light-dot {
+  background: var(--ds-red);
+}
+.ds-ingredients {
+  overflow-wrap: anywhere;
+}
+.ds-seed {
+  padding: 0 3px;
+  border-radius: 4px;
+  background: var(--ds-red-bg);
+  color: #7d1510;
+  font-weight: 700;
+}
+.ds-foot {
+  margin-top: 24px;
+  font-size: 16px;
+}
+
+/* ── This week ──────────────────────────────────────────────────────── */
+.ds-summary {
+  margin: 18px 0 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--ds-line);
+  border-radius: 14px;
+  background: var(--ds-card);
+}
+.ds-summary-big strong {
+  font-size: 30px;
+}
+.ds-meter {
+  height: 12px;
+  margin: 6px 0 12px;
+  border-radius: 6px;
+  background: var(--ds-grey-bg);
+  overflow: hidden;
+}
+.ds-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--ds-green);
+}
+.ds-card--basket {
+  flex-wrap: nowrap;
+}
+
+/* ── Bottom tabs ────────────────────────────────────────────────────── */
+.ds-tabs {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--ds-line);
+  background: #fff;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.ds-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 62px;
+  padding: 6px 2px;
+  font-size: 15px;
+  font-weight: 600;
+  --ds-link: var(--ds-soft);
+  -webkit-tap-highlight-color: transparent;
+}
+.ds-tab.is-active {
+  --ds-link: var(--ds-green);
+  box-shadow: inset 0 3px 0 var(--ds-green);
+}
+
+/* ── Motion: honour the system setting ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ds-app *,
+  .ds-app *::before,
+  .ds-app *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
