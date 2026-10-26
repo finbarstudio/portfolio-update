@@ -212,7 +212,47 @@ export function parseFindParams(params: URLSearchParams): Result<FindFilters> {
     hideOwn: flag(params.get("hideOwn")),
     hideSingle: flag(params.get("hideSingle")),
     tasteDiff: flag(params.get("ttd")),
+    onOffer: flag(params.get("offer")),
   });
+}
+
+/** What a product page's "Similar products" start as: no filters on (the point is to compare everything), best overall. */
+export const SIMILAR_DEFAULTS: FindFilters = {
+  q: "",
+  view: "all",
+  coll: "",
+  zone: "",
+  dept: "",
+  cat: "",
+  animal: "",
+  sort: "best",
+  page: 0,
+  noSeedOil: false,
+  good: false,
+  frozen: false,
+  rated: false,
+  onList: false,
+  fewIngredients: false,
+  hideSat: false,
+  hideOwn: false,
+  hideSingle: false,
+  tasteDiff: false,
+  onOffer: false,
+};
+
+const SIMILAR_KEYS = ["sort", "noSeedOil", "hideSat", "good", "frozen", "rated", "onList", "few", "hideOwn", "hideSingle", "ttd", "offer"] as const;
+
+/** Only the sort and the switches are read; search, category and page never apply to a product page. */
+export function parseSimilarParams(raw: Record<string, string | string[] | undefined>): FindFilters {
+  const params = new URLSearchParams();
+  for (const k of SIMILAR_KEYS) {
+    const v = raw[k];
+    const first = Array.isArray(v) ? v[0] : v;
+    if (typeof first === "string") params.set(k, first);
+  }
+  if (!params.has("sort")) params.set("sort", "best");
+  const parsed = parseFindParams(params);
+  return parsed.ok ? parsed.value : SIMILAR_DEFAULTS;
 }
 
 /** Rows per request: Find uses a full page, the add-item dropdown asks for fewer. */

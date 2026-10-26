@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import CardWhy, { type WhyKind } from "./CardWhy";
 import QuickRate from "./QuickRate";
-import { gbp, groupPromo, pctOff, satTone, shortName } from "@/lib/dad-shop/format";
-import { offerLabel, priceView, tidyMoney, type GroupInfo } from "@/lib/dad-shop/pricing";
+import { gbp, satTone, shortName } from "@/lib/dad-shop/format";
+import { priceView, tidyMoney, type GroupInfo } from "@/lib/dad-shop/pricing";
+import { offerPill } from "@/lib/dad-shop/similar";
 import { BASE_PATH, type DealLink, type ListItem, type ProductCard } from "@/lib/dad-shop/types";
 import type { ListStore } from "./listStore";
 import { GroupTag, ProductImage } from "./ui";
@@ -28,6 +29,8 @@ interface Props {
   deal?: DealLink | null;
   /** On a meal deal's own page the "meal deal" pill would point at itself. */
   inMealPage?: boolean;
+  /** The product whose page this is, pinned first among its similar products. */
+  isMe?: boolean;
 }
 
 /** Only the deal this card is shown in is known here; the server fills in the rest on the next read of the list. */
@@ -43,7 +46,7 @@ const band = (n: number | null): string => (n == null ? "n" : n >= 7 ? "g" : n >
  * pill, three key facts, Fit and Value badges (tap one for the working), and a
  * bottom row of stars and Add. Built to work at about 170px wide on a phone.
  */
-export default function ProductTile({ p, now, store, mine, group, why, rank, swap, deal, inMealPage = false }: Props) {
+export default function ProductTile({ p, now, store, mine, group, why, rank, swap, deal, inMealPage = false, isMe = false }: Props) {
   const [open, setOpen] = useState<WhyKind | null>(null);
   const panelId = useId();
   const card = useRef<HTMLLIElement>(null);
@@ -56,24 +59,16 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
   }, [open]);
   const row = mine.get(p.id);
   const pv = priceView(p, now);
-  const multi = groupPromo(p, now);
-  const mealPromo = p.promos.find((x) => x.kind === "mealdeal");
-  const off = pctOff(p);
   const sat = satTone(p.sat);
   const paid = p.paidBefore;
   const nowEach = pv.nowPence / 100;
   const paidMove = paid ? Math.round((nowEach - paid.each) * 100) : 0;
   const href = `${BASE_PATH}/p/${encodeURIComponent(p.id)}`;
-  const offerHref = multi ? `${BASE_PATH}/offer/${encodeURIComponent(multi.uid)}` : null;
   const fit = p.fit != null ? Math.round(p.fit) : null;
   const val = p.value != null ? Math.round(p.value) : null;
 
   // The one pill: a multi-buy, else a meal deal, else the size of the cut.
-  let pill: { text: string; href: string | null; tone: "offer" | "off" } | null = null;
-  if (multi && offerHref) pill = { text: tidyMoney(offerLabel(multi)), href: offerHref, tone: "offer" };
-  else if (mealPromo && !inMealPage) pill = { text: "Meal deal", href: `${BASE_PATH}/meal/${encodeURIComponent(mealPromo.uid)}`, tone: "offer" };
-  else if (off != null) pill = { text: `−${off}%`, href: null, tone: "off" };
-  else if (pv.cut) pill = { text: "Offer", href: null, tone: "off" };
+  const pill = offerPill(p, now, inMealPage);
 
   // The key facts, each coloured, most important first: how plain it is (ingredients, ultra-processing
   // markers), seed oils, then protein. Saturated fat only shows when it is not low; the breakdown has the rest.
@@ -133,12 +128,12 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
   }
 
   return (
-    <li ref={card} className={`ds-pcard${p.notAtStore ? " is-muted" : ""}${row ? " is-added" : ""}${open ? " is-open" : ""}`}>
+    <li ref={card} className={`ds-pcard${p.notAtStore ? " is-muted" : ""}${row ? " is-added" : ""}${open ? " is-open" : ""}${isMe ? " is-me" : ""}`}>
       <div className="ds-pcard-imgwrap">
         <Link href={href} className="ds-pcard-imglink" aria-label={`${p.name}: open`}>
           <ProductImage src={p.imageUrl} className="ds-img--card" />
         </Link>
-        {rank && <span className="ds-rank">{rank}</span>}
+        {(rank || isMe) && <span className={`ds-rank${isMe ? " ds-rank--me" : ""}`}>{isMe ? `This one${rank ? ` · ${rank.replace(" best overall", "")}` : ""}` : rank}</span>}
         {p.isNew && <span className="ds-newtag">New</span>}
         {pill &&
           (pill.href ? (

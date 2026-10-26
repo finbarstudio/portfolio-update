@@ -38,6 +38,7 @@ const DEFAULTS: FindFilters = {
   hideOwn: false,
   hideSingle: false,
   tasteDiff: false,
+  onOffer: false,
 };
 
 /**

@@ -26,6 +26,7 @@ export function queryFor(f: FindFilters): string {
   if (f.hideOwn) p.set("hideOwn", "1");
   if (f.hideSingle) p.set("hideSingle", "1");
   if (f.tasteDiff) p.set("ttd", "1");
+  if (f.onOffer) p.set("offer", "1");
   if (f.page > 0) p.set("page", String(f.page));
   return p.toString();
 }

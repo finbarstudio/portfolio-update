@@ -2544,3 +2544,427 @@ button.ds-fact::before {
   background: var(--ds-r);
   color: #fff;
 }
+
+/* ── Product page: a compact summary, then Similar products ─────────────
+   The page is wide so the similar products can be 3 across; the summary and
+   the details below keep a readable column of their own. */
+.ds-sheet-main {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.ds-sum {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 2px 0 10px;
+}
+.ds-img.ds-img--sum {
+  width: 96px;
+  height: 96px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.ds-sum-main {
+  flex: 1;
+  min-width: 0;
+}
+.ds-sum-brand {
+  margin: 0;
+  font-size: 15px;
+}
+.ds-sum-main .ds-h1--product {
+  font-size: 20px;
+  line-height: 1.25;
+}
+.ds-sum-main .ds-price {
+  margin: 4px 0 0;
+}
+.ds-scores--sum {
+  max-width: 320px;
+  margin-bottom: 6px;
+}
+
+.ds-simsec {
+  margin: 20px 0 26px;
+  padding-top: 14px;
+  border-top: 2px solid var(--ds-line);
+}
+.ds-sim-h {
+  margin: 0;
+}
+.ds-sim-scope {
+  margin: 2px 0 10px;
+}
+.ds-sim-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ds-seg--sim {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+.ds-seg--sim button {
+  padding: 0 16px;
+}
+.ds-ctl--sim {
+  flex: 1 1 auto;
+}
+.ds-sim-count {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 6px 0 12px;
+  font-size: 16px;
+}
+.ds-sim-rank {
+  color: var(--ds-ink);
+}
+.ds-linkbtn--inline {
+  position: relative;
+  display: inline;
+  min-height: 0;
+  padding: 0 2px;
+  vertical-align: baseline;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* a 48px-tall tap area around the words */
+.ds-linkbtn--inline::before {
+  content: "";
+  position: absolute;
+  inset: -14px -8px;
+}
+.ds-pcard.is-me {
+  border-color: var(--ds-accent);
+  box-shadow: 0 0 0 2px var(--ds-accent);
+}
+.ds-rank.ds-rank--me {
+  background: var(--ds-accent);
+}
+
+/* Compare: one aligned line (two on a phone) per product. The same column
+   template drives the header and every row, so the numbers line up. */
+.ds-cmp {
+  overflow: hidden;
+  border: 1px solid var(--ds-line);
+  border-radius: 14px;
+  background: var(--ds-card);
+}
+.ds-cmp-head,
+.ds-cmp-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1.25fr) minmax(0, 1.35fr) minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 0.75fr) minmax(0, 0.75fr) minmax(0, 0.5fr);
+  grid-template-areas:
+    "img name name name name offer offer offer"
+    "img price unit prot sat ingr upf oil";
+  align-items: center;
+  column-gap: 4px;
+  padding: 8px 8px;
+}
+.ds-cmp-head {
+  grid-template-areas: ". price unit prot sat ingr upf oil";
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--ds-line);
+  background: var(--ds-bg);
+  color: var(--ds-soft);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.ds-cmp-h--name,
+.ds-cmp-h--offer {
+  display: none;
+}
+.ds-cmp-h--price {
+  grid-area: price;
+  text-align: left;
+}
+.ds-cmp-h--perkg {
+  grid-area: unit;
+}
+.ds-cmp-h--protein {
+  grid-area: prot;
+}
+.ds-cmp-h--sat {
+  grid-area: sat;
+}
+.ds-cmp-h--ingr {
+  grid-area: ingr;
+}
+.ds-cmp-h--upf {
+  grid-area: upf;
+}
+.ds-cmp-h--oil {
+  grid-area: oil;
+}
+.ds-cmp-long {
+  display: none;
+}
+.ds-cmp-row {
+  position: relative;
+  min-height: 60px;
+  row-gap: 4px;
+  border-top: 1px solid var(--ds-line);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+.ds-cmp-head + .ds-cmp-row {
+  border-top: 0;
+}
+.ds-cmp-row.is-me {
+  background: var(--ds-sel);
+  box-shadow: inset 4px 0 0 var(--ds-accent);
+}
+.ds-cmp-row.is-muted {
+  opacity: 0.75;
+}
+.ds-cmp-img {
+  grid-area: img;
+  align-self: center;
+}
+.ds-img.ds-img--cmp {
+  width: 44px;
+  height: 44px;
+  padding: 2px;
+  border-radius: 8px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.ds-cmp-name {
+  grid-area: name;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  text-align: left;
+}
+.ds-cmp-link {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ds-ink);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+}
+/* the whole row is the link */
+.ds-cmp-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.ds-cmp-me {
+  flex: none;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--ds-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.ds-cmp-price {
+  grid-area: price;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  text-align: left;
+}
+.ds-cmp-price strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+.ds-cmp-price s {
+  color: var(--ds-soft);
+  font-size: 11px;
+  font-weight: 600;
+}
+.ds-cmp-unit {
+  grid-area: unit;
+}
+.ds-cmp-protein {
+  grid-area: prot;
+}
+.ds-cmp-sat {
+  grid-area: sat;
+}
+.ds-cmp-ingr {
+  grid-area: ingr;
+}
+.ds-cmp-upf {
+  grid-area: upf;
+}
+.ds-cmp-oil {
+  grid-area: oil;
+}
+.ds-cmp-offer {
+  grid-area: offer;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.ds-cmp-c {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  min-width: 0;
+  padding: 1px 3px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.ds-cmp-c.is-best {
+  background: var(--ds-green-bg);
+  color: #0a5c29;
+  font-weight: 800;
+}
+.ds-tone--g {
+  color: var(--ds-g);
+}
+.ds-tone--a {
+  color: var(--ds-a);
+}
+.ds-tone--r {
+  color: var(--ds-r);
+}
+.ds-tone--n {
+  color: var(--ds-soft);
+}
+.ds-cmp-c.is-best.ds-tone--g,
+.ds-cmp-c.is-best.ds-tone--a,
+.ds-cmp-c.is-best.ds-tone--r,
+.ds-cmp-c.is-best.ds-tone--n {
+  color: #0a5c29;
+}
+.ds-cdot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-right: 3px;
+  border-radius: 50%;
+  background: #9aa0a6;
+}
+.ds-cmp-oil .ds-cdot {
+  margin-right: 0;
+}
+.ds-cdot--g {
+  background: var(--ds-g);
+}
+.ds-cdot--a {
+  background: #e0a400;
+}
+.ds-cdot--r {
+  background: var(--ds-r);
+}
+.ds-cpill {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  padding: 0 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 24px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+  --ds-link: #fff;
+}
+/* a 48px tap area around the 24px pill */
+a.ds-cpill::before {
+  content: "";
+  position: absolute;
+  inset: -12px -4px;
+}
+.ds-cpill--offer {
+  background: #c8102e;
+}
+.ds-cpill--off {
+  background: var(--ds-g);
+}
+.ds-cmp-key {
+  margin: 0;
+  padding: 8px 12px;
+  border-top: 1px solid var(--ds-line);
+  color: var(--ds-soft);
+  font-size: 13px;
+}
+.ds-cmp-best {
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--ds-green-bg);
+  color: #0a5c29;
+  font-weight: 800;
+}
+
+/* One line per product only where the name keeps room; narrower, the two-line phone layout stretches. */
+@media (min-width: 960px) {
+  .ds-cmp-head,
+  .ds-cmp-row {
+    grid-template-columns: 44px minmax(0, 1fr) 84px 76px 64px 60px 48px 48px 40px 130px;
+    grid-template-areas: "img name price unit prot sat ingr upf oil offer";
+    column-gap: 8px;
+    padding: 8px 14px;
+  }
+  .ds-cmp-head {
+    grid-template-areas: ". name price unit prot sat ingr upf oil offer";
+    font-size: 12px;
+  }
+  .ds-cmp-h--name,
+  .ds-cmp-h--offer {
+    display: block;
+  }
+  .ds-cmp-h--name {
+    grid-area: name;
+    text-align: left;
+  }
+  .ds-cmp-h--offer {
+    grid-area: offer;
+    text-align: right;
+  }
+  .ds-cmp-long {
+    display: inline;
+  }
+  .ds-cmp-short {
+    display: none;
+  }
+  .ds-cmp-row {
+    min-height: 56px;
+    font-size: 15px;
+  }
+  .ds-cmp-link {
+    font-size: 15px;
+  }
+  .ds-cmp-price strong {
+    font-size: 15px;
+  }
+  .ds-cmp-price s {
+    font-size: 12px;
+  }
+  .ds-cdot {
+    width: 10px;
+    height: 10px;
+  }
+}
+.ds-cmp-unk {
+  color: var(--ds-soft);
+  font-weight: 500;
+  opacity: 0.55;
+}

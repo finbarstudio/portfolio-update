@@ -101,6 +101,7 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
       hideOwn: false,
       hideSingle: false,
       tasteDiff: false,
+      onOffer: false,
     });
   }
 
@@ -289,7 +290,7 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
                   Show them too
                 </button>
               )}
-              {!dealish && (filters.good || filters.frozen || filters.rated || filters.onList || filters.fewIngredients || filters.hideOwn || filters.hideSingle || filters.tasteDiff) && (
+              {!dealish && (filters.good || filters.frozen || filters.rated || filters.onList || filters.fewIngredients || filters.hideOwn || filters.hideSingle || filters.tasteDiff || filters.onOffer) && (
                 <button type="button" className="ds-btn ds-btn--ghost" onClick={reset}>
                   Reset filters
                 </button>

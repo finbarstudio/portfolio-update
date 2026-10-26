@@ -298,6 +298,26 @@ export interface FindFilters {
   hideSingle: boolean;
   /** Only Sainsbury's Taste the Difference range. */
   tasteDiff: boolean;
+  /** Only products on offer (a price cut or a multi-buy). */
+  onOffer: boolean;
+}
+
+/** The "Similar products" section of a product page: the compared products, this one pinned first. */
+export interface SimilarSection {
+  /** This product first (always), then the rest in the chosen sort. */
+  items: ProductCard[];
+  /** Every product of the same type, this one included. */
+  total: number;
+  /** Left out by the filters. */
+  hidden: number;
+  /** Passed the filters but cut off to keep the page light. */
+  capped: number;
+  /** Where this one sits among all of them on Best overall, 1 is best. */
+  rank: number | null;
+  /** Each product's place on Best overall among all of them (for the rank on a card). */
+  ranks: Record<string, number>;
+  /** "chicken breast & fillet", "chicken · ready meals"; what "same type" meant here. */
+  scopeLabel: string;
 }
 
 export const FILTER_DEFAULTS = { noSeedOil: true, hideSat: true } as const;

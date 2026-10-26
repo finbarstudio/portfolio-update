@@ -4,6 +4,7 @@ import type { Sql } from "./db";
 import { fitScore } from "./fit";
 import { OVERALL_WEIGHTS } from "./overall";
 import { buildShelves, SHELF_SIZE } from "./shelves";
+import { scopeLabel, selectSimilar, similarScope, type Candidate } from "./similar";
 import { applyTaste, buildTaste, likedKeys, type TasteProfile, type TasteRow } from "./taste";
 import {
   PAGE_SIZE,
@@ -19,6 +20,7 @@ import {
   type ProductDetail,
   type Promo,
   type SeedOil,
+  type SimilarSection,
   type Sort,
   type Nutrition,
 } from "./types";
@@ -61,8 +63,12 @@ type Fragment = postgres.PendingQuery<postgres.Row[]>;
  * `ids` narrows the output to a few products while still ranking them against
  * everything else in their category. Without it, every product comes back.
  */
-function scored(sql: Sql, ids: string[] | null): Fragment {
-  const scope = ids ? sql`and coalesce(p.category, '') in (select coalesce(category, '') from products where id = any(${ids}::text[]))` : sql``;
+function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = "category"): Fragment {
+  const scope = !ids
+    ? sql``
+    : by === "department"
+      ? sql`and coalesce(p.department, '') in (select coalesce(department, '') from products where id = any(${ids}::text[]))`
+      : sql`and coalesce(p.category, '') in (select coalesce(category, '') from products where id = any(${ids}::text[]))`;
   return sql`
     with b as (
       select p.id, p.slug, p.name, p.brand, p.image_url, p.zone, p.department, p.category,
@@ -389,6 +395,7 @@ function whereFor(sql: Sql, f: FindFilters, opts: WhereOpts = {}): Fragment {
     if (f.hideOwn) parts.push(sql`not ${OWN_BRAND(sql)}`);
     if (f.hideSingle) parts.push(sql`(not s.is_basic and coalesce(s.ingredient_count, 2) <> 1)`);
     if (f.tasteDiff) parts.push(collectionTest(sql, "ttd"));
+    if (f.onOffer) parts.push(sql`s.has_offer`);
   }
   if (!opts.noCategory) {
     if (f.coll) parts.push(collectionTest(sql, f.coll));
@@ -690,21 +697,49 @@ export async function getProduct(sql: Sql, id: string): Promise<ProductDetail | 
   };
 }
 
-/** Other products in the same category (or department), best value first. */
-export async function getSimilar(sql: Sql, id: string, limit: number): Promise<{ items: ProductCard[]; total: number }> {
+/**
+ * The "Similar products" section: every product of the same type, this one
+ * pinned first. Same type means the same category, narrowed to the same animal
+ * when it is known, widened to the department when the category is small
+ * (similar.ts). The filters and sort are the Find ones; what they hide is
+ * counted, not lost. The whole group is read (it is a few dozen products) and
+ * ordered in similar.ts so the rank on Best overall never moves with the filters.
+ */
+export async function getSimilarSection(sql: Sql, id: string, f: FindFilters): Promise<SimilarSection | null> {
+  // The whole department, light: names and categories only. What counts as similar is decided in similar.ts.
+  const cands = await sql<(Candidate & { is_me: boolean })[]>`
+    select p.id, p.name, p.zone, p.department, p.category, p.animal, (p.id = ${id}) as is_me
+    from products p
+    where (p.is_food and p.is_available and p.price > 0
+        and p.department is not distinct from (select department from products where id = ${id}))
+      or p.id = ${id}
+  `;
+  const me = cands.find((c) => c.is_me);
+  if (!me) return null;
+  const { scope, ids, prep } = similarScope(me, cands);
+
+  // Only the toggles apply here: no search, category or animal choice.
+  const toggles: FindFilters = { ...f, view: "all", q: "", coll: "", zone: "", dept: "", cat: "", animal: "", page: 0 };
+
   const [rows, dealIds, profile] = await Promise.all([
-    sql<(ScoredRow & { total: number })[]>`
-      ${scored(sql, [id])},
-      me as (select coalesce(category, department) as k from products where id = ${id})
-      select s.*, count(*) over ()::int as total from s, me
-      where s.id <> ${id} and coalesce(s.category, s.department) = me.k
-      order by ${sortScore(sql, "best")} desc nulls last, s.id
-      limit ${limit}
+    sql<(ScoredRow & { passes: boolean; bscore: number | null; sscore: number | null })[]>`
+      ${scored(sql, [id], scope === "department" ? "department" : "category")}
+      select s.*, (${whereFor(sql, toggles)}) as passes,
+        ${sortScore(sql, "best")}::float8 as bscore, ${sortScore(sql, f.sort)}::float8 as sscore
+      from s
+      where s.id = ${id} or s.id = any(${ids}::text[])
     `,
     loadDealIds(sql),
     loadTaste(sql),
   ]);
-  return { items: applyTaste(rows.map((r) => mapCard(r, dealIds)), profile), total: rows[0]?.total ?? 0 };
+
+  const pick = selectSimilar(
+    rows.map((r) => ({ id: r.id, passes: r.passes, best: r.bscore, score: r.sscore })),
+    id,
+  );
+  const cards = new Map(applyTaste(rows.map((r) => mapCard(r, dealIds)), profile).map((c) => [c.id, c]));
+  const items = pick.ids.map((i) => cards.get(i)).filter((c): c is ProductCard => c !== undefined);
+  return { items, total: pick.total, hidden: pick.hidden, capped: pick.capped, rank: pick.rank, ranks: pick.ranks, scopeLabel: scopeLabel(scope, me, prep) };
 }
 
 export async function getZones(sql: Sql): Promise<string[]> {
