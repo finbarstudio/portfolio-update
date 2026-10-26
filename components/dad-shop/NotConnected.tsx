@@ -1,4 +1,4 @@
-/** Shown when the shop has no database to talk to yet (no DATABASE_URL). */
+/** Shown when the shop has no database to talk to yet (no database URL set). */
 export default function NotConnected() {
   return (
     <div className="ds-page">

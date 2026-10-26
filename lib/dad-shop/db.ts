@@ -3,7 +3,7 @@ import postgres from "postgres";
 
 /**
  * The one place the database is opened. Lazy: nothing connects at import time
- * or at build time, and `getDb()` returns null when DATABASE_URL is not set so
+ * or at build time, and `getDb()` returns null when no database URL is set so
  * pages can show "Not connected yet" and APIs can answer 503.
  */
 export type Sql = postgres.Sql;
@@ -13,7 +13,9 @@ export type Sql = postgres.Sql;
 const holder = globalThis as typeof globalThis & { __dadShopSql?: Sql };
 
 export function getDb(): Sql | null {
-  const url = process.env.DATABASE_URL;
+  // DAD_SHOP_DB_DATABASE_URL is set by the Neon integration on Vercel (namespaced because the
+  // whole site shares one project); DATABASE_URL is the local dev database.
+  const url = process.env.DAD_SHOP_DB_DATABASE_URL ?? process.env.DATABASE_URL;
   if (!url) return null;
   if (!holder.__dadShopSql) {
     holder.__dadShopSql = postgres(url, {
