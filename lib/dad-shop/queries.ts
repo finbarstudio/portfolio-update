@@ -1,24 +1,21 @@
 import "server-only";
 import { generateBasket, type Candidate } from "./basket";
+import { getList } from "./catalog";
 import type { Sql } from "./db";
-import { fitScore } from "./fit";
+import { offerLabel, priceList, type PricedRow, livePromos, nowPence, fullPence } from "./pricing";
 import type { ListAction, SettingsPatch } from "./validate";
 import {
   DEFAULT_SETTINGS,
-  FOOD_ZONES,
   type BasketItem,
   type BasketLine,
   type BasketView,
-  type FindFilters,
   type Freshness,
-  type ListItem,
-  type Nutrition,
-  type ProductCard,
-  type ProductDetail,
   type Promo,
   type SeedOil,
   type Settings,
 } from "./types";
+
+export { getList, getProduct, getZones, searchProducts } from "./catalog";
 
 /**
  * Every SQL statement for Dad's shop. Parameterised only: values go through
@@ -41,169 +38,6 @@ function iso(v: Date | string | null): string | null {
   return v instanceof Date ? v.toISOString() : String(v);
 }
 
-// ── Products ────────────────────────────────────────────────────────────────
-
-interface CardRow {
-  id: string;
-  name: string;
-  brand: string | null;
-  image_url: string | null;
-  zone: string | null;
-  category: string | null;
-  price: number;
-  nectar_price: number | null;
-  unit_price: number | null;
-  unit_measure: string | null;
-  promos: unknown;
-  seed_oil: string;
-  health: number | null;
-  protein: number | null;
-  sat: number | null;
-  ingredient_count: number | null;
-  is_available: boolean;
-  stars: number | null;
-  not_at_store: boolean;
-  on_list: boolean;
-}
-
-function cardCols(sql: Sql) {
-  return sql`
-    p.id, p.name, p.brand, p.image_url, p.zone, p.category,
-    p.price::float8 as price, p.nectar_price::float8 as nectar_price,
-    p.unit_price::float8 as unit_price, p.unit_measure, p.promos, p.seed_oil,
-    p.health::float8 as health,
-    (case when jsonb_typeof(p.nutrition->'protein') = 'number' then (p.nutrition->>'protein')::float8 end) as protein,
-    (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end) as sat,
-    p.ingredient_count, p.is_available,
-    r.stars::int as stars,
-    (n.product_id is not null) as not_at_store,
-    exists (select 1 from list_items li where li.product_id = p.id) as on_list
-  `;
-}
-
-function cardFrom(sql: Sql) {
-  return sql`
-    from products p
-    left join ratings r on r.product_id = p.id
-    left join not_at_store n on n.product_id = p.id
-  `;
-}
-
-function mapCard(r: CardRow): ProductCard {
-  return {
-    id: r.id,
-    name: r.name,
-    brand: r.brand,
-    imageUrl: r.image_url,
-    zone: r.zone,
-    category: r.category,
-    price: r.price,
-    nectarPrice: r.nectar_price,
-    promos: asPromos(r.promos),
-    unitPrice: r.unit_price,
-    unitMeasure: r.unit_measure,
-    seedOil: asSeedOil(r.seed_oil),
-    health: r.health,
-    stars: r.stars,
-    fit: fitScore(r.health, r.stars),
-    protein: r.protein,
-    sat: r.sat,
-    ingredientCount: r.ingredient_count,
-    notAtStore: r.not_at_store,
-    onList: r.on_list,
-    isAvailable: r.is_available,
-  };
-}
-
-/** Escapes LIKE wildcards so what he types is matched literally. */
-function likePattern(word: string): string {
-  return `%${word.replace(/[\\%_]/g, "\\$&")}%`;
-}
-
-export async function searchProducts(
-  sql: Sql,
-  f: FindFilters,
-  limit: number,
-): Promise<{ items: ProductCard[]; hasMore: boolean }> {
-  const protein = sql`(case when jsonb_typeof(p.nutrition->'protein') = 'number' then (p.nutrition->>'protein')::float8 end)`;
-  const sat = sql`(case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end)`;
-  const words = f.q.split(" ").filter(Boolean).slice(0, 6);
-
-  const conditions = [
-    sql`p.is_food and p.is_available`,
-    ...words.map((w) => sql`(p.name ilike ${likePattern(w)} or coalesce(p.brand, '') ilike ${likePattern(w)})`),
-    f.noSeedOil ? sql`p.seed_oil = 'none'` : null,
-    f.highProtein ? sql`${protein} >= 12` : null,
-    f.lowSat ? sql`${sat} <= 1.5` : null,
-    f.fewIngredients ? sql`p.ingredient_count is not null and p.ingredient_count <= 5` : null,
-    f.onOffer ? sql`(p.promos <> '[]'::jsonb or (p.nectar_price is not null and p.nectar_price < p.price))` : null,
-    f.zone ? sql`p.zone = ${f.zone}` : null,
-  ].filter((c): c is NonNullable<typeof c> => c !== null);
-  const where = conditions.reduce((all, c) => sql`${all} and ${c}`);
-
-  const fit = sql`(case when r.stars is null then p.health else 0.6 * p.health + 0.4 * (case r.stars when 1 then 0 when 2 then 2.5 when 3 then 5 when 4 then 7.5 else 10 end) end)`;
-  const order =
-    f.sort === "price"
-      ? sql`coalesce(p.nectar_price, p.price) asc, p.id`
-      : f.sort === "protein"
-        ? sql`((p.pack_grams * ${protein} / 100) / nullif(coalesce(p.nectar_price, p.price), 0)) desc nulls last, p.id`
-        : sql`${fit} desc nulls last, p.id`;
-
-  const rows = await sql<CardRow[]>`
-    select ${cardCols(sql)}
-    ${cardFrom(sql)}
-    where ${where}
-    order by ${order}
-    limit ${limit + 1} offset ${f.page * limit}
-  `;
-  return { items: rows.slice(0, limit).map(mapCard), hasMore: rows.length > limit };
-}
-
-interface DetailRow extends CardRow {
-  slug: string;
-  department: string | null;
-  storage: string | null;
-  pack_grams: number | null;
-  nutrition: Nutrition | null;
-  ingredients: string | null;
-  seed_oils_found: string[] | null;
-  upf_markers: string[] | null;
-  reasons: unknown;
-  listed_at: Date | string;
-}
-
-export async function getProduct(sql: Sql, id: string): Promise<ProductDetail | null> {
-  const rows = await sql<DetailRow[]>`
-    select ${cardCols(sql)},
-      p.slug, p.department, p.storage, p.pack_grams::float8 as pack_grams,
-      p.nutrition, p.ingredients, p.seed_oils_found, p.upf_markers, p.reasons, p.listed_at
-    ${cardFrom(sql)}
-    where p.id = ${id}
-  `;
-  const r = rows[0];
-  if (!r) return null;
-  return {
-    ...mapCard(r),
-    slug: r.slug,
-    department: r.department,
-    storage: r.storage,
-    packGrams: r.pack_grams,
-    nutrition: r.nutrition,
-    ingredients: r.ingredients,
-    seedOilsFound: r.seed_oils_found ?? [],
-    upfMarkers: r.upf_markers ?? [],
-    reasons: Array.isArray(r.reasons) ? (r.reasons as unknown[]).filter((x): x is string => typeof x === "string") : [],
-    listedAt: iso(r.listed_at) ?? "",
-  };
-}
-
-export async function getZones(sql: Sql): Promise<string[]> {
-  const rows = await sql<{ zone: string }[]>`
-    select distinct zone from products where is_food and zone is not null order by zone
-  `;
-  return rows.length > 0 ? rows.map((r) => r.zone) : [...FOOD_ZONES];
-}
-
 export async function getFreshness(sql: Sql): Promise<Freshness> {
   const rows = await sql<{ last_listed: Date | null; products: number; with_details: number }[]>`
     select max(listed_at) as last_listed,
@@ -216,47 +50,6 @@ export async function getFreshness(sql: Sql): Promise<Freshness> {
 }
 
 // ── Shopping list ───────────────────────────────────────────────────────────
-
-interface ListRow {
-  id: number;
-  product_id: string | null;
-  label: string | null;
-  qty: number;
-  ticked: boolean;
-  name: string | null;
-  brand: string | null;
-  image_url: string | null;
-  zone: string | null;
-  price: number | null;
-  nectar_price: number | null;
-  promos: unknown;
-  seed_oil: string | null;
-}
-
-export async function getList(sql: Sql): Promise<ListItem[]> {
-  const rows = await sql<ListRow[]>`
-    select li.id::int as id, li.product_id, li.label, li.qty::int as qty, li.ticked,
-      p.name, p.brand, p.image_url, p.zone,
-      p.price::float8 as price, p.nectar_price::float8 as nectar_price, p.promos, p.seed_oil
-    from list_items li
-    left join products p on p.id = li.product_id
-    order by li.added_at, li.id
-  `;
-  return rows.map((r) => ({
-    id: r.id,
-    productId: r.product_id,
-    name: r.name ?? r.label ?? "Item",
-    brand: r.brand,
-    imageUrl: r.image_url,
-    zone: r.zone,
-    qty: r.qty,
-    ticked: r.ticked,
-    price: r.price,
-    nectarPrice: r.nectar_price,
-    promos: asPromos(r.promos),
-    seedOil: r.seed_oil === null ? null : asSeedOil(r.seed_oil),
-  }));
-}
 
 /**
  * Applies one list change. Safe to repeat: adding something already on the
@@ -322,7 +115,63 @@ export async function applyListAction(sql: Sql, a: ListAction): Promise<{ id: nu
       await sql`delete from list_items where ticked`;
       return { id: null, found: true };
     }
+    case "finish": {
+      await finishShopping(sql);
+      return { id: null, found: true };
+    }
   }
+}
+
+/**
+ * "Finished shopping": saves what is ticked as a past shop (what he paid for
+ * each thing, with the offers worked out as the shelf would), then takes it off
+ * the list. Nothing ticked means nothing to save, so a repeated request after
+ * a dropped answer does no harm.
+ */
+export async function finishShopping(sql: Sql, now: Date = new Date()): Promise<{ saved: boolean }> {
+  const ticked = await getList(sql, "ticked");
+  if (ticked.length === 0) return { saved: false };
+
+  const priced = ticked.filter((i) => i.price != null);
+  const rows: PricedRow[] = priced.map((i) => ({
+    id: i.id,
+    qty: i.qty,
+    item: {
+      price: i.price ?? 0,
+      wasPrice: i.wasPrice ?? null,
+      offerPrice: i.offerPrice ?? null,
+      nectarPrice: i.nectarPrice,
+      promos: i.promos,
+      deals: i.deals,
+    },
+  }));
+  const pricing = priceList(rows, now);
+  const groupLabel = new Map(pricing.groups.map((g) => [g.uid, g.label]));
+
+  const items = ticked.map((i) => {
+    const line = pricing.lines.get(i.id);
+    const paidEach = line && i.qty > 0 ? Math.round(line.cost / i.qty) / 100 : 0;
+    const groupKey = pricing.groupOfRow.get(i.id);
+    let offer: string | null = groupKey ? (groupLabel.get(groupKey) ?? null) : null;
+    if (!offer && i.price != null) {
+      const single = nowPence({ price: i.price, wasPrice: i.wasPrice, offerPrice: i.offerPrice, nectarPrice: i.nectarPrice, promos: i.promos }, now);
+      if (single < fullPence({ price: i.price, wasPrice: i.wasPrice })) {
+        const cut = livePromos(i.promos, now).find((p) => p.kind === "price_cut" && p.text);
+        offer = cut ? offerLabel(cut) : "Nectar price";
+      }
+    }
+    return { productId: i.productId, label: i.productId ? null : i.name, name: i.name, qty: i.qty, paidEach, offer };
+  });
+  const protein = ticked.reduce((n, i) => n + (i.packProtein ?? 0) * i.qty, 0);
+
+  await sql.begin(async (tx) => {
+    await tx`
+      insert into shops (total, full_price, protein_g, items)
+      values (${pricing.total / 100}, ${pricing.full / 100}, ${Math.round(protein)}, ${JSON.stringify(items)}::text::jsonb)
+    `;
+    await tx`delete from list_items where ticked`;
+  });
+  return { saved: true };
 }
 
 // ── Ratings and "not at my store" ───────────────────────────────────────────

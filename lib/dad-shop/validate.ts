@@ -1,4 +1,14 @@
-import { PAGE_SIZE, SORTS, type FindFilters, type Settings, type Sort } from "./types";
+import {
+  ANIMALS,
+  COLLECTIONS,
+  PAGE_SIZE,
+  SORTS,
+  VIEWS,
+  type FindFilters,
+  type Settings,
+  type Sort,
+  type View,
+} from "./types";
 
 /**
  * Input validation for every API route. Each validator takes `unknown` and
@@ -65,6 +75,7 @@ export function parseStars(v: unknown): Result<number | null> {
 }
 
 export type ListAction =
+  | { action: "finish" }
   | { action: "add"; productId: string; qty: number }
   | { action: "add"; label: string; qty: number }
   | { action: "tick"; id: number; ticked: boolean }
@@ -107,6 +118,8 @@ export function parseListAction(body: Record<string, unknown>): Result<ListActio
     }
     case "clear_ticked":
       return ok<ListAction>({ action: "clear_ticked" });
+    case "finish":
+      return ok<ListAction>({ action: "finish" });
     default:
       return fail("I don't know what to do with that.");
   }
@@ -147,26 +160,50 @@ function flag(v: string | null): boolean {
   return v === "1";
 }
 
-/** Query string for Find and the add-item search. */
+function pick(params: URLSearchParams, key: string): Result<string> {
+  const v = (params.get(key) ?? "").trim();
+  if (v.length > MAX_TEXT) return fail("That choice isn't valid.");
+  return ok(v);
+}
+
+/** Query string for Find and the add-item search. Flags are off unless the address says "1". */
 export function parseFindParams(params: URLSearchParams): Result<FindFilters> {
   const q = (params.get("q") ?? "").replace(/\s+/g, " ").trim();
   if (q.length > MAX_TEXT) return fail("That search is too long.");
-  const zone = (params.get("zone") ?? "").trim();
-  if (zone.length > MAX_TEXT) return fail("That section isn't valid.");
-  const sortRaw = params.get("sort") ?? "best";
+  const viewRaw = params.get("view") ?? "all";
+  if (!(VIEWS as readonly string[]).includes(viewRaw)) return fail("That view isn't valid.");
+  const sortRaw = params.get("sort") ?? "rec";
   if (!(SORTS as readonly string[]).includes(sortRaw)) return fail("That sort isn't valid.");
   const pageRaw = params.get("page") ?? "0";
   if (!/^\d{1,3}$/.test(pageRaw) || Number(pageRaw) > MAX_PAGE) return fail("That page isn't valid.");
+  const zone = pick(params, "zone");
+  const dept = pick(params, "dept");
+  const cat = pick(params, "cat");
+  const coll = pick(params, "coll");
+  const animal = pick(params, "animal");
+  for (const r of [zone, dept, cat, coll, animal]) if (!r.ok) return fail(r.error);
+  if (!zone.ok || !dept.ok || !cat.ok || !coll.ok || !animal.ok) return fail("That choice isn't valid.");
+  if (coll.value !== "" && !COLLECTIONS.some((c) => c.key === coll.value)) return fail("That collection isn't valid.");
+  if (animal.value !== "" && !(ANIMALS as readonly string[]).includes(animal.value)) return fail("That choice isn't valid.");
   return ok<FindFilters>({
     q,
-    zone,
+    view: viewRaw as View,
+    coll: coll.value,
+    zone: zone.value,
+    dept: dept.value,
+    cat: cat.value,
+    animal: animal.value,
     sort: sortRaw as Sort,
     page: Number(pageRaw),
     noSeedOil: flag(params.get("noSeedOil")),
-    highProtein: flag(params.get("highProtein")),
-    lowSat: flag(params.get("lowSat")),
-    fewIngredients: flag(params.get("fewIngredients")),
-    onOffer: flag(params.get("onOffer")),
+    good: flag(params.get("good")),
+    frozen: flag(params.get("frozen")),
+    rated: flag(params.get("rated")),
+    onList: flag(params.get("onList")),
+    fewIngredients: flag(params.get("few")),
+    hideSat: flag(params.get("hideSat")),
+    hideOwn: flag(params.get("hideOwn")),
+    hideSingle: flag(params.get("hideSingle")),
   });
 }
 

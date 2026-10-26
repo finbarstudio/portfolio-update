@@ -14,11 +14,14 @@ declare module "bun:test" {
     toBeTruthy(): void;
     toBeFalsy(): void;
     toBeUndefined(): void;
+    toBeNull(): void;
     toBeLessThan(n: number): void;
     toBeLessThanOrEqual(n: number): void;
     toBeGreaterThan(n: number): void;
     toBeGreaterThanOrEqual(n: number): void;
     toMatch(pattern: RegExp | string): void;
+    toMatchObject(expected: Record<string, unknown>): void;
+    toBeCloseTo(expected: number, digits?: number): void;
   }
   export function expect(actual: unknown): Matchers;
   export function test(name: string, fn: () => void | Promise<void>): void;

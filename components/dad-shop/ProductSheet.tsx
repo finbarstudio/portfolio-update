@@ -4,25 +4,52 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { fitScore, nutritionRows } from "@/lib/dad-shop/fit";
-import { ago, daysOld, gbp, ingredientSegments, offerText, unitPriceLabel } from "@/lib/dad-shop/format";
-import { BASE_PATH, type ProductDetail } from "@/lib/dad-shop/types";
+import {
+  ago,
+  daysOld,
+  dealPhrase,
+  endsLabel,
+  gbp,
+  groupPromo,
+  ingredientSegments,
+  packLabel,
+  processing,
+  unitPriceLabel,
+  valueWhy,
+} from "@/lib/dad-shop/format";
+import { priceView } from "@/lib/dad-shop/pricing";
+import { BASE_PATH, type ListItem, type ProductCard, type ProductDetail } from "@/lib/dad-shop/types";
 import { api } from "./api";
-import { FitBadge, ProductImage, StarsInput } from "./ui";
+import ProductTile from "./ProductTile";
+import { FitBadge, PriceBlock, ProductImage, ScoreChip, StarsInput } from "./ui";
+import { useShopList } from "./useShopList";
 
 type Phase = "idle" | "saving" | "saved" | "error";
 
-export default function ProductSheet({ product, nowIso }: { product: ProductDetail; nowIso: string }) {
+interface Props {
+  product: ProductDetail;
+  similar: { items: ProductCard[]; total: number };
+  list: ListItem[];
+  nowIso: string;
+}
+
+export default function ProductSheet({ product, similar, list, nowIso }: Props) {
   const router = useRouter();
   const now = new Date(nowIso);
+  const { store, mine } = useShopList(list, now);
   const [stars, setStars] = useState<number | null>(product.stars);
   const [rating, setRating] = useState<Phase>("idle");
   const [notHere, setNotHere] = useState(product.notAtStore);
   const [notHerePhase, setNotHerePhase] = useState<Phase>("idle");
-  const [onList, setOnList] = useState(product.onList);
-  const [listPhase, setListPhase] = useState<Phase>("idle");
 
   const fit = fitScore(product.health, stars);
-  const offer = offerText(product, now);
+  const pv = priceView(product, now);
+  const multi = groupPromo(product, now);
+  const mealPromo = product.promos.find((x) => x.kind === "mealdeal");
+  const ends = endsLabel(product.promos, now);
+  const proc = processing(product);
+  const why = valueWhy(product);
+  const row = mine.get(product.id);
   const unit = unitPriceLabel(product.unitPrice, product.unitMeasure);
   const age = daysOld(product.listedAt, now);
   const rows = product.nutrition ? nutritionRows(product.nutrition) : [];
@@ -58,17 +85,6 @@ export default function ProductSheet({ product, nowIso }: { product: ProductDeta
     }
   }
 
-  async function addToList() {
-    setListPhase("saving");
-    try {
-      await api("/list", { method: "POST", body: { action: "add", productId: product.id, qty: 1 } });
-      setOnList(true);
-      setListPhase("saved");
-    } catch {
-      setListPhase("error");
-    }
-  }
-
   return (
     <article className="ds-page ds-sheet">
       <button type="button" className="ds-back" onClick={back}>
@@ -83,11 +99,41 @@ export default function ProductSheet({ product, nowIso }: { product: ProductDeta
         {product.brand && <p className="ds-muted">{product.brand}</p>}
         <h1 className="ds-h1 ds-h1--product">{product.name}</h1>
         <p className="ds-price">
-          <strong>{gbp(product.price)}</strong>
-          {product.packGrams ? <span className="ds-muted"> {Math.round(product.packGrams)}g</span> : null}
+          <PriceBlock view={pv} big />
+          {packLabel(product.packGrams, product.unitMeasure) ? <span className="ds-muted"> {packLabel(product.packGrams, product.unitMeasure)}</span> : null}
           {unit ? <span className="ds-muted"> · {unit}</span> : null}
         </p>
-        {offer && <p className="ds-offer ds-offer--big">{offer}</p>}
+        <p className="ds-sheet-scores">
+          <ScoreChip label="Fit" score={fit} />
+          <ScoreChip label="Value" score={product.value} />
+          {ends && <span className="ds-chipx">{ends}</span>}
+          {proc && <span className={`ds-chipx ds-chipx--${proc.tone}`}>{proc.label}</span>}
+        </p>
+        {multi && (
+          <p>
+            <Link className="ds-offer ds-offer--big ds-offer--link" href={`${BASE_PATH}/offer/${encodeURIComponent(multi.uid)}`}>
+              {dealPhrase(multi)} ›
+            </Link>
+          </p>
+        )}
+        {mealPromo && (
+          <p>
+            <Link className="ds-offer ds-offer--big ds-offer--link" href={`${BASE_PATH}/meal/${encodeURIComponent(mealPromo.uid)}`}>
+              Part of a meal deal ›
+            </Link>
+          </p>
+        )}
+        {why && (
+          <p className="ds-muted">
+            <b>Why Value {product.value}?</b> {why}
+          </p>
+        )}
+        {product.paidBefore && (
+          <p className="ds-paid">
+            Ordered before · you paid {gbp(product.paidBefore.each)}
+            {product.paidBefore.offer ? ` (${product.paidBefore.offer})` : ""}, now {gbp(pv.nowPence / 100)}
+          </p>
+        )}
         {!product.isAvailable && <p className="ds-banner ds-banner--amber">Sainsbury&apos;s isn&apos;t selling this at the moment.</p>}
         {age !== null && age > 14 && (
           <p className="ds-banner ds-banner--amber">This price is {ago(product.listedAt, now)} and may have changed.</p>
@@ -124,15 +170,24 @@ export default function ProductSheet({ product, nowIso }: { product: ProductDeta
       </section>
 
       <section className="ds-actions" aria-label="Actions">
-        <button
-          type="button"
-          className={`ds-btn ${onList ? "ds-btn--done" : "ds-btn--primary"} ds-btn--wide`}
-          onClick={addToList}
-          disabled={onList || listPhase === "saving"}
-        >
-          {onList ? "On your list ✓" : listPhase === "saving" ? "Adding…" : listPhase === "error" ? "Try adding again" : "+ Add to list"}
-        </button>
-        {onList && (
+        {row ? (
+          <div className="ds-step ds-step--wide" role="group" aria-label={`How many ${product.name}`}>
+            <button type="button" className="ds-step-btn" aria-label={row.qty > 1 ? "One fewer" : "Take it off your list"} onClick={() => (row.qty > 1 ? store.setQty(row.id, row.qty - 1) : store.remove(row.id))}>
+              <span aria-hidden="true">−</span>
+            </button>
+            <span className="ds-step-qty" aria-live="polite">
+              {row.qty} on your list ✓
+            </span>
+            <button type="button" className="ds-step-btn" aria-label="One more" onClick={() => store.setQty(row.id, row.qty + 1)}>
+              <span aria-hidden="true">+</span>
+            </button>
+          </div>
+        ) : (
+          <button type="button" className="ds-btn ds-btn--primary ds-btn--wide" onClick={() => store.add(product)}>
+            + Add to list
+          </button>
+        )}
+        {row && (
           <Link className="ds-link" href={BASE_PATH}>
             Go to my list
           </Link>
@@ -209,6 +264,28 @@ export default function ProductSheet({ product, nowIso }: { product: ProductDeta
           <p className="ds-muted">Processed extras: {product.upfMarkers.join(", ")}.</p>
         )}
       </section>
+
+      {similar.items.length > 0 && (
+        <section className="ds-block" aria-label="Similar products">
+          <h2 className="ds-h2">Similar products</h2>
+          <p className="ds-muted">
+            Showing {similar.items.length} of {similar.total} {product.category ? `in ${product.category.toLowerCase()}` : "like this"}.
+          </p>
+          <ul className="ds-cards ds-cards--grid">
+            {similar.items.map((p) => (
+              <ProductTile key={p.id} p={p} now={now} store={store} mine={mine} />
+            ))}
+          </ul>
+          {similar.total > similar.items.length && product.zone && product.department && (
+            <Link
+              className="ds-link"
+              href={`${BASE_PATH}/find?noSeedOil=0&hideSat=0&zone=${encodeURIComponent(product.zone)}&dept=${encodeURIComponent(product.department)}${product.category ? `&cat=${encodeURIComponent(product.category)}` : ""}`}
+            >
+              See all {similar.total + 1} in Find
+            </Link>
+          )}
+        </section>
+      )}
 
       <p className="ds-foot">
         <a href={`https://www.sainsburys.co.uk/gol-ui/product/${encodeURIComponent(product.slug)}`} target="_blank" rel="noopener noreferrer">

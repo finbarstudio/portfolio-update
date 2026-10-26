@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { fitBand, fitNumber, fitWord } from "@/lib/dad-shop/fit";
+import { gbp } from "@/lib/dad-shop/format";
+import type { GroupInfo } from "@/lib/dad-shop/pricing";
+import { GROUP_COLOURS } from "@/lib/dad-shop/pricing";
+import type { PriceView } from "@/lib/dad-shop/pricing";
 import type { SeedOil } from "@/lib/dad-shop/types";
 
 /** Small shared pieces: picture, Fit badge, stars, seed-oil tag. */
@@ -94,4 +98,56 @@ export function SeedOilTag({ seedOil }: { seedOil: SeedOil | null }) {
   if (seedOil === "yes") return <span className="ds-tag ds-tag--red">Seed oil</span>;
   if (seedOil === "likely") return <span className="ds-tag ds-tag--amber">May have seed oil</span>;
   return null;
+}
+
+/** "Fit 7" or "Value 8" on a picture. Green 7+, amber 5-6, red below. */
+export function ScoreChip({ label, score }: { label: string; score: number | null }) {
+  if (score == null) return null;
+  const n = Math.round(score);
+  const tone = n >= 7 ? "g" : n >= 5 ? "a" : "r";
+  return (
+    <span className={`ds-score ds-score--${tone}`} aria-label={`${label} ${n} out of 10`}>
+      {label} {n}
+    </span>
+  );
+}
+
+/** The price he pays, with the usual price struck through and a small Nectar note. */
+export function PriceBlock({ view, qty = 1, big = false }: { view: PriceView; qty?: number; big?: boolean }) {
+  return (
+    <span className={`ds-pb${big ? " ds-pb--big" : ""}`}>
+      <strong className="ds-pb-now">{gbp((view.nowPence * qty) / 100)}</strong>
+      {view.cut && (
+        <s className="ds-pb-was">
+          <span className="ds-sr">Usually </span>
+          {gbp((view.fullPence * qty) / 100)}
+        </s>
+      )}
+      {view.nectar && <span className="ds-pb-note">with Nectar</span>}
+    </span>
+  );
+}
+
+/** The letter and colour of a list group, shown on cards too. */
+export function GroupTag({ group, label }: { group: Pick<GroupInfo, "letter" | "colour" | "label">; label?: string }) {
+  const [bg, fg] = GROUP_COLOURS[group.colour % GROUP_COLOURS.length];
+  return (
+    <span className="ds-gtag" style={{ "--gbg": bg, "--gfg": fg } as React.CSSProperties} title={`Offer group ${group.letter}: these items count together`}>
+      <span className="ds-gtag-l">{group.letter}</span>
+      <span>{label ?? group.label}</span>
+    </span>
+  );
+}
+
+export function groupStyle(colour: number): React.CSSProperties {
+  const [bg, fg] = GROUP_COLOURS[colour % GROUP_COLOURS.length];
+  return { "--gbg": bg, "--gfg": fg } as React.CSSProperties;
+}
+
+export function Caret() {
+  return (
+    <svg className="ds-caret" width="12" height="12" viewBox="0 0 10 10" aria-hidden="true">
+      <path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }

@@ -83,3 +83,51 @@ insert into settings (key, value) values
   ('budget_gbp', '60'), ('people', '1'), ('protein_g_per_day', '100'),
   ('max_per_category', '2'), ('include_unrated_share', '0.2')
 on conflict (key) do nothing;
+
+-- v2 (26 Oct 2026): Tesco-app parity. Additive and idempotent.
+alter table products add column if not exists was_price    numeric(8,2);   -- shelf price before an offer (promo original_price)
+alter table products add column if not exists offer_price  numeric(8,2);   -- best single-unit price he can actually pay (Nectar / price cut / 'Buy 1 for X')
+alter table products add column if not exists review_avg   numeric(3,2);   -- Sainsbury's star rating, 0-5
+alter table products add column if not exists review_count int;
+alter table products add column if not exists is_new       boolean not null default false;
+alter table products add column if not exists animal       text;           -- 'beef' | 'pork' | 'chicken' | 'lamb' | 'turkey' | 'duck' | 'fish' | 'seafood' | 'game' | null
+create index if not exists products_promos on products using gin (promos jsonb_path_ops);
+create index if not exists products_dept on products (zone, department, category);
+
+-- Dinner meal deals (Dine In etc). Lunch deals are deliberately not stored.
+create table if not exists deals (
+  id          text primary key,              -- Sainsbury's promotion uid
+  slug        text not null,                 -- e.g. 'ttd-dine-in-deal'
+  title       text not null,                 -- e.g. 'Taste the Difference Dine In'
+  strap       text not null,                 -- e.g. 'Meal Deal for £15.00 with Nectar'
+  price       numeric(8,2) not null,
+  nectar      boolean not null default false,
+  starts_on   date,
+  ends_on     date,
+  updated_at  timestamptz not null default now()
+);
+create table if not exists deal_parts (
+  deal_id  text not null references deals(id) on delete cascade,
+  list_id  int not null,
+  label    text not null,                    -- 'Main' | 'Side' | 'Dessert' | 'Drink' | 'Pizza' | 'Dip' ... (named from its products)
+  qty      int not null default 1,
+  primary key (deal_id, list_id)
+);
+create table if not exists deal_items (
+  deal_id    text not null,
+  list_id    int not null,
+  product_id text not null references products(id) on delete cascade,
+  primary key (deal_id, list_id, product_id),
+  foreign key (deal_id, list_id) references deal_parts(deal_id, list_id) on delete cascade
+);
+create index if not exists deal_items_product on deal_items (product_id);
+
+-- Past shops: "Finished shopping" snapshots the ticked list.
+create table if not exists shops (
+  id          bigserial primary key,
+  finished_at timestamptz not null default now(),
+  total       numeric(8,2) not null,
+  full_price  numeric(8,2) not null,         -- what it would have cost without offers
+  protein_g   numeric not null default 0,
+  items       jsonb not null                 -- [{productId, label, name, qty, paidEach, offer}]
+);

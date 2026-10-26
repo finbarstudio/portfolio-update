@@ -1,4 +1,4 @@
-import type { ListItem, ProductCard } from "@/lib/dad-shop/types";
+import type { DealLink, ListItem, ProductCard } from "@/lib/dad-shop/types";
 import { api, ApiError } from "./api";
 
 /**
@@ -30,12 +30,14 @@ type Op =
   | { type: "tick"; id: number; ticked: boolean }
   | { type: "qty"; id: number; qty: number }
   | { type: "remove"; id: number }
-  | { type: "clear" };
+  | { type: "clear" }
+  | { type: "finish" };
 
 type AddableProduct = Pick<
   ProductCard,
   "id" | "name" | "brand" | "imageUrl" | "zone" | "price" | "nectarPrice" | "promos" | "seedOil"
->;
+> &
+  Partial<Pick<ProductCard, "wasPrice" | "offerPrice" | "value" | "protein" | "packGrams">> & { deals?: DealLink[] };
 
 const KEY = "ds-list-v1";
 const RETRY_MS = [2000, 4000, 8000, 15_000, 30_000];
@@ -59,6 +61,7 @@ function applyOp(items: ListItem[], op: Op): ListItem[] {
     case "remove":
       return items.filter((i) => i.id !== op.id);
     case "clear":
+    case "finish":
       return items.filter((i) => !i.ticked);
   }
 }
@@ -77,7 +80,13 @@ function bodyFor(op: Op): unknown {
       return { action: "remove", id: op.id };
     case "clear":
       return { action: "clear_ticked" };
+    case "finish":
+      return { action: "finish" };
   }
+}
+
+function fixOp(op: Op): Op {
+  return op.type === "add" ? { ...op, item: fixItem(op.item) } : op;
 }
 
 function refersTo(op: Op, id: number): boolean {
@@ -88,6 +97,21 @@ function retarget(op: Op, from: number, to: number): Op {
   if (!refersTo(op, from)) return op;
   return { ...(op as Extract<Op, { id: number }>), id: to };
 }
+
+/** Rows cached by an older version of the page lack the newer fields. */
+function fixItem(i: ListItem): ListItem {
+  return {
+    ...i,
+    wasPrice: i.wasPrice ?? null,
+    offerPrice: i.offerPrice ?? null,
+    packProtein: i.packProtein ?? null,
+    value: i.value ?? null,
+    deals: i.deals ?? [],
+    promos: Array.isArray(i.promos) ? i.promos : [],
+  };
+}
+
+type Mode = "off" | "keeper" | "full";
 
 export class ListStore {
   private snap: ListSnapshot;
@@ -130,12 +154,55 @@ export class ListStore {
     }
   }
 
+  private holders = 0;
+  private keepers = 0;
+  private mode: Mode = "off";
+  private teardown: (() => void) | null = null;
+  private loadFailed = false;
+
   /**
-   * Call once on the client. `loadFailed` means the server could not give us the
-   * list. `keeper` means "only send saved changes left over from earlier, and do
-   * nothing otherwise" (used off the List page).
+   * A page holds the store while it is on screen. Pages hold it in full (reads
+   * the phone's saved copy, refreshes, sends changes); the tab bar holds it as a
+   * keeper everywhere else (only sends changes left over from earlier). The store
+   * is shared, so the list is the same on every page and nothing is sent twice.
+   * `loadFailed` means the server could not give this page the list.
    */
-  start(loadFailed: boolean, keeper = false): () => void {
+  acquire(loadFailed: boolean, keeper = false): () => void {
+    if (keeper) this.keepers += 1;
+    else this.holders += 1;
+    if (loadFailed) this.loadFailed = true;
+    this.sync();
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      if (keeper) this.keepers -= 1;
+      else this.holders -= 1;
+      this.sync();
+    };
+  }
+
+  private sync(): void {
+    const want: Mode = this.holders > 0 ? "full" : this.keepers > 0 ? "keeper" : "off";
+    if (want === this.mode) return;
+    this.teardown?.();
+    this.teardown = null;
+    this.mode = want;
+    if (want === "off") {
+      this.stopped = true;
+      return;
+    }
+    this.teardown = this.begin(this.loadFailed, want === "keeper");
+  }
+
+  /** Replaces the screen's list with the server's, unless changes are still waiting to be saved. */
+  hydrate(items: ListItem[]): void {
+    if (this.queue.length > 0 || this.running) return;
+    this.commit({ items: items.map(fixItem), status: this.snap.status === "offline" ? "offline" : "saved" });
+    this.persist();
+  }
+
+  private begin(loadFailed: boolean, keeper: boolean): () => void {
     this.stopped = false; // React dev mode runs effects twice: start, stop, start
     let cached: { items: ListItem[]; queue: Op[] } | null = null;
     try {
@@ -144,7 +211,9 @@ export class ListStore {
         const parsed: unknown = JSON.parse(raw);
         if (typeof parsed === "object" && parsed !== null && "items" in parsed && "queue" in parsed) {
           const { items, queue } = parsed as { items: unknown; queue: unknown };
-          if (Array.isArray(items) && Array.isArray(queue)) cached = { items: items as ListItem[], queue: queue as Op[] };
+          if (Array.isArray(items) && Array.isArray(queue)) {
+            cached = { items: (items as ListItem[]).map(fixItem), queue: (queue as Op[]).map(fixOp) };
+          }
         }
       }
     } catch {
@@ -153,12 +222,12 @@ export class ListStore {
 
     if (keeper && !(cached && cached.queue.length > 0)) return () => undefined;
 
-    if (cached && (cached.queue.length > 0 || loadFailed)) {
+    if (this.queue.length === 0 && cached && (cached.queue.length > 0 || loadFailed)) {
       // Unsaved changes (or no server list at all): the cached screen is the truth.
       this.queue = cached.queue;
       this.commit({ items: cached.items, status: cached.queue.length > 0 ? "saving" : "offline" });
     }
-    this.nextTemp = Math.min(-1, ...this.snap.items.map((i) => i.id - 1), ...this.queue.map((o) => (o.type === "add" ? o.item.id - 1 : -1)));
+    this.nextTemp = Math.min(-1, this.nextTemp, ...this.snap.items.map((i) => i.id - 1), ...this.queue.map((o) => (o.type === "add" ? o.item.id - 1 : -1)));
     this.lastRefresh = Date.now();
     this.persist();
 
@@ -190,6 +259,8 @@ export class ListStore {
   // ── Changes ──────────────────────────────────────────────────────────────
 
   add(product: AddableProduct, qty = 1): void {
+    const packProtein =
+      product.packGrams != null && product.protein != null ? Math.round(((product.packGrams * product.protein) / 100) * 10) / 10 : null;
     this.dispatch({
       type: "add",
       item: {
@@ -205,6 +276,11 @@ export class ListStore {
         nectarPrice: product.nectarPrice,
         promos: product.promos,
         seedOil: product.seedOil,
+        wasPrice: product.wasPrice ?? null,
+        offerPrice: product.offerPrice ?? null,
+        packProtein,
+        value: product.value ?? null,
+        deals: product.deals ?? [],
       },
     });
   }
@@ -225,6 +301,11 @@ export class ListStore {
         nectarPrice: null,
         promos: [],
         seedOil: null,
+        wasPrice: null,
+        offerPrice: null,
+        packProtein: null,
+        value: null,
+        deals: [],
       },
     });
   }
@@ -243,6 +324,11 @@ export class ListStore {
 
   clearTicked(): void {
     this.dispatch({ type: "clear" });
+  }
+
+  /** "Finished shopping": the server saves the ticked items as a past shop and takes them off the list. */
+  finishShopping(): void {
+    this.dispatch({ type: "finish" });
   }
 
   private dispatch(op: Op): void {
@@ -326,5 +412,30 @@ export class ListStore {
   async refresh(): Promise<void> {
     if (this.running || this.queue.length > 0) return;
     await this.pull();
+  }
+}
+
+/**
+ * One store per browser tab, shared by every page, so the list is always the
+ * same. On the server each render gets its own, so nothing leaks between
+ * visitors.
+ */
+const shared = globalThis as typeof globalThis & { __dsListStore?: ListStore };
+
+export function getListStore(initial: ListItem[]): ListStore {
+  if (typeof window === "undefined") return new ListStore(initial);
+  shared.__dsListStore ??= new ListStore(initial.map(fixItem));
+  return shared.__dsListStore;
+}
+
+/** True when this phone holds changes that were never sent (no signal when they were made). */
+export function hasPendingChanges(): boolean {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return false;
+    const parsed: unknown = JSON.parse(raw);
+    return typeof parsed === "object" && parsed !== null && "queue" in parsed && Array.isArray((parsed as { queue: unknown }).queue) && (parsed as { queue: unknown[] }).queue.length > 0;
+  } catch {
+    return false;
   }
 }

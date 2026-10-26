@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { BASE_PATH } from "@/lib/dad-shop/types";
-import { ListStore } from "./listStore";
+import { getListStore, hasPendingChanges } from "./listStore";
 
 type TabId = "list" | "find" | "week" | "settings";
 
@@ -54,7 +54,7 @@ const TABS: { id: TabId; label: string; href: string; icon: React.ReactNode }[] 
 /** Works whether the browser shows /dadshop/find or the internal /lab/... path. */
 function activeTab(pathname: string): TabId {
   const parts = pathname.split("/").filter(Boolean);
-  if (parts.includes("find") || parts.includes("p")) return "find";
+  if (parts.includes("find") || parts.includes("p") || parts.includes("offer") || parts.includes("meal")) return "find";
   if (parts.includes("week")) return "week";
   if (parts.includes("settings")) return "settings";
   return "list";
@@ -64,11 +64,11 @@ export default function TabBar() {
   const pathname = usePathname();
   const active = activeTab(pathname);
 
-  // Off the List page nobody is draining the saved-changes queue, so a change
-  // that failed on his phone would sit there. This keeper sends it, if any.
+  // Pages that show the list send its changes themselves. On the others (This week,
+  // Settings) a change that failed on his phone would sit there, so this keeper sends it.
   useEffect(() => {
-    if (active === "list") return;
-    return new ListStore([]).start(false, true);
+    if (!hasPendingChanges()) return;
+    return getListStore([]).acquire(false, true);
   }, [active]);
 
   return (

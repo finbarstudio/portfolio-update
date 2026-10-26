@@ -1,5 +1,5 @@
-import { activePromos } from "./pricing";
-import { ZONE_ORDER, type PriceInfo } from "./types";
+import { livePromos, nowPence, offerLabel, tidyMoney } from "./pricing";
+import { ZONE_ORDER, type PriceInfo, type ProductCard, type Promo } from "./types";
 
 export interface ZoneGroup<T> {
   zone: string;
@@ -31,12 +31,108 @@ export function gbp(n: number): string {
   return `£${n.toFixed(2)}`;
 }
 
-/** The offer to show next to a price: a running promo's own words, else a Nectar price. */
+/** The words for one running offer, Nectar taken as read. Null when there is nothing to say. */
 export function offerText(p: PriceInfo, now: Date): string | null {
-  const promo = activePromos(p.promos, now).find((x) => x.text.trim().length > 0);
-  if (promo) return promo.text.trim();
-  if (p.nectarPrice != null && p.nectarPrice > 0 && p.nectarPrice < p.price) return `${gbp(p.nectarPrice)} with Nectar`;
+  const promo = shownPromos(p.promos, now).find((x) => x.text.trim().length > 0);
+  if (promo) return tidyMoney(offerLabel(promo));
+  const n = nowPence(p, now);
+  if (n < Math.round(p.price * 100)) return `${gbp(n / 100)} with Nectar`;
   return null;
+}
+
+/** Running offers worth a tag. Dinner meal deals have their own pages; plain "Buy 1 for X" shows as the price itself. */
+export function shownPromos(promos: Promo[], now: Date): Promo[] {
+  return livePromos(promos, now).filter((p) => p.kind !== "mealdeal" && !(p.kind === "price_cut" && /^buy\s+1\s+for\b/i.test(p.text ?? "")));
+}
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** "3 Nov" from a date, as written (no time zone shifting). */
+export function shortDate(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const month = MONTHS[Number(m[2]) - 1];
+  return month ? `${Number(m[3])} ${month}` : null;
+}
+
+/** "ends 3 Nov": the soonest end among the offers worth a tag. */
+export function endsLabel(promos: Promo[], now: Date): string | null {
+  const ends = shownPromos(promos, now)
+    .map((p) => p.end)
+    .filter((e) => e && !Number.isNaN(Date.parse(e)))
+    .sort();
+  const d = shortDate(ends[0]);
+  return d ? `ends ${d}` : null;
+}
+
+/** The multi-buy a product is in, for the "each in 3 for £6" link. */
+export function groupPromo(p: PriceInfo, now: Date): Promo | null {
+  return livePromos(p.promos, now).find((x) => x.kind === "multibuy" && x.qty && x.qty >= 2) ?? null;
+}
+
+/** How a multi-buy reads in the "each in …" link under a price. */
+export function dealPhrase(promo: Promo): string {
+  const any = /\bany\b/i.test(promo.text ?? "");
+  const n = promo.qty ?? 2;
+  if (promo.getFree && promo.getFree > 0) return `Buy ${n}, cheapest ${promo.getFree === 1 ? "one" : promo.getFree} free`;
+  if (promo.savePct && promo.savePct > 0) return `${Math.round(promo.savePct)}% off when you buy ${n}+`;
+  if (promo.dealPrice) return `each in ${any ? "any " : ""}${n} for ${tidyMoney(`£${promo.dealPrice.toFixed(2)}`)}`;
+  return tidyMoney(offerLabel(promo));
+}
+
+/** The name without its trailing pack size, which is shown as its own tag. */
+export function shortName(name: string): string {
+  return name.replace(/\s*,?\s*\b(\d+\s?x\s?)?\d+(\.\d+)?\s?(kg|g|ml|l|cl|ltr|litres?)\.?\s*$/i, "").trim();
+}
+
+/** "500g", "1.2kg", "750ml", "1.5 litres". */
+export function packLabel(grams: number | null, measure: string | null): string | null {
+  if (grams == null || grams <= 0) return null;
+  if (measure === "ltr") return grams >= 1000 ? `${+(grams / 1000).toFixed(2)} litres` : `${Math.round(grams)}ml`;
+  return grams >= 1000 ? `${+(grams / 1000).toFixed(2)}kg` : `${Math.round(grams)}g`;
+}
+
+export function pctOff(card: Pick<ProductCard, "discount">): number | null {
+  const p = Math.round(card.discount * 100);
+  return p >= 5 ? p : null;
+}
+
+/** One plain sentence on why a Value score is what it is. */
+export function valueWhy(c: Pick<ProductCard, "value" | "valueBasis" | "valuePct" | "discount">): string | null {
+  if (c.value == null) return null;
+  const parts: string[] = [];
+  if (c.valuePct != null && c.valueBasis) {
+    const cheaperThan = Math.round(c.valuePct * 10);
+    const what = c.valueBasis === "protein" ? "Protein for your money" : "The price per kg";
+    parts.push(
+      cheaperThan >= 5
+        ? `${what} beats ${cheaperThan} in 10 similar products`
+        : `${what} is poorer than ${10 - cheaperThan} in 10 similar products`,
+    );
+  }
+  const off = Math.round(c.discount * 100);
+  if (off >= 5) parts.push(`${off}% off adds a little`);
+  if (parts.length === 0) return "Not enough similar products to compare, so this is a middle score.";
+  return parts.join(". ") + ".";
+}
+
+export type Tone = "g" | "a" | "r";
+
+/** The processing verdict from the ingredients, or null when the label has not been read. */
+export function processing(c: Pick<ProductCard, "upfCount" | "ingredientCount">): { label: string; tone: Tone } | null {
+  if (c.upfCount == null) return null;
+  if (c.ingredientCount === 1) return { label: "Whole food", tone: "g" };
+  if (c.upfCount === 0) {
+    return { label: c.ingredientCount ? `Simple · ${c.ingredientCount} ingredients` : "No processing markers", tone: "g" };
+  }
+  return { label: `Ultra-processed · ${c.upfCount} marker${c.upfCount === 1 ? "" : "s"}`, tone: c.upfCount >= 3 ? "r" : "a" };
+}
+
+/** Saturated fat per 100g, UK traffic-light bands. */
+export function satTone(sat: number | null): Tone | null {
+  if (sat == null) return null;
+  return sat <= 1.5 ? "g" : sat > 5 ? "r" : "a";
 }
 
 /** "2 days ago", "today". */
