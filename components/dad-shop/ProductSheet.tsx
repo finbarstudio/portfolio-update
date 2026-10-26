@@ -18,7 +18,7 @@ import {
   valueWhy,
 } from "@/lib/dad-shop/format";
 import { priceView } from "@/lib/dad-shop/pricing";
-import { BASE_PATH, type ListItem, type ProductCard, type ProductDetail } from "@/lib/dad-shop/types";
+import { BASE_PATH, LIST_PATH, type ListItem, type ProductCard, type ProductDetail } from "@/lib/dad-shop/types";
 import { api } from "./api";
 import ProductTile from "./ProductTile";
 import { FitBadge, PriceBlock, ProductImage, ScoreChip, StarsInput } from "./ui";
@@ -56,7 +56,7 @@ export default function ProductSheet({ product, similar, list, nowIso }: Props) 
 
   function back() {
     if (window.history.length > 1) router.back();
-    else router.push(`${BASE_PATH}/find`);
+    else router.push(BASE_PATH);
   }
 
   async function rate(next: number | null) {
@@ -188,7 +188,7 @@ export default function ProductSheet({ product, similar, list, nowIso }: Props) 
           </button>
         )}
         {row && (
-          <Link className="ds-link" href={BASE_PATH}>
+          <Link className="ds-link" href={LIST_PATH}>
             Go to my list
           </Link>
         )}

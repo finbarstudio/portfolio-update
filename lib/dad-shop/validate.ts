@@ -74,6 +74,13 @@ export function parseStars(v: unknown): Result<number | null> {
   return ok<number | null>(v);
 }
 
+/** Yes (1), No (-1), or null to take his answer back. */
+export function parseVote(v: unknown): Result<1 | -1 | null> {
+  if (v === null) return ok<1 | -1 | null>(null);
+  if (v === 1 || v === -1) return ok<1 | -1 | null>(v);
+  return fail("Say yes or no.");
+}
+
 export type ListAction =
   | { action: "finish" }
   | { action: "add"; productId: string; qty: number }
@@ -204,6 +211,7 @@ export function parseFindParams(params: URLSearchParams): Result<FindFilters> {
     hideSat: flag(params.get("hideSat")),
     hideOwn: flag(params.get("hideOwn")),
     hideSingle: flag(params.get("hideSingle")),
+    tasteDiff: flag(params.get("ttd")),
   });
 }
 

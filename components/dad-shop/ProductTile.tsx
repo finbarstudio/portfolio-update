@@ -1,26 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import CardWhy, { type WhyKind } from "./CardWhy";
 import QuickRate from "./QuickRate";
-import {
-  dealPhrase,
-  endsLabel,
-  gbp,
-  groupPromo,
-  packLabel,
-  pctOff,
-  processing,
-  satTone,
-  shortName,
-  shownPromos,
-  unitPriceLabel,
-  valueWhy,
-} from "@/lib/dad-shop/format";
+import { gbp, groupPromo, pctOff, satTone, shortName } from "@/lib/dad-shop/format";
 import { offerLabel, priceView, tidyMoney, type GroupInfo } from "@/lib/dad-shop/pricing";
 import { BASE_PATH, type DealLink, type ListItem, type ProductCard } from "@/lib/dad-shop/types";
 import type { ListStore } from "./listStore";
-import { GroupTag, PriceBlock, ProductImage, ScoreChip, SeedOilTag, StarsDisplay } from "./ui";
+import { GroupTag, ProductImage } from "./ui";
 
 interface Props {
   p: ProductCard;
@@ -30,17 +18,15 @@ interface Props {
   mine: Map<string, ListItem>;
   /** The lettered offer group this product is in on the list, if any. */
   group?: Pick<GroupInfo, "letter" | "colour" | "label" | "uid" | "kind"> | null;
-  /** "✦ why" line on For you shelves. */
+  /** Why it is on a For you shelf. One short muted line, and in the breakdown. */
   why?: string;
-  /** "#1 all round" inside a deal. */
+  /** "#3 best overall" on the picture. */
   rank?: string;
   /** A clearly better product from the same deal, with a Swap button. */
   swap?: ProductCard | null;
   /** The meal deal this card is being shown in, so the list can price the bundle. */
   deal?: DealLink | null;
-  /** Shelf cards have a fixed width. */
-  shelf?: boolean;
-  /** On a meal deal's own page the "part of a meal deal" link would point at itself. */
+  /** On a meal deal's own page the "meal deal" pill would point at itself. */
   inMealPage?: boolean;
 }
 
@@ -49,84 +35,184 @@ function dealsFor(deal: DealLink | null | undefined): DealLink[] {
   return deal ? [deal] : [];
 }
 
-/** One product: picture with overlays, price, a few chips, details behind a button, and the add control. */
-export default function ProductTile({ p, now, store, mine, group, why, rank, swap, deal, shelf = false, inMealPage = false }: Props) {
-  const [open, setOpen] = useState(false);
+const band = (n: number | null): string => (n == null ? "n" : n >= 7 ? "g" : n >= 5 ? "a" : "r");
+
+/**
+ * THE product card, the same everywhere (Find, Multi-buys, For you, deal pages,
+ * similar products). Slim: picture, two-line name, one price row, one offer
+ * pill, three key facts, Fit and Value badges (tap one for the working), and a
+ * bottom row of stars and Add. Built to work at about 170px wide on a phone.
+ */
+export default function ProductTile({ p, now, store, mine, group, why, rank, swap, deal, inMealPage = false }: Props) {
+  const [open, setOpen] = useState<WhyKind | null>(null);
+  const panelId = useId();
+  const card = useRef<HTMLLIElement>(null);
+
+  // On a phone the open card takes the whole row; keep it in view when it does.
+  useEffect(() => {
+    if (!open) return;
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    card.current?.scrollIntoView({ block: "nearest", behavior: calm ? "auto" : "smooth" });
+  }, [open]);
   const row = mine.get(p.id);
   const pv = priceView(p, now);
-  const offers = shownPromos(p.promos, now);
   const multi = groupPromo(p, now);
   const mealPromo = p.promos.find((x) => x.kind === "mealdeal");
   const off = pctOff(p);
-  const hasOffer = pv.cut || offers.length > 0 || multi !== null;
-  const pack = packLabel(p.packGrams, p.unitMeasure);
-  const ends = endsLabel(p.promos, now);
-  const proc = processing(p);
   const sat = satTone(p.sat);
-  const unit = unitPriceLabel(p.unitPrice, p.unitMeasure);
-  const why2 = valueWhy(p);
-  const nowEach = pv.nowPence / 100;
   const paid = p.paidBefore;
-  // Bought in a multi-buy that is still running: the single price is not the thing to compare.
-  const sameDeal = paid != null && paid.offer != null && multi != null && tidyMoney(offerLabel(multi)) === paid.offer;
-  const paidMove = paid && !sameDeal ? Math.round((nowEach - paid.each) * 100) : 0;
+  const nowEach = pv.nowPence / 100;
+  const paidMove = paid ? Math.round((nowEach - paid.each) * 100) : 0;
+  const href = `${BASE_PATH}/p/${encodeURIComponent(p.id)}`;
   const offerHref = multi ? `${BASE_PATH}/offer/${encodeURIComponent(multi.uid)}` : null;
-  const storage = p.storage === "frozen" ? "Frozen" : p.storage === "chilled" ? "Fridge" : null;
+  const fit = p.fit != null ? Math.round(p.fit) : null;
+  const val = p.value != null ? Math.round(p.value) : null;
+
+  // The one pill: a multi-buy, else a meal deal, else the size of the cut.
+  let pill: { text: string; href: string | null; tone: "offer" | "off" } | null = null;
+  if (multi && offerHref) pill = { text: tidyMoney(offerLabel(multi)), href: offerHref, tone: "offer" };
+  else if (mealPromo && !inMealPage) pill = { text: "Meal deal", href: `${BASE_PATH}/meal/${encodeURIComponent(mealPromo.uid)}`, tone: "offer" };
+  else if (off != null) pill = { text: `−${off}%`, href: null, tone: "off" };
+  else if (pv.cut) pill = { text: "Offer", href: null, tone: "off" };
+
+  // The key facts, each coloured, most important first: how plain it is (ingredients, ultra-processing
+  // markers), seed oils, then protein. Saturated fat only shows when it is not low; the breakdown has the rest.
+  const facts: { key: string; tone: string; text: string; label: string; why?: boolean }[] = [];
+  const markers = p.upfMarkers;
+  if (p.upfCount == null && p.ingredientCount == null && !p.isBasic) {
+    facts.push({ key: "ingr", tone: "n", text: "Ingredients ?", label: "Ingredients not read yet", why: true });
+  } else {
+    if (p.isBasic || p.ingredientCount === 1) facts.push({ key: "ingr", tone: "g", text: "1 ingr", label: "Single-ingredient food", why: true });
+    else if (p.ingredientCount != null) {
+      facts.push({
+        key: "ingr",
+        tone: p.ingredientCount <= 5 ? "g" : p.ingredientCount <= 10 ? "a" : "r",
+        text: `${p.ingredientCount} ingr`,
+        label: `${p.ingredientCount} ingredients`,
+        why: true,
+      });
+    }
+    if (p.upfCount != null) {
+      facts.push(
+        p.upfCount === 0
+          ? { key: "upf", tone: "g", text: "No UPF", label: "No ultra-processing markers", why: true }
+          : {
+              key: "upf",
+              tone: p.upfCount >= 3 ? "r" : "a",
+              text: `${p.upfCount} UPF`,
+              label: `${p.upfCount} ultra-processing ${p.upfCount === 1 ? "marker" : "markers"}${markers.length > 0 ? `: ${markers.join(", ")}` : ""}`,
+              why: true,
+            },
+      );
+    }
+  }
+  if (p.seedOil === "none") facts.push({ key: "oil", tone: "g", text: "No seed oil", label: "No seed oils" });
+  else if (p.seedOil === "yes") facts.push({ key: "oil", tone: "r", text: "Seed oil", label: "Contains seed oils" });
+  else if (p.seedOil === "likely") facts.push({ key: "oil", tone: "a", text: "Maybe seed oil", label: "May contain a seed oil" });
+  if (p.protein != null) {
+    const g = p.protein >= 10 ? Math.round(p.protein) : +p.protein.toFixed(1);
+    facts.push({ key: "protein", tone: p.protein >= 15 ? "g" : p.protein >= 6 ? "a" : "n", text: `${g}g protein`, label: `${g} grams of protein in every 100 grams` });
+  }
+  if (p.sat != null && sat && sat !== "g") {
+    facts.push({ key: "sat", tone: sat, text: `Sat ${+p.sat.toFixed(1)}g`, label: `${+p.sat.toFixed(1)} grams of saturated fat in every 100 grams` });
+  }
+
+  // One short muted line, most important first.
+  let note: { text: string; tone: string } | null = null;
+  if (p.notAtStore) note = { text: "Not at my store", tone: "n" };
+  else if (why) note = { text: `✦ ${why}`, tone: "why" };
+  else if (paid) {
+    note = {
+      text: `Paid ${gbp(paid.each)} before${paidMove < 0 ? ", now cheaper" : paidMove > 0 ? ", now dearer" : ""}`,
+      tone: paidMove < 0 ? "g" : paidMove > 0 ? "r" : "n",
+    };
+  } else if (p.valueBasis === "protein" && p.per100Protein != null) note = { text: `${gbp(p.per100Protein)} per 100g protein`, tone: "n" };
+
+  function toggle(kind: WhyKind) {
+    setOpen((cur) => (cur === kind ? null : kind));
+  }
 
   return (
-    <li className={`ds-pcard${p.notAtStore ? " is-muted" : ""}${shelf ? " ds-pcard--shelf" : ""}${row ? " is-added" : ""}`}>
-      <Link href={`${BASE_PATH}/p/${encodeURIComponent(p.id)}`} className="ds-pcard-imgwrap" aria-label={`${p.name}: open`}>
-        <ProductImage src={p.imageUrl} className="ds-img--card" />
-        <span className="ds-ov ds-ov--tl" aria-hidden="false">
-          {rank != null && <span className="ds-score ds-score--rank">{rank}</span>}
-          <ScoreChip label="Fit" score={p.fit} />
-          <ScoreChip label="Value" score={p.value} />
-        </span>
-        <span className="ds-ov ds-ov--bl">
-          {hasOffer && <span className="ds-ovchip ds-ovchip--offer">Offer</span>}
-          {off != null && <span className="ds-ovchip ds-ovchip--off">−{off}%</span>}
-          {pack && <span className="ds-ovchip">{pack}</span>}
-          {p.isNew && <span className="ds-ovchip ds-ovchip--new">New</span>}
-        </span>
-      </Link>
+    <li ref={card} className={`ds-pcard${p.notAtStore ? " is-muted" : ""}${row ? " is-added" : ""}${open ? " is-open" : ""}`}>
+      <div className="ds-pcard-imgwrap">
+        <Link href={href} className="ds-pcard-imglink" aria-label={`${p.name}: open`}>
+          <ProductImage src={p.imageUrl} className="ds-img--card" />
+        </Link>
+        {rank && <span className="ds-rank">{rank}</span>}
+        {p.isNew && <span className="ds-newtag">New</span>}
+        {pill &&
+          (pill.href ? (
+            <Link href={pill.href} className={`ds-pill ds-pill--${pill.tone}`}>
+              {pill.text} <span aria-hidden="true">›</span>
+            </Link>
+          ) : (
+            <span className={`ds-pill ds-pill--${pill.tone}`}>{pill.text}</span>
+          ))}
+      </div>
 
       <div className="ds-pcard-body">
-        <Link href={`${BASE_PATH}/p/${encodeURIComponent(p.id)}`} className="ds-pcard-name" title={p.name}>
+        <Link href={href} className="ds-pcard-name" title={p.name}>
           {shortName(p.name)}
         </Link>
 
         <div className="ds-pcard-price">
-          <PriceBlock view={pv} />
-          {unit && <span className="ds-muted ds-pcard-unit">{unit}</span>}
-        </div>
-        {multi && offerHref && (
-          <Link href={offerHref} className="ds-eachin">
-            {dealPhrase(multi)} <span aria-hidden="true">›</span>
-          </Link>
-        )}
-        {mealPromo && !inMealPage && (
-          <Link href={`${BASE_PATH}/meal/${encodeURIComponent(mealPromo.uid)}`} className="ds-eachin">
-            Part of a meal deal <span aria-hidden="true">›</span>
-          </Link>
-        )}
-        {p.per100Protein != null && <p className="ds-cmp">{gbp(p.per100Protein)} per 100g protein</p>}
-
-        <div className="ds-pcard-chips">
-          {group && <GroupTag group={group} label={group.kind === "mealdeal" ? group.label : tidyMoney(group.label)} />}
-          {ends && <span className="ds-chipx">{ends}</span>}
-          {proc && <span className={`ds-chipx ds-chipx--${proc.tone}`}>{proc.label}</span>}
-          {p.seedOil === "none" ? <span className="ds-chipx ds-chipx--g">No seed oils</span> : <SeedOilTag seedOil={p.seedOil} />}
-          {sat && p.sat != null && <span className={`ds-chipx ds-chipx--${sat}`}>Sat fat {+p.sat.toFixed(1)}g</span>}
-          {storage && <span className="ds-chipx">{storage}</span>}
-          {paid && (
-            <span className={`ds-chipx ${paidMove < 0 ? "ds-chipx--g" : paidMove > 0 ? "ds-chipx--r" : ""}`}>
-              {sameDeal ? `Ordered before · same deal as then, ${gbp(paid.each)} each` : `Ordered before · paid ${gbp(paid.each)}, now ${gbp(nowEach)}`}
-            </span>
+          <strong className="ds-pcard-now">{gbp(nowEach)}</strong>
+          {pv.cut && (
+            <s className="ds-pcard-was">
+              <span className="ds-sr">Usually </span>
+              {gbp(pv.fullPence / 100)}
+            </s>
           )}
-          {p.notAtStore && <span className="ds-chipx ds-chipx--grey">Not at my store</span>}
+          {pv.nectar && <span className="ds-pcard-nectar">Nectar</span>}
         </div>
 
-        {why && <p className="ds-why">✦ {why}</p>}
+        {group && <GroupTag group={group} label={group.kind === "mealdeal" ? group.label : tidyMoney(group.label)} />}
+
+        {facts.length > 0 && (
+          <ul className="ds-facts3" aria-label="Key facts">
+            {facts.map((f) => (
+              <li key={f.key}>
+                {f.why ? (
+                  <button type="button" className={`ds-fact ds-fact--${f.tone}`} aria-label={`${f.label}. Tap to see how Fit is worked out.`} onClick={() => setOpen("fit")}>
+                    {f.text}
+                  </button>
+                ) : (
+                  <span className={`ds-fact ds-fact--${f.tone}`} aria-label={f.label}>
+                    {f.text}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {note && <p className={`ds-pcard-note ds-pcard-note--${note.tone}`}>{note.text}</p>}
+
+        <div className="ds-scores" role="group" aria-label="Scores. Tap one to see how it is worked out.">
+          <button
+            type="button"
+            className={`ds-sbtn ds-sbtn--${band(fit)}`}
+            aria-expanded={open === "fit"}
+            aria-controls={panelId}
+            onClick={() => toggle("fit")}
+          >
+            <span>Fit {fit ?? "?"}</span>
+            {p.stars != null ? <i aria-label="from your rating">✓</i> : p.learned ? <i aria-label="estimated from your taste">≈</i> : null}
+            <Caret open={open === "fit"} />
+          </button>
+          <button
+            type="button"
+            className={`ds-sbtn ds-sbtn--${band(val)}`}
+            aria-expanded={open === "value"}
+            aria-controls={panelId}
+            onClick={() => toggle("value")}
+          >
+            <span>Value {val ?? "?"}</span>
+            <Caret open={open === "value"} />
+          </button>
+        </div>
+
+        {open && <CardWhy p={p} kind={open} id={panelId} rank={rank} why={why} />}
 
         {swap && row && (
           <p className="ds-swap">
@@ -146,56 +232,10 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
           </p>
         )}
 
-        <details className="ds-more" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
-          <summary>{open ? "Hide details" : "Details"}</summary>
-          <dl className="ds-facts">
-            {p.protein != null && (
-              <div>
-                <dt>Protein</dt>
-                <dd>{+p.protein.toFixed(1)}g in every 100g</dd>
-              </div>
-            )}
-            {p.sat != null && (
-              <div>
-                <dt>Sat fat</dt>
-                <dd>{+p.sat.toFixed(1)}g in every 100g</dd>
-              </div>
-            )}
-            {p.ingredientCount != null && (
-              <div>
-                <dt>Ingredients</dt>
-                <dd>{p.ingredientCount === 1 ? "Only 1" : p.ingredientCount}</dd>
-              </div>
-            )}
-            {p.stars !== null && (
-              <div>
-                <dt>You rated it</dt>
-                <dd>
-                  <StarsDisplay stars={p.stars} />
-                </dd>
-              </div>
-            )}
-            {p.reviewAvg != null && p.reviewCount != null && p.reviewCount > 0 && (
-              <div>
-                <dt>Shoppers</dt>
-                <dd>
-                  {p.reviewAvg.toFixed(1)} out of 5 from {p.reviewCount}
-                </dd>
-              </div>
-            )}
-          </dl>
-          {why2 && (
-            <p className="ds-valuewhy">
-              <b>Why Value {p.value}?</b> {why2}
-            </p>
-          )}
-        </details>
-
-        <QuickRate productId={p.id} name={p.name} stars={p.stars} />
-
         <div className="ds-pcard-foot">
+          <QuickRate productId={p.id} name={p.name} stars={p.stars} />
           {row ? (
-            <div className="ds-step" role="group" aria-label={`How many ${p.name}`}>
+            <div className="ds-step ds-step--card" role="group" aria-label={`How many ${p.name}`}>
               {row.qty > 1 ? (
                 <button type="button" className="ds-step-btn" aria-label={`One fewer ${p.name}`} onClick={() => store.setQty(row.id, row.qty - 1)}>
                   <span aria-hidden="true">−</span>
@@ -206,7 +246,8 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
                 </button>
               )}
               <span className="ds-step-qty" aria-live="polite">
-                {row.qty} on list
+                {row.qty}
+                <span className="ds-sr"> on list</span>
               </span>
               <button type="button" className="ds-step-btn" aria-label={`One more ${p.name}`} onClick={() => store.setQty(row.id, row.qty + 1)}>
                 <span aria-hidden="true">+</span>
@@ -214,11 +255,19 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
             </div>
           ) : (
             <button type="button" className="ds-btn ds-btn--primary ds-pcard-add" aria-label={`Add ${p.name} to your list`} onClick={() => store.add({ ...p, deals: dealsFor(deal) })}>
-              + Add to list
+              + Add
             </button>
           )}
         </div>
       </div>
     </li>
+  );
+}
+
+function Caret({ open }: { open: boolean }) {
+  return (
+    <svg className={`ds-sbtn-caret${open ? " is-open" : ""}`} width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+      <path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }

@@ -92,6 +92,8 @@ export interface BasketItem {
   lineTotal: number;
   reason: string;
   dealGroup?: string;
+  /** Which part of the week it feeds (dinner, breakfast, ...). Older baskets don't have it. */
+  slot?: "dinner" | "breakfast" | "lunch" | "veg" | "staples";
 }
 
 /** A product as shown on a card in Find, or at the top of a sheet. */
@@ -135,15 +137,28 @@ export interface ProductCard extends PriceInfo {
   per100Protein: number | null;
   /** What he paid each last time, and when, from his past shops. */
   paidBefore: { each: number; at: string; offer: string | null } | null;
+  /** A plain ingredient: meat, fish, eggs, veg, rice, tofu... (the pipeline's call). */
+  isBasic: boolean;
+  /** His Yes (1) or No (-1) on a basket pick, if he gave one. */
+  vote: 1 | -1 | null;
+  /** Where the ingredients and nutrition on this card came from, when not Sainsbury's own label. */
+  ingredientsSource: string | null;
+  nutritionSource: string | null;
+  /** Energy per 100g, for the Fit breakdown. */
+  kcal: number | null;
+  /** The ultra-processing markers found in the ingredients, and the seed oils found. */
+  upfMarkers: string[];
+  seedOilsFound: string[];
+  /** The pipeline's plain-English reasons behind the health score. */
+  reasons: string[];
+  /** His taste for this product worked out from what he has rated, voted and bought (0-10), when he has not rated it himself. */
+  learned?: { taste: number; conf: number; from: string[] } | null;
 }
 
 export interface ProductDetail extends ProductCard {
   slug: string;
   nutrition: Nutrition | null;
   ingredients: string | null;
-  seedOilsFound: string[];
-  upfMarkers: string[];
-  reasons: string[];
   listedAt: string;
 }
 
@@ -188,6 +203,20 @@ export interface BasketView {
   warnings: string[];
   /** True when this is an older basket shown because a new one could not be made. */
   fromHistory: boolean;
+  /** His Yes / No on this basket's picks, by product id. */
+  votes: Record<string, 1 | -1>;
+  /** What his votes have taught so far, in plain words. */
+  taught: string[];
+  /** Calendar slots the week is made of, with how many servings of each the basket covers. */
+  meals: MealCoverage[];
+}
+
+/** One slot of the week (dinners, breakfasts...): how much of it the basket covers. */
+export interface MealCoverage {
+  slot: "dinner" | "breakfast" | "lunch" | "veg" | "staples";
+  label: string;
+  have: number;
+  need: number;
 }
 
 export interface Freshness {
@@ -196,10 +225,11 @@ export interface Freshness {
   withDetails: number;
 }
 
-export const SORTS = ["rec", "value", "saving", "score", "price", "few", "ppp"] as const;
+export const SORTS = ["best", "rec", "value", "saving", "score", "price", "few", "ppp"] as const;
 export type Sort = (typeof SORTS)[number];
 
 export const SORT_INFO: Record<Sort, { label: string; sub: string }> = {
+  best: { label: "Best overall", sub: "Health 50% · value 35% · your taste 15%" },
   rec: { label: "Picked for you", sub: "Your taste, value and the saving" },
   value: { label: "Best deal", sub: "Value score first, then what suits you" },
   saving: { label: "Biggest saving", sub: "Most off the usual price" },
@@ -221,12 +251,22 @@ export const VIEW_LABEL: Record<View, string> = {
   deals: "Meal deals",
 };
 
+/** The same, short enough for one slim row on a phone. */
+export const VIEW_SHORT: Record<View, string> = {
+  all: "All",
+  foryou: "✦ For you",
+  offers: "Offers",
+  multibuys: "Multi",
+  deals: "Deals",
+};
+
 /** Cross-cutting lists, Tesco style: they cut across the shop's own sections. */
 export const COLLECTIONS = [
   { key: "meals", label: "Ready meals", desc: "Heat and eat: chilled and frozen meals, pizza, pies, soup" },
   { key: "protein", label: "High protein", desc: "15g or more protein in every 100g" },
   { key: "freezer", label: "Freezer backups", desc: "Frozen food to keep in" },
   { key: "breakfast", label: "Breakfast", desc: "Cereal, porridge, eggs, bacon, yoghurt" },
+  { key: "ttd", label: "Taste the Difference", desc: "Sainsbury's premium own range" },
   { key: "fancy", label: "Fancy night in", desc: "Taste the Difference and dinner deals for a treat" },
   { key: "ordered", label: "Ordered before", desc: "Everything from your past shops, with what you paid then" },
 ] as const;
@@ -254,8 +294,10 @@ export interface FindFilters {
   /** Hide */
   hideSat: boolean;
   hideOwn: boolean;
-  /** Plain ingredients (chicken breast, rice, eggs): anything with just one ingredient. */
+  /** Single-ingredient foods: anything with one ingredient, or a plain food like chicken breast, rice, eggs (is_basic). */
   hideSingle: boolean;
+  /** Only Sainsbury's Taste the Difference range. */
+  tasteDiff: boolean;
 }
 
 export const FILTER_DEFAULTS = { noSeedOil: true, hideSat: true } as const;
@@ -299,6 +341,8 @@ export const FOOD_ZONES = [
 ] as const;
 
 export const BASE_PATH = "/dadshop";
+/** The shopping list lives here now; the home page is Find, on For you. */
+export const LIST_PATH = `${BASE_PATH}/list`;
 
 // ── Meal deals (dinner deals: Dine In, Discovery, Takeaway) ─────────────────
 
@@ -338,20 +382,20 @@ export interface OfferPage {
   items: ProductCard[];
 }
 
-/** A multi-buy offer with its best few products, for the Multi-buys view. */
-export interface OfferGroup {
-  uid: string;
-  text: string;
-  count: number;
-  endsOn: string | null;
-  items: ProductCard[];
-}
-
 export interface Shelf {
   key: string;
   title: string;
   sub: string;
   items: (ProductCard & { why: string })[];
+  /** The dinner deals shelf lists deals instead of products. */
+  deals?: Deal[];
+}
+
+/** For you: the shelves, and how much he has told us so far. */
+export interface ForYou {
+  shelves: Shelf[];
+  /** Products he has rated. Zero means the shelves are going by his rules alone. */
+  rated: number;
 }
 
 /** One finished shop. */

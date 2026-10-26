@@ -6,22 +6,10 @@ import Popover from "./Popover";
 import { Caret } from "./ui";
 
 /** Sort: a popover of choices, each with a one-line reason under its name. */
-export function SortButton({
-  value,
-  allRound = false,
-  onChange,
-}: {
-  value: Sort | "round";
-  /** Deal pages start in "All round", which is not one of the normal sorts. */
-  allRound?: boolean;
-  onChange: (next: Sort | "round") => void;
-}) {
+export function SortButton({ value, onChange }: { value: Sort; onChange: (next: Sort) => void }) {
   const [open, setOpen] = useState(false);
   const anchor = useRef<HTMLButtonElement>(null);
-  const items: { key: Sort | "round"; label: string; sub: string }[] = [
-    ...(allRound ? [{ key: "round" as const, label: "All round", sub: "Suits you, good value, least processed" }] : []),
-    ...SORTS.map((s) => ({ key: s, label: SORT_INFO[s].label, sub: SORT_INFO[s].sub })),
-  ];
+  const items: { key: Sort; label: string; sub: string }[] = SORTS.map((s) => ({ key: s, label: SORT_INFO[s].label, sub: SORT_INFO[s].sub }));
   const current = items.find((i) => i.key === value) ?? items[0];
 
   function close(refocus: boolean) {
@@ -75,7 +63,7 @@ export function SortButton({
   );
 }
 
-export type ToggleKey = "good" | "frozen" | "rated" | "onList" | "fewIngredients" | "noSeedOil" | "hideSat" | "hideOwn" | "hideSingle";
+export type ToggleKey = "good" | "frozen" | "rated" | "onList" | "fewIngredients" | "noSeedOil" | "hideSat" | "hideOwn" | "hideSingle" | "tasteDiff";
 
 const ONLY: { key: ToggleKey; label: string; hint?: string }[] = [
   { key: "good", label: "Good deals", hint: "25% off or more, and good value" },
@@ -83,12 +71,13 @@ const ONLY: { key: ToggleKey; label: string; hint?: string }[] = [
   { key: "rated", label: "Rated by me" },
   { key: "onList", label: "On my list" },
   { key: "fewIngredients", label: "5 ingredients or fewer" },
+  { key: "tasteDiff", label: "Taste the Difference", hint: "Sainsbury's premium own range" },
   { key: "noSeedOil", label: "No seed oils", hint: "Hides anything with seed oils, or no ingredients listed yet" },
 ];
 const HIDE: { key: ToggleKey; label: string; hint?: string }[] = [
   { key: "hideSat", label: "Hide high sat fat" },
   { key: "hideOwn", label: "Hide Sainsbury's own brand" },
-  { key: "hideSingle", label: "Hide plain ingredients", hint: "Single-ingredient foods like chicken breast, rice or eggs" },
+  { key: "hideSingle", label: "Hide single-ingredient foods", hint: "Hides anything that is just one ingredient: plain meat, fish, eggs, fruit, veg, rice, tofu…" },
 ];
 
 export function countFilters(f: FindFilters): number {

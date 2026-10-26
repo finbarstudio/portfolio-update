@@ -1,14 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { gbp, shortDate } from "@/lib/dad-shop/format";
 import { sortCards, betterSwap, type SortKey } from "@/lib/dad-shop/sorts";
 import { BASE_PATH, type DealLink, type DealPage, type ListItem, type ProductCard } from "@/lib/dad-shop/types";
 import { SortButton } from "./FindControls";
 import ProductTile from "./ProductTile";
 import { groupStyle } from "./ui";
-import { useHideOnScroll } from "./useHideOnScroll";
 import { useShopList } from "./useShopList";
 
 type Item = ProductCard & { listId: number };
@@ -23,9 +22,7 @@ export default function MealDealPage({ page, list, nowIso }: { page: DealPage; l
   const now = new Date(nowIso);
   const { deal, items } = page;
   const { store, snap, pricing, mine } = useShopList(list, now);
-  const [sort, setSort] = useState<SortKey>("round");
-  const bar = useRef<HTMLDivElement>(null);
-  const hidden = useHideOnScroll(bar);
+  const [sort, setSort] = useState<SortKey>("best");
 
   const partOf = new Map<string, number>();
   for (const i of items) if (!partOf.has(i.id)) partOf.set(i.id, i.listId);
@@ -79,7 +76,7 @@ export default function MealDealPage({ page, list, nowIso }: { page: DealPage; l
 
   return (
     <div className="ds-page ds-page--wide ds-dealpage">
-      <div ref={bar} className={`ds-dealbar-wrap${hidden ? " is-hidden" : ""}`}>
+      <div className="ds-dealbar-wrap">
         <div className="ds-dealbar" style={group ? groupStyle(group.colour) : undefined}>
           {group ? <span className="ds-gtag-l ds-dealbar-l">{group.letter}</span> : <span aria-hidden="true" />}
           <div className="ds-dealbar-main">
@@ -115,7 +112,7 @@ export default function MealDealPage({ page, list, nowIso }: { page: DealPage; l
               </button>
             );
           })}
-          <SortButton value={sort} allRound onChange={(s) => setSort(s)} />
+          <SortButton value={sort} onChange={(s) => setSort(s)} />
         </div>
       </div>
 

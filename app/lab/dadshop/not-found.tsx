@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="ds-empty">
         <p className="ds-empty-title">Couldn&apos;t find that.</p>
         <p>It may have been taken off the shelves.</p>
-        <Link className="ds-btn ds-btn--primary" href={`${BASE_PATH}/find`}>
+        <Link className="ds-btn ds-btn--primary" href={BASE_PATH}>
           Search for something else
         </Link>
       </div>

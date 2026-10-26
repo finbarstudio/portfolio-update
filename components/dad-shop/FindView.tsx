@@ -1,23 +1,22 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
-import { shortDate } from "@/lib/dad-shop/format";
-import { offerWords, tidyMoney, type GroupInfo } from "@/lib/dad-shop/pricing";
+import { type GroupInfo } from "@/lib/dad-shop/pricing";
 import {
   ANIMALS,
   BASE_PATH,
   FILTER_DEFAULTS,
   VIEWS,
   VIEW_LABEL,
+  VIEW_SHORT,
   type Deal,
   type Facets,
+  SORT_INFO,
   type FindFilters,
   type ListItem,
-  type OfferGroup,
+  type ForYou,
   type ProductCard,
-  type Shelf,
   type Sort,
   type View,
 } from "@/lib/dad-shop/types";
@@ -27,7 +26,6 @@ import { FiltersButton, SortButton, type ToggleKey } from "./FindControls";
 import MealDealCard from "./MealDealCard";
 import ProductTile from "./ProductTile";
 import Shelves from "./Shelves";
-import { useHideOnScroll } from "./useHideOnScroll";
 import { useShopList } from "./useShopList";
 
 interface Props {
@@ -35,9 +33,7 @@ interface Props {
   facets: Facets;
   items: ProductCard[];
   hasMore: boolean;
-  groups: OfferGroup[] | null;
-  groupsMore: boolean;
-  shelves: Shelf[] | null;
+  forYou: ForYou | null;
   deals: Deal[] | null;
   list: ListItem[];
   nowIso: string;
@@ -45,13 +41,11 @@ interface Props {
 
 const cap = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
 
-export default function FindView({ filters, facets, items, hasMore, groups, groupsMore, shelves, deals, list, nowIso }: Props) {
+export default function FindView({ filters, facets, items, hasMore, forYou, deals, list, nowIso }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [text, setText] = useState(filters.q);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const head = useRef<HTMLDivElement>(null);
-  const hidden = useHideOnScroll(head);
   const now = new Date(nowIso);
   const { store, pricing, mine, snap } = useShopList(list, now);
 
@@ -106,6 +100,7 @@ export default function FindView({ filters, facets, items, hasMore, groups, grou
       fewIngredients: false,
       hideOwn: false,
       hideSingle: false,
+      tasteDiff: false,
     });
   }
 
@@ -139,11 +134,13 @@ export default function FindView({ filters, facets, items, hasMore, groups, grou
       : (facets.zones.find((z) => z.zone === filters.zone)?.n ?? 0);
   const animals = facets.animals.filter((a) => (ANIMALS as readonly string[]).includes(a.animal));
 
-  const empty = items.length === 0 && (!groups || groups.length === 0) && (!shelves || shelves.length === 0) && (!deals || deals.length === 0);
+  const shelves = forYou?.shelves ?? null;
+  const empty = items.length === 0 && (!shelves || shelves.length === 0) && (!deals || deals.length === 0);
+  const ranked = filters.sort === "best";
 
   return (
     <div className="ds-page ds-page--wide ds-find">
-      <div ref={head} className={`ds-find-head${hidden ? " is-hidden" : ""}`}>
+      <div className="ds-find-head">
         <div className="ds-find-top">
           <h1 className="ds-h1">Find</h1>
           <form
@@ -171,23 +168,31 @@ export default function FindView({ filters, facets, items, hasMore, groups, grou
               onChange={(e) => onType(e.target.value)}
             />
           </form>
+          <FiltersButton filters={filters} ignored={dealish} onToggle={toggle} onReset={reset} />
         </div>
 
         <div className="ds-seg" role="group" aria-label="View">
           {VIEWS.map((v) => (
             <button key={v} type="button" aria-pressed={filters.view === v} onClick={() => setView(v)}>
-              {VIEW_LABEL[v]}
+              <span className="ds-lab-long">{VIEW_LABEL[v]}</span>
+              <span className="ds-lab-short" aria-hidden="true">
+                {VIEW_SHORT[v]}
+              </span>
             </button>
           ))}
         </div>
+      </div>
 
+      <div className="ds-find-tools">
         <div className="ds-ctl">
           {filters.view !== "deals" && <CategoryMenu facets={facets} sel={sel} onPick={pickCat} />}
-          {filters.view !== "foryou" && (
-            <SortButton value={filters.sort} onChange={(s) => go({ sort: s as Sort })} />
-          )}
-          <FiltersButton filters={filters} ignored={dealish} onToggle={toggle} onReset={reset} />
+          {filters.view !== "foryou" && <SortButton value={filters.sort} onChange={(s) => go({ sort: s as Sort })} />}
         </div>
+        {filters.view !== "foryou" && (
+          <p className="ds-sortline" aria-live="polite">
+            <b>{SORT_INFO[filters.sort].label}</b>: {SORT_INFO[filters.sort].sub}
+          </p>
+        )}
 
         {filters.view !== "deals" && tabs.length > 1 && (
           <div className="ds-tabs2" role="group" aria-label="Type">
@@ -231,51 +236,26 @@ export default function FindView({ filters, facets, items, hasMore, groups, grou
           </section>
         )}
 
-        {filters.view === "multibuys" && groups && groups.length > 0 && (
-          <div className="ds-offergroups">
-            {groups.map((g) => (
-              <section key={g.uid} className="ds-ogroup" aria-label={g.text}>
-                <div className="ds-ogroup-head">
-                  <div>
-                    <h2 className="ds-h2 ds-ogroup-name">{tidyMoney(offerWords(g.text))}</h2>
-                    <p className="ds-muted ds-ogroup-sub">
-                      {g.count} {g.count === 1 ? "product" : "products"}
-                      {g.endsOn ? ` · ends ${shortDate(g.endsOn) ?? ""}` : ""}
-                    </p>
-                  </div>
-                  <Link className="ds-btn ds-btn--ghost ds-btn--small" href={`${BASE_PATH}/offer/${encodeURIComponent(g.uid)}`}>
-                    Open the deal ›
-                  </Link>
-                </div>
-                <ul className="ds-cards">
-                  {g.items.map((p) => (
-                    <ProductTile key={p.id} p={p} now={now} store={store} mine={mine} group={groupOf.get(p.id) ?? null} />
-                  ))}
-                </ul>
-                {g.count > g.items.length && (
-                  <Link className="ds-link ds-ogroup-more" href={`${BASE_PATH}/offer/${encodeURIComponent(g.uid)}`}>
-                    See all {g.count} in this deal
-                  </Link>
-                )}
-              </section>
-            ))}
-            {groupsMore && (
-              <button type="button" className="ds-btn ds-btn--ghost ds-btn--wide" onClick={() => go({ page: filters.page + 1 })}>
-                Show more offers
-              </button>
-            )}
-          </div>
+        {filters.view === "multibuys" && items.length > 0 && (
+          <p className="ds-muted ds-note-small">
+            Every product here has a multi-buy offer. Nothing is hidden: only the sort changes. Tap an offer on a card to see everything that shares it.
+          </p>
         )}
 
+        {filters.view === "foryou" && forYou && forYou.rated === 0 && shelves && shelves.length > 0 && (
+          <p className="ds-note-small ds-learn">
+            Rate a few products with the stars and this page learns what you like. Until then it goes by your rules: healthy, no seed oils, good value.
+          </p>
+        )}
         {filters.view === "foryou" && shelves && shelves.length > 0 && (
-          <Shelves shelves={shelves} now={now} store={store} mine={mine} groupOf={groupOf} />
+          <Shelves shelves={shelves} now={now} store={store} mine={mine} groupOf={groupOf} dealOnList={(id) => snap.items.filter((i) => !i.ticked && i.deals?.some((x) => x.id === id)).length} />
         )}
 
         {items.length > 0 && (
           <>
             <ul className="ds-cards ds-cards--grid">
-              {items.map((p) => (
-                <ProductTile key={p.id} p={p} now={now} store={store} mine={mine} group={groupOf.get(p.id) ?? null} />
+              {items.map((p, i) => (
+                <ProductTile key={p.id} p={p} now={now} store={store} mine={mine} group={groupOf.get(p.id) ?? null} rank={ranked ? `#${i + 1} best overall` : undefined} />
               ))}
             </ul>
             {hasMore && (
@@ -309,7 +289,7 @@ export default function FindView({ filters, facets, items, hasMore, groups, grou
                   Show them too
                 </button>
               )}
-              {!dealish && (filters.good || filters.frozen || filters.rated || filters.onList || filters.fewIngredients || filters.hideOwn || filters.hideSingle) && (
+              {!dealish && (filters.good || filters.frozen || filters.rated || filters.onList || filters.fewIngredients || filters.hideOwn || filters.hideSingle || filters.tasteDiff) && (
                 <button type="button" className="ds-btn ds-btn--ghost" onClick={reset}>
                   Reset filters
                 </button>

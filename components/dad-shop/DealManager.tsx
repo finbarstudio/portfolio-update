@@ -1,29 +1,27 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { shortDate } from "@/lib/dad-shop/format";
+import { overallWeightsLine } from "@/lib/dad-shop/overall";
 import { offerWords, tidyMoney } from "@/lib/dad-shop/pricing";
 import { sortCards, betterSwap, type SortKey } from "@/lib/dad-shop/sorts";
 import { BASE_PATH, type ListItem, type OfferPage } from "@/lib/dad-shop/types";
 import { SortButton } from "./FindControls";
 import ProductTile from "./ProductTile";
 import { groupStyle } from "./ui";
-import { useHideOnScroll } from "./useHideOnScroll";
 import { useShopList } from "./useShopList";
 
 /**
  * One offer and everything that shares it. His own picks sit first; the rest
- * are ranked all round, and + / − swaps them. Filters never hide anything
+ * are ranked best overall, and + / − swaps them. Filters never hide anything
  * here, only the sort changes.
  */
 export default function DealManager({ offer, list, nowIso }: { offer: OfferPage; list: ListItem[]; nowIso: string }) {
   const router = useRouter();
   const now = new Date(nowIso);
   const { store, snap, pricing, mine } = useShopList(list, now);
-  const [sort, setSort] = useState<SortKey>("round");
-  const bar = useRef<HTMLDivElement>(null);
-  const hidden = useHideOnScroll(bar);
+  const [sort, setSort] = useState<SortKey>("best");
 
   const group = pricing.groups.find((g) => g.uid === offer.uid) ?? null;
   const have = snap.items.filter((i) => !i.ticked && i.promos.some((p) => p.uid === offer.uid)).reduce((n, i) => n + i.qty, 0);
@@ -41,12 +39,12 @@ export default function DealManager({ offer, list, nowIso }: { offer: OfferPage;
 
   function back() {
     if (window.history.length > 1) router.back();
-    else router.push(`${BASE_PATH}/find`);
+    else router.push(BASE_PATH);
   }
 
   return (
     <div className="ds-page ds-page--wide ds-dealpage">
-      <div ref={bar} className={`ds-dealbar-wrap${hidden ? " is-hidden" : ""}`}>
+      <div className="ds-dealbar-wrap">
         <div className="ds-dealbar" style={group ? groupStyle(group.colour) : undefined}>
           {group ? <span className="ds-gtag-l ds-dealbar-l">{group.letter}</span> : <span aria-hidden="true" />}
           <div className="ds-dealbar-main">
@@ -69,12 +67,12 @@ export default function DealManager({ offer, list, nowIso }: { offer: OfferPage;
           </button>
         </div>
         <div className="ds-ctl ds-ctl--deal">
-          <SortButton value={sort} allRound onChange={(s) => setSort(s)} />
+          <SortButton value={sort} onChange={(s) => setSort(s)} />
         </div>
       </div>
 
       <p className="ds-muted ds-note-small">
-        Everything in this deal shows; filters don&apos;t apply here. {sort === "round" ? "Ranked best to worst all round (suits you, value, least processed)." : "Sorted your way."}
+        Everything in this deal shows; filters don&apos;t apply here. {sort === "best" ? `Ranked best overall: ${overallWeightsLine().toLowerCase()}.` : "Sorted your way."}
         {picks.length > 0 ? " Your picks are first." : ""}
       </p>
 
@@ -96,7 +94,7 @@ export default function DealManager({ offer, list, nowIso }: { offer: OfferPage;
               store={store}
               mine={mine}
               group={mine.has(p.id) ? g : null}
-              rank={sort === "round" ? `#${rankOf.get(p.id)} all round` : `#${rankOf.get(p.id)}`}
+              rank={sort === "best" ? `#${rankOf.get(p.id)} best overall` : `#${rankOf.get(p.id)}`}
               swap={swap}
             />
           );

@@ -131,3 +131,22 @@ create table if not exists shops (
   protein_g   numeric not null default 0,
   items       jsonb not null                 -- [{productId, label, name, qty, paidEach, offer}]
 );
+
+-- v3 (26 Oct 2026): Yes / No on weekly-basket picks. Yes keeps it in the next basket, No keeps it out
+-- for a while; both teach his taste (category / brand affinity).
+create table if not exists basket_votes (
+  product_id text primary key references products(id) on delete cascade,
+  vote       smallint not null check (vote in (-1, 1)),
+  voted_at   timestamptz not null default now()
+);
+
+-- v4 (26 Oct 2026): ingredients for every product. Sainsbury's product page wins; otherwise the same barcode's
+-- label from Finbar's Tesco data, then Open Food Facts. The source is stored so the app can say where it came from.
+alter table products add column if not exists eans               text[] not null default '{}';
+alter table products add column if not exists ingredients_source text;   -- 'sainsburys' | 'tesco' | 'openfoodfacts'
+alter table products add column if not exists nutrition_source   text;   -- same values
+create index if not exists products_eans on products using gin (eans);
+
+-- v5 (26 Oct 2026): "basic ingredient" = a plain food you cook with (raw meat/fish, eggs, fruit & veg, rice,
+-- oats, pulses, tofu, plain nuts, flour…), even with salt / water / a firming agent. Drives "Hide plain ingredients".
+alter table products add column if not exists is_basic boolean not null default false;

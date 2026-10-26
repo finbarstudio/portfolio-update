@@ -81,7 +81,7 @@ body:has(.lb-root):has(.ds-app) {
 .ds-page {
   max-width: 720px;
   margin: 0 auto;
-  padding: 16px 16px 40px;
+  padding: 16px 16px calc(32px + var(--ds-tabs-h));
 }
 
 .ds-app :focus-visible {
@@ -500,7 +500,8 @@ body:has(.lb-root):has(.ds-app) {
 }
 .ds-total {
   position: sticky;
-  bottom: 8px;
+  bottom: calc(var(--ds-tabs-now) + 8px);
+  transition: bottom 220ms ease-out;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -880,24 +881,36 @@ body:has(.lb-root):has(.ds-app) {
 }
 
 /* ── Bottom tabs ────────────────────────────────────────────────────── */
+/* The tab bar floats over the bottom of the page so it can slide away on a phone
+   without anything reflowing; pages leave room for it (--ds-tabs-h). */
+.ds-app {
+  --ds-tabs-h: calc(52px + env(safe-area-inset-bottom, 0px));
+  --ds-tabs-now: var(--ds-tabs-h);
+}
 .ds-tabs {
-  flex: none;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border-top: 1px solid var(--ds-line);
   background: #fff;
   padding-bottom: env(safe-area-inset-bottom, 0);
+  transition: transform 220ms ease-out;
 }
 .ds-tab {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-height: 62px;
-  padding: 6px 2px;
-  font-size: 15px;
+  gap: 1px;
+  min-height: 52px;
+  padding: 3px 2px;
+  font-size: 13px;
   font-weight: 600;
+  line-height: 1.2;
   --ds-link: var(--ds-soft);
   -webkit-tap-highlight-color: transparent;
 }
@@ -961,11 +974,20 @@ body:has(.lb-root):has(.ds-app) {
   min-width: 0;
   margin: 0;
 }
+.ds-lab-short {
+  display: none;
+}
+.ds-find-tools {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ds-find-tools .ds-sortline {
+  margin: 0;
+}
 @media (max-width: 700px) {
-  .ds-find-head.is-hidden {
-    transform: translateY(-100%);
-  }
-  /* the tab bar already says "Find": the search takes the whole row */
+  /* One compact block: the search with its Filters button, then the views on one slim row.
+     Category and Sort sit just under it and scroll away with the page. */
   .ds-find-top .ds-h1 {
     position: absolute;
     width: 1px;
@@ -974,16 +996,60 @@ body:has(.lb-root):has(.ds-app) {
     clip: rect(0 0 0 0);
   }
   .ds-find-head {
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 8px 16px 8px;
+  }
+  .ds-find-top {
     gap: 8px;
-    padding-top: 10px;
+  }
+  /* Filters becomes an icon with its count */
+  .ds-find-top .ds-pbtn {
+    flex: none;
+    justify-content: center;
+    gap: 4px;
+    min-width: 48px;
+    padding: 0 10px;
+  }
+  .ds-find-top .ds-pbtn b,
+  .ds-find-top .ds-pbtn .ds-caret {
+    display: none;
+  }
+  .ds-find-head .ds-seg {
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 3px;
+  }
+  .ds-find-head .ds-seg button {
+    position: relative;
+    min-height: 40px;
+    min-width: 0;
+    padding: 0 4px;
+    font-size: 16px;
+  }
+  /* a 48px-tall tap area around a 40px button */
+  .ds-find-head .ds-seg button::before {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
+  }
+  .ds-lab-long {
+    display: none;
+  }
+  .ds-lab-short {
+    display: inline;
   }
   .ds-ctl > .ds-pbtn--cat {
-    flex-basis: 100%;
+    flex: 1 1 0;
+    min-width: 0;
   }
   .ds-ctl > .ds-pbtn:not(.ds-pbtn--cat) {
-    flex: 1 1 0;
+    flex: none;
     justify-content: center;
-    padding: 0 10px;
+    padding: 0 12px;
+  }
+  .ds-ctl .ds-pbtn {
+    min-height: 44px;
   }
   .ds-ctl .ds-pbtn-k {
     display: none;
@@ -1382,18 +1448,42 @@ body:has(.lb-root):has(.ds-app) {
 }
 
 /* ── Product cards ───────────────────────────────────────────────────── */
+/* Every product grid: exactly 3 across, and exactly 2 on a phone. One card, one size rule. */
 .ds-cards--grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(310px, 100%), 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
+  align-items: stretch;
 }
+@media (max-width: 699px) {
+  .ds-cards--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    gap: 10px;
+  }
+  /* A card whose working is open takes the whole row, so the text has room. */
+  .ds-pcard.is-open {
+    grid-column: 1 / -1;
+  }
+}
+.ds-pb-note {
+  color: var(--ds-g);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ── The product card ────────────────────────────────────────────────────
+   Slim, and made to work about 170px wide (two across on a phone).
+   Picture, 2-line name, one price row, one offer pill, 3 key facts, Fit and
+   Value badges (tap for the working), stars and Add in the bottom row. */
 .ds-pcard {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--ds-line);
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--ds-card);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
 }
@@ -1406,53 +1496,433 @@ body:has(.lb-root):has(.ds-app) {
 }
 .ds-pcard-imgwrap {
   position: relative;
-  display: block;
   background: #fff;
+}
+.ds-pcard-imglink {
+  display: block;
 }
 .ds-img.ds-img--card {
   width: 100%;
-  height: 180px;
+  height: 120px;
   margin: 0;
+  padding: 6px;
   border-radius: 0;
   background: #fff;
+  object-fit: contain;
 }
-.ds-ov {
+.ds-img--card.ds-img--empty {
+  padding: 0;
+}
+.ds-rank,
+.ds-newtag,
+.ds-pill {
   position: absolute;
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  align-items: flex-start;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.ds-rank {
+  top: 6px;
+  left: 6px;
   max-width: calc(100% - 12px);
-}
-.ds-ov--tl {
-  top: 8px;
-  left: 8px;
-  flex-direction: column;
-}
-.ds-ov--bl {
-  bottom: 8px;
-  left: 8px;
-}
-.ds-ovchip {
-  padding: 2px 8px;
-  border-radius: 7px;
-  background: rgb(255 255 255 / 0.95);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
-  color: var(--ds-ink);
-  font-size: 15px;
-  font-weight: 700;
-}
-.ds-ovchip--offer {
-  background: #c8102e;
+  padding: 1px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 999px;
+  background: var(--ds-ink);
   color: #fff;
 }
-.ds-ovchip--off {
-  background: var(--ds-g);
-  color: #fff;
-}
-.ds-ovchip--new {
+.ds-newtag {
+  top: 6px;
+  right: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
   background: var(--ds-accent);
   color: #fff;
+}
+.ds-rank ~ .ds-newtag {
+  top: 28px;
+}
+.ds-pill {
+  bottom: 6px;
+  left: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100% - 12px);
+  min-height: 32px;
+  padding: 0 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  font-size: 15px;
+  --ds-link: #fff;
+  color: #fff;
+}
+.ds-pill--offer {
+  background: #c8102e;
+}
+.ds-pill--off {
+  background: var(--ds-g);
+}
+.ds-pcard-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 10px 10px;
+}
+.ds-pcard-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-height: 2.5em;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+.ds-pcard-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+}
+.ds-pcard-now {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.ds-pcard-was {
+  color: var(--ds-soft);
+  font-size: 14px;
+}
+.ds-pcard-nectar {
+  padding: 0 5px;
+  border-radius: 5px;
+  background: #f1e7f7;
+  color: #6a2c91;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+.ds-facts3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+button.ds-fact {
+  position: relative;
+  border: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* a taller tap area around a small chip */
+button.ds-fact::before {
+  content: "";
+  position: absolute;
+  inset: -9px -2px;
+}
+.ds-fact {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 7px;
+  background: var(--ds-n-bg);
+  color: #3f444a;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.ds-fact--g {
+  background: var(--ds-green-bg);
+  color: #0a5c29;
+}
+.ds-fact--a {
+  background: #fbf0d6;
+  color: var(--ds-a);
+}
+.ds-fact--r {
+  background: var(--ds-red-bg);
+  color: var(--ds-r);
+}
+.ds-pcard-note {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ds-soft);
+  font-size: 14px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ds-pcard-note--why {
+  color: var(--ds-accent);
+  font-weight: 600;
+}
+.ds-pcard-note--g {
+  color: var(--ds-g);
+  font-weight: 700;
+}
+.ds-pcard-note--r {
+  color: var(--ds-r);
+  font-weight: 700;
+}
+
+/* Fit and Value: two small coloured badges that open their working inside the card */
+.ds-scores {
+  display: flex;
+  gap: 6px;
+}
+.ds-sbtn {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  height: 32px;
+  padding: 0 4px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ds-n-bg);
+  color: #3f444a;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* a 48px-tall tap area around a 32px badge */
+.ds-sbtn::before {
+  content: "";
+  position: absolute;
+  inset: -8px -3px;
+}
+.ds-sbtn--g {
+  background: var(--ds-green-bg);
+  color: #0a5c29;
+}
+.ds-sbtn--a {
+  background: #fbf0d6;
+  color: var(--ds-a);
+}
+.ds-sbtn--r {
+  background: var(--ds-red-bg);
+  color: var(--ds-r);
+}
+.ds-sbtn i {
+  font-size: 12px;
+  font-style: normal;
+}
+.ds-sbtn-caret {
+  flex: none;
+  transition: transform 120ms ease;
+}
+.ds-sbtn-caret.is-open {
+  transform: rotate(180deg);
+}
+.ds-sbtn[aria-expanded="true"] {
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+
+/* the working, inside the card */
+.ds-why {
+  padding: 8px;
+  overflow-wrap: anywhere;
+  border: 1px solid #d7e2f3;
+  border-radius: 10px;
+  background: #f3f6fb;
+  font-size: 14px;
+  line-height: 1.35;
+}
+.ds-why-top {
+  margin: 0 0 6px;
+  color: var(--ds-accent);
+}
+.ds-why-h {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.ds-why-rows {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+.ds-why-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  align-items: baseline;
+}
+.ds-why-s--g {
+  color: var(--ds-green);
+}
+.ds-why-s--a {
+  color: var(--ds-a);
+}
+.ds-why-s--r {
+  color: var(--ds-r);
+}
+.ds-why small {
+  display: block;
+  color: var(--ds-soft);
+  font-size: 13px;
+}
+.ds-why-line {
+  margin: 0 0 6px;
+}
+.ds-why-cap {
+  display: block;
+  color: var(--ds-r);
+  font-weight: 600;
+}
+.ds-why-note {
+  color: #6b4200;
+}
+.ds-why-all {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0 0;
+  padding-top: 6px;
+  border-top: 1px solid #d7e2f3;
+}
+
+/* bottom row: stars, then Add (side by side once the card is wide enough) */
+.ds-pcard-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 2px;
+}
+.ds-qrate {
+  min-width: 0;
+}
+.ds-qrate-stars {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+.ds-qrate-star {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #6b7078;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ds-qrate-star.is-on {
+  color: #b36b00;
+}
+.ds-qrate-flag {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  color: var(--ds-g);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
+.ds-qrate-flag.is-bad {
+  color: var(--ds-r);
+}
+.ds-pcard-add {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 8px;
+}
+.ds-step--card {
+  justify-content: space-between;
+  width: 100%;
+}
+.ds-step--card .ds-step-btn {
+  width: 44px;
+  height: 44px;
+}
+@container (max-width: 210px) {
+  .ds-sbtn-caret {
+    display: none;
+  }
+  /* no room for the word: a purple N, the Nectar mark */
+  .ds-pcard-nectar {
+    width: 18px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    font-size: 0;
+    line-height: 18px;
+    text-align: center;
+  }
+  .ds-pcard-nectar::before {
+    content: "N";
+    font-size: 12px;
+  }
+}
+@container (min-width: 300px) {
+  .ds-pcard-foot {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .ds-qrate {
+    flex: 0 0 170px;
+  }
+  .ds-pcard-add,
+  .ds-step--card {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+}
+
+/* ── For you: the same grid, cut to ONE row until "Show all" ────────── */
+.ds-shelf-row:not(.is-open) > :nth-child(n + 4) {
+  display: none;
+}
+@media (max-width: 699px) {
+  .ds-shelf-row:not(.is-open) > :nth-child(n + 3) {
+    display: none;
+  }
+}
+.ds-shelf-more {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 10px;
+}
+@media (min-width: 700px) {
+  .ds-shelf-more--phone {
+    display: none;
+  }
+}
+.ds-sortline {
+  margin: 4px 0 0;
+  color: var(--ds-soft);
+  font-size: 15px;
+}
+.ds-learn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--ds-sel);
+  color: var(--ds-accent);
 }
 .ds-score {
   display: inline-block;
@@ -1475,35 +1945,6 @@ body:has(.lb-root):has(.ds-app) {
   background: var(--ds-red-bg);
   color: var(--ds-r);
 }
-.ds-score--rank {
-  background: var(--ds-ink);
-  color: #fff;
-}
-.ds-pcard-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px 14px 14px;
-}
-.ds-pcard-name {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  min-height: 2.6em;
-  overflow: hidden;
-  font-weight: 650;
-  line-height: 1.3;
-}
-.ds-pcard-price {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 10px;
-}
-.ds-pcard-unit {
-  font-size: 15px;
-}
 .ds-pb {
   display: inline-flex;
   flex-wrap: wrap;
@@ -1520,35 +1961,6 @@ body:has(.lb-root):has(.ds-app) {
 .ds-pb-was {
   color: var(--ds-soft);
   font-size: 16px;
-}
-.ds-pb-note {
-  color: var(--ds-g);
-  font-size: 14px;
-  font-weight: 700;
-}
-.lb-root .ds-app a.ds-eachin,
-.ds-eachin {
-  --ds-link: var(--ds-accent);
-  gap: 6px;
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  min-height: 48px;
-  margin: -6px 0;
-  font-weight: 700;
-  text-decoration: underline !important;
-  text-underline-offset: 3px;
-}
-.ds-cmp {
-  margin: 0;
-  color: var(--ds-accent);
-  font-size: 16px;
-  font-weight: 700;
-}
-.ds-pcard-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
 }
 .ds-chipx {
   display: inline-block;
@@ -1602,15 +2014,6 @@ body:has(.lb-root):has(.ds-app) {
   color: var(--gbg);
   font-weight: 800;
 }
-.ds-why {
-  margin: 0;
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: var(--ds-sel);
-  color: var(--ds-accent);
-  font-size: 16px;
-  font-weight: 600;
-}
 .ds-swap {
   display: flex;
   flex-wrap: wrap;
@@ -1636,50 +2039,9 @@ body:has(.lb-root):has(.ds-app) {
   font-weight: 800;
   cursor: pointer;
 }
-.ds-more > summary {
-  display: flex;
-  align-items: center;
-  min-height: 48px;
-  color: var(--ds-soft);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.ds-facts {
-  display: grid;
-  gap: 6px;
-  margin: 0 0 8px;
-  font-size: 16px;
-}
-.ds-facts > div {
-  display: grid;
-  grid-template-columns: 110px minmax(0, 1fr);
-  gap: 8px;
-}
-.ds-facts dt {
-  color: var(--ds-soft);
-}
-.ds-facts dd {
-  margin: 0;
-}
-.ds-valuewhy {
-  margin: 0 0 6px;
-  font-size: 16px;
-}
-.ds-pcard-foot {
-  margin-top: auto;
-  padding-top: 6px;
-}
-.ds-pcard-add {
-  width: 100%;
-}
 .ds-step--wide {
   justify-content: space-between;
   width: 100%;
-}
-.ds-pcard-foot .ds-step {
-  width: 100%;
-  justify-content: space-between;
 }
 .ds-step-btn--bin {
   color: var(--ds-r);
@@ -1717,45 +2079,7 @@ body:has(.lb-root):has(.ds-app) {
   margin: 0;
   font-size: 16px;
 }
-.ds-shelf-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-@media (min-width: 900px) {
-  .ds-shelf-row {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-.ds-shelf-more {
-  width: 100%;
-  min-height: 48px;
-  margin-top: 10px;
-}
 /* Half-width cards: picture, name, price, why and the add button. The rest is on the product page. */
-.ds-pcard--shelf .ds-img.ds-img--card {
-  height: 130px;
-}
-.ds-pcard--shelf .ds-pcard-body {
-  padding: 10px;
-}
-.ds-pcard--shelf .ds-pcard-name {
-  font-size: 16px;
-}
-.ds-pcard--shelf .ds-pcard-chips,
-.ds-pcard--shelf .ds-cmp,
-.ds-pcard--shelf .ds-swap,
-.ds-pcard--shelf .ds-more,
-.ds-pcard--shelf .ds-eachin,
-.ds-pcard--shelf .ds-pcard-unit {
-  display: none;
-}
-.ds-pcard--shelf .ds-pcard-foot {
-  padding: 0 10px 10px;
-}
 
 /* ── Meal deals, multi-buys ──────────────────────────────────────────── */
 .ds-dealstrip-wrap {
@@ -1835,9 +2159,26 @@ body:has(.lb-root):has(.ds-app) {
   box-shadow: 0 1px 0 var(--ds-line);
   transition: transform 220ms ease-out;
 }
+/* Scrolling down on a phone: the header, the deal bar and the tab bar slide away (transform only);
+   scrolling up, or reaching the end of the page, brings them back. */
 @media (max-width: 700px) {
-  .ds-dealbar-wrap.is-hidden {
+  .ds-app[data-chrome="hidden"] {
+    --ds-tabs-now: 0px;
+  }
+  .ds-app[data-chrome="hidden"] .ds-find-head,
+  .ds-app[data-chrome="hidden"] .ds-dealbar-wrap {
     transform: translateY(-100%);
+  }
+  .ds-app[data-chrome="hidden"] .ds-tabs {
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-find-head,
+  .ds-dealbar-wrap,
+  .ds-tabs,
+  .ds-total {
+    transition: none;
   }
 }
 .ds-dealbar {
@@ -2126,48 +2467,80 @@ body:has(.lb-root):has(.ds-app) {
 }
 
 /* Personal rating on every card */
-.ds-qrate {
+
+/* Half-width cards: keep just Fit and the % off over the picture */
+
+
+/* ── This week: Yes / No on each pick, and what the week covers ─────── */
+.ds-meals {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 2px 8px;
-  margin-top: auto;
-  padding-top: 6px;
-}
-.ds-qrate + .ds-pcard-foot {
-  margin-top: 0;
-}
-.ds-qrate-stars {
-  display: flex;
-  flex: 1 1 auto;
-  max-width: 260px;
-}
-.ds-qrate-star {
-  flex: 1 1 0;
-  min-width: 0;
-  height: 44px;
+  gap: 6px;
+  margin: 0 0 10px;
   padding: 0;
-  border: 0;
-  background: none;
-  color: #6b7078;
-  font-size: 30px;
-  line-height: 1;
+  list-style: none;
+}
+.ds-meals li {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--ds-green-bg);
+  color: #0a5c29;
+  font-size: 16px;
+}
+.ds-meals li.is-short {
+  background: #fbf0d6;
+  color: var(--ds-a);
+}
+.ds-banner--learn {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid #d7e2f3;
+  border-radius: 12px;
+  background: var(--ds-sel);
+  color: #123a6b;
+}
+.ds-banner--learn p {
+  margin: 0 0 4px;
+}
+.ds-banner--learn p:last-child {
+  margin-bottom: 0;
+}
+.ds-card--basket {
+  flex-wrap: wrap;
+}
+.ds-card--basket .ds-card-main {
+  flex: 1 1 100%;
+}
+.ds-card--basket.is-no {
+  opacity: 0.7;
+}
+.ds-card--basket.is-yes {
+  border-color: var(--ds-g);
+}
+.ds-vote {
+  display: flex;
+  flex: 1 1 100%;
+  gap: 10px;
+}
+.ds-vote-btn {
+  flex: 1 1 0;
+  min-height: 48px;
+  border: 2px solid var(--ds-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ds-ink);
+  font: inherit;
+  font-weight: 700;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.ds-qrate-star.is-on {
-  color: #b36b00;
+.ds-vote-btn--yes[aria-pressed="true"] {
+  border-color: var(--ds-g);
+  background: var(--ds-g);
+  color: #fff;
 }
-.ds-qrate-note {
-  color: var(--ds-soft);
-  font-size: 14px;
-}
-.ds-pcard--shelf .ds-qrate-star {
-  font-size: 24px;
-}
-
-/* Half-width cards: keep just Fit and the % off over the picture */
-.ds-pcard--shelf .ds-ov--tl > :nth-child(n + 2),
-.ds-pcard--shelf .ds-ov--bl > :not(.ds-ovchip--off) {
-  display: none;
+.ds-vote-btn--no[aria-pressed="true"] {
+  border-color: var(--ds-r);
+  background: var(--ds-r);
+  color: #fff;
 }

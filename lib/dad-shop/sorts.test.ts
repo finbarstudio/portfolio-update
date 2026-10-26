@@ -41,6 +41,14 @@ function card(id: string, over: Partial<ProductCard> = {}): ProductCard {
     discount: 0,
     per100Protein: null,
     paidBefore: null,
+    isBasic: false,
+    vote: null,
+    ingredientsSource: null,
+    nutritionSource: null,
+    kcal: null,
+    upfMarkers: [],
+    seedOilsFound: [],
+    reasons: [],
     ...over,
   };
 }
@@ -63,12 +71,16 @@ describe("sortCards", () => {
     expect(sortCards([b, a], "ppp").map((c) => c.id)).toEqual(["a", "b"]);
   });
 
-  test("all round prefers fit, then value, and keeps ties in their order", () => {
-    const a = card("a", { fit: 8, value: 5 });
-    const b = card("b", { fit: 6, value: 7 });
-    const c = card("c", { fit: 8, value: 5 });
-    expect(sortCards([b, a, c], "round").map((x) => x.id)).toEqual(["a", "c", "b"]);
-    expect(sortScoreOf(a, "round")).toBeGreaterThan(sortScoreOf(b, "round"));
+  test("best overall blends health, value and his taste, and keeps ties in their order", () => {
+    const a = card("a", { health: 8, value: 5 });
+    const b = card("b", { health: 6, value: 7 });
+    const c = card("c", { health: 8, value: 5 });
+    expect(sortCards([b, a, c], "best").map((x) => x.id)).toEqual(["a", "c", "b"]);
+    expect(sortScoreOf(a, "best")).toBeGreaterThan(sortScoreOf(b, "best"));
+    // His stars lift a product over an identical one he has not rated.
+    const rated = card("rated", { health: 7, value: 6, stars: 5 });
+    const plain = card("plain", { health: 7, value: 6 });
+    expect(sortCards([plain, rated], "best").map((x) => x.id)).toEqual(["rated", "plain"]);
   });
 
   test("fewest ingredients first, products with no list last", () => {

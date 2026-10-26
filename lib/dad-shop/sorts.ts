@@ -1,12 +1,12 @@
+import { overallScore } from "./overall";
 import type { ProductCard, Sort } from "./types";
 
 /**
  * The same sorts the database uses (catalog.ts `sortScore`), for pages that
  * already hold every product and just re-order them: deal pages and shelves.
- * "round" is the all-round order used inside a deal: how well it suits him, plus
- * half its value, less a little for each processing marker.
+ * "best" is Best overall (overall.ts): health, value and his taste, weighted.
  */
-export type SortKey = Sort | "round";
+export type SortKey = Sort;
 
 export function sortScoreOf(c: ProductCard, sort: SortKey): number {
   const fit = c.fit ?? 5;
@@ -29,8 +29,8 @@ export function sortScoreOf(c: ProductCard, sort: SortKey): number {
       const now = priceNow(c);
       return protein != null && now > 0 ? protein / now : -1;
     }
-    case "round":
-      return (fit + value * 0.5) * 100 - (c.upfCount ?? 0);
+    case "best":
+      return overallScore(c) * 100 - (c.upfCount ?? 0);
   }
 }
 

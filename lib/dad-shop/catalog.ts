@@ -2,6 +2,9 @@ import "server-only";
 import type postgres from "postgres";
 import type { Sql } from "./db";
 import { fitScore } from "./fit";
+import { OVERALL_WEIGHTS } from "./overall";
+import { buildShelves, SHELF_SIZE } from "./shelves";
+import { applyTaste, buildTaste, likedKeys, type TasteProfile, type TasteRow } from "./taste";
 import {
   PAGE_SIZE,
   type Deal,
@@ -10,13 +13,12 @@ import {
   type Facets,
   type FindFilters,
   type ListItem,
-  type OfferGroup,
+  type ForYou,
   type OfferPage,
   type ProductCard,
   type ProductDetail,
   type Promo,
   type SeedOil,
-  type Shelf,
   type Sort,
   type Nutrition,
 } from "./types";
@@ -68,7 +70,7 @@ function scored(sql: Sql, ids: string[] | null): Fragment {
         p.nectar_price::float8 as nectar_price, p.unit_price::float8 as unit_price, p.unit_measure,
         p.pack_grams::float8 as pack_grams, p.storage, p.promos, p.seed_oil, p.health::float8 as health,
         p.ingredient_count, p.ingredients, p.upf_markers, p.review_avg::float8 as review_avg, p.review_count,
-        p.is_new, p.animal, p.is_available, p.nutrition, p.seed_oils_found, p.reasons, p.listed_at,
+        p.is_new, p.is_basic, p.ingredients_source, p.nutrition_source, p.animal, p.is_available, p.nutrition, p.seed_oils_found, p.reasons, p.listed_at,
         pr.now_price, pr.full_price,
         (case when jsonb_typeof(p.nutrition->'protein') = 'number' then (p.nutrition->>'protein')::float8 end) as protein,
         (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end) as sat,
@@ -131,6 +133,7 @@ function scored(sql: Sql, ids: string[] | null): Fragment {
       select m.*,
         case when r.n >= 4 then r.pr end as pct,
         rt.stars::int as stars,
+        bv.vote::int as vote,
         (nas.product_id is not null) as not_at_store,
         exists (select 1 from list_items li where li.product_id = m.id) as on_list,
         paid.each as paid_each, paid.at as paid_at, paid.offer as paid_offer,
@@ -146,6 +149,7 @@ function scored(sql: Sql, ids: string[] | null): Fragment {
       from m
       left join r on r.id = m.id
       left join ratings rt on rt.product_id = m.id
+      left join basket_votes bv on bv.product_id = m.id
       left join not_at_store nas on nas.product_id = m.id
       left join paid on paid.pid = m.id
     )
@@ -178,6 +182,10 @@ export interface ScoredRow {
   review_avg: number | null;
   review_count: number | null;
   is_new: boolean;
+  is_basic: boolean;
+  ingredients_source: string | null;
+  nutrition_source: string | null;
+  vote: number | null;
   animal: string | null;
   is_available: boolean;
   nutrition: Nutrition | null;
@@ -215,6 +223,24 @@ async function loadDealIds(sql: Sql): Promise<Set<string>> {
     select id from deals where ends_on is null or ends_on >= current_date
   `;
   return new Set(rows.map((r) => r.id));
+}
+
+/**
+ * Everything he has told us, in one query: stars, Yes / No votes, what is on his
+ * list, and what he bought in past shops. buildTaste (taste.ts) turns it into a profile.
+ */
+export async function loadTaste(sql: Sql): Promise<TasteProfile> {
+  const rows = await sql<{ product_id: string; src: TasteRow["source"]; val: number; category: string | null; department: string | null; brand: string | null }[]>`
+    select t.pid as product_id, t.src, t.val::float8 as val, p.category, p.department, p.brand
+    from (
+      select product_id as pid, 'rating' as src, stars::float8 as val from ratings
+      union all select product_id, 'vote', vote::float8 from basket_votes
+      union all select product_id, 'list', 1::float8 from list_items where product_id is not null
+      union all select i->>'productId', 'shop', case when jsonb_typeof(i->'qty') = 'number' then (i->>'qty')::float8 else 1 end
+        from shops sh, jsonb_array_elements(sh.items) i where i->>'productId' is not null
+    ) t join products p on p.id = t.pid
+  `;
+  return buildTaste(rows.map((r) => ({ productId: r.product_id, source: r.src, value: r.val, category: r.category, department: r.department, brand: r.brand })));
 }
 
 export function mapCard(r: ScoredRow, dealIds: Set<string>): ProductCard {
@@ -257,14 +283,28 @@ export function mapCard(r: ScoredRow, dealIds: Set<string>): ProductCard {
     discount: Math.round(r.discount * 1000) / 1000,
     per100Protein: per100,
     paidBefore: r.paid_each != null && r.paid_at ? { each: r.paid_each, at: iso(r.paid_at) ?? "", offer: r.paid_offer } : null,
+    isBasic: r.is_basic === true,
+    vote: r.vote === 1 || r.vote === -1 ? r.vote : null,
+    ingredientsSource: r.ingredients_source,
+    nutritionSource: r.nutrition_source,
+    kcal: typeof r.nutrition?.kcal === "number" ? r.nutrition.kcal : null,
+    upfMarkers: r.upf_markers ?? [],
+    seedOilsFound: r.seed_oils_found ?? [],
+    reasons: Array.isArray(r.reasons) ? (r.reasons as unknown[]).filter((x): x is string => typeof x === "string") : [],
   };
 }
 
 // ── Sorting ─────────────────────────────────────────────────────────────────
 
 /** Every sort is a number to sort high-to-low. */
-function sortScore(sql: Sql, sort: Sort | "round"): Fragment {
+function sortScore(sql: Sql, sort: Sort): Fragment {
   switch (sort) {
+    case "best":
+      // Best overall (overall.ts): health, value and his taste, weighted. Taste is his stars, then his Yes / No, else 5.
+      return sql`(coalesce(s.health, 5) * ${OVERALL_WEIGHTS.health}::float8 + coalesce(s.value, 5) * ${OVERALL_WEIGHTS.value}::float8
+        + coalesce(case s.stars when 1 then 0 when 2 then 2.5 when 3 then 5 when 4 then 7.5 when 5 then 10 end,
+                   case s.vote when 1 then 8.5 when -1 then 1 end, 5)::float8 * ${OVERALL_WEIGHTS.taste}::float8
+        - coalesce(array_length(s.upf_markers, 1), 0) * 0.01)`;
     case "rec":
       return sql`(coalesce(s.fit, 5) + 0.5 * coalesce(s.value, 5) + 2.5 * least(s.discount, 0.6) + coalesce((s.stars - 3) * 0.8, 0) + (case when s.protein >= 15 then 0.5 else 0 end))`;
     case "value":
@@ -279,8 +319,6 @@ function sortScore(sql: Sql, sort: Sort | "round"): Fragment {
       return sql`(-coalesce(s.ingredient_count, 999) * 100 + coalesce(s.value, 0))`;
     case "ppp":
       return sql`coalesce(s.pack_protein / nullif(s.now_price, 0), -1)`;
-    case "round":
-      return sql`((coalesce(s.fit, 5) + coalesce(s.value, 5) * 0.5) * 100 - coalesce(array_length(s.upf_markers, 1), 0))`;
   }
 }
 
@@ -296,6 +334,8 @@ function collectionTest(sql: Sql, key: string): Fragment {
       return sql`(s.storage = 'frozen' and coalesce(s.department, '') not in ('Ice cream', 'Desserts', 'Fruit'))`;
     case "breakfast":
       return sql`(s.department in ('Breakfast cereals', 'Eggs', 'Yogurts', 'Bacon & sausages') or s.category ilike '%porridge%' or s.category ilike '%croissant%')`;
+    case "ttd":
+      return sql`(s.name ilike '%taste the difference%' or coalesce(s.brand, '') ilike '%taste the difference%')`;
     case "fancy":
       return sql`(s.name ilike '%taste the difference%' or exists (select 1 from deal_items di where di.product_id = s.id))`;
     case "ordered":
@@ -305,7 +345,7 @@ function collectionTest(sql: Sql, key: string): Fragment {
   }
 }
 
-const COLLECTION_KEYS = ["meals", "protein", "freezer", "breakfast", "fancy", "ordered"] as const;
+const COLLECTION_KEYS = ["meals", "protein", "freezer", "breakfast", "ttd", "fancy", "ordered"] as const;
 
 const OWN_BRAND = (sql: Sql) =>
   sql`((s.brand ilike 'sainsbury%' or s.name ilike 'sainsbury''s %') and s.name !~* 'taste the difference')`;
@@ -347,7 +387,8 @@ function whereFor(sql: Sql, f: FindFilters, opts: WhereOpts = {}): Fragment {
     if (f.fewIngredients) parts.push(sql`(s.ingredient_count is not null and s.ingredient_count <= 5)`);
     if (f.hideSat) parts.push(sql`(s.sat is null or s.sat <= 5)`);
     if (f.hideOwn) parts.push(sql`not ${OWN_BRAND(sql)}`);
-    if (f.hideSingle) parts.push(sql`(s.ingredient_count is null or s.ingredient_count > 1)`);
+    if (f.hideSingle) parts.push(sql`(not s.is_basic and coalesce(s.ingredient_count, 2) <> 1)`);
+    if (f.tasteDiff) parts.push(collectionTest(sql, "ttd"));
   }
   if (!opts.noCategory) {
     if (f.coll) parts.push(collectionTest(sql, f.coll));
@@ -385,7 +426,7 @@ export async function searchProducts(
   f: FindFilters,
   limit: number,
 ): Promise<{ items: ProductCard[]; hasMore: boolean }> {
-  const [rows, dealIds] = await Promise.all([
+  const [rows, dealIds, profile] = await Promise.all([
     sql<ScoredRow[]>`
       ${scored(sql, null)}
       select s.* from s
@@ -394,8 +435,9 @@ export async function searchProducts(
       limit ${limit + 1} offset ${f.page * limit}
     `,
     loadDealIds(sql),
+    loadTaste(sql),
   ]);
-  return { items: rows.slice(0, limit).map((r) => mapCard(r, dealIds)), hasMore: rows.length > limit };
+  return { items: applyTaste(rows.slice(0, limit).map((r) => mapCard(r, dealIds)), profile), hasMore: rows.length > limit };
 }
 
 /** Counts for the category menu, the type tabs and the animal pills. They follow every filter that is on. */
@@ -458,66 +500,25 @@ export async function getFacets(sql: Sql, f: FindFilters): Promise<Facets> {
   };
 }
 
-// ── Multi-buys, grouped by offer ────────────────────────────────────────────
-
-export const OFFER_GROUPS_PER_PAGE = 8;
-const PER_GROUP = 4;
-
-export async function getOfferGroups(
-  sql: Sql,
-  f: FindFilters,
-): Promise<{ groups: OfferGroup[]; hasMore: boolean }> {
-  const cap = OFFER_GROUPS_PER_PAGE * (f.page + 1);
-  const [rows, dealIds] = await Promise.all([
-    sql<(ScoredRow & { g_uid: string; g_text: string; g_end: string | null; g_count: number; g_rank: number; rn: number })[]>`
-      ${scored(sql, null)},
-      x as (
-        select s.id, e->>'uid' as g_uid, e->>'text' as g_text, e->>'end' as g_end,
-          row_number() over (partition by e->>'uid' order by ${sortScore(sql, sortFor(f))} desc nulls last, s.id) as rn,
-          count(*) over (partition by e->>'uid') as g_count,
-          max(${sortScore(sql, sortFor(f))}) over (partition by e->>'uid') as g_top
-        from s, jsonb_array_elements(s.promos) e
-        where e->>'kind' = 'multibuy' and ${whereFor(sql, f)}
-      ),
-      y as (
-        select x.*, dense_rank() over (order by x.g_top desc nulls last, x.g_uid) as g_rank from x
-      )
-      select s.*, y.g_uid, y.g_text, y.g_end, y.g_count::int as g_count, y.g_rank::int as g_rank, y.rn::int as rn
-      from y join s on s.id = y.id
-      where y.rn <= ${PER_GROUP} and y.g_rank <= ${cap + 1}
-      order by y.g_rank, y.rn
-    `,
-    loadDealIds(sql),
-  ]);
-  const groups = new Map<string, OfferGroup & { rank: number }>();
-  for (const r of rows) {
-    let g = groups.get(r.g_uid);
-    if (!g) {
-      g = { uid: r.g_uid, text: r.g_text, count: r.g_count, endsOn: r.g_end, items: [], rank: r.g_rank };
-      groups.set(r.g_uid, g);
-    }
-    g.items.push(mapCard(r, dealIds));
-  }
-  const all = [...groups.values()].sort((a, b) => a.rank - b.rank);
-  const page: OfferGroup[] = all.slice(0, cap).map((g) => ({ uid: g.uid, text: g.text, count: g.count, endsOn: g.endsOn, items: g.items }));
-  return { groups: page, hasMore: all.length > cap };
-}
-
 // ── Deal manager: everything sharing one offer ──────────────────────────────
 
 export async function getOffer(sql: Sql, uid: string): Promise<OfferPage | null> {
-  const [rows, dealIds] = await Promise.all([
+  const [rows, dealIds, profile] = await Promise.all([
     sql<ScoredRow[]>`
       ${scored(sql, null)}
       select s.* from s
       where s.promos @> ${JSON.stringify([{ uid }])}::text::jsonb
-      order by ${sortScore(sql, "round")} desc nulls last, s.id
+      order by ${sortScore(sql, "best")} desc nulls last, s.id
       limit 200
     `,
     loadDealIds(sql),
+    loadTaste(sql),
   ]);
   if (rows.length === 0) return null;
-  const items = rows.map((r) => mapCard(r, dealIds));
+  const items = applyTaste(
+    rows.map((r) => mapCard(r, dealIds)),
+    profile,
+  );
   const promo = items[0].promos.find((p) => p.uid === uid) ?? asPromos(rows[0].promos).find((p) => p.uid === uid);
   if (!promo) return null;
   return {
@@ -591,120 +592,119 @@ export async function getDealPage(sql: Sql, id: string): Promise<DealPage | null
     select di.product_id, di.list_id from deal_items di where di.deal_id = ${id}
   `;
   const ids = [...new Set(links.map((l) => l.product_id))];
-  const [rows, dealIds] = await Promise.all([
+  const [rows, dealIds, profile] = await Promise.all([
     ids.length === 0
       ? Promise.resolve([] as ScoredRow[])
       : sql<ScoredRow[]>`
           ${scored(sql, ids)}
           select s.* from s where s.id = any(${ids}::text[])
-          order by ${sortScore(sql, "round")} desc nulls last, s.id
+          order by ${sortScore(sql, "best")} desc nulls last, s.id
         `,
     loadDealIds(sql),
+    loadTaste(sql),
   ]);
   const byId = new Map(rows.map((r) => [r.id, r]));
   const items: DealPage["items"] = [];
   for (const l of links) {
     const r = byId.get(l.product_id);
-    if (r) items.push({ ...mapCard(r, dealIds), listId: l.list_id });
+    if (r) items.push({ ...applyTaste([mapCard(r, dealIds)], profile)[0], listId: l.list_id });
   }
-  // Same all-round order as the rows came in.
+  // Same best-overall order as the rows came in.
   const order = new Map(rows.map((r, i) => [r.id, i]));
   items.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
   return { deal: mapDeal(drows[0]), items };
 }
 
-// ── For you: sideways shelves ───────────────────────────────────────────────
+// ── For you ─────────────────────────────────────────────────────────────────
 
-const SHELF_SIZE = 16;
+/** Dinner meal deals where every part has something that is not ruled out for him. */
+async function dealsThatFit(sql: Sql): Promise<Deal[]> {
+  const rows = await sql<DealRow[]>`
+    ${dealSelect(sql)}
+    where (d.ends_on is null or d.ends_on >= current_date)
+      and not exists (
+        select 1 from deal_parts dp where dp.deal_id = d.id and not exists (
+          select 1 from deal_items di join products p on p.id = di.product_id
+          where di.deal_id = dp.deal_id and di.list_id = dp.list_id
+            and p.is_food and p.is_available and p.seed_oil <> 'yes'
+            and (p.health is null or p.health >= 5)
+            and (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end is null
+                 or (p.nutrition->>'sat')::float8 <= 5)
+            and not exists (select 1 from not_at_store n where n.product_id = p.id)
+        ))
+    order by d.price desc, d.title
+  `;
+  return rows.filter((r) => r.products > 0).map(mapDeal);
+}
 
-export async function getShelves(sql: Sql, f: FindFilters): Promise<Shelf[]> {
-  const base = sql`${whereFor(sql, f)} and not s.not_at_store and not s.on_list and coalesce(s.stars, 3) >= 3`;
-  const order = sql`order by ${sortScore(sql, "rec")} desc nulls last, s.id limit ${SHELF_SIZE + 12}`;
-  const [fav, top, fresh, deals, dealIds] = await Promise.all([
-    sql<ScoredRow[]>`${scored(sql, null)} select s.* from s where ${base} and s.stars >= 4 and s.has_offer ${order}`,
-    sql<ScoredRow[]>`${scored(sql, null)} select s.* from s where ${base} and s.health >= 7 and s.seed_oil = 'none' and coalesce(s.value, 5) >= 5 ${order}`,
-    sql<ScoredRow[]>`${scored(sql, null)} select s.* from s where ${base} and s.is_new ${order}`,
-    sql<ScoredRow[]>`${scored(sql, null)} select s.* from s where ${base} and s.discount >= 0.3
-      and s.department in (select p2.department from ratings r2 join products p2 on p2.id = r2.product_id where r2.stars >= 4 and p2.department is not null) ${order}`,
-    loadDealIds(sql),
-  ]);
+/**
+ * For you. A handful of queries, run together: his taste signals, the live deal
+ * ids, the dinner deals that fit, then ONE candidate query; the shelves are
+ * worked out in JS (shelves.ts) so nothing runs once per shelf or per product.
+ */
+export async function getShelves(sql: Sql, f: FindFilters): Promise<ForYou> {
+  const [profile, dealIds, fitting] = await Promise.all([loadTaste(sql), loadDealIds(sql), dealsThatFit(sql)]);
+  const liked = likedKeys(profile);
+  const likedTests: Fragment[] = [];
+  if (liked.categories.length > 0) likedTests.push(sql`lower(s.category) = any(${liked.categories}::text[])`);
+  if (liked.departments.length > 0) likedTests.push(sql`lower(s.department) = any(${liked.departments}::text[])`);
+  if (liked.brands.length > 0) likedTests.push(sql`lower(s.brand) = any(${liked.brands}::text[])`);
+  const likedAny = likedTests.length > 0 ? likedTests.reduce((all, c) => sql`${all} or ${c}`) : sql`false`;
 
-  const seen = new Set<string>();
-  const take = (rows: ScoredRow[], why: (c: ProductCard) => string): (ProductCard & { why: string })[] => {
-    const out: (ProductCard & { why: string })[] = [];
-    for (const r of rows) {
-      if (seen.has(r.id) || out.length >= SHELF_SIZE) continue;
-      seen.add(r.id);
-      const c = mapCard(r, dealIds);
-      out.push({ ...c, why: why(c) });
-    }
-    return out;
-  };
-  const pct = (c: ProductCard) => `${Math.round(c.discount * 100)}% off`;
-  const shelves: Shelf[] = [
-    {
-      key: "fav",
-      title: "Your favourites on offer",
-      sub: "Things you rated 4 or 5 stars, on offer now",
-      items: take(fav, (c) => `you gave it ${c.stars} stars${c.discount >= 0.05 ? ` · ${pct(c)}` : ""}`),
-    },
-    {
-      key: "top",
-      title: "Top picks for your rules",
-      sub: "Healthy, no seed oils and good value",
-      items: take(top, (c) => `${c.health != null ? `health ${Math.round(c.health)}/10 · ` : ""}no seed oils${c.discount >= 0.1 ? ` · ${pct(c)}` : ""}`),
-    },
-    {
-      key: "new",
-      title: "New in",
-      sub: "Just arrived at Sainsbury's",
-      items: take(fresh, () => "new in"),
-    },
-    {
-      key: "deals",
-      title: "Big deals on things you like",
-      sub: "30% or more off, in types of food you rate well",
-      items: take(deals, (c) => `${pct(c)} · you like ${(c.department ?? "this kind of food").toLowerCase()}`),
-    },
-  ];
-  return shelves.filter((s) => s.items.length > 0);
+  const rows = await sql<ScoredRow[]>`
+    ${scored(sql, null)}
+    select s.* from s
+    where ${whereFor(sql, f)} and not s.not_at_store and not s.on_list
+      and coalesce(s.stars, 3) >= 3 and coalesce(s.vote, 0) >= 0
+      and (
+        ((s.stars >= 4 or s.vote = 1) and s.has_offer)
+        or s.vote = 1
+        or (s.health >= 7 and s.seed_oil = 'none' and coalesce(s.value, 5) >= 5)
+        or s.is_new
+        or s.discount >= 0.25
+        or s.paid_each is not null
+        or ${likedAny}
+      )
+    order by ${sortScore(sql, "best")} desc nulls last, s.id
+    limit ${SHELF_SIZE * 30}
+  `;
+  return buildShelves({ cards: rows.map((r) => mapCard(r, dealIds)), profile, dealsThatFit: fitting });
 }
 
 // ── Single products ─────────────────────────────────────────────────────────
 
 export async function getProduct(sql: Sql, id: string): Promise<ProductDetail | null> {
-  const [rows, dealIds] = await Promise.all([
+  const [rows, dealIds, profile] = await Promise.all([
     sql<ScoredRow[]>`${scored(sql, [id])} select s.* from s where s.id = ${id}`,
     loadDealIds(sql),
+    loadTaste(sql),
   ]);
   const r = rows[0];
   if (!r) return null;
   return {
-    ...mapCard(r, dealIds),
+    ...applyTaste([mapCard(r, dealIds)], profile)[0],
     slug: r.slug,
     nutrition: r.nutrition,
     ingredients: r.ingredients,
-    seedOilsFound: r.seed_oils_found ?? [],
-    upfMarkers: r.upf_markers ?? [],
-    reasons: Array.isArray(r.reasons) ? (r.reasons as unknown[]).filter((x): x is string => typeof x === "string") : [],
     listedAt: iso(r.listed_at) ?? "",
   };
 }
 
 /** Other products in the same category (or department), best value first. */
 export async function getSimilar(sql: Sql, id: string, limit: number): Promise<{ items: ProductCard[]; total: number }> {
-  const [rows, dealIds] = await Promise.all([
+  const [rows, dealIds, profile] = await Promise.all([
     sql<(ScoredRow & { total: number })[]>`
       ${scored(sql, [id])},
       me as (select coalesce(category, department) as k from products where id = ${id})
       select s.*, count(*) over ()::int as total from s, me
       where s.id <> ${id} and coalesce(s.category, s.department) = me.k
-      order by ${sortScore(sql, "round")} desc nulls last, s.id
+      order by ${sortScore(sql, "best")} desc nulls last, s.id
       limit ${limit}
     `,
     loadDealIds(sql),
+    loadTaste(sql),
   ]);
-  return { items: rows.map((r) => mapCard(r, dealIds)), total: rows[0]?.total ?? 0 };
+  return { items: applyTaste(rows.map((r) => mapCard(r, dealIds)), profile), total: rows[0]?.total ?? 0 };
 }
 
 export async function getZones(sql: Sql): Promise<string[]> {

@@ -1,8 +1,8 @@
 import type { FindFilters, Sort, View } from "./types";
 
-/** Offers and Multi-buys start on "Biggest saving"; everything else on "Picked for you". */
+/** Best overall (health, value and his taste) is the default almost everywhere; For you has its own shelves. */
 export function defaultSort(view: View): Sort {
-  return view === "offers" || view === "multibuys" ? "saving" : "rec";
+  return view === "foryou" ? "rec" : "best";
 }
 
 /** The URL is the state: back from a product lands on the same search. */
@@ -25,6 +25,7 @@ export function queryFor(f: FindFilters): string {
   if (f.fewIngredients) p.set("few", "1");
   if (f.hideOwn) p.set("hideOwn", "1");
   if (f.hideSingle) p.set("hideSingle", "1");
+  if (f.tasteDiff) p.set("ttd", "1");
   if (f.page > 0) p.set("page", String(f.page));
   return p.toString();
 }

@@ -11,10 +11,30 @@ export function tasteScore(stars: number): number {
   return TASTE[stars] ?? 5;
 }
 
+/** What a Yes or No on a basket pick says about taste (0-10). */
+export const VOTE_YES_TASTE = 8.5;
+export const VOTE_NO_TASTE = 1;
+/** No opinion either way. */
+export const TASTE_NEUTRAL = 5;
+
 export function fitScore(health: number | null, stars: number | null): number | null {
   if (stars == null) return health;
   if (health == null) return tasteScore(stars);
   return 0.6 * health + 0.4 * tasteScore(stars);
+}
+
+/** What a learned taste estimate counts for at best (his own rating counts 40%). */
+export const LEARNED_MAX = 0.3;
+
+/**
+ * Fit for a product he has not rated, with a taste estimate worked out from
+ * what he has rated, voted on and bought (see taste.ts). `conf` is 0-1: how
+ * much those signals agree; the estimate counts LEARNED_MAX x conf.
+ */
+export function learnedFit(health: number | null, taste: number, conf: number): number | null {
+  if (health == null) return null;
+  const w = LEARNED_MAX * Math.min(1, Math.max(0, conf));
+  return health * (1 - w) + taste * w;
 }
 
 export type Band = "good" | "ok" | "poor" | "none";

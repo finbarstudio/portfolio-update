@@ -1,14 +1,16 @@
 import "server-only";
-import { generateBasket, type Candidate } from "./basket";
-import { getList } from "./catalog";
+import { generateBasket, type BasketDeal, type Candidate, type VoteInfo } from "./basket";
+import { getList, loadTaste } from "./catalog";
 import type { Sql } from "./db";
 import { offerLabel, priceList, type PricedRow, livePromos, nowPence, fullPence } from "./pricing";
 import type { ListAction, SettingsPatch } from "./validate";
+import { describeVotes } from "./votes";
 import {
   DEFAULT_SETTINGS,
   type BasketItem,
   type BasketLine,
   type BasketView,
+  type MealCoverage,
   type Freshness,
   type Promo,
   type SeedOil,
@@ -238,7 +240,8 @@ export async function saveSettings(sql: Sql, patch: SettingsPatch): Promise<void
 interface BasketRow {
   id: number;
   created_at: Date | string;
-  settings: Settings;
+  /** The settings it was made with. `meals` rides along here (there is no column for it). */
+  settings: Settings & { meals?: MealCoverage[] };
   items: BasketItem[];
   total: number;
   protein_g: number;
@@ -285,17 +288,49 @@ async function hydrate(sql: Sql, items: BasketItem[]): Promise<BasketLine[]> {
   });
 }
 
+interface VoteDbRow {
+  product_id: string;
+  vote: number;
+  voted_at: Date | string;
+  department: string | null;
+  category: string | null;
+}
+
+/** All his Yes / No answers, with what kind of food each was. */
+async function loadVotes(sql: Sql): Promise<VoteDbRow[]> {
+  return sql<VoteDbRow[]>`
+    select bv.product_id, bv.vote::int as vote, bv.voted_at, p.department, p.category
+    from basket_votes bv join products p on p.id = bv.product_id
+  `;
+}
+
+function voteMap(rows: VoteDbRow[]): Record<string, VoteInfo> {
+  const out: Record<string, VoteInfo> = {};
+  for (const r of rows) if (r.vote === 1 || r.vote === -1) out[r.product_id] = { vote: r.vote, at: iso(r.voted_at) ?? "" };
+  return out;
+}
+
+function taughtLines(rows: VoteDbRow[]): string[] {
+  return describeVotes(rows.filter((r) => r.vote === 1 || r.vote === -1).map((r) => ({ vote: r.vote === 1 ? 1 : -1, department: r.department, category: r.category })));
+}
+
 async function toView(sql: Sql, row: BasketRow, fromHistory: boolean): Promise<BasketView> {
   const items = Array.isArray(row.items) ? row.items : [];
+  const { meals, ...settings } = row.settings ?? ({} as BasketRow["settings"]);
+  const [lines, votes] = await Promise.all([hydrate(sql, items), loadVotes(sql)]);
+  const shown = new Set(items.map((i) => i.productId));
   return {
     id: row.id,
     createdAt: iso(row.created_at),
-    settings: { ...DEFAULT_SETTINGS, ...row.settings },
-    items: await hydrate(sql, items),
+    settings: { ...DEFAULT_SETTINGS, ...settings },
+    items: lines,
     total: row.total,
     proteinG: row.protein_g,
     warnings: stringArray(row.warnings),
     fromHistory,
+    votes: Object.fromEntries(Object.entries(voteMap(votes)).filter(([id]) => shown.has(id)).map(([id, v]) => [id, v.vote])),
+    taught: taughtLines(votes),
+    meals: Array.isArray(meals) ? meals : [],
   };
 }
 
@@ -304,11 +339,28 @@ export async function getLastBasket(sql: Sql): Promise<BasketView | null> {
   return row ? toView(sql, row, false) : null;
 }
 
+/** Saves his Yes (1), No (-1), or takes it back (null). False when the product does not exist. */
+export async function setVote(sql: Sql, productId: string, vote: 1 | -1 | null): Promise<boolean> {
+  if (vote === null) {
+    await sql`delete from basket_votes where product_id = ${productId}`;
+    return true;
+  }
+  const rows = await sql<{ product_id: string }[]>`
+    insert into basket_votes (product_id, vote)
+    select p.id, ${vote}::smallint from products p where p.id = ${productId}
+    on conflict (product_id) do update set vote = excluded.vote, voted_at = now()
+    returning product_id
+  `;
+  return rows.length > 0;
+}
+
 interface CandidateRow {
   id: string;
   name: string;
   zone: string | null;
+  department: string | null;
   category: string | null;
+  brand: string | null;
   price: number;
   nectar_price: number | null;
   pack_grams: number | null;
@@ -317,23 +369,39 @@ interface CandidateRow {
   is_food: boolean;
   storage: string | null;
   protein: number | null;
+  sat: number | null;
   seed_oil: string;
   health: number | null;
   listed_at: Date | string;
   has_detail: boolean;
+  ingredient_count: number | null;
+  whole_food: boolean;
+  review_avg: number | null;
+  review_count: number | null;
 }
 
+const PRODUCE = ["Fresh fruit", "Fresh vegetables"];
+
+/** Everything the generator may pick from. The generator applies his rules again, so this only keeps the list small. */
 async function loadCandidates(sql: Sql): Promise<Candidate[]> {
   const rows = await sql<CandidateRow[]>`
-    select p.id, p.name, p.zone, p.category,
+    select p.id, p.name, p.zone, p.department, p.category, p.brand,
       p.price::float8 as price, p.nectar_price::float8 as nectar_price,
       p.pack_grams::float8 as pack_grams, p.promos, p.is_available, p.is_food, p.storage,
       (case when jsonb_typeof(p.nutrition->'protein') = 'number' then (p.nutrition->>'protein')::float8 end) as protein,
+      (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end) as sat,
       p.seed_oil, p.health::float8 as health, p.listed_at,
-      (p.nutrition is not null and p.ingredients is not null) as has_detail
+      (p.nutrition is not null and p.ingredients is not null) as has_detail,
+      p.ingredient_count, p.review_avg::float8 as review_avg, p.review_count,
+      (p.ingredient_count = 1 or (p.ingredient_count is null and p.department = any(${PRODUCE}::text[])
+        and p.name !~* '(salad|kit|dip|dressing|prepared|stir.?fry|ready|soup|juice|slaw|mash|chips|wedges|roast)')) as whole_food
     from products p
-    where p.is_food and p.is_available and p.price > 0 and p.seed_oil <> 'yes'
-      and (p.health >= 5 or exists (select 1 from ratings r where r.product_id = p.id and r.stars >= 4))
+    where p.is_food and p.is_available and p.price > 0 and p.seed_oil not in ('yes', 'likely')
+      and (p.seed_oil = 'none' or p.department = any(${PRODUCE}::text[]) or p.ingredient_count = 1)
+      and (p.health >= 5
+           or (p.health is null and p.department = any(${PRODUCE}::text[]))
+           or exists (select 1 from ratings r where r.product_id = p.id and r.stars >= 4)
+           or exists (select 1 from basket_votes v where v.product_id = p.id and v.vote = 1))
     order by p.id
     limit 8000
   `;
@@ -341,7 +409,9 @@ async function loadCandidates(sql: Sql): Promise<Candidate[]> {
     id: r.id,
     name: r.name,
     zone: r.zone,
+    department: r.department,
     category: r.category,
+    brand: r.brand,
     price: r.price,
     nectarPrice: r.nectar_price,
     packGrams: r.pack_grams,
@@ -350,17 +420,39 @@ async function loadCandidates(sql: Sql): Promise<Candidate[]> {
     isFood: r.is_food,
     storage: r.storage,
     protein: r.protein,
+    sat: r.sat,
     seedOil: asSeedOil(r.seed_oil),
     health: r.health,
     listedAt: iso(r.listed_at) ?? "",
     hasDetail: r.has_detail,
+    ingredientCount: r.ingredient_count,
+    wholeFood: r.whole_food === true,
+    reviewAvg: r.review_avg,
+    reviewCount: r.review_count,
   }));
+}
+
+/** The dinner meal deals that are on now, with the products that fill each part. */
+async function loadBasketDeals(sql: Sql): Promise<BasketDeal[]> {
+  const rows = await sql<{ id: string; title: string; price: number; parts: BasketDeal["parts"] | null; items: BasketDeal["items"] | null }[]>`
+    select d.id, d.title, d.price::float8 as price,
+      (select jsonb_agg(jsonb_build_object('listId', dp.list_id, 'label', dp.label, 'qty', dp.qty) order by dp.list_id)
+         from deal_parts dp where dp.deal_id = d.id) as parts,
+      (select jsonb_agg(jsonb_build_object('listId', di.list_id, 'productId', di.product_id))
+         from deal_items di where di.deal_id = d.id) as items
+    from deals d
+    where d.ends_on is null or d.ends_on >= current_date
+  `;
+  return rows.map((r) => ({ id: r.id, title: r.title, price: r.price, parts: r.parts ?? [], items: r.items ?? [] }));
 }
 
 /**
  * Makes this week's basket and saves it. Never throws: if anything goes wrong,
  * or there is nothing to choose from, it returns the last saved basket with a
  * warning, or an empty basket with a plain-English message.
+ *
+ * This is also "Regenerate": his Yes picks from the last basket stay, his No
+ * picks stay out for 28 days, and the rest is refilled.
  */
 export async function buildWeeklyBasket(sql: Sql, now: Date = new Date()): Promise<BasketView> {
   let last: BasketRow | null = null;
@@ -388,15 +480,21 @@ export async function buildWeeklyBasket(sql: Sql, now: Date = new Date()): Promi
       proteinG: 0,
       warnings: why.length > 0 ? why : ["Couldn't make a basket just now. Try again in a minute."],
       fromHistory: false,
+      votes: {},
+      taught: [],
+      meals: [],
     };
   };
 
   try {
     const settings = await getSettings(sql);
-    const [candidates, ratingRows, notAtRows] = await Promise.all([
+    const [candidates, ratingRows, notAtRows, voteRows, deals, taste] = await Promise.all([
       loadCandidates(sql),
       sql<{ product_id: string; stars: number }[]>`select product_id, stars::int as stars from ratings`,
       sql<{ product_id: string }[]>`select product_id from not_at_store`,
+      loadVotes(sql),
+      loadBasketDeals(sql),
+      loadTaste(sql),
     ]);
     const ratings: Record<string, number> = {};
     for (const r of ratingRows) ratings[r.product_id] = r.stars;
@@ -405,6 +503,9 @@ export async function buildWeeklyBasket(sql: Sql, now: Date = new Date()): Promi
       candidates,
       ratings,
       notAtStore: notAtRows.map((r) => r.product_id),
+      votes: voteMap(voteRows),
+      taste,
+      deals,
       settings,
       previous: last && Array.isArray(last.items) ? { items: last.items } : null,
       now,
@@ -414,7 +515,7 @@ export async function buildWeeklyBasket(sql: Sql, now: Date = new Date()): Promi
     const saved = await sql<{ id: number; created_at: Date | string }[]>`
       insert into baskets (settings, items, total, protein_g, warnings)
       values (
-        ${JSON.stringify(result.settings)}::text::jsonb,
+        ${JSON.stringify({ ...result.settings, meals: result.meals })}::text::jsonb,
         ${JSON.stringify(result.items)}::text::jsonb,
         ${result.total},
         ${result.proteinG},
@@ -422,6 +523,7 @@ export async function buildWeeklyBasket(sql: Sql, now: Date = new Date()): Promi
       )
       returning id::int as id, created_at
     `;
+    const shown = new Set(result.items.map((i) => i.productId));
     return {
       id: saved[0]?.id ?? null,
       createdAt: iso(saved[0]?.created_at ?? null),
@@ -431,6 +533,9 @@ export async function buildWeeklyBasket(sql: Sql, now: Date = new Date()): Promi
       proteinG: result.proteinG,
       warnings: result.warnings,
       fromHistory: false,
+      votes: Object.fromEntries(Object.entries(voteMap(voteRows)).filter(([id]) => shown.has(id)).map(([id, v]) => [id, v.vote])),
+      taught: taughtLines(voteRows),
+      meals: result.meals,
     };
   } catch (err) {
     console.error("[dad-shop] basket generation failed:", err instanceof Error ? err.message : err);
