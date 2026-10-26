@@ -150,3 +150,64 @@ create index if not exists products_eans on products using gin (eans);
 -- v5 (26 Oct 2026): "basic ingredient" = a plain food you cook with (raw meat/fish, eggs, fruit & veg, rice,
 -- oats, pulses, tofu, plain nuts, flour…), even with salt / water / a firming agent. Drives "Hide plain ingredients".
 alter table products add column if not exists is_basic boolean not null default false;
+
+-- v6 (26 Oct 2026): is it on the shelf at Chislehurst (store 0171)? Sainsbury's online API can't say (0171 is not an
+-- online store), so the pipeline reads Just Eat's range file for the exact store (plus Eltham / Bromley / Orpington as
+-- cross-checks) every day, matches it to products by barcode, and computes products.store_status. `source` says which
+-- feed a row came from, so another feed (Deliveroo, Uber Eats, Sainsbury's online range) can be added without a schema change.
+-- store_range keeps history: first_listed .. last_listed is the run of days a product was on that store's list;
+-- last_checked is the last time the store's list was read at all (last_listed < last_checked = dropped from the list).
+create table if not exists store_range (
+  product_id   text not null references products(id) on delete cascade,
+  store        text not null,                 -- 'chislehurst' | 'eltham' | 'bromley' | 'orpington'
+  source       text not null default 'justeat', -- 'justeat' | 'deliveroo' | 'ubereats' | 'sainsburys_online'
+  first_listed date not null,
+  last_listed  date not null,
+  last_checked date not null,
+  primary key (product_id, store, source)
+);
+-- (A first draft of v6 had no source column and a (product_id, store) key: bring that shape forward, idempotently.)
+alter table store_range add column if not exists source text not null default 'justeat';
+do $$
+begin
+  if not exists (
+    select 1 from pg_index i
+    join pg_attribute a on a.attrelid = i.indrelid and a.attnum = any (i.indkey)
+    where i.indrelid = 'store_range'::regclass and i.indisprimary and a.attname = 'source'
+  ) then
+    alter table store_range drop constraint if exists store_range_pkey;
+    alter table store_range add primary key (product_id, store, source);
+  end if;
+end $$;
+create index if not exists store_range_lookup on store_range (store, source, last_listed);
+
+-- Dad's own evidence from the shop: the app writes these (tick = ticked it off the list, button = "not at my store" /
+-- "found it"). The pipeline only reads them. His reports beat the feed.
+create table if not exists store_reports (
+  id          bigserial primary key,
+  product_id  text not null references products(id) on delete cascade,
+  status      text not null check (status in ('found', 'missing')),
+  reported_at timestamptz not null default now(),
+  source      text not null check (source in ('tick', 'button'))
+);
+create index if not exists store_reports_product on store_reports (product_id, reported_at desc);
+
+-- store_status: 'yes' | 'likely' | 'unlikely' | 'no' | 'unknown'; store_reason is the short plain-English reason shown with it.
+alter table products add column if not exists store_status text
+  check (store_status in ('yes', 'likely', 'unlikely', 'no', 'unknown'));
+alter table products add column if not exists store_reason text;
+alter table products add column if not exists store_checked_at timestamptz;
+-- Made-to-order lines (party platters, "4 days to prepare"): from the listing's is_supply_chain_orderable / promise.
+alter table products add column if not exists store_order_only boolean not null default false;
+create index if not exists products_store_status on products (store_status);
+
+-- v7 (26 Oct 2026): comparison groups. A product's £/kg and protein per £ are judged only against its own group (what a
+-- shopper would realistically buy INSTEAD: deli chicken is not compared with raw chicken). 192 groups, listed in
+-- Lab/dad-shop/data/group-taxonomy.json (copied from the Tesco app). product_group is the group name, protein_main the
+-- main protein ('beef' | 'pork' | 'lamb' | 'chicken' | 'turkey' | 'duck & game' | 'mixed meat' | 'salmon' | 'white fish' |
+-- 'tuna' | 'prawns & shellfish' | 'other fish' | 'egg' | 'cheese & dairy' | 'veggie', or null). group_source says who
+-- decided: 'llm' (a model, merged and validated against the taxonomy) or 'rule' (the keyword fallback for new products).
+alter table products add column if not exists product_group text;
+alter table products add column if not exists protein_main text;
+alter table products add column if not exists group_source text check (group_source in ('llm', 'rule'));
+create index if not exists products_product_group on products (product_group);
