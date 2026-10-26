@@ -177,4 +177,4 @@ export const FOOD_ZONES = [
   "Food cupboard",
 ] as const;
 
-export const BASE_PATH = "/dads-shop-k7q2";
+export const BASE_PATH = "/dadshop";

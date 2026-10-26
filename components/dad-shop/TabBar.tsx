@@ -51,7 +51,7 @@ const TABS: { id: TabId; label: string; href: string; icon: React.ReactNode }[] 
   },
 ];
 
-/** Works whether the browser shows /dads-shop-k7q2/find or the internal /lab/... path. */
+/** Works whether the browser shows /dadshop/find or the internal /lab/... path. */
 function activeTab(pathname: string): TabId {
   const parts = pathname.split("/").filter(Boolean);
   if (parts.includes("find") || parts.includes("p")) return "find";
