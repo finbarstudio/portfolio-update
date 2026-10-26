@@ -4,6 +4,7 @@ import type { Sql } from "./db";
 import { fitScore } from "./fit";
 import { OVERALL_WEIGHTS } from "./overall";
 import { buildShelves, SHELF_SIZE } from "./shelves";
+import { STOCK_FRESH_HOURS } from "./store";
 import { scopeLabel, selectSimilar, similarScope, type Candidate } from "./similar";
 import { applyTaste, buildTaste, likedKeys, type TasteProfile, type TasteRow } from "./taste";
 import {
@@ -86,7 +87,7 @@ function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = 
         p.nectar_price::float8 as nectar_price, p.unit_price::float8 as unit_price, p.unit_measure,
         p.pack_grams::float8 as pack_grams, p.storage, p.promos, p.seed_oil, p.health::float8 as health,
         p.ingredient_count, p.ingredients, p.upf_markers, p.review_avg::float8 as review_avg, p.review_count,
-        p.is_new, p.is_basic, p.ingredients_source, p.nutrition_source, p.animal, p.product_group, p.protein_main, p.store_status, p.store_reason, p.is_available, p.nutrition, p.seed_oils_found, p.reasons, p.listed_at,
+        p.is_new, p.is_basic, p.ingredients_source, p.nutrition_source, p.animal, p.product_group, p.protein_main, p.store_status, p.store_reason, p.store_in_stock, p.store_stock_at, p.is_available, p.nutrition, p.seed_oils_found, p.reasons, p.listed_at,
         pr.now_price, pr.full_price,
         (case when jsonb_typeof(p.nutrition->'protein') = 'number' then (p.nutrition->>'protein')::float8 end) as protein,
         (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end) as sat,
@@ -164,6 +165,11 @@ function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = 
              else coalesce(m.store_status, 'unknown') end as store_eff,
         case when lr.status = 'found' then 'You found it here' when lr.status = 'missing' or nas.product_id is not null then 'You said it isn''t on the shelf here'
              else m.store_reason end as store_why,
+        -- Live stock counts only for a yes or likely that nobody has overruled, and only while the reading is fresh.
+        case when lr.status is null and nas.product_id is null and m.store_status in ('yes', 'likely')
+                  and m.store_in_stock is not null and m.store_stock_at > now() - make_interval(hours => ${STOCK_FRESH_HOURS}::int)
+             then case when m.store_in_stock then 'in' else 'out' end end as store_stock,
+        m.store_stock_at,
         exists (select 1 from list_items li where li.product_id = m.id) as on_list,
         paid.each as paid_each, paid.at as paid_at, paid.offer as paid_offer,
         case
@@ -234,6 +240,8 @@ export interface ScoredRow {
   not_at_store: boolean;
   store_eff: string;
   store_why: string | null;
+  store_stock: string | null;
+  store_stock_at: Date | string | null;
   product_group: string | null;
   protein_main: string | null;
   on_list: boolean;
@@ -311,6 +319,8 @@ export function mapCard(r: ScoredRow, dealIds: Set<string>): ProductCard {
     notAtStore: r.not_at_store,
     storeStatus: asStoreStatus(r.store_eff),
     storeReason: r.store_why,
+    storeStock: r.store_stock === "in" || r.store_stock === "out" ? r.store_stock : null,
+    storeStockAt: r.store_stock === "in" || r.store_stock === "out" ? iso(r.store_stock_at) : null,
     productGroup: r.product_group,
     proteinMain: r.protein_main,
     onList: r.on_list,

@@ -133,6 +133,10 @@ export interface ProductCard extends PriceInfo {
   storeStatus: StoreStatus;
   /** One plain sentence on why, shown when he taps the store chip. */
   storeReason: string | null;
+  /** Live stock from Just Eat, only when it is fresh (a few hours old) and the product is a yes or likely: in, or out today. */
+  storeStock: "in" | "out" | null;
+  /** When that stock reading was taken (ISO). */
+  storeStockAt: string | null;
   /** The comparison group (what you would buy instead of it, prep state built in), when classified. */
   productGroup: string | null;
   /** The main protein: beef, chicken, salmon, egg, veggie... when classified. */
@@ -203,6 +207,8 @@ export interface BasketLine extends BasketItem {
   brand: string | null;
   imageUrl: string | null;
   zone: string | null;
+  /** Is it at Chislehurst right now? Read live each time the basket is shown, not saved with it. */
+  store?: { status: StoreStatus; reason: string | null; stock: "in" | "out" | null; stockAt: string | null };
 }
 
 /** A generated (or last saved) basket, ready to show. */

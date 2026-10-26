@@ -11,7 +11,7 @@ function card(id: string, over: Partial<ProductCard> = {}): ProductCard {
     reviewAvg: null, reviewCount: null, isNew: false, animal: null, notAtStore: false, onList: false, isAvailable: true,
     value: 7, valueBasis: null, valuePct: null, discount: 0, per100Protein: null, paidBefore: null,
     isBasic: false, vote: null, ingredientsSource: null, nutritionSource: null, kcal: 120, upfMarkers: [], seedOilsFound: [], reasons: [],
-    storeStatus: "unknown", storeReason: null, productGroup: null, proteinMain: null,
+    storeStatus: "unknown", storeStock: null, storeStockAt: null, storeReason: null, productGroup: null, proteinMain: null,
     ...over,
   };
 }

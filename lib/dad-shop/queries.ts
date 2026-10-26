@@ -4,6 +4,7 @@ import { getList, loadTaste } from "./catalog";
 import type { Sql } from "./db";
 import { offerLabel, priceList, type PricedRow, livePromos, nowPence, fullPence } from "./pricing";
 import type { ListAction, SettingsPatch } from "./validate";
+import { STOCK_FRESH_HOURS } from "./store";
 import { describeVotes } from "./votes";
 import {
   DEFAULT_SETTINGS,
@@ -299,8 +300,22 @@ async function hydrate(sql: Sql, items: BasketItem[]): Promise<BasketLine[]> {
   const rows =
     ids.length === 0
       ? []
-      : await sql<{ id: string; name: string; brand: string | null; image_url: string | null; zone: string | null }[]>`
-          select id, name, brand, image_url, zone from products where id = any(${ids}::text[])
+      : await sql<
+          { id: string; name: string; brand: string | null; image_url: string | null; zone: string | null; store_eff: string; store_why: string | null; store_stock: string | null; store_stock_at: Date | string | null }[]
+        >`
+          select p.id, p.name, p.brand, p.image_url, p.zone,
+            case when lr.status = 'found' then 'yes' when lr.status = 'missing' or nas.product_id is not null then 'no'
+                 else coalesce(p.store_status, 'unknown') end as store_eff,
+            case when lr.status = 'found' then 'You found it here' when lr.status = 'missing' or nas.product_id is not null then 'You said it isn''t on the shelf here'
+                 else p.store_reason end as store_why,
+            case when lr.status is null and nas.product_id is null and p.store_status in ('yes', 'likely')
+                      and p.store_in_stock is not null and p.store_stock_at > now() - make_interval(hours => ${STOCK_FRESH_HOURS}::int)
+                 then case when p.store_in_stock then 'in' else 'out' end end as store_stock,
+            p.store_stock_at
+          from products p
+          left join not_at_store nas on nas.product_id = p.id
+          left join lateral (select sr.status from store_reports sr where sr.product_id = p.id order by sr.reported_at desc limit 1) lr on true
+          where p.id = any(${ids}::text[])
         `;
   const byId = new Map(rows.map((r) => [r.id, r]));
   return items.map((i) => {
@@ -311,6 +326,14 @@ async function hydrate(sql: Sql, items: BasketItem[]): Promise<BasketLine[]> {
       brand: p?.brand ?? null,
       imageUrl: p?.image_url ?? null,
       zone: p?.zone ?? null,
+      store: p
+        ? {
+            status: (STORE_STATUSES as readonly string[]).includes(p.store_eff) ? (p.store_eff as StoreStatus) : "unknown",
+            reason: p.store_why,
+            stock: p.store_stock === "in" || p.store_stock === "out" ? p.store_stock : null,
+            stockAt: p.store_stock === "in" || p.store_stock === "out" ? iso(p.store_stock_at) : null,
+          }
+        : undefined,
     };
   });
 }

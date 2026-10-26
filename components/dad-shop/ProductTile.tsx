@@ -160,7 +160,7 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
           {pv.nectar && <span className="ds-pcard-nectar">Nectar</span>}
         </div>
 
-        <StoreChip status={p.storeStatus} reason={p.storeReason} id={`${panelId}-store`} />
+        <StoreChip status={p.storeStatus} reason={p.storeReason} stock={p.storeStock} stockAt={p.storeStockAt} id={`${panelId}-store`} />
 
         {group && <GroupTag group={group} label={group.kind === "mealdeal" ? group.label : tidyMoney(group.label)} />}
 

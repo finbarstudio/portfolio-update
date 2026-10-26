@@ -6,6 +6,7 @@ import { gbp } from "@/lib/dad-shop/format";
 import type { GroupInfo } from "@/lib/dad-shop/pricing";
 import { GROUP_COLOURS } from "@/lib/dad-shop/pricing";
 import type { PriceView } from "@/lib/dad-shop/pricing";
+import { storeView } from "@/lib/dad-shop/store";
 import type { SeedOil, StoreStatus } from "@/lib/dad-shop/types";
 
 /** Small shared pieces: picture, Fit badge, stars, seed-oil tag. */
@@ -152,31 +153,30 @@ export function Caret() {
   );
 }
 
-/** What the store chip says and how it looks, for a status. Shared by the card and the product page. */
-export function storeChip(status: StoreStatus): { text: string; tone: "g" | "n" | "r"; fallback: string } {
-  switch (status) {
-    case "yes":
-    case "likely":
-      return { text: "At Chislehurst ✓", tone: "g", fallback: status === "yes" ? "On the Chislehurst shelf list." : "Probably on the shelf at Chislehurst." };
-    case "no":
-      return { text: "Not at Chislehurst", tone: "r", fallback: "Not on the Chislehurst shelf list." };
-    default:
-      return { text: "Check in store", tone: "n", fallback: "Not sure it is stocked at Chislehurst. Worth a look when you are there." };
-  }
-}
-
-/** The store chip: tap for the reason. */
-export function StoreChip({ status, reason, id }: { status: StoreStatus; reason: string | null; id: string }) {
+/** The store chip: tap for the reason (and, when there is a fresh stock reading, whether it is in or out today). */
+export function StoreChip({
+  status,
+  reason,
+  stock = null,
+  stockAt = null,
+  id,
+}: {
+  status: StoreStatus;
+  reason: string | null;
+  stock?: "in" | "out" | null;
+  stockAt?: string | null;
+  id: string;
+}) {
   const [open, setOpen] = useState(false);
-  const c = storeChip(status);
+  const v = storeView(status, reason, stock, stockAt);
   return (
     <>
-      <button type="button" className={`ds-store ds-store--${c.tone}`} aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>
-        {c.text}
+      <button type="button" className={`ds-store ds-store--${v.tone}`} aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>
+        {v.text}
       </button>
       {open && (
         <p className="ds-store-why" id={id} role="note">
-          {reason ?? c.fallback}
+          {v.detail}
         </p>
       )}
     </>

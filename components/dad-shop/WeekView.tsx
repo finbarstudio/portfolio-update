@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ago, gbp, groupByZone } from "@/lib/dad-shop/format";
 import { BASE_PATH, LIST_PATH, type BasketView } from "@/lib/dad-shop/types";
 import { api, ApiError } from "./api";
-import { ProductImage } from "./ui";
+import { ProductImage, StoreChip } from "./ui";
 
 type Phase = "idle" | "working" | "error";
 
@@ -245,6 +245,11 @@ export default function WeekView({ initial, nowIso }: { initial: BasketView | nu
                           </span>
                         </span>
                       </Link>
+                      {i.store && (i.store.status === "no" || i.store.stock === "out") && (
+                        <div className="ds-basket-store">
+                          <StoreChip status={i.store.status} reason={i.store.reason} stock={i.store.stock} stockAt={i.store.stockAt} id={`ds-bs-${i.productId}`} />
+                        </div>
+                      )}
                       <div className="ds-vote" role="group" aria-label={`Do you want ${i.name}?`}>
                         <button type="button" className="ds-vote-btn ds-vote-btn--yes" aria-pressed={v === 1} onClick={() => vote(i.productId, 1)}>
                           <span aria-hidden="true">{v === 1 ? "✓ " : ""}</span>Yes

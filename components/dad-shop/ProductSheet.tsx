@@ -181,7 +181,7 @@ export default function ProductSheet({ product, similar, filters, list, nowIso }
 
         <section className="ds-block ds-storebox" aria-label="Is it at Chislehurst?">
           <p className="ds-store-line">
-            <StoreChip status={status} reason={reason} id="ds-sheet-store" />
+            <StoreChip status={status} reason={reason} stock={report ? null : product.storeStock} stockAt={report ? null : product.storeStockAt} id="ds-sheet-store" />
             <span className="ds-muted">Been to the shelf? Tell me.</span>
           </p>
           <div className="ds-found" role="group" aria-label="Is it on the shelf here?">
