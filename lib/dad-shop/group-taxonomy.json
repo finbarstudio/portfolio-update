@@ -1,0 +1,1196 @@
+{
+  "_about": "Comparison groups: a product's £/kg and protein per £ are judged only against its own group. A group = what a shopper would realistically buy INSTEAD (substitutes). Every product is classified into exactly one group (data/groups.json, id → group). `cat` is the app category the group is filed under. Edit here, then reclassify.",
+  "groups": [
+    {
+      "g": "non-food",
+      "cat": "other",
+      "d": "flowers, bakeware, cake boxes, cases, kitchenware, alcohol (wine, beer, spirits), pet food",
+      "dept": "other"
+    },
+    {
+      "g": "baby & toddler food",
+      "cat": "other",
+      "d": "infant cereal, baby pouches, toddler snacks (Organix, Kiddylicious, Little Dish kids meals stay ready meals)",
+      "dept": "other"
+    },
+    {
+      "g": "protein powder",
+      "cat": "supplements",
+      "d": "whey, isolate, clear whey, vegan protein powders, protein drink mixes in tubs/pouches",
+      "dept": "supplements"
+    },
+    {
+      "g": "creatine",
+      "cat": "supplements",
+      "d": "creatine powder/capsules/gummies",
+      "dept": "supplements"
+    },
+    {
+      "g": "vitamins & supplements",
+      "cat": "supplements",
+      "d": "vitamins, collagen, electrolytes, pre-workout, superfood blends",
+      "dept": "supplements"
+    },
+    {
+      "g": "protein shakes (ready to drink)",
+      "cat": "supplements",
+      "d": "bottled/canned protein shakes and meal drinks",
+      "dept": "supplements"
+    },
+    {
+      "g": "coffee (ground & beans)",
+      "cat": "coffee",
+      "d": "ground coffee and whole coffee beans only",
+      "dept": "drinks"
+    },
+    {
+      "g": "coffee pods, instant & coffee drinks",
+      "cat": "drinks",
+      "d": "capsules, pods, instant coffee, iced coffee, coffee sachets",
+      "dept": "drinks"
+    },
+    {
+      "g": "tea",
+      "cat": "drinks",
+      "d": "tea bags, loose tea, herbal and fruit tea",
+      "dept": "drinks"
+    },
+    {
+      "g": "hot chocolate & malted drinks",
+      "cat": "drinks",
+      "d": "hot chocolate, drinking chocolate, Horlicks, Ovaltine",
+      "dept": "drinks"
+    },
+    {
+      "g": "soft drinks",
+      "cat": "drinks",
+      "d": "cola, lemonade, fizzy drinks, energy drinks, sports drinks, squash, cordial, water, alcohol-free beer, cider & wine (0.0–0.5%)",
+      "dept": "drinks"
+    },
+    {
+      "g": "juice & smoothies",
+      "cat": "drinks",
+      "d": "fruit juice, smoothies, lassi, yogurt drinks, kombucha",
+      "dept": "drinks"
+    },
+    {
+      "g": "milk",
+      "cat": "dairy-eggs",
+      "d": "cow's milk (fresh, UHT), milkshakes, flavoured milk",
+      "dept": "dairy"
+    },
+    {
+      "g": "plant milk",
+      "cat": "dairy-eggs",
+      "d": "oat, almond, soya, coconut drinks, barista alternatives",
+      "dept": "dairy"
+    },
+    {
+      "g": "milk powder & condensed milk",
+      "cat": "dairy-eggs",
+      "d": "milk powder, evaporated and condensed milk",
+      "dept": "dairy"
+    },
+    {
+      "g": "eggs",
+      "cat": "dairy-eggs",
+      "d": "hen eggs, egg whites (not scotch eggs, not chocolate eggs)",
+      "dept": "dairy"
+    },
+    {
+      "g": "butter",
+      "cat": "dairy-eggs",
+      "d": "block butter",
+      "dept": "dairy"
+    },
+    {
+      "g": "spreads & margarine",
+      "cat": "dairy-eggs",
+      "d": "spreadable butter blends, margarine, dairy-free spreads",
+      "dept": "dairy"
+    },
+    {
+      "g": "cooking fats (ghee, lard, dripping)",
+      "cat": "dairy-eggs",
+      "d": "ghee, lard, beef dripping, suet",
+      "dept": "dairy"
+    },
+    {
+      "g": "cream",
+      "cat": "dairy-eggs",
+      "d": "single, double, whipping, squirty, crème fraîche, sour cream, clotted",
+      "dept": "dairy"
+    },
+    {
+      "g": "custard",
+      "cat": "dairy-eggs",
+      "d": "ready custard (chilled or ambient), custard pots",
+      "dept": "dairy"
+    },
+    {
+      "g": "cheddar & everyday hard cheese",
+      "cat": "dairy-eggs",
+      "d": "cheddar, red leicester, regional hard cheese, grated/sliced everyday cheese, cheese slices",
+      "dept": "dairy"
+    },
+    {
+      "g": "continental & speciality cheese",
+      "cat": "dairy-eggs",
+      "d": "parmesan, grana padano, gruyère, manchego, emmental, raclette, blue cheese, brie, camembert, goats cheese",
+      "dept": "dairy"
+    },
+    {
+      "g": "soft & cream cheese",
+      "cat": "dairy-eggs",
+      "d": "cream cheese, Philadelphia, mascarpone, ricotta, cheese spread, Laughing Cow, Boursin",
+      "dept": "dairy"
+    },
+    {
+      "g": "mozzarella, halloumi, feta & paneer",
+      "cat": "dairy-eggs",
+      "d": "mozzarella, burrata, halloumi, feta/salad cheese, paneer",
+      "dept": "dairy"
+    },
+    {
+      "g": "cottage cheese",
+      "cat": "dairy-eggs",
+      "d": "cottage cheese of any fat level",
+      "dept": "dairy"
+    },
+    {
+      "g": "cheese snacks",
+      "cat": "dairy-eggs",
+      "d": "Babybel, cheese strings, Dunkers, cheese & cracker snack packs, lunchbox cheese",
+      "dept": "dairy"
+    },
+    {
+      "g": "plain & greek yogurt (tubs)",
+      "cat": "dairy-eggs",
+      "d": "natural, plain, greek style, coconut natural yogurt in tubs (unflavoured)",
+      "dept": "dairy"
+    },
+    {
+      "g": "flavoured yogurts",
+      "cat": "dairy-eggs",
+      "d": "fruit and flavoured yogurts, multipacks, corner pots, Muller Light, Activia, dairy-free flavoured",
+      "dept": "dairy"
+    },
+    {
+      "g": "kids yogurts & fromage frais",
+      "cat": "dairy-eggs",
+      "d": "Petits Filous, Frubes, Munch Bunch, Suckies, Little Yeos, kids tubes and pouches",
+      "dept": "dairy"
+    },
+    {
+      "g": "high-protein yogurt, skyr & quark",
+      "cat": "dairy-eggs",
+      "d": "protein yogurts, skyr, quark, kvarg, high protein drinking yogurt, Graham's protein pouches",
+      "dept": "dairy"
+    },
+    {
+      "g": "protein puddings & mousses",
+      "cat": "dairy-eggs",
+      "d": "high-protein dessert pots: Arla, GetPro, Muller x MyProtein pudding/mousse, Lindahls pudding",
+      "dept": "dairy"
+    },
+    {
+      "g": "crisps",
+      "cat": "snacks",
+      "d": "potato crisps, corn chips, tortilla chips, puffs, multipack and sharing bags (Walkers, Doritos, Pringles, Monster Munch, Wotsits)",
+      "dept": "snacks"
+    },
+    {
+      "g": "other savoury snacks",
+      "cat": "snacks",
+      "d": "pretzels, Twiglets, veggie straws, lentil/pea snacks, rice crackers snacks, snack crunch mixes, Japanese crackers",
+      "dept": "snacks"
+    },
+    {
+      "g": "popcorn",
+      "cat": "snacks",
+      "d": "ready popcorn and popcorn kernels",
+      "dept": "snacks"
+    },
+    {
+      "g": "Indian snack mixes",
+      "cat": "snacks",
+      "d": "Bombay mix, chevda, sev, bhuja, Cofresh/Jaimin snacks, puri, chakli",
+      "dept": "snacks"
+    },
+    {
+      "g": "poppadoms & prawn crackers",
+      "cat": "snacks",
+      "d": "poppadoms and prawn crackers (takeaway sides)",
+      "dept": "snacks"
+    },
+    {
+      "g": "crackers & crispbreads",
+      "cat": "crackers",
+      "d": "crackers, crispbreads, rice/corn cakes, oatcakes, breadsticks, cheese biscuits, Mini Cheddars",
+      "dept": "snacks"
+    },
+    {
+      "g": "meat snacks",
+      "cat": "snacks",
+      "d": "biltong, jerky, Peperami, pork scratchings and crackling snacks, Fridge Raiders",
+      "dept": "snacks"
+    },
+    {
+      "g": "snack nuts (salted, roasted, coated)",
+      "cat": "nuts-seeds",
+      "d": "salted/roasted/flavoured/coated peanuts and nuts, KP, That's Nuts, nut selections for snacking",
+      "dept": "snacks"
+    },
+    {
+      "g": "plain & baking nuts",
+      "cat": "nuts-seeds",
+      "d": "unsalted plain nuts: almonds, walnuts, pecans, cashews, hazelnuts, ground almonds, chopped nuts, nuts in shell",
+      "dept": "snacks"
+    },
+    {
+      "g": "seeds",
+      "cat": "nuts-seeds",
+      "d": "chia, flax/linseed, sunflower, pumpkin, sesame, mixed seed bags (not spice seeds)",
+      "dept": "snacks"
+    },
+    {
+      "g": "fruit & nut mixes",
+      "cat": "nuts-seeds",
+      "d": "nuts & raisins, trail mix, fruit and nut snack pots and shots",
+      "dept": "snacks"
+    },
+    {
+      "g": "nut butters & tahini",
+      "cat": "nuts-seeds",
+      "d": "peanut, almond, cashew butter, tahini",
+      "dept": "snacks"
+    },
+    {
+      "g": "protein bars",
+      "cat": "snacks",
+      "d": "bars sold for protein: Barebells, Grenade, Fulfil, Trek protein, Nature Valley protein, Huel bar, Warrior",
+      "dept": "snacks"
+    },
+    {
+      "g": "cereal, oat & fruit bars",
+      "cat": "snacks",
+      "d": "cereal bars, flapjacks, Nakd, Nature Valley crunchy, Belvita bars, Nutri-Grain, Rice Krispies Squares, Eat Natural, KIND",
+      "dept": "snacks"
+    },
+    {
+      "g": "fruit snacks (kids)",
+      "cat": "snacks",
+      "d": "BEAR yoyos and splits, Fruit Winders, Zombie fruit bars, Whitworths Fusions, yogurt-coated fruit bites",
+      "dept": "snacks"
+    },
+    {
+      "g": "chocolate bars & multipacks",
+      "cat": "treats",
+      "d": "single chocolate bars, tablets, multipacks of bars (Dairy Milk, KitKat, Twix, Mars, Snickers, Freddo), dark chocolate bars",
+      "dept": "treats"
+    },
+    {
+      "g": "chocolate sharing bags & pouches",
+      "cat": "treats",
+      "d": "Maltesers, M&M's, Minstrels, Buttons, Galaxy minis, chocolate pouches and bags",
+      "dept": "treats"
+    },
+    {
+      "g": "chocolate boxes & gifts",
+      "cat": "treats",
+      "d": "boxed chocolates, truffles, Lindor, Ferrero Rocher boxes, Thorntons, After Eight, advent calendars, selection boxes, big tubs (Heroes, Roses, Celebrations, Quality Street), novelty and seasonal chocolate",
+      "dept": "treats"
+    },
+    {
+      "g": "biscuits",
+      "cat": "treats",
+      "d": "everyday biscuits: digestives, Hobnobs, rich tea, bourbons, chocolate biscuit bars (Club, Penguin, Blue Riband), wafers, Jaffa Cakes",
+      "dept": "treats"
+    },
+    {
+      "g": "cookies",
+      "cat": "treats",
+      "d": "cookies, cookie dough to bake, premium cookies",
+      "dept": "treats"
+    },
+    {
+      "g": "biscuit tins & assortments",
+      "cat": "treats",
+      "d": "biscuit selections and tins (Victoria, Family Circle, Fox's assortments, Finest tins)",
+      "dept": "treats"
+    },
+    {
+      "g": "sweets & gummies",
+      "cat": "treats",
+      "d": "Haribo, Maoam, jelly sweets, sour sweets, chews, lollipops, sweet tubs, marshmallows, fudge, toffee, liquorice",
+      "dept": "treats"
+    },
+    {
+      "g": "mints & chewing gum",
+      "cat": "treats",
+      "d": "mints, chewing gum, Polo, Smint, Extra",
+      "dept": "treats"
+    },
+    {
+      "g": "Indian sweets & desserts",
+      "cat": "treats",
+      "d": "gulab jamun, rasmalai, rasgulla, kheer, falooda, soan papdi, barfi, halwa, jalebi",
+      "dept": "treats"
+    },
+    {
+      "g": "snack cakes & cake bars",
+      "cat": "treats",
+      "d": "packaged cake bars, mini rolls, Mr Kipling slices, Soreen, snack cakes, Kinder Pingui",
+      "dept": "treats"
+    },
+    {
+      "g": "cakes & celebration cakes",
+      "cat": "treats",
+      "d": "whole cakes, celebration cakes, loaf cakes, brownies, yule logs, cupcakes, cake slices from the bakery",
+      "dept": "treats"
+    },
+    {
+      "g": "croissants, pastries & sweet buns",
+      "cat": "treats",
+      "d": "croissants, pain au chocolat, Danish, cinnamon swirls, iced buns, hot cross buns, teacakes, scones, doughnuts, muffins (cake)",
+      "dept": "treats"
+    },
+    {
+      "g": "pancakes, crumpets & waffles",
+      "cat": "bread",
+      "d": "crumpets, pikelets, ready pancakes, scotch pancakes, sweet waffles",
+      "dept": "bakery"
+    },
+    {
+      "g": "chilled dessert pots",
+      "cat": "treats",
+      "d": "individual dessert pots: Gü, Bonne Maman, mousse pots, chocolate pots, panna cotta, crème brûlée, jelly pots, Muller Light desserts",
+      "dept": "treats"
+    },
+    {
+      "g": "sharing desserts & cheesecakes",
+      "cat": "treats",
+      "d": "whole cheesecakes, trifles, tiramisu, profiterole bowls, pavlova, party desserts serving 4+",
+      "dept": "treats"
+    },
+    {
+      "g": "rice pudding",
+      "cat": "treats",
+      "d": "rice pudding pots and tins, Muller Rice, Ambrosia rice",
+      "dept": "treats"
+    },
+    {
+      "g": "hot puddings & crumbles",
+      "cat": "treats",
+      "d": "sticky toffee pudding, sponge puddings, crumbles, roly poly, Christmas pudding, melt-in-the-middle puddings",
+      "dept": "treats"
+    },
+    {
+      "g": "mince pies & sweet pies",
+      "cat": "treats",
+      "d": "mince pies, fruit pies, tarts (bakewell, custard, lemon), Mr Kipling pies",
+      "dept": "treats"
+    },
+    {
+      "g": "ice cream tubs",
+      "cat": "treats",
+      "d": "ice cream, gelato, sorbet in tubs and blocks",
+      "dept": "treats"
+    },
+    {
+      "g": "ice lollies, cones & sticks",
+      "cat": "treats",
+      "d": "Magnum, Cornetto, ice lollies, multipack sticks, choc ices, mochi, frozen chocolate-coated fruit (trüfrü)",
+      "dept": "treats"
+    },
+    {
+      "g": "everyday honey",
+      "cat": "baking",
+      "d": "squeezy and jar honey, hot honey",
+      "dept": "baking"
+    },
+    {
+      "g": "manuka & premium honey",
+      "cat": "baking",
+      "d": "Manuka (any MGO/UMF), monofloral premium honey",
+      "dept": "baking"
+    },
+    {
+      "g": "jam, marmalade & curd",
+      "cat": "baking",
+      "d": "jam, conserve, marmalade, lemon curd, fruit coulis",
+      "dept": "baking"
+    },
+    {
+      "g": "chocolate & sweet spreads",
+      "cat": "baking",
+      "d": "Nutella, chocolate spread, Biscoff spread, hazelnut creme",
+      "dept": "baking"
+    },
+    {
+      "g": "yeast extract & savoury spreads",
+      "cat": "baking",
+      "d": "Marmite, Vegemite, Bovril jar, sandwich spread",
+      "dept": "baking"
+    },
+    {
+      "g": "syrups",
+      "cat": "baking",
+      "d": "golden syrup, maple syrup, pancake syrup, agave, date syrup, treacle",
+      "dept": "baking"
+    },
+    {
+      "g": "sugar",
+      "cat": "baking",
+      "d": "granulated, caster, brown, icing, demerara sugar",
+      "dept": "baking"
+    },
+    {
+      "g": "sweeteners",
+      "cat": "baking",
+      "d": "Canderel, stevia, Natvia, sweetener tablets and granules",
+      "dept": "baking"
+    },
+    {
+      "g": "baking mixes",
+      "cat": "baking",
+      "d": "cake, brownie, cookie, pancake, bread, Yorkshire pudding and batter mixes, cookie and biscuit kits",
+      "dept": "baking"
+    },
+    {
+      "g": "icing, decorations & baking chocolate",
+      "cat": "baking",
+      "d": "icing, frosting, sprinkles, cake decorations, cooking chocolate, chocolate chunks/chips for baking, cocoa powder",
+      "dept": "baking"
+    },
+    {
+      "g": "baking basics",
+      "cat": "baking",
+      "d": "yeast, baking powder, bicarb, vanilla extract/paste, gelatine, food colouring, pastry (ready-rolled, block), mincemeat, marzipan, glacé cherries, desiccated coconut",
+      "dept": "baking"
+    },
+    {
+      "g": "flour, breadcrumbs & semolina",
+      "cat": "flour",
+      "d": "plain/self-raising/bread flour, atta, chapatti flour, cornflour, semolina, polenta, breadcrumbs, panko, gari",
+      "dept": "baking"
+    },
+    {
+      "g": "cooking oils",
+      "cat": "sauces",
+      "d": "olive, rapeseed, sunflower, vegetable, coconut, sesame oil, cooking spray",
+      "dept": "sauces"
+    },
+    {
+      "g": "vinegar",
+      "cat": "sauces",
+      "d": "malt, balsamic, cider, wine, rice vinegar",
+      "dept": "sauces"
+    },
+    {
+      "g": "salt",
+      "cat": "stock-seasoning",
+      "d": "table, sea, rock, flaked, pink salt, salt grinders",
+      "dept": "herbs"
+    },
+    {
+      "g": "dried herbs & spices",
+      "cat": "stock-seasoning",
+      "d": "single dried herbs and spices in jars/bags: pepper, chilli flakes, paprika, cumin, garam masala, curry powder, whole spices, spice seeds",
+      "dept": "herbs"
+    },
+    {
+      "g": "seasoning blends & rubs",
+      "cat": "stock-seasoning",
+      "d": "shaker seasonings, rubs, chicken/steak/chip seasonings, Aromat, peri peri salt, MSG, nutritional yeast",
+      "dept": "herbs"
+    },
+    {
+      "g": "garlic, ginger & chilli (jarred, frozen, fresh-prepared)",
+      "cat": "stock-seasoning",
+      "d": "Very Lazy jars, frozen chopped garlic/ginger/herbs, crushed garlic/ginger tubs, freeze-dried aromatics",
+      "dept": "herbs"
+    },
+    {
+      "g": "stock cubes & pots",
+      "cat": "stock-seasoning",
+      "d": "stock cubes, stock pots, bouillon, liquid stock",
+      "dept": "herbs"
+    },
+    {
+      "g": "gravy & sauce granules",
+      "cat": "stock-seasoning",
+      "d": "gravy granules/powder, ready gravy, Bisto sauce mixes, packet sauce mixes (peppercorn, cheese, white sauce)",
+      "dept": "herbs"
+    },
+    {
+      "g": "stuffing",
+      "cat": "stock-seasoning",
+      "d": "stuffing mix, stuffing balls, dumpling mix",
+      "dept": "herbs"
+    },
+    {
+      "g": "recipe mix sachets",
+      "cat": "stock-seasoning",
+      "d": "Schwartz/Colman's/Maggi recipe mixes, bag & bake, so juicy, curry spice sachets, biryani masala mix",
+      "dept": "herbs"
+    },
+    {
+      "g": "dinner kits",
+      "cat": "stock-seasoning",
+      "d": "fajita, taco, burrito, enchilada kits, curry kits (Spice Tailor), chilled stir-fry/noodle kits with sauce",
+      "dept": "herbs"
+    },
+    {
+      "g": "ketchup, brown & BBQ sauce",
+      "cat": "sauces",
+      "d": "tomato ketchup, brown sauce, BBQ sauce, burger sauce, mop sauces",
+      "dept": "sauces"
+    },
+    {
+      "g": "mayonnaise & salad cream",
+      "cat": "sauces",
+      "d": "mayonnaise, flavoured mayo (sriracha mayo, garlic mayo), aioli, salad cream, perinaise",
+      "dept": "sauces"
+    },
+    {
+      "g": "mustard & horseradish",
+      "cat": "sauces",
+      "d": "mustard, horseradish, mint sauce, cranberry sauce, apple sauce, bread sauce, tartare",
+      "dept": "sauces"
+    },
+    {
+      "g": "Asian pantry sauces",
+      "cat": "sauces",
+      "d": "soy sauce, oyster, hoisin, fish sauce, teriyaki sauce, mirin, black bean sauce bottles",
+      "dept": "sauces"
+    },
+    {
+      "g": "hot sauce",
+      "cat": "sauces",
+      "d": "hot sauces, sriracha, peri peri sauce, pepper sauce, chilli oil, chilli crisp, gochujang sauce",
+      "dept": "sauces"
+    },
+    {
+      "g": "sweet chilli & dipping sauces",
+      "cat": "sauces",
+      "d": "sweet chilli sauce, dipping sauces, tamarind sauce, ranch, garlic & herb sauce, chimichurri",
+      "dept": "sauces"
+    },
+    {
+      "g": "chutneys & pickles (jars)",
+      "cat": "sauces",
+      "d": "mango chutney, Branston pickle, piccalilli, Indian pickles, relish",
+      "dept": "sauces"
+    },
+    {
+      "g": "salad dressings",
+      "cat": "sauces",
+      "d": "salad dressings, vinaigrettes, Caesar dressing",
+      "dept": "sauces"
+    },
+    {
+      "g": "pesto",
+      "cat": "sauces",
+      "d": "green and red pesto, stir-in pesto",
+      "dept": "sauces"
+    },
+    {
+      "g": "curry pastes",
+      "cat": "sauces",
+      "d": "Patak's pastes, Thai curry pastes, tandoori/tikka paste, gochujang paste",
+      "dept": "sauces"
+    },
+    {
+      "g": "cooking pastes & purées",
+      "cat": "sauces",
+      "d": "tomato purée, sun-dried tomato paste, harissa, garlic/ginger paste, marinades, cooking pastes",
+      "dept": "sauces"
+    },
+    {
+      "g": "pasta sauces",
+      "cat": "sauces",
+      "d": "jars and fresh pots of pasta sauce, pasta bake sauces, stir-in sauces, carbonara, cheese sauce, white/lasagne sauce",
+      "dept": "sauces"
+    },
+    {
+      "g": "curry & Indian cooking sauces",
+      "cat": "sauces",
+      "d": "jars of curry sauce (korma, tikka masala, jalfrezi, butter chicken), Loyd Grossman curry, Thai curry sauce jars",
+      "dept": "sauces"
+    },
+    {
+      "g": "stir-fry sauces",
+      "cat": "sauces",
+      "d": "stir-fry sauce sachets and pouches (Blue Dragon, Tesco), sweet & sour, black bean",
+      "dept": "sauces"
+    },
+    {
+      "g": "other cooking sauces",
+      "cat": "sauces",
+      "d": "Mexican cooking sauces, casserole sauces, cooking sauce cans (Homepride wine sauces), hollandaise, peppercorn sauce pots",
+      "dept": "sauces"
+    },
+    {
+      "g": "hummus",
+      "cat": "sauces",
+      "d": "houmous/hummus of any flavour",
+      "dept": "sauces"
+    },
+    {
+      "g": "dips",
+      "cat": "sauces",
+      "d": "salsa, guacamole, sour cream & chive, tzatziki, nacho cheese dip, tapenade, taramasalata, onion & garlic dip, smashed avocado",
+      "dept": "sauces"
+    },
+    {
+      "g": "tinned soup",
+      "cat": "soup",
+      "d": "tinned and ambient carton/pouch soups",
+      "dept": "soup"
+    },
+    {
+      "g": "fresh soup",
+      "cat": "soup",
+      "d": "chilled fresh soup, bone broth, ramen broth",
+      "dept": "soup"
+    },
+    {
+      "g": "instant & cup soup",
+      "cat": "soup",
+      "d": "cup a soup, dry packet soup, soup sachets",
+      "dept": "soup"
+    },
+    {
+      "g": "pizza",
+      "cat": "ready-meal",
+      "d": "whole pizzas (chilled, frozen), stuffed pizza bagels, pizza bases",
+      "dept": "ready"
+    },
+    {
+      "g": "garlic bread & topped flatbreads",
+      "cat": "bread",
+      "d": "garlic bread, garlic baguettes, pizza bread, cheesy/topped flatbreads, focaccia, dough balls",
+      "dept": "bakery"
+    },
+    {
+      "g": "savoury pies, pasties & sausage rolls",
+      "cat": "ready-meal",
+      "d": "pies (steak, chicken, Pukka), pasties, sausage rolls, pork pies, scotch eggs, quiches, frittata, Spanish tortilla, Ginsters, steak bakes, Jamaican patties, picnic eggs",
+      "dept": "ready"
+    },
+    {
+      "g": "party food & starters",
+      "cat": "ready-meal",
+      "d": "samosas, spring rolls, bhajis, pakoras, dumplings, gyoza, bao, prawn toast, canapés, party selections, mozzarella sticks, halloumi fries, onion rings, tempura veg, savoury tarts, blinis",
+      "dept": "ready"
+    },
+    {
+      "g": "sandwiches & wraps (ready-made)",
+      "cat": "ready-meal",
+      "d": "filled sandwiches, filled wraps, sandwich kits, Rustlers microwave sandwiches",
+      "dept": "ready"
+    },
+    {
+      "g": "lunch kits & snack packs",
+      "cat": "ready-meal",
+      "d": "Attack a Snak, Lunchables-style kits, cracker & cheese/meat snack packs",
+      "dept": "ready"
+    },
+    {
+      "g": "sushi & poke",
+      "cat": "ready-meal",
+      "d": "sushi boxes and rolls (maki, nigiri, dragon/california rolls), sushi tacos, poke bowls",
+      "dept": "ready"
+    },
+    {
+      "g": "ready meals (chilled & frozen)",
+      "cat": "ready-meal",
+      "d": "complete single meals: curries with rice, pasta meals, lasagne, cottage pie, fish pie, macaroni cheese, roast dinners, meal boxes, High Protein meals, grain bowls, meat in sauce meals (ham hock in mustard sauce, brisket in gravy)",
+      "dept": "ready"
+    },
+    {
+      "g": "ambient meals (tins, pots & pouches)",
+      "cat": "ready-meal",
+      "d": "Fray Bentos, tinned meals, heat & eat pouches (Ashoka), Dolmio pasta pots, Pot Pasta, pasta 'n' sauce packets, Super Rice packets",
+      "dept": "ready"
+    },
+    {
+      "g": "rice, noodle & grain sides (ready)",
+      "cat": "ready-meal",
+      "d": "egg fried rice, pilau rice (chilled/frozen), chilled couscous/grain salads to heat, noodle sides",
+      "dept": "ready"
+    },
+    {
+      "g": "potato & veg sides (prepared)",
+      "cat": "ready-meal",
+      "d": "mash, roast potatoes with butter/herbs, hasselback, bombay potatoes, cauliflower cheese, gratins, dhal, chana, bean chilli, patatas bravas, garlic mushrooms, Yorkshire puddings, pigs-in-blankets style trimmings with stuffing",
+      "dept": "ready"
+    },
+    {
+      "g": "deli salads & coleslaw",
+      "cat": "veg",
+      "d": "coleslaw, potato salad, pasta salad, bean/chickpea/lentil deli salads, Greek salad pots",
+      "dept": "veg"
+    },
+    {
+      "g": "breaded & battered fish",
+      "cat": "fish",
+      "d": "fish fingers, fishcakes, breaded/battered/dusted fillets, goujons, scampi, breaded prawns, calamari",
+      "dept": "fish"
+    },
+    {
+      "g": "smoked salmon & ready-to-eat fish",
+      "cat": "fish",
+      "d": "smoked salmon, hot-smoked/roast salmon flakes, smoked mackerel, gravadlax, cooked prawn cocktail, crab sticks",
+      "dept": "fish"
+    },
+    {
+      "g": "fish in sauce & ready-to-cook fish",
+      "cat": "fish",
+      "d": "fish in sauce or with butter/crust, fish kievs, fish pie mix, seafood selections, cook-in-bag fish",
+      "dept": "fish"
+    },
+    {
+      "g": "salmon & trout",
+      "cat": "fish",
+      "d": "plain salmon/trout fillets and portions (fresh or frozen), salmon steaks",
+      "dept": "fish"
+    },
+    {
+      "g": "white fish fillets",
+      "cat": "fish",
+      "d": "plain cod, haddock, pollock, basa, hake, sea bass, bream, plaice fillets, and plain tuna / swordfish steaks (fresh or frozen, unbreaded)",
+      "dept": "fish"
+    },
+    {
+      "g": "prawns",
+      "cat": "fish",
+      "d": "raw and cooked prawns, king prawns, flavoured prawns",
+      "dept": "fish"
+    },
+    {
+      "g": "other seafood",
+      "cat": "fish",
+      "d": "mussels, scallops, squid, crab, lobster, octopus",
+      "dept": "fish"
+    },
+    {
+      "g": "tinned tuna",
+      "cat": "fish",
+      "d": "tinned/pouched tuna, tuna infusions, tuna salad pots",
+      "dept": "fish"
+    },
+    {
+      "g": "tinned salmon, sardines, mackerel & other fish",
+      "cat": "fish",
+      "d": "tinned salmon, sardines, mackerel (incl. in sauce), anchovies, pilchards, kippers, herring",
+      "dept": "fish"
+    },
+    {
+      "g": "breast & fillets (plain, raw)",
+      "cat": "chicken-turkey",
+      "d": "plain raw chicken/turkey breast, mini fillets, breast steaks, diced or strips of breast (fresh or frozen)",
+      "dept": "meat"
+    },
+    {
+      "g": "thighs, drumsticks & legs (raw)",
+      "cat": "chicken-turkey",
+      "d": "raw thighs, drumsticks, legs, chicken pieces, duck legs",
+      "dept": "meat"
+    },
+    {
+      "g": "wings",
+      "cat": "chicken-turkey",
+      "d": "raw or coated/sauced chicken wings",
+      "dept": "meat"
+    },
+    {
+      "g": "breaded & coated",
+      "cat": "chicken-turkey",
+      "d": "nuggets, dippers, goujons, tenders, popcorn chicken, kievs, escalopes, schnitzel, southern fried, buttermilk, breaded chicken burgers, turkey dinosaurs",
+      "dept": "meat"
+    },
+    {
+      "g": "marinated & flavoured (raw, to cook)",
+      "cat": "chicken-turkey",
+      "d": "raw meat in marinade, seasoning or sauce to cook: tikka/piri piri/BBQ chicken, stuffed or bacon-wrapped chicken, marinated pork/lamb, duck breasts in sauce",
+      "dept": "meat"
+    },
+    {
+      "g": "cooked chicken pieces & skewers",
+      "cat": "chicken-turkey",
+      "d": "ready-to-eat cooked chicken/turkey pieces, roast drumsticks, skewers, tikka bites, chicken shawarma pieces",
+      "dept": "meat"
+    },
+    {
+      "g": "deli: sliced cooked meats",
+      "cat": "meat",
+      "d": "sliced ham, sliced chicken/turkey, roast beef slices, corned beef, luncheon meat, wafer thin, deli slices",
+      "dept": "meat"
+    },
+    {
+      "g": "deli: salami, chorizo & charcuterie",
+      "cat": "meat",
+      "d": "salami, chorizo, pepperoni, prosciutto, Parma ham, nduja, antipasto platters, kabanos",
+      "dept": "meat"
+    },
+    {
+      "g": "pâté",
+      "cat": "meat",
+      "d": "pâté and terrines",
+      "dept": "meat"
+    },
+    {
+      "g": "mince",
+      "cat": "meat",
+      "d": "raw mince of any animal: beef, pork, lamb, turkey, chicken, steak mince",
+      "dept": "meat"
+    },
+    {
+      "g": "meatballs",
+      "cat": "meat",
+      "d": "raw or frozen meatballs and koftas (any animal)",
+      "dept": "meat"
+    },
+    {
+      "g": "burgers & patties",
+      "cat": "meat",
+      "d": "burgers, patties, grillsteaks, quarter pounders (any animal, not breaded), kebab/doner meat",
+      "dept": "meat"
+    },
+    {
+      "g": "sausages",
+      "cat": "meat",
+      "d": "sausages, chipolatas, hot dogs, frankfurters, pigs in blankets (any animal)",
+      "dept": "meat"
+    },
+    {
+      "g": "bacon",
+      "cat": "meat",
+      "d": "bacon rashers, medallions, lardons, pancetta cubes",
+      "dept": "meat"
+    },
+    {
+      "g": "steaks",
+      "cat": "meat",
+      "d": "beef steaks (sirloin, rump, ribeye, fillet, minute), pork steaks, gammon steaks, lamb steaks, turkey/duck breast steaks stay in breast",
+      "dept": "meat"
+    },
+    {
+      "g": "chops & cuts",
+      "cat": "meat",
+      "d": "pork/lamb chops, cutlets, pork belly slices, loin steaks",
+      "dept": "meat"
+    },
+    {
+      "g": "diced, strips & stewing",
+      "cat": "meat",
+      "d": "diced beef/pork/lamb, stewing steak, stir-fry strips",
+      "dept": "meat"
+    },
+    {
+      "g": "roasting joints & whole birds",
+      "cat": "meat",
+      "d": "whole chicken, turkey crowns and joints, duck, goose, beef/pork/lamb/gammon joints, racks, stuffed joints",
+      "dept": "meat"
+    },
+    {
+      "g": "ribs & slow-cooked",
+      "cat": "meat",
+      "d": "rib racks, ribs, pulled pork, lamb shanks, slow-cooked brisket/joints (uncooked or cooked, not complete ready meals)",
+      "dept": "meat"
+    },
+    {
+      "g": "black pudding, haggis & offal",
+      "cat": "meat",
+      "d": "black/white pudding, haggis, liver, kidneys, faggots",
+      "dept": "meat"
+    },
+    {
+      "g": "tofu & tempeh",
+      "cat": "veggie",
+      "d": "tofu (plain, smoked, marinated), Tofoo, tempeh, tempeh bites",
+      "dept": "veggie"
+    },
+    {
+      "g": "Quorn & meat-free mince, pieces & roasts",
+      "cat": "veggie",
+      "d": "Quorn mince/pieces/fillets/slices/roasts, meat-free mince, soya chunks, plant-based roasts",
+      "dept": "veggie"
+    },
+    {
+      "g": "veggie burgers, sausages & bites",
+      "cat": "veggie",
+      "d": "plant-based burgers, sausages, nuggets, falafel, veggie bites, fishless fingers",
+      "dept": "veggie"
+    },
+    {
+      "g": "everyday sliced bread",
+      "cat": "loaves",
+      "d": "standard sliced white, wholemeal, brown, seeded, 50/50, toastie loaves (Hovis, Warburtons, Kingsmill, Tesco)",
+      "dept": "bakery"
+    },
+    {
+      "g": "sourdough & speciality loaves",
+      "cat": "loaves",
+      "d": "sourdough, bloomers, tiger, Finest/artisan loaves, rye, ciabatta loaves, fruit loaves",
+      "dept": "bakery"
+    },
+    {
+      "g": "gluten-free bread & rolls",
+      "cat": "loaves",
+      "d": "gluten-free loaves, rolls and bagels",
+      "dept": "bakery"
+    },
+    {
+      "g": "wraps & tortillas",
+      "cat": "wraps",
+      "d": "tortilla wraps, burrito/mini wraps, corn tortillas, gluten-free/protein wraps",
+      "dept": "bakery"
+    },
+    {
+      "g": "naan, pitta & flatbreads",
+      "cat": "wraps",
+      "d": "naan, pitta, chapatti, roti, paratha, plain flatbreads, Lebanese bread",
+      "dept": "bakery"
+    },
+    {
+      "g": "rolls, baps & buns",
+      "cat": "bread",
+      "d": "bread rolls, baps, burger and hot dog buns, sub rolls, brioche rolls, baguettes, petit pains",
+      "dept": "bakery"
+    },
+    {
+      "g": "bagels & English muffins",
+      "cat": "bread",
+      "d": "bagels (incl. protein, sourdough), English/breakfast muffins, sandwich thins",
+      "dept": "bakery"
+    },
+    {
+      "g": "dried pasta",
+      "cat": "pasta",
+      "d": "dried pasta of any shape, lasagne sheets, orzo, macaroni",
+      "dept": "carbs"
+    },
+    {
+      "g": "fresh & filled pasta, gnocchi",
+      "cat": "pasta",
+      "d": "fresh pasta, ravioli, tortellini, gnocchi",
+      "dept": "carbs"
+    },
+    {
+      "g": "tinned pasta",
+      "cat": "pasta",
+      "d": "spaghetti hoops, tinned spaghetti, ravioli in sauce",
+      "dept": "carbs"
+    },
+    {
+      "g": "instant noodles & pots",
+      "cat": "noodles",
+      "d": "instant noodles, pot noodles, ramen packs, Super Noodles, protein instant noodles",
+      "dept": "carbs"
+    },
+    {
+      "g": "noodles (dried & fresh)",
+      "cat": "noodles",
+      "d": "egg/rice/udon/wholewheat noodles, wok-ready noodles, vermicelli",
+      "dept": "carbs"
+    },
+    {
+      "g": "dry rice",
+      "cat": "rice",
+      "d": "uncooked rice in bags (basmati, long grain, jasmine, risotto, pudding rice, boil-in-bag)",
+      "dept": "carbs"
+    },
+    {
+      "g": "microwave rice & grain pouches",
+      "cat": "rice",
+      "d": "250g microwave rice and grain pouches, flavoured pouches (Tilda, Ben's, Tesco), ready lentil/grain pouches",
+      "dept": "carbs"
+    },
+    {
+      "g": "couscous, quinoa & other grains",
+      "cat": "rice",
+      "d": "dry couscous, quinoa, bulgur, pearl barley, freekeh",
+      "dept": "carbs"
+    },
+    {
+      "g": "breakfast cereal",
+      "cat": "cereal",
+      "d": "boxed cereals, wheat biscuits, shredded wheat, cornflakes, kids cereals, protein cereal",
+      "dept": "cereal"
+    },
+    {
+      "g": "granola & muesli",
+      "cat": "cereal",
+      "d": "granola, muesli, clusters",
+      "dept": "cereal"
+    },
+    {
+      "g": "porridge oats",
+      "cat": "cereal",
+      "d": "bags/boxes of oats",
+      "dept": "cereal"
+    },
+    {
+      "g": "porridge pots & sachets",
+      "cat": "cereal",
+      "d": "porridge pots, sachets, ready porridge pots (Oat So Simple, Ambrosia, FUEL10K)",
+      "dept": "cereal"
+    },
+    {
+      "g": "potatoes (fresh)",
+      "cat": "veg",
+      "d": "raw potatoes, baby, baking, sweet potatoes",
+      "dept": "veg"
+    },
+    {
+      "g": "chips, fries & frozen potato",
+      "cat": "veg",
+      "d": "oven chips, fries, wedges, hash browns, potato waffles, frozen roast potatoes, croquettes, loaded fries",
+      "dept": "veg"
+    },
+    {
+      "g": "fresh veg",
+      "cat": "veg",
+      "d": "fresh vegetables, mushrooms, onions, tomatoes, peppers, fresh herbs, green beans, avocado",
+      "dept": "veg"
+    },
+    {
+      "g": "prepared fresh veg",
+      "cat": "veg",
+      "d": "chopped/sliced/spiralised veg packs, stir-fry veg packs, veg rice, roasting veg trays, prepared greens",
+      "dept": "veg"
+    },
+    {
+      "g": "frozen veg",
+      "cat": "veg",
+      "d": "frozen peas, sweetcorn, mixed veg, spinach, broccoli, frozen stir-fry veg",
+      "dept": "veg"
+    },
+    {
+      "g": "salad leaves & salad kits",
+      "cat": "veg",
+      "d": "bagged leaves, lettuce, rocket, spinach leaves, salad kits",
+      "dept": "veg"
+    },
+    {
+      "g": "tinned veg & sweetcorn",
+      "cat": "veg",
+      "d": "tinned sweetcorn, peas, carrots, potatoes, bean sprouts, jarred veg",
+      "dept": "veg"
+    },
+    {
+      "g": "tinned tomatoes & passata",
+      "cat": "veg",
+      "d": "chopped/plum tomatoes, passata, polpa",
+      "dept": "veg"
+    },
+    {
+      "g": "baked beans",
+      "cat": "veg",
+      "d": "baked beans in tomato sauce, beans & sausages",
+      "dept": "veg"
+    },
+    {
+      "g": "tinned beans & pulses",
+      "cat": "veg",
+      "d": "tins/jars/cartons of kidney, black, cannellini beans, chickpeas, lentils, mixed beans, refried beans, mushy peas",
+      "dept": "veg"
+    },
+    {
+      "g": "dried beans, lentils & pulses",
+      "cat": "veg",
+      "d": "dried lentils, split peas, dried chickpeas and beans in 500g-2kg bags",
+      "dept": "veg"
+    },
+    {
+      "g": "olives",
+      "cat": "veg",
+      "d": "olives in jars and deli pots",
+      "dept": "veg"
+    },
+    {
+      "g": "pickles, ferments & antipasti",
+      "cat": "veg",
+      "d": "gherkins, pickled onions, jalapeños, jarred beetroot, roasted peppers, sun-dried tomatoes, artichokes, capers, sauerkraut, kimchi, stuffed vine leaves",
+      "dept": "veg"
+    },
+    {
+      "g": "everyday fresh fruit",
+      "cat": "fruit",
+      "d": "apples, bananas, pears, oranges, easy peelers, lemons, limes, grapes, melon, pineapple, mango, kiwi, stone fruit",
+      "dept": "fruit"
+    },
+    {
+      "g": "berries & soft fruit",
+      "cat": "fruit",
+      "d": "strawberries, raspberries, blueberries, blackberries, cherries",
+      "dept": "fruit"
+    },
+    {
+      "g": "prepared fruit & fruit pots",
+      "cat": "fruit",
+      "d": "fruit pots, chunks, melon medley, fruit platters, fruit salad, apple slices with dip",
+      "dept": "fruit"
+    },
+    {
+      "g": "dried fruit",
+      "cat": "fruit",
+      "d": "raisins, sultanas, dried apricots, dates, prunes, cranberries, dried mango, banana chips",
+      "dept": "fruit"
+    },
+    {
+      "g": "frozen fruit",
+      "cat": "fruit",
+      "d": "frozen berries, mango, smoothie mixes, frozen avocado",
+      "dept": "fruit"
+    },
+    {
+      "g": "tinned fruit & purée",
+      "cat": "fruit",
+      "d": "tinned fruit, fruit in juice/syrup, mango pulp",
+      "dept": "fruit"
+    }
+  ],
+  "depts": {
+    "meat": "Meat & poultry",
+    "fish": "Fish & seafood",
+    "veggie": "Meat-free",
+    "ready": "Ready meals, pizza & party food",
+    "dairy": "Dairy & eggs",
+    "bakery": "Bread & bakery",
+    "carbs": "Pasta, rice & noodles",
+    "cereal": "Cereal & porridge",
+    "veg": "Veg, salad & potatoes",
+    "fruit": "Fruit",
+    "snacks": "Crisps, nuts & snacks",
+    "treats": "Chocolate, sweets & desserts",
+    "soup": "Soup",
+    "sauces": "Sauces, dips & oils",
+    "herbs": "Herbs, spices & stock",
+    "baking": "Baking, spreads & sugar",
+    "drinks": "Coffee & drinks",
+    "supplements": "Protein & supplements",
+    "other": "Other"
+  },
+  "proteins": [
+    "beef",
+    "pork",
+    "lamb",
+    "chicken",
+    "turkey",
+    "duck & game",
+    "mixed meat",
+    "salmon",
+    "white fish",
+    "tuna",
+    "prawns & shellfish",
+    "other fish",
+    "egg",
+    "cheese & dairy",
+    "veggie",
+    "none"
+  ]
+}

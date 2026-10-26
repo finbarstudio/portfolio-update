@@ -979,6 +979,7 @@ body:has(.lb-root):has(.ds-app) {
 }
 .ds-find-tools {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   margin-bottom: 12px;
 }
@@ -2967,4 +2968,87 @@ a.ds-cpill::before {
   color: var(--ds-soft);
   font-weight: 500;
   opacity: 0.55;
+}
+
+/* ── Is it at Chislehurst? A small chip on every card; tap for the reason ─ */
+.ds-store {
+  position: relative;
+  align-self: flex-start;
+  max-width: 100%;
+  min-height: 22px;
+  padding: 0 9px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* a 48px-tall tap area around the 22px chip */
+.ds-store::before {
+  content: "";
+  position: absolute;
+  inset: -13px -4px;
+}
+.ds-store--g {
+  background: var(--ds-green-bg);
+  color: #0a5c29;
+}
+.ds-store--n {
+  background: var(--ds-n-bg);
+  color: var(--ds-soft);
+}
+.ds-store--r {
+  background: var(--ds-red-bg);
+  color: var(--ds-red);
+}
+.ds-store-why {
+  margin: 0;
+  color: var(--ds-soft);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* "Found it here" / "Not here" on a product page */
+.ds-found {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 10px 0 4px;
+}
+.ds-found .ds-btn {
+  min-height: 56px;
+  font-size: 18px;
+}
+.ds-found .ds-btn--found[aria-pressed="true"] {
+  border-color: var(--ds-g);
+  background: var(--ds-green-bg);
+  color: #0a5c29;
+}
+.ds-found .ds-btn--missing[aria-pressed="true"] {
+  border-color: var(--ds-r);
+  background: var(--ds-red-bg);
+  color: var(--ds-red);
+}
+.ds-store-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 8px 0 0;
+}
+
+/* Compare-group tabs under a chosen category: they wrap, never scroll sideways. */
+.ds-tabs2--groups button {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 15px;
+}
+.ds-pills--sim {
+  margin: 10px 0 2px;
 }

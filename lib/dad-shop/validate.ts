@@ -1,3 +1,4 @@
+import { isGroup, isProtein } from "./groups";
 import {
   ANIMALS,
   COLLECTIONS,
@@ -79,6 +80,12 @@ export function parseVote(v: unknown): Result<1 | -1 | null> {
   if (v === null) return ok<1 | -1 | null>(null);
   if (v === 1 || v === -1) return ok<1 | -1 | null>(v);
   return fail("Say yes or no.");
+}
+
+/** "found" (it is on the shelf here) or "missing" (it is not). */
+export function parseReportStatus(v: unknown): Result<"found" | "missing"> {
+  if (v === "found" || v === "missing") return ok<"found" | "missing">(v);
+  return fail("Say found or missing.");
 }
 
 export type ListAction =
@@ -188,8 +195,12 @@ export function parseFindParams(params: URLSearchParams): Result<FindFilters> {
   const cat = pick(params, "cat");
   const coll = pick(params, "coll");
   const animal = pick(params, "animal");
-  for (const r of [zone, dept, cat, coll, animal]) if (!r.ok) return fail(r.error);
-  if (!zone.ok || !dept.ok || !cat.ok || !coll.ok || !animal.ok) return fail("That choice isn't valid.");
+  const group = pick(params, "group");
+  const protein = pick(params, "protein");
+  for (const r of [zone, dept, cat, coll, animal, group, protein]) if (!r.ok) return fail(r.error);
+  if (!zone.ok || !dept.ok || !cat.ok || !coll.ok || !animal.ok || !group.ok || !protein.ok) return fail("That choice isn't valid.");
+  if (group.value !== "" && !isGroup(group.value)) return fail("That group isn't valid.");
+  if (protein.value !== "" && protein.value !== "any" && !isProtein(protein.value)) return fail("That choice isn't valid.");
   if (coll.value !== "" && !COLLECTIONS.some((c) => c.key === coll.value)) return fail("That collection isn't valid.");
   if (animal.value !== "" && !(ANIMALS as readonly string[]).includes(animal.value)) return fail("That choice isn't valid.");
   return ok<FindFilters>({
@@ -213,6 +224,10 @@ export function parseFindParams(params: URLSearchParams): Result<FindFilters> {
     hideSingle: flag(params.get("hideSingle")),
     tasteDiff: flag(params.get("ttd")),
     onOffer: flag(params.get("offer")),
+    atStore: flag(params.get("store")),
+    atStoreSure: flag(params.get("sure")),
+    group: group.value,
+    protein: protein.value,
   });
 }
 
@@ -238,9 +253,13 @@ export const SIMILAR_DEFAULTS: FindFilters = {
   hideSingle: false,
   tasteDiff: false,
   onOffer: false,
+  atStore: false,
+  atStoreSure: false,
+  group: "",
+  protein: "",
 };
 
-const SIMILAR_KEYS = ["sort", "noSeedOil", "hideSat", "good", "frozen", "rated", "onList", "few", "hideOwn", "hideSingle", "ttd", "offer"] as const;
+const SIMILAR_KEYS = ["sort", "noSeedOil", "hideSat", "good", "frozen", "rated", "onList", "few", "hideOwn", "hideSingle", "ttd", "offer", "store", "sure", "protein"] as const;
 
 /** Only the sort and the switches are read; search, category and page never apply to a product page. */
 export function parseSimilarParams(raw: Record<string, string | string[] | undefined>): FindFilters {

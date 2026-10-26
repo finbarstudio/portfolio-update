@@ -17,11 +17,11 @@ import {
   unitPriceLabel,
 } from "@/lib/dad-shop/format";
 import { priceView } from "@/lib/dad-shop/pricing";
-import { BASE_PATH, LIST_PATH, type FindFilters, type ListItem, type ProductDetail, type SimilarSection as Similar } from "@/lib/dad-shop/types";
+import { BASE_PATH, LIST_PATH, type FindFilters, type ListItem, type ProductDetail, type SimilarSection as Similar, type StoreStatus } from "@/lib/dad-shop/types";
 import { api } from "./api";
 import CardWhy, { type WhyKind } from "./CardWhy";
 import SimilarSection from "./SimilarSection";
-import { FitBadge, PriceBlock, ProductImage, StarsInput } from "./ui";
+import { FitBadge, PriceBlock, ProductImage, StarsInput, StoreChip } from "./ui";
 import { useShopList } from "./useShopList";
 
 type Phase = "idle" | "saving" | "saved" | "error";
@@ -40,11 +40,15 @@ export default function ProductSheet({ product, similar, filters, list, nowIso }
   const { store, mine } = useShopList(list, now);
   const [stars, setStars] = useState<number | null>(product.stars);
   const [rating, setRating] = useState<Phase>("idle");
-  const [notHere, setNotHere] = useState(product.notAtStore);
-  const [notHerePhase, setNotHerePhase] = useState<Phase>("idle");
+  // His own answer on the buttons below; until he gives one, what the card already knew.
+  const [report, setReport] = useState<"found" | "missing" | null>(product.notAtStore ? "missing" : null);
+  const [reportPhase, setReportPhase] = useState<Phase>("idle");
   const [open, setOpen] = useState<WhyKind | null>(null);
   const panelId = useId();
 
+  // His own answer beats what the store feed says.
+  const status: StoreStatus = report === "found" ? "yes" : report === "missing" ? "no" : product.storeStatus;
+  const reason = report === "found" ? "You found it here" : report === "missing" ? "You said it isn't on the shelf here" : product.storeReason;
   const fit = fitScore(product.health, stars);
   const pv = priceView(product, now);
   const multi = groupPromo(product, now);
@@ -77,16 +81,16 @@ export default function ProductSheet({ product, similar, filters, list, nowIso }
     }
   }
 
-  async function toggleNotHere() {
-    const next = !notHere;
-    setNotHere(next);
-    setNotHerePhase("saving");
+  async function sendReport(next: "found" | "missing") {
+    const before = report;
+    setReport(next);
+    setReportPhase("saving");
     try {
-      await api("/not-at-store", { method: "POST", body: { productId: product.id, value: next } });
-      setNotHerePhase("saved");
+      await api("/store-report", { method: "POST", body: { productId: product.id, status: next } });
+      setReportPhase("saved");
     } catch {
-      setNotHere(!next);
-      setNotHerePhase("error");
+      setReport(before);
+      setReportPhase("error");
     }
   }
 
@@ -174,6 +178,30 @@ export default function ProductSheet({ product, similar, filters, list, nowIso }
             </Link>
           )}
         </section>
+
+        <section className="ds-block ds-storebox" aria-label="Is it at Chislehurst?">
+          <p className="ds-store-line">
+            <StoreChip status={status} reason={reason} id="ds-sheet-store" />
+            <span className="ds-muted">Been to the shelf? Tell me.</span>
+          </p>
+          <div className="ds-found" role="group" aria-label="Is it on the shelf here?">
+            <button type="button" className="ds-btn ds-btn--ghost ds-btn--found" aria-pressed={report === "found"} disabled={reportPhase === "saving"} onClick={() => sendReport("found")}>
+              Found it here
+            </button>
+            <button type="button" className="ds-btn ds-btn--ghost ds-btn--missing" aria-pressed={report === "missing"} disabled={reportPhase === "saving"} onClick={() => sendReport("missing")}>
+              Not here
+            </button>
+          </div>
+          <p className="ds-muted ds-hint" role="status">
+            {reportPhase === "error"
+              ? "Couldn't save that. Try again."
+              : report === "missing"
+                ? "Marked. It won't go in your weekly baskets."
+                : report === "found"
+                  ? "Thanks. I'll count it as stocked."
+                  : "Ticking it off your list counts as found."}
+          </p>
+        </section>
       </div>
 
       {similar && <SimilarSection productId={product.id} section={similar} filters={filters} now={now} store={store} mine={mine} />}
@@ -205,25 +233,6 @@ export default function ProductSheet({ product, similar, filters, list, nowIso }
             {rating === "saved" && (stars === null ? "Rating cleared." : "Saved.")}
             {rating === "error" && "Couldn't save that. Try again."}
             {rating === "idle" && (stars === null ? "Tap a star. Tap it again to clear." : "Tap the same star again to clear.")}
-          </p>
-        </section>
-
-        <section className="ds-actions" aria-label="Not at my store">
-          <button
-            type="button"
-            className={`ds-btn ds-btn--ghost ds-btn--wide${notHere ? " is-on" : ""}`}
-            aria-pressed={notHere}
-            onClick={toggleNotHere}
-            disabled={notHerePhase === "saving"}
-          >
-            {notHere ? "Not at my store ✓" : "Not at my store"}
-          </button>
-          <p className="ds-muted ds-hint" role="status">
-            {notHerePhase === "error"
-              ? "Couldn't save that. Try again."
-              : notHere
-                ? "Marked. It won't go in your weekly baskets."
-                : "Tap if you looked and the shelf was empty."}
           </p>
         </section>
 

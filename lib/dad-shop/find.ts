@@ -27,6 +27,10 @@ export function queryFor(f: FindFilters): string {
   if (f.hideSingle) p.set("hideSingle", "1");
   if (f.tasteDiff) p.set("ttd", "1");
   if (f.onOffer) p.set("offer", "1");
+  if (f.atStore) p.set("store", "1");
+  if (f.atStoreSure) p.set("sure", "1");
+  if (f.group) p.set("group", f.group);
+  if (f.protein) p.set("protein", f.protein);
   if (f.page > 0) p.set("page", String(f.page));
   return p.toString();
 }

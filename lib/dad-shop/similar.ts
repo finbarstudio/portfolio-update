@@ -15,7 +15,7 @@ export const MIN_SIMILAR = 6;
 /** A department can hold hundreds; show the best of them. */
 export const MAX_SHOWN = 120;
 
-export type SimilarScope = "category+animal" | "category" | "department";
+export type SimilarScope = "group" | "category+animal" | "category" | "department";
 
 /** How many OTHER products share each level with the one being looked at. */
 export interface ScopeCounts {
@@ -36,8 +36,14 @@ export function pickScope(c: ScopeCounts): SimilarScope {
   return "department";
 }
 
-/** "raw chicken breast & fillet", "chicken · indian ready meals", "everything in dairy". Plain words for the heading. */
-export function scopeLabel(scope: SimilarScope, me: { category: string | null; department: string | null; animal: string | null }, prep: Prep | null = null): string {
+/** What the heading calls the group: "mince · beef", "raw chicken breast & fillet", "dairy". Plain words. */
+export function scopeLabel(
+  scope: SimilarScope,
+  me: { category: string | null; department: string | null; animal: string | null; productGroup?: string | null },
+  prep: Prep | null = null,
+  protein: string | null = null,
+): string {
+  if (scope === "group" && me.productGroup) return protein ? `${me.productGroup} · ${protein}` : me.productGroup;
   const cat = (me.category ?? me.department ?? "").toLowerCase();
   const dept = (me.department ?? me.category ?? "").toLowerCase();
   const base = scope === "department" ? dept : scope === "category" ? cat : me.animal && cat && !cat.includes(me.animal) ? `${me.animal} · ${cat}` : cat;
@@ -52,31 +58,61 @@ export interface Candidate {
   department: string | null;
   category: string | null;
   animal: string | null;
+  /** The comparison group, once the pipeline has classified it. */
+  productGroup: string | null;
+  proteinMain: string | null;
 }
 
 export interface ScopeResult {
   scope: SimilarScope;
   /** The ids of the other products that count as similar (this one is not in it). */
   ids: string[];
-  /** Set when only products prepared the same way (raw, cooked, breaded, marinated) were kept. */
+  /** Set when only products prepared the same way (raw, cooked, breaded, marinated) were kept. Only without a group. */
   prep: Prep | null;
+  /** The comparison group, when that is what similar means. */
+  group: string | null;
+  /** The proteins in the group, to narrow by; empty when it has one (or none). */
+  proteins: { protein: string; n: number }[];
+  /** The protein the list is narrowed to, null for all. */
+  protein: string | null;
 }
 
 /**
- * THE one place that decides what "similar" means. Today: the same category,
- * narrowed to the same animal when it is known, widened to the department when
- * the category is small; and for fresh and frozen meat and fish, only products
- * prepared the same way. `all` is every product in this one's department.
- * When the pipeline gains `product_type` and `prep`, change this function only.
+ * THE one place that decides what "similar" means.
+ *
+ * With a comparison group (products.product_group): everything in the same
+ * group, and nothing else. The groups already keep raw, cooked, breaded and
+ * marinated apart, so there is no widening to the department when the group is
+ * small. Where the group covers several proteins (mince: beef, lamb, pork...) it
+ * is narrowed to this product's own protein unless `choice` says "any" or another one.
+ *
+ * Without a group (not classified yet): the same category, narrowed to the same
+ * animal when it is known, widened to the department when the category is small,
+ * and for fresh and frozen meat and fish only products prepared the same way
+ * (prep.ts). `all` is the group, or else the department, this product is in.
  */
-export function similarScope(me: Candidate, all: Candidate[]): ScopeResult {
+export function similarScope(me: Candidate, all: Candidate[], choice = ""): ScopeResult {
+  if (me.productGroup) {
+    const inGroup = all.filter((c) => c.productGroup === me.productGroup);
+    const tally = new Map<string, number>();
+    for (const c of inGroup) if (c.proteinMain) tally.set(c.proteinMain, (tally.get(c.proteinMain) ?? 0) + 1);
+    const proteins = tally.size > 1 ? [...tally.entries()].map(([protein, n]) => ({ protein, n })).sort((a, b) => b.n - a.n || (a.protein < b.protein ? -1 : 1)) : [];
+    let protein: string | null = null;
+    if (proteins.length > 0 && choice !== "any") {
+      if (choice && tally.has(choice)) protein = choice;
+      else if (me.proteinMain && tally.has(me.proteinMain)) protein = me.proteinMain;
+    }
+    const ids = inGroup.filter((c) => c.id !== me.id && (protein === null || c.proteinMain === protein)).map((c) => c.id);
+    return { scope: "group", ids, prep: null, group: me.productGroup, proteins, protein };
+  }
+
   const prep = prepApplies(me) ? prepOf(me.name) : null;
   const others = all.filter((c) => c.id !== me.id && c.department === me.department && (prep === null || (prepApplies(c) && prepOf(c.name) === prep)));
   const inCat = me.category != null ? others.filter((c) => c.category === me.category) : [];
   const inCatAnimal = me.animal != null ? inCat.filter((c) => c.animal === me.animal) : [];
   const scope = pickScope({ categoryAnimal: inCatAnimal.length, category: inCat.length, department: others.length });
   const pool = scope === "category+animal" ? inCatAnimal : scope === "category" ? inCat : others;
-  return { scope, ids: pool.map((c) => c.id), prep };
+  return { scope, ids: pool.map((c) => c.id), prep, group: null, proteins: [], protein: null };
 }
 
 export interface PoolRow {

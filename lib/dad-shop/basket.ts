@@ -1,7 +1,7 @@
 import { fitScore, learnedFit } from "./fit";
 import { bestMultibuy, dealLabel, linePrice, singlePence, toPence, toPounds } from "./pricing";
 import { estimateTaste, type TasteEstimate, type TasteProfile } from "./taste";
-import type { BasketItem, MealCoverage, Promo, SeedOil, Settings } from "./types";
+import type { BasketItem, MealCoverage, Promo, SeedOil, Settings, StoreStatus } from "./types";
 import { DEFAULT_SETTINGS } from "./types";
 import { NO_DAYS } from "./votes";
 
@@ -55,6 +55,8 @@ export interface Candidate {
   wholeFood?: boolean;
   reviewAvg?: number | null;
   reviewCount?: number | null;
+  /** On the shelf at Chislehurst? "no" is never picked; "yes" and "likely" are preferred. Missing counts as unknown. */
+  storeStatus?: StoreStatus | null;
 }
 
 /** A dinner meal deal (Dine In and the like) with the products that can fill each part. */
@@ -106,6 +108,10 @@ const MAX_SAT = 5;
 const FULL_DETAIL_FLOOR = 30;
 const DAY_MS = 24 * 3600 * 1000;
 const STAPLE_ITEMS = 4;
+/** Quality points for how sure we are it is on the shelf (a point is about one Fit point). */
+const STORE_YES = 1.2;
+const STORE_LIKELY = 0.8;
+const STORE_UNLIKELY = 0.8;
 /** At least this many different products in each part of the week, when there are that many to choose from. */
 const MIN_VARIETY = 3;
 /** A multi-buy has to be at least this much cheaper per item to be worth chasing. */
@@ -298,7 +304,7 @@ export function generateBasket(input: BasketInput): BasketResult {
   let stale = 0;
   for (const c of [...input.candidates].sort((a, b) => cmp(a.id, b.id))) {
     if (!c.isFood || !c.isAvailable || !(c.price > 0)) continue;
-    if (blocked.has(c.id)) continue;
+    if (blocked.has(c.id) || c.storeStatus === "no") continue;
     if (c.seedOil === "yes" || c.seedOil === "likely") continue;
     if (c.seedOil === "unknown" && !c.wholeFood) continue;
     if (noRecently(c.id)) continue;
@@ -396,6 +402,10 @@ export function generateBasket(input: BasketInput): BasketResult {
     if (c.protein != null) q += Math.min(c.protein, 25) / 12.5;
     if (c.sat != null && c.sat <= 1.5) q += 0.5;
     if (c.ingredientCount != null && c.ingredientCount <= 5) q += 0.5;
+    // Between similar items, the one that is on the shelf at Chislehurst.
+    if (c.storeStatus === "yes") q += STORE_YES;
+    else if (c.storeStatus === "likely") q += STORE_LIKELY;
+    else if (c.storeStatus === "unlikely") q -= STORE_UNLIKELY;
     return q;
   }
 

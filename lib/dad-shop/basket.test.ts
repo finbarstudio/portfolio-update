@@ -189,6 +189,22 @@ describe("generateBasket", () => {
     expect(r.items[0].reason).toMatch(/5★/);
   });
 
+  test("never picks what is known not to be at Chislehurst, and prefers what is", () => {
+    const base = larder();
+    const picked = generateBasket(input(base)).items.map((i) => i.productId);
+    expect(picked.length).toBeGreaterThan(5);
+    // Everything it picked is now known not to be there: none of it comes back.
+    const off = base.map((c) => (picked.includes(c.id) ? { ...c, storeStatus: "no" as const } : c));
+    const again = generateBasket(input(off)).items.map((i) => i.productId);
+    expect(again.filter((id) => picked.includes(id))).toEqual([]);
+
+    // An identical twin that is on the shelf wins over one nobody knows about.
+    const first = base.find((c) => c.id === picked.find((id) => id.startsWith("chi")))!;
+    const twin = { ...first, id: "zzz-twin", name: "Twin", storeStatus: "yes" as const };
+    const pair = generateBasket(input([...base.filter((c) => c.id !== first.id), { ...first, storeStatus: null }, twin])).items.map((i) => i.productId);
+    expect(pair).toContain("zzz-twin");
+  });
+
   test("prices a half-filled multi-buy at the single price, a whole one at the deal price", () => {
     const deal = cand("deal", { price: 2.44, promos: [multibuy], packGrams: 960, protein: 30.6, storage: "ambient" });
     const tight = generateBasket(input([deal], { settings: { ...DEFAULT_SETTINGS, budget_gbp: 3 } }));

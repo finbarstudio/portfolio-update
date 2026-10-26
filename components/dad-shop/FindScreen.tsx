@@ -16,7 +16,7 @@ import {
 } from "@/lib/dad-shop/types";
 import { parseFindParams } from "@/lib/dad-shop/validate";
 
-const EMPTY_FACETS: Facets = { total: 0, zones: [], depts: [], cats: [], colls: {}, collDepts: {}, animals: [] };
+const EMPTY_FACETS: Facets = { total: 0, zones: [], depts: [], cats: [], colls: {}, collDepts: {}, animals: [], groups: [], proteins: [] };
 
 const DEFAULTS: FindFilters = {
   q: "",
@@ -39,6 +39,10 @@ const DEFAULTS: FindFilters = {
   hideSingle: false,
   tasteDiff: false,
   onOffer: false,
+  atStore: false,
+  atStoreSure: false,
+  group: "",
+  protein: "",
 };
 
 /**

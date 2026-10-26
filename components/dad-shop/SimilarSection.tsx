@@ -39,6 +39,8 @@ const ALL_OFF: Partial<FindFilters> = {
   hideSingle: false,
   tasteDiff: false,
   onOffer: false,
+  atStore: false,
+  atStoreSure: false,
 };
 
 /**
@@ -61,7 +63,7 @@ export default function SimilarSection({ productId, section, filters, now, store
   }
 
   function reset() {
-    go({ noSeedOil: false, hideSat: false, good: false, frozen: false, rated: false, onList: false, fewIngredients: false, hideOwn: false, hideSingle: false, tasteDiff: false, onOffer: false, sort: "best" });
+    go({ noSeedOil: false, hideSat: false, good: false, frozen: false, rated: false, onList: false, fewIngredients: false, hideOwn: false, hideSingle: false, tasteDiff: false, onOffer: false, atStore: false, atStoreSure: false, sort: "best" });
   }
 
   const { items, total, hidden, capped, rank, ranks } = section;
@@ -73,10 +75,14 @@ export default function SimilarSection({ productId, section, filters, now, store
   return (
     <section className="ds-simsec" aria-label="Similar products">
       <h2 className="ds-h2 ds-sim-h">
-        Similar products <span className="ds-muted">· {total}</span>
+        {section.group ? `Similar: ${section.group}` : "Similar products"} <span className="ds-muted">· {total}</span>
       </h2>
       <p className="ds-muted ds-sim-scope">
-        {total <= 1 ? "Nothing else like this one." : `Everything in ${section.scopeLabel}, to compare price and nutrition.`}
+        {total <= 1
+          ? "Nothing else like this one."
+          : section.group
+            ? "Everything you could buy instead, to compare price and nutrition."
+            : `Everything in ${section.scopeLabel}, to compare price and nutrition.`}
       </p>
 
       {total > 1 && (
@@ -95,6 +101,18 @@ export default function SimilarSection({ productId, section, filters, now, store
               <SortButton value={filters.sort} onChange={(s: Sort) => go({ sort: s })} />
             </div>
           </div>
+          {section.proteins.length > 1 && (
+            <div className="ds-pills ds-pills--sim" role="group" aria-label="Main protein">
+              <button type="button" aria-pressed={section.protein === null} onClick={() => go({ protein: "any" })}>
+                Any <span className="ds-tabs2-n">{section.proteins.reduce((n, p) => n + p.n, 0)}</span>
+              </button>
+              {section.proteins.map((p) => (
+                <button key={p.protein} type="button" aria-pressed={section.protein === p.protein} onClick={() => go({ protein: p.protein })}>
+                  {p.protein.charAt(0).toUpperCase() + p.protein.slice(1)} <span className="ds-tabs2-n">{p.n}</span>
+                </button>
+              ))}
+            </div>
+          )}
           <p className="ds-sortline" aria-live="polite">
             <b>{SORT_INFO[filters.sort].label}</b>: {SORT_INFO[filters.sort].sub}
           </p>

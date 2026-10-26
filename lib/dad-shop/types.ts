@@ -96,6 +96,10 @@ export interface BasketItem {
   slot?: "dinner" | "breakfast" | "lunch" | "veg" | "staples";
 }
 
+/** On the shelf at Chislehurst: yes / likely (the feed lists it), unlikely, no, or unknown (the feed does not cover it). */
+export type StoreStatus = "yes" | "likely" | "unlikely" | "unknown" | "no";
+export const STORE_STATUSES: readonly StoreStatus[] = ["yes", "likely", "unlikely", "unknown", "no"];
+
 /** A product as shown on a card in Find, or at the top of a sheet. */
 export interface ProductCard extends PriceInfo {
   id: string;
@@ -123,7 +127,16 @@ export interface ProductCard extends PriceInfo {
   reviewCount: number | null;
   isNew: boolean;
   animal: string | null;
+  /** Marked by him as not on the shelf here (his own report). Also folded into storeStatus. */
   notAtStore: boolean;
+  /** Is it on the shelf at Chislehurst? His latest report wins, then the daily range feed (see StoreStatus). */
+  storeStatus: StoreStatus;
+  /** One plain sentence on why, shown when he taps the store chip. */
+  storeReason: string | null;
+  /** The comparison group (what you would buy instead of it, prep state built in), when classified. */
+  productGroup: string | null;
+  /** The main protein: beef, chicken, salmon, egg, veggie... when classified. */
+  proteinMain: string | null;
   onList: boolean;
   isAvailable: boolean;
   /** 0-10: protein or £/kg per £ against similar products, plus the size of any deal. Null when it can't be judged. */
@@ -300,6 +313,14 @@ export interface FindFilters {
   tasteDiff: boolean;
   /** Only products on offer (a price cut or a multi-buy). */
   onOffer: boolean;
+  /** Hides what is known not to be at Chislehurst. Unknown stays. */
+  atStore: boolean;
+  /** Only what is confirmed at Chislehurst (yes or likely). */
+  atStoreSure: boolean;
+  /** One comparison group ("mince", "wings"). */
+  group: string;
+  /** One main protein (beef, chicken...). On a product page: "" = this product's own, "any" = all of them. */
+  protein: string;
 }
 
 /** The "Similar products" section of a product page: the compared products, this one pinned first. */
@@ -316,8 +337,14 @@ export interface SimilarSection {
   rank: number | null;
   /** Each product's place on Best overall among all of them (for the rank on a card). */
   ranks: Record<string, number>;
-  /** "chicken breast & fillet", "chicken · ready meals"; what "same type" meant here. */
+  /** "chicken breast & fillet", "mince · beef"; what "same type" meant here. */
   scopeLabel: string;
+  /** Set when similar means the product's comparison group (the heading names it). */
+  group: string | null;
+  /** Proteins in that group, to narrow by. Empty when the group has only one (or none). */
+  proteins: { protein: string; n: number }[];
+  /** The protein it is narrowed to, null for all of them. */
+  protein: string | null;
 }
 
 export const FILTER_DEFAULTS = { noSeedOil: true, hideSat: true } as const;
@@ -332,6 +359,10 @@ export interface Facets {
   /** Departments inside each collection (a collection spans several). */
   collDepts: Record<string, { zone: string; dept: string; n: number }[]>;
   animals: { animal: string; n: number }[];
+  /** Comparison groups inside the chosen category, with counts. */
+  groups: { group: string; n: number }[];
+  /** Main proteins inside the chosen category and group, with counts. */
+  proteins: { protein: string; n: number }[];
 }
 
 export const PAGE_SIZE = 30;

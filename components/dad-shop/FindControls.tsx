@@ -63,10 +63,12 @@ export function SortButton({ value, onChange }: { value: Sort; onChange: (next: 
   );
 }
 
-export type ToggleKey = "good" | "frozen" | "rated" | "onList" | "fewIngredients" | "noSeedOil" | "hideSat" | "hideOwn" | "hideSingle" | "tasteDiff" | "onOffer";
+export type ToggleKey = "good" | "frozen" | "rated" | "onList" | "fewIngredients" | "noSeedOil" | "hideSat" | "hideOwn" | "hideSingle" | "tasteDiff" | "onOffer" | "atStore" | "atStoreSure";
 
 const ONLY: { key: ToggleKey; label: string; hint?: string }[] = [
   { key: "onOffer", label: "Only on offer", hint: "A price cut or a multi-buy" },
+  { key: "atStore", label: "Only at Chislehurst", hint: "Hides what isn't stocked there. Anything we can't tell stays." },
+  { key: "atStoreSure", label: "Only confirmed at Chislehurst", hint: "Just what the store's list shows, or you found" },
   { key: "good", label: "Good deals", hint: "25% off or more, and good value" },
   { key: "frozen", label: "Frozen" },
   { key: "rated", label: "Rated by me" },

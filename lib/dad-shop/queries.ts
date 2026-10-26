@@ -15,6 +15,8 @@ import {
   type Promo,
   type SeedOil,
   type Settings,
+  type StoreStatus,
+  STORE_STATUSES,
 } from "./types";
 
 export { getList, getProduct, getZones, searchProducts } from "./catalog";
@@ -97,6 +99,15 @@ export async function applyListAction(sql: Sql, a: ListAction): Promise<{ id: nu
       return { id: existing[0]?.id ?? null, found: existing.length > 0 };
     }
     case "tick": {
+      // Ticking something off is proof it is on the shelf here: tell the store feed (his reports beat it).
+      if (a.ticked) {
+        await sql`
+          insert into store_reports (product_id, status, source)
+          select li.product_id, 'found', 'tick' from list_items li
+          where li.id = ${a.id} and li.product_id is not null and not li.ticked
+        `;
+        await sql`delete from not_at_store where product_id = (select product_id from list_items where id = ${a.id})`;
+      }
       await sql`
         update list_items
         set ticked = ${a.ticked}::boolean,
@@ -205,6 +216,22 @@ export async function setNotAtStore(sql: Sql, productId: string, value: boolean)
     returning product_id
   `;
   return rows.length > 0;
+}
+
+/**
+ * "Found it here" / "Not here". Writes his report (the pipeline reads these, and
+ * they beat the store feed) and keeps the older not_at_store list in step, which
+ * the weekly basket and the For you shelves still read. False when the product does not exist.
+ */
+export async function setStoreReport(sql: Sql, productId: string, status: "found" | "missing", source: "button" | "tick"): Promise<boolean> {
+  const rows = await sql<{ id: number }[]>`
+    insert into store_reports (product_id, status, source)
+    select p.id, ${status}, ${source} from products p where p.id = ${productId}
+    returning id::int as id
+  `;
+  if (rows.length === 0) return false;
+  await setNotAtStore(sql, productId, status === "missing");
+  return true;
 }
 
 // ── Settings ────────────────────────────────────────────────────────────────
@@ -378,6 +405,7 @@ interface CandidateRow {
   whole_food: boolean;
   review_avg: number | null;
   review_count: number | null;
+  store_eff: string;
 }
 
 const PRODUCE = ["Fresh fruit", "Fresh vegetables"];
@@ -394,8 +422,11 @@ async function loadCandidates(sql: Sql): Promise<Candidate[]> {
       (p.nutrition is not null and p.ingredients is not null) as has_detail,
       p.ingredient_count, p.review_avg::float8 as review_avg, p.review_count,
       (p.ingredient_count = 1 or (p.ingredient_count is null and p.department = any(${PRODUCE}::text[])
-        and p.name !~* '(salad|kit|dip|dressing|prepared|stir.?fry|ready|soup|juice|slaw|mash|chips|wedges|roast)')) as whole_food
+        and p.name !~* '(salad|kit|dip|dressing|prepared|stir.?fry|ready|soup|juice|slaw|mash|chips|wedges|roast)')) as whole_food,
+      -- His latest report wins, then the daily range feed (same rule as the cards).
+      case when lr.status = 'found' then 'yes' when lr.status = 'missing' then 'no' else coalesce(p.store_status, 'unknown') end as store_eff
     from products p
+    left join lateral (select sr.status from store_reports sr where sr.product_id = p.id order by sr.reported_at desc limit 1) lr on true
     where p.is_food and p.is_available and p.price > 0 and p.seed_oil not in ('yes', 'likely')
       and (p.seed_oil = 'none' or p.department = any(${PRODUCE}::text[]) or p.ingredient_count = 1)
       and (p.health >= 5
@@ -429,6 +460,7 @@ async function loadCandidates(sql: Sql): Promise<Candidate[]> {
     wholeFood: r.whole_food === true,
     reviewAvg: r.review_avg,
     reviewCount: r.review_count,
+    storeStatus: (STORE_STATUSES as readonly string[]).includes(r.store_eff) ? (r.store_eff as StoreStatus) : "unknown",
   }));
 }
 

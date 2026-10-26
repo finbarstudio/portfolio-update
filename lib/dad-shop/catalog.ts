@@ -21,6 +21,8 @@ import {
   type Promo,
   type SeedOil,
   type SimilarSection,
+  type StoreStatus,
+  STORE_STATUSES,
   type Sort,
   type Nutrition,
 } from "./types";
@@ -39,6 +41,10 @@ const SEED_OILS: readonly string[] = ["none", "likely", "yes", "unknown"];
 
 function asSeedOil(v: string | null): SeedOil {
   return v !== null && SEED_OILS.includes(v) ? (v as SeedOil) : "unknown";
+}
+
+function asStoreStatus(v: string | null): StoreStatus {
+  return v !== null && (STORE_STATUSES as readonly string[]).includes(v) ? (v as StoreStatus) : "unknown";
 }
 
 function asPromos(v: unknown): Promo[] {
@@ -64,11 +70,15 @@ type Fragment = postgres.PendingQuery<postgres.Row[]>;
  * everything else in their category. Without it, every product comes back.
  */
 function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = "category"): Fragment {
+  // A group can span categories, so its members come along with the category (or department): the value
+  // benchmark (group first, then category) must see the same products it would on the whole catalogue.
   const scope = !ids
     ? sql``
     : by === "department"
-      ? sql`and coalesce(p.department, '') in (select coalesce(department, '') from products where id = any(${ids}::text[]))`
-      : sql`and coalesce(p.category, '') in (select coalesce(category, '') from products where id = any(${ids}::text[]))`;
+      ? sql`and (coalesce(p.department, '') in (select coalesce(department, '') from products where id = any(${ids}::text[]))
+        or p.product_group in (select product_group from products where id = any(${ids}::text[])))`
+      : sql`and (coalesce(p.category, '') in (select coalesce(category, '') from products where id = any(${ids}::text[]))
+        or p.product_group in (select product_group from products where id = any(${ids}::text[])))`;
   return sql`
     with b as (
       select p.id, p.slug, p.name, p.brand, p.image_url, p.zone, p.department, p.category,
@@ -76,7 +86,7 @@ function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = 
         p.nectar_price::float8 as nectar_price, p.unit_price::float8 as unit_price, p.unit_measure,
         p.pack_grams::float8 as pack_grams, p.storage, p.promos, p.seed_oil, p.health::float8 as health,
         p.ingredient_count, p.ingredients, p.upf_markers, p.review_avg::float8 as review_avg, p.review_count,
-        p.is_new, p.is_basic, p.ingredients_source, p.nutrition_source, p.animal, p.is_available, p.nutrition, p.seed_oils_found, p.reasons, p.listed_at,
+        p.is_new, p.is_basic, p.ingredients_source, p.nutrition_source, p.animal, p.product_group, p.protein_main, p.store_status, p.store_reason, p.is_available, p.nutrition, p.seed_oils_found, p.reasons, p.listed_at,
         pr.now_price, pr.full_price,
         (case when jsonb_typeof(p.nutrition->'protein') = 'number' then (p.nutrition->>'protein')::float8 end) as protein,
         (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end) as sat,
@@ -108,10 +118,17 @@ function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = 
       ) dl on true
       where p.is_food and p.is_available and p.price > 0 ${scope}
     ),
+    gc as (
+      select product_group, count(*)::int as n from products
+      where is_food and is_available and price > 0 and product_group is not null group by product_group
+    ),
     m as (
       select b.*,
         greatest(0, 1 - least(b.now_price, coalesce(b.deal_unit, b.now_price)) / nullif(b.full_price, 0)) as discount,
-        coalesce(b.category, b.department, b.zone, '') as ckey,
+        -- Value is judged against its own comparison group (deli chicken against deli chicken); a group with
+        -- fewer than 4 products, or no group yet, falls back to its category.
+        case when b.product_group is not null and coalesce(gc.n, 0) >= 4 then 'g:' || b.product_group
+             else coalesce(b.category, b.department, b.zone, '') end as ckey,
         case
           when b.pack_protein >= 5 and b.protein >= 10 then b.now_price / b.pack_protein * 100
           when b.unit_price is not null and b.unit_price > 0 and b.unit_measure in ('kg', 'ltr') then b.unit_price * b.now_price / b.price
@@ -120,7 +137,7 @@ function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = 
           when b.pack_protein >= 5 and b.protein >= 10 then 'protein'
           when b.unit_price is not null and b.unit_price > 0 and b.unit_measure in ('kg', 'ltr') then 'kg'
         end as basis
-      from b
+      from b left join gc on gc.product_group = b.product_group
     ),
     r as (
       select m.id,
@@ -141,6 +158,12 @@ function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = 
         rt.stars::int as stars,
         bv.vote::int as vote,
         (nas.product_id is not null) as not_at_store,
+        -- His own report wins (the latest tick, button or "not at my store"), then the daily range feed.
+        case when lr.status = 'found' then 'yes'
+             when lr.status = 'missing' or nas.product_id is not null then 'no'
+             else coalesce(m.store_status, 'unknown') end as store_eff,
+        case when lr.status = 'found' then 'You found it here' when lr.status = 'missing' or nas.product_id is not null then 'You said it isn''t on the shelf here'
+             else m.store_reason end as store_why,
         exists (select 1 from list_items li where li.product_id = m.id) as on_list,
         paid.each as paid_each, paid.at as paid_at, paid.offer as paid_offer,
         case
@@ -157,6 +180,7 @@ function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = 
       left join ratings rt on rt.product_id = m.id
       left join basket_votes bv on bv.product_id = m.id
       left join not_at_store nas on nas.product_id = m.id
+      left join lateral (select sr.status from store_reports sr where sr.product_id = m.id order by sr.reported_at desc limit 1) lr on true
       left join paid on paid.pid = m.id
     )
   `;
@@ -208,6 +232,10 @@ export interface ScoredRow {
   pct: number | null;
   stars: number | null;
   not_at_store: boolean;
+  store_eff: string;
+  store_why: string | null;
+  product_group: string | null;
+  protein_main: string | null;
   on_list: boolean;
   paid_each: number | null;
   paid_at: Date | string | null;
@@ -281,6 +309,10 @@ export function mapCard(r: ScoredRow, dealIds: Set<string>): ProductCard {
     isNew: r.is_new,
     animal: r.animal,
     notAtStore: r.not_at_store,
+    storeStatus: asStoreStatus(r.store_eff),
+    storeReason: r.store_why,
+    productGroup: r.product_group,
+    proteinMain: r.protein_main,
     onList: r.on_list,
     isAvailable: r.is_available,
     value: r.value,
@@ -375,6 +407,10 @@ interface WhereOpts {
   noCategory?: boolean;
   /** Leave the animal choice out. */
   noAnimal?: boolean;
+  /** Leave the group choice out (for the group tabs' counts). */
+  noGroup?: boolean;
+  /** Leave the protein choice out (for the protein pills' counts). */
+  noProtein?: boolean;
 }
 
 /**
@@ -396,6 +432,8 @@ function whereFor(sql: Sql, f: FindFilters, opts: WhereOpts = {}): Fragment {
     if (f.hideSingle) parts.push(sql`(not s.is_basic and coalesce(s.ingredient_count, 2) <> 1)`);
     if (f.tasteDiff) parts.push(collectionTest(sql, "ttd"));
     if (f.onOffer) parts.push(sql`s.has_offer`);
+    if (f.atStoreSure) parts.push(sql`s.store_eff in ('yes', 'likely')`);
+    else if (f.atStore) parts.push(sql`s.store_eff <> 'no'`);
   }
   if (!opts.noCategory) {
     if (f.coll) parts.push(collectionTest(sql, f.coll));
@@ -403,6 +441,8 @@ function whereFor(sql: Sql, f: FindFilters, opts: WhereOpts = {}): Fragment {
     if (f.dept) parts.push(sql`s.department = ${f.dept}`);
     if (f.cat) parts.push(sql`s.category = ${f.cat}`);
   }
+  if (!opts.noGroup && f.group) parts.push(sql`s.product_group = ${f.group}`);
+  if (!opts.noProtein && f.protein && f.protein !== "any") parts.push(sql`s.protein_main = ${f.protein}`);
   if (!opts.noAnimal && f.animal) parts.push(sql`s.animal = ${f.animal}`);
   return and(sql, parts);
 }
@@ -449,7 +489,7 @@ export async function searchProducts(
 
 /** Counts for the category menu, the type tabs and the animal pills. They follow every filter that is on. */
 export async function getFacets(sql: Sql, f: FindFilters): Promise<Facets> {
-  const pool = sql`${viewTest(sql, f)} and ${whereFor(sql, f, { noCategory: true, noAnimal: true })}`;
+  const pool = sql`${viewTest(sql, f)} and ${whereFor(sql, f, { noCategory: true, noAnimal: true, noGroup: true, noProtein: true })}`;
   const colls = COLLECTION_KEYS.map((k) => sql`count(*) filter (where ${collectionTest(sql, k)})::int as ${sql("c_" + k)}`);
   const collCols = colls.reduce((all, c) => sql`${all}, ${c}`);
   const rows = await sql<({ zone: string | null; department: string | null; category: string | null; n: number } & Record<string, unknown>)[]>`
@@ -496,6 +536,28 @@ export async function getFacets(sql: Sql, f: FindFilters): Promise<Facets> {
     animals = arows.map((a) => ({ animal: a.animal, n: a.n }));
   }
 
+  // Group tabs and protein pills follow the chosen category (and, for proteins, the chosen group).
+  let groups: Facets["groups"] = [];
+  let proteins: Facets["proteins"] = [];
+  if (f.zone || f.dept || f.cat || f.coll) {
+    const [grows, prows] = await Promise.all([
+      sql<{ product_group: string; n: number }[]>`
+        ${scored(sql, null)}
+        select s.product_group, count(*)::int as n from s
+        where ${viewTest(sql, f)} and ${whereFor(sql, f, { noGroup: true, noProtein: true })} and s.product_group is not null
+        group by s.product_group order by n desc, s.product_group
+      `,
+      sql<{ protein_main: string; n: number }[]>`
+        ${scored(sql, null)}
+        select s.protein_main, count(*)::int as n from s
+        where ${viewTest(sql, f)} and ${whereFor(sql, f, { noProtein: true })} and s.protein_main is not null
+        group by s.protein_main order by n desc, s.protein_main
+      `,
+    ]);
+    groups = grows.map((g) => ({ group: g.product_group, n: g.n }));
+    proteins = prows.map((p) => ({ protein: p.protein_main, n: p.n }));
+  }
+
   return {
     total,
     zones: [...zones.entries()].map(([zone, n]) => ({ zone, n })),
@@ -504,6 +566,8 @@ export async function getFacets(sql: Sql, f: FindFilters): Promise<Facets> {
     colls: colMap,
     collDepts: Object.fromEntries([...collDepts.entries()].map(([k, m]) => [k, [...m.values()]])),
     animals,
+    groups,
+    proteins,
   };
 }
 
@@ -706,17 +770,21 @@ export async function getProduct(sql: Sql, id: string): Promise<ProductDetail | 
  * ordered in similar.ts so the rank on Best overall never moves with the filters.
  */
 export async function getSimilarSection(sql: Sql, id: string, f: FindFilters): Promise<SimilarSection | null> {
-  // The whole department, light: names and categories only. What counts as similar is decided in similar.ts.
+  // Light candidates: the product's comparison group, or (not classified yet) its department. Names and
+  // categories only. What counts as similar is decided in similar.ts.
   const cands = await sql<(Candidate & { is_me: boolean })[]>`
-    select p.id, p.name, p.zone, p.department, p.category, p.animal, (p.id = ${id}) as is_me
-    from products p
-    where (p.is_food and p.is_available and p.price > 0
-        and p.department is not distinct from (select department from products where id = ${id}))
-      or p.id = ${id}
+    with me as (select department, product_group from products where id = ${id})
+    select p.id, p.name, p.zone, p.department, p.category, p.animal, p.product_group as "productGroup", p.protein_main as "proteinMain",
+      (p.id = ${id}) as is_me
+    from products p, me
+    where p.id = ${id}
+      or (p.is_food and p.is_available and p.price > 0
+          and (case when me.product_group is not null then p.product_group = me.product_group
+                    else p.department is not distinct from me.department end))
   `;
   const me = cands.find((c) => c.is_me);
   if (!me) return null;
-  const { scope, ids, prep } = similarScope(me, cands);
+  const { scope, ids, prep, group, proteins, protein } = similarScope(me, cands, f.protein);
 
   // Only the toggles apply here: no search, category or animal choice.
   const toggles: FindFilters = { ...f, view: "all", q: "", coll: "", zone: "", dept: "", cat: "", animal: "", page: 0 };
@@ -739,7 +807,7 @@ export async function getSimilarSection(sql: Sql, id: string, f: FindFilters): P
   );
   const cards = new Map(applyTaste(rows.map((r) => mapCard(r, dealIds)), profile).map((c) => [c.id, c]));
   const items = pick.ids.map((i) => cards.get(i)).filter((c): c is ProductCard => c !== undefined);
-  return { items, total: pick.total, hidden: pick.hidden, capped: pick.capped, rank: pick.rank, ranks: pick.ranks, scopeLabel: scopeLabel(scope, me, prep) };
+  return { items, total: pick.total, hidden: pick.hidden, capped: pick.capped, rank: pick.rank, ranks: pick.ranks, scopeLabel: scopeLabel(scope, me, prep, protein), group, proteins, protein };
 }
 
 export async function getZones(sql: Sql): Promise<string[]> {

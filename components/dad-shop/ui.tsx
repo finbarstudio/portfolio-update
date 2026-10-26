@@ -6,7 +6,7 @@ import { gbp } from "@/lib/dad-shop/format";
 import type { GroupInfo } from "@/lib/dad-shop/pricing";
 import { GROUP_COLOURS } from "@/lib/dad-shop/pricing";
 import type { PriceView } from "@/lib/dad-shop/pricing";
-import type { SeedOil } from "@/lib/dad-shop/types";
+import type { SeedOil, StoreStatus } from "@/lib/dad-shop/types";
 
 /** Small shared pieces: picture, Fit badge, stars, seed-oil tag. */
 
@@ -149,5 +149,36 @@ export function Caret() {
     <svg className="ds-caret" width="12" height="12" viewBox="0 0 10 10" aria-hidden="true">
       <path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+/** What the store chip says and how it looks, for a status. Shared by the card and the product page. */
+export function storeChip(status: StoreStatus): { text: string; tone: "g" | "n" | "r"; fallback: string } {
+  switch (status) {
+    case "yes":
+    case "likely":
+      return { text: "At Chislehurst ✓", tone: "g", fallback: status === "yes" ? "On the Chislehurst shelf list." : "Probably on the shelf at Chislehurst." };
+    case "no":
+      return { text: "Not at Chislehurst", tone: "r", fallback: "Not on the Chislehurst shelf list." };
+    default:
+      return { text: "Check in store", tone: "n", fallback: "Not sure it is stocked at Chislehurst. Worth a look when you are there." };
+  }
+}
+
+/** The store chip: tap for the reason. */
+export function StoreChip({ status, reason, id }: { status: StoreStatus; reason: string | null; id: string }) {
+  const [open, setOpen] = useState(false);
+  const c = storeChip(status);
+  return (
+    <>
+      <button type="button" className={`ds-store ds-store--${c.tone}`} aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>
+        {c.text}
+      </button>
+      {open && (
+        <p className="ds-store-why" id={id} role="note">
+          {reason ?? c.fallback}
+        </p>
+      )}
+    </>
   );
 }

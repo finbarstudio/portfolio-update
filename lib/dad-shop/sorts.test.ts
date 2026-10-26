@@ -49,6 +49,10 @@ function card(id: string, over: Partial<ProductCard> = {}): ProductCard {
     upfMarkers: [],
     seedOilsFound: [],
     reasons: [],
+    storeStatus: "unknown",
+    storeReason: null,
+    productGroup: null,
+    proteinMain: null,
     ...over,
   };
 }

@@ -64,6 +64,10 @@ function card(id: string, over: Partial<ProductCard> = {}): ProductCard {
     upfMarkers: [],
     seedOilsFound: [],
     reasons: [],
+    storeStatus: "unknown",
+    storeReason: null,
+    productGroup: null,
+    proteinMain: null,
     ...over,
   };
 }
@@ -104,6 +108,11 @@ describe("scopeLabel", () => {
   test("department scope names the department", () => {
     expect(scopeLabel("department", me)).toBe("chicken");
   });
+  test("a group names itself, with the protein when narrowed", () => {
+    const g = { category: null, department: null, animal: null, productGroup: "mince" };
+    expect(scopeLabel("group", g)).toBe("mince");
+    expect(scopeLabel("group", g, null, "beef")).toBe("mince · beef");
+  });
   test("says when only the same preparation is compared", () => {
     expect(scopeLabel("category+animal", me, "raw")).toBe("raw chicken breast & fillet");
     expect(scopeLabel("category+animal", me, "cooked")).toBe("cooked chicken breast & fillet");
@@ -111,7 +120,7 @@ describe("scopeLabel", () => {
 });
 
 function cand(id: string, name: string, over: Partial<Candidate> = {}): Candidate {
-  return { id, name, zone: "Meat & fish", department: "Chicken", category: "Chicken breast & fillet", animal: "chicken", ...over };
+  return { id, name, zone: "Meat & fish", department: "Chicken", category: "Chicken breast & fillet", animal: "chicken", productGroup: null, proteinMain: null, ...over };
 }
 
 describe("similarScope", () => {
@@ -145,7 +154,7 @@ describe("similarScope", () => {
     expect(r.ids.some((i) => i.startsWith("c"))).toBe(false);
   });
   test("prep does not split a non-meat category", () => {
-    const yog = (id: string, name: string) => ({ id, name, zone: "Chilled food", department: "Yogurts", category: "Greek yogurt", animal: null });
+    const yog = (id: string, name: string): Candidate => ({ id, name, zone: "Chilled food", department: "Yogurts", category: "Greek yogurt", animal: null, productGroup: null, proteinMain: null });
     const me = yog("me", "Greek Yogurt Honey Flavoured 500g");
     const all = [me, ...Array.from({ length: 7 }, (_, i) => yog(`y${i}`, `Greek Yogurt Natural ${i}`))];
     const r = similarScope(me, all);
@@ -158,6 +167,60 @@ describe("similarScope", () => {
     const r = similarScope(me, [me, ...Array.from({ length: 7 }, (_, i) => meal(`m${i}`, `Chicken Korma ${i}`))]);
     expect(r.prep).toBeNull();
     expect(r.ids).toHaveLength(7);
+  });
+});
+
+describe("similarScope with comparison groups", () => {
+  const inGroup = (group: string, protein: string | null, n: number, prefix: string): Candidate[] =>
+    Array.from({ length: n }, (_, i) => cand(`${prefix}${i}`, `${prefix} product ${i}`, { productGroup: group, proteinMain: protein, category: `cat ${prefix}` }));
+
+  test("similar is the same group and nothing else, across categories", () => {
+    const me = cand("me", "Cooked chicken pieces", { productGroup: "cooked chicken pieces & skewers", proteinMain: "chicken", category: "Chicken breast & fillet" });
+    const all = [me, ...inGroup("cooked chicken pieces & skewers", "chicken", 5, "a"), ...inGroup("breast & fillets (plain, raw)", "chicken", 9, "b")];
+    const r = similarScope(me, all);
+    expect(r.scope).toBe("group");
+    expect(r.group).toBe("cooked chicken pieces & skewers");
+    expect(r.ids).toHaveLength(5);
+    expect(r.ids.every((i) => i.startsWith("a"))).toBe(true);
+    expect(r.proteins).toEqual([]);
+    expect(r.protein).toBeNull();
+  });
+  test("a small group is shown as it is, never widened to the department", () => {
+    const me = cand("me", "Smoked wings", { productGroup: "wings", proteinMain: "chicken" });
+    const all = [me, ...inGroup("wings", "chicken", 2, "w"), ...inGroup("breast & fillets (plain, raw)", "chicken", 30, "b")];
+    const r = similarScope(me, all);
+    expect(r.ids).toHaveLength(2);
+    expect(r.scope).toBe("group");
+  });
+  test("a group of several proteins starts on this product's own", () => {
+    const me = cand("me", "Beef mince", { productGroup: "mince", proteinMain: "beef" });
+    const all = [me, ...inGroup("mince", "beef", 4, "b"), ...inGroup("mince", "lamb", 3, "l"), ...inGroup("mince", "pork", 2, "p")];
+    const r = similarScope(me, all);
+    expect(r.protein).toBe("beef");
+    expect(r.ids).toHaveLength(4);
+    expect(r.proteins).toEqual([
+      { protein: "beef", n: 5 },
+      { protein: "lamb", n: 3 },
+      { protein: "pork", n: 2 },
+    ]);
+  });
+  test("the pills can ask for another protein, or all of them", () => {
+    const me = cand("me", "Beef mince", { productGroup: "mince", proteinMain: "beef" });
+    const all = [me, ...inGroup("mince", "beef", 4, "b"), ...inGroup("mince", "lamb", 3, "l")];
+    expect(similarScope(me, all, "lamb").ids).toHaveLength(3);
+    expect(similarScope(me, all, "lamb").protein).toBe("lamb");
+    expect(similarScope(me, all, "any").ids).toHaveLength(7);
+    expect(similarScope(me, all, "any").protein).toBeNull();
+    // a protein that is not in the group is ignored
+    expect(similarScope(me, all, "duck & game").protein).toBe("beef");
+  });
+  test("a product with no group falls back to category and prep", () => {
+    const me = cand("me", "Sainsbury's British Chicken Breast Fillets 640g");
+    const rawN = Array.from({ length: 8 }, (_, i) => cand(`r${i}`, `Sainsbury's British Chicken Breast Fillets ${i}`));
+    const r = similarScope(me, [me, ...rawN]);
+    expect(r.group).toBeNull();
+    expect(r.prep).toBe("raw");
+    expect(r.ids).toHaveLength(8);
   });
 });
 

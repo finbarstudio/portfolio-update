@@ -78,7 +78,7 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
   }
 
   function pickCat(c: CatSel) {
-    go({ ...c, animal: "" });
+    go({ ...c, animal: "", group: "", protein: "" });
   }
 
   function setView(view: View) {
@@ -102,6 +102,8 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
       hideSingle: false,
       tasteDiff: false,
       onOffer: false,
+      atStore: false,
+      atStoreSure: false,
     });
   }
 
@@ -134,6 +136,9 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
       ? (facets.colls[filters.coll] ?? 0)
       : (facets.zones.find((z) => z.zone === filters.zone)?.n ?? 0);
   const animals = facets.animals.filter((a) => (ANIMALS as readonly string[]).includes(a.animal));
+  // Comparison groups and main proteins (from the pipeline's classification) replace the older animal pills where they exist.
+  const groups = facets.groups.slice(0, 14);
+  const proteins = facets.proteins;
 
   const shelves = forYou?.shelves ?? null;
   const empty = items.length === 0 && (!shelves || shelves.length === 0) && (!deals || deals.length === 0);
@@ -208,7 +213,33 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
           </div>
         )}
 
-        {filters.view !== "deals" && picked && animals.length > 1 && (
+        {filters.view !== "deals" && picked && groups.length > 1 && (
+          <div className="ds-tabs2 ds-tabs2--groups" role="group" aria-label="Compare group">
+            <button type="button" aria-pressed={!filters.group} onClick={() => go({ group: "", protein: "" })}>
+              Any type
+            </button>
+            {groups.map((g) => (
+              <button key={g.group} type="button" aria-pressed={filters.group === g.group} onClick={() => go({ group: g.group, protein: "" })}>
+                {cap(g.group)} <span className="ds-tabs2-n">{g.n}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {filters.view !== "deals" && picked && proteins.length > 1 && (
+          <div className="ds-pills" role="group" aria-label="Main protein">
+            <button type="button" aria-pressed={!filters.protein} onClick={() => go({ protein: "" })}>
+              Any
+            </button>
+            {proteins.map((p) => (
+              <button key={p.protein} type="button" aria-pressed={filters.protein === p.protein} onClick={() => go({ protein: p.protein })}>
+                {cap(p.protein)} <span className="ds-tabs2-n">{p.n}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {filters.view !== "deals" && picked && proteins.length <= 1 && animals.length > 1 && (
           <div className="ds-pills" role="group" aria-label="Main meat or fish">
             <button type="button" aria-pressed={!filters.animal} onClick={() => go({ animal: "" })}>
               Any
@@ -290,7 +321,7 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
                   Show them too
                 </button>
               )}
-              {!dealish && (filters.good || filters.frozen || filters.rated || filters.onList || filters.fewIngredients || filters.hideOwn || filters.hideSingle || filters.tasteDiff || filters.onOffer) && (
+              {!dealish && (filters.good || filters.frozen || filters.rated || filters.onList || filters.fewIngredients || filters.hideOwn || filters.hideSingle || filters.tasteDiff || filters.onOffer || filters.atStore || filters.atStoreSure) && (
                 <button type="button" className="ds-btn ds-btn--ghost" onClick={reset}>
                   Reset filters
                 </button>

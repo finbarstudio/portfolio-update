@@ -9,7 +9,7 @@ import { priceView, tidyMoney, type GroupInfo } from "@/lib/dad-shop/pricing";
 import { offerPill } from "@/lib/dad-shop/similar";
 import { BASE_PATH, type DealLink, type ListItem, type ProductCard } from "@/lib/dad-shop/types";
 import type { ListStore } from "./listStore";
-import { GroupTag, ProductImage } from "./ui";
+import { GroupTag, ProductImage, StoreChip } from "./ui";
 
 interface Props {
   p: ProductCard;
@@ -114,8 +114,7 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
 
   // One short muted line, most important first.
   let note: { text: string; tone: string } | null = null;
-  if (p.notAtStore) note = { text: "Not at my store", tone: "n" };
-  else if (why) note = { text: `✦ ${why}`, tone: "why" };
+  if (why) note = { text: `✦ ${why}`, tone: "why" };
   else if (paid) {
     note = {
       text: `Paid ${gbp(paid.each)} before${paidMove < 0 ? ", now cheaper" : paidMove > 0 ? ", now dearer" : ""}`,
@@ -128,7 +127,7 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
   }
 
   return (
-    <li ref={card} className={`ds-pcard${p.notAtStore ? " is-muted" : ""}${row ? " is-added" : ""}${open ? " is-open" : ""}${isMe ? " is-me" : ""}`}>
+    <li ref={card} className={`ds-pcard${p.notAtStore || p.storeStatus === "no" ? " is-muted" : ""}${row ? " is-added" : ""}${open ? " is-open" : ""}${isMe ? " is-me" : ""}`}>
       <div className="ds-pcard-imgwrap">
         <Link href={href} className="ds-pcard-imglink" aria-label={`${p.name}: open`}>
           <ProductImage src={p.imageUrl} className="ds-img--card" />
@@ -160,6 +159,8 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
           )}
           {pv.nectar && <span className="ds-pcard-nectar">Nectar</span>}
         </div>
+
+        <StoreChip status={p.storeStatus} reason={p.storeReason} id={`${panelId}-store`} />
 
         {group && <GroupTag group={group} label={group.kind === "mealdeal" ? group.label : tidyMoney(group.label)} />}
 
