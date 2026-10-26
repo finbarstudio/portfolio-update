@@ -211,3 +211,21 @@ alter table products add column if not exists product_group text;
 alter table products add column if not exists protein_main text;
 alter table products add column if not exists group_source text check (group_source in ('llm', 'rule'));
 create index if not exists products_product_group on products (product_group);
+
+-- v8 (26 Oct 2026): is it in stock at Chislehurst right now? Just Eat's live "dynamic" menu lists the variation ids that
+-- are unavailable at this moment (about 10% of the range, changing within the hour); `bun run store-stock` maps them to
+-- products through the latest saved items file. This is a separate fact from store_status: a product that is listed but
+-- sold out today is still store_status 'yes'.
+--   store_in_stock  true / false; null = not on Just Eat's list (so nothing is known).
+--   store_stock_at  when it was last checked. Older than 6 hours, treat stock as unknown (a failed fetch leaves the
+--                   old values in place, so they simply get older).
+-- store_stock_events keeps one row per CHANGE (in stock -> out, out -> in, and a first sighting of "out"), so the
+-- history can later say "often out on Sundays". It is never written for a check that found nothing new.
+alter table products add column if not exists store_in_stock boolean;
+alter table products add column if not exists store_stock_at timestamptz;
+create table if not exists store_stock_events (
+  product_id text not null references products(id) on delete cascade,
+  in_stock   boolean not null,
+  at         timestamptz not null default now()
+);
+create index if not exists store_stock_events_product on store_stock_events (product_id, at desc);
