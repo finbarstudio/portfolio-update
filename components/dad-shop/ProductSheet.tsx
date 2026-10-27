@@ -12,11 +12,11 @@ import {
   gbp,
   groupPromo,
   ingredientSegments,
-  packLabel,
   processing,
   unitPriceLabel,
 } from "@/lib/dad-shop/format";
 import { priceView } from "@/lib/dad-shop/pricing";
+import { gramsText } from "@/lib/dad-shop/protein";
 import { BASE_PATH, LIST_PATH, type FindFilters, type ListItem, type ProductDetail, type SimilarSection as Similar, type StoreStatus } from "@/lib/dad-shop/types";
 import { api } from "./api";
 import CardWhy, { type WhyKind } from "./CardWhy";
@@ -108,7 +108,7 @@ export default function ProductSheet({ product, similar, filters, list, nowIso }
             <h1 className="ds-h1 ds-h1--product">{product.name}</h1>
             <p className="ds-price">
               <PriceBlock view={pv} big />
-              {packLabel(product.packGrams, product.unitMeasure) ? <span className="ds-muted"> {packLabel(product.packGrams, product.unitMeasure)}</span> : null}
+              {product.packText ? <span className="ds-muted"> · {product.packText}</span> : null}
               {unit ? <span className="ds-muted"> · {unit}</span> : null}
             </p>
           </header>
@@ -128,6 +128,12 @@ export default function ProductSheet({ product, similar, filters, list, nowIso }
         <p className="ds-sheet-scores">
           {ends && <span className="ds-chipx">{ends}</span>}
           {proc && <span className={`ds-chipx ds-chipx--${proc.tone}`}>{proc.label}</span>}
+          {product.protein != null && <span className="ds-chipx">Protein {gramsText(product.protein)} per 100g</span>}
+          {product.folicAcid && (
+            <span className="ds-chipx ds-chipx--r" title="A warning only: it doesn't change the score">
+              Folic acid
+            </span>
+          )}
         </p>
         {multi && (
           <p>

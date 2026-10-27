@@ -2,6 +2,10 @@ import { describe, expect, test } from "bun:test";
 import { OVERALL_WEIGHTS, overallParts, overallScore, overallWeightsLine } from "./overall";
 
 describe("Best overall", () => {
+  test("health leads, then value, then taste", () => {
+    expect(OVERALL_WEIGHTS).toEqual({ health: 0.6, value: 0.25, taste: 0.15 });
+  });
+
   test("the weights add up to one, so the score stays on a 0-10 scale", () => {
     const sum = OVERALL_WEIGHTS.health + OVERALL_WEIGHTS.value + OVERALL_WEIGHTS.taste;
     expect(Math.round(sum * 1000)).toBe(1000);
@@ -11,7 +15,7 @@ describe("Best overall", () => {
 
   test("blends health, value and taste by the constant", () => {
     const s = overallScore({ health: 8.5, value: 7, stars: 4, vote: null });
-    expect(s).toBeCloseTo(8.5 * 0.5 + 7 * 0.35 + 7.5 * 0.15, 5);
+    expect(s).toBeCloseTo(8.5 * 0.6 + 7 * 0.25 + 7.5 * 0.15, 5);
     expect(overallParts({ health: 8.5, value: 7, stars: 4, vote: null }).taste.how).toBe("stars");
   });
 
@@ -35,6 +39,6 @@ describe("Best overall", () => {
   });
 
   test("says its weights in words", () => {
-    expect(overallWeightsLine()).toBe("Health 50% · value 35% · your taste 15%");
+    expect(overallWeightsLine()).toBe("Health 60% · value 25% · your taste 15%");
   });
 });

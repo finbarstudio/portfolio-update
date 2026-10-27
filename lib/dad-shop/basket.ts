@@ -1,3 +1,4 @@
+import { isAvoided, readAvoid } from "./avoid";
 import { fitScore, learnedFit } from "./fit";
 import { bestMultibuy, dealLabel, linePrice, singlePence, toPence, toPounds } from "./pricing";
 import { estimateTaste, type TasteEstimate, type TasteProfile } from "./taste";
@@ -55,6 +56,8 @@ export interface Candidate {
   wholeFood?: boolean;
   reviewAvg?: number | null;
   reviewCount?: number | null;
+  /** The main protein (beef, pork, salmon...). One he doesn't eat (Settings) is never picked. Missing counts as none. */
+  proteinMain?: string | null;
   /** On the shelf at Chislehurst? "no" is never picked; "yes" and "likely" are preferred. Missing counts as unknown. */
   storeStatus?: StoreStatus | null;
 }
@@ -175,6 +178,7 @@ export function sanitiseSettings(s: Settings): Settings {
     protein_g_per_day: clamp(s?.protein_g_per_day, 20, 300, DEFAULT_SETTINGS.protein_g_per_day),
     max_per_category: Math.round(clamp(s?.max_per_category, 1, 5, DEFAULT_SETTINGS.max_per_category)),
     include_unrated_share: clamp(s?.include_unrated_share, 0, 0.5, DEFAULT_SETTINGS.include_unrated_share),
+    avoid_proteins: s?.avoid_proteins === undefined ? [...DEFAULT_SETTINGS.avoid_proteins] : readAvoid(s.avoid_proteins),
   };
 }
 
@@ -305,6 +309,8 @@ export function generateBasket(input: BasketInput): BasketResult {
   for (const c of [...input.candidates].sort((a, b) => cmp(a.id, b.id))) {
     if (!c.isFood || !c.isAvailable || !(c.price > 0)) continue;
     if (blocked.has(c.id) || c.storeStatus === "no") continue;
+    // The foods he doesn't eat are never picked, even when he rated one well or said yes to it before.
+    if (isAvoided(c.proteinMain ?? null, settings.avoid_proteins)) continue;
     if (c.seedOil === "yes" || c.seedOil === "likely") continue;
     if (c.seedOil === "unknown" && !c.wholeFood) continue;
     if (noRecently(c.id)) continue;

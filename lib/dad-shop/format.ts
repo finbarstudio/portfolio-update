@@ -119,12 +119,17 @@ export function valueWhy(c: Pick<ProductCard, "value" | "valueBasis" | "valuePct
 
 export type Tone = "g" | "a" | "r";
 
-/** The processing verdict from the ingredients, or null when the label has not been read. */
+/**
+ * The processing verdict, worded the same as the chip on a card: "Unprocessed · 1 ingredient",
+ * "No UPF additives · 11 ingredients", "Ultra-processed · 2 markers" (never green with a marker).
+ * Null when the label has not been read.
+ */
 export function processing(c: Pick<ProductCard, "upfCount" | "ingredientCount">): { label: string; tone: Tone } | null {
   if (c.upfCount == null) return null;
-  if (c.ingredientCount === 1) return { label: "Whole food", tone: "g" };
   if (c.upfCount === 0) {
-    return { label: c.ingredientCount ? `Simple · ${c.ingredientCount} ingredients` : "No processing markers", tone: "g" };
+    const n = c.ingredientCount;
+    const count = n ? ` · ${n} ${n === 1 ? "ingredient" : "ingredients"}` : "";
+    return { label: n === 1 ? `Unprocessed${count}` : `No UPF additives${count}`, tone: "g" };
   }
   return { label: `Ultra-processed · ${c.upfCount} marker${c.upfCount === 1 ? "" : "s"}`, tone: c.upfCount >= 3 ? "r" : "a" };
 }

@@ -93,6 +93,10 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
     go({
       noSeedOil: FILTER_DEFAULTS.noSeedOil,
       hideSat: FILTER_DEFAULTS.hideSat,
+      hideAvoided: FILTER_DEFAULTS.hideAvoided,
+      hideFolic: false,
+      highProtein: false,
+      maxUpf: null,
       good: false,
       frozen: false,
       rated: false,
@@ -106,6 +110,10 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
       atStoreSure: false,
     });
   }
+
+  // A typed search ignores the default filters (no seed oils, high sat fat, foods he doesn't eat).
+  const searching = filters.q.trim() !== "" && !dealish;
+  const defaultsPaused = searching && (filters.noSeedOil || filters.hideSat || filters.hideAvoided);
 
   // ── Type tabs and animal pills: they narrow what the category menu picked ──
   interface Tab {
@@ -174,7 +182,7 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
               onChange={(e) => onType(e.target.value)}
             />
           </form>
-          <FiltersButton filters={filters} ignored={dealish} onToggle={toggle} onReset={reset} />
+          <FiltersButton filters={filters} ignored={dealish} searching={searching} onToggle={toggle} onUpf={(maxUpf) => go({ maxUpf })} onReset={reset} />
         </div>
 
         <div className="ds-seg" role="group" aria-label="View">
@@ -197,6 +205,12 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
         {filters.view !== "foryou" && (
           <p className="ds-sortline" aria-live="polite">
             <b>{SORT_INFO[filters.sort].label}</b>: {SORT_INFO[filters.sort].sub}
+          </p>
+        )}
+
+        {defaultsPaused && (
+          <p className="ds-sortline ds-searchnote" role="note">
+            Search shows everything; filters apply when you clear it.
           </p>
         )}
 
@@ -316,12 +330,12 @@ export default function FindView({ filters, facets, items, hasMore, forYou, deal
                   Show all categories
                 </button>
               ) : null}
-              {!dealish && filters.noSeedOil && (
+              {!dealish && filters.noSeedOil && !searching && (
                 <button type="button" className="ds-btn ds-btn--primary" onClick={() => go({ noSeedOil: false })}>
                   Show them too
                 </button>
               )}
-              {!dealish && (filters.good || filters.frozen || filters.rated || filters.onList || filters.fewIngredients || filters.hideOwn || filters.hideSingle || filters.tasteDiff || filters.onOffer || filters.atStore || filters.atStoreSure) && (
+              {!dealish && (filters.good || filters.frozen || filters.rated || filters.onList || filters.fewIngredients || filters.hideOwn || filters.hideSingle || filters.tasteDiff || filters.onOffer || filters.highProtein || filters.hideFolic || filters.maxUpf != null || filters.atStore || filters.atStoreSure) && (
                 <button type="button" className="ds-btn ds-btn--ghost" onClick={reset}>
                   Reset filters
                 </button>

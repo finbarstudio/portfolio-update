@@ -69,12 +69,22 @@ export interface DealLink {
   parts: { listId: number; label: string; qty: number }[];
 }
 
+/** The main proteins he can say he doesn't eat (products.protein_main). Mixed meat, egg, dairy and veggie are not on the list. */
+export const AVOID_CHOICES = ["pork", "beef", "lamb", "chicken", "turkey", "duck & game", "salmon", "white fish", "tuna", "prawns & shellfish", "other fish"] as const;
+export type AvoidChoice = (typeof AVOID_CHOICES)[number];
+
+export function isAvoidChoice(v: unknown): v is AvoidChoice {
+  return typeof v === "string" && (AVOID_CHOICES as readonly string[]).includes(v);
+}
+
 export interface Settings {
   budget_gbp: number;
   people: number;
   protein_g_per_day: number;
   max_per_category: number;
   include_unrated_share: number;
+  /** Foods he doesn't eat, by main protein. Left out of For you and the weekly basket. */
+  avoid_proteins: string[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -83,6 +93,7 @@ export const DEFAULT_SETTINGS: Settings = {
   protein_g_per_day: 100,
   max_per_category: 2,
   include_unrated_share: 0.2,
+  avoid_proteins: ["pork"],
 };
 
 export interface BasketItem {
@@ -163,6 +174,12 @@ export interface ProductCard extends PriceInfo {
   nutritionSource: string | null;
   /** Energy per 100g, for the Fit breakdown. */
   kcal: number | null;
+  /** The ingredients say "folic acid". A label only: it never changes a score. */
+  folicAcid: boolean;
+  /** Pack size for the picture ("400g", "4 x 330ml", "≈510g"), null when it can't be told. */
+  packText: string | null;
+  /** True when packText is worked out from the price, so only roughly right. */
+  packEst: boolean;
   /** The ultra-processing markers found in the ingredients, and the seed oils found. */
   upfMarkers: string[];
   seedOilsFound: string[];
@@ -248,7 +265,7 @@ export const SORTS = ["best", "rec", "value", "saving", "score", "price", "few",
 export type Sort = (typeof SORTS)[number];
 
 export const SORT_INFO: Record<Sort, { label: string; sub: string }> = {
-  best: { label: "Best overall", sub: "Health 50% · value 35% · your taste 15%" },
+  best: { label: "Best overall", sub: "Health 60% · value 25% · your taste 15%" },
   rec: { label: "Picked for you", sub: "Your taste, value and the saving" },
   value: { label: "Best deal", sub: "Value score first, then what suits you" },
   saving: { label: "Biggest saving", sub: "Most off the usual price" },
@@ -310,7 +327,7 @@ export interface FindFilters {
   rated: boolean;
   onList: boolean;
   fewIngredients: boolean;
-  /** Hide */
+  /** Hide. High saturated fat is hidden unless the food is a whole food (see isWholeFood in breakdown.ts). */
   hideSat: boolean;
   hideOwn: boolean;
   /** Single-ingredient foods: anything with one ingredient, or a plain food like chicken breast, rice, eggs (is_basic). */
@@ -319,6 +336,14 @@ export interface FindFilters {
   tasteDiff: boolean;
   /** Only products on offer (a price cut or a multi-buy). */
   onOffer: boolean;
+  /** Only high protein: 15g or more per 100g, or 8g or more per 100 kcal. */
+  highProtein: boolean;
+  /** Hide anything with folic acid in the ingredients. */
+  hideFolic: boolean;
+  /** Hide the foods he doesn't eat (Settings), by main protein. Searching by name ignores it. */
+  hideAvoided: boolean;
+  /** At most this many ultra-processing markers (0 = none). Null is any. Unread ingredients are left out when it is set. */
+  maxUpf: 0 | 1 | 2 | null;
   /** Hides what is known not to be at Chislehurst. Unknown stays. */
   atStore: boolean;
   /** Only what is confirmed at Chislehurst (yes or likely). */
@@ -353,7 +378,7 @@ export interface SimilarSection {
   protein: string | null;
 }
 
-export const FILTER_DEFAULTS = { noSeedOil: true, hideSat: true } as const;
+export const FILTER_DEFAULTS = { noSeedOil: true, hideSat: true, hideAvoided: true } as const;
 
 /** What the facets (counts for the category menu and the tabs) say about the products. */
 export interface Facets {

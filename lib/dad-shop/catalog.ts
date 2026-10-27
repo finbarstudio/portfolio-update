@@ -1,9 +1,13 @@
 import "server-only";
 import type postgres from "postgres";
 import type { Sql } from "./db";
+import { AVOID_KEY, avoidFromRows } from "./avoid";
 import { fitScore } from "./fit";
 import { OVERALL_WEIGHTS } from "./overall";
-import { buildShelves, SHELF_SIZE } from "./shelves";
+import { packInfo } from "./pack";
+import { HIGH_PROTEIN_FLOOR_G, HIGH_PROTEIN_G, HIGH_PROTEIN_PER_100KCAL } from "./protein";
+import { searchVariants } from "./search";
+import { buildShelves, PROTEIN_SHELF_MAX_SAT, SHELF_SIZE } from "./shelves";
 import { STOCK_FRESH_HOURS } from "./store";
 import { scopeLabel, selectSimilar, similarScope, type Candidate } from "./similar";
 import { applyTaste, buildTaste, likedKeys, type TasteProfile, type TasteRow } from "./taste";
@@ -90,7 +94,11 @@ function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = 
         p.is_new, p.is_basic, p.ingredients_source, p.nutrition_source, p.animal, p.product_group, p.protein_main, p.store_status, p.store_reason, p.store_in_stock, p.store_stock_at, p.is_available, p.nutrition, p.seed_oils_found, p.reasons, p.listed_at,
         pr.now_price, pr.full_price,
         (case when jsonb_typeof(p.nutrition->'protein') = 'number' then (p.nutrition->>'protein')::float8 end) as protein,
-        (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end) as sat,
+        -- No saturates printed on a fat-free product counts as 0, as the pipeline scores it.
+        (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8
+              when jsonb_typeof(p.nutrition->'fat') = 'number' and (p.nutrition->>'fat')::float8 = 0 then 0 end) as sat,
+        (case when jsonb_typeof(p.nutrition->'kcal') = 'number' then (p.nutrition->>'kcal')::float8 end) as kcal,
+        coalesce(p.ingredients ~* 'folic acid', false) as folic_acid,
         (p.pack_grams * (case when jsonb_typeof(p.nutrition->'protein') = 'number' then (p.nutrition->>'protein')::float8 end) / 100)::float8 as pack_protein,
         (pr.now_price < pr.full_price - 0.004 or exists (
           select 1 from jsonb_array_elements(p.promos) e
@@ -232,6 +240,8 @@ export interface ScoredRow {
   full_price: number;
   protein: number | null;
   sat: number | null;
+  kcal: number | null;
+  folic_acid: boolean;
   pack_protein: number | null;
   discount: number;
   basis: string | null;
@@ -286,6 +296,7 @@ export async function loadTaste(sql: Sql): Promise<TasteProfile> {
 }
 
 export function mapCard(r: ScoredRow, dealIds: Set<string>): ProductCard {
+  const pack = packInfo({ name: r.name, packGrams: r.pack_grams, unitMeasure: r.unit_measure, price: r.price, unitPrice: r.unit_price });
   const per100 = r.pack_protein != null && r.pack_protein >= 5 ? Math.round((r.now_price / r.pack_protein) * 10000) / 100 : null;
   return {
     id: r.id,
@@ -336,6 +347,9 @@ export function mapCard(r: ScoredRow, dealIds: Set<string>): ProductCard {
     ingredientsSource: r.ingredients_source,
     nutritionSource: r.nutrition_source,
     kcal: typeof r.nutrition?.kcal === "number" ? r.nutrition.kcal : null,
+    folicAcid: r.folic_acid === true,
+    packText: pack?.text ?? null,
+    packEst: pack?.estimated === true,
     upfMarkers: r.upf_markers ?? [],
     seedOilsFound: r.seed_oils_found ?? [],
     reasons: Array.isArray(r.reasons) ? (r.reasons as unknown[]).filter((x): x is string => typeof x === "string") : [],
@@ -398,13 +412,41 @@ const COLLECTION_KEYS = ["meals", "protein", "freezer", "breakfast", "ttd", "fan
 const OWN_BRAND = (sql: Sql) =>
   sql`((s.brand ilike 'sainsbury%' or s.name ilike 'sainsbury''s %') and s.name !~* 'taste the difference')`;
 
-/** Words he typed: every word must be somewhere in the name or brand. */
+/**
+ * Words he typed: every word must be somewhere in the name or brand, in any of
+ * its spellings (search.ts: "piri" also tries "peri", "yoghurts" also "yogurt").
+ */
 function searchTests(sql: Sql, q: string): Fragment[] {
-  return q
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 6)
-    .map((w) => sql`(s.name ilike ${likePattern(w)} or coalesce(s.brand, '') ilike ${likePattern(w)})`);
+  return searchVariants(q).map((variants) => {
+    const tests = variants.map((v) => sql`(s.name ilike ${likePattern(v)} or coalesce(s.brand, '') ilike ${likePattern(v)})`);
+    return tests.length === 1 ? tests[0] : sql`(${or(sql, tests)})`;
+  });
+}
+
+function or(sql: Sql, parts: Fragment[]): Fragment {
+  return parts.reduce((all, c) => sql`${all} or ${c}`);
+}
+
+/** A whole food (breakdown.ts `isWholeFood`, same as the pipeline): a plain ingredient, or a known 3 or fewer ingredients with no ultra-processing marker and seed oil 'none'. */
+function wholeFoodTest(sql: Sql): Fragment {
+  return sql`(s.is_basic or (s.ingredient_count <= 3 and coalesce(array_length(s.upf_markers, 1), 0) = 0 and s.seed_oil = 'none'))`;
+}
+
+/** High protein (protein.ts `isHighProtein`). */
+function highProteinTest(sql: Sql): Fragment {
+  return sql`(s.protein >= ${HIGH_PROTEIN_G}::float8
+    or (s.kcal > 0 and s.protein >= ${HIGH_PROTEIN_FLOOR_G}::float8 and s.protein / s.kcal * 100 >= ${HIGH_PROTEIN_PER_100KCAL}::float8))`;
+}
+
+/** The foods he doesn't eat (Settings), by main protein. Mixed meat and products with no main protein pass. */
+function avoidedTest(sql: Sql, avoid: readonly string[]): Fragment {
+  return avoid.length === 0 ? sql`true` : sql`(s.protein_main is null or s.protein_main <> all(${[...avoid]}::text[]))`;
+}
+
+/** His "Foods you don't eat" setting. Pork until he changes it. */
+export async function loadAvoid(sql: Sql): Promise<string[]> {
+  const rows = await sql<{ key: string; value: unknown }[]>`select key, value from settings where key = ${AVOID_KEY}`;
+  return avoidFromRows(rows);
 }
 
 function and(sql: Sql, parts: Fragment[]): Fragment {
@@ -421,6 +463,8 @@ interface WhereOpts {
   noGroup?: boolean;
   /** Leave the protein choice out (for the protein pills' counts). */
   noProtein?: boolean;
+  /** The foods he doesn't eat, for "Hide foods I don't eat". */
+  avoid?: readonly string[];
 }
 
 /**
@@ -430,14 +474,22 @@ interface WhereOpts {
 function whereFor(sql: Sql, f: FindFilters, opts: WhereOpts = {}): Fragment {
   const parts: Fragment[] = [...searchTests(sql, f.q)];
   const dealish = f.view === "offers" || f.view === "multibuys" || f.view === "deals";
+  // A typed search ignores the three filters that are on by default, so a brand he likes is always found.
+  // Anything he switched on himself still applies.
+  const searching = f.q.trim().length > 0;
   if (!dealish) {
-    if (f.noSeedOil) parts.push(sql`s.seed_oil = 'none'`);
+    if (f.noSeedOil && !searching) parts.push(sql`s.seed_oil = 'none'`);
     if (f.good) parts.push(sql`(s.discount >= 0.25 and coalesce(s.value, 0) >= 6)`);
     if (f.frozen) parts.push(sql`(s.storage = 'frozen' or s.zone = 'Frozen')`);
     if (f.rated) parts.push(sql`s.stars is not null`);
     if (f.onList) parts.push(sql`s.on_list`);
     if (f.fewIngredients) parts.push(sql`(s.ingredient_count is not null and s.ingredient_count <= 5)`);
-    if (f.hideSat) parts.push(sql`(s.sat is null or s.sat <= 5)`);
+    // Saturated fat only counts against processed food: a whole food stays.
+    if (f.hideSat && !searching) parts.push(sql`(s.sat is null or s.sat <= 5 or ${wholeFoodTest(sql)})`);
+    if (f.hideAvoided && !searching) parts.push(avoidedTest(sql, opts.avoid ?? []));
+    if (f.hideFolic) parts.push(sql`not s.folic_acid`);
+    if (f.highProtein) parts.push(highProteinTest(sql));
+    if (f.maxUpf != null) parts.push(sql`((s.ingredients is not null or s.is_basic) and coalesce(array_length(s.upf_markers, 1), 0) <= ${f.maxUpf}::int)`);
     if (f.hideOwn) parts.push(sql`not ${OWN_BRAND(sql)}`);
     if (f.hideSingle) parts.push(sql`(not s.is_basic and coalesce(s.ingredient_count, 2) <> 1)`);
     if (f.tasteDiff) parts.push(collectionTest(sql, "ttd"));
@@ -483,11 +535,12 @@ export async function searchProducts(
   f: FindFilters,
   limit: number,
 ): Promise<{ items: ProductCard[]; hasMore: boolean }> {
+  const avoid = await loadAvoid(sql);
   const [rows, dealIds, profile] = await Promise.all([
     sql<ScoredRow[]>`
       ${scored(sql, null)}
       select s.* from s
-      where ${viewTest(sql, f)} and ${whereFor(sql, f)}
+      where ${viewTest(sql, f)} and ${whereFor(sql, f, { avoid })}
       order by ${sortScore(sql, sortFor(f))} desc nulls last, s.id
       limit ${limit + 1} offset ${f.page * limit}
     `,
@@ -499,7 +552,8 @@ export async function searchProducts(
 
 /** Counts for the category menu, the type tabs and the animal pills. They follow every filter that is on. */
 export async function getFacets(sql: Sql, f: FindFilters): Promise<Facets> {
-  const pool = sql`${viewTest(sql, f)} and ${whereFor(sql, f, { noCategory: true, noAnimal: true, noGroup: true, noProtein: true })}`;
+  const avoid = await loadAvoid(sql);
+  const pool = sql`${viewTest(sql, f)} and ${whereFor(sql, f, { noCategory: true, noAnimal: true, noGroup: true, noProtein: true, avoid })}`;
   const colls = COLLECTION_KEYS.map((k) => sql`count(*) filter (where ${collectionTest(sql, k)})::int as ${sql("c_" + k)}`);
   const collCols = colls.reduce((all, c) => sql`${all}, ${c}`);
   const rows = await sql<({ zone: string | null; department: string | null; category: string | null; n: number } & Record<string, unknown>)[]>`
@@ -540,7 +594,7 @@ export async function getFacets(sql: Sql, f: FindFilters): Promise<Facets> {
     const arows = await sql<{ animal: string; n: number }[]>`
       ${scored(sql, null)}
       select s.animal, count(*)::int as n from s
-      where ${viewTest(sql, f)} and ${whereFor(sql, f, { noAnimal: true })} and s.animal is not null
+      where ${viewTest(sql, f)} and ${whereFor(sql, f, { noAnimal: true, avoid })} and s.animal is not null
       group by s.animal order by n desc
     `;
     animals = arows.map((a) => ({ animal: a.animal, n: a.n }));
@@ -554,13 +608,13 @@ export async function getFacets(sql: Sql, f: FindFilters): Promise<Facets> {
       sql<{ product_group: string; n: number }[]>`
         ${scored(sql, null)}
         select s.product_group, count(*)::int as n from s
-        where ${viewTest(sql, f)} and ${whereFor(sql, f, { noGroup: true, noProtein: true })} and s.product_group is not null
+        where ${viewTest(sql, f)} and ${whereFor(sql, f, { noGroup: true, noProtein: true, avoid })} and s.product_group is not null
         group by s.product_group order by n desc, s.product_group
       `,
       sql<{ protein_main: string; n: number }[]>`
         ${scored(sql, null)}
         select s.protein_main, count(*)::int as n from s
-        where ${viewTest(sql, f)} and ${whereFor(sql, f, { noProtein: true })} and s.protein_main is not null
+        where ${viewTest(sql, f)} and ${whereFor(sql, f, { noProtein: true, avoid })} and s.protein_main is not null
         group by s.protein_main order by n desc, s.protein_main
       `,
     ]);
@@ -699,7 +753,8 @@ export async function getDealPage(sql: Sql, id: string): Promise<DealPage | null
 // ── For you ─────────────────────────────────────────────────────────────────
 
 /** Dinner meal deals where every part has something that is not ruled out for him. */
-async function dealsThatFit(sql: Sql): Promise<Deal[]> {
+async function dealsThatFit(sql: Sql, avoid: readonly string[]): Promise<Deal[]> {
+  const avoided = [...avoid];
   const rows = await sql<DealRow[]>`
     ${dealSelect(sql)}
     where (d.ends_on is null or d.ends_on >= current_date)
@@ -712,6 +767,7 @@ async function dealsThatFit(sql: Sql): Promise<Deal[]> {
             and (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end is null
                  or (p.nutrition->>'sat')::float8 <= 5)
             and not exists (select 1 from not_at_store n where n.product_id = p.id)
+            and (p.protein_main is null or p.protein_main <> all(${avoided}::text[]))
         ))
     order by d.price desc, d.title
   `;
@@ -724,7 +780,8 @@ async function dealsThatFit(sql: Sql): Promise<Deal[]> {
  * worked out in JS (shelves.ts) so nothing runs once per shelf or per product.
  */
 export async function getShelves(sql: Sql, f: FindFilters): Promise<ForYou> {
-  const [profile, dealIds, fitting] = await Promise.all([loadTaste(sql), loadDealIds(sql), dealsThatFit(sql)]);
+  const avoid = await loadAvoid(sql);
+  const [profile, dealIds, fitting] = await Promise.all([loadTaste(sql), loadDealIds(sql), dealsThatFit(sql, avoid)]);
   const liked = likedKeys(profile);
   const likedTests: Fragment[] = [];
   if (liked.categories.length > 0) likedTests.push(sql`lower(s.category) = any(${liked.categories}::text[])`);
@@ -735,7 +792,9 @@ export async function getShelves(sql: Sql, f: FindFilters): Promise<ForYou> {
   const rows = await sql<ScoredRow[]>`
     ${scored(sql, null)}
     select s.* from s
-    where ${whereFor(sql, f)} and not s.not_at_store and not s.on_list
+    where ${whereFor(sql, f, { avoid })} and not s.not_at_store and not s.on_list
+      -- The foods he doesn't eat never show on For you, whatever the filter says.
+      and ${avoidedTest(sql, avoid)}
       and coalesce(s.stars, 3) >= 3 and coalesce(s.vote, 0) >= 0
       and (
         ((s.stars >= 4 or s.vote = 1) and s.has_offer)
@@ -744,6 +803,7 @@ export async function getShelves(sql: Sql, f: FindFilters): Promise<ForYou> {
         or s.is_new
         or s.discount >= 0.25
         or s.paid_each is not null
+        or (${highProteinTest(sql)} and s.seed_oil = 'none' and (s.sat is null or s.sat <= ${PROTEIN_SHELF_MAX_SAT}::float8 or ${wholeFoodTest(sql)}))
         or ${likedAny}
       )
     order by ${sortScore(sql, "best")} desc nulls last, s.id
@@ -799,10 +859,11 @@ export async function getSimilarSection(sql: Sql, id: string, f: FindFilters): P
   // Only the toggles apply here: no search, category or animal choice.
   const toggles: FindFilters = { ...f, view: "all", q: "", coll: "", zone: "", dept: "", cat: "", animal: "", page: 0 };
 
+  const avoid = await loadAvoid(sql);
   const [rows, dealIds, profile] = await Promise.all([
     sql<(ScoredRow & { passes: boolean; bscore: number | null; sscore: number | null })[]>`
       ${scored(sql, [id], scope === "department" ? "department" : "category")}
-      select s.*, (${whereFor(sql, toggles)}) as passes,
+      select s.*, (${whereFor(sql, toggles, { avoid })}) as passes,
         ${sortScore(sql, "best")}::float8 as bscore, ${sortScore(sql, f.sort)}::float8 as sscore
       from s
       where s.id = ${id} or s.id = any(${ids}::text[])

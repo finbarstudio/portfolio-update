@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { fitBlend, healthBreakdown, overallSum, processingScore, proteinScore, satScore, sourceNotes, valueBreakdown } from "./breakdown";
+import { fitBlend, healthBreakdown, isWholeFood, overallSum, processingScore, proteinScore, satScore, sourceNotes, valueBreakdown } from "./breakdown";
 
 const base = {
   protein: 31,
@@ -13,18 +13,140 @@ const base = {
   reasons: ["31g protein per 100g"],
   ingredientsSource: null,
   nutritionSource: null,
+  isBasic: false,
+  folicAcid: false,
+  productGroup: null as string | null,
 };
+
+describe("whole food", () => {
+  const wf = { isBasic: false, ingredientCount: 5, upfMarkers: [] as string[], seedOil: "none" as const };
+
+  test("a plain ingredient is a whole food", () => {
+    expect(isWholeFood({ ...wf, isBasic: true, ingredientCount: null })).toBe(true);
+    expect(isWholeFood({ ...wf, isBasic: true, ingredientCount: 12, seedOil: "yes", upfMarkers: ["emulsifier"] })).toBe(true);
+  });
+
+  test("three ingredients or fewer, no markers, seed oil 'none'", () => {
+    expect(isWholeFood({ ...wf, ingredientCount: 1 })).toBe(true);
+    expect(isWholeFood({ ...wf, ingredientCount: 3 })).toBe(true);
+    expect(isWholeFood({ ...wf, ingredientCount: 4 })).toBe(false);
+    expect(isWholeFood({ ...wf, ingredientCount: 2, upfMarkers: ["flavouring"] })).toBe(false);
+    expect(isWholeFood({ ...wf, ingredientCount: 2, seedOil: "yes" })).toBe(false);
+    expect(isWholeFood({ ...wf, ingredientCount: 2, seedOil: "likely" })).toBe(false);
+  });
+
+  test("seed oil 'unknown' fails the clean-list branch, and so does an unread ingredient count", () => {
+    expect(isWholeFood({ ...wf, ingredientCount: 2, seedOil: "unknown" })).toBe(false);
+    expect(isWholeFood({ ...wf, ingredientCount: null })).toBe(false);
+    expect(isWholeFood({ ...wf, ingredientCount: null, isBasic: true, seedOil: "unknown" })).toBe(true);
+  });
+});
+
+describe("saturated fat only counts against processed food", () => {
+  const fatty = { ...base, sat: 12, kcal: 250, protein: 25, health: 9 };
+
+  test("a whole food scores 10 on it and says why", () => {
+    const b = healthBreakdown({ ...fatty, isBasic: true, ingredientCount: 1 });
+    const sat = b.parts.find((p) => p.key === "sat");
+    expect(sat?.score).toBe(10);
+    expect(sat?.detail).toMatch(/^A whole food, so its saturated fat isn't counted against it/);
+  });
+
+  test("the whole-food line only appears where the complaint would have fired", () => {
+    // 1g sat in 150 kcal: nothing to excuse, so the plain working shows, but the score is still the whole-food 10.
+    const lean = healthBreakdown({ ...base, sat: 1, kcal: 150, isBasic: true });
+    const sat = lean.parts.find((p) => p.key === "sat");
+    expect(sat?.score).toBe(10);
+    expect(sat?.detail).not.toMatch(/whole food/);
+    // 5g or more triggers it even when the sat score is not low.
+    const five = healthBreakdown({ ...base, sat: 5, kcal: 97, isBasic: true });
+    expect(five.parts.find((p) => p.key === "sat")?.detail).toMatch(/^A whole food/);
+  });
+
+  test("a processed food keeps its penalty, and says so when it has markers", () => {
+    const b = healthBreakdown({ ...fatty, ingredientCount: 9, upfMarkers: ["emulsifier"] });
+    const sat = b.parts.find((p) => p.key === "sat");
+    expect(sat?.score).toBe(satScore(12, 250));
+    expect(sat?.score).toBeLessThan(3);
+    expect(sat?.detail).toMatch(/high: minus 2/);
+    expect(sat?.detail).toMatch(/Processed and high in saturated fat$/);
+    // No markers: the penalty stands but the markers line does not.
+    const clean = healthBreakdown({ ...fatty, ingredientCount: 9 });
+    expect(clean.parts.find((p) => p.key === "sat")?.detail).not.toMatch(/Processed and high/);
+  });
+
+  test("full-fat Greek yoghurt: 3 ingredients or fewer is the line", () => {
+    const fage = { ...fatty, sat: 5, kcal: 97, protein: 9, ingredientCount: 2 };
+    expect(healthBreakdown(fage).parts.find((p) => p.key === "sat")?.score).toBe(10);
+    expect(healthBreakdown({ ...fage, ingredientCount: 6 }).parts.find((p) => p.key === "sat")?.score).toBeLessThan(10);
+  });
+});
+
+describe("folic acid and protein wording", () => {
+  test("folic acid is a note only: the parts and raw score do not change", () => {
+    const plain = healthBreakdown(base);
+    const folic = healthBreakdown({ ...base, folicAcid: true });
+    expect(folic.notes).toContain("Contains folic acid. Shown as a warning only; it doesn't change the score.");
+    expect(plain.notes.join(" ")).not.toMatch(/folic/);
+    expect(folic.raw).toBe(plain.raw);
+    expect(folic.parts.map((p) => p.score)).toEqual(plain.parts.map((p) => p.score));
+  });
+
+  test("protein is worded per 100g, with the calorie comparison in brackets", () => {
+    const b = healthBreakdown({ ...base, protein: 9, kcal: 97 });
+    expect(b.parts[0].detail).toBe(
+      "9g protein per 100g (about 9g for every 100 calories; scoring compares protein to calories so yoghurt and steak can be compared fairly)",
+    );
+  });
+});
+
+describe("processing scale per comparison group", () => {
+  test("the lenient curve, for lenient groups and for products with no group", () => {
+    for (const group of [null, "pizza", "ready meals (chilled & frozen)", "pasta sauces"]) {
+      const at = (n: number) => processingScore(n, 0, group);
+      expect([at(1), at(2), at(3), at(5), at(6), at(10), at(11), at(20), at(21)]).toEqual([10, 10, 8, 8, 6, 6, 4, 4, 2]);
+    }
+    expect(processingScore(8, 2)).toBe(3);
+  });
+
+  test("the strict curve, for every other group", () => {
+    const at = (n: number) => processingScore(n, 0, "butter");
+    expect([1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 15, 16, 20, 21].map(at)).toEqual([10, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2]);
+  });
+
+  test("markers take 1.5 each, at most 6, on both curves", () => {
+    expect(processingScore(8, 2, "butter")).toBe(2);
+    expect(processingScore(8, 2, "pizza")).toBe(3);
+    expect(processingScore(2, 9, "butter")).toBe(4);
+    expect(processingScore(30, 9, "butter")).toBe(0);
+  });
+
+  test("the breakdown uses the group's curve", () => {
+    const strict = healthBreakdown({ ...base, ingredientCount: 7, productGroup: "butter" });
+    const lenient = healthBreakdown({ ...base, ingredientCount: 7, productGroup: "pizza" });
+    expect(strict.parts.find((p) => p.key === "processing")?.score).toBe(6);
+    expect(lenient.parts.find((p) => p.key === "processing")?.score).toBe(6);
+    const four = healthBreakdown({ ...base, ingredientCount: 4, productGroup: "butter" });
+    expect(four.parts.find((p) => p.key === "processing")?.score).toBe(8);
+    const nine = healthBreakdown({ ...base, ingredientCount: 9, productGroup: "butter" });
+    const nineLenient = healthBreakdown({ ...base, ingredientCount: 9, productGroup: "pizza" });
+    expect(nine.parts.find((p) => p.key === "processing")?.score).toBe(5);
+    expect(nineLenient.parts.find((p) => p.key === "processing")?.score).toBe(6);
+  });
+});
 
 describe("health breakdown", () => {
   test("repeats the pipeline's maths: 35% protein, 30% sat fat, 35% processing", () => {
-    const b = healthBreakdown(base);
+    const b = healthBreakdown({ ...base, ingredientCount: 8 });
     expect(b.mode).toBe("full");
     expect(b.parts.map((p) => p.weight)).toEqual([0.35, 0.3, 0.35]);
     expect(proteinScore(31, 150)).toBe(10);
     expect(satScore(1, 150)).toBeCloseTo(9.2, 5);
-    expect(processingScore(1, 0)).toBe(10);
-    expect(b.raw).toBe(9.8);
+    expect(processingScore(8, 0)).toBe(6);
+    expect(b.raw).toBe(8.4);
     expect(b.final).toBe(9.8);
+    // The same food as a plain ingredient: sat fat is not counted, so a full 10.
+    expect(healthBreakdown(base).raw).toBe(10);
   });
 
   test("processing counts markers and high sat fat loses two points", () => {
@@ -83,7 +205,7 @@ describe("value breakdown", () => {
 describe("overall sum", () => {
   test("writes the actual points", () => {
     const o = overallSum({ health: 8.5, value: 7, stars: 4, vote: null });
-    expect(o.text).toBe("Health 8.5 × 0.5 + Value 7 × 0.35 + taste 4★ × 0.15 = 7.8");
+    expect(o.text).toBe("Health 8.5 × 0.6 + Value 7 × 0.25 + taste 4★ × 0.15 = 8");
     expect(overallSum({ health: 5, value: 5, stars: null, vote: 1 }).text).toMatch(/taste yes/);
     expect(overallSum({ health: 5, value: 5, stars: null, vote: null }).text).toMatch(/taste 5 \(no opinion yet\)/);
   });

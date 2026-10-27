@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { gbp, shortName } from "@/lib/dad-shop/format";
 import { queryFor } from "@/lib/dad-shop/find";
 import { priceView } from "@/lib/dad-shop/pricing";
+import { gramsText } from "@/lib/dad-shop/protein";
 import { bestInColumns, compareValues, offerPill, type CompareColumn, type CompareValues } from "@/lib/dad-shop/similar";
 import { BASE_PATH, SORT_INFO, type FindFilters, type ListItem, type ProductCard, type SimilarSection as Section, type Sort } from "@/lib/dad-shop/types";
 import type { ListStore } from "./listStore";
@@ -39,6 +40,10 @@ const ALL_OFF: Partial<FindFilters> = {
   hideSingle: false,
   tasteDiff: false,
   onOffer: false,
+  highProtein: false,
+  hideFolic: false,
+  hideAvoided: false,
+  maxUpf: null,
   atStore: false,
   atStoreSure: false,
 };
@@ -63,7 +68,7 @@ export default function SimilarSection({ productId, section, filters, now, store
   }
 
   function reset() {
-    go({ noSeedOil: false, hideSat: false, good: false, frozen: false, rated: false, onList: false, fewIngredients: false, hideOwn: false, hideSingle: false, tasteDiff: false, onOffer: false, atStore: false, atStoreSure: false, sort: "best" });
+    go({ ...ALL_OFF, sort: "best" });
   }
 
   const { items, total, hidden, capped, rank, ranks } = section;
@@ -97,7 +102,7 @@ export default function SimilarSection({ productId, section, filters, now, store
               </button>
             </div>
             <div className="ds-ctl ds-ctl--sim">
-              <FiltersButton filters={filters} ignored={false} onToggle={(k: ToggleKey) => go({ [k]: !filters[k] } as Partial<FindFilters>)} onReset={reset} />
+              <FiltersButton filters={filters} ignored={false} onToggle={(k: ToggleKey) => go({ [k]: !filters[k] } as Partial<FindFilters>)} onUpf={(maxUpf) => go({ maxUpf })} onReset={reset} />
               <SortButton value={filters.sort} onChange={(s: Sort) => go({ sort: s })} />
             </div>
           </div>
@@ -208,7 +213,7 @@ function CompareList({
         <CompareRow key={p.id} p={p} v={rows[i]} best={best} isMe={p.id === meId} now={now} />
       ))}
       <p className="ds-cmp-key">
-        <span className="ds-cmp-best">Green</span> is the best in its column. Per kg is what you pay after offers. Protein and sat fat are per 100g.
+        <span className="ds-cmp-best">Green</span> is the best in its column. Per kg is what you pay after offers. Protein and sat fat are grams per 100g.
       </p>
     </div>
   );
@@ -247,6 +252,11 @@ function CompareRow({ p, v, best, isMe, now }: { p: ProductCard; v: CompareValue
         <Link href={href} className="ds-cmp-link" title={p.name}>
           {rowName(p.name)}
         </Link>
+        {p.packText && (
+          <span className="ds-cmp-pack" title={p.packEst ? "Size worked out from the price, so only roughly right" : undefined}>
+            {p.packText}
+          </span>
+        )}
         {isMe && <b className="ds-cmp-me">This one</b>}
       </span>
       <span className="ds-cmp-c ds-cmp-price" role="cell">
@@ -262,7 +272,14 @@ function CompareRow({ p, v, best, isMe, now }: { p: ProductCard; v: CompareValue
         {v.unit != null ? `${gbp(v.unit)}${v.unitMeasure === "ltr" ? "/l" : ""}` : <Unknown />}
       </span>
       <span className={`${cls("protein")} ds-cmp-protein`} role="cell">
-        {p.protein != null ? `${p.protein >= 10 ? Math.round(p.protein) : +p.protein.toFixed(1)}g` : <Unknown />}
+        {p.protein != null ? (
+          <>
+            {gramsText(p.protein)}
+            <span className="ds-sr"> protein per 100g</span>
+          </>
+        ) : (
+          <Unknown />
+        )}
       </span>
       <span className={`${cls("sat")} ds-cmp-sat`} role="cell">
         {v.sat != null ? (

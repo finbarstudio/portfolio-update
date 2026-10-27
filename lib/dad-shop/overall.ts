@@ -5,14 +5,15 @@ import { TASTE_NEUTRAL, VOTE_NO_TASTE, VOTE_YES_TASTE, tasteScore } from "./fit"
  *   health   the pipeline's objective score (protein, sat fat, processing, seed oils),
  *   value    protein or £/kg per £ against its own category, plus the size of any deal,
  *   taste    his own stars, or his Yes / No on a basket pick (5 = no opinion yet).
+ * What he cares about most is what is in the food, so health leads and value matters less.
  * The weights live here, in one place, so they can be tuned later. The sort
  * in catalog.ts and the explanation on the card both read this one constant.
  */
-export const OVERALL_WEIGHTS = { health: 0.5, value: 0.35, taste: 0.15 } as const;
+export const OVERALL_WEIGHTS = { health: 0.6, value: 0.25, taste: 0.15 } as const;
 
 const PCT = (n: number): string => `${Math.round(n * 100)}%`;
 
-/** "Health 50% · value 35% · your taste 15%" */
+/** "Health 60% · value 25% · your taste 15%" */
 export function overallWeightsLine(): string {
   return `Health ${PCT(OVERALL_WEIGHTS.health)} · value ${PCT(OVERALL_WEIGHTS.value)} · your taste ${PCT(OVERALL_WEIGHTS.taste)}`;
 }

@@ -39,6 +39,10 @@ const DEFAULTS: FindFilters = {
   hideSingle: false,
   tasteDiff: false,
   onOffer: false,
+  highProtein: false,
+  hideFolic: false,
+  hideAvoided: true,
+  maxUpf: null,
   atStore: false,
   atStoreSure: false,
   group: "",
@@ -66,9 +70,10 @@ export default async function FindScreen({
     const first = Array.isArray(v) ? v[0] : v;
     if (typeof first === "string") params.set(k, first);
   }
-  // "No seed oils" and "Hide high sat fat" are on unless the address says otherwise.
+  // "No seed oils", "Hide high sat fat" and "Hide foods I don't eat" are on unless the address says otherwise.
   if (!params.has("noSeedOil")) params.set("noSeedOil", "1");
   if (!params.has("hideSat")) params.set("hideSat", "1");
+  if (!params.has("hideAvoided")) params.set("hideAvoided", "1");
   const asked = params.get("view") ?? defaultView;
   const view = (VIEWS as readonly string[]).includes(asked) ? (asked as View) : defaultView;
   params.set("view", view);

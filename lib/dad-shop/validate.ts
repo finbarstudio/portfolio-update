@@ -1,7 +1,9 @@
 import { isGroup, isProtein } from "./groups";
 import {
   ANIMALS,
+  AVOID_CHOICES,
   COLLECTIONS,
+  isAvoidChoice,
   PAGE_SIZE,
   SORTS,
   VIEWS,
@@ -146,9 +148,16 @@ function numberIn(v: unknown, lo: number, hi: number, label: string, whole: bool
   return ok(whole ? v : Math.round(v * 100) / 100);
 }
 
-export type SettingsPatch = Partial<Pick<Settings, "budget_gbp" | "people" | "protein_g_per_day">>;
+export type SettingsPatch = Partial<Pick<Settings, "budget_gbp" | "people" | "protein_g_per_day" | "avoid_proteins">>;
 
-/** Only the three settings he can change. Unknown keys are ignored. */
+/** Foods he doesn't eat: a list of main proteins from the fixed choices, no repeats, in the order of the choices. */
+export function parseAvoidList(v: unknown): Result<string[]> {
+  if (!Array.isArray(v) || v.length > AVOID_CHOICES.length) return fail("Pick from the list of foods.");
+  if (!v.every(isAvoidChoice)) return fail("Pick from the list of foods.");
+  return ok(AVOID_CHOICES.filter((c) => v.includes(c)));
+}
+
+/** Only the settings he can change: budget, people, protein and the foods he doesn't eat. Unknown keys are ignored. */
 export function parseSettingsPatch(body: Record<string, unknown>): Result<SettingsPatch> {
   const patch: SettingsPatch = {};
   if (body.budget_gbp !== undefined) {
@@ -166,12 +175,22 @@ export function parseSettingsPatch(body: Record<string, unknown>): Result<Settin
     if (!r.ok) return fail(r.error);
     patch.protein_g_per_day = r.value;
   }
+  if (body.avoid_proteins !== undefined) {
+    const r = parseAvoidList(body.avoid_proteins);
+    if (!r.ok) return fail(r.error);
+    patch.avoid_proteins = r.value;
+  }
   if (Object.keys(patch).length === 0) return fail("Nothing to save.");
   return ok(patch);
 }
 
 function flag(v: string | null): boolean {
   return v === "1";
+}
+
+/** "0", "1" or "2": the most ultra-processing markers allowed. Anything else is "any". */
+export function parseMaxUpf(v: string | null): 0 | 1 | 2 | null {
+  return v === "0" ? 0 : v === "1" ? 1 : v === "2" ? 2 : null;
 }
 
 function pick(params: URLSearchParams, key: string): Result<string> {
@@ -224,6 +243,10 @@ export function parseFindParams(params: URLSearchParams): Result<FindFilters> {
     hideSingle: flag(params.get("hideSingle")),
     tasteDiff: flag(params.get("ttd")),
     onOffer: flag(params.get("offer")),
+    highProtein: flag(params.get("hp")),
+    hideFolic: flag(params.get("folic")),
+    hideAvoided: flag(params.get("hideAvoided")),
+    maxUpf: parseMaxUpf(params.get("upf")),
     atStore: flag(params.get("store")),
     atStoreSure: flag(params.get("sure")),
     group: group.value,
@@ -253,13 +276,17 @@ export const SIMILAR_DEFAULTS: FindFilters = {
   hideSingle: false,
   tasteDiff: false,
   onOffer: false,
+  highProtein: false,
+  hideFolic: false,
+  hideAvoided: false,
+  maxUpf: null,
   atStore: false,
   atStoreSure: false,
   group: "",
   protein: "",
 };
 
-const SIMILAR_KEYS = ["sort", "noSeedOil", "hideSat", "good", "frozen", "rated", "onList", "few", "hideOwn", "hideSingle", "ttd", "offer", "store", "sure", "protein"] as const;
+const SIMILAR_KEYS = ["sort", "noSeedOil", "hideSat", "good", "frozen", "rated", "onList", "few", "hideOwn", "hideSingle", "ttd", "offer", "hp", "folic", "hideAvoided", "upf", "store", "sure", "protein"] as const;
 
 /** Only the sort and the switches are read; search, category and page never apply to a product page. */
 export function parseSimilarParams(raw: Record<string, string | string[] | undefined>): FindFilters {

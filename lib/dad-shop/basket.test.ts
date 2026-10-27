@@ -391,3 +391,33 @@ describe("slotsOf", () => {
     expect(slotsOf({ ...base, department: "Cooking ingredients", category: "Gravies", zone: "Food cupboard" })).toEqual([]);
   });
 });
+
+describe("foods he doesn't eat", () => {
+  const pigs = () => [
+    cand("pork1", { proteinMain: "pork", department: "Pork", category: "Pork chops" }),
+    cand("pork2", { proteinMain: "pork", department: "Pork", category: "Pork loin" }),
+    cand("mixed1", { proteinMain: "mixed meat", department: "Pork", category: "Pork and apple" }),
+  ];
+
+  test("pork is left out of the week by default, even when he rated it five stars", () => {
+    const r = generateBasket(input([...larder(), ...pigs()], { settings: roomy, ratings: { pork1: 5 } }));
+    const ids = r.items.map((i) => i.productId);
+    expect(ids).not.toContain("pork1");
+    expect(ids).not.toContain("pork2");
+  });
+
+  test("mixed meat is not excluded, and turning pork back on brings it back", () => {
+    const only = [cand("pork1", { proteinMain: "pork" }), cand("mixed1", { proteinMain: "mixed meat", category: "Mixed" })];
+    const off = generateBasket(input(only, { settings: { ...roomy, avoid_proteins: ["pork"] } }));
+    expect(off.items.map((i) => i.productId)).toEqual(["mixed1"]);
+    const on = generateBasket(input([only[0]], { settings: { ...roomy, avoid_proteins: [] } }));
+    expect(on.items.map((i) => i.productId)).toEqual(["pork1"]);
+  });
+
+  test("whatever else he lists is left out too", () => {
+    const only = [cand("beef1", { proteinMain: "beef", category: "Beef steak" }), cand("fish1", { proteinMain: "salmon", category: "Salmon" })];
+    const r = generateBasket(input(only, { settings: { ...roomy, avoid_proteins: ["beef"] } }));
+    expect(r.items.map((i) => i.productId)).toEqual(["fish1"]);
+  });
+});
+

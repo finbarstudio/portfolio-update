@@ -18,6 +18,7 @@ export function queryFor(f: FindFilters): string {
   if (f.sort !== defaultSort(f.view)) p.set("sort", f.sort);
   p.set("noSeedOil", f.noSeedOil ? "1" : "0");
   p.set("hideSat", f.hideSat ? "1" : "0");
+  p.set("hideAvoided", f.hideAvoided ? "1" : "0");
   if (f.good) p.set("good", "1");
   if (f.frozen) p.set("frozen", "1");
   if (f.rated) p.set("rated", "1");
@@ -27,6 +28,9 @@ export function queryFor(f: FindFilters): string {
   if (f.hideSingle) p.set("hideSingle", "1");
   if (f.tasteDiff) p.set("ttd", "1");
   if (f.onOffer) p.set("offer", "1");
+  if (f.highProtein) p.set("hp", "1");
+  if (f.hideFolic) p.set("folic", "1");
+  if (f.maxUpf != null) p.set("upf", String(f.maxUpf));
   if (f.atStore) p.set("store", "1");
   if (f.atStoreSure) p.set("sure", "1");
   if (f.group) p.set("group", f.group);

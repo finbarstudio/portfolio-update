@@ -1271,43 +1271,90 @@ body:has(.lb-root):has(.ds-app) {
   color: var(--ds-amber);
   font-size: 16px;
 }
-.ds-frow {
+/* Wrapping pill toggles, filled when on (the same idea as the Tesco app's filter list). */
+.ds-fchips {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  min-height: 52px;
-  padding: 6px 10px;
-  border: 0;
-  border-radius: 10px;
-  background: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 8px 8px;
+}
+.ds-fchip {
+  min-height: 44px;
+  padding: 4px 13px;
+  border: 2px solid var(--ds-line);
+  border-radius: 999px;
+  background: #fff;
   color: var(--ds-ink);
   font: inherit;
-  text-align: left;
+  font-size: 17px;
+  line-height: 1.2;
   cursor: pointer;
 }
-.ds-frow small {
-  display: block;
-  color: var(--ds-soft);
-  font-size: 14px;
-}
-.ds-frow:hover {
+.ds-fchip:hover {
   background: var(--ds-n-bg);
 }
-.ds-frow[aria-disabled="true"] {
+.ds-fchip[aria-pressed="true"] {
+  border-color: var(--ds-accent);
+  background: var(--ds-accent);
+  color: #fff;
+}
+.ds-fchip[aria-disabled="true"] {
   opacity: 0.55;
 }
-.ds-switch {
-  flex: none;
-  width: 48px;
-  height: 28px;
-  border-radius: 999px;
-  background: radial-gradient(circle 11px at 14px 50%, #fff 95%, transparent) #cfcbc0;
-  transition: background-position 150ms;
+/* On by default but paused while a search is typed. */
+.ds-fchip.is-paused[aria-pressed="true"] {
+  border-style: dashed;
+  background: var(--ds-sel);
+  color: var(--ds-accent);
 }
-.ds-frow[aria-pressed="true"] .ds-switch {
-  background: radial-gradient(circle 11px at 34px 50%, #fff 95%, transparent) var(--ds-accent);
+.ds-fseg {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 2px 8px 8px;
+  overflow: hidden;
+  border: 2px solid var(--ds-line);
+  border-radius: 12px;
+}
+.ds-fseg[aria-disabled="true"] {
+  opacity: 0.55;
+}
+.ds-fsegb {
+  min-height: 44px;
+  border: 0;
+  border-left: 2px solid var(--ds-line);
+  background: #fff;
+  color: var(--ds-ink);
+  font: inherit;
+  font-size: 17px;
+  cursor: pointer;
+}
+.ds-fsegb:first-child {
+  border-left: 0;
+}
+.ds-fsegb:hover {
+  background: var(--ds-n-bg);
+}
+.ds-fsegb[aria-pressed="true"] {
+  background: var(--ds-accent);
+  color: #fff;
+}
+.ds-fchip:focus-visible,
+.ds-fsegb:focus-visible {
+  outline: 3px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+.ds-searchnote {
+  margin: 0;
+  color: var(--ds-accent);
+}
+.ds-avoid {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.ds-avoid .ds-fchips {
+  padding: 4px 0 0;
 }
 .ds-ffoot {
   position: sticky;
@@ -1515,8 +1562,7 @@ body:has(.lb-root):has(.ds-app) {
   padding: 0;
 }
 .ds-rank,
-.ds-newtag,
-.ds-pill {
+.ds-newtag {
   position: absolute;
   font-size: 13px;
   font-weight: 800;
@@ -1545,13 +1591,29 @@ body:has(.lb-root):has(.ds-app) {
 .ds-rank ~ .ds-newtag {
   top: 28px;
 }
-.ds-pill {
+.ds-pcard-imgwrap:has(.ds-frozen) .ds-rank {
+  max-width: calc(100% - 48px);
+}
+/* The offer pill and the pack size share one row along the bottom of the picture. */
+.ds-ovrow {
+  position: absolute;
+  right: 6px;
   bottom: 6px;
   left: 6px;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  align-items: flex-end;
+  gap: 4px;
+  pointer-events: none;
+}
+.ds-ovrow > * {
+  pointer-events: auto;
+}
+.ds-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  max-width: calc(100% - 12px);
+  max-width: 100%;
   min-height: 32px;
   padding: 0 10px;
   overflow: hidden;
@@ -1560,6 +1622,38 @@ body:has(.lb-root):has(.ds-app) {
   font-size: 15px;
   --ds-link: #fff;
   color: #fff;
+}
+.ds-pack {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 0 9px;
+  overflow: hidden;
+  border: 1px solid var(--ds-line);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.94);
+  color: var(--ds-ink);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+/* A frozen product: a snowflake, top right (the New tag moves left of it). */
+.ds-frozen {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e3f0fb;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+  color: #0b5c9e;
+}
+.ds-newtag.has-frozen {
+  right: 42px;
 }
 .ds-pill--offer {
   background: #c8102e;
@@ -1609,6 +1703,13 @@ body:has(.lb-root):has(.ds-app) {
   font-weight: 800;
   line-height: 1.5;
 }
+.ds-pcard-unit {
+  margin: -2px 0 0;
+  color: var(--ds-soft);
+  font-size: 14px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
 .ds-facts3 {
   display: flex;
   flex-wrap: wrap;
@@ -1640,8 +1741,12 @@ button.ds-fact::before {
   color: #3f444a;
   font-size: 13px;
   font-weight: 700;
-  line-height: 1.4;
-  white-space: nowrap;
+  line-height: 1.35;
+  /* "No UPF additives · 11 ingredients" is longer than a slim card is wide: wrap inside the chip. */
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: left;
+  white-space: normal;
 }
 .ds-fact--g {
   background: var(--ds-green-bg);
@@ -1667,6 +1772,7 @@ button.ds-fact::before {
 .ds-pcard-note--why {
   color: var(--ds-accent);
   font-weight: 600;
+  white-space: normal;
 }
 .ds-pcard-note--g {
   color: var(--ds-g);
@@ -2764,6 +2870,13 @@ button.ds-fact::before {
   content: "";
   position: absolute;
   inset: 0;
+}
+.ds-cmp-pack {
+  flex: none;
+  color: var(--ds-soft);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 .ds-cmp-me {
   flex: none;

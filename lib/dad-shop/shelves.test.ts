@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { SHELF_SIZE, buildShelves, notForMe, whyFor } from "./shelves";
+import { SHELF_SIZE, buildShelves, fitsProteinShelf, notForMe, whyFor } from "./shelves";
 import { buildTaste, type TasteRow } from "./taste";
 import type { Deal, ProductCard } from "./types";
 
@@ -7,10 +7,10 @@ function card(id: string, over: Partial<ProductCard> = {}): ProductCard {
   return {
     id, name: id, brand: "Acme", imageUrl: null, zone: "Meat & fish", department: "Chicken", category: "Chicken breast",
     price: 3, wasPrice: null, offerPrice: null, nectarPrice: null, promos: [], unitPrice: null, unitMeasure: null, packGrams: 500,
-    storage: null, seedOil: "none", health: 8, stars: null, fit: 8, protein: 22, sat: 1, ingredientCount: 1, upfCount: 0,
+    storage: null, seedOil: "none", health: 8, stars: null, fit: 8, protein: 8, sat: 1, ingredientCount: 1, upfCount: 0,
     reviewAvg: null, reviewCount: null, isNew: false, animal: null, notAtStore: false, onList: false, isAvailable: true,
     value: 7, valueBasis: null, valuePct: null, discount: 0, per100Protein: null, paidBefore: null,
-    isBasic: false, vote: null, ingredientsSource: null, nutritionSource: null, kcal: 120, upfMarkers: [], seedOilsFound: [], reasons: [],
+    isBasic: false, vote: null, ingredientsSource: null, nutritionSource: null, kcal: 200, upfMarkers: [], folicAcid: false, packText: null, packEst: false, seedOilsFound: [], reasons: [],
     storeStatus: "unknown", storeStock: null, storeStockAt: null, storeReason: null, productGroup: null, proteinMain: null,
     ...over,
   };
@@ -96,6 +96,33 @@ describe("buildShelves", () => {
     expect(keys(r)).toEqual(["meals", "ordered"]);
     expect(r.shelves[0].deals?.[0].id).toBe("d");
     expect(r.shelves[1].items[0].why).toMatch(/paid £2.50/);
+  });
+
+  test("high protein for you: high protein, low sat fat unless a whole food, best overall first", () => {
+    // Fage Total 5%: 9g protein, 97 kcal, 3.5g sat, 2 ingredients, plain food.
+    const fage = card("fage", { protein: 9, kcal: 97, sat: 3.5 + 1, ingredientCount: 2, productGroup: "plain & greek yogurt (tubs)", health: 9.9, fit: 9.9, value: 5 });
+    const steak = card("steak", { protein: 27, kcal: 190, sat: 4, isBasic: true, health: 9, fit: 9, value: 5 });
+    const sausage = card("sausage", { protein: 16, kcal: 280, sat: 9, ingredientCount: 14, upfCount: 2, upfMarkers: ["flavouring", "emulsifier"], health: 6, fit: 6, value: 5 });
+    const lean = card("lean", { protein: 22, kcal: 110, sat: 1, ingredientCount: 8, health: 7, fit: 7, value: 5 });
+    const veg = card("veg", { protein: 3, kcal: 34, sat: 0.1, health: 9, fit: 9 });
+    const oily = card("oily", { protein: 20, kcal: 150, sat: 1, seedOil: "yes", health: 3, fit: 3 });
+    expect(fitsProteinShelf(fage)).toBe(true);
+    expect(fitsProteinShelf(steak)).toBe(true);
+    expect(fitsProteinShelf(lean)).toBe(true);
+    expect(fitsProteinShelf(sausage)).toBe(false);
+    expect(fitsProteinShelf(veg)).toBe(false);
+    expect(fitsProteinShelf(oily)).toBe(false);
+
+    const r = buildShelves({ cards: [fage, steak, sausage, lean, veg, oily], profile: buildTaste([]), ...none });
+    const shelf = r.shelves.find((s) => s.key === "protein");
+    expect(shelf?.title).toBe("High protein for you");
+    expect(shelf?.items.map((i) => i.id)).toEqual(["fage", "steak", "lean"]);
+    expect(shelf?.items[0].why).toBe("9g protein per 100g");
+    expect(shelf?.items[1].why).toBe("27g protein per 100g");
+    // It sits right after his favourites and before Top picks, and nothing is on two shelves.
+    expect(keys(r).indexOf("protein")).toBeLessThan(keys(r).indexOf("top") === -1 ? 99 : keys(r).indexOf("top"));
+    const ids = r.shelves.flatMap((s) => s.items.map((i) => i.id));
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
   test("whyFor says only what the card does not already show, in at most two short bits", () => {

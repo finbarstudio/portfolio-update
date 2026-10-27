@@ -1,3 +1,6 @@
+import { isWholeFood } from "./breakdown";
+import { overallScore } from "./overall";
+import { gramsText, isHighProtein } from "./protein";
 import { applyTaste, likesKind, type TasteProfile } from "./taste";
 import type { Deal, ForYou, ProductCard, Shelf } from "./types";
 
@@ -6,7 +9,8 @@ import type { Deal, ForYou, ProductCard, Shelf } from "./types";
  * each with a short "why". PURE: the database work happens in catalog.ts.
  *
  *   1  Your favourites on offer      rated 4-5 stars, or said Yes, now on offer
- *   2  Top picks for you             healthy, no seed oils, good value, suits his taste
+ *   2  High protein for you          high protein, low in saturated fat unless a whole food (ranked best overall)
+ *      Top picks for you             healthy, no seed oils, good value, suits his taste
  *   3  New in what you like          new at Sainsbury's, in food he likes
  *   4  You might like these          not tried, but close to things he rated well
  *   5  Big deals on your kinds of food   25% off or more in food he likes
@@ -19,6 +23,20 @@ import type { Deal, ForYou, ProductCard, Shelf } from "./types";
 
 /** Cards per shelf: divides by 2 (phone) and 3 (desktop). */
 export const SHELF_SIZE = 18;
+
+/** "Low saturated fat" for the high protein shelf, g per 100g (the UK "low" band stops at 1.5, "high" starts above 5). Whole foods are exempt. */
+export const PROTEIN_SHELF_MAX_SAT = 3;
+
+/**
+ * Fits the "High protein for you" shelf: high protein (protein.ts), no seed oil, healthy enough, and low in
+ * saturated fat unless it is a whole food (steak and full-fat Greek yoghurt count). It sits before Top picks,
+ * so the healthy high-protein food is not all swallowed by them.
+ */
+export function fitsProteinShelf(c: ProductCard): boolean {
+  if (!isHighProtein(c.protein, c.kcal)) return false;
+  if (c.seedOil !== "none" || (c.fit ?? 0) < 5) return false;
+  return c.sat == null || c.sat <= PROTEIN_SHELF_MAX_SAT || isWholeFood(c);
+}
 
 export function hasOffer(c: ProductCard): boolean {
   return c.discount >= 0.05;
@@ -53,6 +71,7 @@ export function notForMe(c: ProductCard): boolean {
  */
 export function whyFor(c: ProductCard, key: string): string {
   const bits: string[] = [];
+  if (key === "protein" && c.protein != null) bits.push(`${gramsText(c.protein)} protein per 100g`);
   if (key === "ordered" && c.paidBefore) bits.push(`you paid £${c.paidBefore.each.toFixed(2)} last time`);
   if (c.stars != null && c.stars >= 4) bits.push(`you gave it ${c.stars} stars`);
   else if (c.vote === 1) bits.push("you said yes to it");
@@ -62,6 +81,7 @@ export function whyFor(c: ProductCard, key: string): string {
     if (key === "top") bits.push("fits all your rules");
     else if (key === "deals") bits.push("a big saving on food you like");
     else if (key === "fav") bits.push("one of your favourites");
+    else if (key === "protein") bits.push("high in protein");
   }
   return bits.slice(0, 2).join(" · ");
 }
@@ -79,6 +99,12 @@ const RULES: Rule[] = [
     title: "Your favourites on offer",
     sub: "Rated 4 or 5 stars, or a yes, and on offer now",
     fits: (c) => (((c.stars ?? 0) >= 4 || c.vote === 1) && hasOffer(c)),
+  },
+  {
+    key: "protein",
+    title: "High protein for you",
+    sub: "Lots of protein, low in saturated fat, best overall first",
+    fits: (c) => fitsProteinShelf(c),
   },
   {
     key: "top",
@@ -157,7 +183,10 @@ export function buildShelves(input: { cards: ProductCard[]; profile: TasteProfil
   for (const rule of RULES) {
     // The dinner deals sit just before "ordered before".
     if (rule.key === "ordered" && input.dealsThatFit.length > 0) shelves.push(mealShelf);
-    const picked = spreadOut(byShelf.get(rule.key) ?? []).slice(0, SHELF_SIZE);
+    const list = byShelf.get(rule.key) ?? [];
+    // High protein goes by Best overall, so the best are on top; the others are spread across kinds of food.
+    const ranked = rule.key === "protein" ? [...list].sort((a, b) => overallScore(b) - overallScore(a) || (a.id < b.id ? -1 : 1)) : spreadOut(list);
+    const picked = ranked.slice(0, SHELF_SIZE);
     if (picked.length > 0) {
       shelves.push({ key: rule.key, title: rule.title, sub: rule.sub, items: picked.map((c) => ({ ...c, why: whyFor(c, rule.key) })) });
     }

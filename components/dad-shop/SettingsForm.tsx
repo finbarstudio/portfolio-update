@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ago } from "@/lib/dad-shop/format";
-import type { Freshness, Settings } from "@/lib/dad-shop/types";
+import { AVOID_CHOICES, type Freshness, type Settings } from "@/lib/dad-shop/types";
 import { api } from "./api";
 
 type Phase = "idle" | "saving" | "saved" | "error";
@@ -11,11 +11,15 @@ interface Draft {
   budget: string;
   people: string;
   protein: string;
+  /** Main proteins he doesn't eat. */
+  avoid: string[];
 }
 
 function toDraft(s: Settings): Draft {
-  return { budget: String(s.budget_gbp), people: String(s.people), protein: String(s.protein_g_per_day) };
+  return { budget: String(s.budget_gbp), people: String(s.people), protein: String(s.protein_g_per_day), avoid: s.avoid_proteins };
 }
+
+const cap = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
 
 /** Returns an error sentence, or null if all three are fine. */
 function check(d: Draft): string | null {
@@ -47,7 +51,7 @@ export default function SettingsForm({ settings, freshness, nowIso }: { settings
     try {
       const res = await api<{ settings: Settings }>("/settings", {
         method: "POST",
-        body: { budget_gbp: Number(draft.budget), people: Number(draft.people), protein_g_per_day: Number(draft.protein) },
+        body: { budget_gbp: Number(draft.budget), people: Number(draft.people), protein_g_per_day: Number(draft.protein), avoid_proteins: draft.avoid },
       });
       setDraft(toDraft(res.settings));
       setPhase("saved");
@@ -57,8 +61,13 @@ export default function SettingsForm({ settings, freshness, nowIso }: { settings
     }
   }
 
-  function field(key: keyof Draft, value: string) {
+  function field(key: "budget" | "people" | "protein", value: string) {
     setDraft({ ...draft, [key]: value });
+    setPhase("idle");
+  }
+
+  function toggleAvoid(food: string) {
+    setDraft({ ...draft, avoid: draft.avoid.includes(food) ? draft.avoid.filter((f) => f !== food) : [...draft.avoid, food] });
     setPhase("idle");
   }
 
@@ -87,6 +96,20 @@ export default function SettingsForm({ settings, freshness, nowIso }: { settings
           </label>
           <input id="ds-protein" className="ds-input" type="number" inputMode="numeric" min={20} max={300} step="1" value={draft.protein} onChange={(e) => field("protein", e.target.value)} />
         </div>
+
+        <fieldset className="ds-field ds-avoid">
+          <legend className="ds-label">Foods you don&apos;t eat</legend>
+          <p className="ds-hint ds-muted">
+            Left out of For you and your week&apos;s basket. Searching by name still finds them, and Similar products still shows them.
+          </p>
+          <div className="ds-fchips">
+            {AVOID_CHOICES.map((food) => (
+              <button key={food} type="button" className="ds-fchip" aria-pressed={draft.avoid.includes(food)} onClick={() => toggleAvoid(food)}>
+                {cap(food)}
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
         <button type="submit" className="ds-btn ds-btn--primary ds-btn--wide" disabled={phase === "saving"}>
           {phase === "saving" ? "Saving…" : "Save"}

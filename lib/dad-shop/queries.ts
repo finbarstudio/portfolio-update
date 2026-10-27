@@ -3,6 +3,7 @@ import { generateBasket, type BasketDeal, type Candidate, type VoteInfo } from "
 import { getList, loadTaste } from "./catalog";
 import type { Sql } from "./db";
 import { offerLabel, priceList, type PricedRow, livePromos, nowPence, fullPence } from "./pricing";
+import { AVOID_KEY, avoidFromRows } from "./avoid";
 import type { ListAction, SettingsPatch } from "./validate";
 import { STOCK_FRESH_HOURS } from "./store";
 import { describeVotes } from "./votes";
@@ -239,7 +240,7 @@ export async function setStoreReport(sql: Sql, productId: string, status: "found
 
 export async function getSettings(sql: Sql): Promise<Settings> {
   const rows = await sql<{ key: string; value: unknown }[]>`select key, value from settings`;
-  const out: Settings = { ...DEFAULT_SETTINGS };
+  const out: Settings = { ...DEFAULT_SETTINGS, avoid_proteins: avoidFromRows(rows) };
   for (const r of rows) {
     if (typeof r.value !== "number" || !Number.isFinite(r.value)) continue;
     if (r.key === "budget_gbp") out.budget_gbp = r.value;
@@ -252,7 +253,7 @@ export async function getSettings(sql: Sql): Promise<Settings> {
 }
 
 export async function saveSettings(sql: Sql, patch: SettingsPatch): Promise<void> {
-  const entries = Object.entries(patch).filter((e): e is [string, number] => typeof e[1] === "number");
+  const entries = Object.entries(patch).filter((e): e is [string, number | string[]] => typeof e[1] === "number" || (e[0] === AVOID_KEY && Array.isArray(e[1])));
   if (entries.length === 0) return;
   const keys = entries.map(([k]) => k);
   const values = entries.map(([, v]) => JSON.stringify(v));
@@ -428,6 +429,7 @@ interface CandidateRow {
   whole_food: boolean;
   review_avg: number | null;
   review_count: number | null;
+  protein_main: string | null;
   store_eff: string;
 }
 
@@ -443,7 +445,7 @@ async function loadCandidates(sql: Sql): Promise<Candidate[]> {
       (case when jsonb_typeof(p.nutrition->'sat') = 'number' then (p.nutrition->>'sat')::float8 end) as sat,
       p.seed_oil, p.health::float8 as health, p.listed_at,
       (p.nutrition is not null and p.ingredients is not null) as has_detail,
-      p.ingredient_count, p.review_avg::float8 as review_avg, p.review_count,
+      p.ingredient_count, p.review_avg::float8 as review_avg, p.review_count, p.protein_main,
       (p.ingredient_count = 1 or (p.ingredient_count is null and p.department = any(${PRODUCE}::text[])
         and p.name !~* '(salad|kit|dip|dressing|prepared|stir.?fry|ready|soup|juice|slaw|mash|chips|wedges|roast)')) as whole_food,
       -- His latest report wins, then the daily range feed (same rule as the cards).
@@ -483,6 +485,7 @@ async function loadCandidates(sql: Sql): Promise<Candidate[]> {
     wholeFood: r.whole_food === true,
     reviewAvg: r.review_avg,
     reviewCount: r.review_count,
+    proteinMain: r.protein_main,
     storeStatus: (STORE_STATUSES as readonly string[]).includes(r.store_eff) ? (r.store_eff as StoreStatus) : "unknown",
   }));
 }

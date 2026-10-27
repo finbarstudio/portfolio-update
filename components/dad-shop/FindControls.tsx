@@ -63,70 +63,121 @@ export function SortButton({ value, onChange }: { value: Sort; onChange: (next: 
   );
 }
 
-export type ToggleKey = "good" | "frozen" | "rated" | "onList" | "fewIngredients" | "noSeedOil" | "hideSat" | "hideOwn" | "hideSingle" | "tasteDiff" | "onOffer" | "atStore" | "atStoreSure";
+export type ToggleKey =
+  | "good"
+  | "frozen"
+  | "rated"
+  | "onList"
+  | "fewIngredients"
+  | "noSeedOil"
+  | "hideSat"
+  | "hideOwn"
+  | "hideSingle"
+  | "tasteDiff"
+  | "onOffer"
+  | "highProtein"
+  | "hideFolic"
+  | "hideAvoided"
+  | "atStore"
+  | "atStoreSure";
 
-const ONLY: { key: ToggleKey; label: string; hint?: string }[] = [
-  { key: "onOffer", label: "Only on offer", hint: "A price cut or a multi-buy" },
-  { key: "atStore", label: "Only at Chislehurst", hint: "Hides what isn't stocked there. Anything we can't tell stays." },
-  { key: "atStoreSure", label: "Only confirmed at Chislehurst", hint: "Just what the store's list shows, or you found" },
-  { key: "good", label: "Good deals", hint: "25% off or more, and good value" },
-  { key: "frozen", label: "Frozen" },
-  { key: "rated", label: "Rated by me" },
-  { key: "onList", label: "On my list" },
-  { key: "fewIngredients", label: "5 ingredients or fewer" },
-  { key: "tasteDiff", label: "Taste the Difference", hint: "Sainsbury's premium own range" },
-  { key: "noSeedOil", label: "No seed oils", hint: "Hides anything with seed oils, or no ingredients listed yet" },
-];
-const HIDE: { key: ToggleKey; label: string; hint?: string }[] = [
-  { key: "hideSat", label: "Hide high sat fat" },
-  { key: "hideOwn", label: "Hide Sainsbury's own brand" },
-  { key: "hideSingle", label: "Hide single-ingredient foods", hint: "Hides anything that is just one ingredient: plain meat, fish, eggs, fruit, veg, rice, tofu…" },
-];
-
-export function countFilters(f: FindFilters): number {
-  return [...ONLY, ...HIDE].filter((t) => f[t.key]).length;
+interface Toggle {
+  key: ToggleKey;
+  /** On the chip. */
+  label: string;
+  /** In the Filters button's list of what is on. */
+  name: string;
+  hint?: string;
 }
 
-/** Filters: iOS-style switches under "Only show" and "Hide", a count badge, and Reset. */
+const ONLY: Toggle[] = [
+  { key: "onOffer", label: "On offer", name: "Only on offer", hint: "A price cut or a multi-buy" },
+  { key: "highProtein", label: "High protein", name: "High protein", hint: "15g or more protein in 100g, or 8g or more for every 100 calories" },
+  { key: "atStore", label: "At Chislehurst", name: "Only at Chislehurst", hint: "Hides what isn't stocked there. Anything we can't tell stays." },
+  { key: "atStoreSure", label: "Confirmed at Chislehurst", name: "Only confirmed at Chislehurst", hint: "Just what the store's list shows, or you found" },
+  { key: "good", label: "Good deals", name: "Good deals", hint: "25% off or more, and good value" },
+  { key: "frozen", label: "Frozen", name: "Frozen" },
+  { key: "tasteDiff", label: "Taste the Difference", name: "Taste the Difference", hint: "Sainsbury's premium own range" },
+  { key: "rated", label: "Rated by me", name: "Rated by me" },
+  { key: "onList", label: "On my list", name: "On my list" },
+  { key: "fewIngredients", label: "≤5 ingredients", name: "5 ingredients or fewer", hint: "Products whose ingredients aren't read yet are left out" },
+  { key: "noSeedOil", label: "No seed oils", name: "No seed oils", hint: "Hides anything with seed oils, or no ingredients listed yet" },
+];
+const HIDE: Toggle[] = [
+  { key: "hideSat", label: "High sat fat", name: "Hide high sat fat", hint: "Whole foods such as steak and full-fat Greek yoghurt stay" },
+  { key: "hideFolic", label: "Folic acid", name: "Hide folic acid", hint: "Hides anything with folic acid in the ingredients, such as most bread" },
+  { key: "hideAvoided", label: "Foods I don't eat", name: "Hide foods I don't eat", hint: "The foods you picked in Settings, such as pork" },
+  { key: "hideSingle", label: "Single-ingredient foods", name: "Hide single-ingredient foods", hint: "Plain meat, fish, eggs, fruit, veg, rice, tofu…" },
+  { key: "hideOwn", label: "Sainsbury's own brand", name: "Hide Sainsbury's own brand" },
+];
+
+/** On by default. A typed search ignores them, so a brand he likes is always found. */
+const DEFAULT_ON: readonly ToggleKey[] = ["noSeedOil", "hideSat", "hideAvoided"];
+
+export const UPF_CHOICES: { value: FindFilters["maxUpf"]; label: string; name: string; hint: string }[] = [
+  { value: null, label: "Any", name: "", hint: "Any amount of processing" },
+  { value: 0, label: "None", name: "no ultra-processing markers", hint: "No ultra-processing markers in the ingredients. Products whose ingredients aren't read yet are left out." },
+  { value: 1, label: "≤ 1", name: "at most 1 ultra-processing marker", hint: "At most one marker, such as a flavouring. Products whose ingredients aren't read yet are left out." },
+  { value: 2, label: "≤ 2", name: "at most 2 ultra-processing markers", hint: "At most two markers. Products whose ingredients aren't read yet are left out." },
+];
+
+/** What is switched on and counts: while searching, the three default filters are paused. */
+function activeFilters(f: FindFilters, searching: boolean): string[] {
+  const on = [...ONLY, ...HIDE].filter((t) => f[t.key] && !(searching && DEFAULT_ON.includes(t.key))).map((t) => t.name);
+  const upf = UPF_CHOICES.find((u) => u.value === f.maxUpf && u.value !== null);
+  return upf ? [...on, `Ultra-processing: ${upf.name}`] : on;
+}
+
+export function countFilters(f: FindFilters, searching = false): number {
+  return activeFilters(f, searching).length;
+}
+
+/** Filters: wrapping pill toggles under "Only show" and "Hide", a segmented control for ultra-processing markers, a count badge, and Reset. */
 export function FiltersButton({
   filters,
   ignored,
+  searching = false,
   onToggle,
+  onUpf,
   onReset,
 }: {
   filters: FindFilters;
   /** Offers, Multi-buys and Meal deals never hide anything. */
   ignored: boolean;
+  /** A search is typed: the default filters are paused. */
+  searching?: boolean;
   onToggle: (key: ToggleKey) => void;
+  onUpf: (max: FindFilters["maxUpf"]) => void;
   onReset: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const anchor = useRef<HTMLButtonElement>(null);
-  const n = ignored ? 0 : countFilters(filters);
+  const active = ignored ? [] : activeFilters(filters, searching);
+  const n = active.length;
+  const paused = searching && !ignored && DEFAULT_ON.some((k) => filters[k]);
 
   function close(refocus: boolean) {
     setOpen(false);
     if (refocus) anchor.current?.focus();
   }
 
-  const row = (t: { key: ToggleKey; label: string; hint?: string }) => (
+  const chip = (t: Toggle) => (
     <button
       key={t.key}
       type="button"
-      className="ds-frow"
+      className={`ds-fchip${searching && DEFAULT_ON.includes(t.key) ? " is-paused" : ""}`}
       aria-pressed={filters[t.key]}
       aria-disabled={ignored}
+      title={t.hint}
       onClick={() => {
         if (!ignored) onToggle(t.key);
       }}
     >
-      <span>
-        {t.label}
-        {t.hint && <small>{t.hint}</small>}
-      </span>
-      <span className="ds-switch" aria-hidden="true" />
+      {t.label}
     </button>
   );
+
+  const summary = n > 0 ? `${n} on: ${active.join(", ")}` : "none on";
 
   return (
     <>
@@ -137,6 +188,8 @@ export function FiltersButton({
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="ds-filt-pop"
+        aria-label={`Filters, ${summary}`}
+        title={n > 0 ? `On: ${active.join(", ")}` : "No filters on"}
         onClick={() => setOpen(!open)}
       >
         <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
@@ -144,21 +197,39 @@ export function FiltersButton({
         </svg>
         <b>Filters</b>
         {n > 0 && (
-          <span className="ds-badge" aria-label={`${n} on`}>
+          <span className="ds-badge" aria-hidden="true">
             {n}
           </span>
         )}
         <Caret />
       </button>
-      <Popover open={open} anchor={anchor} onClose={close} width={340} id="ds-filt-pop" label="Filters" autoFocus=".ds-frow">
+      <Popover open={open} anchor={anchor} onClose={close} width={380} id="ds-filt-pop" label="Filters" autoFocus=".ds-fchip">
         <div className="ds-fpanel">
           {ignored && (
             <p className="ds-fnote">Here everything shows. Filters don&apos;t hide anything in Offers, Multi-buys and Meal deals: only the sort changes.</p>
           )}
+          {paused && <p className="ds-fnote">Search shows everything the default filters hide. They apply again when you clear the search.</p>}
           <p className="ds-fh">Only show</p>
-          {ONLY.map(row)}
+          <div className="ds-fchips">{ONLY.map(chip)}</div>
+          <p className="ds-fh">Ultra-processing</p>
+          <div className="ds-fseg" role="group" aria-label="Ultra-processing markers" aria-disabled={ignored}>
+            {UPF_CHOICES.map((u) => (
+              <button
+                key={String(u.value)}
+                type="button"
+                className="ds-fsegb"
+                aria-pressed={filters.maxUpf === u.value}
+                title={u.hint}
+                onClick={() => {
+                  if (!ignored) onUpf(u.value);
+                }}
+              >
+                {u.label}
+              </button>
+            ))}
+          </div>
           <p className="ds-fh">Hide</p>
-          {HIDE.map(row)}
+          <div className="ds-fchips">{HIDE.map(chip)}</div>
           <div className="ds-ffoot">
             <button type="button" className="ds-linkbtn" onClick={onReset}>
               Reset to default

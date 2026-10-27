@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import CardWhy, { type WhyKind } from "./CardWhy";
 import QuickRate from "./QuickRate";
+import { isWholeFood } from "@/lib/dad-shop/breakdown";
 import { gbp, satTone, shortName } from "@/lib/dad-shop/format";
 import { priceView, tidyMoney, type GroupInfo } from "@/lib/dad-shop/pricing";
-import { offerPill } from "@/lib/dad-shop/similar";
+import { gramsText } from "@/lib/dad-shop/protein";
+import { compareValues, offerPill, unitText } from "@/lib/dad-shop/similar";
 import { BASE_PATH, type DealLink, type ListItem, type ProductCard } from "@/lib/dad-shop/types";
 import type { ListStore } from "./listStore";
 import { GroupTag, ProductImage, StoreChip } from "./ui";
@@ -42,9 +44,10 @@ const band = (n: number | null): string => (n == null ? "n" : n >= 7 ? "g" : n >
 
 /**
  * THE product card, the same everywhere (Find, Multi-buys, For you, deal pages,
- * similar products). Slim: picture, two-line name, one price row, one offer
- * pill, three key facts, Fit and Value badges (tap one for the working), and a
- * bottom row of stars and Add. Built to work at about 170px wide on a phone.
+ * similar products). Slim: picture (offer pill and pack size along its bottom,
+ * a snowflake when frozen), two-line name, one price row with a muted unit-price
+ * line under it, the key facts, Fit and Value badges (tap one for the working),
+ * and a bottom row of stars and Add. Built to work at about 170px wide on a phone.
  */
 export default function ProductTile({ p, now, store, mine, group, why, rank, swap, deal, inMealPage = false, isMe = false }: Props) {
   const [open, setOpen] = useState<WhyKind | null>(null);
@@ -70,47 +73,62 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
   // The one pill: a multi-buy, else a meal deal, else the size of the cut.
   const pill = offerPill(p, now, inMealPage);
 
-  // The key facts, each coloured, most important first: how plain it is (ingredients, ultra-processing
-  // markers), seed oils, then protein. Saturated fat only shows when it is not low; the breakdown has the rest.
+  // The key facts, each coloured, most important first: how plain it is (one chip for processing, with the
+  // ingredient and marker counts), seed oils, folic acid, then protein per 100g. Saturated fat only shows when it
+  // is not low and the food is processed (a whole food's fat is not held against it); the breakdown has the rest.
   const facts: { key: string; tone: string; text: string; label: string; why?: boolean }[] = [];
   const markers = p.upfMarkers;
-  if (p.upfCount == null && p.ingredientCount == null && !p.isBasic) {
+  const unread = p.upfCount == null && p.ingredientCount == null && !p.isBasic;
+  const wholeFood = isWholeFood(p);
+  if (unread) {
     facts.push({ key: "ingr", tone: "n", text: "Ingredients ?", label: "Ingredients not read yet", why: true });
   } else {
-    if (p.isBasic || p.ingredientCount === 1) facts.push({ key: "ingr", tone: "g", text: "1 ingr", label: "Single-ingredient food", why: true });
-    else if (p.ingredientCount != null) {
+    const n = p.isBasic && p.ingredientCount == null ? 1 : p.ingredientCount;
+    const count = n != null ? `${n} ${n === 1 ? "ingredient" : "ingredients"}` : null;
+    const m = p.upfCount ?? 0;
+    if (m > 0) {
       facts.push({
-        key: "ingr",
-        tone: p.ingredientCount <= 5 ? "g" : p.ingredientCount <= 10 ? "a" : "r",
-        text: `${p.ingredientCount} ingr`,
-        label: `${p.ingredientCount} ingredients`,
+        key: "upf",
+        tone: m >= 3 ? "r" : "a",
+        text: `Ultra-processed · ${m} ${m === 1 ? "marker" : "markers"}`,
+        label: `Ultra-processed: ${m} ${m === 1 ? "marker" : "markers"}${markers.length > 0 ? ` (${markers.join(", ")})` : ""}`,
         why: true,
       });
-    }
-    if (p.upfCount != null) {
-      facts.push(
-        p.upfCount === 0
-          ? { key: "upf", tone: "g", text: "No UPF", label: "No ultra-processing markers", why: true }
-          : {
-              key: "upf",
-              tone: p.upfCount >= 3 ? "r" : "a",
-              text: `${p.upfCount} UPF`,
-              label: `${p.upfCount} ultra-processing ${p.upfCount === 1 ? "marker" : "markers"}${markers.length > 0 ? `: ${markers.join(", ")}` : ""}`,
-              why: true,
-            },
-      );
+      if (n != null) facts.push({ key: "ingr", tone: n <= 5 ? "g" : n <= 10 ? "a" : "r", text: `${n} ingr`, label: count ?? "", why: true });
+    } else if (p.upfCount === 0 || p.isBasic) {
+      const plain = p.isBasic || n === 1;
+      facts.push({
+        key: "upf",
+        tone: "g",
+        text: `${plain ? "Unprocessed" : "No UPF additives"}${count ? ` · ${count}` : ""}`,
+        label: `${plain ? "Unprocessed" : "No ultra-processing markers"}${count ? `, ${count}` : ""}`,
+        why: true,
+      });
+    } else if (n != null) {
+      facts.push({ key: "ingr", tone: n <= 5 ? "g" : n <= 10 ? "a" : "r", text: `${n} ingr`, label: count ?? "", why: true });
     }
   }
   if (p.seedOil === "none") facts.push({ key: "oil", tone: "g", text: "No seed oil", label: "No seed oils" });
   else if (p.seedOil === "yes") facts.push({ key: "oil", tone: "r", text: "Seed oil", label: "Contains seed oils" });
   else if (p.seedOil === "likely") facts.push({ key: "oil", tone: "a", text: "Maybe seed oil", label: "May contain a seed oil" });
+  if (p.folicAcid) facts.push({ key: "folic", tone: "r", text: "Folic acid", label: "Contains folic acid. A warning only: it doesn't change the score." });
   if (p.protein != null) {
-    const g = p.protein >= 10 ? Math.round(p.protein) : +p.protein.toFixed(1);
-    facts.push({ key: "protein", tone: p.protein >= 15 ? "g" : p.protein >= 6 ? "a" : "n", text: `${g}g protein`, label: `${g} grams of protein in every 100 grams` });
+    facts.push({
+      key: "protein",
+      tone: p.protein >= 15 ? "g" : p.protein >= 6 ? "a" : "n",
+      text: `Protein ${gramsText(p.protein)}/100g`,
+      label: `${gramsText(p.protein)} of protein in every 100 grams`,
+    });
   }
-  if (p.sat != null && sat && sat !== "g") {
+  if (p.sat != null && sat && sat !== "g" && !wholeFood) {
     facts.push({ key: "sat", tone: sat, text: `Sat ${+p.sat.toFixed(1)}g`, label: `${+p.sat.toFixed(1)} grams of saturated fat in every 100 grams` });
   }
+
+  // Under the price, one muted line to compare with: price per 100g of protein for protein foods (worked from
+  // the whole pack), else the price per kg or litre. Never per serving.
+  const unitLine =
+    p.valueBasis === "protein" && p.per100Protein != null ? `${gbp(p.per100Protein)} per 100g protein` : unitText(compareValues(p, now));
+  const frozen = p.storage === "frozen" || p.zone === "Frozen";
 
   // One short muted line, most important first.
   let note: { text: string; tone: string } | null = null;
@@ -120,7 +138,7 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
       text: `Paid ${gbp(paid.each)} before${paidMove < 0 ? ", now cheaper" : paidMove > 0 ? ", now dearer" : ""}`,
       tone: paidMove < 0 ? "g" : paidMove > 0 ? "r" : "n",
     };
-  } else if (p.valueBasis === "protein" && p.per100Protein != null) note = { text: `${gbp(p.per100Protein)} per 100g protein`, tone: "n" };
+  }
 
   function toggle(kind: WhyKind) {
     setOpen((cur) => (cur === kind ? null : kind));
@@ -133,15 +151,32 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
           <ProductImage src={p.imageUrl} className="ds-img--card" />
         </Link>
         {(rank || isMe) && <span className={`ds-rank${isMe ? " ds-rank--me" : ""}`}>{isMe ? `This one${rank ? ` · ${rank.replace(" best overall", "")}` : ""}` : rank}</span>}
-        {p.isNew && <span className="ds-newtag">New</span>}
-        {pill &&
-          (pill.href ? (
-            <Link href={pill.href} className={`ds-pill ds-pill--${pill.tone}`}>
-              {pill.text} <span aria-hidden="true">›</span>
-            </Link>
-          ) : (
-            <span className={`ds-pill ds-pill--${pill.tone}`}>{pill.text}</span>
-          ))}
+        {p.isNew && <span className={`ds-newtag${frozen ? " has-frozen" : ""}`}>New</span>}
+        {frozen && (
+          <span className="ds-frozen" role="img" aria-label="Frozen" title="Frozen">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 2 3-2M9 20l3-2 3 2M4 10.5l2.5-.5.5-2.5M20 10.5l-2.5-.5-.5-2.5M4 13.5l2.5.5.5 2.5M20 13.5l-2.5.5-.5 2.5" />
+            </svg>
+          </span>
+        )}
+        {(pill || p.packText) && (
+          <div className="ds-ovrow">
+            {pill &&
+              (pill.href ? (
+                <Link href={pill.href} className={`ds-pill ds-pill--${pill.tone}`}>
+                  {pill.text} <span aria-hidden="true">›</span>
+                </Link>
+              ) : (
+                <span className={`ds-pill ds-pill--${pill.tone}`}>{pill.text}</span>
+              ))}
+            {p.packText && (
+              <span className="ds-pack" title={p.packEst ? "Size worked out from the price, so only roughly right" : undefined}>
+                <span className="ds-sr">Pack size </span>
+                {p.packText}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="ds-pcard-body">
@@ -159,6 +194,7 @@ export default function ProductTile({ p, now, store, mine, group, why, rank, swa
           )}
           {pv.nectar && <span className="ds-pcard-nectar">Nectar</span>}
         </div>
+        {unitLine && <p className="ds-pcard-unit">{unitLine}</p>}
 
         <StoreChip status={p.storeStatus} reason={p.storeReason} stock={p.storeStock} stockAt={p.storeStockAt} id={`${panelId}-store`} />
 

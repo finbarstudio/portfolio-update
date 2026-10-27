@@ -1,5 +1,6 @@
 import { LEARNED_MAX, tasteScore } from "./fit";
 import { unitPriceLabel } from "./format";
+import { LENIENT_GROUPS } from "./lenient-groups";
 import { OVERALL_WEIGHTS, overallParts } from "./overall";
 import type { ProductCard } from "./types";
 
@@ -9,12 +10,25 @@ import type { ProductCard } from "./types";
  *
  * Health mirrors the pipeline's score (Lab/dad-shop/src/score.ts): 35% protein,
  * 30% saturated fat, 35% processing, then the seed-oil and missing-data caps.
+ * Saturated fat only counts against processed food: a whole food (steak, full-fat
+ * Greek yoghurt, cheese on its own) scores a full 10 on it. Folic acid is a label,
+ * never a score.
  * The final number shown is always the stored health; the parts are recomputed
  * here from the same inputs so he can see where it came from.
  */
 
 const clamp = (n: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, n));
 const r1 = (n: number): number => Math.round(n * 10) / 10;
+
+/**
+ * A whole food, exactly as the pipeline decides it (Lab/dad-shop/src/score.ts `isWholeFood`): a plain ingredient
+ * (is_basic), or a short, clean list: 3 or fewer ingredients (the count must be known), no ultra-processing
+ * markers, and seed oil 'none' (yes, likely and unknown all fail). Saturated fat is not counted against these.
+ */
+export function isWholeFood(c: Pick<ProductCard, "isBasic" | "ingredientCount" | "upfMarkers" | "seedOil">): boolean {
+  if (c.isBasic) return true;
+  return c.ingredientCount != null && c.ingredientCount <= 3 && c.upfMarkers.length === 0 && c.seedOil === "none";
+}
 
 /** g protein per 100 kcal: 10 or more => 10, linear down to 2 or less => 1. */
 export function proteinScore(protein: number, kcal: number): number {
@@ -35,9 +49,17 @@ export function satScore(sat: number, kcal: number): number {
   return clamp(s, 0, 10);
 }
 
-/** 1-2 ingredients => 10, up to 5 => 8, 10 => 6, 20 => 4, more => 2; minus 1.5 per marker (at most 6). */
-export function processingScore(count: number, markers: number): number {
-  const base = count <= 2 ? 10 : count <= 5 ? 8 : count <= 10 ? 6 : count <= 20 ? 4 : 2;
+/**
+ * From the ingredient count, on one scale per comparison group; minus 1.5 per marker (at most 6).
+ * Lenient groups (LENIENT_GROUPS, where a long list is normal) and products with no group:
+ *   1-2 => 10, up to 5 => 8, up to 10 => 6, up to 20 => 4, more => 2.
+ * Every other group: 1-2 => 10, 3 => 9, 4 => 8, 5 => 7, 6-7 => 6, 8-10 => 5, 11-15 => 4, 16-20 => 3, more => 2.
+ */
+export function processingScore(count: number, markers: number, group: string | null = null): number {
+  const lenient = group === null || LENIENT_GROUPS.has(group);
+  const base = lenient
+    ? count <= 2 ? 10 : count <= 5 ? 8 : count <= 10 ? 6 : count <= 20 ? 4 : 2
+    : count <= 2 ? 10 : count <= 3 ? 9 : count <= 4 ? 8 : count <= 5 ? 7 : count <= 7 ? 6 : count <= 10 ? 5 : count <= 15 ? 4 : count <= 20 ? 3 : 2;
   return clamp(base - Math.min(markers * 1.5, 6), 0, 10);
 }
 
@@ -69,7 +91,20 @@ export interface HealthBreakdown {
 
 type HealthInput = Pick<
   ProductCard,
-  "protein" | "sat" | "kcal" | "ingredientCount" | "upfMarkers" | "seedOil" | "seedOilsFound" | "health" | "reasons" | "ingredientsSource" | "nutritionSource"
+  | "protein"
+  | "sat"
+  | "kcal"
+  | "ingredientCount"
+  | "upfMarkers"
+  | "seedOil"
+  | "seedOilsFound"
+  | "health"
+  | "reasons"
+  | "ingredientsSource"
+  | "nutritionSource"
+  | "isBasic"
+  | "folicAcid"
+  | "productGroup"
 >;
 
 const SOURCE_WORDS: Record<string, string> = {
@@ -93,7 +128,7 @@ export function healthBreakdown(c: HealthInput): HealthBreakdown {
   const complete = c.kcal != null && c.protein != null && c.sat != null;
   const count = c.ingredientCount;
   const markers = c.upfMarkers.length;
-  const procScore = count != null ? processingScore(count, markers) : null;
+  const procScore = count != null ? processingScore(count, markers, c.productGroup) : null;
 
   const protein: HealthPart = {
     key: "protein",
@@ -108,14 +143,23 @@ export function healthBreakdown(c: HealthInput): HealthBreakdown {
 
   if (c.protein != null && c.kcal != null) {
     protein.score = proteinScore(c.protein, c.kcal);
-    protein.detail = `${r1(c.protein)}g protein in ${Math.round(c.kcal)} kcal, so ${r1(c.kcal > 0 ? (c.protein / c.kcal) * 100 : 0)}g per 100 kcal`;
+    const per100kcal = c.kcal > 0 ? Math.round((c.protein / c.kcal) * 100) : 0;
+    protein.detail = `${r1(c.protein)}g protein per 100g (about ${per100kcal}g for every 100 calories; scoring compares protein to calories so yoghurt and steak can be compared fairly)`;
   } else if (c.protein != null) {
     protein.detail = `${r1(c.protein)}g protein per 100g, but no calories to judge it against`;
   }
   if (c.sat != null && c.kcal != null) {
-    sat.score = satScore(c.sat, c.kcal);
     const pct = c.kcal > 0 ? ((c.sat * 9) / c.kcal) * 100 : 0;
-    sat.detail = `${r1(c.sat)}g sat fat, ${Math.round(pct)}% of the calories${c.sat >= 5 ? " (high: minus 2)" : ""}`;
+    const raw = satScore(c.sat, c.kcal);
+    const plain = `${r1(c.sat)}g sat fat, ${Math.round(pct)}% of the calories${c.sat >= 5 ? " (high: minus 2)" : ""}`;
+    if (isWholeFood(c)) {
+      // A whole food scores 10 whatever its fat. The line only appears where the complaint would have fired.
+      sat.score = 10;
+      sat.detail = c.sat >= 5 || raw <= 4 ? `A whole food, so its saturated fat isn't counted against it (${plain})` : plain;
+    } else {
+      sat.score = raw;
+      sat.detail = markers > 0 && raw <= 4 ? `${plain}. Processed and high in saturated fat` : plain;
+    }
   } else if (c.sat != null) {
     sat.detail = `${r1(c.sat)}g sat fat per 100g, but no calories to judge it against`;
   }
@@ -152,6 +196,7 @@ export function healthBreakdown(c: HealthInput): HealthBreakdown {
     if (c.seedOil === "yes") caps.push(`Seed oils (${c.seedOilsFound.join(", ") || "found"}) cap it at 3`);
     else if (c.seedOil === "likely") caps.push("Unnamed vegetable oil (probably a seed oil) caps it at 5");
   }
+  if (c.folicAcid) notes.push("Contains folic acid. Shown as a warning only; it doesn't change the score.");
   const parts = mode === "processing" ? [proc] : [protein, sat, proc];
   return { mode, parts, raw: raw != null ? r1(raw) : null, caps, final: c.health, reasons: c.reasons, notes };
 }
@@ -208,7 +253,7 @@ export function valueBreakdown(c: ValueInput): ValueBreakdown {
 
 // ── Best overall ────────────────────────────────────────────────────────────
 
-/** "Health 8.5 × 0.5 + Value 7 × 0.35 + taste 4★ × 0.15 = 7.9" */
+/** "Health 8.5 × 0.6 + Value 7 × 0.25 + taste 4★ × 0.15 = 7.9" */
 export function overallSum(c: Pick<ProductCard, "health" | "value" | "stars" | "vote">): { text: string; total: number } {
   const p = overallParts(c);
   const taste =
