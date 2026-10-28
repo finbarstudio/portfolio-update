@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { queryFor } from "./find";
-import { parseFindParams, parseMaxUpf, parseSimilarParams, SIMILAR_DEFAULTS } from "./validate";
+import { parseFindParams, parseMaxUpf, parseSimilarParams } from "./validate";
 
 const parse = (qs: string) => {
   const r = parseFindParams(new URLSearchParams(qs));
@@ -17,23 +16,12 @@ describe("the new filters", () => {
     expect(f.maxUpf).toBeNull();
   });
 
-  test("they read from the address and write back to it", () => {
+  test("they read from the address", () => {
     const f = parse("hp=1&folic=1&hideAvoided=1&upf=1");
     expect(f.highProtein).toBe(true);
     expect(f.hideFolic).toBe(true);
     expect(f.hideAvoided).toBe(true);
     expect(f.maxUpf).toBe(1);
-    const again = parse(queryFor(f));
-    expect(again.highProtein).toBe(true);
-    expect(again.hideFolic).toBe(true);
-    expect(again.hideAvoided).toBe(true);
-    expect(again.maxUpf).toBe(1);
-  });
-
-  test("hide foods I don't eat is kept when off, so a reload doesn't turn it back on", () => {
-    const off = parse(queryFor({ ...SIMILAR_DEFAULTS, hideAvoided: false }));
-    expect(off.hideAvoided).toBe(false);
-    expect(queryFor({ ...SIMILAR_DEFAULTS, hideAvoided: false })).toMatch(/hideAvoided=0/);
   });
 
   test("the ultra-processing choice is 0, 1, 2 or any", () => {

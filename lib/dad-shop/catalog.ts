@@ -74,7 +74,7 @@ type Fragment = postgres.PendingQuery<postgres.Row[]>;
  * `ids` narrows the output to a few products while still ranking them against
  * everything else in their category. Without it, every product comes back.
  */
-function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = "category"): Fragment {
+export function scored(sql: Sql, ids: string[] | null, by: "category" | "department" = "category"): Fragment {
   // A group can span categories, so its members come along with the category (or department): the value
   // benchmark (group first, then category) must see the same products it would on the whole catalogue.
   const scope = !ids
@@ -270,7 +270,7 @@ function cleanPromos(v: unknown, dealIds: Set<string>): Promo[] {
   });
 }
 
-async function loadDealIds(sql: Sql): Promise<Set<string>> {
+export async function loadDealIds(sql: Sql): Promise<Set<string>> {
   const rows = await sql<{ id: string }[]>`
     select id from deals where ends_on is null or ends_on >= current_date
   `;

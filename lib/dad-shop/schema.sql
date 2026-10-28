@@ -229,3 +229,12 @@ create table if not exists store_stock_events (
   at         timestamptz not null default now()
 );
 create index if not exists store_stock_events_product on store_stock_events (product_id, at desc);
+
+-- v9 (28 Oct 2026): the app's own whole-document state (Tesco-app parity): ratings (1-10 fit), removals, locked deals,
+-- the basket ({items, ticked, updated}) and past orders. One row per document name; the app reads and writes them through
+-- app/lab/dadshop/api/app/*. The basket is changed with an atomic per-item SQL update, never a whole-document write.
+create table if not exists app_docs (
+  name       text primary key,
+  value      jsonb not null,
+  updated_at timestamptz not null default now()
+);

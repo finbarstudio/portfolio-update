@@ -1,0 +1,7 @@
+/**
+ * Dad's Shop logo: dad in his flat cap and specs, peeking out of a shopping basket, moustache first.
+ * The same drawing is the tab icon (app/lab/dadshop/icon.svg). LOGO_HTML is the header lockup.
+ */
+export const LOGO_SVG = `<svg aria-hidden="true" width="40" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"> <rect width="64" height="64" rx="16" fill="#ffd66b"/> <path d="M10 40h44l-5 17a4 4 0 0 1-3.8 3H18.8a4 4 0 0 1-3.8-3z" fill="#1f7a4a"/> <path d="M19 45v9M27 45v9M37 45v9M45 45v9" stroke="#145233" stroke-width="2.4" stroke-linecap="round"/> <circle cx="32" cy="27" r="13" fill="#f2c39a"/> <path d="M18 23c0-9 6.5-14 14-14s14 5 14 12z" fill="#7a4f2c"/> <path d="M15 23.5c6-3 20-3.6 34-1.2l1.2 1.6c-12 .6-24 1-35.6 1.4z" fill="#5c3a1f"/> <circle cx="26.5" cy="28" r="3.8" fill="#fff" fill-opacity=".55" stroke="#222" stroke-width="1.8"/> <circle cx="37.5" cy="28" r="3.8" fill="#fff" fill-opacity=".55" stroke="#222" stroke-width="1.8"/> <path d="M30.3 28h3.4" stroke="#222" stroke-width="1.8"/> <path d="M32 34.6c-2.6-2.2-7.2-2.6-10 .4 2.8.2 3.7 2.6 6.7 2.4 1.5-.1 2.6-1 3.3-1.8.7.8 1.8 1.7 3.3 1.8 3 .2 3.9-2.2 6.7-2.4-2.8-3-7.4-2.6-10-.4z" fill="#3b2614"/> <path d="M10 40h44" stroke="#145233" stroke-width="3" stroke-linecap="round"/> </svg>`;
+
+export const LOGO_HTML = `<span class="logo">${LOGO_SVG}<span class="logotext"><b>Dad's Shop</b><small>Dad-approved. Mostly.</small></span></span>`;
