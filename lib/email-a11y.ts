@@ -11,8 +11,10 @@ export interface ContrastIssue {
   background: string;
   ratio: number;
   required: number;
-  /** the nearest shade of the text colour that passes on this background */
-  suggestion: string;
+  /** the nearest shade of the text colour that passes on this background; null when none does */
+  suggestion: string | null;
+  /** when no text shade passes: the nearest shade of the background that passes with this text */
+  backgroundSuggestion?: string;
   /** text under 24px, or under 18.66px bold, needs 4.5:1; larger needs 3:1 */
   large: boolean;
 }
@@ -124,8 +126,9 @@ function hex([r, g, b]: [number, number, number, number]): string {
  * The closest colour to `color` that reaches `required` against `background`,
  * found by moving it towards black or white (whichever the background is
  * further from) in small steps. Keeps the hue, changes only the lightness.
+ * Null when even pure black or white falls short, as with light text on a mid-tone background.
  */
-export function passingShade(color: [number, number, number, number], background: [number, number, number, number], required: number): string {
+export function passingShade(color: [number, number, number, number], background: [number, number, number, number], required: number): string | null {
   const target = luminance(background) > 0.5 ? 0 : 255;
   for (let step = 0; step <= 100; step++) {
     const t = step / 100;
@@ -138,7 +141,14 @@ export function passingShade(color: [number, number, number, number], background
     ];
     if (contrastRatio(mixed, background) >= required) return hex(mixed);
   }
-  return target === 0 ? "#000000" : "#ffffff";
+  return null;
+}
+
+/** A shade of the text that passes, or failing that, a shade of the background that does. */
+function shadeAdvice(color: [number, number, number, number], background: [number, number, number, number], required: number): Pick<ContrastIssue, "suggestion" | "backgroundSuggestion"> {
+  const suggestion = passingShade(color, background, required);
+  if (suggestion) return { suggestion };
+  return { suggestion: null, backgroundSuggestion: passingShade(background, color, required) ?? undefined };
 }
 
 /** Walks up for the first opaque background. Null when an image or gradient sits in the way. */
@@ -234,7 +244,7 @@ export function auditDocument(doc: Document): A11yReport {
     const key = `${hex(color)}/${hex(background)}/${large}`;
     if (ratio < required && !seenPairs.has(key)) {
       seenPairs.add(key);
-      report.contrast.push({ text: snippet(text), color: hex(color), background: hex(background), ratio: Math.round(ratio * 100) / 100, required, large, suggestion: passingShade(color, background, required) });
+      report.contrast.push({ text: snippet(text), color: hex(color), background: hex(background), ratio: Math.round(ratio * 100) / 100, required, large, ...shadeAdvice(color, background, required) });
     }
   }
   report.contrast.sort((a, b) => a.ratio - b.ratio);

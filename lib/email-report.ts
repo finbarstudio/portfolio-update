@@ -91,7 +91,7 @@ export function buildReport(input: ReportInput): string {
       out.push(`without style blocks the email still fits a ${narrow.viewport}px phone`);
     }
     for (const c of a11y.contrast) {
-      out.push(`P | contrast ${c.ratio}:1, needs ${c.required}:1 | ${c.color} on ${c.background} | "${c.text}" | passing shade ${c.suggestion}`);
+      out.push(`P | contrast ${c.ratio}:1, needs ${c.required}:1 | ${c.color} on ${c.background} | "${c.text}" | ${c.suggestion ? `passing shade ${c.suggestion}` : c.backgroundSuggestion ? `no text shade passes; passing background ${c.backgroundSuggestion}` : "no shade of either colour passes"}`);
     }
     if (!a11y.contrast.length) out.push("contrast: all measured text passes WCAG AA");
     if (a11y.contrastUnknown) out.push(`N | ${a11y.contrastUnknown} text blocks over a background image, contrast not measurable`);

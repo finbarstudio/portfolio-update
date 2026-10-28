@@ -45,7 +45,7 @@ import { snapshotDocument } from "@/lib/email-snapshot";
  */
 
 /** Shown at the foot of the tool and at the top of the copied report. Bump it when the checks change. */
-const VERSION = "2.9";
+const VERSION = "2.10";
 
 const LEVEL_LABEL: Record<Level, string> = { fail: "Problem", warn: "Warning", info: "Note" };
 
@@ -161,10 +161,50 @@ function kb(bytes: number): string {
   return `${(bytes / 1024).toFixed(1)}KB`;
 }
 
+/**
+ * A stand-in for an image whose file did not come with the HTML (a local path such as
+ * ../assets/hero.png): a grey box at the size the tag asks for, labelled with the file name,
+ * so the layout previews at its real size instead of collapsing round a broken image.
+ */
+function placeholderImage(tag: string, path: string): string {
+  const attr = (name: string) => new RegExp(`\\s${name}\\s*=\\s*["']?(\\d+)(?!\\d*%)`, "i").exec(tag)?.[1];
+  const w = Number(attr("width")) || 120;
+  const h = Number(attr("height")) || Math.round(w / 2);
+  const file = path.split(/[?#]/)[0].split("/").pop() || path;
+  let name = file;
+  try {
+    name = decodeURIComponent(file);
+  } catch {
+    // A stray % in the path: show it as written.
+  }
+  name = name.replace(/[<>&"']/g, "");
+  const size = Math.max(9, Math.min(14, Math.round(Math.min(w / 12, h / 3))));
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    `<rect x="0.5" y="0.5" width="${w - 1}" height="${h - 1}" fill="#e9e6ee" stroke="#9a96a8" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/>` +
+    (h >= 18 && w >= 40
+      ? `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="${size}" fill="#4a4a6a">${name} ${w}×${h}</text>`
+      : "") +
+    "</svg>";
+  // encodeURIComponent leaves ' alone, which would end a single-quoted src early.
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg).replace(/'/g, "%27")}`;
+}
+
+/** Image addresses that point at nothing a mail client (or this page) can fetch. */
+const LOCAL_SRC = /^(?!(?:https?:|data:|cid:|\/\/|%|\{\{|\*\|))[^"'\s]/i;
+
 /** What the preview frame is given: the output, minus whatever is switched off, plus the dark mode treatment. */
 function previewSource(src: string, imagesOff: boolean, stylesOff: boolean, dark: DarkMode, outlines = false): string {
   let out = src;
   if (stylesOff) out = out.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "");
+  if (!imagesOff) {
+    // Images that only exist on the sender's computer show as sized stand-ins.
+    out = out.replace(/<img\b[^>]*>/gi, (tag) =>
+      tag.replace(/(\ssrc\s*=\s*)(["'])([^"']*)\2/i, (m, pre: string, q: string, path: string) =>
+        LOCAL_SRC.test(path.trim()) ? `${pre}${q}${placeholderImage(tag, path.trim())}${q} data-ec-placeholder="${path.replace(/"/g, "&quot;")}"` : m,
+      ),
+    );
+  }
   if (imagesOff) {
     out = out
       .replace(/(<img\b[^>]*?\s)src\s*=/gi, "$1data-src=")
@@ -1213,10 +1253,17 @@ export default function EmailCheck() {
                         &quot;{c.text}&quot;{c.large ? " (large text)" : ""} <Sources list={NOTE_SOURCES.contrast} />
                       </p>
                       <Where lines={linesWhere(output, (l) => new RegExp(`(?<![-\\w])color\\s*:\\s*${escapeRegExp(c.color)}`, "i").test(l))} />
-                      <HowToFix
-                        text={`Darken or lighten the text until it reaches ${c.required}:1. The nearest shade of this colour that passes on ${c.background} is ${c.suggestion}. If the colour is a brand colour you cannot change, make the text larger and bold (24px, or 19px bold, needs only 3:1) or change the background.`}
-                        code={`color: ${c.suggestion};`}
-                      />
+                      {c.suggestion ? (
+                        <HowToFix
+                          text={`Darken or lighten the text until it reaches ${c.required}:1. The nearest shade of this colour that passes on ${c.background} is ${c.suggestion}. If the colour is a brand colour you cannot change, make the text larger and bold (24px, or 19px bold, needs only 3:1) or change the background.`}
+                          code={`color: ${c.suggestion};`}
+                        />
+                      ) : (
+                        <HowToFix
+                          text={`No shade of the text reaches ${c.required}:1 on ${c.background}, not even pure black or white, so the background has to change.${c.backgroundSuggestion ? ` The nearest shade of the background that passes with ${c.color} is ${c.backgroundSuggestion}.` : ""} Larger bold text (24px, or 19px bold) needs only 3:1.`}
+                          code={c.backgroundSuggestion ? `background-color: ${c.backgroundSuggestion};` : undefined}
+                        />
+                      )}
                     </li>
                   ))}
                   {a11y.contrastUnknown > 0 && (
